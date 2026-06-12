@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>采购申请 - 新能源物资供应链管理系统</title>
+  <link rel="stylesheet" href="css/vendor/fa-all.min.css" />
+  <link rel="stylesheet" href="css/subpage-base.css" />
+  <link rel="stylesheet" href="css/carrier-management.css" />
+  <link rel="stylesheet" href="css/source-navbar-header.css" />
+  <style>
+    .pa-role-bar { display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:10px; font-size:13px; color:#516a87; }
+    .pa-role-bar select { height:32px; border:1px solid #d9d9d9; border-radius:6px; min-width:280px; padding:0 8px; }
+    .pa-toolbar-grid { display:flex; flex-wrap:wrap; gap:10px; align-items:flex-end; margin-bottom:12px; padding:12px; background:#fff; border:1px solid #edf2f8; border-radius:8px; }
+    .pa-toolbar-grid label { display:block; font-size:12px; color:#62788f; margin-bottom:4px; }
+    .pa-empty { text-align:center; padding:24px !important; color:#8c8c8c; }
+    .pa-ops { display:inline-flex; gap:8px; flex-wrap:wrap; max-width:340px; align-items:center; }
+    .pa-ops .carrier-btn-add{
+      min-height:auto;padding:0;border:none;background:transparent;box-shadow:none;
+      color:#1677ff;font-size:14px;font-weight:600;line-height:1.2;text-decoration:none;
+    }
+    .pa-ops .carrier-btn-add:hover{ color:#4096ff; text-decoration:underline; }
+    .pa-tag { display:inline-flex; align-items:center; height:22px; padding:0 8px; border-radius:4px; border:1px solid transparent; font-size:12px; }
+    .pa-tag.draft { background:#fafafa; border-color:#d9d9d9; color:#595959; }
+    .pa-tag.pending { background:#fff7e6; border-color:#ffd591; color:#d48806; }
+    .pa-tag.pass { background:#f6ffed; border-color:#b7eb8f; color:#389e0d; }
+    .pa-tag.reject { background:#fff1f0; border-color:#ffccc7; color:#cf1322; }
+    .pa-hint { display:inline-flex; align-items:center; justify-content:center; width:16px; height:16px; margin-left:4px; border-radius:50%; border:1px solid #91caff; color:#1677ff; font-size:11px; cursor:help; position:relative; }
+    .pa-hint-tip { display:none; position:absolute; left:0; bottom:100%; margin-bottom:6px; z-index:50; width:260px; padding:8px 10px; background:#1f2d3d; color:#fff; font-size:12px; line-height:1.45; border-radius:6px; }
+    .pa-hint:hover .pa-hint-tip, .pa-hint:focus .pa-hint-tip { display:block; }
+    .pa-modal-mask { position:fixed; inset:0; background:rgba(0,0,0,.45); display:none; align-items:center; justify-content:center; z-index:2400; padding:16px; box-sizing:border-box; }
+    .pa-modal-mask.show { display:flex; }
+    .pa-dialog { width:100%; max-height:92vh; background:#fff; border-radius:10px; overflow:hidden; display:flex; flex-direction:column; box-shadow:0 16px 48px rgba(0,0,0,.2); }
+    .pa-dialog.w900{ max-width:900px; } .pa-dialog.w700{ max-width:700px; } .pa-dialog.w600{ max-width:600px; } .pa-dialog.w460{ max-width:460px; }
+    .pa-hd{ padding:12px 16px; border-bottom:1px solid #edf2f8; display:flex; justify-content:space-between; align-items:center; font-weight:600; }
+    .pa-bd{ padding:14px 16px; overflow:auto; font-size:13px; }
+    .pa-ft{ padding:10px 16px; border-top:1px solid #edf2f8; display:flex; justify-content:flex-end; gap:8px; flex-wrap:wrap; }
+    .pa-form-grid{ display:grid; gap:10px; margin-bottom:10px; }
+    .pa-form-grid-2{ grid-template-columns:1fr 1fr; }
+    @media (max-width:900px){ .pa-form-grid-2{ grid-template-columns:1fr; } }
+    .pa-form-full{ grid-column:1 / -1; }
+    .pa-sec{ margin:14px 0 8px; font-size:14px; color:#1f3551; border-left:3px solid #1677ff; padding-left:8px; }
+    .pa-req{ color:#cf1322; }
+    .pa-steps{ display:flex; gap:8px; flex-wrap:wrap; margin-bottom:12px; }
+    .pa-step{ padding:6px 10px; border-radius:6px; border:1px solid #d9d9d9; background:#fafafa; color:#8c8c8c; font-size:12px; }
+    .pa-step.done{ background:#f6ffed; border-color:#b7eb8f; color:#389e0d; }
+    .pa-step.active{ background:#e6f4ff; border-color:#91caff; color:#1677ff; }
+  </style>
+</head>
+<body class="page-source-navbar page-subpage page-procurement-apply">
+  <div class="page-bg" aria-hidden="true"></div>
+  <div class="app">
+    <header class="header">
+      <div class="header-left">
+        <button type="button" class="header-hamburger" aria-label="菜单" title="菜单"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+        <a class="header-logo" href="#" aria-label="国家能源集团"><img src="assets/logo-chenergy.png" alt="国家能源集团 CHN ENERGY" width="220" height="40" /></a>
+        <div class="header-source-brand"><p>新能源供应链管理系统</p></div>
+      </div>
+      <div class="header-right"><span class="clock" id="clock"></span><div class="user-avatar" title="用户">用</div></div>
+    </header>
+    <div class="layout">
+      <aside class="sidebar" aria-label="主导航">
+        <div class="nav-item" title="我的资产"><span class="nav-label">我的资产</span></div>
+        <div class="nav-item" title="我的任务"><span class="nav-label">我的任务</span></div>
+        <a class="nav-item" href="index-portal-screen-alt.html" title="首页"><span class="nav-label">首页</span></a>
+        <div class="nav-item" title="驾驶舱"><span class="nav-label">驾驶舱</span></div>
+        <div class="nav-item nav-item--module-active" title="采购管理"><span class="nav-label">采购管理</span></div>
+        <div class="nav-item" title="物流管理"><span class="nav-label">物流管理</span></div>
+        <div class="nav-item" title="仓储管理"><span class="nav-label">仓储管理</span></div>
+        <div class="nav-item" title="物资采购"><span class="nav-label">物资采购</span></div>
+        <div class="nav-item" title="物资出库与处置"><span class="nav-label">物资出库与处置</span></div>
+        <div class="nav-item" title="绩效考核"><span class="nav-label">绩效考核</span></div>
+        <div class="nav-item" title="公告管理"><span class="nav-label">公告管理</span></div>
+        <div class="nav-item" title="综合业务管理"><span class="nav-label">综合业务管理</span></div>
+        <div class="nav-item" title="数据管理"><span class="nav-label">数据管理</span></div>
+        <div class="nav-item" title="开发工具"><span class="nav-label">开发工具</span></div>
+        <div class="nav-item" title="设置"><span class="nav-label">设置</span></div>
+        <div class="nav-item" title="系统管理"><span class="nav-label">系统管理</span></div>
+      </aside>
+      <main class="main-scroll">
+        <nav class="subpage-breadcrumb" aria-label="面包屑"><a href="index-portal-screen-alt.html">首页</a><span class="sep">/</span><span>采购管理</span><span class="sep">/</span><span>采购申请</span></nav>
+        <div class="carrier-main-inner">
+          <h1 class="carrier-page-title">采购申请</h1>
+          <div class="pa-role-bar">
+            <span>演示角色（权限）</span>
+            <select id="paRole">
+              <option value="dept_asset">部门资产专责（可新建/编辑/提交/删除本部门）</option>
+              <option value="dept_material">部门物资专责（可新建/编辑/提交/删除本部门）</option>
+              <option value="dept_head">部门主管（本部门查看/审批）</option>
+              <option value="leader">主管领导（分管部门审批）</option>
+              <option value="corp_specialist">公司采购专责（王卿明，仅查看+生成采购计划）</option>
+              <option value="corp_head">公司采购主管（王超，审批所有）</option>
+              <option value="director">董事/总经理（仅查看）</option>
+            </select>
+          </div>
+          <div class="pa-toolbar-grid">
+            <div><label for="paFNo">申请单号</label><input id="paFNo" class="carrier-search" placeholder="CG-YYYYMMDD-XXXX" /></div>
+            <div><label for="paFDept">申请部门</label><select id="paFDept" class="carrier-select"></select></div>
+            <div><label for="paFMaterial">物资名称</label><input id="paFMaterial" class="carrier-search" placeholder="支持模糊搜索" /></div>
+            <div><label for="paFStatus">审批状态</label><select id="paFStatus" class="carrier-select"><option value="">全部</option><option>草稿</option><option>审批中</option><option>已通过</option><option>已驳回</option><option>已撤回</option></select></div>
+            <div><label>申请时间起</label><input id="paFDate0" type="date" class="carrier-search" /></div>
+            <div><label>申请时间止</label><input id="paFDate1" type="date" class="carrier-search" /></div>
+            <div style="display:flex;gap:8px;align-items:flex-end;padding-top:18px;flex-wrap:wrap">
+              <button type="button" class="carrier-btn-add" id="paBtnSearch">搜索</button>
+              <button type="button" class="carrier-btn-add" id="paBtnReset" style="background:#fff;color:#1677ff;border:1px solid #91caff">重置</button>
+              <button type="button" class="carrier-btn-add" id="paBtnNew"><i class="fa-solid fa-plus"></i> 新建</button>
+          </div>
+        </div>
+          <div class="carrier-table-wrap">
+            <table class="carrier-table" style="min-width:2600px">
+              <thead><tr><th>申请单号</th><th>项目名称</th><th>物资名称</th><th>规格型号</th><th>物资类别</th><th>计划数量</th><th>单位</th><th>预算单价（元）</th><th>预算总价（元）</th><th>需求日期</th><th>申请部门</th><th>申请人</th><th>申请时间</th><th>紧急程度</th><th>是否关联年度计划</th><th>审批状态</th><th>当前审批节点</th><th>备注</th><th style="min-width:220px">操作</th></tr></thead>
+              <tbody id="paTableBody"></tbody>
+          </table>
+        </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <div id="paModalEdit" class="pa-modal-mask" role="dialog"><div class="pa-dialog w900"><div class="pa-hd"><span id="paModalEditTitle">新建采购申请</span><button type="button" class="carrier-btn-add" data-close style="padding:4px 10px">&times;</button></div><div class="pa-bd" id="paModalEditBody"></div><div class="pa-ft" id="paEditFooter"><button type="button" class="carrier-btn-add" id="paBtnSaveDraft" style="background:#fff;color:#1677ff;border:1px solid #91caff">保存草稿</button><button type="button" class="carrier-btn-add" id="paBtnSubmit">提交审批</button><button type="button" class="carrier-btn-add" data-close style="background:#fff;color:#595959;border:1px solid #d9d9d9">取消</button></div></div></div>
+
+  <div id="paModalApprove" class="pa-modal-mask" role="dialog"><div class="pa-dialog w700"><div class="pa-hd">采购申请审批 <button type="button" class="carrier-btn-add" data-close style="padding:4px 10px">&times;</button></div><div class="pa-bd"><p id="paApprInfo"></p><div id="paApprPreview" style="margin:8px 0"></div><label>审批预算(万元，不能超过申请预算)</label><input id="paApprBudget" type="number" class="carrier-search" /><p id="paApprWarn" style="font-size:12px;color:#cf1322;display:none">审批预算不能超过申请预算</p><label>审批意见（必填）</label><textarea id="paApprOpinion" rows="3" style="width:100%;box-sizing:border-box;border:1px solid #d9d9d9;border-radius:6px;padding:8px;margin-top:6px"></textarea><p style="margin-top:8px;font-size:12px;color:#62788f">附件上传：<input type="file" /></p><div style="display:flex;gap:8px;margin-top:10px"><button class="carrier-btn-add" id="paApprPass" style="background:#f6ffed;color:#389e0d;border:1px solid #b7eb8f">通过</button><button class="carrier-btn-add" id="paApprReject" style="background:#fff1f0;color:#cf1322;border:1px solid #ffccc7">驳回</button></div></div><div class="pa-ft"><button type="button" class="carrier-btn-add" id="paApprOk">提交审批结果</button><button type="button" class="carrier-btn-add" data-close style="background:#fff;color:#595959;border:1px solid #d9d9d9">取消</button></div></div></div>
+
+  <div id="paModalProgress" class="pa-modal-mask" role="dialog"><div class="pa-dialog w700"><div class="pa-hd">审批进度 <button type="button" class="carrier-btn-add" data-close style="padding:4px 10px">&times;</button></div><div class="pa-bd"><div class="pa-steps" id="paSteps"></div><div class="carrier-table-wrap"><table class="carrier-table"><thead><tr><th>节点名称</th><th>审批人</th><th>审批时间</th><th>审批结果</th><th>审批意见</th></tr></thead><tbody id="paProgressBody"></tbody></table></div></div><div class="pa-ft"><button type="button" class="carrier-btn-add" data-close>取消</button></div></div></div>
+
+  <div id="paModalPlan" class="pa-modal-mask" role="dialog"><div class="pa-dialog w600"><div class="pa-hd">生成采购计划 <button type="button" class="carrier-btn-add" data-close style="padding:4px 10px">&times;</button></div><div class="pa-bd"><label>关联采购计划</label><select id="paPlanSelect" class="carrier-select"><option>采购计划A-华北备件项目</option><option>采购计划B-运维改造项目</option><option value="new">新建采购计划</option></select><div id="paNewPlanWrap" style="display:none;margin-top:10px" class="pa-form-grid pa-form-grid-2"><div><label>项目名称</label><input id="paNewPlanName" class="carrier-search" /></div><div><label>预算(万元)</label><input id="paNewPlanBudget" type="number" class="carrier-search" /></div><div class="pa-form-full"><label>业务部门</label><input id="paNewPlanDept" class="carrier-search" /></div></div><p style="margin-top:10px;font-size:12px;color:#62788f">确认后，采购申请中的物资明细将自动带入采购计划物资明细。</p></div><div class="pa-ft"><button type="button" class="carrier-btn-add" id="paPlanOk">确认生成</button><button type="button" class="carrier-btn-add" data-close style="background:#fff;color:#595959;border:1px solid #d9d9d9">取消</button></div></div></div>
+
+  <div id="paModalWithdraw" class="pa-modal-mask" role="dialog"><div class="pa-dialog w460"><div class="pa-hd">撤回确认 <button type="button" class="carrier-btn-add" data-close style="padding:4px 10px">&times;</button></div><div class="pa-bd">确认撤回该采购申请吗？撤回后状态将变为草稿，可重新编辑提交。</div><div class="pa-ft"><button type="button" class="carrier-btn-add" id="paWithdrawOk">确认</button><button type="button" class="carrier-btn-add" data-close style="background:#fff;color:#595959;border:1px solid #d9d9d9">取消</button></div></div></div>
+  <div id="paModalDelete" class="pa-modal-mask" role="dialog"><div class="pa-dialog w460"><div class="pa-hd">删除确认 <button type="button" class="carrier-btn-add" data-close style="padding:4px 10px">&times;</button></div><div class="pa-bd">确认删除该采购申请吗？删除后不可恢复。</div><div class="pa-ft"><button type="button" class="carrier-btn-add" id="paDeleteOk" style="background:#fff1f0;color:#cf1322;border:1px solid #ffccc7">确认删除</button><button type="button" class="carrier-btn-add" data-close style="background:#fff;color:#595959;border:1px solid #d9d9d9">取消</button></div></div></div>
+  <div id="paModalSubmit" class="pa-modal-mask" role="dialog"><div class="pa-dialog w460"><div class="pa-hd">提交确认 <button type="button" class="carrier-btn-add" data-close style="padding:4px 10px">&times;</button></div><div class="pa-bd">确认提交审批吗？提交后将无法编辑，请确认信息填写完整。</div><div class="pa-ft"><button type="button" class="carrier-btn-add" id="paSubmitOk">确认提交</button><button type="button" class="carrier-btn-add" data-close style="background:#fff;color:#595959;border:1px solid #d9d9d9">取消</button></div></div></div>
+
+  <script src="js/sidebar-actions.js"></script>
+  <script src="js/site-footer.js"></script>
+  <script src="js/subpage-clock.js"></script>
+  <script src="js/subpage-feature-title.js"></script>
+  <script src="js/procurement-application-prototype.js"></script>
+</body>
+</html>

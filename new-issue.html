@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>表单中心 - 新能源物资供应链管理系统</title>
+  <link rel="stylesheet" href="css/vendor/fa-all.min.css" />
+  <link rel="stylesheet" href="css/subpage-base.css" />
+  <link rel="stylesheet" href="css/source-navbar-header.css" />
+  <style>
+    .ni-wrap { padding: 12px 16px 20px; max-width: 1120px; margin: 0 auto; }
+    .ni-hint {
+      background: #fff7e6; border: 1px solid #ffd591; color: #d48806;
+      border-radius: 10px; padding: 10px 12px; font-size: 13px; margin: 10px 0 14px;
+    }
+    .ni-title { font-size: 20px; color: #1f3551; margin: 0 0 8px; font-weight: 700; }
+    .ni-subtitle { color: #516a87; font-size: 14px; margin: 0 0 14px; }
+    .ni-grid {
+      display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px;
+    }
+    @media (max-width: 1100px) { .ni-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+    @media (max-width: 760px) { .ni-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+    @media (max-width: 460px) { .ni-grid { grid-template-columns: 1fr; } }
+    .ni-card {
+      background: #fff; border: 1px solid #e8eef5; border-radius: 14px;
+      box-shadow: 0 10px 24px rgba(2, 6, 23, 0.05);
+      cursor: pointer; padding: 14px 12px; text-align: center;
+      min-height: 124px; display: flex; flex-direction: column; align-items: center; justify-content: center;
+      transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+    .ni-card:hover { transform: translateY(-2px); border-color: #91caff; box-shadow: 0 14px 30px rgba(2,6,23,.08); }
+    .ni-card:active { transform: translateY(0); }
+    .ni-card .ni-ico { font-size: 30px; line-height: 1; }
+    .ni-card .ni-name { margin-top: 10px; font-weight: 800; font-size: 14px; color: #1f3551; }
+    .ni-card .ni-desc { margin-top: 6px; font-size: 12px; color: #516a87; line-height: 1.45; }
+
+    .ni-modal-mask {
+      position: fixed; inset: 0; z-index: 2400;
+      background: rgba(0, 0, 0, .45);
+      display: none; align-items: center; justify-content: center;
+      padding: 16px; box-sizing: border-box;
+    }
+    .ni-modal-mask.show { display: flex; }
+    .ni-dialog {
+      width: min(800px, 96vw);
+      max-height: 90vh; overflow: auto;
+      background: #fff; border-radius: 12px; border: 1px solid #dbe6f3;
+      box-shadow: 0 16px 48px rgba(0,0,0,.2);
+      display: flex; flex-direction: column;
+    }
+    .ni-hd { padding: 12px 16px; border-bottom: 1px solid #edf2f8; display: flex; justify-content: space-between; align-items: center; font-weight: 700; color: #1f3551; }
+    .ni-x {
+      border: none; background: transparent; cursor: pointer; font-size: 20px; color: #7a8fa8; line-height: 1;
+    }
+    .ni-bd { padding: 14px 16px; font-size: 13px; color: #2f435d; }
+    .ni-ft { padding: 10px 16px; border-top: 1px solid #edf2f8; display: flex; justify-content: flex-end; gap: 10px; flex-wrap: wrap; }
+    .ni-form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    @media (max-width: 760px) { .ni-form-grid { grid-template-columns: 1fr; } }
+    .ni-field { display: flex; flex-direction: column; gap: 4px; }
+    .ni-field label { font-size: 12px; color: #62788f; }
+    .ni-field input, .ni-field select, .ni-field textarea {
+      border: 1px solid #d9d9d9; border-radius: 8px;
+      height: 34px; padding: 0 10px; font-size: 13px; color: #1f2937;
+      outline: none;
+    }
+    .ni-field textarea { height: 92px; padding-top: 8px; resize: vertical; }
+    .ni-form-row { grid-column: 1 / -1; }
+    .ni-primary { background: #1890ff; border: 1px solid #1890ff; color: #fff; }
+    .ni-primary:hover { background: #40a9ff; border-color: #40a9ff; }
+    .ni-btn {
+      height: 32px; padding: 0 14px; border-radius: 8px;
+      border: 1px solid #d9d9d9; background: #fff; cursor: pointer;
+      font-family: inherit; font-size: 13px; color: #2f435d;
+    }
+    .ni-btn:hover { border-color: #91caff; }
+    .ni-sheet-title {
+      text-align: center; font-size: 16px; font-weight: 700; color: #1f3551; margin: 4px 0 12px;
+    }
+    .ni-sheet-meta { display: flex; justify-content: space-between; align-items: center; color: #5f738b; font-size: 12px; margin-bottom: 8px; }
+    .ni-sheet-grid { width: 100%; border-collapse: collapse; table-layout: fixed; font-size: 13px; }
+    .ni-sheet-grid td { border: 1px solid #e8eef5; padding: 0; }
+    .ni-sheet-grid .lab {
+      width: 16%; background: #f6f8fb; color: #3f5366; text-align: right; padding: 8px 10px; box-sizing: border-box;
+    }
+    .ni-sheet-grid .cell { width: 34%; padding: 6px 8px; box-sizing: border-box; background: #fff; }
+    .ni-sheet-grid input, .ni-sheet-grid textarea, .ni-sheet-grid select {
+      width: 100%; border: 1px solid #d9d9d9; border-radius: 4px; height: 32px; padding: 0 8px; font-size: 13px; box-sizing: border-box;
+    }
+    .ni-sheet-grid textarea { min-height: 66px; resize: vertical; padding-top: 6px; }
+    .ni-req { color: #cf1322; margin-right: 2px; }
+    .ni-pending-box { margin-top: 12px; border: 1px solid #e8eef5; border-radius: 8px; overflow: hidden; }
+    .ni-pending-hd {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 8px 10px; background: #f8fafc; color: #1f3551; font-weight: 700; font-size: 13px;
+    }
+    .ni-pending-btn {
+      border: 1px solid #1890ff; background: #1890ff; color: #fff; border-radius: 4px; height: 28px; padding: 0 10px; cursor: pointer;
+      font-size: 12px;
+    }
+    .ni-pending-btn:hover { background: #40a9ff; border-color: #40a9ff; }
+    .ni-pending-table { width: 100%; border-collapse: collapse; font-size: 12px; table-layout: fixed; }
+    .ni-pending-table th, .ni-pending-table td { border-top: 1px solid #edf1f6; padding: 8px 6px; text-align: center; }
+    .ni-pending-table th { background: #f6f8fb; color: #4d6480; }
+  </style>
+</head>
+<body class="page-source-navbar page-subpage">
+  <div class="app">
+    <header class="header">
+      <div class="header-left">
+        <button type="button" class="header-hamburger" aria-label="菜单">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+        </button>
+        <a class="header-logo" href="#"><img src="assets/logo-chenergy.png" alt="" width="220" height="40" /></a>
+        <div class="header-source-brand"><p>新能源供应链管理系统</p></div>
+      </div>
+      <div class="header-right"><span class="clock" id="clock"></span><div class="user-avatar" title="用户">用</div></div>
+    </header>
+
+    <div class="layout">
+      <!-- 保留现有样式：左侧侧边栏（此处仅用于本页原型，避免依赖自动补齐逻辑） -->
+      <aside class="sidebar" aria-label="主导航">
+        <div class="nav-item" title="我的资产"><span class="nav-label">我的资产</span></div>
+        <div class="nav-item nav-item--module-active" title="表单中心"><span class="nav-label">表单中心</span></div>
+        <div class="nav-item" title="我的任务"><span class="nav-label">我的任务</span></div>
+        <a class="nav-item" href="index-portal-screen-alt.html" title="首页"><span class="nav-label">首页</span></a>
+        <div class="nav-item" title="驾驶舱"><span class="nav-label">驾驶舱</span></div>
+        <div class="nav-item" title="采购管理"><span class="nav-label">采购管理</span></div>
+        <div class="nav-item" title="物流管理"><span class="nav-label">物流管理</span></div>
+        <div class="nav-item" title="仓储管理"><span class="nav-label">仓储管理</span></div>
+        <div class="nav-item" title="物资采购"><span class="nav-label">物资采购</span></div>
+        <div class="nav-item" title="物资出库与处置"><span class="nav-label">物资出库与处置</span></div>
+        <div class="nav-item" title="绩效考核"><span class="nav-label">绩效考核</span></div>
+        <div class="nav-item" title="公告管理"><span class="nav-label">公告管理</span></div>
+        <div class="nav-item" title="综合业务管理"><span class="nav-label">综合业务管理</span></div>
+        <div class="nav-item" title="数据管理"><span class="nav-label">数据管理</span></div>
+        <div class="nav-item" title="开发工具"><span class="nav-label">开发工具</span></div>
+        <div class="nav-item" title="设置"><span class="nav-label">设置</span></div>
+        <div class="nav-item" title="系统管理"><span class="nav-label">系统管理</span></div>
+      </aside>
+
+      <main class="main-scroll">
+        <div class="carrier-main-inner">
+          <nav class="subpage-breadcrumb" aria-label="面包屑">
+            <a href="index-portal-screen-alt.html">首页</a><span class="sep">/</span><span>表单中心</span>
+          </nav>
+
+          <h1 class="carrier-page-title">表单中心</h1>
+          <div class="ni-hint">该页面提示此 重要约束】：演示原型仅本地写入数据，不接入真实后端审批。</div>
+          <div class="ni-subtitle">下方显示可发起的事项类型（不同角色显示的卡片会不同）。</div>
+
+          <div class="ni-grid" id="niCardGrid"></div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- 事项弹窗 -->
+  <div class="ni-modal-mask" id="niMask" aria-hidden="true">
+    <div class="ni-dialog" role="dialog" aria-modal="true" aria-label="事项表单">
+      <div class="ni-hd">
+        <span id="niModalTitle">事项表单</span>
+        <button type="button" class="ni-x" id="niX" aria-label="关闭">×</button>
+      </div>
+      <div class="ni-bd">
+        <div id="niModalBody"></div>
+      </div>
+      <div class="ni-ft" data-skip-demo-unify>
+        <button type="button" class="ni-btn" id="niBtnDraft">保存草稿</button>
+        <button type="button" class="ni-btn ni-primary" id="niBtnSubmit">提交审批</button>
+        <button type="button" class="ni-btn" id="niBtnCancel">取消</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/map-demo-toast.js"></script>
+  <script src="js/subpage-clock.js"></script>
+  <script>
+    (function () {
+      var CARD_KEY = "map_new_issue_cards_v1";
+      var DRAFT_KEY = "map_new_issue_drafts_v1";
+      var TASK_KEY = "map_new_issue_tasks_v1";
+      var REQUEST_KEY = "map_new_issue_requests_v1";
+
+      var cards = [
+        { id: "purchase-apply", title: "采购申请", icon: "📦", desc: "发起新的采购计划申请", requiredModule: "purchaseMgmt" },
+        { id: "use-apply", title: "领用申请", icon: "📋", desc: "发起内部领用物资申请", requiredModule: "warehouse" },
+        { id: "return-exchange", title: "退换货申请", icon: "🔄", desc: "发起退货或换货申请", requiredModule: "purchaseMgmt" },
+        { id: "order-demand", title: "订单需求", icon: "🛒", desc: "项目公司发起采购订单", requiredModule: "purchaseMgmt" },
+        { id: "sales-contract", title: "销售合同", icon: "✍️", desc: "发起销售合同签订", requiredModule: "purchaseMgmt" },
+        { id: "inbound-apply", title: "入库申请", icon: "📥", desc: "发起货物入库申请", requiredModule: "purchaseMgmt" },
+        { id: "accept-apply", title: "验收申请", icon: "✅", desc: "发起货物验收申请", requiredModule: "purchaseMgmt" }
+      ];
+
+      var fallbackCard = { id: "other", title: "其他", icon: "📄", desc: "其他类型的申请", requiredModule: "" };
+
+      function getRole() {
+        try {
+          if (typeof window.getCurrentRole === "function") return window.getCurrentRole();
+        } catch (e) {}
+        try {
+          var rid = sessionStorage.getItem("demoOrgRoleId") || "";
+          return { id: rid, modules: "all" };
+        } catch (e2) {}
+        return null;
+      }
+
+      function roleModulesOk(role, required) {
+        if (!required) return true;
+        if (!role || role.modules == null) return true;
+        var ms = role.modules;
+        if (ms === "all") return true;
+        if (typeof ms === "string") return ms === required;
+        if (Array.isArray(ms)) return ms.indexOf(required) >= 0;
+        return true;
+      }
+
+      function esc(s) {
+        return String(s == null ? "" : s)
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;");
+      }
+
+      function nowText() {
+        var d = new Date();
+        function p(n) { return String(n).padStart(2, "0"); }
+        return d.getFullYear() + "-" + p(d.getMonth() + 1) + "-" + p(d.getDate()) + " " + p(d.getHours()) + ":" + p(d.getMinutes());
+      }
+
+      var role = getRole();
+      var grid = document.getElementById("niCardGrid");
+
+      function renderCards() {
+        var list = [];
+        for (var i = 0; i < cards.length; i++) {
+          var c = cards[i];
+          if (roleModulesOk(role, c.requiredModule)) list.push(c);
+        }
+        // “其他”始终保底可见
+        list.push(fallbackCard);
+        grid.innerHTML = list
+          .map(function (c) {
+            return (
+              '<div class="ni-card" role="button" tabindex="0" data-card-id="' + esc(c.id) + '">' +
+              '<div class="ni-ico">' + esc(c.icon) + "</div>" +
+              '<div class="ni-name">' + esc(c.title) + "</div>" +
+              '<div class="ni-desc">' + esc(c.desc) + "</div>" +
+              "</div>"
+            );
+          })
+          .join("");
+      }
+
+      function buildForm(cardId) {
+        // 每种事项只提供“演示字段”，提交后写入 localStorage 即可。
+        if (cardId === "purchase-apply") {
+          return (
+            '<div class="ni-sheet-title">采购申请审批单</div>' +
+            '<div class="ni-sheet-meta"><span>归档：请选择</span><span>表单编号：TASK-1</span></div>' +
+            '<table class="ni-sheet-grid">' +
+            '  <tr>' +
+            '    <td class="lab"><span class="ni-req">*</span>申请单号</td><td class="cell"><input id="f-no" placeholder="CG-YYYYMMDD-XXXX" /></td>' +
+            '    <td class="lab"><span class="ni-req">*</span>提报时间</td><td class="cell"><input id="f-time" value="2026-04-29 18:30" /></td>' +
+            '  </tr>' +
+            '  <tr>' +
+            '    <td class="lab"><span class="ni-req">*</span>申请部门</td><td class="cell"><input id="f-dept" placeholder="示例：经营发展中心" /></td>' +
+            '    <td class="lab"><span class="ni-req">*</span>申请人</td><td class="cell"><input id="f-user" placeholder="示例：王五" /></td>' +
+            '  </tr>' +
+            '  <tr>' +
+            '    <td class="lab"><span class="ni-req">*</span>物资名称</td><td class="cell"><input id="f-material" placeholder="例如：智能风机控制器" /></td>' +
+            '    <td class="lab"><span class="ni-req">*</span>规格型号</td><td class="cell"><input id="f-spec" placeholder="例如：V2.0" /></td>' +
+            '  </tr>' +
+            '  <tr>' +
+            '    <td class="lab"><span class="ni-req">*</span>计划数量</td><td class="cell"><input id="f-qty" placeholder="例如：100" /></td>' +
+            '    <td class="lab"><span class="ni-req">*</span>需求日期</td><td class="cell"><input type="date" id="f-date" /></td>' +
+            '  </tr>' +
+            '  <tr>' +
+            '    <td class="lab">预算单价（元）</td><td class="cell"><input id="f-price" placeholder="例如：1200" /></td>' +
+            '    <td class="lab">预算总价（元）</td><td class="cell"><input id="f-total" placeholder="例如：120000" /></td>' +
+            '  </tr>' +
+            '  <tr>' +
+            '    <td class="lab"><span class="ni-req">*</span>备注</td>' +
+            '    <td class="cell" colspan="3"><textarea id="f-remark" placeholder="选填：补充说明"></textarea></td>' +
+            '  </tr>' +
+            '</table>'
+          );
+        }
+        if (cardId === "use-apply") {
+          return (
+            '<div class="ni-sheet-title">领用申请审批单</div>' +
+            '<div class="ni-sheet-meta"><span>归档：请选择</span><span>表单编号：TASK-1</span></div>' +
+            '<table class="ni-sheet-grid">' +
+            '  <tr>' +
+            '    <td class="lab"><span class="ni-req">*</span>领用单号</td><td class="cell"><input id="f-no" value="LY-202604-087" /></td>' +
+            '    <td class="lab"><span class="ni-req">*</span>提报时间</td><td class="cell"><input id="f-time" value="2024-12-09 11:17:23" /></td>' +
+            '  </tr>' +
+            '  <tr>' +
+            '    <td class="lab"><span class="ni-req">*</span>领用部门</td><td class="cell"><input id="f-dept" value="机械所" /></td>' +
+            '    <td class="lab"><span class="ni-req">*</span>领用人</td><td class="cell"><input id="f-user" value="王五" /></td>' +
+            '  </tr>' +
+            '  <tr>' +
+            '    <td class="lab"><span class="ni-req">*</span>合同编号</td><td class="cell"><input id="f-contract" value="HT-2026-309" /></td>' +
+            '    <td class="lab"><span class="ni-req">*</span>流转批次号</td><td class="cell"><input id="f-batch" value="BATCH-20260429-473" /></td>' +
+            '  </tr>' +
+            '  <tr>' +
+            '    <td class="lab"><span class="ni-req">*</span>上游流转部门</td><td class="cell"><input id="f-upstream" value="电控所" /></td>' +
+            '    <td class="lab"><span class="ni-req">*</span>流转时间</td><td class="cell"><input id="f-transfer-time" value="2026-04-29 12:45" /></td>' +
+            '  </tr>' +
+            '  <tr>' +
+            '    <td class="lab"><span class="ni-req">*</span>物资名称</td><td class="cell"><input id="f-material" value="智能风机控制器" /></td>' +
+            '    <td class="lab"><span class="ni-req">*</span>规格型号</td><td class="cell"><input id="f-spec" value="V2.0" /></td>' +
+            '  </tr>' +
+            '  <tr>' +
+            '    <td class="lab"><span class="ni-req">*</span>申请数量</td><td class="cell"><input id="f-qty" value="12" /></td>' +
+            '    <td class="lab"><span class="ni-req">*</span>库存数量</td><td class="cell"><input id="f-stock" value="80" /></td>' +
+            '  </tr>' +
+            '  <tr>' +
+            '    <td class="lab"><span class="ni-req">*</span>领用用途</td><td class="cell"><input id="f-reason" value="故障维修" /></td>' +
+            '    <td class="lab">要求到货时间</td><td class="cell"><input id="f-date" value="2026-05-02" /></td>' +
+            '  </tr>' +
+            '</table>' +
+            '<div class="ni-pending-box">' +
+            '  <div class="ni-pending-hd"><span>待领用物资清单</span><button type="button" class="ni-pending-btn" id="f-pick-btn">选中后发起领用申请</button></div>' +
+            '  <table class="ni-pending-table">' +
+            '    <thead><tr><th>选择</th><th>合同编号</th><th>物资名称</th><th>规格型号</th><th>可领用数量</th><th>流转批次号</th><th>上游流转部门</th><th>流转时间</th></tr></thead>' +
+            '    <tbody>' +
+            '      <tr><td><input type="radio" name="fPick" checked /></td><td>HT-2026-309</td><td>智能风机控制器</td><td>V2.0</td><td>20</td><td>BATCH-20260429-473</td><td>电控所</td><td>2026-04-29 12:45</td></tr>' +
+            '      <tr><td><input type="radio" name="fPick" /></td><td>HT-2026-309</td><td>变桨系统</td><td>XH-109</td><td>18</td><td>BATCH-202604-03</td><td>电控所</td><td>2026-04-27 16:05</td></tr>' +
+            '      <tr><td><input type="radio" name="fPick" /></td><td>HT-2026-311</td><td>IGBT驱动板</td><td>V3.1</td><td>12</td><td>BATCH-202604-05</td><td>电控所</td><td>2026-04-28 09:22</td></tr>' +
+            '    </tbody>' +
+            '  </table>' +
+            '</div>'
+          );
+        }
+        if (cardId === "return-exchange") {
+          return (
+            '<div class="ni-form-grid">' +
+            '  <div class="ni-field"><label>合同编号</label><input id="f-contract" placeholder="例如：HT-2026-305" /></div>' +
+            '  <div class="ni-field"><label>物资名称</label><input id="f-material" /></div>' +
+            '  <div class="ni-field"><label>申请数量</label><input id="f-qty" /></div>' +
+            '  <div class="ni-field"><label>退换类型</label><select id="f-type"><option>退货退款</option><option>换货</option></select></div>' +
+            '  <div class="ni-field ni-form-row"><label>备注</label><textarea id="f-remark"></textarea></div>' +
+            "</div>"
+          );
+        }
+        if (cardId === "order-demand") {
+          return (
+            '<div class="ni-form-grid">' +
+            '  <div class="ni-field"><label>需求部门</label><input id="f-dept" placeholder="例如：工程管理部" /></div>' +
+            '  <div class="ni-field"><label>需求人</label><input id="f-user" placeholder="例如：赵六" /></div>' +
+            '  <div class="ni-field"><label>需求物资</label><input id="f-material" /></div>' +
+            '  <div class="ni-field"><label>规格型号</label><input id="f-spec" /></div>' +
+            '  <div class="ni-field"><label>需求数量</label><input id="f-qty" /></div>' +
+            '  <div class="ni-field"><label>计划到货时间</label><input type="date" id="f-date" /></div>' +
+            '  <div class="ni-field ni-form-row"><label>需求说明</label><textarea id="f-remark"></textarea></div>' +
+            "</div>"
+          );
+        }
+        if (cardId === "sales-contract") {
+          return (
+            '<div class="ni-form-grid">' +
+            '  <div class="ni-field"><label>客户名称</label><input id="f-customer" placeholder="例如：天津龙源" /></div>' +
+            '  <div class="ni-field"><label>销售部门</label><input id="f-salesDept" placeholder="例如：经营发展中心" /></div>' +
+            '  <div class="ni-field"><label>合同金额（万元）</label><input id="f-amount" placeholder="例如：168" /></div>' +
+            '  <div class="ni-field"><label>签订时间</label><input type="date" id="f-date" /></div>' +
+            '  <div class="ni-field ni-form-row"><label>备注</label><textarea id="f-remark"></textarea></div>' +
+            "</div>"
+          );
+        }
+        if (cardId === "inbound-apply") {
+          return (
+            '<div class="ni-form-grid">' +
+            '  <div class="ni-field"><label>入库单号</label><input id="f-rkNo" placeholder="例如：RK-2026..." /></div>' +
+            '  <div class="ni-field"><label>项目公司</label><input id="f-company" placeholder="例如：华北项目公司" /></div>' +
+            '  <div class="ni-field"><label>供应商</label><input id="f-supplier" /></div>' +
+            '  <div class="ni-field"><label>物资名称</label><input id="f-material" /></div>' +
+            '  <div class="ni-field"><label>规格型号</label><input id="f-spec" /></div>' +
+            '  <div class="ni-field"><label>入库数量</label><input id="f-qty" /></div>' +
+            '  <div class="ni-field ni-form-row"><label>备注</label><textarea id="f-remark"></textarea></div>' +
+            "</div>"
+          );
+        }
+        if (cardId === "accept-apply") {
+          return (
+            '<div class="ni-form-grid">' +
+            '  <div class="ni-field"><label>验收单号</label><input id="f-qaNo" placeholder="例如：YS-..." /></div>' +
+            '  <div class="ni-field"><label>合同编号</label><input id="f-contract" placeholder="HT-..." /></div>' +
+            '  <div class="ni-field"><label>物资名称</label><input id="f-material" /></div>' +
+            '  <div class="ni-field"><label>规格型号</label><input id="f-spec" /></div>' +
+            '  <div class="ni-field"><label>到货数量</label><input id="f-arrQty" /></div>' +
+            '  <div class="ni-field"><label>实收数量</label><input id="f-realQty" /></div>' +
+            '  <div class="ni-field"><label>收货时间</label><input type="date" id="f-date" /></div>' +
+            '  <div class="ni-field ni-form-row"><label>验收说明</label><textarea id="f-remark"></textarea></div>' +
+            "</div>"
+          );
+        }
+        // other
+        return (
+          '<div class="ni-form-grid">' +
+          '  <div class="ni-field ni-form-row"><label>说明</label><textarea id="f-remark" placeholder="填写你要发起的内容"></textarea></div>' +
+          "</div>"
+        );
+      }
+
+      var modalMask = document.getElementById("niMask");
+      var modalTitle = document.getElementById("niModalTitle");
+      var modalBody = document.getElementById("niModalBody");
+      var closeBtn = document.getElementById("niX");
+      var btnDraft = document.getElementById("niBtnDraft");
+      var btnSubmit = document.getElementById("niBtnSubmit");
+      var btnCancel = document.getElementById("niBtnCancel");
+
+      var currentCardId = "";
+      function openModal(card) {
+        currentCardId = card.id;
+        modalTitle.textContent = card.title + "表单";
+        modalBody.innerHTML = buildForm(card.id);
+        modalMask.classList.add("show");
+        modalMask.setAttribute("aria-hidden", "false");
+      }
+      function closeModal() {
+        currentCardId = "";
+        modalMask.classList.remove("show");
+        modalMask.setAttribute("aria-hidden", "true");
+      }
+
+      closeBtn.addEventListener("click", closeModal);
+      btnCancel.addEventListener("click", closeModal);
+      modalMask.addEventListener("click", function (e) {
+        if (e.target === modalMask) closeModal();
+      });
+
+      function readFormValues() {
+        // 通用读取：按 input/select/textarea id 采集
+        var out = {};
+        var el = modalBody.querySelectorAll("input,select,textarea");
+        for (var i = 0; i < el.length; i++) {
+          var k = el[i].id;
+          out[k] = el[i].value;
+        }
+        out.__submittedAt = nowText();
+        out.__cardId = currentCardId;
+        return out;
+      }
+
+      function loadList(key) {
+        try { return JSON.parse(localStorage.getItem(key) || "[]"); } catch (e) { return []; }
+      }
+      function saveList(key, arr) {
+        try { localStorage.setItem(key, JSON.stringify(arr)); } catch (e) {}
+      }
+
+      function mapCardToTaskName(cardId) {
+        // 用于 my-tasks 的流程定义名称匹配（演示）
+        if (cardId === "purchase-apply") return "采购计划审批";
+        if (cardId === "use-apply") return "领用申请审批";
+        if (cardId === "return-exchange") return "退换货管理审批";
+        if (cardId === "order-demand") return "订单需求管理审批";
+        if (cardId === "sales-contract") return "销售合同审批";
+        if (cardId === "inbound-apply") return "公司层面入库审批";
+        if (cardId === "accept-apply") return "货物质量验收审批";
+        return "采购计划审批";
+      }
+
+      function leaderRoleIds() {
+        // 演示：公司领导角色集合（你可按需要增删）
+        return ["gm_zeng", "director_feng", "leader_supervisor", "dept_head"];
+      }
+
+      function submitToLocalAndOpenApproval() {
+        var payload = readFormValues();
+        var reqId = "NI-" + Date.now();
+
+        var req = { id: reqId, cardId: currentCardId, createdAt: payload.__submittedAt, payload: payload };
+        var reqList = loadList(REQUEST_KEY);
+        reqList.push(req);
+        saveList(REQUEST_KEY, reqList);
+
+        var taskName = mapCardToTaskName(currentCardId);
+        var taskId = "newissue_" + reqId;
+        var tasks = loadList(TASK_KEY);
+        tasks.push({
+          id: taskId,
+          status: "待审批",
+          createdAt: payload.__submittedAt,
+          assigneeRoleIds: leaderRoleIds(),
+          taskName: taskName,
+          procName: taskName,
+          requestId: reqId,
+          requestCardId: currentCardId
+        });
+        saveList(TASK_KEY, tasks);
+
+        closeModal();
+        setTimeout(function () {
+          if (typeof window.mapDemoToast === "function") window.mapDemoToast("已提交！");
+          else alert("已提交！");
+          setTimeout(function () {
+            window.location.href = "my-tasks-prototype-list.html?scene=todo";
+          }, 800);
+        }, 50);
+      }
+
+      function saveDraftLocal() {
+        var payload = readFormValues();
+        payload.status = "草稿";
+        payload.__draftId = "DR-" + Date.now();
+        var drafts = loadList(DRAFT_KEY);
+        drafts.push(payload);
+        saveList(DRAFT_KEY, drafts);
+        closeModal();
+        setTimeout(function () {
+          if (typeof window.mapDemoToast === "function") window.mapDemoToast("已保存！");
+          else alert("已保存！");
+        }, 20);
+      }
+
+      btnDraft.addEventListener("click", saveDraftLocal);
+      btnSubmit.addEventListener("click", submitToLocalAndOpenApproval);
+
+      // 绑定卡片点击
+      document.addEventListener("click", function (e) {
+        var cardEl = e.target && e.target.closest ? e.target.closest(".ni-card[data-card-id]") : null;
+        if (!cardEl) return;
+        var cardId = cardEl.getAttribute("data-card-id") || "";
+        var cardObj = null;
+        for (var i = 0; i < cards.length; i++) if (cards[i].id === cardId) cardObj = cards[i];
+        if (!cardObj && fallbackCard.id === cardId) cardObj = fallbackCard;
+        if (!cardObj) return;
+        openModal(cardObj);
+      });
+
+      // 绑定键盘可访问
+      document.addEventListener("keydown", function (e) {
+        if (e.key !== "Enter" && e.key !== " ") return;
+        var cardEl = e.target && e.target.closest ? e.target.closest(".ni-card[data-card-id]") : null;
+        if (!cardEl) return;
+        e.preventDefault();
+        cardEl.click();
+      });
+
+      renderCards();
+    })();
+  </script>
+</body>
+</html>
+

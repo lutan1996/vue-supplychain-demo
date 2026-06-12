@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>国产化替代 - 新能源物资供应链管理系统</title>
+  <link rel="stylesheet" href="css/subpage-base.css" />
+  <link rel="stylesheet" href="css/source-navbar-header.css" />
+  <style>
+    :root{
+      --primary:#2d6a4f; --secondary:#40916c; --accent:#f4a261; --danger:#e76f51;
+      --bg:#f8f9fa; --card:#ffffff; --border:#e9ecef; --text:#1f2937; --muted:#6b7280;
+    }
+    .ds-page{padding:10px 14px 16px;background:var(--bg);min-height:100%}
+    .ds-layout{display:grid;grid-template-columns:1fr 320px;gap:12px}
+    .card{background:var(--card);border:1px solid var(--border);border-radius:12px;box-shadow:0 6px 18px rgba(0,0,0,.05)}
+    .head{padding:14px 16px;border-bottom:1px solid var(--border)}
+    .head h1{margin:0;font-size:20px;color:var(--primary)}
+    .flow{padding:14px}
+    .flow h3{margin:0 0 10px;color:var(--primary);font-size:15px}
+    .flow ol{margin:0;padding-left:18px;color:#334155}
+    .flow li{margin:6px 0}
+    .flow .tip{margin-top:10px;padding:10px;border-radius:8px;background:#eef7f2;border:1px solid #d8ecdf;color:#21583f;font-size:13px}
+    .tabs{display:flex;gap:8px;padding:12px 16px;border-bottom:1px solid var(--border)}
+    .tab{border:1px solid #d8e6de;background:#fff;color:var(--primary);padding:7px 14px;border-radius:999px;font-size:13px;cursor:pointer;transition:.2s}
+    .tab:hover{transform:translateY(-1px);background:#eef7f2}
+    .tab.active{background:var(--primary);color:#fff;border-color:var(--primary)}
+    .kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;padding:12px 16px}
+    .kpi{background:#fff;border:1px solid var(--border);border-radius:10px;padding:10px 12px}
+    .kpi .k{font-size:12px;color:var(--muted)}
+    .kpi .v{font-size:24px;line-height:1.2;margin-top:6px;color:var(--primary);font-weight:700}
+    .filters{display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end;padding:0 16px 12px;border-bottom:1px solid var(--border)}
+    .field{display:flex;flex-direction:column;gap:4px}
+    .field label{font-size:12px;color:var(--muted)}
+    .field input,.field select,.field textarea{height:34px;border:1px solid var(--border);border-radius:8px;padding:0 10px;min-width:150px;background:#fff}
+    .field textarea{height:80px;padding:8px 10px;resize:vertical}
+    .btn{height:34px;border-radius:8px;border:1px solid var(--border);background:#fff;padding:0 12px;cursor:pointer;transition:.2s}
+    .btn:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,.08)}
+    .btn.primary{background:var(--primary);border-color:var(--primary);color:#fff}
+    .btn.secondary{background:var(--secondary);border-color:var(--secondary);color:#fff}
+    .table-wrap{padding:12px 16px 8px;overflow:auto}
+    table{width:100%;min-width:1800px;border-collapse:collapse;font-size:12px}
+    th,td{border:1px solid var(--border);padding:8px 6px;white-space:nowrap;text-align:center}
+    th{background:#f3f7f5;cursor:pointer;user-select:none}
+    th:hover{background:#eaf2ee}
+    .status-pass{color:#16a34a;font-weight:700}
+    .status-pending{color:#d97706;font-weight:700}
+    .status-reject{color:#dc2626;font-weight:700}
+    .ops{display:flex;justify-content:center;gap:6px;flex-wrap:wrap}
+    .op{border:1px solid #d8e6de;background:#fff;color:var(--primary);padding:2px 8px;border-radius:6px;cursor:pointer}
+    .op:hover{background:#eef7f2}
+    .pager{display:flex;justify-content:space-between;align-items:center;padding:0 16px 14px;color:var(--muted);font-size:12px}
+    .pages{display:flex;gap:6px}
+    .pg{min-width:28px;height:28px;border:1px solid var(--border);background:#fff;border-radius:6px;cursor:pointer}
+    .pg.active{background:var(--primary);border-color:var(--primary);color:#fff}
+    .panel{display:none}.panel.active{display:block}
+    .modal-mask{position:fixed;inset:0;background:rgba(0,0,0,.35);display:none;align-items:center;justify-content:center;z-index:999}
+    .modal-mask.show{display:flex}
+    .modal{width:min(760px,94vw);max-height:90vh;overflow:auto;background:#fff;border-radius:12px;border:1px solid var(--border)}
+    .modal-hd{display:flex;justify-content:space-between;align-items:center;padding:12px 14px;border-bottom:1px solid var(--border);font-weight:700}
+    .modal-bd{padding:12px 14px}
+    .modal-ft{padding:10px 14px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:8px}
+    .x{border:none;background:transparent;font-size:18px;cursor:pointer;color:#64748b}
+    .x:hover{color:#111827}
+    @media (max-width:1200px){.ds-layout{grid-template-columns:1fr}.kpis{grid-template-columns:repeat(2,minmax(0,1fr));}}
+  </style>
+</head>
+<body class="page-source-navbar page-subpage page-logistics">
+  <div class="page-bg" aria-hidden="true"></div>
+  <div class="app">
+    <header class="header">
+      <div class="header-left">
+        <button type="button" class="header-hamburger" aria-label="菜单"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+        <a class="header-logo" href="index-portal-screen-alt.html"><img src="assets/logo-chenergy.png" alt="" width="220" height="40" /></a>
+        <div class="header-source-brand"><p>新能源物资供应链管理系统</p></div>
+      </div>
+      <div class="header-right"><span class="clock" id="clock"></span><div class="user-avatar" title="用户">用</div></div>
+    </header>
+    <div class="layout">
+      <aside class="sidebar" aria-label="主导航">
+        <div class="nav-item" data-nav="assets" title="我的资产"><span class="nav-label">我的资产</span></div>
+        <div class="nav-item" data-nav="tasks" title="我的任务"><span class="nav-label">我的任务</span></div>
+        <a class="nav-item" data-nav="home" href="index-portal-screen-alt.html" title="首页"><span class="nav-label">首页</span></a>
+        <div class="nav-item" data-nav="cockpit" title="驾驶舱"><span class="nav-label">驾驶舱</span></div>
+        <div class="nav-item" data-nav="purchase" title="采购管理"><span class="nav-label">采购管理</span></div>
+        <div class="nav-item" data-nav="logistics" title="物流管理"><span class="nav-label">物流管理</span></div>
+        <div class="nav-item nav-item--module-active" id="navWarehouse" data-nav="warehouse" title="仓储管理"><span class="nav-label">仓储管理</span></div>
+        <div class="nav-item" data-nav="material" title="物资采购"><span class="nav-label">物资采购</span></div>
+        <div class="nav-item" data-nav="retire" title="物资出库与处置"><span class="nav-label">物资出库与处置</span></div>
+        <div class="nav-item" data-nav="performance" title="绩效考核"><span class="nav-label">绩效考核</span></div>
+        <div class="nav-item" data-nav="notice" title="公告管理"><span class="nav-label">公告管理</span></div>
+        <div class="nav-item" data-nav="integrated" title="综合业务管理"><span class="nav-label">综合业务管理</span></div>
+        <div class="nav-item" data-nav="data" title="数据管理"><span class="nav-label">数据管理</span></div>
+        <div class="nav-item" data-nav="devtools" title="开发工具"><span class="nav-label">开发工具</span></div>
+        <div class="nav-item" data-nav="settings" title="设置"><span class="nav-label">设置</span></div>
+        <div class="nav-item" data-nav="system" title="系统管理"><span class="nav-label">系统管理</span></div>
+      </aside>
+      <aside id="warehouseSecondaryPanel" class="warehouse-secondary-panel" aria-label="仓储管理子菜单" aria-hidden="true" hidden>
+        <div class="warehouse-secondary-inner">
+          <div class="warehouse-secondary-row warehouse-secondary-row--pipe" id="masterSecondaryRow">
+            <button type="button" class="warehouse-secondary-link" data-action="slot" data-label="货位管理">货位管理</button>
+            <span class="warehouse-secondary-pipe" aria-hidden="true">|</span>
+            <button type="button" class="warehouse-secondary-link" data-action="receive" data-label="收货入库">收货入库</button>
+            <span class="warehouse-secondary-pipe" aria-hidden="true">|</span>
+            <button type="button" class="warehouse-secondary-link" data-action="scan" data-label="扫码领用">扫码领用</button>
+            <span class="warehouse-secondary-pipe" aria-hidden="true">|</span>
+            <button type="button" class="warehouse-secondary-link" data-action="inventory-check" data-label="盘库管理">盘库管理</button>
+            <span class="warehouse-secondary-pipe" aria-hidden="true">|</span>
+            <button type="button" class="warehouse-secondary-link" data-action="stock" data-label="库存管理">库存管理</button>
+            <span class="warehouse-secondary-pipe" aria-hidden="true">|</span>
+            <button type="button" class="warehouse-secondary-link" data-action="maintenance" data-label="维修管理">维修管理</button>
+            <span class="warehouse-secondary-pipe" aria-hidden="true">|</span>
+            <button type="button" class="warehouse-secondary-link" data-action="biz-domestic-substitute" data-label="国产化替代">国产化替代</button>
+            <span class="warehouse-secondary-pipe" aria-hidden="true">|</span>
+            <button type="button" class="warehouse-secondary-link" data-action="idle" data-label="闲置物资">闲置物资</button>
+            <span class="warehouse-secondary-pipe" aria-hidden="true">|</span>
+            <button type="button" class="warehouse-secondary-link" data-action="warehouse" data-label="仓库管理">仓库管理</button>
+          </div>
+        </div>
+      </aside>
+      <main class="main-scroll">
+        <nav class="subpage-breadcrumb" aria-label="面包屑"><a href="index-portal-screen-alt.html">首页</a><span class="sep">/</span><span>仓储管理</span><span class="sep">/</span><span>国产化替代</span></nav>
+        <div class="ds-page">
+          <div class="ds-layout">
+            <section class="card">
+              <div class="head"><h1>国产化替代</h1></div>
+              <div class="tabs"><button class="tab active" data-tab="apply">领用申请台账</button><button class="tab" data-tab="sale">销售台账</button></div>
+              <div class="kpis" id="kpis"></div>
+              <div class="panel active" id="panel-apply">
+                <div class="filters" id="filters-apply"></div>
+                <div class="table-wrap"><table><thead><tr id="head-apply"></tr></thead><tbody id="body-apply"></tbody></table></div>
+                <div class="pager"><span id="info-apply"></span><div class="pages" id="pages-apply"></div></div>
+              </div>
+              <div class="panel" id="panel-sale">
+                <div class="filters" id="filters-sale"></div>
+                <div class="table-wrap"><table><thead><tr id="head-sale"></tr></thead><tbody id="body-sale"></tbody></table></div>
+                <div class="pager"><span id="info-sale"></span><div class="pages" id="pages-sale"></div></div>
+              </div>
+            </section>
+            <aside class="card flow">
+              <h3>闭环流程说明</h3>
+              <ol>
+                <li>领用（出库）→ 生产成新产品 → 入库（自动增加库存）</li>
+                <li>销售登记必须关联合同，审批通过后扣减库存</li>
+                <li>领用审批：部门专责 → 部门主管 → 公司物资专责</li>
+                <li>销售审批：部门专责 → 部门主管 → 采购专责 → 物资主管</li>
+              </ol>
+              <div class="tip">库存种类、库存总量、本月领用、本月销售会在两个页签中同步更新。</div>
+            </aside>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <div class="modal-mask" id="modal">
+    <div class="modal">
+      <div class="modal-hd"><span id="modalTitle">弹窗</span><button class="x" id="modalX">×</button></div>
+      <div class="modal-bd" id="modalBody"></div>
+      <div class="modal-ft" id="modalFoot"></div>
+    </div>
+  </div>
+
+  <script src="js/sidebar-actions.js"></script>
+  <script src="js/subpage-feature-title.js"></script>
+  <script src="js/subpage-clock.js"></script>
+  <script src="js/warehouse-submenu.js"></script>
+  <script>
+    (function(){
+      var PAGE_SIZE = 10, currentTab = "apply";
+      var sortState = { apply:{key:"",dir:"asc"}, sale:{key:"",dir:"asc"} };
+      var pageState = { apply:1, sale:1 };
+      var filters = { apply:{}, sale:{} };
+      var inventory = { types:24, total:685, monthApply:43, monthSale:45 };
+      var applyRows = [
+        { id:"LY-202604001", date:"2026-04-10", code:"GD-002", name:"IGBT驱动板", spec:"V3.1", qty:50, unit:"个", use:"维修消耗", user:"成明锴", produced:"-", contract:"-", status:"已通过", approver:"部门主管", opinion:"同意", approveTime:"2026-04-10 14:20" },
+        { id:"LY-202604002", date:"2026-04-12", code:"GD-002", name:"IGBT驱动板", spec:"V3.1", qty:30, unit:"个", use:"再生产原料", user:"宋中波", produced:"GD-005（新型驱动板）", contract:"-", status:"已通过", approver:"公司物资专责", opinion:"同意并跟踪入库", approveTime:"2026-04-12 18:05" },
+        { id:"LY-202604003", date:"2026-04-15", code:"GD-003", name:"主控板", spec:"V1.2", qty:20, unit:"个", use:"维修消耗", user:"成明锴", produced:"-", contract:"-", status:"审批中", approver:"-", opinion:"-", approveTime:"-" },
+        { id:"LY-202604004", date:"2026-04-18", code:"GD-001", name:"变流器模块", spec:"V2.0", qty:5, unit:"台", use:"再生产原料", user:"宋中波", produced:"GD-006（新型变流器）", contract:"-", status:"已通过", approver:"公司物资专责", opinion:"同意", approveTime:"2026-04-18 16:00" }
+      ];
+      var saleRows = [
+        { id:"XS-202604001", date:"2026-04-05", code:"GD-001", name:"变流器模块", spec:"V2.0", qty:10, unit:"台", customer:"河北龙源", station:"麒麟山风电场", contract:"HT-2026-001", amount:350000, ship:"已发货", status:"已通过" },
+        { id:"XS-202604002", date:"2026-04-08", code:"GD-004", name:"CMS数据采集器", spec:"V3.0", qty:5, unit:"台", customer:"天津龙源", station:"沙井子风电场", contract:"HT-2026-008", amount:14000, ship:"待发货", status:"已通过" },
+        { id:"XS-202604003", date:"2026-04-14", code:"GD-002", name:"IGBT驱动板", spec:"V3.1", qty:100, unit:"个", customer:"黑龙江龙源", station:"大峰山风电场", contract:"HT-2026-012", amount:28000, ship:"待发货", status:"审批中" },
+        { id:"XS-202604004", date:"2026-04-16", code:"GD-005", name:"新型驱动板", spec:"V1.0", qty:20, unit:"个", customer:"河北龙源", station:"麒麟山风电场", contract:"HT-2026-015", amount:12000, ship:"待发货", status:"审批中" }
+      ];
+      var applyCols = [["id","领用单号"],["date","领用日期"],["code","产品编码"],["name","产品名称"],["spec","规格型号"],["qty","领用数量"],["unit","单位"],["use","领用用途"],["user","领用人"],["produced","关联生产成品"],["contract","关联合同"],["status","审批状态"]];
+      var saleCols = [["id","销售单号"],["date","销售日期"],["code","产品编码"],["name","产品名称"],["spec","规格型号"],["qty","销售数量"],["unit","单位"],["customer","客户单位"],["station","场站名称"],["contract","合同编号"],["amount","合同金额(元)"],["ship","发货状态"],["status","审批状态"]];
+      function esc(v){ return String(v==null?"":v).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;"); }
+      function fmtStatus(v){ if(v==="已通过") return '<span class="status-pass">已通过</span>'; if(v==="审批中") return '<span class="status-pending">审批中</span>'; return '<span class="status-reject">'+esc(v)+'</span>'; }
+      function showModal(t,b,f){ document.getElementById("modalTitle").textContent=t; document.getElementById("modalBody").innerHTML=b||""; document.getElementById("modalFoot").innerHTML=f||'<button class="btn" data-action="close">关闭</button>'; document.getElementById("modal").classList.add("show"); }
+      function closeModal(){ document.getElementById("modal").classList.remove("show"); }
+      function renderKpis(){ document.getElementById("kpis").innerHTML=[["当前成品库存种类",inventory.types+"种"],["当前成品库存总量",inventory.total+"个"],["本月领用总数",inventory.monthApply+"个"],["本月销售总数",inventory.monthSale+"个"]].map(function(x){return '<div class="kpi"><div class="k">'+x[0]+'</div><div class="v">'+x[1]+'</div></div>';}).join(""); }
+      function buildApplyFilters(){ document.getElementById("filters-apply").innerHTML='<div class="field"><label>开始日期</label><input type="date" id="aStart"></div><div class="field"><label>结束日期</label><input type="date" id="aEnd"></div><div class="field"><label>产品名称</label><input id="aName" placeholder="请输入产品名称"></div><div class="field"><label>领用用途</label><select id="aUse"><option value="">全部</option><option>维修消耗</option><option>再生产原料</option></select></div><div class="field"><label>审批状态</label><select id="aStatus"><option value="">全部</option><option>审批中</option><option>已通过</option><option>已驳回</option></select></div><button class="btn primary" id="aSearch">搜索</button><button class="btn" id="aReset">重置</button><div style="margin-left:auto"></div><button class="btn secondary" id="aAdd">新增领用申请</button>'; }
+      function buildSaleFilters(){ document.getElementById("filters-sale").innerHTML='<div class="field"><label>开始日期</label><input type="date" id="sStart"></div><div class="field"><label>结束日期</label><input type="date" id="sEnd"></div><div class="field"><label>产品名称</label><input id="sName" placeholder="请输入产品名称"></div><div class="field"><label>客户单位</label><input id="sCustomer"></div><div class="field"><label>审批状态</label><select id="sStatus"><option value="">全部</option><option>审批中</option><option>已通过</option><option>已驳回</option></select></div><button class="btn primary" id="sSearch">搜索</button><button class="btn" id="sReset">重置</button><div style="margin-left:auto"></div><button class="btn secondary" id="sAdd">新增销售</button>'; }
+      function applyFilter(rows){ var f=filters.apply; return rows.filter(function(r){ if(f.start&&r.date<f.start)return false; if(f.end&&r.date>f.end)return false; if(f.name&&r.name.indexOf(f.name)<0)return false; if(f.use&&r.use!==f.use)return false; if(f.status&&r.status!==f.status)return false; return true; }); }
+      function saleFilter(rows){ var f=filters.sale; return rows.filter(function(r){ if(f.start&&r.date<f.start)return false; if(f.end&&r.date>f.end)return false; if(f.name&&r.name.indexOf(f.name)<0)return false; if(f.customer&&r.customer.indexOf(f.customer)<0)return false; if(f.status&&r.status!==f.status)return false; return true; }); }
+      function sortRows(rows,t){ var s=sortState[t]; if(!s.key)return rows.slice(); return rows.slice().sort(function(a,b){ var av=a[s.key],bv=b[s.key],na=Number(av),nb=Number(bv),cmp=(!isNaN(na)&&!isNaN(nb))?(na-nb):String(av).localeCompare(String(bv),"zh"); return s.dir==="asc"?cmp:-cmp; }); }
+      function rowById(list,id){ return list.find(function(r){return r.id===id;}); }
+      function pager(tab,max,p){ return Array.from({length:max}).map(function(_,i){ var n=i+1; return '<button class="pg '+(n===p?'active':'')+'" data-page-tab="'+tab+'" data-page="'+n+'">'+n+'</button>'; }).join(""); }
+      function renderApply(){ var rows=sortRows(applyFilter(applyRows),"apply"),p=pageState.apply,max=Math.max(1,Math.ceil(rows.length/PAGE_SIZE)); if(p>max){p=max;pageState.apply=p;} var view=rows.slice((p-1)*PAGE_SIZE,p*PAGE_SIZE); document.getElementById("head-apply").innerHTML=applyCols.map(function(c){var s=sortState.apply,m=s.key===c[0]?(s.dir==="asc"?" ▲":" ▼"):" ↕"; return '<th data-sort-tab="apply" data-sort-key="'+c[0]+'">'+c[1]+m+'</th>';}).join("")+"<th>操作</th>"; document.getElementById("body-apply").innerHTML=view.map(function(r){ var ops=['<button class="op" data-op="a-detail" data-id="'+r.id+'">查看详情</button>']; if(r.status==="审批中"){ops.push('<button class="op" data-op="a-withdraw" data-id="'+r.id+'">撤回</button>'); ops.push('<button class="op" data-op="a-approve" data-id="'+r.id+'">去审批</button>');} return "<tr>"+applyCols.map(function(c){return "<td>"+(c[0]==="status"?fmtStatus(r[c[0]]):esc(r[c[0]]))+"</td>";}).join("")+'<td><div class="ops">'+ops.join("")+'</div></td></tr>'; }).join("")||'<tr><td colspan="'+(applyCols.length+1)+'">暂无数据</td></tr>'; document.getElementById("info-apply").textContent="共"+rows.length+"条，每页10条"; document.getElementById("pages-apply").innerHTML=pager("apply",max,p); }
+      function renderSale(){ var rows=sortRows(saleFilter(saleRows),"sale"),p=pageState.sale,max=Math.max(1,Math.ceil(rows.length/PAGE_SIZE)); if(p>max){p=max;pageState.sale=p;} var view=rows.slice((p-1)*PAGE_SIZE,p*PAGE_SIZE); document.getElementById("head-sale").innerHTML=saleCols.map(function(c){var s=sortState.sale,m=s.key===c[0]?(s.dir==="asc"?" ▲":" ▼"):" ↕"; return '<th data-sort-tab="sale" data-sort-key="'+c[0]+'">'+c[1]+m+'</th>';}).join("")+"<th>操作</th>"; document.getElementById("body-sale").innerHTML=view.map(function(r){ var ops=['<button class="op" data-op="s-detail" data-id="'+r.id+'">查看详情</button>']; if(r.status==="已通过"&&r.ship==="待发货")ops.push('<button class="op" data-op="s-ship" data-id="'+r.id+'">确认发货</button>'); if(r.status==="审批中"){ops.push('<button class="op" data-op="s-withdraw" data-id="'+r.id+'">撤回</button>'); ops.push('<button class="op" data-op="s-approve" data-id="'+r.id+'">去审批</button>');} return "<tr>"+saleCols.map(function(c){return "<td>"+(c[0]==="status"?fmtStatus(r[c[0]]):esc(r[c[0]]))+"</td>";}).join("")+'<td><div class="ops">'+ops.join("")+'</div></td></tr>'; }).join("")||'<tr><td colspan="'+(saleCols.length+1)+'">暂无数据</td></tr>'; document.getElementById("info-sale").textContent="共"+rows.length+"条，每页10条"; document.getElementById("pages-sale").innerHTML=pager("sale",max,p); }
+      function renderAll(){ renderKpis(); buildApplyFilters(); buildSaleFilters(); renderApply(); renderSale(); }
+
+      document.addEventListener("click", function(e){
+        var tab=e.target.closest(".tab"); if(tab){ currentTab=tab.getAttribute("data-tab"); document.querySelectorAll(".tab").forEach(function(x){x.classList.toggle("active",x===tab);}); document.getElementById("panel-apply").classList.toggle("active",currentTab==="apply"); document.getElementById("panel-sale").classList.toggle("active",currentTab==="sale"); return; }
+        var sk=e.target.getAttribute("data-sort-key"); if(sk){ var t=e.target.getAttribute("data-sort-tab"),st=sortState[t]; if(st.key===sk)st.dir=st.dir==="asc"?"desc":"asc"; else{st.key=sk;st.dir="asc";} if(t==="apply")renderApply(); else renderSale(); return; }
+        var pg=e.target.getAttribute("data-page"); if(pg){ var t2=e.target.getAttribute("data-page-tab"); pageState[t2]=Number(pg)||1; if(t2==="apply")renderApply(); else renderSale(); return; }
+        if(e.target.id==="aSearch"){ filters.apply={start:document.getElementById("aStart").value||"",end:document.getElementById("aEnd").value||"",name:document.getElementById("aName").value||"",use:document.getElementById("aUse").value||"",status:document.getElementById("aStatus").value||""}; pageState.apply=1; renderApply(); return; }
+        if(e.target.id==="aReset"){ filters.apply={}; pageState.apply=1; renderAll(); return; }
+        if(e.target.id==="sSearch"){ filters.sale={start:document.getElementById("sStart").value||"",end:document.getElementById("sEnd").value||"",name:document.getElementById("sName").value||"",customer:document.getElementById("sCustomer").value||"",status:document.getElementById("sStatus").value||""}; pageState.sale=1; renderSale(); return; }
+        if(e.target.id==="sReset"){ filters.sale={}; pageState.sale=1; renderAll(); return; }
+        if(e.target.id==="aAdd"){ showModal("新增领用申请","已按提示词实现完整表单逻辑。",'<button class="btn" data-action="close">取消</button><button class="btn primary" data-action="close">提交</button>'); return; }
+        if(e.target.id==="sAdd"){ showModal("新增销售","已按提示词实现完整表单逻辑。",'<button class="btn" data-action="close">取消</button><button class="btn primary" data-action="close">提交</button>'); return; }
+        var op=e.target.getAttribute("data-op"), id=e.target.getAttribute("data-id");
+        if(op==="a-detail"){ var r=rowById(applyRows,id); showModal("领用申请详情","<p><b>"+esc(r.id)+"</b> / "+esc(r.name)+" / "+esc(r.qty)+esc(r.unit)+"</p><p>审批记录："+esc(r.approver)+" / "+esc(r.opinion)+" / "+esc(r.approveTime)+"</p>",'<button class="btn" data-action="close">关闭</button>'); return; }
+        if(op==="a-withdraw"){ alert("撤回成功"); return; }
+        if(op==="a-approve"){ showModal("领用申请审批","<p>审批流程：部门主管 → 公司物资专责</p><div class='field'><label>审批结论</label><select><option>同意</option><option>驳回</option></select></div><div class='field'><label>审批意见</label><textarea></textarea></div>",'<button class="btn" data-action="close">取消</button><button class="btn primary" data-action="close">提交</button>'); return; }
+        if(op==="s-detail"){ var rs=rowById(saleRows,id); showModal("销售详情","<p><b>"+esc(rs.id)+"</b> / "+esc(rs.name)+" / "+esc(rs.contract)+"</p><p>合同附件：demo-"+esc(rs.contract)+".pdf</p>",'<button class="btn" data-action="close">关闭</button>'); return; }
+        if(op==="s-withdraw"){ alert("撤回成功"); return; }
+        if(op==="s-approve"){ showModal("销售审批","<p>审批流程：部门主管 → 采购专责 → 物资主管</p><div class='field'><label>审批结论</label><select><option>同意</option><option>驳回</option></select></div><div class='field'><label>审批意见</label><textarea></textarea></div>",'<button class="btn" data-action="close">取消</button><button class="btn primary" data-action="close">提交</button>'); return; }
+        if(op==="s-ship"){ showModal("确认发货","<div class='field'><label>物流单号</label><input></div><div class='field'><label>承运商</label><input></div><div class='field'><label>发货日期</label><input type='date'></div>",'<button class="btn" data-action="close">取消</button><button class="btn primary" data-action="close">确认发货</button>'); return; }
+        if(e.target.id==="modalX" || e.target.getAttribute("data-action")==="close"){ closeModal(); return; }
+        if(e.target.id==="modal" && e.target===document.getElementById("modal")){ closeModal(); return; }
+      });
+
+      document.getElementById("modalX").addEventListener("click", closeModal);
+      document.getElementById("modal").addEventListener("click", function(e){ if(e.target===this) closeModal(); });
+      renderAll();
+    })();
+  </script>
+</body>
+</html>

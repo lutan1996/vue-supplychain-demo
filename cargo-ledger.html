@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>货物台帐</title>
+  <link rel="stylesheet" href="css/subpage-base.css" />
+  <link rel="stylesheet" href="css/source-navbar-header.css" />
+  <style>
+    body{background:#f8f9fa}
+    .page-wrap{padding:12px 16px 18px}
+    .panel{background:#fff;border:1px solid #e9ecef;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,.06)}
+    .panel-head{display:flex;justify-content:space-between;align-items:center;padding:14px 16px;border-bottom:1px solid #edf1f5}
+    .panel-head h2{margin:0;font-size:20px;color:#1f3551}
+    .toolbar{display:flex;gap:8px;padding:12px 16px;border-bottom:1px solid #edf1f5;align-items:flex-end;flex-wrap:wrap}
+    .field{display:flex;flex-direction:column;gap:4px}
+    .field label{font-size:12px;color:#64748b}
+    .field input,.field select{height:34px;min-width:160px;padding:0 10px;border:1px solid #dbe2ea;border-radius:8px}
+    .btn{
+      height:34px;padding:0 12px;border:1px solid #bcd7ff;background:#fff;border-radius:8px;cursor:pointer;
+      color:#1677ff;font-size:13px;font-weight:600;
+    }
+    .btn.primary{background:#1677ff;border-color:#1677ff;color:#fff}
+    .btn.secondary{background:#1677ff;border-color:#1677ff;color:#fff}
+    .table-wrap{padding:0 16px 12px;overflow:auto}
+    table{width:100%;min-width:1800px;border-collapse:collapse;font-size:12px;background:#fff}
+    th,td{border:1px solid #e8edf2;padding:8px 6px;white-space:nowrap;text-align:center}
+    th{background:#f3f7f5;color:#334155}
+    .ops{display:flex;justify-content:center;gap:12px;align-items:center}
+    .op-btn{
+      height:auto;padding:0;border:none;background:transparent;box-shadow:none;
+      color:#1677ff;font-size:14px;font-weight:600;line-height:1.2;cursor:pointer;
+    }
+    .op-btn:hover{color:#4096ff;text-decoration:underline;background:transparent}
+    .op-btn[disabled]{color:#b5c3d6;cursor:not-allowed;text-decoration:none}
+    .tiny-tip{display:inline-flex;align-items:center;justify-content:center;width:14px;height:14px;border-radius:50%;border:1px solid #bcd3c8;color:#2d6a4f;font-size:10px;cursor:help;position:relative}
+    .tiny-tip:hover .tiny-bubble{display:block}
+    .tiny-bubble{
+      display:none;position:absolute;right:18px;left:auto;top:50%;transform:translateY(-50%);
+      width:260px;padding:8px 10px;border-radius:8px;background:#1f2937;color:#fff;text-align:left;line-height:1.45;font-size:12px;z-index:10
+    }
+    .pager{display:flex;justify-content:space-between;align-items:center;padding:0 16px 14px;color:#64748b;font-size:12px}
+    .page-btn{min-width:28px;height:28px;border:1px solid #dbe2ea;border-radius:6px;background:#fff;cursor:pointer}
+    .page-btn.active{background:#1677ff;border-color:#1677ff;color:#fff}
+    .modal-mask{position:fixed;inset:0;background:rgba(0,0,0,.35);display:none;align-items:center;justify-content:center;z-index:3000}
+    .modal-mask.show{display:flex}
+    .modal{width:min(760px,95vw);max-height:88vh;overflow:auto;background:#fff;border:1px solid #e6ebf1;border-radius:12px}
+    .modal-hd{display:flex;justify-content:space-between;align-items:center;padding:12px 14px;border-bottom:1px solid #edf1f5;font-weight:700}
+    .modal-bd{padding:12px 14px}
+    .modal-ft{padding:10px 14px;border-top:1px solid #edf1f5;display:flex;justify-content:flex-end;gap:8px}
+    .x-btn{border:none;background:transparent;cursor:pointer;font-size:18px;color:#64748b}
+    .grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+    .row-note{font-size:12px;color:#64748b}
+    @media (max-width:900px){.grid2{grid-template-columns:1fr}}
+  </style>
+</head>
+<body class="page-source-navbar page-subpage">
+  <div class="app">
+    <header class="header"><div class="header-left"><button class="header-hamburger"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button><a class="header-logo" href="#"><img src="assets/logo-chenergy.png" width="220" height="40" alt="" /></a><div class="header-source-brand"><p>新能源供应链管理系统</p></div></div><div class="header-right"><span class="clock" id="clock"></span><div class="user-avatar">用</div></div></header>
+    <div class="layout">
+      <aside class="sidebar"><div class="nav-item"><span class="nav-label">采购管理</span></div></aside>
+      <main class="main-scroll">
+        <div class="page-wrap">
+          <section class="panel">
+            <div class="panel-head"><h2>货物台帐</h2></div>
+            <div class="toolbar">
+              <div class="field"><label>合同编号</label><input id="fContract" placeholder="请输入合同号"></div>
+              <div class="field"><label>物资名称</label><input id="fName" placeholder="请输入物资名称"></div>
+              <div class="field"><label>采购部门</label><input id="fDept" placeholder="请输入采购部门"></div>
+              <div class="field"><label>&nbsp;</label><div><button class="btn primary" id="btnSearch">筛选</button> <button class="btn" id="btnReset">重置</button> <button class="btn" id="btnImport">导入</button> <button class="btn" id="btnTpl">下载模板</button> <button class="btn" id="btnExport">导出</button> <button class="btn secondary" id="btnAdd">新增</button> <button class="btn" id="btnDelete">删除</button></div></div>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead><tr id="thead"></tr></thead>
+                <tbody id="tbody"></tbody>
+              </table>
+            </div>
+            <div class="pager"><div id="pagerInfo">共0条，每页10条</div><div id="pager"></div></div>
+          </section>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <div class="modal-mask" id="modalMask">
+    <div class="modal">
+      <div class="modal-hd"><span id="modalTitle">弹窗</span><button class="x-btn" id="modalX">×</button></div>
+      <div class="modal-bd" id="modalBody"></div>
+      <div class="modal-ft" id="modalFoot"></div>
+    </div>
+  </div>
+
+  <script src="js/sidebar-actions.js"></script>
+  <script src="js/subpage-feature-title.js"></script>
+  <script src="js/subpage-clock.js"></script>
+  <script>
+    (function(){
+      var PAGE_SIZE = 10;
+      var cols = [
+        ["contractNo","合同编号"],["purchaseDept","采购部门"],["useDept","领用部门"],["useUser","领用人"],["supplier","供应商"],["name","物资名称"],["spec","规格型号"],["category","物资类别"],["qty","采购数量"],
+        ["unitPriceNoTax","采购平均单价（不含税）"],["unitPriceTax","采购单价（含税）"],["totalPriceTax","采购总价（含税）"],["taxRate","税率"],["remark","备注"]
+      ];
+      var state = { page:1, sortKey:"", sortDir:"asc", filters:{} };
+      var rows = Array.from({length:16}).map(function(_,i){
+        var cates = ["生产类","销售类","办公类"];
+        var untaxed = 900 + i*120;
+        var taxed = Math.round(untaxed * 1.13);
+        var qty = 8 + (i%6)*4;
+        return {
+          id: "CG-"+String(i+1).padStart(4,"0"),
+          contractNo:"HT2026"+String(001+i).padStart(3,"0"),
+          purchaseDept:i%2?"经营发展中心":"电控所",
+          useDept:["运维部","工程部","物资部","财务部"][i%4],
+          useUser:["王玉","赵六","李四","钱七"][i%4],
+          supplier:["远景能源","中车电气","金风科技","许继电气"][i%4],
+          name:["智能风机控制器","箱变综合在线监测模块","叶片角度传感器","机组振动采集器","功率柜驱动板","电容补偿单元","工业安全防火墙","风速风向采集器"][i%8],
+          spec:i%2?"V2.0":"V3.1",
+          category:cates[i%3],
+          qty:qty,
+          unitPriceNoTax:untaxed,
+          unitPriceTax:taxed,
+          totalPriceTax:taxed*qty,
+          taxRate:"13%",
+          remark:i%3===0?"重点采购":"常规采购",
+          status:i%4===0?"已同步":"草稿"
+        };
+      });
+
+      function esc(v){ return String(v==null?"":v).replace(/[&<>"']/g,function(s){return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[s];});}
+      function showModal(t,b,f){ document.getElementById("modalTitle").textContent=t; document.getElementById("modalBody").innerHTML=b||""; document.getElementById("modalFoot").innerHTML=f||'<button class="btn" data-close="1">取消</button>'; document.getElementById("modalMask").classList.add("show");}
+      function closeModal(){ document.getElementById("modalMask").classList.remove("show"); }
+
+      function filtered(){
+        var f = state.filters;
+        var list = rows.filter(function(r){
+          if(f.contractNo && String(r.contractNo).indexOf(f.contractNo)<0) return false;
+          if(f.name && String(r.name).indexOf(f.name)<0) return false;
+          if(f.purchaseDept && String(r.purchaseDept).indexOf(f.purchaseDept)<0) return false;
+          return true;
+        });
+        if(state.sortKey){
+          list = list.slice().sort(function(a,b){
+            var av=a[state.sortKey], bv=b[state.sortKey], na=Number(av), nb=Number(bv);
+            var c = (!isNaN(na)&&!isNaN(nb)) ? (na-nb) : String(av).localeCompare(String(bv),"zh");
+            return state.sortDir==="asc"?c:-c;
+          });
+        }
+        return list;
+      }
+
+      function render(){
+        var list = filtered(), max = Math.max(1,Math.ceil(list.length/PAGE_SIZE));
+        if(state.page>max) state.page=max;
+        var view = list.slice((state.page-1)*PAGE_SIZE, state.page*PAGE_SIZE);
+        document.getElementById("thead").innerHTML = '<th style="min-width:44px"><input type="checkbox" id="chkAll"></th>' + cols.map(function(c){
+          var m = state.sortKey===c[0] ? (state.sortDir==="asc"?" ▲":" ▼") : " ↕";
+          return '<th data-sort="'+c[0]+'">'+c[1]+m+'</th>';
+        }).join("") + '<th style="min-width:240px">操作</th>';
+        document.getElementById("tbody").innerHTML = view.map(function(r){
+          var delBtn = '<button class="op-btn" data-op="del" data-id="'+r.id+'">删除</button>';
+          return "<tr><td><input type='checkbox' class='chkRow' data-id='"+r.id+"'></td>"+cols.map(function(c){
+            var v = r[c[0]];
+            if(c[0]==="unitPriceNoTax"||c[0]==="unitPriceTax"||c[0]==="totalPriceTax") v = "¥"+v;
+            return "<td>"+esc(v)+"</td>";
+          }).join("") + '<td><div class="ops">'
+            + '<button class="op-btn" data-op="new" data-id="'+r.id+'">新增</button>'
+            + '<button class="op-btn" data-op="edit" data-id="'+r.id+'">编辑</button>'
+            + '<button class="op-btn" data-op="view" data-id="'+r.id+'">查看</button>'
+            + delBtn
+            + '</div></td></tr>';
+        }).join("") || '<tr><td colspan="'+(cols.length+2)+'">暂无数据</td></tr>';
+        document.getElementById("pagerInfo").textContent = "共"+list.length+"条，每页10条";
+        document.getElementById("pager").innerHTML = Array.from({length:max}).map(function(_,i){
+          var n=i+1; return '<button class="page-btn '+(n===state.page?'active':'')+'" data-page="'+n+'">'+n+'</button>';
+        }).join("");
+      }
+
+      function rowById(id){ for(var i=0;i<rows.length;i++) if(rows[i].id===id) return rows[i]; return null; }
+
+      document.addEventListener("click", function(e){
+        if(e.target.id==="confirmDel"){
+          var did=e.target.getAttribute("data-id");
+          rows = rows.filter(function(x){ return x.id!==did;});
+          closeModal(); render(); return;
+        }
+        if(e.target.id==="btnSearch"){ state.filters={contractNo:document.getElementById("fContract").value.trim(),name:document.getElementById("fName").value.trim(),purchaseDept:document.getElementById("fDept").value.trim()}; state.page=1; render(); return; }
+        if(e.target.id==="btnReset"){ document.getElementById("fContract").value="";document.getElementById("fName").value="";document.getElementById("fDept").value=""; state.filters={}; state.page=1; render(); return; }
+        if(e.target.id==="btnExport"){ alert("已导出当前筛选后的列表（演示）"); return; }
+        if(e.target.id==="btnTpl"){ alert("已下载模板（演示）"); return; }
+        if(e.target.id==="btnImport"){ showModal("导入Excel","<div class='row-note'>步骤：下载模板 → 上传Excel → 预览数据 → 确认导入</div><div style='margin-top:10px'><button class='btn'>下载模板</button> <button class='btn secondary'>上传Excel</button></div>",'<button class="btn" data-close="1">取消</button><button class="btn primary" data-close="1">确认导入</button>'); return; }
+        if(e.target.id==="btnDelete"){
+          var ids = Array.prototype.slice.call(document.querySelectorAll(".chkRow:checked")).map(function(el){ return el.getAttribute("data-id"); });
+          if(!ids.length){ alert("请先勾选要删除的数据"); return; }
+          rows = rows.filter(function(x){ return ids.indexOf(x.id) < 0; });
+          render();
+          return;
+        }
+        if(e.target.id==="chkAll"){
+          Array.prototype.slice.call(document.querySelectorAll(".chkRow")).forEach(function(el){ el.checked = !!e.target.checked; });
+          return;
+        }
+        if(e.target.id==="btnAdd"){ 
+          var form = '<div class="grid2">'
+            + '<div class="field"><label>合同编号*</label><input id="addContractNo"/></div><div class="field"><label>采购部门*</label><input id="addDept"/></div>'
+            + '<div class="field"><label>供应商*</label><input id="addSupplier"/></div><div class="field"><label>物资名称*</label><input id="addName"/></div>'
+            + '<div class="field"><label>规格型号</label><input id="addSpec"/></div><div class="field"><label>物资类别*</label><select id="addCategory"><option>生产类</option><option>销售类</option><option>办公类</option></select></div>'
+            + '<div class="field"><label>采购数量*</label><input id="addQty" type="number" min="1" value="1"/></div><div class="field"><label>采购平均单价（不含税）</label><input id="addNoTax" type="number" min="0"/></div>'
+            + '<div class="field"><label>采购单价（含税）*</label><input id="addTax" type="number" min="0"/></div><div class="field"><label>税率*</label><input id="addRate" value="13%"/></div>'
+            + '<div class="field" style="grid-column:1 / -1"><label>备注</label><input id="addRemark"/></div>'
+            + '</div>';
+          showModal("新增合同",form,'<button class="btn" data-close="1">取消</button><button class="btn primary" id="saveAdd">保存</button>');
+          return;
+        }
+        if(e.target.id==="saveAdd"){
+          var qty = Number(document.getElementById("addQty").value||0);
+          var unitTax = Number(document.getElementById("addTax").value||0);
+          rows.unshift({
+            id:"CG-"+String(rows.length+1).padStart(4,"0"),
+            contractNo:document.getElementById("addContractNo").value||"-",
+            purchaseDept:document.getElementById("addDept").value||"-",
+            supplier:document.getElementById("addSupplier").value||"-",
+            name:document.getElementById("addName").value||"-",
+            spec:document.getElementById("addSpec").value||"-",
+            category:document.getElementById("addCategory").value||"生产类",
+            qty:qty||1,
+            unitPriceNoTax:Number(document.getElementById("addNoTax").value||0),
+            unitPriceTax:unitTax,
+            totalPriceTax:(qty||1)*unitTax,
+            taxRate:document.getElementById("addRate").value||"13%",
+            remark:document.getElementById("addRemark").value||"",
+            status:"草稿"
+          });
+          closeModal(); state.page=1; render(); return;
+        }
+        var pg = e.target.getAttribute("data-page"); if(pg){ state.page=Number(pg)||1; render(); return; }
+        var th = e.target.closest("[data-sort]"); if(th){ var k=th.getAttribute("data-sort"); if(state.sortKey===k) state.sortDir=state.sortDir==="asc"?"desc":"asc"; else {state.sortKey=k; state.sortDir="asc";} render(); return; }
+        var op = e.target.getAttribute("data-op"), id=e.target.getAttribute("data-id");
+        if(!op) return;
+        var r = rowById(id); if(!r) return;
+        if(op==="view"){
+          showModal("合同详情",'<div class="grid2">'+cols.map(function(c){var v=r[c[0]]; if(c[0]==="unitPriceNoTax"||c[0]==="unitPriceTax"||c[0]==="totalPriceTax") v="¥"+v; return '<div class="field"><label>'+c[1]+'</label><div>'+esc(v)+'</div></div>';}).join("")+'</div>');
+          return;
+        }
+        if(op==="new"){
+          document.getElementById("btnAdd").click();
+          return;
+        }
+        if(op==="edit"){
+          showModal("编辑货物台账",'<div class="grid2"><div class="field"><label>合同编号</label><input id="editContractNo" value="'+esc(r.contractNo)+'"/></div><div class="field"><label>物资名称</label><input id="editName" value="'+esc(r.name)+'"/></div><div class="field"><label>规格型号</label><input id="editSpec" value="'+esc(r.spec)+'"/></div><div class="field"><label>备注</label><input id="editRemark" value="'+esc(r.remark||"")+'"/></div></div>');
+          return;
+        }
+        if(op==="del"){
+          showModal("删除确认","确定删除合同【"+esc(r.contractNo)+"】吗？",'<button class="btn" data-close="1">取消</button><button class="btn primary" id="confirmDel" data-id="'+r.id+'">确定删除</button>');
+          return;
+        }
+      });
+      ["fContract","fName","fDept"].forEach(function(id){
+        var el = document.getElementById(id);
+        if(!el) return;
+        el.addEventListener("input", function(){
+          state.filters = {
+            contractNo:document.getElementById("fContract").value.trim(),
+            name:document.getElementById("fName").value.trim(),
+            purchaseDept:document.getElementById("fDept").value.trim()
+          };
+          state.page = 1;
+          render();
+        });
+      });
+      document.getElementById("modalX").addEventListener("click", closeModal);
+      document.getElementById("modalMask").addEventListener("click", function(e){ if(e.target===this || e.target.getAttribute("data-close")==="1") closeModal(); });
+      render();
+    })();
+  </script>
+</body>
+</html>

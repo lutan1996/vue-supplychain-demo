@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>采购数据台账</title>
+  <link rel="stylesheet" href="css/subpage-base.css" />
+  <link rel="stylesheet" href="css/source-navbar-header.css" />
+  <style>
+    body{background:#f3f5f7}
+    .page-wrap{padding:12px 16px 20px}
+    .card{background:#fff;border:1px solid #e6ecf3;border-radius:8px}
+    .head{padding:12px 14px;border-bottom:1px solid #edf2f7}
+    .head h2{margin:0;font-size:20px;color:#1f2937}
+    .tabs{display:flex;gap:8px;padding:10px 14px;border-bottom:1px solid #edf2f7;flex-wrap:wrap}
+    .tab-btn{border:1px solid #d3dce8;background:#fff;color:#334155;border-radius:20px;padding:6px 12px;font-size:12px;cursor:pointer}
+    .tab-btn.is-active{background:#1677ff;border-color:#1677ff;color:#fff}
+    .sub-tabs{display:none;gap:8px;padding:8px 14px;border-bottom:1px solid #edf2f7;background:#fafcff}
+    .sub-tabs.show{display:flex}
+    .sub-tab-btn{border:1px solid #d3dce8;background:#fff;color:#334155;border-radius:16px;padding:4px 10px;font-size:12px;cursor:pointer}
+    .sub-tab-btn.is-active{background:#1677ff;border-color:#1677ff;color:#fff}
+    .search-row{display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end;padding:10px 14px;border-bottom:1px solid #edf2f7}
+    .field{display:flex;flex-direction:column;gap:4px}
+    .field label{font-size:12px;color:#64748b}
+    .field input{height:30px;border:1px solid #d3dce8;border-radius:4px;padding:0 10px;min-width:150px}
+    .btn{height:36px;padding:0 18px;border:1px solid #c7dcff;border-radius:8px;background:#fff;color:#1f3555;font-size:20px;font-weight:600;cursor:pointer;line-height:34px}
+    .btn.primary{background:#1677ff;border-color:#1677ff;color:#fff}
+    .btn.danger{border-color:#ffd1d1;color:#cf1322;background:#fff}
+    .btn.op-btn{height:auto;line-height:1.2;padding:0;border:none;background:transparent;color:#1677ff;font-size:20px}
+    .btn.op-btn:hover{text-decoration:none;color:#4096ff}
+    .status-pill{display:inline-flex;align-items:center;justify-content:center;min-width:74px;height:32px;padding:0 16px;border-radius:999px;border:1px solid #d9d9d9;background:#fff;font-size:12px;font-weight:700;box-sizing:border-box}
+    .status-pending{color:#d48806;border-color:#f3d7a1;background:#fff8e6}
+    .status-pass{color:#1677ff;border-color:#91caff;background:#e6f4ff}
+    .status-reject{color:#cf1322;border-color:#ffb3b3;background:#fff}
+    .status-draft{color:#262626;border-color:#d9d9d9;background:#fff}
+    .table-wrap{overflow:auto}
+    table{width:100%;min-width:1400px;border-collapse:collapse;font-size:12px}
+    th,td{border:1px solid #edf2f7;padding:8px 6px;white-space:nowrap;text-align:center}
+    th{background:#fafcff;color:#334155;font-weight:600}
+    .pdl-modal-mask{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:3000;display:none;align-items:center;justify-content:center;padding:16px;box-sizing:border-box}
+    .pdl-modal-mask.show{display:flex}
+    .pdl-dialog{background:#fff;border-radius:10px;width:100%;max-width:1100px;max-height:92vh;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 16px 48px rgba(0,0,0,.18)}
+    .pdl-dlg-hd{padding:12px 16px;border-bottom:1px solid #edf2f7;font-weight:600;font-size:16px;color:#1f3551;display:flex;justify-content:space-between;align-items:center}
+    .pdl-dlg-bd{padding:12px 16px;overflow-y:auto;font-size:13px}
+    .pdl-dlg-ft{padding:10px 16px;border-top:1px solid #edf2f7;display:flex;justify-content:flex-end;gap:10px}
+    .pdl-sec{margin-bottom:16px}
+    .pdl-sec-h{margin:0 0 10px;font-size:14px;color:#1f3551;border-left:3px solid #1677ff;padding-left:8px;font-weight:600}
+    .pdl-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px 12px}
+    @media(max-width:900px){.pdl-grid{grid-template-columns:repeat(2,1fr)}}
+    @media(max-width:520px){.pdl-grid{grid-template-columns:1fr}}
+    .pdl-f{display:flex;flex-direction:column;gap:4px;min-width:0}
+    .pdl-f label{font-size:12px;color:#64748b}
+    .pdl-f input,.pdl-f select,.pdl-f textarea{height:32px;border:1px solid #d3dce8;border-radius:6px;padding:0 8px;font-size:13px;box-sizing:border-box;width:100%}
+    .pdl-f textarea{height:56px;min-height:56px;padding:6px 8px;resize:vertical}
+    .pdl-f-full{grid-column:1/-1}
+    .pdl-ro{background:#f8fafc;color:#334155;font-weight:500;padding:8px 10px;border-radius:6px;border:1px solid #e6ecf3;min-height:20px}
+    .pdl-row-hid{display:none}
+    .pdl-x{background:none;border:none;font-size:20px;line-height:1;cursor:pointer;color:#64748b;padding:4px 8px}
+    .pdl-req::after{content:" *";color:#cf1322;font-weight:600}
+  </style>
+</head>
+<body class="page-source-navbar page-subpage">
+  <div class="app">
+    <header class="header"><div class="header-left"><button class="header-hamburger"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button><a class="header-logo" href="#"><img src="assets/logo-chenergy.png" width="220" height="40" alt="" /></a><div class="header-source-brand"><p>新能源供应链管理系统</p></div></div><div class="header-right"><span class="clock" id="clock"></span><div class="user-avatar">用</div></div></header>
+    <div class="layout">
+      <aside class="sidebar"><div class="nav-item"><span class="nav-label">采购管理</span></div></aside>
+      <main class="main-scroll">
+        <div class="page-wrap">
+          <section class="card">
+            <div class="head"><h2>采购数据台账</h2></div>
+            <div class="tabs" id="tabs"></div>
+            <div class="sub-tabs" id="subTabs"></div>
+            <div class="search-row">
+              <div class="field"><label>物资名称</label><input id="qName" placeholder="请输入物资名称"/></div>
+              <div class="field"><label>保管部门</label><input id="qDept" placeholder="请输入保管部门"/></div>
+              <div class="field"><label>当前状态</label><input id="qStatus" placeholder="请输入当前状态"/></div>
+              <div class="field"><label>&nbsp;</label><div><button class="btn primary" id="btnSearch">搜索</button> <button class="btn" id="btnReset">重置</button></div></div>
+            </div>
+            <div class="search-row" style="border-top:0">
+              <div class="field"><label>&nbsp;</label><div><button class="btn primary" id="btnAdd">新增</button> <button class="btn" id="btnImport">导入</button> <button class="btn" id="btnTpl">下载模板</button> <button class="btn" id="btnExport">导出</button> <button class="btn danger" id="btnDeleteBatch">删除</button></div></div>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead id="thead"></thead>
+                <tbody id="tbody"></tbody>
+              </table>
+            </div>
+          </section>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <div class="pdl-modal-mask" id="pdlModalMask" aria-hidden="true">
+    <div class="pdl-dialog" role="dialog" aria-labelledby="pdlDlgTitle">
+      <div class="pdl-dlg-hd">
+        <span id="pdlDlgTitle">采购信息台账 — 新增</span>
+        <button type="button" class="pdl-x" id="pdlBtnClose" aria-label="关闭">×</button>
+      </div>
+      <div class="pdl-dlg-bd">
+        <form id="pdlForm" autocomplete="off">
+          <div class="pdl-sec">
+            <h3 class="pdl-sec-h">项目基础信息</h3>
+            <div class="pdl-grid">
+              <div class="pdl-f"><label for="pdlProjName">项目名称</label><input id="pdlProjName" placeholder="请输入项目名称" /></div>
+              <div class="pdl-f"><label for="pdlSupplierName">供应商名称</label><input id="pdlSupplierName" placeholder="请输入供应商名称" /></div>
+              <div class="pdl-f"><label for="pdlMethod">采购方式</label><select id="pdlMethod"><option value="">请选择</option><option>公开招标</option><option>邀请招标</option><option>竞争性谈判</option><option>询价</option><option>单一来源</option></select></div>
+              <div class="pdl-f"><label for="pdlCat">采购标的类别</label><select id="pdlCat"><option value="">请选择</option><option>物资</option><option>服务</option><option>工程</option></select></div>
+              <div class="pdl-f"><label for="pdlBizDept">业务部门</label><input id="pdlBizDept" placeholder="请输入业务部门" /></div>
+              <div class="pdl-f"><label for="pdlBizHandler">业务经办人</label><input id="pdlBizHandler" placeholder="请输入姓名" /></div>
+              <div class="pdl-f"><label for="pdlContractHandler">合同经办人</label><input id="pdlContractHandler" placeholder="请输入姓名" /></div>
+              <div class="pdl-f"><label for="pdlPartyHandler">相对方经办人</label><input id="pdlPartyHandler" placeholder="请输入姓名" /></div>
+              <div class="pdl-f"><label for="pdlIsFa">是否框架</label><select id="pdlIsFa"><option value="">请选择</option><option value="是">是</option><option value="否">否</option></select></div>
+              <div class="pdl-f pdl-row-hid" id="pdlFaAmtWrap"><label for="pdlFaAmt">框架协议金额（万元）</label><input id="pdlFaAmt" type="number" step="0.01" placeholder="请输入" /></div>
+              <div class="pdl-f"><label for="pdlExecContractAmt">执行合同金额（万元）</label><input id="pdlExecContractAmt" type="number" step="0.01" placeholder="自动带出" /></div>
+              <div class="pdl-f"><label for="pdlProcContractAmt">采购合同金额（万元）</label><input id="pdlProcContractAmt" type="number" step="0.01" placeholder="自动带出" /></div>
+              <div class="pdl-f"><label for="pdlProjType">项目类别</label><select id="pdlProjType"><option value="">请选择</option><option>一类</option><option>二类</option><option>三类</option></select></div>
+              <div class="pdl-f"><label for="pdlBudget">预算（万元）</label><input id="pdlBudget" type="number" step="0.01" placeholder="请输入" /></div>
+              <div class="pdl-f"><label for="pdlPriceLimit">是否限价</label><select id="pdlPriceLimit"><option value="">请选择</option><option>是</option><option>否</option></select></div>
+              <div class="pdl-f"><label for="pdlIsTech">是否科技项目</label><select id="pdlIsTech"><option value="">请选择</option><option value="是">是</option><option value="否">否</option></select></div>
+              <div class="pdl-f pdl-row-hid" id="pdlTechNameWrap"><label for="pdlTechName">科技项目名称</label><input id="pdlTechName" placeholder="请输入科技项目名称" /></div>
+              <div class="pdl-f"><label for="pdlWbs">项目/WBS编码</label><input id="pdlWbs" placeholder="请输入编码" /></div>
+              <div class="pdl-f"><label for="pdlIsXa">是否西安公司</label><select id="pdlIsXa"><option value="">请选择</option><option>是</option><option>否</option></select></div>
+            </div>
+          </div>
+          <div class="pdl-sec">
+            <h3 class="pdl-sec-h">审批信息</h3>
+            <div class="pdl-grid">
+              <div class="pdl-f"><label for="pdlOaFormTime">龙源OA审批表时间</label><input id="pdlOaFormTime" type="date" /></div>
+              <div class="pdl-f"><label for="pdlOaMinutesTime">龙源OA审查纪要时间</label><input id="pdlOaMinutesTime" type="date" /></div>
+              <div class="pdl-f"><label for="pdlCommitteePass">采委会计划通过期数</label><input id="pdlCommitteePass" placeholder="请输入" /></div>
+            </div>
+          </div>
+          <div class="pdl-sec">
+            <h3 class="pdl-sec-h">采购流程跟踪</h3>
+            <div class="pdl-grid">
+              <div class="pdl-f"><label for="pdlSrmSubmit">SRM提报时间</label><input id="pdlSrmSubmit" type="date" /></div>
+              <div class="pdl-f pdl-f-full"><label for="pdlProgress" class="pdl-req">采购流程进度</label><select id="pdlProgress"></select></div>
+              <div class="pdl-f"><label for="pdlPostTime">挂网时间</label><input id="pdlPostTime" type="date" /></div>
+              <div class="pdl-f pdl-f-full"><label for="pdlPostUrl">挂网网址</label><input id="pdlPostUrl" placeholder="https://" /></div>
+              <div class="pdl-f pdl-f-full"><label for="pdlBasis">采购依据</label><input id="pdlBasis" placeholder="请输入" /></div>
+              <div class="pdl-f"><label for="pdlPkgNo" class="pdl-req">采购标包号</label><select id="pdlPkgNo"><option value="">请选择采购标包编号</option></select></div>
+              <div class="pdl-f"><label for="pdlBidCode">招标/采购编码</label><input id="pdlBidCode" placeholder="请输入" /></div>
+              <div class="pdl-f"><label for="pdlOpenTime">开标时间</label><input id="pdlOpenTime" type="date" /></div>
+              <div class="pdl-f"><label for="pdlAwardTime">定标时间</label><input id="pdlAwardTime" type="date" /></div>
+              <div class="pdl-f"><label for="pdlPubTime">招标公示时间</label><input id="pdlPubTime" type="date" /></div>
+              <div class="pdl-f"><label for="pdlNoticeTime">中标/成交通知书下发时间</label><input id="pdlNoticeTime" type="date" /></div>
+              <div class="pdl-f"><label for="pdlWinAmt">中标/成交金额（万元）</label><input id="pdlWinAmt" type="number" step="0.01" placeholder="请输入" /></div>
+              <div class="pdl-f"><label for="pdlWinSupp">中标/成交供应商</label><input id="pdlWinSupp" placeholder="请输入" /></div>
+              <div class="pdl-f"><label for="pdlAnnualPlan">是否关联年度计划</label><select id="pdlAnnualPlan"><option value="">请选择</option><option>是</option><option>否</option></select></div>
+              <div class="pdl-f"><label for="pdlSealTime">合同用印时间</label><input id="pdlSealTime" type="date" /></div>
+              <div class="pdl-f"><label for="pdlContractSign">采购合同签订时间</label><input id="pdlContractSign" type="date" /></div>
+              <div class="pdl-f pdl-f-full"><label for="pdlTrackRemark">备注</label><textarea id="pdlTrackRemark" placeholder="请输入备注"></textarea></div>
+            </div>
+          </div>
+          <div class="pdl-sec">
+            <h3 class="pdl-sec-h">考核点（只读）</h3>
+            <div class="pdl-grid">
+              <div class="pdl-f"><label>考核点1：采购时长</label><div class="pdl-ro" id="pdlKpi1">—</div></div>
+              <div class="pdl-f"><label>考核点2：合同签订时长</label><div class="pdl-ro" id="pdlKpi2">—</div></div>
+              <div class="pdl-f pdl-f-full"><label for="pdlKpiRemark">考核点备注</label><textarea id="pdlKpiRemark" placeholder="选填"></textarea></div>
+              <div class="pdl-f pdl-f-full"><label for="pdlMainRemark">备注</label><textarea id="pdlMainRemark" placeholder="选填"></textarea></div>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="pdl-dlg-ft">
+        <button type="button" class="btn primary" id="pdlBtnSave">保存</button>
+        <button type="button" class="btn" id="pdlBtnCancel">取消</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/map-demo-toast.js"></script>
+  <script src="js/sidebar-actions.js"></script>
+  <script src="js/subpage-feature-title.js"></script>
+  <script src="js/subpage-clock.js"></script>
+  <script>
+    (function(){
+      var TABS = [
+        { key:"exec", name:"采购信息台帐", href:"purchase-plan-management.html" },
+        { key:"contract-mgmt", name:"合同信息管理台帐", href:"contract-management.html" },
+        { key:"inventory", name:"库存管理台帐", href:"material-procurement-hub.html?tab=m10" },
+        { key:"material", name:"物资管理台帐", href:"purchase-ledger.html?tab=ledger" },
+        { key:"order", name:"订单需求管理台帐", href:"material-procurement-hub.html?tab=m3" },
+        { key:"proj-inbound", name:"项目公司入库台帐", href:"proj-company-inbound.html" },
+        { key:"goods-quality", name:"货物质量验收台帐", href:"proc-quality-accept.html" }
+      ];
+      var activeTab = "exec";
+      var currentSchema = ["物资编码","物资名称","规格型号","物资类别","当前状态","保管部门","保管人","存放地点","操作"];
+      var TAB_SCHEMAS = {
+        "exec": ["序号","项目名称","供应商名称","采购方式","采购标的类别","业务部门","业务经办人","合同经办人","相对方经办人","是否框架","框架协议金额（万元）","执行合同金额（万元）","采购合同金额（万元）","项目类别","预算（万元）","是否限价","是否科技项目","科技项目名称","项目/WBS编码","是否西安公司","龙源OA审批表时间","龙源OA审查纪要时间","采委会计划通过期数","SRM提报时间","流程进度","挂网时间","挂网网址","采购依据","采购标包号","招标/采购编码","开标时间","定标时间","招标公示时间","中标/成交通知书下发时间","中标/成交金额","中标/成交供应商","是否关联年度计划","合同用印时间","采购合同签订时间","考核点1：采购时长","考核点2：合同签订时长","考核点备注","备注","操作"],
+        "contract-mgmt": ["合同编号","合同名称","合同类型","供应商名称","相对方","签订时间","合同金额","付款方式","付款比例","合同有效期","质保期","入账时间","入账进度","支付金额","支付时间","支付进度","阶段号","物资名称","规格型号","物资类别","采购数量","采购单价（含税）","税率","采购总价（含税）","备注","操作"],
+        "inventory": ["框架协议号/常规合同编号","执行合同编号","采购部门","供应商","物资名称","规格型号","采购平均单价（不含税）","采购单价（含税）","采购总价（不含税）","采购总价（含税）","采购数量","发货数量","验收数量","库存数量","收货时间","收货人","物流单号","入库人","入库状态","仓库","物资类别","备注","操作"],
+        "material": ["合同编号","采购部门","物资名称","规格型号","物资类别","采购平均单价（不含税）","领用总数","库存数量","操作"],
+        "order": ["提报人","部门","公司","日期","场站名称","设备清单（物资名称、规格型号、数量）","订单状态","当前处理人","物流单号","销售合同号","销售合同编号","操作"],
+        "goods-quality": ["验收单号","合同编号","供应商名称","物资名称","规格型号","发货数量","入库类型","验收状态","存放仓库/货位","保管人","入库时间","入库人","物资类别","备注","操作"],
+        "proj-inbound": ["入库单号","采购订单号","供应商","到货日期","验收状态","入库状态","关联部门","入库人","物资名称","规格型号","验收数量","备注","操作"]
+      };
+
+      var PROC_PROGRESS = [
+        "未报送","龙源OA采购计划审批中","采购部备案","准备上传SRM","询价编制文件","神华推送招标文件","亿泰推送采购文件","SRM审批中","SRM审批完成","挂网","等待上会","公示","准备签订合同","合同签订中","流程完毕","二次挂网","项目终止","计划终止"
+      ];
+
+      function fmtKpiShow(a, b){
+        if (!a || !b) return "—";
+        var da = new Date(String(a).slice(0, 10) + "T00:00:00");
+        var db = new Date(String(b).slice(0, 10) + "T00:00:00");
+        if (isNaN(da.getTime()) || isNaN(db.getTime())) return "—";
+        var n = Math.ceil((da - db) / 864e5);
+        if (!isFinite(n)) return "—";
+        return n + " 天";
+      }
+
+      function kpiDiffNum(a, b){
+        if (!a || !b) return null;
+        var da = new Date(String(a).slice(0, 10) + "T00:00:00");
+        var db = new Date(String(b).slice(0, 10) + "T00:00:00");
+        if (isNaN(da.getTime()) || isNaN(db.getTime())) return null;
+        var n = Math.ceil((da - db) / 864e5);
+        return isFinite(n) ? n : null;
+      }
+
+      function stripMoneyForForm(raw){
+        var s = normalize(String(raw || "")).replace(/[¥,\s]/g, "");
+        var n = parseFloat(s);
+        return isNaN(n) ? "" : String(n);
+      }
+
+      function tabStatusPool(key){
+        var m = {
+          "exec":["草稿","审批中","已通过","已驳回"],
+          "contract-mgmt":["草稿","审批中","已生效","已驳回"],
+          "inventory":["待验收","验收中","已验收"],
+          "material":["在库","领用中","已领用"],
+          "order":["草稿","待确认","已确认","已发货","已完成","已驳回"],
+          "goods-quality":["待验收","入库中","已验收"],
+          "proj-inbound":["待入库","入库中","已入库"]
+        };
+        return m[key] || ["草稿","审批中","已通过","已驳回"];
+      }
+
+      function makeRowsByTab(key){
+        var statusPool = tabStatusPool(key);
+        var list = [];
+        for(var i=1;i<=10;i++){
+          list.push({
+            code:"WZ-" + key.toUpperCase().slice(0,3) + "-20260425-" + String(i).padStart(4,"0"),
+            name:["变流器模块","IGBT驱动板","汇流箱","接线端子","支架组件","逆变器","电缆","保护器"][i%8],
+            spec:"XH-" + (100 + i),
+            cat:["设备类","电子类","材料类"][i%3],
+            status: statusPool[i % statusPool.length],
+            dept:["经营发展中心","采购部","工程部","财务部"][i%4],
+            keeper:["宋中波","王玉","赵六","李四","钱七"][i%5],
+            loc:["中心库A-01","中心库B-12","区域库C-03","中转区D-02"][i%4]
+          });
+        }
+        return list;
+      }
+
+      var rows = makeRowsByTab(activeTab);
+      var schemaCache = {};
+      var pdlEditCode = null;
+
+      function esc(v){ return String(v==null?"":v).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;"); }
+
+      function toastPdl(msg){
+        if (typeof mapDemoToast === "function") mapDemoToast(msg);
+        else alert(msg);
+      }
+
+      function initPdlLedgerModal(){
+        var sel = document.getElementById("pdlProgress");
+        if (sel && !sel._filled){
+          sel._filled = true;
+          sel.innerHTML = '<option value="">请选择采购流程进度</option>' + PROC_PROGRESS.map(function(p){ return "<option>"+esc(p)+"</option>"; }).join("");
+        }
+        var mask = document.getElementById("pdlModalMask");
+        var dlg = mask && mask.querySelector(".pdl-dialog");
+        if (dlg && !dlg._stop){
+          dlg._stop = true;
+          dlg.addEventListener("click", function(ev){ ev.stopPropagation(); });
+        }
+        if (mask && !mask._bound){
+          mask._bound = true;
+          mask.addEventListener("click", function(){ closePdlLedgerModal(); });
+          ["pdlBtnClose","pdlBtnCancel"].forEach(function(id){
+            var b = document.getElementById(id);
+            if (b) b.addEventListener("click", function(e){ e.preventDefault(); closePdlLedgerModal(); });
+          });
+          var pdlFormKpi = document.getElementById("pdlForm");
+          if (pdlFormKpi && !pdlFormKpi._pdlKpiDeleg){
+            pdlFormKpi._pdlKpiDeleg = true;
+            pdlFormKpi.addEventListener("change", function(){ updatePdlKpiUi(); });
+            pdlFormKpi.addEventListener("input", function(){ updatePdlKpiUi(); });
+          }
+          var isTech = document.getElementById("pdlIsTech");
+          if (isTech){ isTech.addEventListener("change", syncPdlTechRow); syncPdlTechRow(); }
+          var isFa = document.getElementById("pdlIsFa");
+          if (isFa){ isFa.addEventListener("change", syncPdlFaRow); syncPdlFaRow(); }
+          var saveBtn = document.getElementById("pdlBtnSave");
+          if (saveBtn) saveBtn.addEventListener("click", function(e){ e.preventDefault(); onPdlSaveClick(); });
+          var pdlForm = document.getElementById("pdlForm");
+          if (pdlForm && !pdlForm._pkgDeleg){
+            pdlForm._pkgDeleg = true;
+            pdlForm.addEventListener("change", function(ev){
+              if (ev.target && ev.target.id === "pdlPkgNo") pdlApplyPackageSelection();
+            });
+          }
+        }
+      }
+
+      function syncPdlTechRow(){
+        var w = document.getElementById("pdlTechNameWrap");
+        var el = document.getElementById("pdlIsTech");
+        if (!w || !el) return;
+        w.classList.toggle("pdl-row-hid", el.value !== "是");
+        if (el.value !== "是"){
+          var tn = document.getElementById("pdlTechName");
+          if (tn) tn.value = "";
+        }
+      }
+
+      function syncPdlFaRow(){
+        var w = document.getElementById("pdlFaAmtWrap");
+        var el = document.getElementById("pdlIsFa");
+        if (!w || !el) return;
+        w.classList.toggle("pdl-row-hid", el.value !== "是");
+      }
+
+      function updatePdlKpiUi(){
+        var srm = (document.getElementById("pdlSrmSubmit")||{}).value || "";
+        var cs = (document.getElementById("pdlContractSign")||{}).value || "";
+        var seal = (document.getElementById("pdlSealTime")||{}).value || "";
+        var notice = (document.getElementById("pdlNoticeTime")||{}).value || "";
+        var e1 = document.getElementById("pdlKpi1");
+        var e2 = document.getElementById("pdlKpi2");
+        if (e1) e1.textContent = fmtKpiShow(srm, cs);
+        if (e2) e2.textContent = fmtKpiShow(seal, notice);
+      }
+
+      function closePdlLedgerModal(){
+        var m = document.getElementById("pdlModalMask");
+        if (m){ m.classList.remove("show"); m.setAttribute("aria-hidden","true"); }
+        pdlEditCode = null;
+      }
+
+      function openPdlLedgerModal(mode, row){
+        initPdlLedgerModal();
+        var m = document.getElementById("pdlModalMask");
+        var title = document.getElementById("pdlDlgTitle");
+        if (mode === "add"){
+          if (title) title.textContent = "采购信息台账 — 新增";
+          pdlEditCode = null;
+          resetPdlLedgerForm();
+        } else if (row){
+          if (title) title.textContent = "采购信息台账 — 编辑";
+          pdlEditCode = normalize(row["物资编码"] || row["编号"] || row["单号"] || row.__id || "");
+          fillPdlLedgerForm(row);
+        }
+        syncPdlTechRow();
+        syncPdlFaRow();
+        updatePdlKpiUi();
+        refreshPdlPackageSelect(mode === "edit" && row ? row["采购标包号"] : "");
+        if (m){ m.classList.add("show"); m.setAttribute("aria-hidden","false"); }
+      }
+
+      function resetPdlLedgerForm(){
+        var f = document.getElementById("pdlForm");
+        if (f) f.reset();
+        var k1 = document.getElementById("pdlKpi1");
+        var k2 = document.getElementById("pdlKpi2");
+        if (k1) k1.textContent = "—";
+        if (k2) k2.textContent = "—";
+        refreshPdlPackageSelect("");
+      }
+
+      function fillPdlLedgerForm(r){
+        function gv(k){ return normalize(r[k]||""); }
+        function setId(id, v){ var el = document.getElementById(id); if (el) el.value = v; }
+        function stripMoney(s){
+          s = normalize(s).replace(/[¥,\s]/g,"");
+          var n = parseFloat(s);
+          return isNaN(n) ? "" : String(n);
+        }
+        setId("pdlProjName", gv("项目名称"));
+        setId("pdlSupplierName", gv("供应商名称"));
+        setId("pdlMethod", gv("采购方式"));
+        setId("pdlCat", gv("采购标的类别"));
+        setId("pdlBizDept", gv("业务部门"));
+        setId("pdlBizHandler", gv("业务经办人"));
+        setId("pdlContractHandler", gv("合同经办人"));
+        setId("pdlPartyHandler", gv("相对方经办人"));
+        setId("pdlIsFa", gv("是否框架"));
+        setId("pdlFaAmt", gv("框架协议金额（万元）"));
+        setId("pdlExecContractAmt", stripMoney(gv("执行合同金额（万元）")));
+        setId("pdlProcContractAmt", stripMoney(gv("采购合同金额（万元）")));
+        setId("pdlProjType", gv("项目类别"));
+        setId("pdlBudget", stripMoney(gv("预算（万元）")));
+        setId("pdlPriceLimit", gv("是否限价"));
+        setId("pdlIsTech", gv("是否科技项目"));
+        setId("pdlTechName", gv("科技项目名称"));
+        setId("pdlWbs", gv("项目/WBS编码"));
+        setId("pdlIsXa", gv("是否西安公司"));
+        setId("pdlOaFormTime", gv("龙源OA审批表时间").slice(0,10));
+        setId("pdlOaMinutesTime", gv("龙源OA审查纪要时间").slice(0,10));
+        setId("pdlCommitteePass", gv("采委会计划通过期数"));
+        setId("pdlSrmSubmit", gv("SRM提报时间").slice(0,10));
+        setId("pdlProgress", gv("流程进度"));
+        setId("pdlPostTime", gv("挂网时间").slice(0,10));
+        setId("pdlPostUrl", gv("挂网网址"));
+        setId("pdlBasis", gv("采购依据"));
+        setId("pdlPkgNo", gv("采购标包号"));
+        setId("pdlBidCode", gv("招标/采购编码"));
+        setId("pdlOpenTime", gv("开标时间").slice(0,10));
+        setId("pdlAwardTime", gv("定标时间").slice(0,10));
+        setId("pdlPubTime", gv("招标公示时间").slice(0,10));
+        setId("pdlNoticeTime", gv("中标/成交通知书下发时间").slice(0,10));
+        setId("pdlWinAmt", stripMoney(gv("中标/成交金额")));
+        setId("pdlWinSupp", gv("中标/成交供应商"));
+        setId("pdlAnnualPlan", gv("是否关联年度计划"));
+        setId("pdlSealTime", gv("合同用印时间").slice(0,10));
+        setId("pdlContractSign", gv("采购合同签订时间").slice(0,10));
+        var rem = gv("备注");
+        if (rem.indexOf("流程：")===0){
+          var parts = rem.split("\n");
+          setId("pdlTrackRemark", parts[0].replace(/^流程：/,""));
+          setId("pdlMainRemark", parts.slice(1).join("\n"));
+        } else {
+          setId("pdlTrackRemark", "");
+          setId("pdlMainRemark", rem);
+        }
+        setId("pdlKpiRemark", gv("考核点备注"));
+      }
+
+      function buildPdlRowFromForm(){
+        function v(id){ var el = document.getElementById(id); return el ? el.value : ""; }
+        var track = normalize(v("pdlTrackRemark"));
+        var main = normalize(v("pdlMainRemark"));
+        var remarkMerged = [track && ("流程：" + track), main].filter(Boolean).join("\n");
+        var o = {};
+        o["供应商名称"] = normalize(v("pdlSupplierName"));
+        o["项目名称"] = normalize(v("pdlProjName"));
+        o["采购方式"] = normalize(v("pdlMethod"));
+        o["采购标的类别"] = normalize(v("pdlCat"));
+        o["业务部门"] = normalize(v("pdlBizDept"));
+        o["业务经办人"] = normalize(v("pdlBizHandler"));
+        o["合同经办人"] = normalize(v("pdlContractHandler"));
+        o["相对方经办人"] = normalize(v("pdlPartyHandler"));
+        o["是否框架"] = normalize(v("pdlIsFa"));
+        o["框架协议金额（万元）"] = o["是否框架"] === "是" ? normalize(v("pdlFaAmt")) : "";
+        o["执行合同金额（万元）"] = normalize(v("pdlExecContractAmt"));
+        o["采购合同金额（万元）"] = normalize(v("pdlProcContractAmt"));
+        o["项目类别"] = normalize(v("pdlProjType"));
+        o["预算（万元）"] = normalize(v("pdlBudget"));
+        o["是否限价"] = normalize(v("pdlPriceLimit"));
+        o["是否科技项目"] = normalize(v("pdlIsTech"));
+        o["科技项目名称"] = o["是否科技项目"] === "是" ? normalize(v("pdlTechName")) : "";
+        o["项目/WBS编码"] = normalize(v("pdlWbs"));
+        o["是否西安公司"] = normalize(v("pdlIsXa"));
+        o["龙源OA审批表时间"] = normalize(v("pdlOaFormTime"));
+        o["龙源OA审查纪要时间"] = normalize(v("pdlOaMinutesTime"));
+        o["采委会计划通过期数"] = normalize(v("pdlCommitteePass"));
+        o["SRM提报时间"] = normalize(v("pdlSrmSubmit"));
+        o["流程进度"] = normalize(v("pdlProgress"));
+        o["挂网时间"] = normalize(v("pdlPostTime"));
+        o["挂网网址"] = normalize(v("pdlPostUrl"));
+        o["采购依据"] = normalize(v("pdlBasis"));
+        o["采购标包号"] = normalize(v("pdlPkgNo"));
+        o["招标/采购编码"] = normalize(v("pdlBidCode"));
+        o["开标时间"] = normalize(v("pdlOpenTime"));
+        o["定标时间"] = normalize(v("pdlAwardTime"));
+        o["招标公示时间"] = normalize(v("pdlPubTime"));
+        o["中标/成交通知书下发时间"] = normalize(v("pdlNoticeTime"));
+        o["中标/成交金额"] = normalize(v("pdlWinAmt"));
+        o["中标/成交供应商"] = normalize(v("pdlWinSupp"));
+        o["是否关联年度计划"] = normalize(v("pdlAnnualPlan"));
+        o["合同用印时间"] = normalize(v("pdlSealTime"));
+        o["采购合同签订时间"] = normalize(v("pdlContractSign"));
+        o["考核点备注"] = normalize(v("pdlKpiRemark"));
+        o["备注"] = remarkMerged;
+        updatePdlKpiUi();
+        var k1 = document.getElementById("pdlKpi1");
+        var k2 = document.getElementById("pdlKpi2");
+        o["考核点1：采购时长"] = k1 ? k1.textContent.trim() : "—";
+        o["考核点2：合同签订时长"] = k2 ? k2.textContent.trim() : "—";
+        o["操作"] = "__OPS__";
+        o["状态"] = "草稿";
+        o["当前状态"] = "草稿";
+        var idNew = "NO-" + Date.now();
+        if (pdlEditCode){
+          var prev = rows.find(function(r){
+            var c = normalize(r["物资编码"] || r["编号"] || r["单号"] || r.__id);
+            return c === pdlEditCode;
+          });
+          if (prev){
+            o["序号"] = prev["序号"] || "";
+            o.__id = prev.__id;
+            if (prev["单号"]) o["单号"] = prev["单号"];
+            if (prev["编号"]) o["编号"] = prev["编号"];
+            if (prev["物资编码"]) o["物资编码"] = prev["物资编码"];
+          } else {
+            o["序号"] = String(rows.length + 1);
+            o.__id = idNew;
+          }
+        } else {
+          o["序号"] = String(rows.length + 1);
+          o.__id = idNew;
+        }
+        if (!o["单号"]) o["单号"] = idNew;
+        currentSchema.forEach(function(h){
+          if (o[h] === undefined || o[h] === null) o[h] = "";
+        });
+        return o;
+      }
+
+      function onPdlSaveClick(){
+        updatePdlKpiUi();
+        var prog = normalize((document.getElementById("pdlProgress")||{}).value);
+        if (!prog){ toastPdl("请选择采购流程进度"); return; }
+        if (PROC_PROGRESS.indexOf(prog) < 0){ toastPdl("采购流程进度不合法，请重新选择"); return; }
+        var pkgSel = document.getElementById("pdlPkgNo");
+        if (!pkgSel || !normalize(pkgSel.value)){ toastPdl("请选择采购标包编号"); return; }
+        var techEl = document.getElementById("pdlIsTech");
+        var nameEl = document.getElementById("pdlTechName");
+        if (techEl && techEl.value === "是" && (!nameEl || !normalize(nameEl.value))){
+          toastPdl("请输入科技项目名称");
+          return;
+        }
+        var srm = (document.getElementById("pdlSrmSubmit")||{}).value || "";
+        var cs = (document.getElementById("pdlContractSign")||{}).value || "";
+        var seal = (document.getElementById("pdlSealTime")||{}).value || "";
+        var notice = (document.getElementById("pdlNoticeTime")||{}).value || "";
+        var n1 = kpiDiffNum(srm, cs);
+        var n2 = kpiDiffNum(seal, notice);
+        if (n1 != null && n1 < 0){
+          toastPdl("考核点1：采购时长计算异常：SRM提报时间不能早于采购合同签订时间，请核对日期");
+          return;
+        }
+        if (n2 != null && n2 < 0){
+          toastPdl("考核点2：合同签订时长计算异常：合同用印时间不能早于中标/成交通知书下发时间，请核对日期");
+          return;
+        }
+        var row = buildPdlRowFromForm();
+        if (pdlEditCode){
+          var idx = rows.findIndex(function(r){
+            var c = normalize(r["物资编码"] || r["编号"] || r["单号"] || r.__id);
+            return c === pdlEditCode;
+          });
+          if (idx >= 0) rows[idx] = row; else rows.unshift(row);
+        } else rows.unshift(row);
+        renderRows();
+        closePdlLedgerModal();
+        toastPdl("保存成功");
+      }
+
+      function renderTabs(){
+        document.getElementById("tabs").innerHTML = TABS.map(function(t){
+          var active = t.key === activeTab ? " is-active" : "";
+          return '<button type="button" class="tab-btn'+active+'" data-tab-key="'+esc(t.key)+'">'+t.name+'</button>';
+        }).join("");
+        renderSubTabs();
+      }
+
+      function renderSubTabs(){
+        var sub = document.getElementById("subTabs");
+        if (!sub) return;
+        sub.classList.remove("show");
+        sub.innerHTML = "";
+      }
+
+      function statusClass(st){
+        if(st === "审批中" || st === "待确认" || st === "待验收" || st === "入库中" || st === "待入库" || st === "待发货" || st === "待审核") return "status-pending";
+        if(st === "已通过" || st === "已确认" || st === "已生效" || st === "已批准" || st === "已出库" || st === "已发货" || st === "已签收" || st === "已完成" || st === "审核通过") return "status-pass";
+        if(st === "已驳回" || st === "不通过" || st === "已拒绝") return "status-reject";
+        return "status-draft";
+      }
+
+      function normalize(s){ return String(s||"").replace(/\s+/g," ").trim(); }
+
+      function refreshPdlPackageSelect(preserveValue){
+        var sel = document.getElementById("pdlPkgNo");
+        if (!sel) return;
+        var prev = preserveValue !== undefined && preserveValue !== null ? normalize(String(preserveValue)) : normalize(sel.value);
+        var set = {};
+        var opts = [];
+        rows.forEach(function(r){
+          var p = normalize(r["采购标包号"] || "");
+          if (p && !set[p]){ set[p] = true; opts.push(p); }
+        });
+        opts.sort();
+        if (!opts.length) opts.push("SP-CG-2026-001");
+        var h = '<option value="">请选择采购标包编号</option>';
+        opts.forEach(function(p){ h += "<option>" + esc(p) + "</option>"; });
+        sel.innerHTML = h;
+        if (prev && opts.indexOf(prev) >= 0) sel.value = prev;
+        else sel.value = "";
+      }
+
+      function findExecRowByPackage(pkg){
+        var p = normalize(pkg);
+        if (!p) return null;
+        for (var i = 0; i < rows.length; i++){
+          if (normalize(rows[i]["采购标包号"]) === p) return rows[i];
+        }
+        return null;
+      }
+
+      function pdlApplyPackageSelection(){
+        var sel = document.getElementById("pdlPkgNo");
+        var pkg = sel ? normalize(sel.value) : "";
+        if (!pkg) return;
+        var found = findExecRowByPackage(pkg);
+        if (!found) return;
+        var amt = stripMoneyForForm(found["中标/成交金额"]);
+        var supp = normalize(found["中标/成交供应商"] || "");
+        function setId(id, v){ var el = document.getElementById(id); if (el) el.value = v; }
+        setId("pdlSupplierName", supp);
+        setId("pdlWinSupp", supp);
+        setId("pdlWinAmt", amt);
+        setId("pdlFaAmt", amt);
+        setId("pdlExecContractAmt", amt);
+        setId("pdlProcContractAmt", amt);
+      }
+
+      function opHtmlByStatus(st){
+        var canEditDelete = (st === "草稿" || st === "已驳回" || st === "已拒绝" || st === "已撤回");
+        var canEditOnly = (st === "不通过" || st === "待发货");
+        var ops = "<button class='btn op-btn' data-op='view'>查看</button>";
+        if (canEditDelete || canEditOnly) ops += " <button class='btn op-btn' data-op='edit'>编辑</button>";
+        if (canEditDelete) ops += " <button class='btn op-btn' data-op='delete'>删除</button>";
+        return ops;
+      }
+
+      function renderHeader(schema){
+        currentSchema = (schema && schema.length ? schema : currentSchema).slice();
+        var thead = document.getElementById("thead");
+        var html = "<tr><th><input type='checkbox' id='chkAll'></th>";
+        currentSchema.forEach(function(h){ html += "<th>" + esc(h) + "</th>"; });
+        html += "</tr>";
+        thead.innerHTML = html;
+      }
+
+      function fillBySchema(schema, i, key){
+        var statusPool = tabStatusPool(key);
+        var st = statusPool[i % statusPool.length];
+        var row = { __id: key + "-" + (i + 1) };
+        schema.forEach(function(h, idx){
+          var t = normalize(h).replace(/\s+/g,"");
+          if (!t) { row[h] = ""; return; }
+          if (t === "流程进度") { row[h] = PROC_PROGRESS[i % PROC_PROGRESS.length]; return; }
+          if (t.indexOf("状态")>=0 || (t.indexOf("进度")>=0 && t !== "流程进度") || t.indexOf("结论")>=0) { row[h] = st; return; }
+          if (t.indexOf("操作")>=0 || t.indexOf("详情")>=0) { row[h] = "__OPS__"; return; }
+          if (t.indexOf("框架协议号/常规合同编号")>=0) {
+            row[h] = i >= 7
+              ? "CG-2026-" + String(100 + (i % 5)).padStart(3,"0") + "-0" + ((i % 3) + 1)
+              : "KJ-2026-" + String(100 + (i % 5)).padStart(3,"0");
+            return;
+          }
+          if (t.indexOf("执行合同编号")>=0) {
+            if (i >= 7) { row[h] = ""; return; }
+            row[h] = "ZX-2026-" + String(100 + (i % 5)).padStart(3,"0") + "-0" + ((i % 3) + 1);
+            return;
+          }
+          if (t.indexOf("单号")>=0 || t.indexOf("编号")>=0) { row[h] = "NO-" + (2026042500 + i + 1); return; }
+          if (t.indexOf("合同")>=0 && t.indexOf("号")>=0) { row[h] = "HT-2026-" + (100 + i + 1); return; }
+          if (t.indexOf("供应商名称")>=0) { row[h] = ["华东电控股份有限公司","北方能源装备有限公司","中能建设配套供应商"][i % 3]; return; }
+          if (t.indexOf("采购标包号")>=0) { row[h] = "SP-CG-2026-" + String(100 + i).padStart(3,"0"); return; }
+          if (t.indexOf("科技项目名称")>=0) { row[h] = (i % 3 === 0) ? ("科技课题-" + ((i % 4) + 1)) : ""; return; }
+          if (t.indexOf("项目类别")>=0) { row[h] = ["一类","二类","三类"][i % 3]; return; }
+          if (t.indexOf("项目/WBS")>=0 || (t.indexOf("WBS")>=0 && t.indexOf("编码")>=0)) { row[h] = "WBS-2026-" + (100 + i); return; }
+          if (t.indexOf("项目名称")>=0) { row[h] = "新能源示范项目" + ((i % 6) + 1); return; }
+          if (t.indexOf("是否")===0 || (h.indexOf("是否")===0 && t.indexOf("是否")>=0)) { row[h] = (i % 2 === 0) ? "是" : "否"; return; }
+          if (t.indexOf("框架协议金额")>=0) { row[h] = (i % 2 === 0) ? String((0.8 + i * 0.31).toFixed(2)) : ""; return; }
+          if (t.indexOf("执行合同金额")>=0 || t.indexOf("采购合同金额")>=0) {
+            row[h] = stripMoneyForForm("¥" + (1000 + i * 320));
+            return;
+          }
+          if (t.indexOf("采购方式")>=0) { row[h] = ["公开招标","竞争性谈判","询价"][i % 3]; return; }
+          if (t.indexOf("采购标的类别")>=0 || (t.indexOf("标的")>=0 && t.indexOf("类别")>=0)) { row[h] = ["物资","服务","工程"][i % 3]; return; }
+          if (t.indexOf("网址")>=0) { row[h] = "https://demo.example/p/" + i; return; }
+          if (t.indexOf("物资")>=0 || t.indexOf("货物")>=0 || (t.indexOf("名称")>=0 && t.indexOf("项目")<0 && t.indexOf("科技")<0)) { row[h] = ["变流器模块","IGBT驱动板","汇流箱","接线端子","支架组件","逆变器","电缆","保护器"][i%8]; return; }
+          if (t.indexOf("规格")>=0 || t.indexOf("型号")>=0) { row[h] = "XH-" + (101 + i); return; }
+          if (t.indexOf("数量")>=0) { row[h] = String(10 + (i % 9) * 5); return; }
+          if (t === "单位") { row[h] = ["台","件","套","米","个"][i%5]; return; }
+          if (t.indexOf("中标")>=0 && t.indexOf("成交")>=0 && t.indexOf("金额")>=0) { row[h] = "¥" + (1000 + i * 320); return; }
+          if (t.indexOf("价")>=0 || t.indexOf("金额")>=0) { row[h] = "¥" + (1000 + i * 320); return; }
+          if (t.indexOf("日期")>=0 || t.indexOf("时间")>=0) { row[h] = "2026-04-" + String(10 + (i % 18)).padStart(2,"0"); return; }
+          if (t.indexOf("部门")>=0) { row[h] = ["采购部","工程部","财务部","经营发展中心"][i%4]; return; }
+          if (t.indexOf("人")>=0) { row[h] = ["王玉","赵六","李四","钱七","宋中波"][i%5]; return; }
+          if (t.indexOf("仓")>=0 || t.indexOf("库位")>=0 || t.indexOf("货位")>=0 || t.indexOf("地点")>=0) { row[h] = ["中心库A-01","中心库B-12","区域库C-03","中转区D-02"][i%4]; return; }
+          if (t.indexOf("备注")>=0) { row[h] = "正常"; return; }
+          if (t.indexOf("序号")>=0) { row[h] = String(i+1); return; }
+          row[h] = "正常";
+        });
+        if (key === "exec") {
+          row["考核点1：采购时长"] = fmtKpiShow(row["SRM提报时间"], row["采购合同签订时间"]);
+          row["考核点2：合同签订时长"] = fmtKpiShow(row["合同用印时间"], row["中标/成交通知书下发时间"]);
+        }
+        return row;
+      }
+
+      async function loadSchemaAndRows(tab){
+        if (!tab) return { schema: currentSchema, rows: makeRowsByTab(activeTab) };
+        var schemaKey = tab.key;
+        if (schemaCache[schemaKey]) return schemaCache[schemaKey];
+        var schema = (TAB_SCHEMAS[schemaKey] || TAB_SCHEMAS[tab.key] || currentSchema).slice();
+        var parsed = [];
+        for (var i=0;i<10;i++) parsed.push(fillBySchema(schema, i, tab.key));
+        var result = { schema: schema, rows: parsed };
+        schemaCache[schemaKey] = result;
+        return result;
+      }
+
+      function renderRows(){
+        var n = (document.getElementById("qName").value || "").trim();
+        var d = (document.getElementById("qDept").value || "").trim();
+        var s = (document.getElementById("qStatus").value || "").trim();
+        var list = rows.filter(function(r){
+          var name = normalize(r["物资名称"] || r["名称"] || r["货物名称"] || r["项目名称"] || r["供应商名称"] || "");
+          var dept = normalize(r["保管部门"] || r["部门"] || r["申请部门"] || r["业务部门"] || "");
+          var st = normalize(r["当前状态"] || r["状态"] || r["审批状态"] || "");
+          if(n && name.indexOf(n)<0) return false;
+          if(d && dept.indexOf(d)<0) return false;
+          if(s && st.indexOf(s)<0) return false;
+          return true;
+        });
+        document.getElementById("tbody").innerHTML = list.map(function(r){
+          var code = normalize(r["物资编码"] || r["编号"] || r["单号"] || r["入库单号"] || r["发货单号"] || r["合同编号"] || r.__id || ("ROW-" + Math.random()));
+          var tr = "<tr data-code='"+esc(code)+"'><td><input type='checkbox' class='row-chk' data-code='"+esc(code)+"'></td>";
+          currentSchema.forEach(function(h){
+            var hk = normalize(h).replace(/\s+/g,"");
+            var val = r[h];
+            if (val == null || val === "") val = "";
+            var isFlowProgress = hk === "流程进度" || normalize(h).replace(/\s+/g,"") === "流程进度";
+            if (!isFlowProgress && (hk.indexOf("状态")>=0 || hk.indexOf("进度")>=0 || hk.indexOf("结论")>=0)) {
+              tr += "<td><span class='status-pill "+statusClass(normalize(val))+"'>"+esc(normalize(val)||"草稿")+"</span></td>";
+            } else if (hk.indexOf("操作")>=0 || hk.indexOf("详情")>=0 || val === "__OPS__") {
+              tr += "<td>"+opHtmlByStatus(normalize(r["状态"] || r["当前状态"] || r["审批状态"] || "草稿"))+"</td>";
+            } else {
+              tr += "<td>"+esc(val)+"</td>";
+            }
+          });
+          tr += "</tr>";
+          return tr;
+        }).join("") || '<tr><td colspan="' + (currentSchema.length + 1) + '" style="padding:20px;color:#94a3b8">暂无数据</td></tr>';
+      }
+
+      document.addEventListener("click", function(e){
+        var tabBtn = e.target.closest("[data-tab-key]");
+        if(tabBtn){
+          activeTab = tabBtn.getAttribute("data-tab-key") || "exec";
+          renderTabs();
+          var current = TABS.find(function(t){ return t.key === activeTab; });
+          loadSchemaAndRows(current).then(function(res){
+            renderHeader(res.schema);
+            rows = res.rows;
+            renderRows();
+          });
+          return;
+        }
+        if(e.target.id === "btnSearch"){ renderRows(); return; }
+        if(e.target.id === "btnReset"){ document.getElementById("qName").value=""; document.getElementById("qDept").value=""; document.getElementById("qStatus").value=""; renderRows(); return; }
+        if(e.target.id === "btnAdd"){
+          if (activeTab === "exec"){ openPdlLedgerModal("add", null); return; }
+          rows.unshift(fillBySchema(currentSchema, 0, activeTab));
+          renderRows();
+          return;
+        }
+        if(e.target.id === "btnDeleteBatch"){
+          var ids = Array.prototype.slice.call(document.querySelectorAll(".row-chk:checked")).map(function(c){ return c.getAttribute("data-code"); });
+          if(!ids.length){ alert("请先勾选要删除的数据"); return; }
+          rows = rows.filter(function(r){
+            var code = normalize(r["物资编码"] || r["编号"] || r["单号"] || r["入库单号"] || r["发货单号"] || r["合同编号"] || r.__id);
+            return ids.indexOf(code) < 0;
+          });
+          renderRows();
+          return;
+        }
+        if(e.target.id === "chkAll"){
+          var ck = !!e.target.checked;
+          Array.prototype.forEach.call(document.querySelectorAll(".row-chk"), function(c){ c.checked = ck; });
+          return;
+        }
+        var op = e.target.getAttribute("data-op");
+        if(op){
+          var tr = e.target.closest("tr[data-code]");
+          if(!tr) return;
+          var code = tr.getAttribute("data-code");
+          var row = rows.find(function(r){
+            var c = normalize(r["物资编码"] || r["编号"] || r["单号"] || r["入库单号"] || r["发货单号"] || r["合同编号"] || r.__id);
+            return c === code;
+          });
+          if(!row) return;
+          if(op === "view"){ alert("查看详情（演示）"); return; }
+          if(op === "edit"){
+            if (activeTab === "exec"){ openPdlLedgerModal("edit", row); return; }
+            alert("编辑弹窗（演示）"); return;
+          }
+          if(op === "delete"){
+            rows = rows.filter(function(r){
+              var c = normalize(r["物资编码"] || r["编号"] || r["单号"] || r["入库单号"] || r["发货单号"] || r["合同编号"] || r.__id);
+              return c !== code;
+            });
+            renderRows(); return;
+          }
+        }
+        if(e.target.id === "btnImport"){ alert("已导入「" + TABS.find(function(t){return t.key===activeTab;}).name + "」（演示）"); return; }
+        if(e.target.id === "btnTpl"){ alert("已下载「" + TABS.find(function(t){return t.key===activeTab;}).name + "」模板（演示）"); return; }
+        if(e.target.id === "btnExport"){ alert("已导出「" + TABS.find(function(t){return t.key===activeTab;}).name + "」（演示）"); return; }
+      });
+
+      renderTabs();
+      initPdlLedgerModal();
+      renderHeader(currentSchema);
+      loadSchemaAndRows(TABS.find(function(t){ return t.key === activeTab; })).then(function(res){
+        renderHeader(res.schema);
+        rows = res.rows;
+        renderRows();
+      });
+    })();
+  </script>
+</body>
+</html>

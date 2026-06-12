@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>产品目录 - 新能源物资供应链管理系统</title>
+    <link rel="stylesheet" href="css/vendor/fa-all.min.css" />
+  <link rel="stylesheet" href="css/subpage-base.css" />
+  <link rel="stylesheet" href="css/carrier-management.css" />
+<link rel="stylesheet" href="css/source-navbar-header.css" />
+  <style>
+    .cd .main-scroll{background:#f5f7fb;overflow-x:hidden;overflow-y:auto;-webkit-overflow-scrolling:touch;display:flex;flex-direction:column}
+    .cd .carrier-main-inner{padding:10px 12px 12px;background:#f5f7fb;flex:1;min-height:0;display:flex;flex-direction:column;box-sizing:border-box}
+    .btn{font-size:12px;border-radius:2px;padding:4px 10px;border:1px solid transparent;cursor:pointer;display:inline-flex;align-items:center;gap:4px}
+    .bs{background:#1890ff;color:#fff;border-color:#1890ff}.br{background:#fff;color:#4d6480;border-color:#dbe6f3}
+    .pd-panel{border:1px solid #e7ecf3;border-radius:4px;background:#fff;overflow:hidden}
+    .pd-panel-hd{padding:10px 12px;border-bottom:1px solid #edf1f6;font-size:13px;font-weight:600;color:#1f3551}
+    .pd-content{display:none;padding:0;flex-direction:column;gap:0;box-sizing:border-box}
+    .pd-content.is-show{display:flex}
+    .pd-section{border:1px solid #edf1f6;border-radius:4px;background:#fff;box-sizing:border-box}
+    .pd-section-hd{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 12px;border-bottom:1px solid #edf1f6}
+    .pd-section-title{font-size:13px;font-weight:600;color:#1f3551}
+    .pd-scroll{overflow:auto;width:100%}
+    .pd-type-scroll{max-height:120px}
+    .pd-product-scroll{max-height:none;overflow-x:hidden;overflow-y:auto}
+    .pd-table{width:100%;border-collapse:collapse;font-size:12px;min-width:0}
+    .pd-table th,.pd-table td{border:1px solid #edf1f6;padding:8px 10px;text-align:left;color:#334155;word-break:break-word;vertical-align:middle;white-space:nowrap}
+    .pd-table th{background:#f6f8fb;font-weight:600}
+    .pd-table--wide{width:100%;min-width:0;table-layout:fixed}
+    .pd-table--wide th,.pd-table--wide td{
+      white-space:normal;word-break:break-word;line-height:1.35;vertical-align:top;padding:6px 7px;font-size:11px;min-width:0;
+    }
+    .pd-table--wide th.pd-col-fixed:nth-child(1){width:10%}
+    .pd-table--wide th.pd-col-fixed:nth-child(2){width:9%}
+    .pd-table--wide th.pd-col-fixed:nth-child(3){width:8%}
+    .pd-table--wide th.pd-col-fixed:nth-child(4){width:10%}
+    .pd-table--wide th.pd-col-op,.pd-table--wide td.pd-col-op{
+      width:100px;min-width:100px;white-space:nowrap;vertical-align:middle;position:static;right:auto;overflow:visible;
+    }
+    .pd-table--wide td.pd-col-op.map-op-cell .pd-icon-btn:not(:last-child){margin-right:2px!important}
+    .pd-table tr:hover td{background:#fafcff}
+    .pd-icon-btn{width:24px;height:24px;border:none;border-radius:4px;background:transparent;color:#4f95cf;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;padding:0}
+    .pd-icon-btn:hover{color:#1677ff;background:#eef4ff}
+    .pd-icon-btn svg{display:block;pointer-events:none}
+    .pd-row-actions{display:inline-flex;align-items:center;gap:2px}
+    .pd-modal-mask{position:fixed;inset:0;background:rgba(15,23,42,.45);z-index:3000;display:none;align-items:center;justify-content:center;padding:20px}
+    .pd-modal-mask.show{display:flex}
+    .pd-modal{width:720px;max-width:96vw;max-height:90vh;background:#fff;border-radius:8px;display:flex;flex-direction:column;overflow:hidden}
+    .pd-modal-hd{padding:12px 16px;border-bottom:1px solid #edf1f6;font-size:14px;font-weight:600;color:#1f3551}
+    .pd-modal-bd{padding:14px 16px;overflow:auto}
+    .pd-modal-ft{padding:10px 16px;border-top:1px solid #edf1f6;display:flex;justify-content:flex-end;gap:8px}
+    .pd-modal.is-readonly #pdMMfrDdRoot{pointer-events:none}
+    .pd-modal.is-readonly input[readonly],.pd-modal.is-readonly #pdMFeatGrid input{background:#f5f7fa!important;color:#334155;cursor:default}
+    .pd-modal--confirm{width:400px;max-width:92vw}
+    .pd-confirm-text{font-size:14px;color:#1f2d3d;line-height:1.8;margin:0}
+    .btn.bd{background:#fff1f0;color:#cf1322;border-color:#ffccc7}
+    .btn.bd:hover{background:#ffeceb}
+    .pd-field{margin-bottom:10px}
+    .pd-field label{display:block;font-size:12px;color:#5b6b7f;margin-bottom:4px}
+    .pd-field input{width:100%;height:30px;border:1px solid #dbe6f3;border-radius:4px;padding:0 8px;box-sizing:border-box;font-size:12px}
+    .pd-feat-grid{display:flex;flex-direction:column;gap:10px;margin-top:8px}
+    .pd-feat-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .pd-catalog-shell{border:1px solid #e7ecf3;border-radius:4px;background:#fff;overflow:hidden;box-sizing:border-box;flex:1;min-height:0;display:flex;flex-direction:column}
+    .pd-catalog-shell-hd{padding:12px 14px;border-bottom:1px solid #edf1f6;background:#fafbfc}
+    .pd-catalog-shell-hd h1{margin:0;font-size:16px;font-weight:600;color:#1f3551;display:inline}
+    .pd-catalog-shell-tip{margin:6px 0 0;font-size:12px;color:#64748b;line-height:1.6}
+    .cd .pd-page{flex:1;display:flex;gap:10px;align-items:stretch;min-height:0;padding:10px;box-sizing:border-box}
+    .pd-panel--tree{width:300px;flex-shrink:0;display:flex;flex-direction:column;min-height:0;align-self:stretch}
+    .pd-panel--tree #pdTree{flex:1;min-height:0;overflow:auto;padding:8px 6px 10px}
+    .pd-tree-search{padding:8px 10px;border-bottom:1px solid #edf1f6}
+    .pd-tree-search input{width:100%;height:30px;border:1px solid #dbe6f3;border-radius:4px;padding:0 8px;font-size:12px;box-sizing:border-box}
+    .pd-panel--right{border:none;background:transparent;overflow:visible;flex:1;min-width:0;min-height:0;display:flex;flex-direction:column}
+    .pd-panel--right .pd-content.is-show{flex:1;min-height:0}
+    .pd-catalog-body{display:flex;flex-direction:column;gap:0;border:1px solid #edf1f6;border-radius:4px;background:#fff;overflow:hidden;flex:1;min-height:0}
+    .pd-block--type{border-bottom:1px solid #edf1f6;background:#fafbfc}
+    .pd-block-hd{padding:10px 12px;font-size:13px;font-weight:600;color:#1f3551;border-bottom:1px solid #eef2f6;background:#fff}
+    .pd-type-summary{padding:14px 16px 16px;font-size:13px;color:#334155;box-sizing:border-box}
+    .pd-type-grid-all{display:grid;grid-template-columns:minmax(0,2.2fr) minmax(0,1fr) minmax(0,0.9fr) minmax(0,1fr);gap:12px 16px;align-items:start}
+    .pd-type-item{display:flex;flex-direction:column;gap:4px;min-width:0}
+    .pd-type-item .k{font-size:12px;color:#64748b;font-weight:500}
+    .pd-type-item .v{font-size:13px;color:#1f3551;line-height:1.5;word-break:break-word}
+    .pd-block--products{flex:1;min-height:0;display:flex;flex-direction:column}
+    .pd-block--products .pd-section{border:none;border-radius:0;flex:1;min-height:0;display:flex;flex-direction:column}
+    .pd-block--products .pd-product-scroll{flex:1;min-height:0;max-height:none}
+    @media (max-width:1100px){.pd-type-grid-all{grid-template-columns:1fr 1fr;}}
+  </style>
+</head>
+<body class="page-source-navbar page-subpage page-logistics cd">
+<div class="page-bg" aria-hidden="true"></div><div class="app">
+<header class="header"><div class="header-left"><button type="button" class="header-hamburger" aria-label="菜单"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button><a class="header-logo" href="#"><img src="assets/logo-chenergy.png" alt="" width="220" height="40"/></a><div class="header-source-brand"><p>新能源供应链管理系统</p></div></div><div class="header-right"><span class="clock" id="clock"></span><div class="user-avatar">用</div></div></header>
+<div class="layout"><aside class="sidebar" aria-label="主导航"><div class="nav-item" title="我的资产"><span class="nav-label">我的资产</span></div><div class="nav-item"><span class="nav-label">我的任务</span></div><a class="nav-item" href="index-portal-screen-alt.html"><span class="nav-label">首页</span></a><a class="nav-item" href="cockpit-analytics.html"><span class="nav-label">驾驶舱</span></a><div class="nav-item"><span class="nav-label">采购管理</span></div><a class="nav-item" href="carrier-management.html"><span class="nav-label">物流管理</span></a><a class="nav-item" href="warehouse.html"><span class="nav-label">仓储管理</span></a><div class="nav-item"><span class="nav-label">物资采购</span></div><div class="nav-item"><span class="nav-label">物资出库与处置</span></div><div class="nav-item"><span class="nav-label">绩效考核</span></div><div class="nav-item"><span class="nav-label">公告管理</span></div><div class="nav-item"><span class="nav-label">综合业务管理</span></div><div class="nav-item nav-item--module-active"><span class="nav-label">数据管理</span></div><div class="nav-item"><span class="nav-label">开发工具</span></div><div class="nav-item"><span class="nav-label">设置</span></div><div class="nav-item"><span class="nav-label">系统管理</span></div></aside>
+<main class="main-scroll"><div class="carrier-main-inner">
+  <div class="pd-catalog-shell">
+    <div class="pd-catalog-shell-hd">
+      <h1>产品目录</h1>
+    </div>
+    <div class="pd-page">
+      <div class="pd-panel pd-panel--tree">
+        <div class="pd-panel-hd">物资类型</div>
+        <div class="pd-tree-search"><input type="search" id="pdTreeSearch" placeholder="搜索类型编码或名称" autocomplete="off" /></div>
+        <div id="pdTree"></div>
+      </div>
+      <div class="pd-panel pd-panel--right">
+        <div id="pdHint" style="padding:12px;color:#5b6b7f;font-size:12px">请在左侧选择第三级「小类」节点后查看物资类型信息与产品列表。</div>
+        <div id="pdContent" class="pd-content">
+          <div class="pd-catalog-body">
+            <div class="pd-block--type">
+              <div class="pd-block-hd">物资类型信息</div>
+              <div class="pd-type-summary" id="pdTypeSummary">
+                <p style="margin:0;color:#8b9ab0">—</p>
+              </div>
+            </div>
+            <div class="pd-block--products">
+              <div class="pd-section">
+                <div class="pd-section-hd">
+                  <span class="pd-section-title">产品列表</span>
+                  <button type="button" class="btn br" id="pdBtnAdd" disabled><span id="pdBtnAddIcon"></span>新增</button>
+                </div>
+                <div class="pd-scroll pd-product-scroll">
+                  <table class="pd-table pd-table--wide">
+                    <thead id="pdProductHead"></thead>
+                    <tbody id="pdProductBody"></tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div></main></div></div>
+<div class="pd-modal-mask" id="pdModalMask" aria-hidden="true">
+  <div class="pd-modal" role="dialog">
+    <div class="pd-modal-hd" id="pdModalTitle">新增产品</div>
+    <div class="pd-modal-bd">
+      <div class="pd-field"><label>产品名称</label><input id="pdMName" /></div>
+      <div class="pd-field"><label>制造商名称</label><div id="pdMMfrDdRoot"></div><input type="hidden" id="pdMMfr" /></div>
+      <div class="pd-field"><label>来源</label><input id="pdMSource" readonly placeholder="选择制造商后自动带入" style="background:#fafafa" /></div>
+      <div class="pd-field"><label>产品型号</label><input id="pdMModel" /></div>
+      <div class="pd-field"><label>产品编码</label><input id="pdMProductCode" readonly placeholder="B00000001" /></div>
+      <div style="font-size:12px;font-weight:600;color:#1f3551;margin:12px 0 8px">特征项</div>
+      <div class="pd-feat-grid" id="pdMFeatGrid"></div>
+    </div>
+    <div class="pd-modal-ft">
+      <button type="button" class="btn br" id="pdModalCancel">取消</button>
+      <button type="button" class="btn bs" id="pdModalSave">保存</button>
+    </div>
+  </div>
+</div>
+<div class="pd-modal-mask" id="pdDeleteModalMask" aria-hidden="true">
+  <div class="pd-modal pd-modal--confirm" role="dialog" aria-labelledby="pdDeleteModalTitle">
+    <div class="pd-modal-hd" id="pdDeleteModalTitle">删除确认</div>
+    <div class="pd-modal-bd">
+      <p class="pd-confirm-text" id="pdDeleteText">是否确认删除该产品？删除后不可恢复。</p>
+    </div>
+    <div class="pd-modal-ft">
+      <button type="button" class="btn br" id="pdDeleteCancel">取消</button>
+      <button type="button" class="btn bd" id="pdDeleteOk">确认删除</button>
+    </div>
+  </div>
+</div>
+<script src="js/sidebar-actions.js"></script><script src="js/subpage-feature-title.js"></script><script src="js/site-footer.js"></script>
+<script src="js/map-demo-toast.js"></script>
+<script src="js/subpage-clock.js"></script>
+<script src="js/demo-two-col-dd.js"></script>
+<script src="js/demo-manufacturer-data.js"></script>
+<script src="js/material-code-scheme.js"></script>
+<script src="js/demo-product-catalog-data.js"></script>
+<script>
+  (function () {
+    var FEAT_COLS = 30;
+    var STORAGE_PRODUCTS = "map-demo-pd-products-v1";
+    var STORAGE_BSEQ = "map-demo-pd-bseq-v1";
+    var STORAGE_FEATURES = "map-demo-pd-features-v1";
+    var ICON_PLUS = '<svg viewBox="0 0 16 16" width="14" height="14"><path d="M8 3.5v9M3.5 8h9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>';
+    var ICON_EDIT = '<svg viewBox="0 0 16 16" width="14" height="14"><rect x="3" y="3" width="8" height="8" rx="1" fill="none" stroke="currentColor" stroke-width="1.2"/><path d="M9 7l4 4M11.5 4.5l1 1" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>';
+    var ICON_VIEW = '<svg viewBox="0 0 16 16" width="14" height="14"><path d="M2 8s2.5-4 6-4 6 4 6 4-2.5 4-6 4-6-4-6-4z" fill="none" stroke="currentColor" stroke-width="1.2"/><circle cx="8" cy="8" r="2" fill="none" stroke="currentColor" stroke-width="1.2"/></svg>';
+    var ICON_DEL = '<svg viewBox="0 0 16 16" width="14" height="14"><path d="M5.5 6.5v5M8 6.5v5M10.5 6.5v5M4 4.5h8l-.5 8.5a1 1 0 0 1-1 .9H5.5a1 1 0 0 1-1-.9L4 4.5zM6.5 4.5V3.8a1 1 0 0 1 1-.8h1a1 1 0 0 1 1 .8v.7" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+
+    function esc(s) {
+      return String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/"/g, "&quot;");
+    }
+    function loadJson(key, fallback) {
+      try { var raw = localStorage.getItem(key); return raw ? JSON.parse(raw) : fallback; } catch (e) { return fallback; }
+    }
+    function saveJson(key, val) {
+      try { localStorage.setItem(key, JSON.stringify(val)); } catch (e) {}
+    }
+    function catKey(sel) { return sel.big + "|" + sel.mid + "|" + sel.small; }
+    function nextB() {
+      var seq = Number(loadJson(STORAGE_BSEQ, 1)) || 1;
+      saveJson(STORAGE_BSEQ, seq + 1);
+      return "B" + String(seq).padStart(8, "0");
+    }
+    function iconBtn(act, pid, tip) {
+      var icon = act === "view" ? ICON_VIEW : (act === "edit" ? ICON_EDIT : ICON_DEL);
+      return '<button type="button" class="pd-icon-btn" data-act="' + act + '" data-pid="' + esc(pid) + '" title="' + esc(tip) + '" aria-label="' + esc(tip) + '">' +
+        icon + "</button>";
+    }
+
+    var treeEl = document.getElementById("pdTree");
+    var hintEl = document.getElementById("pdHint");
+    var contentEl = document.getElementById("pdContent");
+    var typeSummaryEl = document.getElementById("pdTypeSummary");
+    var treeSearchEl = document.getElementById("pdTreeSearch");
+    var treeSearchQ = "";
+    var productHead = document.getElementById("pdProductHead");
+    var productBody = document.getElementById("pdProductBody");
+    var btnAdd = document.getElementById("pdBtnAdd");
+    var modalMask = document.getElementById("pdModalMask");
+    var modalEl = modalMask ? modalMask.querySelector(".pd-modal") : null;
+    var modalTitle = document.getElementById("pdModalTitle");
+    var modalSave = document.getElementById("pdModalSave");
+    var modalCancel = document.getElementById("pdModalCancel");
+    var mName = document.getElementById("pdMName");
+    var mMfr = document.getElementById("pdMMfr");
+    var mMfrDdRoot = document.getElementById("pdMMfrDdRoot");
+    var mSource = document.getElementById("pdMSource");
+    var mModel = document.getElementById("pdMModel");
+    var pdMfrDdInst = null;
+    var mProductCode = document.getElementById("pdMProductCode");
+    var mFeatGrid = document.getElementById("pdMFeatGrid");
+    var deleteModalMask = document.getElementById("pdDeleteModalMask");
+    var deleteText = document.getElementById("pdDeleteText");
+    var deleteOk = document.getElementById("pdDeleteOk");
+    var deleteCancel = document.getElementById("pdDeleteCancel");
+    var pendingDeleteId = null;
+
+    var classTree = [
+      { code: "A01", name: "大型成套设备", open: true, children: [
+        { code: "01", name: "风力发电机组", open: true, children: [
+          { code: "001", name: "风力发电机组整机", a: "A0100100001", category: "生产类", def: "指风电机组整机，包含机舱、叶片、塔筒等整套机组设备。", typeCode: "001",
+            features: [
+              { key: "f1", name: "制造商名称", required: true }, { key: "f2", name: "制造商型号", required: true },
+              { key: "f3", name: "额定功率", required: true }, { key: "f4", name: "叶轮直径", required: false },
+              { key: "f5", name: "额定风速", required: false }, { key: "f6", name: "切入风速", required: false },
+              { key: "f7", name: "切出风速", required: false }, { key: "f8", name: "环境工况", required: false }
+            ]},
+          { code: "002", name: "机舱", a: "A0100100002", category: "生产类", def: "不包含叶片、轮毂、塔筒。", typeCode: "002", features: [
+            { key: "f1", name: "制造商名称", required: true }, { key: "f2", name: "制造商型号", required: true },
+            { key: "f3", name: "尺寸（长×宽×高，mm）", required: true }, { key: "f4", name: "重量（t）", required: true }
+          ]}
+        ]},
+        { code: "02", name: "叶片", open: false, children: [
+          { code: "001", name: "叶片", a: "A0100200001", category: "生产类", def: "", typeCode: "001", features: [
+            { key: "f1", name: "制造商名称", required: true }, { key: "f2", name: "制造商型号", required: true }
+          ]}
+        ]}
+      ]},
+      { code: "A02", name: "小型设备", open: false, children: [] },
+      { code: "A03", name: "工器具", open: false, children: [] },
+      { code: "A04", name: "消防安防设备", open: false, children: [] }
+    ];
+
+    var allProducts = loadJson(STORAGE_PRODUCTS, {});
+    var allFeatures = loadJson(STORAGE_FEATURES, {});
+
+    function featTplFromTree(list) {
+      return (list || []).map(function (f, i) { return { id: i + 1, name: f.name, required: !!f.required }; });
+    }
+    function seedFeaturesFromTree() {
+      classTree.forEach(function (b) {
+        (b.children || []).forEach(function (m) {
+          (m.children || []).forEach(function (s) {
+            var k = catKey({ big: b.code, mid: m.code, small: s.code });
+            if (!allFeatures[k] && s.features && s.features.length) allFeatures[k] = featTplFromTree(s.features);
+          });
+        });
+      });
+      saveJson(STORAGE_FEATURES, allFeatures);
+    }
+    function featuresForSel() {
+      var key = catKey(sel);
+      if (!allFeatures[key]) allFeatures[key] = [];
+      return allFeatures[key];
+    }
+    function featKeyByIndex(i) { return "f" + i; }
+
+    function ensureDemoProducts() {
+      if (window.DemoProductCatalogData && DemoProductCatalogData.ensureDemoProducts) {
+        allProducts = DemoProductCatalogData.ensureDemoProducts();
+        return;
+      }
+    }
+    ensureDemoProducts();
+    seedFeaturesFromTree();
+
+    var sel = { big: "", mid: "", small: "" };
+    var currentSmall = null;
+    var editingProductId = null;
+    var modalMode = "add";
+
+    function findSmall(big, mid, small) {
+      var b = classTree.find(function (x) { return x.code === big; });
+      if (!b) return null;
+      var m = (b.children || []).find(function (x) { return x.code === mid; });
+      if (!m) return null;
+      return (m.children || []).find(function (x) { return x.code === small; }) || null;
+    }
+    function productsForSel() {
+      var key = catKey(sel);
+      if (!allProducts[key]) allProducts[key] = [];
+      return allProducts[key];
+    }
+    function normalizeProduct(p) {
+      var feats = p.features || {};
+      return {
+        id: p.id,
+        b: p.b || "",
+        a: p.a || (currentSmall && currentSmall.a) || "",
+        productName: p.productName || p.name || "",
+        mfrName: p.mfrName || feats.f1 || "",
+        model: p.model || feats.f2 || "",
+        features: feats
+      };
+    }
+
+    function renderTree() {
+      function renderBig(b) {
+        var bLabel = b.code + " " + b.name;
+        var bShow = treeLabelMatches(bLabel);
+        var kids = "";
+        if (b.children && b.children.length) {
+          kids = b.children
+            .map(function (m) {
+              return renderMid(b, m, bLabel);
+            })
+            .join("");
+        }
+        if (!bShow && !kids && treeSearchQ) return "";
+        var has = b.children && b.children.length;
+        var toggle = has ? '<button type="button" class="btn br" style="height:20px;padding:0 6px" data-t="big" data-code="' + esc(b.code) + '">' + (b.open ? "▾" : "▸") + "</button>" : '<span style="width:22px"></span>';
+        var row = '<div style="display:flex;align-items:center;gap:6px;padding:6px 8px;cursor:pointer" data-sel="big" data-code="' + esc(b.code) + '">' + toggle + '<span style="font-size:13px">' + esc(bLabel) + "</span></div>";
+        return row + (kids ? '<div style="margin-left:18px;display:' + (b.open ? "block" : "none") + '">' + kids + "</div>" : "");
+      }
+      function renderMid(b, m, parentLabel) {
+        var mLabel = m.code + " " + m.name;
+        var mShow = treeLabelMatches(mLabel) || treeLabelMatches(parentLabel);
+        var kids = "";
+        if (m.children && m.children.length) {
+          kids = m.children
+            .map(function (s) {
+              return renderSmall(b, m, s, mLabel, mShow);
+            })
+            .join("");
+        }
+        if (!mShow && !kids && treeSearchQ) return "";
+        var has = m.children && m.children.length;
+        var toggle = has ? '<button type="button" class="btn br" style="height:20px;padding:0 6px" data-t="mid" data-big="' + esc(b.code) + '" data-code="' + esc(m.code) + '">' + (m.open ? "▾" : "▸") + "</button>" : '<span style="width:22px"></span>';
+        var row = '<div style="display:flex;align-items:center;gap:6px;padding:6px 8px;cursor:pointer" data-sel="mid" data-big="' + esc(b.code) + '" data-code="' + esc(m.code) + '">' + toggle + '<span style="font-size:13px">' + esc(mLabel) + "</span></div>";
+        return row + (kids ? '<div style="margin-left:18px;display:' + (m.open ? "block" : "none") + '">' + kids + "</div>" : "");
+      }
+      function renderSmall(b, m, s, parentLabel, parentShow) {
+        var sLabel = s.code + " " + s.name + " " + (s.a || "");
+        var sShow = treeLabelMatches(sLabel) || parentShow || treeLabelMatches(parentLabel);
+        if (!sShow && treeSearchQ) return "";
+        var active = sel.big === b.code && sel.mid === m.code && sel.small === s.code;
+        return '<div style="display:flex;align-items:center;gap:6px;padding:6px 8px;border-radius:4px;cursor:pointer;color:' + (active ? "#1677ff" : "#334155") + ";background:" + (active ? "#e6f4ff" : "transparent") + '" data-sel="small" data-big="' + esc(b.code) + '" data-mid="' + esc(m.code) + '" data-code="' + esc(s.code) + '">' +
+          '<span style="width:22px"></span><span style="font-size:13px;font-weight:' + (active ? "600" : "400") + '">' + esc(s.code + " " + s.name) + "</span></div>";
+      }
+      var html = classTree.map(renderBig).join("");
+      treeEl.innerHTML = html || '<p style="padding:8px;color:#94a3b8;font-size:12px">无匹配节点</p>';
+    }
+
+    function renderTypeInfo() {
+      if (!typeSummaryEl) return;
+      if (!currentSmall) {
+        typeSummaryEl.innerHTML = '<p style="margin:0;color:#8b9ab0">—</p>';
+        return;
+      }
+      typeSummaryEl.innerHTML =
+        '<div class="pd-type-grid-all">' +
+        '<div class="pd-type-item"><span class="k">物资类型定义</span><span class="v">' +
+        esc(currentSmall.def || "—") +
+        "</span></div>" +
+        '<div class="pd-type-item"><span class="k">物资类型名称</span><span class="v">' +
+        esc(currentSmall.name) +
+        "</span></div>" +
+        '<div class="pd-type-item"><span class="k">物资类型码</span><span class="v">' +
+        esc(currentSmall.a || "—") +
+        "</span></div>" +
+        "</div>";
+    }
+
+    function treeLabelMatches(label) {
+      if (!treeSearchQ) return true;
+      return String(label || "").toLowerCase().indexOf(treeSearchQ) >= 0;
+    }
+
+    function visibleFeatCols() {
+      var seen = {};
+      featuresForSel().forEach(function (def) {
+        if (!def) return;
+        var id = Number(def.id);
+        if (!id) return;
+        if (isBaseFeatName(def.name || "")) return;
+        seen[id] = 1;
+      });
+      productsForSel().map(normalizeProduct).forEach(function (p) {
+        extraFeatIndices(p).forEach(function (i) {
+          seen[i] = 1;
+        });
+      });
+      return Object.keys(seen)
+        .map(Number)
+        .sort(function (a, b) {
+          return a - b;
+        });
+    }
+
+    function featCellByFeatIndex(p, featIndex) {
+      var key = featKeyByIndex(featIndex);
+      var feats = p.features || {};
+      var name = feats[key + "_name"] || "";
+      var param = feats[key] || "";
+      if (!name) {
+        var def = featuresForSel().find(function (x) {
+          return Number(x.id) === featIndex;
+        });
+        if (def) name = def.name || "";
+      }
+      if (isBaseFeatName(name)) return "<td>—</td>";
+      var text = name && param ? name + "：" + param : name || param || "";
+      return "<td>" + esc(text || "—") + "</td>";
+    }
+
+    function buildProductHead(featCols) {
+      var h =
+        '<tr><th class="pd-col-fixed">产品名称</th><th class="pd-col-fixed">制造商名称</th><th class="pd-col-fixed">产品型号</th><th class="pd-col-fixed">产品编码</th>';
+      featCols.forEach(function (i, idx) {
+        h += "<th>特征值" + (idx + 1) + "</th>";
+      });
+      h += '<th class="pd-col-op">操作</th></tr>';
+      productHead.innerHTML = h;
+    }
+
+    function isBaseFeatName(name) {
+      return /制造商名称|制造商型号|产品型号/.test(String(name || ""));
+    }
+    function extraFeatIndices(p) {
+      var feats = p.features || {};
+      var defs = featuresForSel();
+      var out = [];
+      var i;
+      for (i = 1; i <= FEAT_COLS; i++) {
+        var key = featKeyByIndex(i);
+        var name = feats[key + "_name"] || "";
+        if (!name) {
+          var def = defs.find(function (x) { return Number(x.id) === i; });
+          if (def) name = def.name || "";
+        }
+        if (isBaseFeatName(name)) continue;
+        if (name || feats[key]) out.push(i);
+      }
+      return out;
+    }
+    function featDisplayText(p, tableColIndex) {
+      var indices = extraFeatIndices(p);
+      var featIndex = indices[tableColIndex - 1];
+      if (!featIndex) return "";
+      var key = featKeyByIndex(featIndex);
+      var feats = p.features || {};
+      var name = feats[key + "_name"] || "";
+      var param = feats[key] || "";
+      if (!name) {
+        var def = featuresForSel().find(function (x) { return Number(x.id) === featIndex; });
+        if (def) name = def.name || "";
+      }
+      if (name && param) return name + "：" + param;
+      if (name) return name;
+      if (param) return param;
+      return "";
+    }
+
+    function featCell(p, i) {
+      var text = featDisplayText(p, i);
+      return "<td>" + esc(text || "—") + "</td>";
+    }
+
+    function renderProductList() {
+      var list = productsForSel().map(normalizeProduct);
+      var featCols = visibleFeatCols();
+      buildProductHead(featCols);
+      if (!list.length) {
+        productBody.innerHTML =
+          '<tr><td colspan="' +
+          (4 + featCols.length + 1) +
+          '" style="text-align:center;color:#8b9ab0">暂无产品，请点击右上角「新增」</td></tr>';
+        return;
+      }
+      productBody.innerHTML = list
+        .map(function (p) {
+          var cells =
+            "<td>" +
+            esc(p.productName) +
+            "</td><td>" +
+            esc(p.mfrName) +
+            "</td><td>" +
+            esc(p.model) +
+            "</td><td>" +
+            esc(p.b || "—") +
+            "</td>";
+          featCols.forEach(function (i) {
+            cells += featCellByFeatIndex(p, i);
+          });
+          cells +=
+            '<td class="pd-col-op"><span class="pd-row-actions">' +
+            iconBtn("view", p.id, "查看") +
+            iconBtn("edit", p.id, "编辑") +
+            iconBtn("del", p.id, "删除") +
+            "</span></td>";
+          return '<tr data-pid="' + esc(p.id) + '">' + cells + "</tr>";
+        })
+        .join("");
+    }
+
+    function renderModalFeatInputs(p) {
+      var html = "";
+      for (var i = 1; i <= FEAT_COLS; i++) {
+        html += '<div class="pd-feat-row">' +
+          '<div class="pd-field"><label>特征值' + i + '名称</label><input data-feat-name-idx="' + i + '" value="" placeholder="如：额定风速" /></div>' +
+          '<div class="pd-field"><label>特征值' + i + '参数</label><input data-feat-idx="' + i + '" value="" placeholder="如：10.3m/s" /></div>' +
+          "</div>";
+      }
+      mFeatGrid.innerHTML = html;
+    }
+
+    function applyPdMfrSourceFromName(name) {
+      var rec = window.DemoManufacturerData ? DemoManufacturerData.findByName(name) : null;
+      if (mSource) mSource.value = rec && rec.source ? rec.source : "";
+    }
+    function initPdManufacturerDd(selectedName) {
+      if (!mMfrDdRoot || !mMfr || !window.DemoTwoColDd || !window.DemoManufacturerData) return;
+      if (pdMfrDdInst && pdMfrDdInst.destroy) {
+        pdMfrDdInst.destroy();
+        pdMfrDdInst = null;
+      }
+      DemoManufacturerData.ensureSeeded();
+      var rows = [{ value: "", c1: "", c2: "请选择制造商", placeholder: true }];
+      DemoManufacturerData.ddRows().forEach(function (r) {
+        rows.push({ value: r.value, c1: r.c1, c2: r.c2 });
+      });
+      pdMfrDdInst = DemoTwoColDd.mount({
+        root: mMfrDdRoot,
+        hiddenInput: mMfr,
+        placeholder: "请选择制造商",
+        searchPlaceholder: "搜索制造商编号或名称",
+        col1: "制造商编号",
+        col2: "制造商名称",
+        rows: rows,
+        onChange: function () {
+          applyPdMfrSourceFromName(mMfr.value);
+        }
+      });
+      if (selectedName) {
+        pdMfrDdInst.setValue(String(selectedName), true);
+        applyPdMfrSourceFromName(selectedName);
+      } else {
+        mMfr.value = "";
+        if (mSource) mSource.value = "";
+      }
+    }
+    function setModalEditable(editable) {
+      if (modalEl) modalEl.classList.toggle("is-readonly", !editable);
+      mName.readOnly = !editable;
+      mModel.readOnly = !editable;
+      if (mMfrDdRoot) mMfrDdRoot.style.pointerEvents = editable ? "" : "none";
+      Array.prototype.forEach.call(mFeatGrid.querySelectorAll("input"), function (ip) {
+        ip.readOnly = !editable;
+      });
+    }
+    function openModal(mode, product) {
+      modalMode = mode;
+      editingProductId = (mode === "edit" || mode === "view") && product ? product.id : null;
+      modalTitle.textContent = mode === "view" ? "查看产品" : (mode === "edit" ? "编辑产品" : "新增产品");
+      var p = product ? normalizeProduct(product) : null;
+      mName.value = p ? p.productName : "";
+      mModel.value = p ? p.model : "";
+      initPdManufacturerDd(p ? p.mfrName : "");
+      if (mProductCode) mProductCode.value = p ? p.b : (mode === "add" ? nextB() : "");
+      renderModalFeatInputs(p);
+      setModalEditable(mode !== "view");
+      modalSave.style.display = mode === "view" ? "none" : "";
+      modalCancel.textContent = mode === "view" ? "关闭" : "取消";
+      modalMask.classList.add("show");
+      modalMask.setAttribute("aria-hidden", "false");
+    }
+    function closeModal() {
+      modalMask.classList.remove("show");
+      modalMask.setAttribute("aria-hidden", "true");
+      editingProductId = null;
+      modalMode = "add";
+      setModalEditable(true);
+      modalSave.style.display = "";
+      modalCancel.textContent = "取消";
+    }
+    function openDeleteModal(product) {
+      if (!product) return;
+      pendingDeleteId = product.id;
+      var name = (product.productName || "").trim() || "该产品";
+      deleteText.textContent = "是否确认删除产品「" + name + "」？删除后不可恢复。";
+      deleteModalMask.classList.add("show");
+      deleteModalMask.setAttribute("aria-hidden", "false");
+    }
+    function closeDeleteModal() {
+      deleteModalMask.classList.remove("show");
+      deleteModalMask.setAttribute("aria-hidden", "true");
+      pendingDeleteId = null;
+    }
+    function readModalFeatures() {
+      var feats = {};
+      Array.prototype.forEach.call(mFeatGrid.querySelectorAll("input[data-feat-name-idx]"), function (ip) {
+        var idx = Number(ip.getAttribute("data-feat-name-idx"));
+        feats[featKeyByIndex(idx) + "_name"] = (ip.value || "").trim();
+      });
+      Array.prototype.forEach.call(mFeatGrid.querySelectorAll("input[data-feat-idx]"), function (ip) {
+        feats[featKeyByIndex(Number(ip.getAttribute("data-feat-idx")))] = (ip.value || "").trim();
+      });
+      return feats;
+    }
+
+    function renderPanel() {
+      currentSmall = findSmall(sel.big, sel.mid, sel.small);
+      if (!currentSmall) {
+        hintEl.style.display = "block";
+        contentEl.classList.remove("is-show");
+        btnAdd.disabled = true;
+        return;
+      }
+      hintEl.style.display = "none";
+      contentEl.classList.add("is-show");
+      btnAdd.disabled = false;
+      renderTypeInfo();
+      renderProductList();
+    }
+
+    var addIconEl = document.getElementById("pdBtnAddIcon");
+    if (addIconEl) addIconEl.innerHTML = ICON_PLUS;
+
+    btnAdd.addEventListener("click", function () {
+      if (!currentSmall) return;
+      openModal("add", null);
+    });
+    modalCancel.addEventListener("click", closeModal);
+    modalMask.addEventListener("click", function (e) { if (e.target === modalMask) closeModal(); });
+    modalSave.addEventListener("click", function () {
+      if (modalMode === "view") return;
+      if (!currentSmall) return;
+      var productName = mName.value.trim();
+      var mfrName = mMfr.value.trim();
+      var model = mModel.value.trim();
+      if (!productName) { alert("请填写产品名称"); return; }
+      if (!mfrName) { alert("请选择制造商名称"); return; }
+      if (!model) { alert("请填写产品型号"); return; }
+      var feats = readModalFeatures();
+      feats.f1 = mfrName;
+      feats.f2 = model;
+      var list = productsForSel();
+      var payload = normalizeProduct({
+        id: editingProductId || ("p-" + Date.now()),
+        b: (mProductCode && mProductCode.value) || nextB(),
+        a: currentSmall.a,
+        productName: productName,
+        mfrName: mfrName,
+        model: model,
+        features: feats
+      });
+      if (editingProductId) {
+        var idx = list.findIndex(function (x) { return x.id === editingProductId; });
+        if (idx >= 0) list[idx] = payload;
+      } else {
+        list.push(payload);
+      }
+      saveJson(STORAGE_PRODUCTS, allProducts);
+      closeModal();
+      renderProductList();
+      alert("保存成功（演示）");
+    });
+
+    productBody.addEventListener("click", function (e) {
+      var btn = e.target.closest("[data-act]");
+      if (!btn) return;
+      e.preventDefault();
+      var pid = btn.getAttribute("data-pid");
+      var p = productsForSel().find(function (x) { return x.id === pid; });
+      if (!p) return;
+      if (btn.getAttribute("data-act") === "view") openModal("view", p);
+      if (btn.getAttribute("data-act") === "edit") openModal("edit", p);
+      if (btn.getAttribute("data-act") === "del") openDeleteModal(p);
+    });
+
+    deleteCancel.addEventListener("click", closeDeleteModal);
+    deleteModalMask.addEventListener("click", function (e) {
+      if (e.target === deleteModalMask) closeDeleteModal();
+    });
+    deleteOk.addEventListener("click", function () {
+      if (!pendingDeleteId) return;
+      allProducts[catKey(sel)] = productsForSel().filter(function (x) { return x.id !== pendingDeleteId; });
+      saveJson(STORAGE_PRODUCTS, allProducts);
+      closeDeleteModal();
+      renderProductList();
+      if (typeof window.mapDemoToast === "function") window.mapDemoToast("已删除！");
+    });
+
+    treeEl.addEventListener("click", function (e) {
+      var t = e.target.closest("[data-t]");
+      if (t) {
+        e.stopPropagation();
+        if (t.getAttribute("data-t") === "big") {
+          var b = classTree.find(function (x) { return x.code === t.getAttribute("data-code"); });
+          if (b) b.open = !b.open;
+        } else {
+          var b2 = classTree.find(function (x) { return x.code === t.getAttribute("data-big"); });
+          var m2 = b2 && (b2.children || []).find(function (x) { return x.code === t.getAttribute("data-code"); });
+          if (m2) m2.open = !m2.open;
+        }
+        renderTree();
+        return;
+      }
+      var r = e.target.closest("[data-sel]");
+      if (!r || r.getAttribute("data-sel") !== "small") return;
+      sel = { big: r.getAttribute("data-big"), mid: r.getAttribute("data-mid"), small: r.getAttribute("data-code") };
+      renderTree();
+      renderPanel();
+    });
+
+    if (treeSearchEl) {
+      treeSearchEl.addEventListener("input", function () {
+        treeSearchQ = String(this.value || "").trim().toLowerCase();
+        renderTree();
+      });
+    }
+
+    renderTree();
+    renderPanel();
+  })();
+</script>
+</body>
+</html>

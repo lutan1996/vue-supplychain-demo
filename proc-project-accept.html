@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>验收确认 - 新能源物资供应链管理系统</title>
+  <link rel="stylesheet" href="css/vendor/fa-all.min.css" />
+  <link rel="stylesheet" href="css/subpage-base.css" />
+  <link rel="stylesheet" href="css/carrier-management.css" />
+  <link rel="stylesheet" href="css/source-navbar-header.css" />
+  <style>
+    .pc-ops a{color:#1677ff;text-decoration:none;font-weight:600;font-size:14px;margin-right:8px}
+    .pc-ops a:hover{color:#4096ff;text-decoration:underline}
+  </style>
+</head>
+<body class="page-source-navbar page-subpage page-logistics">
+  <div class="page-bg" aria-hidden="true"></div>
+  <div class="app">
+    <header class="header"><div class="header-left"><button class="header-hamburger"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button><a class="header-logo" href="#"><img src="assets/logo-chenergy.png" width="220" height="40" alt=""/></a><div class="header-source-brand"><p>新能源供应链管理系统</p></div></div><div class="header-right"><span class="clock" id="clock"></span><div class="user-avatar">用</div></div></header>
+    <div class="layout"><aside class="sidebar"><div class="nav-item nav-item--module-active"><span class="nav-label">采购管理</span></div></aside><main class="main-scroll"><div class="carrier-main-inner">
+      <h1 class="carrier-page-title">验收确认（项目公司验收后）</h1>
+      <div class="carrier-toolbar">
+        <div>
+          <button class="carrier-btn-add" id="pcBtnAdd"><i class="fa-solid fa-plus"></i> 新增</button>
+          <button class="carrier-btn-add" id="pcBtnImport" style="background:#fff;color:#389e0d;border:1px solid #b7eb8f"><i class="fa-solid fa-file-import"></i> 导入</button>
+          <button class="carrier-btn-add" id="pcBtnTpl" style="background:#fff;color:#1677ff;border:1px solid #91caff"><i class="fa-solid fa-download"></i> 下载模板</button>
+          <button class="carrier-btn-add" id="pcBtnExport" style="background:#fff;color:#1677ff;border:1px solid #91caff"><i class="fa-solid fa-file-export"></i> 导出</button>
+          <button class="carrier-btn-add" id="pcBtnDelete" style="background:#fff1f0;color:#cf1322;border:1px solid #ffccc7">删除</button>
+        </div>
+        <div class="carrier-toolbar-right">
+          <select class="carrier-select" id="pcRole"><option value="biz">业务部门专责</option><option value="project">项目公司</option></select>
+          <input class="carrier-search" id="pcKeyword" placeholder="确认单号/发货单号"/>
+          <button class="carrier-btn-add" id="pcBtnSearch">搜索</button>
+          <button class="carrier-btn-add" id="pcBtnReset" style="background:#fff;color:#1677ff;border:1px solid #91caff">重置</button>
+        </div>
+      </div>
+      <div class="carrier-table-wrap"><table class="carrier-table"><thead><tr><th>确认单号</th><th>发货单号</th><th>销售合同编号</th><th>项目公司</th><th>场站名称</th><th>物资摘要</th><th>发货数量</th><th>实收数量</th><th data-status-h>确认状态</th><th>验收完成时间</th><th>确认时间</th><th>操作</th></tr></thead><tbody id="pcTb">
+        <tr><td>QR-2026-001</td><td>FH-2026-101</td><td>HT-XS-2026-001</td><td>天津龙源</td><td>沙井子风电场</td><td>IGBT驱动板</td><td>30</td><td>30</td><td data-status><span class="tag-status tag-status--to-shelf">待确认</span></td><td>2026-04-20 10:00</td><td>-</td><td><span class="pc-ops" data-ops></span></td></tr>
+      </tbody></table></div>
+    </div></main></div>
+  </div>
+  <script src="js/sidebar-actions.js"></script><script src="js/subpage-feature-title.js"></script><script src="js/site-footer.js"></script><script src="js/subpage-clock.js"></script>
+  <script>
+    (function(){
+      var modalCtx = { mode:"", tr:null };
+      function ensurePcModal(){
+        var m = document.getElementById("pcQuickMask");
+        if(m) return m;
+        m = document.createElement("div");
+        m.id = "pcQuickMask";
+        m.style.cssText = "position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:center;justify-content:center;z-index:2600;padding:16px;box-sizing:border-box;";
+        m.innerHTML =
+          '<div style="width:min(980px,96vw);max-height:88vh;background:#fff;border-radius:10px;overflow:hidden;display:flex;flex-direction:column;">' +
+          '<div style="padding:12px 16px;border-bottom:1px solid #edf2f8;font-weight:600;display:flex;align-items:center;gap:8px;"><span id="pcQuickTitle"></span><button type="button" data-close-quick="1" style="margin-left:auto;border:none;background:transparent;color:#8c8c8c;font-size:18px;cursor:pointer;">×</button></div>' +
+          '<div id="pcQuickBody" style="padding:12px 16px;overflow:auto;max-height:calc(88vh - 104px);"></div>' +
+          '<div id="pcQuickFoot" style="padding:10px 16px;border-top:1px solid #edf2f8;text-align:right;"><button type="button" class="carrier-btn-add" data-close-quick="1">关闭</button></div>' +
+          '</div>';
+        m.addEventListener("click", function(e){
+          if(e.target===m || (e.target && e.target.getAttribute("data-close-quick")==="1")) m.style.display="none";
+          var ok = e.target && e.target.closest ? e.target.closest("[data-ok-quick='1']") : null;
+          if(!ok) return;
+          if(modalCtx.mode==="edit" && modalCtx.tr){
+            modalCtx.tr.children[1].textContent = document.getElementById("pcFShipNo").value || modalCtx.tr.children[1].textContent;
+            modalCtx.tr.children[3].textContent = document.getElementById("pcFProject").value || modalCtx.tr.children[3].textContent;
+            modalCtx.tr.children[5].textContent = document.getElementById("pcFMaterial").value || modalCtx.tr.children[5].textContent;
+            modalCtx.tr.children[7].textContent = document.getElementById("pcFRealQty").value || modalCtx.tr.children[7].textContent;
+          } else if(modalCtx.mode==="delete" && modalCtx.tr){
+            modalCtx.tr.remove();
+            ensureTenRows();
+          }
+          m.style.display="none";
+          modalCtx = { mode:"", tr:null };
+        });
+        document.body.appendChild(m);
+        return m;
+      }
+      function rowData(tr){
+        if(!tr) return {};
+        return {
+          confirmNo: tr.children[0] ? tr.children[0].textContent : "",
+          shipNo: tr.children[1] ? tr.children[1].textContent : "",
+          contractNo: tr.children[2] ? tr.children[2].textContent : "",
+          project: tr.children[3] ? tr.children[3].textContent : "",
+          site: tr.children[4] ? tr.children[4].textContent : "",
+          material: tr.children[5] ? tr.children[5].textContent : "",
+          shipQty: tr.children[6] ? tr.children[6].textContent : "",
+          realQty: tr.children[7] ? tr.children[7].textContent : "",
+          status: tr.children[8] ? tr.children[8].textContent.trim() : "",
+          doneTime: tr.children[9] ? tr.children[9].textContent : "",
+          confirmTime: tr.children[10] ? tr.children[10].textContent : ""
+        };
+      }
+      function pcFormHtml(d, readonly){
+        d=d||{};
+        var ro = readonly ? "readonly" : "";
+        var dis = readonly ? "disabled" : "";
+        var bg = readonly ? "background:#f5f5f5;" : "";
+        function row(label, input){ return "<label style='color:#64748b;align-self:center'>" + label + "</label>" + input; }
+        return '<div style="display:grid;grid-template-columns:120px 1fr 120px 1fr;gap:10px 12px;font-size:13px;line-height:1.5;">'
+          + row("确认单号","<input class='carrier-search' style='width:100%;"+bg+"' value='"+(d.confirmNo||"")+"' "+ro+">")
+          + row("发货单号","<input id='pcFShipNo' class='carrier-search' style='width:100%;"+bg+"' value='"+(d.shipNo||"")+"' "+ro+">")
+          + row("销售合同编号","<input class='carrier-search' style='width:100%;"+bg+"' value='"+(d.contractNo||"")+"' "+ro+">")
+          + row("项目公司","<input id='pcFProject' class='carrier-search' style='width:100%;"+bg+"' value='"+(d.project||"")+"' "+ro+">")
+          + row("场站名称","<input class='carrier-search' style='width:100%;"+bg+"' value='"+(d.site||"")+"' "+ro+">")
+          + row("物资摘要","<input id='pcFMaterial' class='carrier-search' style='width:100%;"+bg+"' value='"+(d.material||"")+"' "+ro+">")
+          + row("发货数量","<input class='carrier-search' style='width:100%;"+bg+"' value='"+(d.shipQty||"")+"' "+ro+">")
+          + row("实收数量","<input id='pcFRealQty' class='carrier-search' style='width:100%;"+bg+"' value='"+(d.realQty||"")+"' "+ro+">")
+          + row("确认状态","<select class='carrier-select' style='width:100%;"+bg+"' "+dis+"><option>待确认</option><option>已确认</option><option>已驳回</option></select>")
+          + row("确认时间","<input class='carrier-search' style='width:100%;"+bg+"' value='"+(d.confirmTime||"")+"' "+ro+">")
+          + "</div>";
+      }
+      function openPcModal(title, bodyHtml, withProgress, mode, tr){
+        var m = ensurePcModal();
+        modalCtx = { mode: mode || "", tr: tr || null };
+        var t = m.querySelector("#pcQuickTitle");
+        var b = m.querySelector("#pcQuickBody");
+        var f = m.querySelector("#pcQuickFoot");
+        t.innerHTML = withProgress ? title+'<a href="#" data-open-flow style="margin-left:10px;color:#1677ff;font-size:12px;text-decoration:none;font-weight:600;">流程进度</a>' : title;
+        b.innerHTML = bodyHtml;
+        f.innerHTML = mode ? '<button type="button" class="carrier-btn-add" data-close-quick="1">取消</button><button type="button" class="carrier-btn-add" data-ok-quick="1">'+(mode==="delete"?"确认删除":"确定")+'</button>' : '<button type="button" class="carrier-btn-add" data-close-quick="1">关闭</button>';
+        m.style.display = "flex";
+      }
+      function statusOf(tr){return (tr.querySelector("[data-status]")||tr.children[8]).textContent.trim();}
+      function ensureTenRows(){
+        var tb = document.getElementById("pcTb");
+        Array.prototype.slice.call(tb.querySelectorAll("tr.pc-fill-row")).forEach(function(r){ r.remove(); });
+        var rows = Array.prototype.slice.call(tb.querySelectorAll("tr"));
+        if (rows.length >= 10) return;
+        var col = 12;
+        for (var i = rows.length; i < 10; i++) {
+          var tr = document.createElement("tr");
+          tr.className = "pc-fill-row";
+          var html = "";
+          for (var j = 0; j < col; j++) html += '<td style="color:#bfbfbf">—</td>';
+          tr.innerHTML = html;
+          tb.appendChild(tr);
+        }
+      }
+      function renderOps(){
+        var role=document.getElementById("pcRole").value;
+        Array.prototype.slice.call(document.querySelectorAll("#pcTb tr")).forEach(function(tr){
+          if (tr.classList.contains("pc-fill-row")) return;
+          var st=statusOf(tr), ops=['<a href="#" data-a="detail">查看</a>'];
+          if (st.indexOf("草稿")>=0 || st.indexOf("已驳回")>=0) {
+            ops.push('<a href="#" data-a="edit">编辑</a>');
+            ops.push('<a href="#" data-a="delete">删除</a>');
+          } else if (st.indexOf("不通过")>=0) {
+            ops.push('<a href="#" data-a="edit">编辑</a>');
+          }
+          if (role === "project") ops = ['<a href="#" data-a="detail">查看</a>'];
+          tr.querySelector("[data-ops]").innerHTML=ops.join("");
+        });
+        ensureTenRows();
+      }
+      document.getElementById("pcTb").addEventListener("click",function(e){
+        var a=e.target.closest("[data-a]"); if(!a) return; e.preventDefault();
+        var tr=a.closest("tr"), act=a.getAttribute("data-a");
+        if(act==="detail") return openPcModal("验收确认详情", pcFormHtml(rowData(tr), true), true);
+        if(act==="new") return openPcModal("新增验收确认", pcFormHtml({}, false), false, "edit");
+        if(act==="edit") return openPcModal("编辑验收确认", pcFormHtml(rowData(tr), false), false, "edit", tr);
+        if(act==="delete") return openPcModal("删除确认", '<p style="font-size:14px;line-height:1.8;color:#1f2d3d">是否确认删除该条验收确认记录？</p>', false, "delete", tr);
+        if(act==="reject") { tr.querySelector("[data-status]").innerHTML='<span class="tag-status tag-status--isolate">已驳回</span>'; renderOps(); return; }
+        if(act==="confirm"){ tr.querySelector("[data-status]").innerHTML='<span class="tag-status tag-status--in-use">已确认</span>'; tr.children[10].textContent=new Date().toISOString().slice(0,16).replace("T"," "); renderOps(); }
+      });
+      document.getElementById("pcBtnAdd").addEventListener("click", function(){ openPcModal("新增验收确认", pcFormHtml({}, false), false, "edit"); });
+      document.getElementById("pcBtnImport").addEventListener("click", function(){ alert("导入（演示）"); });
+      document.getElementById("pcBtnTpl").addEventListener("click", function(){ alert("下载模板（演示）"); });
+      document.getElementById("pcBtnExport").addEventListener("click", function(){ alert("导出（演示）"); });
+      document.getElementById("pcBtnDelete").addEventListener("click", function(){ alert("批量删除（演示）"); });
+      document.getElementById("pcBtnSearch").addEventListener("click", function(){ alert("按条件搜索（演示）"); });
+      document.getElementById("pcBtnReset").addEventListener("click", function(){ var k=document.getElementById("pcKeyword"); if(k) k.value=""; });
+      document.getElementById("pcRole").addEventListener("change",renderOps);
+      renderOps();
+    })();
+  </script>
+</body>
+</html>

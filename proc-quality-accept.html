@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>库存管理 - 新能源物资供应链管理系统</title>
+  <link rel="stylesheet" href="css/vendor/fa-all.min.css" />
+  <link rel="stylesheet" href="css/subpage-base.css" />
+  <link rel="stylesheet" href="css/carrier-management.css" />
+  <link rel="stylesheet" href="css/source-navbar-header.css" />
+  <style>
+    .carrier-table{table-layout:auto;min-width:1680px}
+    .carrier-table thead th,.carrier-table tbody td{white-space:nowrap;word-break:keep-all}
+    .carrier-table thead th:last-child,.carrier-table tbody td:last-child{min-width:240px}
+    .qa-toolbar{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:10px}
+    .qa-toolbar-left,.qa-toolbar-right{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+    .carrier-btn-ghost{background:#fff;color:#1677ff;border:1px solid #91caff}
+    .qa-op{color:#1677ff;text-decoration:none;font-weight:600;font-size:13px;margin-right:8px}
+    .qa-op:last-child{margin-right:0}
+    .qa-op.is-disabled{color:#bfbfbf;pointer-events:none;cursor:not-allowed;text-decoration:none}
+    .qa-op:hover{text-decoration:underline}
+    .map-approval-status-pill{display:inline-flex;align-items:center;justify-content:center;min-width:56px;height:24px;padding:0 10px;border-radius:999px;font-size:12px;font-weight:600;border:1px solid transparent}
+    .map-approval-status-draft{color:#595959;background:#fafafa;border-color:#d9d9d9}
+    .map-approval-status-wait{color:#1677ff;background:#e6f4ff;border-color:#91caff}
+    .map-approval-status-doing{color:#722ed1;background:#f9f0ff;border-color:#d3adf7}
+    .map-approval-status-pending{color:#fa8c16;background:#fff7e6;border-color:#ffd591}
+    .map-approval-status-pass{color:#389e0d;background:#f6ffed;border-color:#b7eb8f}
+    .map-approval-status-reject{color:#cf1322;background:#fff1f0;border-color:#ffa39e}
+    .qa-modal-mask{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.36);z-index:3100;padding:16px}
+    .qa-modal-mask.is-open{display:flex}
+    .qa-modal{width:min(980px,96vw);max-height:90vh;background:#fff;border-radius:10px;display:flex;flex-direction:column;overflow:hidden}
+    .qa-modal-hd{padding:12px 16px;border-bottom:1px solid #edf2f8;display:flex;align-items:center;gap:10px}
+    .qa-modal-hd h3{margin:0;font-size:16px;color:#1f3551}
+    .qa-modal-x{margin-left:auto;border:none;background:transparent;font-size:18px;line-height:1;color:#8c8c8c;cursor:pointer}
+    .qa-modal-bd{padding:14px 16px;overflow:auto}
+    .qa-modal-ft{padding:10px 16px;border-top:1px solid #edf2f8;display:flex;gap:8px;justify-content:flex-end}
+    .qa-sheet-title{margin:0 0 12px;font-size:30px;color:#1d3a8a;text-align:center;letter-spacing:1px}
+    .qa-sheet-meta{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+    .qa-sheet-grid{width:100%;border-collapse:collapse}
+    .qa-sheet-grid td{border:1px solid #e5e7eb;padding:8px 10px;font-size:13px}
+    .qa-sheet-label{width:160px;color:#334155;background:#f8fafc;font-weight:600}
+    .req{color:#cf1322;margin-right:2px}
+    .qa-sheet-grid input,.qa-sheet-grid textarea,.qa-sheet-grid select{width:100%;border:1px solid #d9d9d9;border-radius:4px;min-height:30px;padding:4px 8px;font-size:13px}
+    .qa-sheet-grid textarea{min-height:60px;resize:vertical}
+    .qa-sheet-grid .readonly-input{background:#f5f5f5}
+  </style>
+</head>
+<body class="page-source-navbar page-subpage page-logistics">
+  <div class="page-bg" aria-hidden="true"></div>
+  <div class="app">
+    <header class="header"><div class="header-left"><button class="header-hamburger"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button><a class="header-logo" href="#"><img src="assets/logo-chenergy.png" width="220" height="40" alt=""/></a><div class="header-source-brand"><p>新能源供应链管理系统</p></div></div><div class="header-right"><span class="clock" id="clock"></span><div class="user-avatar">用</div></div></header>
+    <div class="layout"><aside class="sidebar"><div class="nav-item nav-item--module-active"><span class="nav-label">采购管理</span></div></aside><main class="main-scroll"><div class="carrier-main-inner">
+      <h1 class="carrier-page-title">库存管理（XQ-PROC-7）</h1>
+      <div class="qa-toolbar">
+        <div class="qa-toolbar-left">
+          <button class="carrier-btn-add" id="btnCreate"><i class="fa-solid fa-plus"></i> 发起验收</button>
+        </div>
+        <div class="qa-toolbar-right">
+          <input class="carrier-search" id="qaKeyword" placeholder="验收单号/物资名称/合同编号"/>
+          <select class="carrier-select" id="qaStatusFilter">
+            <option value="">全部状态</option>
+            <option value="草稿">草稿</option>
+            <option value="待入库">待入库</option>
+            <option value="验收中">验收中</option>
+            <option value="待确认">待确认</option>
+            <option value="已通过">已通过</option>
+            <option value="不通过">不通过</option>
+          </select>
+          <button class="carrier-btn-add" id="btnSearch">筛选/搜索</button>
+          <button class="carrier-btn-add carrier-btn-ghost" id="btnReset">重置</button>
+        </div>
+      </div>
+      <div class="carrier-table-wrap">
+        <table class="carrier-table">
+          <thead>
+            <tr>
+              <th>验收单号</th><th>合同编号</th><th>物资名称</th><th>规格型号</th><th>应收数量</th><th>实收数量</th>
+              <th>合格数量</th><th>不合格数量</th><th>验收结论</th><th>验收状态</th><th>提报时间</th><th>操作</th>
+            </tr>
+          </thead>
+          <tbody id="qaTableBody"></tbody>
+        </table>
+      </div>
+    </div></main></div>
+  </div>
+
+  <div class="qa-modal-mask" id="qaModalMask" aria-hidden="true">
+    <div class="qa-modal" role="dialog" aria-modal="true" aria-labelledby="qaModalTitle">
+      <div class="qa-modal-hd">
+        <h3 id="qaModalTitle">发起验收</h3>
+        <button type="button" class="qa-modal-x" id="qaModalClose" aria-label="关闭">×</button>
+      </div>
+      <div class="qa-modal-bd">
+        <h2 class="qa-sheet-title">库存管理审批单</h2>
+        <div class="qa-sheet-meta">
+          <label>归档
+            <select id="qaArchive">
+              <option value="">请选择</option><option value="yes">是</option><option value="no">否</option>
+            </select>
+          </label>
+          <span id="qaFormNo">表单编号：TASK-NEW</span>
+        </div>
+        <table class="qa-sheet-grid" role="presentation">
+          <tbody>
+            <tr>
+              <td class="qa-sheet-label"><span class="req">*</span>验收单号</td><td><input id="f-acceptNo" /></td>
+              <td class="qa-sheet-label"><span class="req">*</span>提报时间</td><td><input id="f-reportTime" class="readonly-input" readonly /></td>
+            </tr>
+            <tr>
+              <td class="qa-sheet-label"><span class="req">*</span>合同编号</td><td><input id="f-contractNo" /></td>
+              <td class="qa-sheet-label"><span class="req">*</span>供应商</td><td><input id="f-supplier" /></td>
+            </tr>
+            <tr>
+              <td class="qa-sheet-label"><span class="req">*</span>物资名称</td><td><input id="f-material" /></td>
+              <td class="qa-sheet-label"><span class="req">*</span>规格型号</td><td><input id="f-spec" /></td>
+            </tr>
+            <tr>
+              <td class="qa-sheet-label"><span class="req">*</span>应收数量</td><td><input id="f-planQty" type="number" min="0" step="1" /></td>
+              <td class="qa-sheet-label"><span class="req">*</span>实收数量</td><td><input id="f-recvQty" type="number" min="0" step="1" /></td>
+            </tr>
+            <tr>
+              <td class="qa-sheet-label">合格数量</td><td><input id="f-passQty" type="number" min="0" step="1" /></td>
+              <td class="qa-sheet-label">不合格数量</td><td><input id="f-failQty" type="number" min="0" step="1" /></td>
+            </tr>
+            <tr>
+              <td class="qa-sheet-label"><span class="req">*</span>验收结论</td>
+              <td>
+                <select id="f-conclusion"><option value="通过">通过</option><option value="不通过">不通过</option></select>
+              </td>
+              <td class="qa-sheet-label">待确认部门</td><td><input id="f-pendingDept" value="业务部门" /></td>
+            </tr>
+            <tr>
+              <td class="qa-sheet-label">验收备注</td>
+              <td colspan="3"><textarea id="f-remark" placeholder="填写验收说明"></textarea></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="qa-modal-ft">
+        <button type="button" class="carrier-btn-add carrier-btn-ghost" id="qaCancel">取消</button>
+        <button type="button" class="carrier-btn-add" id="qaSaveDraft">保存草稿</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/sidebar-actions.js"></script><script src="js/subpage-feature-title.js"></script><script src="js/site-footer.js"></script>
+<script src="js/subpage-clock.js"></script>
+  <script>
+    (function () {
+      var bodyEl = document.getElementById("qaTableBody");
+      var keywordEl = document.getElementById("qaKeyword");
+      var statusEl = document.getElementById("qaStatusFilter");
+      var modalMask = document.getElementById("qaModalMask");
+      var mode = "create";
+      var editingId = "";
+      var seq = 8;
+
+      var rows = [
+        { id: "YS-20260423-01", contractNo: "HT-2026-301", material: "变流器模块", spec: "V2.0", planQty: 120, recvQty: 118, passQty: 118, failQty: 0, conclusion: "通过", status: "已通过", createdAt: "2026-04-23 09:16", supplier: "远景能源", pendingDept: "完成", remark: "已归档" },
+        { id: "YS-20260423-02", contractNo: "HT-2026-302", material: "IGBT驱动板", spec: "V3.1", planQty: 100, recvQty: 98, passQty: 98, failQty: 0, conclusion: "通过", status: "已通过", createdAt: "2026-04-23 09:32", supplier: "远景能源", pendingDept: "完成", remark: "已归档" },
+        { id: "YS-20260423-03", contractNo: "HT-2026-303", material: "汇流箱", spec: "XH-103", planQty: 30, recvQty: 30, passQty: 30, failQty: 0, conclusion: "通过", status: "已通过", createdAt: "2026-04-23 10:18", supplier: "许继电气", pendingDept: "完成", remark: "已归档" },
+        { id: "YS-20260423-04", contractNo: "HT-2026-304", material: "支架组件", spec: "XH-105", planQty: 60, recvQty: 60, passQty: 60, failQty: 0, conclusion: "通过", status: "已通过", createdAt: "2026-04-23 10:56", supplier: "华驰电力", pendingDept: "完成", remark: "已归档" },
+        { id: "YS-20260423-05", contractNo: "HT-2026-305", material: "预制连接子", spec: "XH-104", planQty: 25, recvQty: 25, passQty: 25, failQty: 0, conclusion: "通过", status: "已通过", createdAt: "2026-04-23 11:30", supplier: "运景能源", pendingDept: "完成", remark: "已归档" },
+        { id: "YS-20260423-06", contractNo: "HT-2026-306", material: "电缆", spec: "XH-102", planQty: 50, recvQty: 50, passQty: 50, failQty: 0, conclusion: "通过", status: "已通过", createdAt: "2026-04-23 13:20", supplier: "金风科技", pendingDept: "完成", remark: "已归档" },
+        { id: "YS-20260423-07", contractNo: "HT-2026-307", material: "变桨系统", spec: "XH-109", planQty: 18, recvQty: 17, passQty: 17, failQty: 0, conclusion: "通过", status: "已通过", createdAt: "2026-04-23 14:05", supplier: "联合动力", pendingDept: "完成", remark: "已归档" }
+      ];
+
+      var STATUS_STYLE = {
+        "草稿": "map-approval-status-draft",
+        "待入库": "map-approval-status-wait",
+        "验收中": "map-approval-status-doing",
+        "待确认": "map-approval-status-pending",
+        "已通过": "map-approval-status-pass",
+        "不通过": "map-approval-status-reject"
+      };
+
+      function nowText() {
+        var d = new Date();
+        function p(v) { return String(v).padStart(2, "0"); }
+        return d.getFullYear() + "-" + p(d.getMonth() + 1) + "-" + p(d.getDate()) + " " + p(d.getHours()) + ":" + p(d.getMinutes()) + ":" + p(d.getSeconds());
+      }
+
+      function esc(s) {
+        return String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+      }
+
+      function statusTag(s) {
+        var cls = STATUS_STYLE[s] || "map-approval-status-draft";
+        return '<span class="map-approval-status-pill ' + cls + '">' + esc(s) + "</span>";
+      }
+
+      function opLink(name, label, enabled) {
+        if (!enabled) return '<a href="#" class="qa-op is-disabled" data-a="' + name + '">' + label + "</a>";
+        return '<a href="#" class="qa-op" data-a="' + name + '">' + label + "</a>";
+      }
+
+      function renderTable() {
+        var kw = String(keywordEl.value || "").trim();
+        var st = String(statusEl.value || "");
+        var display = rows.filter(function (r) {
+          var hit = !kw || r.id.indexOf(kw) >= 0 || r.material.indexOf(kw) >= 0 || r.contractNo.indexOf(kw) >= 0;
+          var statusHit = !st || r.status === st;
+          return hit && statusHit;
+        });
+        bodyEl.innerHTML = display.map(function (r) {
+          return (
+            "<tr data-id='" + esc(r.id) + "'>" +
+            "<td>" + esc(r.id) + "</td><td>" + esc(r.contractNo) + "</td><td>" + esc(r.material) + "</td><td>" + esc(r.spec) + "</td>" +
+            "<td>" + esc(r.planQty) + "</td><td>" + esc(r.recvQty) + "</td><td>" + esc(r.passQty) + "</td><td>" + esc(r.failQty) + "</td>" +
+            "<td>" + esc(r.conclusion) + "</td><td>" + statusTag(r.status) + "</td><td>" + esc(r.createdAt) + "</td>" +
+            "<td>" + opLink("view", "查看", true) + "</td>" +
+            "</tr>"
+          );
+        }).join("") || "<tr><td colspan='12' class='cell-muted'>暂无数据</td></tr>";
+      }
+
+      function openModal(type, row) {
+        mode = type;
+        editingId = row ? row.id : "";
+        document.getElementById("qaModalTitle").textContent = type === "view" ? "查看验收详情" : (type === "edit" ? "编辑验收申请" : "发起验收");
+        var readonly = type === "view";
+        var disabled = readonly ? "disabled" : "";
+        function setField(id, val) {
+          var el = document.getElementById(id);
+          if (!el) return;
+          el.value = val == null ? "" : String(val);
+          if (readonly) el.setAttribute("disabled", "disabled");
+          else el.removeAttribute("disabled");
+          if (readonly) el.classList.add("readonly-input");
+          else el.classList.remove("readonly-input");
+        }
+
+        var defaultNo = "YS-" + nowText().slice(0, 10).replace(/-/g, "") + "-" + String(seq++).padStart(2, "0");
+        document.getElementById("qaFormNo").textContent = "表单编号：" + (row ? row.id : defaultNo);
+        setField("f-acceptNo", row ? row.id : defaultNo);
+        setField("f-reportTime", row ? row.createdAt : nowText());
+        setField("f-contractNo", row ? row.contractNo : "");
+        setField("f-supplier", row ? row.supplier : "");
+        setField("f-material", row ? row.material : "");
+        setField("f-spec", row ? row.spec : "");
+        setField("f-planQty", row ? row.planQty : "");
+        setField("f-recvQty", row ? row.recvQty : "");
+        setField("f-passQty", row ? row.passQty : "");
+        setField("f-failQty", row ? row.failQty : "");
+        setField("f-conclusion", row ? row.conclusion : "通过");
+        setField("f-pendingDept", row ? row.pendingDept : "业务部门");
+        setField("f-remark", row ? row.remark : "");
+        document.getElementById("qaSaveDraft").style.display = readonly ? "none" : "";
+        document.getElementById("qaArchive").disabled = !!readonly;
+        modalMask.classList.add("is-open");
+      }
+
+      function closeModal() { modalMask.classList.remove("is-open"); }
+
+      function findRow(id) { return rows.find(function (r) { return r.id === id; }); }
+
+      function collectForm() {
+        return {
+          id: document.getElementById("f-acceptNo").value.trim(),
+          createdAt: document.getElementById("f-reportTime").value.trim(),
+          contractNo: document.getElementById("f-contractNo").value.trim(),
+          supplier: document.getElementById("f-supplier").value.trim(),
+          material: document.getElementById("f-material").value.trim(),
+          spec: document.getElementById("f-spec").value.trim(),
+          planQty: Number(document.getElementById("f-planQty").value || 0),
+          recvQty: Number(document.getElementById("f-recvQty").value || 0),
+          passQty: Number(document.getElementById("f-passQty").value || 0),
+          failQty: Number(document.getElementById("f-failQty").value || 0),
+          conclusion: document.getElementById("f-conclusion").value,
+          pendingDept: document.getElementById("f-pendingDept").value.trim(),
+          remark: document.getElementById("f-remark").value.trim()
+        };
+      }
+
+      function validateForm(d) {
+        if (!d.id || !d.contractNo || !d.material || !d.spec) return "请填写必填字段（验收单号/合同编号/物资名称/规格型号）";
+        if (!d.planQty || !d.recvQty) return "应收数量和实收数量不能为空";
+        return "";
+      }
+
+      function saveDraft() {
+        var data = collectForm();
+        var err = validateForm(data);
+        if (err) { alert(err); return; }
+        if (mode === "edit") {
+          var r = findRow(editingId);
+          if (!r) return;
+          Object.assign(r, data, { status: r.status === "不通过" ? "不通过" : "草稿" });
+        } else {
+          rows.unshift(Object.assign({}, data, { status: "草稿" }));
+        }
+        closeModal();
+        renderTable();
+      }
+
+      function submitRow(id) {
+        var r = findRow(id);
+        if (!r) return;
+        if (r.status !== "草稿" && r.status !== "不通过") return;
+        r.status = "待确认";
+        r.pendingDept = "业务部门";
+        r.remark = (r.remark || "") + "（已提交审批流）";
+        renderTable();
+      }
+
+      function deleteRow(id) {
+        var r = findRow(id);
+        if (!r || r.status !== "草稿") return;
+        if (!window.confirm("确认删除该草稿验收申请？")) return;
+        rows = rows.filter(function (x) { return x.id !== id; });
+        renderTable();
+      }
+
+      document.getElementById("btnCreate").addEventListener("click", function () { openModal("create"); });
+      document.getElementById("btnSearch").addEventListener("click", renderTable);
+      document.getElementById("btnReset").addEventListener("click", function () { keywordEl.value = ""; statusEl.value = ""; renderTable(); });
+      document.getElementById("qaModalClose").addEventListener("click", closeModal);
+      document.getElementById("qaCancel").addEventListener("click", closeModal);
+      document.getElementById("qaSaveDraft").addEventListener("click", saveDraft);
+      modalMask.addEventListener("click", function (e) { if (e.target === modalMask) closeModal(); });
+
+      bodyEl.addEventListener("click", function (e) {
+        var a = e.target.closest("[data-a]");
+        if (!a || a.classList.contains("is-disabled")) return;
+        e.preventDefault();
+        var tr = a.closest("tr");
+        var id = tr ? tr.getAttribute("data-id") : "";
+        var row = findRow(id);
+        if (!row) return;
+        var action = a.getAttribute("data-a");
+        if (action === "view") openModal("view", row);
+        else if (action === "edit") openModal("edit", row);
+        else if (action === "delete") deleteRow(id);
+        else if (action === "submit") submitRow(id);
+      });
+
+      renderTable();
+    })();
+  </script>
+</body>
+</html>

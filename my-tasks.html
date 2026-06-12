@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>我的任务 - 新能源物资供应链管理系统</title>
+    <link rel="stylesheet" href="css/vendor/fa-all.min.css" />
+  <link rel="stylesheet" href="css/subpage-base.css" />
+  <link rel="stylesheet" href="css/carrier-management.css" />
+  <link rel="stylesheet" href="css/module-hub.css" />
+  <link rel="stylesheet" href="css/source-navbar-header.css" />
+</head>
+<body class="page-subpage page-logistics page-my-tasks page-source-navbar">
+  <div class="page-bg" aria-hidden="true"></div>
+  <div class="app">
+    <header class="header">
+      <div class="header-left">
+        <button type="button" class="header-hamburger" aria-label="菜单" title="菜单">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+        </button>
+        <a class="header-logo" href="#" aria-label="国家能源集团">
+          <img src="assets/logo-chenergy.png" alt="国家能源集团 CHN ENERGY" width="220" height="40" />
+        </a>
+        <div class="header-source-brand"><p>新能源供应链管理系统</p></div>
+      </div>
+      <div class="header-right">
+        <span class="clock" id="clock"></span>
+        <div class="user-avatar" title="用户">用</div>
+      </div>
+    </header>
+    <div class="layout">
+      <aside class="sidebar" aria-label="主导航">
+        <div class="nav-item" title="我的资产"><span class="nav-label">我的资产</span></div>
+        <div class="nav-item nav-item--module-active" title="我的任务">
+          <span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M9 2h6a1 1 0 0 1 1 1v1H8V3a1 1 0 0 1 1-1z"/><rect x="5" y="5" width="14" height="17" rx="1.5"/><path d="M8 9h8M8 12.5h8M8 16h6"/></svg></span>
+<span class="nav-label">我的任务</span>
+        </div>
+        <a class="nav-item" href="index-portal-screen-alt.html" title="首页"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M3 10.5L12 3l9 7.5V20a1.5 1.5 0 0 1-1.5 1.5H15v-7H9v7H4.5A1.5 1.5 0 0 1 3 20v-9.5z"/></svg></span><span class="nav-label">首页</span></a>
+        <a class="nav-item" href="cockpit-analytics.html" title="驾驶舱"><span class="nav-label">驾驶舱</span></a>
+        <div class="nav-item" title="采购管理"><span class="nav-label">采购管理</span></div>
+        <a class="nav-item" href="carrier-management.html" title="物流管理"><span class="nav-label">物流管理</span></a>
+        <a class="nav-item" href="warehouse.html" title="仓储管理"><span class="nav-label">仓储管理</span></a>
+        <div class="nav-item" title="物资采购"><span class="nav-label">物资采购</span></div>
+        <div class="nav-item" title="物资出库与处置"><span class="nav-label">物资出库与处置</span></div>
+        <div class="nav-item" title="绩效考核"><span class="nav-label">绩效考核</span></div>
+        <div class="nav-item" title="公告管理"><span class="nav-label">公告管理</span></div>
+        <div class="nav-item" title="综合业务管理"><span class="nav-label">综合业务管理</span></div>
+        <div class="nav-item" title="数据管理"><span class="nav-label">数据管理</span></div>
+        <div class="nav-item" title="开发工具"><span class="nav-label">开发工具</span></div>
+        <div class="nav-item" title="设置"><span class="nav-label">设置</span></div>
+        <div class="nav-item" title="系统管理"><span class="nav-label">系统管理</span></div>
+      </aside>
+      <main class="main-scroll">
+        <div class="carrier-main-inner">
+          <h1 class="carrier-page-title">我的任务</h1>
+          <div class="module-hub-tabs" role="tablist" aria-label="任务分类">
+            <button type="button" class="is-active" data-tab="initiated" role="tab">我发起的</button>
+            <button type="button" data-tab="todo" role="tab">我的待办</button>
+            <button type="button" data-tab="done" role="tab">我的已办</button>
+            <button type="button" data-tab="cc" role="tab">我的抄送</button>
+          </div>
+
+          <div class="module-hub-panel is-visible" data-panel="initiated">
+            <div class="carrier-table-wrap">
+              <table class="carrier-table">
+                <thead>
+                  <tr>
+                    <th>序号</th>
+                    <th>流程定义名称</th>
+                    <th>流程定义KEY</th>
+                    <th>申请单号</th>
+                    <th>申请事项</th>
+                    <th>申请人</th>
+                    <th>申请部门</th>
+                    <th>申请时间</th>
+                    <th>流程状态</th>
+                    <th>当前节点</th>
+                    <th>当前处理人</th>
+                    <th style="min-width:140px">操作</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr data-view-summary="流程定义：采购申请审批；申请单号：PA20260423001；申请部门：经营发展中心；当前节点：部门主管审批。">
+                    <td>1</td>
+                    <td>采购申请审批</td>
+                    <td>cgsqsp</td>
+                    <td>PA20260423001</td>
+                    <td>风机备件集中采购申请</td>
+                    <td>李哲</td>
+                    <td>经营发展中心</td>
+                    <td>2026-04-23 09:20:00</td>
+                    <td><span class="tag-status tag-status--to-shelf">审批中</span></td>
+                    <td>部门主管审批</td>
+                    <td>张主管</td>
+                    <td><div class="wh-ops"><a href="#" class="js-view">查看</a><a href="#" class="js-withdraw" data-can-withdraw="1">撤回</a></div></td>
+                  </tr>
+                  <tr data-view-summary="流程定义：采购合同审批；申请单号：HT-CG-202604-09；申请部门：供应链管理部；流程已办结。">
+                    <td>2</td>
+                    <td>采购合同审批</td>
+                    <td>cghtsp</td>
+                    <td>HT-CG-202604-09</td>
+                    <td>年度运输框架协议续签</td>
+                    <td>李哲</td>
+                    <td>供应链管理部</td>
+                    <td>2026-04-18 14:00:00</td>
+                    <td><span class="tag-status tag-status--done">已通过</span></td>
+                    <td>已完成</td>
+                    <td>—</td>
+                    <td><div class="wh-ops"><a href="#" class="js-view">查看</a></div></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="module-hub-panel" data-panel="todo">
+            <div class="carrier-table-wrap">
+              <table class="carrier-table">
+                <thead>
+                  <tr>
+                    <th>序号</th>
+                    <th>任务名称</th>
+                    <th>流程定义名称</th>
+                    <th>流程定义KEY</th>
+                    <th>办理人</th>
+                    <th>流程状态</th>
+                    <th>创建时间</th>
+                    <th style="min-width:100px">操作</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr
+                    data-flow-type="采购申请审批"
+                    data-flow-key="cgsqsp"
+                    data-handle-summary="任务名称：部门主管审批；流程定义：采购申请审批；申请单号：PA20260423001；申请人：李哲；当前状态：待审批。"
+                  >
+                    <td>1</td>
+                    <td>部门主管审批</td>
+                    <td>采购申请审批</td>
+                    <td>cgsqsp</td>
+                    <td>张主管</td>
+                    <td><span class="tag-status tag-status--to-shelf">待审批</span></td>
+                    <td>2026-04-23 10:00:00</td>
+                    <td><div class="wh-ops"><a href="#" class="js-approve-open">办理</a></div></td>
+                  </tr>
+                  <tr
+                    data-flow-type="采购合同审批"
+                    data-flow-key="cghtsp"
+                    data-handle-summary="任务名称：公司采购主管审批；流程定义：采购合同审批；合同编号：HT-CG-202604-09；当前状态：待审批。"
+                  >
+                    <td>2</td>
+                    <td>公司采购主管审批</td>
+                    <td>采购合同审批</td>
+                    <td>cghtsp</td>
+                    <td>王超</td>
+                    <td><span class="tag-status tag-status--to-shelf">待审批</span></td>
+                    <td>2026-04-23 10:30:00</td>
+                    <td><div class="wh-ops"><a href="#" class="js-approve-open">办理</a></div></td>
+                  </tr>
+                  <tr
+                    data-flow-type="发货确认"
+                    data-flow-key="fhqr"
+                    data-handle-summary="任务名称：项目公司签收确认；流程定义：发货确认；发货单号：FH-20260423-12；需确认物流签收与发货信息。"
+                  >
+                    <td>3</td>
+                    <td>项目公司签收确认</td>
+                    <td>发货确认</td>
+                    <td>fhqr</td>
+                    <td>项目公司-周宁</td>
+                    <td><span class="tag-status tag-status--to-shelf">待审批</span></td>
+                    <td>2026-04-23 11:10:00</td>
+                    <td><div class="wh-ops"><a href="#" class="js-approve-open">办理</a></div></td>
+                  </tr>
+                  <tr
+                    data-flow-type="货物质量验收确认"
+                    data-flow-key="hwzlysqr"
+                    data-handle-summary="任务名称：货物质量验收确认；流程定义：货物质量验收确认；验收单号：YS-20260423-08；请核对收货信息与验收结论后执行确认通过/驳回。"
+                  >
+                    <td>4</td>
+                    <td>货物质量验收确认</td>
+                    <td>货物质量验收确认</td>
+                    <td>hwzlysqr</td>
+                    <td>项目公司-陈蕾</td>
+                    <td><span class="tag-status tag-status--to-shelf">待审批</span></td>
+                    <td>2026-04-23 13:05:00</td>
+                    <td><div class="wh-ops"><a href="#" class="js-approve-open">确认验收</a></div></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="module-hub-panel" data-panel="done">
+            <div class="carrier-table-wrap">
+              <table class="carrier-table">
+                <thead>
+                  <tr>
+                    <th>序号</th>
+                    <th>任务名称</th>
+                    <th>流程定义名称</th>
+                    <th>流程定义KEY</th>
+                    <th>办理人</th>
+                    <th>我的审批结果</th>
+                    <th>我的审批意见</th>
+                    <th>我的审批时间</th>
+                    <th>流程状态</th>
+                    <th>创建时间</th>
+                    <th>操作</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr data-view-summary="流程定义：采购合同审批；任务：公司采购主管审批；我的审批结果：通过；审批意见：同意签署。">
+                    <td>1</td>
+                    <td>公司采购主管审批</td>
+                    <td>采购合同审批</td>
+                    <td>cghtsp</td>
+                    <td>王超</td>
+                    <td>通过</td>
+                    <td>同意签署</td>
+                    <td>2026-04-22 16:40:00</td>
+                    <td><span class="tag-status tag-status--done">已通过</span></td>
+                    <td>2026-04-22 09:10:00</td>
+                    <td><div class="wh-ops"><a href="#" class="js-view">查看</a></div></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="module-hub-panel" data-panel="cc">
+            <div class="carrier-table-wrap">
+              <table class="carrier-table">
+                <thead>
+                  <tr>
+                    <th>序号</th>
+                    <th>流程定义名称</th>
+                    <th>流程定义KEY</th>
+                    <th>申请单号</th>
+                    <th>申请事项</th>
+                    <th>发起人</th>
+                    <th>发起部门</th>
+                    <th>抄送时间</th>
+                    <th>申请时间</th>
+                    <th>流程状态</th>
+                    <th>当前节点</th>
+                    <th>操作</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr data-view-summary="流程定义：领用申请审批；申请单号：LY-20260422-11；抄送原因：流程审批完成后同步知会。">
+                    <td>1</td>
+                    <td>领用申请审批</td>
+                    <td>lysqsp</td>
+                    <td>LY-20260422-11</td>
+                    <td>风机电控模块领用申请</td>
+                    <td>李哲</td>
+                    <td>经营发展中心</td>
+                    <td>2026-04-23 09:30:00</td>
+                    <td>2026-04-22 17:05:00</td>
+                    <td><span class="tag-status tag-status--to-shelf">审批中</span></td>
+                    <td>公司物资主管审批</td>
+                    <td><div class="wh-ops"><a href="#" class="js-view">查看</a></div></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <div class="modal-mask" id="approveModal" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="approveModalTitle">
+      <div class="modal-header">
+        <h2 class="modal-title" id="approveModalTitle">任务处理</h2>
+        <button type="button" class="modal-close" id="btnCloseApprove" aria-label="关闭">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="field">
+          <label>申请摘要</label>
+          <textarea id="approveDetail" rows="3" readonly placeholder="根据流程类型展示"></textarea>
+        </div>
+        <div class="field">
+          <label id="approveActionHint">处理动作</label>
+          <div class="approval-radio" id="approveActionText">请在下方选择处理按钮</div>
+        </div>
+        <div class="field">
+          <label for="approveRemark">意见说明</label>
+          <textarea id="approveRemark" rows="3" placeholder="驳回时必填"></textarea>
+        </div>
+        <div class="field">
+          <label for="approveFile">上传附件（可选）</label>
+          <input type="file" id="approveFile" />
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn" id="btnCancelApprove">取消</button>
+        <button type="button" class="btn btn-primary" id="btnApprovePass">审批通过</button>
+        <button type="button" class="btn" id="btnApproveReject">驳回</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/sidebar-actions.js"></script>
+  <script src="js/subpage-feature-title.js"></script>
+  <script src="js/site-footer.js"></script>
+  <script src="js/subpage-clock.js"></script>
+  <script src="js/module-hub-tabs.js"></script>
+  <script>
+    (function () {
+      var mask = document.getElementById("approveModal");
+      var detail = document.getElementById("approveDetail");
+      var remark = document.getElementById("approveRemark");
+      var actionText = document.getElementById("approveActionText");
+      var btnPass = document.getElementById("btnApprovePass");
+      var btnReject = document.getElementById("btnApproveReject");
+      var currentFlowType = "";
+      var FLOW_ACTIONS = {
+        "采购申请审批": { pass: "审批通过", reject: "驳回" },
+        "采购项目审批": { pass: "审批通过", reject: "驳回" },
+        "采购合同审批": { pass: "审批通过", reject: "驳回" },
+        "销售合同审批": { pass: "审批通过", reject: "驳回" },
+        "采购环节质量验收确认": { pass: "确认通过", reject: "驳回" },
+        "验收入库确认": { pass: "确认通过", reject: "驳回" },
+        "领用申请审批": { pass: "审批通过", reject: "驳回" },
+        "订单需求确认": { pass: "确认通过", reject: "驳回" },
+        "发货确认": { pass: "确认发货", reject: "驳回" },
+        "货物质量验收确认": { pass: "确认通过", reject: "驳回" },
+        "退换货审批": { pass: "审批通过", reject: "驳回" },
+        "维修申请审批": { pass: "审批通过", reject: "驳回" },
+        "报废申请审批": { pass: "审批通过", reject: "驳回" },
+        "调拨申请审批": { pass: "审批通过", reject: "驳回" }
+      };
+      function closeModal() {
+        mask.classList.remove("show");
+        mask.setAttribute("aria-hidden", "true");
+        btnPass.style.display = "";
+        btnReject.style.display = "";
+      }
+      function setActionButtons(flowType) {
+        var cfg = FLOW_ACTIONS[flowType] || { pass: "审批通过", reject: "驳回" };
+        btnPass.textContent = cfg.pass;
+        btnReject.textContent = cfg.reject;
+        actionText.textContent = "可执行动作：" + cfg.pass + " / " + cfg.reject;
+      }
+      document.getElementById("btnCloseApprove").addEventListener("click", closeModal);
+      document.getElementById("btnCancelApprove").addEventListener("click", closeModal);
+      mask.addEventListener("click", function (e) {
+        if (e.target === mask) closeModal();
+      });
+      document.querySelectorAll(".js-approve-open").forEach(function (a) {
+        a.addEventListener("click", function (e) {
+          e.preventDefault();
+          var tr = a.closest("tr");
+          currentFlowType = tr ? tr.getAttribute("data-flow-type") || "" : "";
+          var sum = tr ? tr.getAttribute("data-handle-summary") || "" : "";
+          var flowKey = tr ? tr.getAttribute("data-flow-key") || "" : "";
+          var flowDesc = currentFlowType + (flowKey ? "（" + flowKey + "）" : "");
+          detail.value = sum
+            ? sum
+            : "流程类型：" + flowDesc + "\n（演示：此处展示申请详情）";
+          setActionButtons(currentFlowType);
+          remark.value = "";
+          mask.classList.add("show");
+          mask.setAttribute("aria-hidden", "false");
+        });
+      });
+      btnPass.addEventListener("click", function () {
+        alert((btnPass.textContent || "审批通过") + "已提交（演示）");
+        closeModal();
+      });
+      btnReject.addEventListener("click", function () {
+        if (!(remark.value || "").trim()) {
+          alert("驳回时请填写意见说明");
+          return;
+        }
+        alert((btnReject.textContent || "驳回") + "已提交（演示）");
+        closeModal();
+      });
+      document.querySelectorAll(".js-view").forEach(function (a) {
+        a.addEventListener("click", function (e) {
+          e.preventDefault();
+          var tr = a.closest("tr");
+          var sum = tr ? tr.getAttribute("data-view-summary") || "" : "";
+          detail.value = sum || "详情只读预览（演示）";
+          setActionButtons("");
+          btnPass.style.display = "none";
+          btnReject.style.display = "none";
+          mask.classList.add("show");
+          mask.setAttribute("aria-hidden", "false");
+        });
+      });
+      document.querySelectorAll(".js-withdraw").forEach(function (a) {
+        a.addEventListener("click", function (e) {
+          e.preventDefault();
+          if (a.getAttribute("data-can-withdraw") !== "1") {
+            alert("当前流程不可撤回");
+            return;
+          }
+          showActionConfirm("撤回", "确定撤回？", function () { alert("已撤回（演示）"); });
+        });
+      });
+      /* 页签切换由 js/module-hub-tabs.js 处理；可加 ?tab=todo 直达「我的待办」 */
+    })();
+  </script>
+</body>
+</html>

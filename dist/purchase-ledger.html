@@ -1,0 +1,3512 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>物资领用</title>
+  <link rel="stylesheet" href="css/subpage-base.css" />
+  <link rel="stylesheet" href="css/source-navbar-header.css" />
+  <style>
+    :root{
+      --primary:#2d6a4f;
+      --secondary:#40916c;
+      --accent:#f4a261;
+      --danger:#e76f51;
+      --bg:#f8f9fa;
+      --card:#ffffff;
+      --border:#e9ecef;
+      --text:#1f2937;
+      --muted:#6b7280;
+    }
+    body{background:var(--bg)}
+    .page-wrap{padding:12px 16px 20px}
+    .panel{
+      background:var(--card);border:1px solid var(--border);border-radius:12px;
+      box-shadow:0 8px 24px rgba(45,106,79,.08);
+    }
+    .panel-head{padding:14px 16px;border-bottom:1px solid var(--border)}
+    .panel-head h2{margin:0;color:var(--primary);font-size:20px}
+    .tabs{display:flex;gap:8px;padding:10px 16px;border-bottom:1px solid var(--border)}
+    .tab-btn{
+      border:1px solid #d7e4dd;background:#fff;color:var(--primary);
+      border-radius:999px;padding:6px 14px;font-size:12px;cursor:pointer;
+      transition:all .2s ease;
+    }
+    .tab-btn:hover{background:#eef7f2;border-color:var(--secondary);transform:translateY(-1px)}
+    .tab-btn.is-active{background:var(--primary);border-color:var(--primary);color:#fff}
+    .filters{
+      display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end;
+      padding:12px 16px;border-bottom:1px solid var(--border);
+    }
+    .field{display:flex;flex-direction:column;gap:4px}
+    .field label{font-size:12px;color:var(--muted)}
+    .field input,.field select{
+      height:32px;border:1px solid var(--border);border-radius:8px;padding:0 10px;min-width:150px;
+      transition:border-color .2s ease, box-shadow .2s ease;
+    }
+    .field input:focus,.field select:focus{
+      outline:none;border-color:var(--secondary);box-shadow:0 0 0 3px rgba(64,145,108,.16);
+    }
+    .btn{
+      height:32px;padding:0 12px;border-radius:8px;border:1px solid var(--border);
+      background:#fff;color:var(--text);font-size:12px;cursor:pointer;transition:all .2s ease;
+    }
+    .btn:hover{transform:translateY(-1px);box-shadow:0 6px 14px rgba(31,41,55,.12)}
+    .btn.primary{background:var(--primary);border-color:var(--primary);color:#fff}
+    .btn.primary:hover{background:#245a43}
+    .btn.secondary{background:var(--secondary);border-color:var(--secondary);color:#fff}
+    .btn.secondary:hover{background:#337a5b}
+    .cards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;padding:12px 16px}
+    .stat{
+      background:#fff;border:1px solid var(--border);border-radius:10px;padding:10px 12px;
+      box-shadow:0 4px 12px rgba(0,0,0,.04);
+    }
+    .stat .k{font-size:12px;color:var(--muted)}
+    .stat .v{margin-top:6px;font-size:22px;font-weight:700;color:var(--primary)}
+    .table-wrap{overflow-x:hidden;padding:0 16px 10px}
+    table{width:100%;min-width:0;border-collapse:collapse;font-size:12px;background:#fff;table-layout:fixed}
+    th,td{border:1px solid var(--border);padding:8px 6px;text-align:center;white-space:normal;word-break:break-word;line-height:1.35}
+    th:last-child,td:last-child,.ops{white-space:nowrap}
+    th{background:#f3f7f5;color:#334155;cursor:pointer;user-select:none}
+    th:hover{background:#eaf3ef}
+    tr:hover td{background:#fbfcfc}
+    .tag{display:inline-block;padding:2px 8px;border-radius:999px;font-size:12px;border:1px solid transparent}
+    .tag.green{background:#e9f8ef;border-color:#b4e4c4;color:#1b7a46}
+    .tag.blue{background:#ecf4ff;border-color:#c6dcff;color:#2559b2}
+    .tag.orange{background:#fff5ea;border-color:#ffd8ae;color:#b56f1f}
+    .tag.red{background:#fff0ed;border-color:#ffc8bd;color:#c75239}
+    .warn{color:var(--danger);font-weight:700}
+    .ops{display:flex;justify-content:center;gap:12px;align-items:center}
+    .op-btn{
+      min-width:auto;height:auto;line-height:1.2;border:none;border-radius:0;
+      background:transparent;color:#1677ff;cursor:pointer;font-size:14px;font-weight:600;padding:0;
+    }
+    .op-btn:hover{color:#4096ff;text-decoration:underline;background:transparent;transform:none}
+    .pager{
+      display:flex;justify-content:space-between;align-items:center;padding:8px 16px 14px;color:var(--muted);font-size:12px
+    }
+    .pager-right{display:flex;gap:6px;align-items:center}
+    .page-btn{
+      min-width:28px;height:28px;border:1px solid var(--border);border-radius:6px;background:#fff;cursor:pointer;font-size:12px
+    }
+    .page-btn:hover{border-color:var(--secondary);color:var(--primary)}
+    .page-btn.is-active{background:var(--primary);border-color:var(--primary);color:#fff}
+
+    .modal-mask{
+      position:fixed;inset:0;background:rgba(0,0,0,.36);display:none;align-items:center;justify-content:center;z-index:3000
+    }
+    .modal-mask.show{display:flex}
+    .modal{
+      width:min(980px,96vw);max-height:90vh;overflow:auto;background:#fff;border-radius:12px;border:1px solid var(--border);
+      box-shadow:0 16px 40px rgba(0,0,0,.18);
+    }
+    .modal-hd{display:flex;justify-content:space-between;align-items:center;padding:12px 14px;border-bottom:1px solid var(--border);font-weight:700;color:#1f2937}
+    .modal-bd{padding:12px 14px;font-size:13px;color:#374151}
+    .modal-ft{padding:10px 14px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:8px}
+    .x-btn{border:none;background:transparent;cursor:pointer;font-size:18px;color:#6b7280}
+    .x-btn:hover{color:#111827}
+    .detail-body{display:block}
+    .detail-grid{display:grid;grid-template-columns:110px 1fr 110px 1fr;gap:8px 12px}
+    .detail-grid .k{color:#64748b}
+    .detail-grid .v{color:#111827}
+    .name-link{color:#000;font-weight:400;cursor:pointer}
+    .name-link:hover{text-decoration:underline}
+    .stage-wrap{margin-top:12px;border:1px solid #edf1f6;border-radius:12px;padding:12px;background:#f8fafc}
+    .stage-line{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
+    .stage-item{flex:1;text-align:center;position:relative}
+    .stage-dot{
+      width:34px;height:34px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;
+      border:1px solid #d8e2ef;background:#eef2f8;color:#64748b;font-weight:700
+    }
+    .stage-item.done .stage-dot,.stage-item.active .stage-dot{background:#10b981;color:#fff;border-color:#10b981}
+    .stage-item.active .stage-dot{background:#2563eb;border-color:#2563eb}
+    .stage-label{display:block;margin-top:6px;font-size:12px;color:#334155}
+    .stage-item:not(:last-child)::after{
+      content:"";position:absolute;top:16px;left:calc(50% + 24px);right:calc(-50% + 10px);height:2px;background:#d8e2ef
+    }
+    .stage-item.done:not(:last-child)::after{background:#10b981}
+    .record-list{margin-top:12px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+    .record-card{
+      border:1px solid #e9edf4;border-radius:10px;padding:10px 12px;background:#fff;
+      writing-mode:horizontal-tb;text-orientation:mixed;word-break:break-word;
+    }
+    .record-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+    .record-title{font-weight:700;color:#0f172a}
+    .record-link{color:#2563eb;text-decoration:none;font-size:12px;writing-mode:horizontal-tb}
+    .record-link:hover{text-decoration:underline}
+    .record-desc{font-size:12px;color:#475569;line-height:1.5}
+    #stageNarrativeBox{word-break:break-word;font-size:13px;line-height:1.65}
+    .stage-prose{margin:0 0 12px;color:#1f2937;font-size:13px;line-height:1.85;text-align:justify}
+    .stage-prose:last-child{margin-bottom:0}
+    .stage-prose strong{color:#0f172a;font-weight:600}
+    @media (max-width:1000px){
+      .detail-grid{grid-template-columns:110px 1fr}
+      .record-list{grid-template-columns:1fr}
+    }
+    @media (max-width:1100px){.cards{grid-template-columns:repeat(2,minmax(0,1fr));}}
+
+    /* 新增领用 · 选择物资弹窗（左树右表） */
+    .pl-req-picker-mask{
+      position:fixed;inset:0;background:rgba(0,0,0,.42);display:none;align-items:center;justify-content:center;z-index:4000;
+    }
+    .pl-req-picker-mask.show{display:flex}
+    .pl-req-picker{
+      width:min(1680px,98vw);height:min(680px,90vh);background:#fff;border-radius:4px;border:1px solid #d9e2ef;
+      box-shadow:0 18px 48px rgba(15,23,42,.22);display:flex;flex-direction:column;overflow:hidden;
+      border-top:3px solid #1890ff;
+    }
+    .pl-req-picker-hd{
+      display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid #e8eef5;
+      font-size:15px;font-weight:600;color:#1f3551;
+    }
+    .pl-req-picker-bd{flex:1;min-height:0;display:flex}
+    .pl-req-picker-side{
+      width:260px;flex-shrink:0;border-right:1px solid #e8eef5;background:#fafbfc;display:flex;flex-direction:column;
+    }
+    .pl-req-picker-side-hd{
+      padding:8px 10px;font-size:13px;font-weight:600;color:#1f3551;border-bottom:1px solid #e8eef5;
+    }
+    .pl-req-picker-tree{flex:1;overflow:auto;padding:8px 6px 12px}
+    .pl-req-picker-node{user-select:none}
+    .pl-req-picker-node-row{
+      display:flex;align-items:center;gap:4px;padding:5px 6px;border-radius:4px;cursor:pointer;font-size:13px;color:#334155;line-height:1.4;
+    }
+    .pl-req-picker-node-row:hover{background:#eef4ff}
+    .pl-req-picker-node-row.is-active{background:#e6f4ff;color:#1677ff;font-weight:600}
+    .pl-req-picker-toggle{
+      width:16px;height:16px;border:none;background:transparent;color:#8b9ab0;cursor:pointer;font-size:10px;padding:0;flex-shrink:0;
+    }
+    .pl-req-picker-toggle.is-leaf{visibility:hidden}
+    .pl-req-picker-label{flex:1;min-width:0}
+    .pl-req-picker-count{color:#8b9ab0;font-size:12px;font-weight:400;margin-left:2px}
+    .pl-req-picker-node-row.is-active .pl-req-picker-count{color:#5b8fd9}
+    .pl-req-picker-children{margin-left:18px;display:none}
+    .pl-req-picker-children.is-open{display:block}
+    .pl-req-picker-main{flex:1;min-width:0;display:flex;flex-direction:column;min-height:0}
+    .pl-req-picker-toolbar{
+      display:flex;align-items:center;justify-content:flex-end;gap:8px;padding:10px 12px;border-bottom:1px solid #eef2f6;
+    }
+    .pl-req-picker-search{
+      width:220px;height:32px;border:1px solid #d9d9d9;border-radius:4px;padding:0 10px;font-size:13px;
+    }
+    .pl-req-picker-table-wrap{flex:1;min-height:0;overflow-x:hidden;overflow-y:auto;padding:0 12px}
+    .pl-req-picker-table{
+      width:100% !important;min-width:0 !important;border-collapse:collapse;font-size:11px;
+      table-layout:fixed !important;
+    }
+    .pl-req-picker-table th,.pl-req-picker-table td{
+      border:1px solid #e8eef5;padding:6px 4px;white-space:normal;word-break:break-word;text-align:left;
+      overflow:hidden;line-height:1.35;vertical-align:middle;
+    }
+    .pl-req-picker-table th:first-child,.pl-req-picker-table td:first-child{
+      width:36px;min-width:36px;max-width:36px;text-align:center;white-space:nowrap;padding:6px 2px;
+    }
+    .pl-req-picker-table th{background:#e8f4fc;color:#334155;font-weight:600}
+    .pl-req-picker-table tbody td{color:#000}
+    .pl-req-picker-table tbody tr:hover td{background:#f8fbff}
+    .pl-req-picker-table tbody tr.is-checked td{background:#f0f7ff}
+    .pl-req-picker-table thead th:last-child,
+    .pl-req-picker-table tbody td:last-child{
+      text-align:center !important;
+      padding:6px 2px !important;
+      width:52px;
+      min-width:52px;
+      max-width:52px;
+      box-sizing:border-box;
+      vertical-align:middle;
+    }
+    #detailBody table {
+      table-layout: auto;
+    }
+    #detailBody table thead th:last-child,
+    #detailBody table tbody td:last-child {
+      text-align: center !important;
+      padding: 8px !important;
+      width: 170px;
+      min-width: 170px;
+      max-width: none;
+      box-sizing: border-box;
+      vertical-align: middle;
+      overflow: visible;
+    }
+    #detailBody table tbody td:last-child,
+    .pl-req-picker-table tbody td:last-child {
+      text-align: center;
+    }
+    #detailBody table tbody td:last-child .req-op-wrap,
+    .pl-req-picker-table tbody td:last-child .req-op-wrap {
+      display: inline-flex;
+      gap: 10px;
+      align-items: center;
+      justify-content: center;
+      white-space: nowrap;
+      min-width: 140px;
+    }
+    #detailBody table tbody td:last-child .req-op-wrap a {
+      display: inline-flex;
+      color: #1677ff !important;
+      text-decoration: none !important;
+      font-weight: 600;
+      white-space: nowrap;
+      min-width: auto;
+    }
+    #actionBody table tbody td:last-child .req-op-wrap a {
+      display: inline-flex !important;
+      visibility: visible !important;
+      color: #1677ff !important;
+      text-decoration: none !important;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    .pl-req-picker-ft{
+      display:flex;align-items:center;justify-content:space-between;padding:8px 12px;border-top:1px solid #e8eef5;background:#fafbfc;font-size:12px;color:#64748b;
+    }
+    .pl-req-picker-pager{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+    .pl-req-picker-pager button{
+      min-width:28px;height:28px;border:1px solid #d9d9d9;border-radius:4px;background:#fff;cursor:pointer;font-size:12px;color:#334155;
+    }
+    .pl-req-picker-pager button:disabled{opacity:.45;cursor:not-allowed}
+    .pl-req-picker-actions{display:flex;gap:8px;padding:10px 14px;border-top:1px solid #e8eef5;justify-content:flex-end}
+    .req-pick-summary{font-size:12px;color:#64748b;margin-top:4px}
+    #btnReqPickMaterial{min-width:120px}
+  </style>
+</head>
+<body class="page-source-navbar page-subpage" data-breadcrumb="none">
+  <div class="app">
+    <header class="header"><div class="header-left"><button class="header-hamburger"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button><a class="header-logo" href="#"><img src="assets/logo-chenergy.png" width="220" height="40" alt="" /></a><div class="header-source-brand"><p>新能源供应链管理系统</p></div></div><div class="header-right"><span class="clock" id="clock"></span><div class="user-avatar">用</div></div></header>
+    <div class="layout">
+      <aside class="sidebar"><div class="nav-item"><span class="nav-label">采购管理</span></div></aside>
+      <main class="main-scroll">
+        <nav class="subpage-breadcrumb" aria-label="面包屑"><a href="index-portal-screen-alt.html">首页</a><span class="sep">/</span><span>采购管理</span><span class="sep">/</span><span>物资领用</span></nav>
+        <div class="page-wrap">
+          <section class="panel">
+            <div class="panel-head"><h2>物资领用</h2></div>
+            <div class="tabs" id="tabs"></div>
+            <div class="filters" id="filters"></div>
+            <div class="cards" id="cards"></div>
+            <div class="table-wrap">
+              <table>
+                <thead><tr id="thead"></tr></thead>
+                <tbody id="tbody"></tbody>
+              </table>
+      </div>
+            <div class="pager">
+              <div id="pagerInfo">共0条，每页10条</div>
+              <div class="pager-right" id="pager"></div>
+        </div>
+          </section>
+      </div>
+      </main>
+          </div>
+        </div>
+
+  <div class="modal-mask" id="detailMask" aria-hidden="true">
+    <div class="modal">
+      <div class="modal-hd"><span id="detailTitle">详情</span><div style="display:flex;align-items:center;gap:8px"><button class="btn secondary" id="detailProgressTop" style="display:none;height:28px;padding:0 10px">流程进度</button><button class="x-btn" id="detailX" aria-label="关闭">×</button></div></div>
+      <div class="modal-bd"><div class="detail-body" id="detailBody"></div></div>
+      <div class="modal-ft"><button class="btn" id="detailClose">取消</button></div>
+      </div>
+  </div>
+  <div class="modal-mask" id="actionMask" aria-hidden="true">
+    <div class="modal">
+      <div class="modal-hd"><span id="actionTitle">操作</span><div style="display:flex;align-items:center;gap:8px"><button class="btn secondary" id="actionProgressTop" style="display:none;height:28px;padding:0 10px">流程进度</button><button class="x-btn" id="actionX" aria-label="关闭">×</button></div></div>
+      <div class="modal-bd" id="actionBody"></div>
+      <div class="modal-ft" id="actionFoot">
+        <button class="btn secondary" id="actionProgress" style="display:none">流程进度</button>
+        <button class="btn" id="actionCancel">取消</button>
+        <button class="btn primary" id="actionOk">确定</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="pl-req-picker-mask" id="reqMatPickerMask" aria-hidden="true">
+    <div class="pl-req-picker" role="dialog" aria-modal="true" aria-labelledby="reqMatPickerTitle">
+      <div class="pl-req-picker-hd">
+        <span id="reqMatPickerTitle">选择物资</span>
+        <button type="button" class="x-btn" id="reqMatPickerClose" aria-label="关闭">×</button>
+      </div>
+      <div class="pl-req-picker-bd">
+        <aside class="pl-req-picker-side">
+          <div class="pl-req-picker-side-hd">物资类型</div>
+          <div class="pl-req-picker-tree" id="reqMatPickerTree"></div>
+        </aside>
+        <div class="pl-req-picker-main">
+          <div class="pl-req-picker-toolbar">
+            <input type="search" class="pl-req-picker-search" id="reqMatPickerSearch" placeholder="—查询条件—" autocomplete="off" />
+          </div>
+          <div class="pl-req-picker-table-wrap">
+            <table class="pl-req-picker-table">
+              <thead>
+                <tr>
+                  <th style="width:40px"><input type="checkbox" id="reqMatPickerChkAll" title="全选本页" /></th>
+                  <th>物资类型编码</th>
+                  <th>物资类型名称</th>
+                  <th>产品型号</th>
+                  <th>物资类别</th>
+                  <th>采购单价（含税）</th>
+                  <th>库存数量</th>
+                </tr>
+              </thead>
+              <tbody id="reqMatPickerTbody"></tbody>
+            </table>
+          </div>
+          <div class="pl-req-picker-ft">
+            <span id="reqMatPickerCount">共0条记录</span>
+            <div class="pl-req-picker-pager">
+              <select id="reqMatPickerPageSize" style="height:28px;border:1px solid #d9d9d9;border-radius:4px;font-size:12px">
+                <option value="20" selected>20</option>
+                <option value="50">50</option>
+              </select>
+              <span id="reqMatPickerPageInfo">共0页</span>
+              <button type="button" id="reqMatPickerFirst" title="首页">«</button>
+              <button type="button" id="reqMatPickerPrev" title="上一页">‹</button>
+              <span>第 <input type="text" id="reqMatPickerPageInp" value="1" style="width:36px;height:26px;text-align:center;border:1px solid #d9d9d9;border-radius:4px" /> 页</span>
+              <button type="button" id="reqMatPickerNext" title="下一页">›</button>
+              <button type="button" id="reqMatPickerLast" title="末页">»</button>
+              <button type="button" id="reqMatPickerGo">GO</button>
+            </div>
+          </div>
+          <div id="reqMatPickerTrackBox" style="display:none;margin-top:10px;border:1px solid #e9edf4;border-radius:8px;background:#fff;padding:10px 12px"></div>
+        </div>
+      </div>
+      <div class="pl-req-picker-actions">
+        <button type="button" class="btn" id="reqMatPickerCancel">取消</button>
+        <button type="button" class="btn primary" id="reqMatPickerOk">确定</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/sidebar-actions.js"></script>
+  <script src="js/subpage-feature-title.js"></script>
+  <script src="js/subpage-clock.js?v=20260611-action-track-visible"></script>
+  <script src="js/cross-dept-handoff-demo.js"></script>
+  <script src="js/material-code-scheme.js"></script>
+  <script src="js/demo-product-catalog-data.js"></script>
+  <script src="js/demo-product-catalog-picker.js"></script>
+  <script src="js/demo-two-col-dd.js"></script>
+  <script>
+(function(){
+      var PAGE_SIZE = 10;
+      var MCS = window.MaterialCodeScheme;
+      function esc(v){ return String(v == null ? "" : v).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;"); }
+      function q(v){ return encodeURIComponent(String(v == null ? "" : v)); }
+      function demoInstanceCode(category, name, seq, padLen){
+        if (!MCS) return "A0100100001";
+        return MCS.materialTypeCode(category, name);
+      }
+      function demoMaterialCode(category, name, seq, padLen){
+        if (!MCS) return "B" + String(seq).padStart(8, "0");
+        var tc = MCS.materialTypeCode(category, name);
+        return MCS.materialInstanceCode(tc, seq, padLen == null ? 3 : padLen);
+      }
+      function normalizeCategoryCode(v){
+        return MCS ? MCS.parseTypeCode(v) : String(v == null ? "" : v);
+      }
+      function normalizeMaterialCode(v){
+        return MCS ? MCS.parseInstanceCode(v, 3) : String(v == null ? "" : v);
+      }
+      function normalizeMaterialCode4(v){
+        return MCS ? MCS.parseInstanceCode(v, 4) : String(v == null ? "" : v);
+      }
+      function ledgerHashSeed(s) {
+        var h = 0;
+        var str = String(s || "");
+        for (var i = 0; i < str.length; i++) {
+          h = ((h << 5) - h + str.charCodeAt(i)) | 0;
+        }
+        return Math.abs(h);
+      }
+      function demoDeviceUniqueCode(seq) {
+        return MCS ? MCS.deviceUniqueCode(seq) : "C" + String(Math.max(1, Number(seq) || 1)).padStart(11, "0");
+      }
+      var LEDGER_DETAIL_HEADERS = [
+        "序号",
+        "产品名称",
+        "产品型号",
+        "产品编码",
+        "物资唯一码",
+        "物资类型名称",
+        "物资类型编码",
+        "采购部门",
+        "供应商",
+        "采购单价（含税）",
+        "入库时间",
+        "经办人",
+        "使用人",
+        "资产类型",
+        "仓库名称",
+        "是否在库",
+        "是否开票",
+        "操作"
+      ];
+      var LEDGER_DETAIL_VIEW_HEADERS = [
+        "序号",
+        "产品名称",
+        "产品型号",
+        "产品编码",
+        "物资唯一码",
+        "物资类型名称",
+        "物资类型编码",
+        "采购部门",
+        "供应商",
+        "采购单价（含税）",
+        "是否在本部门",
+        "是否开票",
+        "使用人",
+        "资产类型",
+        "操作"
+      ];
+      var NORMAL_HANDLERS = ["宋中波","成明锴","王卿明","李哲","李泽","赵六","张伟","陈刚"];
+      function normalizeHandler(v) {
+        if (!v) return "宋中波";
+        var s = String(v);
+        if (/^(中心库|仓库|[A-Z][\u4e00-\u9fa5]|库[A-Z]|[\u4e00-\u9fa5]\d|-)/.test(s)) return NORMAL_HANDLERS[Math.abs(hashCode(s)) % NORMAL_HANDLERS.length];
+        return s;
+      }
+      function detailUserName(d, fallback) {
+        var raw = (d && (d.userName || d.keeper || d.applicant || d.receiver || d.transferBy || d.handler)) || fallback || "";
+        return normalizeHandler(raw);
+      }
+      function formatWarehouseName(v) {
+        var s = String(v == null ? "" : v).trim();
+        if (!s) return "";
+        var m = s.match(/中心库\s*([0-9一二三四五六七八九十]+)\s*[-－—_/\\\s]*0?(\d{1,2})/);
+        if (m) return "中心库" + m[1] + "-" + String(m[2]).padStart(2, "0");
+        var h = Math.abs(hashCode(s));
+        return "中心库" + ((h % 3) + 1) + "-" + String((h % 9) + 1).padStart(2, "0");
+      }
+      function hashCode(s) {
+        for (var h = 0, i = 0; i < s.length; i++) h = (Math.imul(31, h) + s.charCodeAt(i)) | 0;
+        return h;
+      }
+      function assetTypeName(row) {
+        var raw = String((row && (row.assetType || row.category || row.materialType || row.typeName)) || "");
+        if (raw.indexOf("无形") >= 0 || raw.indexOf("软件") >= 0 || raw.indexOf("许可") >= 0) return "无形资产";
+        if (raw.indexOf("存货") >= 0 || raw.indexOf("办公") >= 0 || raw.indexOf("销售") >= 0 || raw.indexOf("物料") >= 0) return "存货";
+        return "固定资产";
+      }
+      function normalizeAssetCategory(v) {
+        return assetTypeName({ assetType: v });
+      }
+      function ledgerDetailProductCode(baseCode, idx) {
+        if (MCS && /^B\d{8}$/i.test(String(baseCode || ""))) {
+          return MCS.instanceCodeWithOffset(baseCode, idx - 1);
+        }
+        return String(baseCode || "");
+      }
+      function buildLedgerDetailRowsFromSummary(row, rowCount) {
+        if (!row) return [];
+        var count = Math.max(1, Math.min(20, Number(rowCount) || Number(row.stockQty) || 10));
+        var typeCode = normalizeCategoryCode(row.code || row.assetNo);
+        var baseName = String(row.name || "");
+        var baseSpec = String(row.spec || "GW66-1500");
+        var baseCode = demoMaterialCode(row.category || "生产类", row.name, 1, 3) || normalizeMaterialCode(typeCode);
+        var unitPrice = row.unitPriceIncl != null && String(row.unitPriceIncl) !== "" ? String(row.unitPriceIncl) : rowUnitPriceIncl(row);
+        var dept = row.purchaseDept || row.dept || "—";
+        var supplier = row.supplier || "—";
+        var inboundTime = row.inDate ? String(row.inDate) + " 09:30" : "2026-04-20 09:30";
+        var handler = normalizeHandler(row.keeper || "宋中波");
+        var warehouse = row.location || row.warehouse || "公司中心库";
+        var out = [];
+        var i;
+        for (i = 1; i <= count; i++) {
+          var productCode = ledgerDetailProductCode(baseCode, i);
+          var pickId = typeCode + "-" + productCode + "-" + i;
+          out.push({
+            pickId: pickId,
+            seq: i,
+            productName: baseName,
+            productModel: baseSpec,
+            productCode: productCode,
+            deviceUniqueCode: demoDeviceUniqueCode(i),
+            typeName: baseName,
+            typeCode: typeCode,
+            purchaseDept: dept,
+            supplier: supplier,
+            unitPriceIncl: unitPrice,
+            inboundTime: inboundTime,
+            handler: handler,
+            userName: detailUserName(row, handler),
+            assetType: assetTypeName(row),
+            warehouse: warehouse,
+            inStock: "否",
+            invoiceStatus: row.invoiceStatus || (i % 4 === 0 ? "已开票" : "未开票"),
+            category: normalizeAssetCategory(row.assetType || row.category || row.materialType || row.typeName || baseName),
+            name: baseName,
+            spec: baseSpec,
+            code: typeCode,
+            stockQty: row.stockQty,
+            location: warehouse,
+            fixedCode: row.fixedCode || ""
+          });
+        }
+        return out;
+      }
+      function buildReqPickerDetailCatalog(ledgerRows) {
+        var out = [];
+        (ledgerRows || []).forEach(function (r) {
+          buildLedgerDetailRowsFromSummary(r, 10).forEach(function (d) {
+            out.push(d);
+          });
+        });
+        return out;
+      }
+      var TRANSFER_BIZ_DEPTS = ["经营发展中心", "电控所", "机械所", "运维中心"];
+      function filterTransferableLedgerRows(rows) {
+        return (rows || []).filter(function (r) {
+          var dept = String(r.dept || r.purchaseDept || "").trim();
+          return dept && TRANSFER_BIZ_DEPTS.indexOf(dept) >= 0;
+        });
+      }
+      function reqPickerDetailRowId(r) {
+        return String((r && (r.pickId || r.deviceUniqueCode)) || reqPickerRowCode(r) || "");
+      }
+      function ledgerDetailThHtml(headers) {
+        return (headers || LEDGER_DETAIL_HEADERS)
+          .map(function (h) {
+            return "<th>" + esc(h) + "</th>";
+          })
+          .join("");
+      }
+      function ledgerDetailTdHtml(d, withTrack) {
+        var track =
+          '<span class="req-op-wrap"><a href="#" class="req-track-link" data-track-name="' +
+          esc(d.productName || d.name || "") +
+          '" data-track-code="' +
+          esc(d.productCode || "") +
+          '" style="color:#1677ff;text-decoration:none">物资跟踪</a></span>';
+        var cells = [
+          esc(d.seq != null ? d.seq : ""),
+          esc(d.productName || d.name || ""),
+          esc(d.productModel || d.spec || ""),
+          esc(d.productCode || ""),
+          esc(d.deviceUniqueCode || ""),
+          esc(d.typeName || d.name || ""),
+          esc(d.typeCode || d.code || ""),
+          esc(d.purchaseDept || ""),
+          esc(d.supplier || ""),
+          esc(d.unitPriceIncl || rowUnitPriceIncl(d) || ""),
+          esc(d.inboundTime || ""),
+          esc(d.handler || ""),
+          esc(detailUserName(d)),
+          esc(assetTypeName(d)),
+          esc(d.warehouse || d.location || ""),
+          esc(d.inStock || "否"),
+          esc(d.invoiceStatus || "")
+        ];
+        if (withTrack !== false) cells.push(track);
+        return cells.map(function (c) {
+          return "<td>" + c + "</td>";
+        }).join("");
+      }
+      function formatReqMaterialDisplay(r){
+        var base = normalizeCategoryCode(String((r && (r.code || r.assetNo)) || ""));
+        var name = String((r && r.name) || "").trim();
+        var spec = String((r && r.spec) || "").trim();
+        if (!base) return "";
+        return base + "-" + name + (spec ? ("(" + spec + ")") : "");
+      }
+      function getReqCpuGpuDdRows(){
+        return [
+          {
+            code: demoInstanceCode("生产类", "CPU服务器", 1, 3),
+            name: "CPU服务器",
+            spec: "R750·2U",
+            category: "固定资产",
+            unitPriceExcl: "128,000.00",
+            stockQty: 6,
+            dept: "电控所",
+            keeper: "宋中波",
+            location: "中心库1-05",
+            fixedCode: "FA-2026-9001"
+          },
+          {
+            code: demoInstanceCode("生产类", "GPU服务器", 1, 3),
+            name: "GPU服务器",
+            spec: "A100·4卡",
+            category: "生产类",
+            unitPriceExcl: "256,000.00",
+            stockQty: 4,
+            dept: "电控所",
+            keeper: "成明锴",
+            location: "中心库2-08",
+            fixedCode: "FA-2026-9002"
+          }
+        ];
+      }
+      function ledgerMaterialDdRows(list, withMatCode){
+        var rows = [{ value: "", c2: "请选择物资", placeholder: true }];
+        (list || []).forEach(function(r){
+          var v = String(r.code || r.assetNo || "");
+          var row = {
+            value: v,
+            c1: normalizeCategoryCode(v),
+            c2: String(r.name || "") + (r.spec ? ("（" + r.spec + "）") : "")
+          };
+          if (withMatCode) row.c3 = demoMaterialCode(r.category || "生产类", r.name, 1, 3) || normalizeMaterialCode(v) || v;
+          rows.push(row);
+        });
+        return rows;
+      }
+      function mountLedgerMaterialDd(mountId, hiddenId, list, onChange, opts){
+        if (!window.DemoTwoColDd) return null;
+        var root = document.getElementById(mountId);
+        var hidden = document.getElementById(hiddenId);
+        if (!root || !hidden) return null;
+        opts = opts || {};
+        var withMatCode = !!opts.withMatCode;
+        var cfg = {
+          root: root,
+          hiddenInput: hidden,
+          placeholder: "请选择物资",
+          searchPlaceholder: "搜索物资类型编码或名称",
+          col1: "物资类型编码",
+          col2: "物资类型名称",
+          rows: ledgerMaterialDdRows(list, withMatCode),
+          onChange: onChange
+        };
+        if (withMatCode) cfg.col3 = "物资编码";
+        return DemoTwoColDd.mount(cfg);
+      }
+
+      var REQ_PICKER_TREE_DATA = [
+        {
+          id: "a01", codePart: "A01", label: "A01大型成套设备", open: true, matCount: 0, children: [
+            { id: "a01-01", codePart: "01", label: "01风力发电机组", open: true, matCount: 0, children: [
+              { id: "a01-01-001", codePart: "001", label: "001风力发电机组整机", matCount: 2, category: "生产类", name: "风力发电机组整机", code: "A0100100001" },
+              { id: "a01-01-002", codePart: "002", label: "002机舱", matCount: 0, category: "生产类", name: "机舱", code: "A0100100002" }
+            ]},
+            { id: "a01-02", codePart: "02", label: "02叶片", open: true, matCount: 0, children: [
+              { id: "a01-02-001", codePart: "001", label: "001叶片", matCount: 0, category: "生产类", name: "叶片", code: "A0100200001" }
+            ]},
+            { id: "a01-03", codePart: "03", label: "03变桨轴承", open: true, matCount: 0, children: [
+              { id: "a01-03-001", codePart: "001", label: "001变桨轴承", matCount: 0, category: "生产类", name: "变桨轴承", code: "A0100300001" }
+            ]},
+            { id: "a01-04", codePart: "04", label: "04主轴总成", open: true, matCount: 0, children: [
+              { id: "a01-04-001", codePart: "001", label: "001主轴总成", matCount: 0, category: "生产类", name: "主轴总成", code: "A0100400001" }
+            ]},
+            { id: "a01-05", codePart: "05", label: "05主齿轮箱", open: false, matCount: 0, children: [
+              { id: "a01-05-001", codePart: "001", label: "001主齿轮箱本体", matCount: 0, category: "生产类", name: "主齿轮箱本体", code: "A0100500001" }
+            ]},
+            { id: "a01-06", codePart: "06", label: "06发电机", open: false, matCount: 0, children: [
+              { id: "a01-06-001", codePart: "001", label: "001发电机", matCount: 0, category: "生产类", name: "发电机", code: "A0100600001" }
+            ]}
+          ]
+        },
+        { id: "a02", codePart: "A02", label: "A02小型设备", matCount: 0, children: [] },
+        { id: "a03", codePart: "A03", label: "A03工器具", matCount: 0, children: [] },
+        { id: "a04", codePart: "A04", label: "A04消防安防设备", matCount: 0, children: [] }
+      ];
+      var reqMatPickerState = {
+        catalog: [],
+        treeNodeId: "a01-01-001",
+        treeFilterPrefix: "A0100100001",
+        search: "",
+        page: 1,
+        pageSize: 20,
+        pendingSelected: {},
+        onDone: null,
+        variant: "req"
+      };
+      function reqPickerTreeFindNode(list, id) {
+        for (var i = 0; i < list.length; i++) {
+          var n = list[i];
+          if (n.id === id) return n;
+          if (n.children && n.children.length) {
+            var hit = reqPickerTreeFindNode(n.children, id);
+            if (hit) return hit;
+          }
+        }
+        return null;
+      }
+      function reqPickerTreeAncestorChain(nodeId) {
+        var chain = [];
+        function walk(list, ancestors) {
+          for (var i = 0; i < list.length; i++) {
+            var n = list[i];
+            var path = ancestors.concat([n]);
+            if (n.id === nodeId) {
+              chain = path;
+              return true;
+            }
+            if (n.children && n.children.length && walk(n.children, path)) return true;
+          }
+          return false;
+        }
+        walk(REQ_PICKER_TREE_DATA, []);
+        return chain;
+      }
+      function reqPickerTreeFilterPrefix(nodeId) {
+        var chain = reqPickerTreeAncestorChain(nodeId);
+        if (!chain.length) return "";
+        var leaf = chain[chain.length - 1];
+        if (leaf.code) return String(leaf.code).toUpperCase();
+        if (chain.length >= 3) {
+          var big = String(chain[0].codePart || "").toUpperCase();
+          var mid = String(chain[1].codePart || "").replace(/\D/g, "").padStart(2, "0").slice(-2);
+          var small = String(chain[2].codePart || "").replace(/\D/g, "").padStart(3, "0").slice(-3);
+          return big + mid + small;
+        }
+        if (chain.length === 2) {
+          var big2 = String(chain[0].codePart || "").toUpperCase();
+          var mid2 = String(chain[1].codePart || "").replace(/\D/g, "").padStart(2, "0").slice(-2);
+          return big2 + mid2;
+        }
+        return String(chain[0].codePart || "").toUpperCase();
+      }
+      function reqPickerRowTypeCode(r) {
+        return normalizeCategoryCode((r && (r.typeCode || r.code)) || "").toUpperCase();
+      }
+      function reqPickerRowMatchesTree(r) {
+        var prefix = String(reqMatPickerState.treeFilterPrefix || "").toUpperCase();
+        if (!prefix) return true;
+        var tc = reqPickerRowTypeCode(r);
+        return tc.indexOf(prefix) === 0;
+      }
+      function reqPickerTreeAggCount(n) {
+        var prefix = reqPickerTreeFilterPrefix(n.id);
+        var cnt = 0;
+        (reqMatPickerState.catalog || []).forEach(function (r) {
+          if (!prefix) return;
+          if (reqPickerRowTypeCode(r).indexOf(prefix) === 0) cnt += 1;
+        });
+        if (n.children && n.children.length) {
+          var sum = 0;
+          for (var i = 0; i < n.children.length; i++) sum += reqPickerTreeAggCount(n.children[i]);
+          return sum;
+        }
+        return cnt;
+      }
+      function reqPickerSelectTreeNode(nodeId) {
+        reqMatPickerState.treeNodeId = nodeId;
+        reqMatPickerState.treeFilterPrefix = reqPickerTreeFilterPrefix(nodeId);
+        reqMatPickerState.page = 1;
+      }
+      function reqPickerRenderTreeNodes(nodes) {
+        return (nodes || [])
+          .map(function (n) {
+            var hasChild = n.children && n.children.length;
+            var isLeaf = !hasChild;
+            var open = !!n.open;
+            var active = n.id === reqMatPickerState.treeNodeId ? " is-active" : "";
+            var cnt = reqPickerTreeAggCount(n);
+            var childHtml = hasChild
+              ? '<div class="pl-req-picker-children' +
+                (open ? " is-open" : "") +
+                '">' +
+                reqPickerRenderTreeNodes(n.children) +
+                "</div>"
+              : "";
+            return (
+              '<div class="pl-req-picker-node" data-id="' +
+              esc(n.id) +
+              '">' +
+              '<div class="pl-req-picker-node-row' +
+              active +
+              '" data-tree-id="' +
+              esc(n.id) +
+              '">' +
+              '<button type="button" class="pl-req-picker-toggle' +
+              (isLeaf ? " is-leaf" : "") +
+              '" data-tree-toggle="' +
+              esc(n.id) +
+              '" aria-label="展开收起">' +
+              (open ? "▼" : "▶") +
+              "</button>" +
+              '<span class="pl-req-picker-label">' +
+              esc(n.label) +
+              '<span class="pl-req-picker-count"> (' +
+              cnt +
+              ")</span></span>" +
+              "</div>" +
+              childHtml +
+              "</div>"
+            );
+          })
+          .join("");
+      }
+      function renderReqMatPickerTree() {
+        var root = document.getElementById("reqMatPickerTree");
+        if (!root) return;
+        root.innerHTML = reqPickerRenderTreeNodes(REQ_PICKER_TREE_DATA);
+      }
+
+      function rowUnitPriceExcl(r) {
+        if (r && r.unitPriceExcl != null && String(r.unitPriceExcl) !== "") return String(r.unitPriceExcl);
+        return "—";
+      }
+
+      function rowUnitPriceIncl(r) {
+        if (r && r.unitPriceIncl) return String(r.unitPriceIncl);
+        var ex = parseFloat(String((r && r.unitPriceExcl) || "").replace(/,/g, ""));
+        if (isNaN(ex)) return "—";
+        return (ex * 1.13).toLocaleString("zh-CN", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      }
+
+      function reqPickerRowCode(r) {
+        return String((r && (r.code || r.assetNo)) || "");
+      }
+
+      function reqPickerFilteredRows() {
+        var q = String(reqMatPickerState.search || "").trim().toLowerCase();
+        return (reqMatPickerState.catalog || []).filter(function (r) {
+          if (!reqPickerRowMatchesTree(r)) return false;
+          if (reqMatPickerState.variant === "transfer") {
+            if (!q) return true;
+            var hayT = [
+              r.typeCode,
+              r.typeName,
+              r.productName,
+              r.productModel,
+              r.productCode,
+              r.deviceUniqueCode,
+              r.category,
+              r.code,
+              r.name
+            ]
+              .join(" ")
+              .toLowerCase();
+            return hayT.indexOf(q) >= 0;
+          }
+          if (!q) return true;
+          var hay =
+            [
+              r.typeCode,
+              r.typeName,
+              r.productName,
+              r.productModel,
+              r.productCode,
+              r.deviceUniqueCode,
+              r.category
+            ].join(" ").toLowerCase();
+          return hay.indexOf(q) >= 0;
+        });
+      }
+
+      function updateReqMatPickerTreeActive() {
+        renderReqMatPickerTree();
+      }
+
+      function updateReqMatPickerThead() {
+        var tr = document.querySelector("#reqMatPickerMask .pl-req-picker-table thead tr");
+        if (!tr) return;
+        tr.innerHTML =
+          '<th style="width:40px"><input type="checkbox" id="reqMatPickerChkAll" title="全选本页" /></th>' +
+          ledgerDetailThHtml(LEDGER_DETAIL_HEADERS);
+      }
+
+      function renderReqMatPickerTable() {
+        var tbody = document.getElementById("reqMatPickerTbody");
+        if (!tbody) return;
+        var all = reqPickerFilteredRows();
+        var pageSize = Math.max(1, Number(reqMatPickerState.pageSize) || 20);
+        var totalPages = Math.max(1, Math.ceil(all.length / pageSize) || 1);
+        if (reqMatPickerState.page > totalPages) reqMatPickerState.page = totalPages;
+        if (reqMatPickerState.page < 1) reqMatPickerState.page = 1;
+        var start = (reqMatPickerState.page - 1) * pageSize;
+        var pageRows = all.slice(start, start + pageSize);
+        var pending = reqMatPickerState.pendingSelected || {};
+        var emptyColspan = LEDGER_DETAIL_HEADERS.length + 1;
+        tbody.innerHTML = pageRows
+          .map(function (r) {
+            var code = reqPickerDetailRowId(r);
+            var checked = !!pending[code];
+            var cells =
+              '<td><input type="checkbox" class="req-mat-pick-chk"' +
+              (checked ? " checked" : "") +
+              ' data-code="' +
+              esc(code) +
+              '" /></td>' +
+              ledgerDetailTdHtml(r, true);
+            return (
+              "<tr" +
+              (checked ? ' class="is-checked"' : "") +
+              ' data-code="' +
+              esc(code) +
+              '">' +
+              cells +
+              "</tr>"
+            );
+          })
+          .join("");
+        if (!pageRows.length) {
+          tbody.innerHTML =
+            '<tr><td colspan="' +
+            emptyColspan +
+            '" style="padding:24px;text-align:center;color:#94a3b8">暂无物资</td></tr>';
+        }
+        var countEl = document.getElementById("reqMatPickerCount");
+        if (countEl) countEl.textContent = "共" + all.length + "条记录";
+        var pageInfo = document.getElementById("reqMatPickerPageInfo");
+        if (pageInfo) pageInfo.textContent = "共" + totalPages + "页";
+        var pageInp = document.getElementById("reqMatPickerPageInp");
+        if (pageInp) pageInp.value = String(reqMatPickerState.page);
+        var chkAll = document.getElementById("reqMatPickerChkAll");
+        if (chkAll) {
+          var allOnPage = pageRows.length > 0 && pageRows.every(function (r) {
+            return !!pending[reqPickerDetailRowId(r)];
+          });
+          chkAll.checked = allOnPage;
+          chkAll.indeterminate = !allOnPage && pageRows.some(function (r) {
+            return !!pending[reqPickerDetailRowId(r)];
+          });
+        }
+        ["reqMatPickerFirst", "reqMatPickerPrev"].forEach(function (id) {
+          var b = document.getElementById(id);
+          if (b) b.disabled = reqMatPickerState.page <= 1;
+        });
+        ["reqMatPickerNext", "reqMatPickerLast"].forEach(function (id) {
+          var b = document.getElementById(id);
+          if (b) b.disabled = reqMatPickerState.page >= totalPages;
+        });
+      }
+
+      function ledgerRowToProduct(r, products) {
+        if (!r || !products || !products.length) return null;
+        var code = normalizeCategoryCode(r.code || r.assetNo);
+        var name = String(r.name || "").trim();
+        var i;
+        for (i = 0; i < products.length; i++) {
+          var p = products[i];
+          if (code && String(p.a) === code && (!name || String(p.productName) === name)) return p;
+        }
+        for (i = 0; i < products.length; i++) {
+          if (code && String(products[i].a) === code) return products[i];
+        }
+        return null;
+      }
+
+      function openReqMaterialPicker(catalog, initialSelected, onDone, pickerOpts) {
+        pickerOpts = pickerOpts || {};
+        var variant = pickerOpts.variant || "req";
+        var mask = document.getElementById("reqMatPickerMask");
+        if (!mask) {
+          if (typeof onDone === "function") onDone(initialSelected || []);
+          return;
+        }
+        reqMatPickerState.variant = variant;
+        reqMatPickerState.onDone = onDone;
+        reqMatPickerState.search = "";
+        reqMatPickerState.page = 1;
+        reqMatPickerState.pendingSelected = {};
+        var sourceRows =
+          Array.isArray(catalog) && catalog.length
+            ? catalog
+            : (tabs.ledger && tabs.ledger.rows) || [];
+        var ledgerRows =
+          variant === "transfer" ? filterTransferableLedgerRows(sourceRows) : sourceRows;
+        reqMatPickerState.catalog = buildReqPickerDetailCatalog(ledgerRows);
+        reqPickerSelectTreeNode("a01-01-001");
+        (initialSelected || []).forEach(function (r) {
+          var id = reqPickerDetailRowId(r);
+          if (id) reqMatPickerState.pendingSelected[id] = r;
+        });
+        var searchEl = document.getElementById("reqMatPickerSearch");
+        if (searchEl) searchEl.value = "";
+        var pickerTitle = document.getElementById("reqMatPickerTitle");
+        if (pickerTitle) {
+          pickerTitle.textContent =
+            "选择物资";
+        }
+        updateReqMatPickerThead();
+        updateReqMatPickerTreeActive();
+        renderReqMatPickerTable();
+        mask.classList.add("show");
+        mask.setAttribute("aria-hidden", "false");
+      }
+
+      function closeReqMaterialPicker() {
+        var mask = document.getElementById("reqMatPickerMask");
+        if (mask) {
+          mask.classList.remove("show");
+          mask.setAttribute("aria-hidden", "true");
+        }
+        reqMatPickerState.onDone = null;
+        reqMatPickerState.variant = "req";
+      }
+
+      function bindReqMatPickerEventsOnce() {
+        if (bindReqMatPickerEventsOnce._done) return;
+        bindReqMatPickerEventsOnce._done = true;
+        var mask = document.getElementById("reqMatPickerMask");
+        if (!mask) return;
+
+        function setPending(code, row, on) {
+          if (!code) return;
+          if (on) reqMatPickerState.pendingSelected[code] = row;
+          else delete reqMatPickerState.pendingSelected[code];
+        }
+        function reqPickerFindRowByCode(code) {
+          var i;
+          for (i = 0; i < reqMatPickerState.catalog.length; i++) {
+            var r = reqMatPickerState.catalog[i];
+            var rid = reqPickerDetailRowId(r);
+            if (rid === code) return r;
+          }
+          return null;
+        }
+
+        mask.addEventListener("click", function (e) {
+          if (e.target === mask) {
+            closeReqMaterialPicker();
+            return;
+          }
+          var treeToggle = e.target.closest ? e.target.closest("[data-tree-toggle]") : null;
+          if (treeToggle) {
+            e.preventDefault();
+            e.stopPropagation();
+            var tid = String(treeToggle.getAttribute("data-tree-toggle") || "");
+            var tnode = reqPickerTreeFindNode(REQ_PICKER_TREE_DATA, tid);
+            if (tnode && tnode.children && tnode.children.length) {
+              tnode.open = !tnode.open;
+              renderReqMatPickerTree();
+            }
+            return;
+          }
+          var treeRow = e.target.closest ? e.target.closest(".pl-req-picker-node-row") : null;
+          if (treeRow) {
+            var nodeId = String(treeRow.getAttribute("data-tree-id") || "");
+            if (nodeId) {
+              reqPickerSelectTreeNode(nodeId);
+              updateReqMatPickerTreeActive();
+              renderReqMatPickerTable();
+            }
+            return;
+          }
+          if (e.target.id === "reqMatPickerClose" || e.target.id === "reqMatPickerCancel") {
+            closeReqMaterialPicker();
+            return;
+          }
+          if (e.target.id === "reqMatPickerOk") {
+            var picked = [];
+            var pend = reqMatPickerState.pendingSelected || {};
+            Object.keys(pend).forEach(function (k) {
+              if (pend[k]) picked.push(pend[k]);
+            });
+            var done = reqMatPickerState.onDone;
+            closeReqMaterialPicker();
+            if (typeof done === "function") done(picked);
+            return;
+          }
+          if (e.target.id === "reqMatPickerFirst") {
+            reqMatPickerState.page = 1;
+            renderReqMatPickerTable();
+            return;
+          }
+          if (e.target.id === "reqMatPickerPrev") {
+            reqMatPickerState.page = Math.max(1, reqMatPickerState.page - 1);
+            renderReqMatPickerTable();
+            return;
+          }
+          if (e.target.id === "reqMatPickerNext") {
+            reqMatPickerState.page += 1;
+            renderReqMatPickerTable();
+            return;
+          }
+          if (e.target.id === "reqMatPickerLast") {
+            reqMatPickerState.page = 99999;
+            renderReqMatPickerTable();
+            return;
+          }
+          if (e.target.id === "reqMatPickerGo") {
+            var inp = document.getElementById("reqMatPickerPageInp");
+            reqMatPickerState.page = Math.max(1, Number(inp && inp.value) || 1);
+            renderReqMatPickerTable();
+            return;
+          }
+          var chk = e.target.closest ? e.target.closest(".req-mat-pick-chk") : null;
+          if (chk) {
+            var code = String(chk.getAttribute("data-code") || "");
+            var row = reqPickerFindRowByCode(code);
+            setPending(code, row, chk.checked);
+            var tr = chk.closest ? chk.closest("tr") : null;
+            if (tr) tr.classList.toggle("is-checked", chk.checked);
+            var chkAll = document.getElementById("reqMatPickerChkAll");
+            if (chkAll) {
+              var pageChks = Array.prototype.slice.call(document.querySelectorAll(".req-mat-pick-chk"));
+              chkAll.checked = pageChks.length > 0 && pageChks.every(function (x) {
+                return x.checked;
+              });
+              chkAll.indeterminate =
+                !chkAll.checked && pageChks.some(function (x) {
+                  return x.checked;
+                });
+            }
+            return;
+          }
+          if (e.target.id === "reqMatPickerChkAll") {
+            var on = !!e.target.checked;
+            Array.prototype.forEach.call(document.querySelectorAll(".req-mat-pick-chk"), function (chkEl) {
+              chkEl.checked = on;
+              var code = String(chkEl.getAttribute("data-code") || "");
+              var row = reqPickerFindRowByCode(code);
+              setPending(code, row, on);
+              var tr = chkEl.closest ? chkEl.closest("tr") : null;
+              if (tr) tr.classList.toggle("is-checked", on);
+            });
+          }
+        });
+
+        var searchEl = document.getElementById("reqMatPickerSearch");
+        if (searchEl) {
+          searchEl.addEventListener("input", function () {
+            reqMatPickerState.search = String(searchEl.value || "");
+            reqMatPickerState.page = 1;
+            renderReqMatPickerTable();
+          });
+        }
+        var sizeEl = document.getElementById("reqMatPickerPageSize");
+        if (sizeEl) {
+          sizeEl.addEventListener("change", function () {
+            reqMatPickerState.pageSize = Math.max(1, Number(sizeEl.value) || 20);
+            reqMatPickerState.page = 1;
+            renderReqMatPickerTable();
+          });
+        }
+      }
+
+      var M10_INBOUND_FALLBACK = [
+        { acceptNo: "RK-YC-20260428-01", contractNo: "KJ-2026-001", supplier: "远景能源", name: "变流器模块", spec: "V2.0", warehouse: "公司中心库 / A区-01-01", qty: "100", materialType: "固定资产" },
+        { acceptNo: "RK-YC-20260429-02", contractNo: "KJ-2026-001", supplier: "远景能源", name: "变流器模块", spec: "V2.0", warehouse: "公司中心库 / A区-01-01", qty: "100", materialType: "固定资产" },
+        { acceptNo: "RK-2026-014", contractNo: "KJ-2026-010", supplier: "华驰电力", name: "支架组件", spec: "XH-105", warehouse: "公司中心库 / B区-02", qty: "60", materialType: "存货" }
+      ];
+      function formatM10InboundLabel(o) {
+        var w = o.warehouse || "";
+        return (o.acceptNo || "") + " · " + (o.name || "") + (w ? "（" + w + "）" : "");
+      }
+      function getM10InboundOptions() {
+        try {
+          var raw = localStorage.getItem("map_m10_inbound_list_v1");
+          var arr = raw ? JSON.parse(raw) : null;
+          if (Array.isArray(arr) && arr.length) return arr;
+        } catch (e) {}
+        return M10_INBOUND_FALLBACK.slice();
+      }
+
+      var tabs = {
+        ledger: {
+          name: "物资统计",
+          search: [["name","物资类型名称"],["dept","领用部门"]],
+          columns: [
+            ["name","物资类型名称"],
+            ["code","物资类型编码"],
+            ["category","资产类型"],
+            ["unitPriceIncl","采购单价（含税）"],
+            ["stockQty","库存数量"],
+            ["requisitionTotal","领用数量"],
+            ["dept","领用部门"],
+            ["keeper","领用人"],
+            ["location","存放地点"]
+          ],
+          rows: Array.from({length:14}).map(function(_,i){
+            var categoryList = ["固定资产","存货","无形资产"];
+            var statusList = ["在库","在用","维修中","已转固","已销售"];
+            var shipList = ["未发货","已发货","已签收"];
+            var nameList = ["智能风机控制器","高压配电柜","工业级交换机","移动式检修电源","机舱温控模块","主控信号采集单元","防雷监测终端","变流器散热组件","箱变状态采集器","场站通信网关","功率调节执行器","电能质量分析仪","远程维护工控机","继电保护测试仪"];
+            var origin = 80000 + i*6500;
+            var net = Math.max(18000, origin - (i+1)*3200);
+            var depList = ["年限平均法","双倍余额递减法","工作量法"];
+            var checkResultList = ["账实一致","盘盈1台","盘亏1台","待复核"];
+            var reqTot = 2 + (i % 8);
+            var baseStock = 12 + (i % 11);
+            var cat = categoryList[i%3];
+            var matName = nameList[i%nameList.length];
+            return {
+              code:demoInstanceCode(cat, matName, i + 1, 3),
+              name:matName,
+              spec:i%2?"V3.1":"V2.0",
+              category:cat,
+              purchaseDept:i%2?"电控所":"经营发展中心",
+              unitPriceExcl:(18500 + i * 920).toLocaleString("zh-CN",{minimumFractionDigits:2,maximumFractionDigits:2}),
+              requisitionTotal:reqTot,
+              stockQty:Math.max(0, baseStock - reqTot + (i % 3)),
+              status:statusList[i%5],
+              invoiceStatus:i%4===0?"已开票":"未开票",
+              shipStatus:shipList[i%3],
+              invoiceTime:i%4===0?"2026-04-"+String((i%20)+1).padStart(2,"0"):"",
+              dept:i%2?"电控所":"经营发展中心",
+              inCurrentDept:i%2?"是":"否",
+              keeper:i%2?"成明锴":"宋中波",
+              location:"中心库"+(i%3+1)+"-0"+(i%5+1),
+              fixedCode:"FA-2026-"+String(i+1).padStart(4,"0"),
+              origin:origin,
+              net:net,
+              depreciation:depList[i%3],
+              inDate:"2026-"+String((i%6)+1).padStart(2,"0")+"-"+String((i%20)+1).padStart(2,"0"),
+              contractNo:"HT-2026-"+String(100+i).padStart(3,"0"),
+              supplier:["中车电气","南瑞继保","许继电气","国电南自"][i%4],
+              lastCheckTime:"2026-"+String((i%6)+1).padStart(2,"0")+"-"+String((i%25)+1).padStart(2,"0")+" 10:"+String((i%6)*10).padStart(2,"0"),
+              lastCheckResult:checkResultList[i%4],
+              receiveMode: i % 2 === 0 ? "engineering" : "project",
+              from_dept:"",
+              to_dept:"",
+              handoff_status:"",
+              handoff_at:"",
+              batch_no:""
+            }
+          })
+        },
+        requisition: {
+          name: "领用记录",
+          search: [["reqNo","领用单号"],["name","选择物资"]],
+          columns: [
+            ["reqNo","领用单号"],
+            ["name","领用产品名称"],
+            ["reqDate","领用日期"],
+            ["applicant","领用人"],
+            ["applyDept","领用部门"],
+            ["status","领用状态"],
+            ["remark","领用说明"]
+          ],
+          rows: Array.from({length:10}).map(function(_,i){
+            var nameList = ["智能风机控制器","高压配电柜","工业级交换机","变流器散热组件","机舱温控模块"];
+            var st = ["领用中","已领用"][i % 2];
+            var unitPriceExclNum = 18500 + i * 920;
+            var requisitionTotal = 2 + (i % 8);
+            var stockQty = Math.max(0, 12 + (i % 11) - requisitionTotal + (i % 3));
+            var reqCat = ["固定资产","存货","无形资产"][i%3];
+            var reqName = nameList[i%nameList.length];
+            var reqName2 = nameList[(i+1)%nameList.length];
+            return {
+              reqNo:"LY-2026-"+String(401+i).padStart(4,"0"),
+              code:demoInstanceCode(reqCat, reqName, (i % 14) + 1, 3),
+              contractNo:"HT-2026-"+String(100+(i%14)).padStart(3,"0"),
+              purchaseDept:i%2?"电控所":"经营发展中心",
+              name:reqName,
+              productNames:reqName + "." + reqName2,
+              spec:i%2?"V3.1":"V2.0",
+              category:reqCat,
+              unitPriceExcl:unitPriceExclNum.toLocaleString("zh-CN",{minimumFractionDigits:2,maximumFractionDigits:2}),
+              unitPriceIncl:(unitPriceExclNum * 1.13).toLocaleString("zh-CN",{minimumFractionDigits:2,maximumFractionDigits:2}),
+              requisitionTotal:requisitionTotal,
+              receiveQty:Math.max(1, requisitionTotal - (i % 2)),
+              stockQty:stockQty,
+              qty:2+(i%5),
+              reqDate:"2026-04-"+String((i%25)+1).padStart(2,"0"),
+              applicant:["王卿明","李哲","宋中波"][i%3],
+              applyDept:["电控所","机械所","经营发展中心"][i%3],
+              status:st,
+              remark:st==="领用中"?"领用处理中":""
+            }
+          })
+        },
+        flow: {
+          name: "流转记录",
+          search: [["flowNo","流转单号"],["materialCode","物资类型编码"]],
+          columns: [
+            ["flowNo","流转单号"],
+            ["bizType","业务类型"],
+            ["materialName","流转产品名称"],
+            ["fromDept","转出部门"],
+            ["warehouse","转出仓库"],
+            ["keeper","转出保管人"],
+            ["toDept","转入部门"],
+            ["toWarehouse","转入仓库"],
+            ["toKeeper","转入保管人"],
+            ["qty","数量"],
+            ["transferBy","转出人"],
+            ["receiver","接收人"],
+            ["flowStatus","流转状态"],
+            ["applyTime","流转时间"],
+            ["finishTime","办结时间"],
+            ["reason","流转原因"]
+          ],
+          rows: Array.from({length:8}).map(function(_,i){
+            var fromDept = i % 2 ? "机械所" : "经营发展中心";
+            var toDept = i % 2 ? "电控所" : "机械所";
+            var status = ["审批中","已办结","待签收"][i % 3];
+            var flowNames = ["智能风机控制器","高压配电柜","箱变状态采集器","机舱温控模块"];
+            var flowCats = ["存货","固定资产","固定资产","无形资产"];
+            var flowName = flowNames[i%4];
+            var flowName2 = flowNames[(i+1)%flowNames.length];
+            return {
+              flowNo:"LZ-2026-"+String(510+i).padStart(4,"0"),
+              bizType:"内部流转",
+              materialCode:demoInstanceCode(flowCats[i%4], flowName, (i % 14) + 1, 3),
+              materialName:flowName,
+              productNames:flowName + "." + flowName2,
+              fromDept:fromDept,
+              toDept:toDept,
+              warehouse:"中心库"+(i%3+1)+"-0"+(i%5+1),
+              keeper:["宋中波","李哲","王卿明"][i%3],
+              toWarehouse:"中心库"+((i+1)%3+1)+"-0"+((i+2)%5+1),
+              toKeeper:["李泽","成明锴","赵六"][i%3],
+              qty:1 + (i % 4),
+              transferBy:["宋中波","王卿明","李哲"][i%3],
+              receiver:["李泽","成明锴","赵六"][i%3],
+              flowStatus:status,
+              applyTime:"2026-05-"+String((i%20)+1).padStart(2,"0")+" 10:"+String((i%6)*10).padStart(2,"0"),
+              finishTime:status==="已办结" ? ("2026-05-"+String((i%20)+1).padStart(2,"0")+" 18:00") : "—",
+              reason:fromDept+"→"+toDept+" 内部调配"
+            };
+          })
+        }
+      };
+
+      (function seedFlowRecordDetailLines() {
+        var ledgerRows = tabs.ledger.rows || [];
+        tabs.flow.rows.forEach(function (row) {
+          if (row.detailLines && row.detailLines.length) return;
+          var qty = Math.max(1, Number(row.qty) || 1);
+          var matched = null;
+          var mc = String(row.materialCode || "").trim();
+          if (mc) {
+            for (var i = 0; i < ledgerRows.length; i++) {
+              var c = String(ledgerRows[i].code || ledgerRows[i].assetNo || "").trim();
+              if (c && c === mc) {
+                matched = ledgerRows[i];
+                break;
+              }
+            }
+          }
+          if (!matched && row.materialName) {
+            for (var j = 0; j < ledgerRows.length; j++) {
+              if (String(ledgerRows[j].name || "") === String(row.materialName || "")) {
+                matched = ledgerRows[j];
+                break;
+              }
+            }
+          }
+          var src = matched || {
+            name: row.materialName,
+            code: row.materialCode,
+            category: "生产类",
+            dept: row.fromDept,
+            purchaseDept: row.fromDept,
+            keeper: normalizeHandler(row.keeper),
+            location: row.warehouse
+          };
+          if (!TRANSFER_BIZ_DEPTS.some(function (d) {
+            return d === String(src.dept || src.purchaseDept || "").trim();
+          })) {
+            src.dept = row.fromDept || TRANSFER_BIZ_DEPTS[0];
+            src.purchaseDept = row.fromDept || TRANSFER_BIZ_DEPTS[0];
+          }
+          row.detailLines = buildLedgerDetailRowsFromSummary(src, qty).slice(0, qty);
+        });
+      })();
+
+      function buildLedgerMaterialNameOptionsHtml(selectedName) {
+        var ledgerRows = tabs.ledger.rows || [];
+        var inboundDemoNames = ["变流器模块","电缆","汇流箱","IGBT驱动板","支架组件","预制连接子"];
+        var nameOptSet = {};
+        inboundDemoNames.forEach(function(n){ nameOptSet[n] = 1; });
+        ledgerRows.forEach(function(r){
+          var n = String(r.name || "").trim();
+          if (n) nameOptSet[n] = 1;
+        });
+        var ex = String(selectedName || "").trim();
+        if (ex) nameOptSet[ex] = 1;
+        var nameOptions = Object.keys(nameOptSet).sort(function(a,b){ return a.localeCompare(b,"zh"); });
+        return '<option value="">请选择</option>' + nameOptions.map(function(n){
+          return '<option value="'+esc(n)+'">'+esc(n)+'</option>';
+        }).join("");
+      }
+
+      var state = {
+        current: "ledger",
+        sort: { ledger: { key: "", dir: "asc" }, requisition: { key: "", dir: "asc" }, flow: { key: "", dir: "asc" } },
+        filters: { ledger: {}, requisition: {}, flow: {} },
+        page: { ledger: 1, requisition: 1, flow: 1 },
+        addedQtyByCode: {}
+      };
+
+      // Keep the default tab stable on refresh.
+      // Do not auto-switch by URL query (?tab=...), which can cause
+      // repeated jumps into requisition/flow during screenshot work.
+      (function initTabFromQuery(){
+        return;
+      })();
+
+      function jump(type,row){
+        var code = row.code || row.assetNo || "";
+        var name = row.name || "";
+        var query = "keyword="+q(code || name)+"&code="+q(code)+"&name="+q(name);
+        if(type==="in") return "purchase-plan-management.html?from=material-in&"+query;
+        if(type==="transport") return "logistics-ledger.html?from=material-transport&"+query;
+        if(type==="manage") return "proc-use-approval.html?from=material-manage&"+query;
+        if(type==="store") return "warehouse-stock-ledger.html?from=material-store&"+query;
+        return "goods-transfer-out.html?from=material-out&"+query;
+      }
+      function stageIndexByStatus(status){
+        if(status==="在库") return 1;      // 进 -> 存
+        if(status==="在用") return 2;      // 到管
+        if(status==="维修中") return 2;    // 到管
+        if(status==="已转固") return 4;    // 到出
+        if(status==="已销售") return 4;    // 到出
+        return 0; // 默认仅进
+      }
+      function stageData(row){
+        return [
+          { key:"in", label:"采购入库", desc:"查看该物资采购/入库明细记录", href:jump("in",row) },
+          { key:"store", label:"仓储/在库/台账", desc:"查看该物资库存、货位及盘点记录", href:jump("store",row) },
+          { key:"manage", label:"领用/生产/内部流转", desc:"查看领用、生产及内部流转记录", href:jump("manage",row) },
+          { key:"transport", label:"销售发货/直发过程", desc:"查看销售发货或直发过程记录", href:jump("transport",row) },
+          { key:"out", label:"出库/处置/回收/维修/报废/再入库", desc:"查看出库、处置与全生命周期闭环记录", href:jump("out",row) }
+        ];
+      }
+      function ledgerReceiveMode(row){
+        var m = row && row.receiveMode;
+        if (m === "project" || m === "直发项目" || m === "直发项目公司") return "project";
+        return "engineering";
+      }
+      function receiveModeHint(row){
+        return ledgerReceiveMode(row) === "project"
+          ? "供应商直发项目公司（工程技术公司不接收实物，系统留痕）"
+          : "供应商发货至工程技术公司（入公司实物库）";
+      }
+      function parseMoneyExcl(row){
+        var s = row && row.unitPriceExcl != null ? String(row.unitPriceExcl) : "0";
+        var n = parseFloat(s.replace(/,/g, "")) || 0;
+        return n;
+      }
+      function stageDemoIds(row){
+        var code = String(row.code || row.assetNo || "A0100100001");
+        var tail = (code.match(/(\d{4})$/) || ["", "1"])[1];
+        var n = parseInt(tail, 10) || 1;
+        var pad3 = function(x){ return String(x).padStart(3, "0"); };
+        return {
+          frameworkNo: "KJ-2026-" + pad3(80 + (n % 120)),
+          subContractNo: "ZX-2026-" + pad3(50 + (n % 150)),
+          acceptNo: "YS-RK-" + code.replace(/^[AB]/, ""),
+          inboundNo: "RK-" + code.replace(/^[AB]/, ""),
+          projRecvNo: "XM-QR-" + code.replace(/^[AB]/, ""),
+          virtualDeductNo: "XN-KC-" + code.replace(/^[AB]/, ""),
+          virtualSyncAt: (row.inDate || "2026-04-20") + " 14:30",
+          propertyTag: "产权：" + (row.purchaseDept || "经营发展中心") + "统筹 / 项目现场使用权",
+          salesContractNo: "XS-" + String(row.contractNo || "").replace(/^HT-/, ""),
+          customerName: row.dept || "项目公司/风电场",
+          orderNo: "DD-XM-2026-" + pad3(300 + n),
+          shipSlipNo: "FH-GC-2026-" + pad3(400 + n),
+          logisticsCo: ["中远物流","德邦供应链","顺丰大件"][n % 3],
+          trackNo: "WL" + String(8800000 + n * 17),
+          shipAt: (row.inDate || "2026-04-18") + " 09:00",
+          eta: (row.inDate || "2026-04-22") + " 18:00",
+          directShipNo: "ZF-GYS-" + code.replace(/^[AB]/, ""),
+          projRecvAt: (row.inDate || "2026-04-21") + " 16:20",
+          recycleNo: "HS-OLD-" + code.replace(/^[AB]/, ""),
+          recycleDate: row.inDate || "2026-04-25",
+          handoverMemo: "旧件返回交接 · " + (row.keeper || "经办人") + " 签收",
+          repairApplyNo: "WX-SQ-" + pad3(600 + n),
+          repairDoneAt: row.status === "维修中" ? "—" : ("2026-05-0" + (1 + (n % 5)) + " 11:00"),
+          reinboundNo: "RK-WX-" + code.replace(/^[AB]/, ""),
+          qualityRecheck: row.status === "维修中" ? "复检中" : "合格",
+          scrapApproveNo: "BF-SP-2026-" + pad3(700 + n),
+          scrapResidual: "残值处置 · 已登记",
+          virtualTraceNo: "XN-LH-" + code.replace(/^[AB]/, ""),
+          titleTransferAt: (row.inDate || "2026-04-26") + " 10:00",
+          financeFlag: row.invoiceStatus === "已开票" ? "已开票 / 可核算" : "待开票 / 暂估",
+          dualAcceptNo: "YS-SF-" + code.replace(/^[AB]/, ""),
+          shipConfirmer: row.keeper || "宋中波"
+        };
+      }
+      function acceptanceResultLabel(row){
+        var sh = String(row.shipStatus || "");
+        if (sh === "已签收") return "通过";
+        if (sh === "已发货") return "待联合验收";
+        return "待到货";
+      }
+      function acceptancePassFail(row){
+        var sh = String(row.shipStatus || "");
+        if (sh === "已签收") return "通过";
+        if (sh === "已发货") return "不通过（待验收）";
+        return "不通过（未到货）";
+      }
+      function handoffFlowState(row){
+        var h = String(row.handoff_status || "").trim();
+        if (h && h.indexOf("待") >= 0) return "待签收";
+        if (row.batch_no || h) return "已签收";
+        return "已签收";
+      }
+      function requisitionsForLedgerRow(row){
+        var c = String(row.code || row.assetNo || "");
+        return (tabs.requisition && tabs.requisition.rows || []).filter(function(r){
+          return String(r.code || "") === c;
+        });
+      }
+      function P(html){
+        return '<p class="stage-prose">' + html + "</p>";
+      }
+      function stageNarrativeHtml(row, key){
+        var isProj = ledgerReceiveMode(row) === "project";
+        var d = stageDemoIds(row);
+        var excl = parseMoneyExcl(row);
+        var ratePct = 13;
+        var incl = excl * (1 + ratePct / 100);
+        var inclStr = incl.toLocaleString("zh-CN", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        var stockN = Number(row.stockQty) || 0;
+        var reqTot = Number(row.requisitionTotal) || 0;
+        var purchaseQty = Math.max(stockN + reqTot, stockN || 1);
+        var totalStr = (excl * purchaseQty * (1 + ratePct / 100)).toLocaleString("zh-CN", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        var reqs = requisitionsForLedgerRow(row);
+        var cat = String(row.category || "");
+        var q0 = reqs[0];
+        var batchNo = row.batch_no || (row.handoff_at ? "HB-" + String(row.code || "").slice(-4) : "—");
+        var flowSt = handoffFlowState(row);
+
+        if (key === "in") {
+          if (!isProj) {
+            return (
+              P("<strong>【采购入库】</strong>")
+              + P('该批物资由 <strong>' + esc(row.purchaseDept || "—") + "</strong> 牵头采购并入库，入库时间为 <strong>" + esc(row.inDate || "—") + "</strong>。入库物资为 <strong>" + esc(row.name || "—") + "</strong>（编码 <strong>" + esc(row.code || "—") + "</strong>，规格 <strong>" + esc(row.spec || "—") + "</strong>，类别 <strong>" + esc(row.category || "—") + "</strong>），数量 <strong>" + esc(purchaseQty) + "</strong>，供应商 <strong>" + esc(row.supplier || "—") + "</strong>。")
+              + P('入库与合同关联信息为：框架协议号 <strong>' + esc(d.frameworkNo) + "</strong>、子合同号 <strong>" + esc(d.subContractNo) + "</strong>、采购合同编号 <strong>" + esc(row.contractNo || "—") + "</strong>；验收单号 <strong>" + esc(d.acceptNo) + "</strong>，验收结果 <strong>" + esc(acceptanceResultLabel(row)) + "</strong>。")
+              + P('本批次形成实物入库，入库单号 <strong>' + esc(d.inboundNo) + "</strong>，货位/库位为 <strong>" + esc(row.location || "—") + "</strong>，归属工程技术公司实物库。")
+            );
+          }
+          return (
+            P("<strong>【采购入库】</strong>")
+            + P('该批物资由 <strong>' + esc(row.purchaseDept || "—") + "</strong> 发起采购，物资为 <strong>" + esc(row.name || "—") + "</strong>（编码 <strong>" + esc(row.code || "—") + "</strong>，规格 <strong>" + esc(row.spec || "—") + "</strong>），数量 <strong>" + esc(purchaseQty) + "</strong>，供应商 <strong>" + esc(row.supplier || "—") + "</strong>。")
+            + P('合同关联信息为：框架协议号 <strong>' + esc(d.frameworkNo) + "</strong>、子合同号 <strong>" + esc(d.subContractNo) + "</strong>、采购合同编号 <strong>" + esc(row.contractNo || "—") + "</strong>；验收单号 <strong>" + esc(d.acceptNo) + "</strong>，验收结果 <strong>" + esc(acceptanceResultLabel(row)) + "</strong>。")
+            + P('该批次为供应商直发项目现场，工程技术公司不接收实物库位；项目公司收货确认单号 <strong>' + esc(d.projRecvNo) + "</strong>，工程技术公司同步虚拟扣减记录 <strong>" + esc(d.virtualDeductNo) + "</strong>（同步时间 <strong>" + esc(d.virtualSyncAt) + "</strong>）。")
+          );
+        }
+        if (key === "store") {
+          if (!isProj) {
+            return (
+              P("<strong>【仓储/在库/台账】</strong>")
+              + P('当前在库物资为 <strong>' + esc(row.name || "—") + "</strong>（编码 <strong>" + esc(row.code || "—") + "</strong>，规格 <strong>" + esc(row.spec || "—") + "</strong>，类别 <strong>" + esc(row.category || "—") + "</strong>），库存数量 <strong>" + esc(row.stockQty != null ? row.stockQty : "—") + "</strong>。")
+              + P('库位为 <strong>' + esc(row.location || "—") + "</strong>，保管部门为 <strong>" + esc(row.dept || "—") + "</strong>，保管人为 <strong>" + esc(row.keeper || "—") + "</strong>；盘点时间 <strong>" + esc(row.lastCheckTime || "—") + "</strong>，盘点结果 <strong>" + esc(row.lastCheckResult || "—") + "</strong>。")
+              + P("该库存口径对应工程技术公司实物库。")
+            );
+          }
+          return (
+            P("<strong>【仓储/在库/台账】</strong>")
+            + P('该物资为直发项目现场，工程技术公司侧保留虚拟库存口径：物资编码 <strong>' + esc(row.code || "—") + "</strong>，物资名称 <strong>" + esc(row.name || "—") + "</strong>，规格 <strong>" + esc(row.spec || "—") + "</strong>，类别 <strong>" + esc(row.category || "—") + "</strong>，同步库存数量 <strong>" + esc(row.stockQty != null ? row.stockQty : "—") + "</strong>。")
+            + P('留痕信息为：同步扣减单号 <strong>' + esc(d.virtualDeductNo) + "</strong>，同步时间 <strong>" + esc(d.virtualSyncAt) + "</strong>，产权归属标记 <strong>" + esc(d.propertyTag) + "</strong>。")
+            + P("项目公司现场实物库由项目公司自行管理。")
+          );
+        }
+        if (key === "manage") {
+          if (isProj) {
+            return (
+              P("<strong>【领用/生产/内部流转】</strong>")
+              + P('该物资为直发项目现场路径，工程技术公司侧无内部领用/流转单据。')
+              + P('现场使用与安装由项目公司执行，系统仅保留合同与留痕关联信息。')
+            );
+          }
+          var reqLine = "";
+          if (q0) {
+            reqLine =
+              "该物资已发生领用流转：领用单号 <strong>" + esc(q0.reqNo || "—") +
+              "</strong>，领用部门 <strong>" + esc(q0.applyDept || "—") +
+              "</strong>，领用人 <strong>" + esc(q0.applicant || "—") +
+              "</strong>，领用数量 <strong>" + esc(q0.receiveQty != null ? q0.receiveQty : "—") +
+              "</strong>，领用时间 <strong>" + esc(q0.reqDate || "—") +
+              "</strong>，领用事由 <strong>" + esc(q0.remark || "—") +
+              "</strong>，审批状态 <strong>" + esc(q0.status || "—") +
+              "</strong>。部门间流转批次号 <strong>" + esc(batchNo) +
+              "</strong>，流转状态 <strong>" + esc(flowSt) + "</strong>。";
+          } else {
+            reqLine =
+              "该物资当前未匹配到同编码领用明细，台账口径显示领用部门 <strong>" + esc(row.dept || "—") +
+              "</strong>，领用人 <strong>" + esc(row.keeper || "—") +
+              "</strong>，流转批次号 <strong>" + esc(batchNo) +
+              "</strong>，流转状态 <strong>" + esc(flowSt) + "</strong>。";
+          }
+          var extra = "";
+          if (cat === "生产类") {
+            extra = P("生产类路径：生产任务单号 <strong>" + esc("SC-RW-" + String(row.code || "").slice(-4)) + "</strong>，生产完成后回库单号 <strong>" + esc("RK-SC-" + String(row.code || "").slice(-4)) + "</strong>。");
+          } else if (cat === "销售类") {
+            extra = P("销售类路径：项目订单号 <strong>" + esc(d.orderNo) + "</strong>，订单确认时间 <strong>" + esc((row.inDate || "—") + " 15:00") + "</strong>，销售合同编号 <strong>" + esc(d.salesContractNo) + "</strong>，审批结果 <strong>" + esc(row.status === "已销售" ? "通过" : "不通过") + "</strong>。");
+          } else {
+            extra = P("办公类路径：固定资产编号 <strong>" + esc(row.fixedCode || "—") + "</strong>，入账时间 <strong>" + esc(row.inDate || "—") + "</strong>，使用部门 <strong>" + esc(row.dept || "—") + "</strong>。");
+          }
+          return P("<strong>【领用/生产/内部流转】</strong>") + P(reqLine) + extra;
+        }
+        if (key === "transport") {
+          if (!isProj) {
+            return (
+              P("<strong>【销售发货/直发过程】</strong>")
+              + P('该物资进入销售发货环节：销售合同编号 <strong>' + esc(d.salesContractNo) + "</strong>，客户 <strong>" + esc(d.customerName) + "</strong>，订单号 <strong>" + esc(d.orderNo) + "</strong>，发货单号 <strong>" + esc(d.shipSlipNo) + "</strong>。")
+              + P('物流承运为 <strong>' + esc(d.logisticsCo) + "</strong>，物流单号 <strong>" + esc(d.trackNo) + "</strong>，发货时间 <strong>" + esc(d.shipAt) + "</strong>，预计到货 <strong>" + esc(d.eta) + "</strong>。工程技术公司发货确认人 <strong>" + esc(d.shipConfirmer) + "</strong>，双方验收单号 <strong>" + esc(d.dualAcceptNo) + "</strong>，验收结果 <strong>" + esc(acceptancePassFail(row)) + "</strong>。")
+            );
+          }
+          return (
+            P("<strong>【销售发货/直发过程】</strong>")
+            + P('该物资走直发项目现场：供应商直发单号 <strong>' + esc(d.directShipNo) + "</strong>，项目公司收货确认时间 <strong>" + esc(d.projRecvAt) + "</strong>，验收结果 <strong>" + esc(acceptancePassFail(row)) + "</strong>。")
+            + P('关联销售信息为：销售合同编号 <strong>' + esc(d.salesContractNo) + "</strong>，客户 <strong>" + esc(d.customerName) + "</strong>，订单号 <strong>" + esc(d.orderNo) + "</strong>。该路径下工程技术公司无发货单与承运物流节点。")
+          );
+        }
+        var stOut = String(row.status || "");
+        var canRepair = stOut === "维修中" || stOut === "在库" || stOut === "在用";
+        var h5 = P("<strong>【出库/处置/回收/维修/报废/再入库】</strong>")
+          + P('旧物回收与维修链路信息为：回收单号 <strong>' + esc(d.recycleNo) + "</strong>，回收日期 <strong>" + esc(d.recycleDate) + "</strong>，交接记录 <strong>" + esc(d.handoverMemo) + "</strong>，维修申请单号 <strong>" + esc(d.repairApplyNo) + "</strong>，维修方式 <strong>" + esc(row.status === "维修中" ? "内部" : "内部/外部") + "</strong>，维修完成时间 <strong>" + esc(d.repairDoneAt) + "</strong>，维修后入库单号 <strong>" + esc(d.reinboundNo) + "</strong>，质量复检结果 <strong>" + esc(d.qualityRecheck) + "</strong>。");
+        if (canRepair) {
+          h5 += P("处置结论为可维修，维修后已重新入库，可再次领用或销售。");
+        } else {
+          h5 += P("处置结论为不可维修，报废审批单号 <strong>" + esc(d.scrapApproveNo) + "</strong>，报废残值处理记录 <strong>" + esc(d.scrapResidual) + "</strong>。");
+        }
+        h5 += P('项目公司入库环节留痕为：工程技术公司虚拟库单号 <strong>' + esc(d.virtualTraceNo) + "</strong>，产权转移确认时间 <strong>" + esc(d.titleTransferAt) + "</strong>，财务核算标记 <strong>" + esc(d.financeFlag) + "</strong>。项目公司实物库由项目公司自行管理。");
+        h5 += P("<strong>【全流程闭环汇总】</strong>");
+        h5 += P("报表侧关注采购率、到货及时率、库存周转率、维修率、报废率等指标，并汇总采购计划、订单需求、采购台账、货物台账、质量验收等关键信息。");
+        h5 += P("当前物资可按合同号 <strong>" + esc(row.contractNo || "—") + "</strong>、物资编码 <strong>" + esc(row.code || "—") + "</strong>、批次号 <strong>" + esc(batchNo) + "</strong>进行全流程追溯。");
+        return h5;
+      }
+
+      function getRows(){
+        var c = state.current, cfg = tabs[c], fs = state.filters[c], st = state.sort[c];
+        if (c === "ledger") applyInvoiceUpdates(cfg.rows);
+        if (c === "ledger" && window.DemoCrossDeptHandoff) {
+          DemoCrossDeptHandoff.applyHandoffToMaterialRows(cfg.rows);
+        }
+        var rows = cfg.rows.filter(function(r){
+          if(c==="ledger" && fs.category && String(r.category||"") !== String(fs.category)) return false;
+          if(c==="ledger" && fs.invoiceStatus && String(r.invoiceStatus||"") !== String(fs.invoiceStatus)) return false;
+          if(c==="ledger" && fs.shipStatus && String(r.shipStatus||"") !== String(fs.shipStatus)) return false;
+          if(c==="requisition" && fs.status && String(r.status||"") !== String(fs.status)) return false;
+          if(c==="flow" && fs.flowStatus && String(r.flowStatus||"") !== String(fs.flowStatus)) return false;
+          return cfg.search.every(function(s){
+            var k=s[0],v=String(fs[k]||"").trim();
+        if(!v) return true;
+            return String(r[k]==null?"":r[k]).indexOf(v)>=0;
+      });
+    });
+        if(st.key){
+          rows = rows.slice().sort(function(a,b){
+            var av = a[st.key], bv = b[st.key];
+            if(av==null) av=""; if(bv==null) bv="";
+            var na = Number(av), nb = Number(bv);
+            var cmp = (!isNaN(na)&&!isNaN(nb)) ? (na-nb) : String(av).localeCompare(String(bv),"zh");
+            return st.dir==="asc" ? cmp : -cmp;
+          });
+        }
+        return rows;
+      }
+
+      function renderTabs(){
+        var el = document.getElementById("tabs");
+        if (Object.keys(tabs).length <= 1) {
+          el.innerHTML = "";
+          el.style.display = "none";
+          return;
+        }
+        el.style.display = "";
+        el.innerHTML = Object.keys(tabs).map(function(k){
+          return '<button type="button" class="tab-btn '+(k===state.current?'is-active':'')+'" data-tab="'+k+'">'+tabs[k].name+'</button>';
+        }).join("");
+      }
+
+      function renderFilters(){
+        var c = state.current, cfg = tabs[c], fs = state.filters[c];
+        var html = cfg.search.map(function(s){
+          return '<div class="field"><label>'+s[1]+'</label><input data-f="'+s[0]+'" value="'+esc(fs[s[0]]||"")+'" placeholder="请输入'+s[1]+'"/></div>';
+        }).join("");
+        if(c==="ledger"){
+          html += '<div class="field"><label>资产类型</label><select data-f="category">'
+            + '<option value="">全部</option>'
+            + '<option value="固定资产" '+((fs.category||"")==="固定资产"?'selected':'')+'>固定资产</option>'
+            + '<option value="存货" '+((fs.category||"")==="存货"?'selected':'')+'>存货</option>'
+            + '<option value="无形资产" '+((fs.category||"")==="无形资产"?'selected':'')+'>无形资产</option>'
+            + '</select></div>';
+        }
+        if(c==="requisition"){
+          html += '<div class="field"><label>领用状态</label><select data-f="status">'
+            + '<option value="">全部</option>'
+            + '<option value="领用中" '+((fs.status||"")==="领用中"?'selected':'')+'>领用中</option>'
+            + '<option value="已领用" '+((fs.status||"")==="已领用"?'selected':'')+'>已领用</option>'
+            + '</select></div>';
+        }
+        if(c==="flow"){
+          html += '<div class="field"><label>流转状态</label><select data-f="flowStatus">'
+            + '<option value="">全部</option>'
+            + '<option value="审批中" '+((fs.flowStatus||"")==="审批中"?'selected':'')+'>审批中</option>'
+            + '<option value="待签收" '+((fs.flowStatus||"")==="待签收"?'selected':'')+'>待签收</option>'
+            + '<option value="已办结" '+((fs.flowStatus||"")==="已办结"?'selected':'')+'>已办结</option>'
+            + '</select></div>';
+        }
+        html +=
+          '<div class="field"><label>&nbsp;</label><div><button type="button" class="btn primary" id="btnSearch">搜索</button> <button type="button" class="btn" id="btnReset">重置</button>' +
+          (c === "requisition"
+            ? ' <button type="button" class="btn primary" id="btnNewRequisition">新增领用</button>'
+            : c === "flow"
+            ? ' <button type="button" class="btn primary" id="btnNewTransfer" style="background:#1677ff;border-color:#1677ff;color:#fff;font-weight:700">内部流转</button>'
+            : "") +
+          "</div></div>";
+        if (c === "ledger") {
+          var toolBtns = '<button type="button" class="btn" id="btnImport">导入</button> <button type="button" class="btn" id="btnTpl">下载模板</button> <button type="button" class="btn secondary" id="btnExport">导出</button>';
+          html += '<div class="field"><label>&nbsp;</label><div>' + toolBtns + "</div></div>";
+        }
+        document.getElementById("filters").innerHTML = html;
+      }
+
+      function renderCards(rows){
+        document.getElementById("cards").innerHTML = "";
+      }
+
+      function statusTag(v){
+        var cls = "blue";
+        if(v==="在库") cls="green";
+        else if(v==="维修中") cls="orange";
+        else if(v==="已报废") cls="red";
+        return '<span class="tag '+cls+'">'+esc(v)+'</span>';
+      }
+      function invoiceTag(v){
+        var x = String(v || "未开票");
+        var cls = x === "已开票" ? "green" : "orange";
+        return '<span class="tag '+cls+'">'+esc(x)+'</span>';
+      }
+      function shipTag(v){
+        var x = String(v || "未发货");
+        var cls = "blue";
+        if (x === "未发货") cls = "orange";
+        else if (x === "已发货") cls = "blue";
+        else if (x === "已签收") cls = "green";
+        return '<span class="tag '+cls+'">'+esc(x)+'</span>';
+      }
+      function nowDate(){
+        var d = new Date();
+        function p(n){ return String(n).padStart(2, "0"); }
+        return d.getFullYear()+"-"+p(d.getMonth()+1)+"-"+p(d.getDate());
+      }
+      function loadInvoiceUpdates(){
+        try { return JSON.parse(localStorage.getItem("map_invoice_updates_v1") || "[]"); } catch(e) { return []; }
+      }
+      function applyInvoiceUpdates(rows){
+        var list = loadInvoiceUpdates();
+        if(!list.length) return;
+        rows.forEach(function(r){
+          var rCode = String(r.code || r.assetNo || "");
+          for (var i=0;i<list.length;i++){
+            var x = list[i];
+            var hitByCode = String(x.materialCode || "") && rCode && String(x.materialCode) === rCode;
+            var hitByContract = String(x.contractNo || "") && String(r.contractNo || "") === String(x.contractNo || "");
+            var hitByName = String(x.materialName || "") && String(r.name || "") === String(x.materialName || "");
+            if (hitByCode || hitByContract || hitByName){
+              r.invoiceStatus = x.invoiceStatus || r.invoiceStatus || "未开票";
+              r.invoiceTime = x.invoiceStatus === "已开票" ? (x.invoiceTime || r.invoiceTime || "") : "";
+              if (x.shipStatus) r.shipStatus = x.shipStatus;
+              break;
+            }
+          }
+        });
+      }
+      function persistInvoiceForRow(row){
+        if(!row) return;
+        var key = "map_invoice_updates_v1";
+        var list = loadInvoiceUpdates();
+        var item = {
+          materialCode: row.code || row.assetNo || "",
+          contractNo: row.contractNo || "",
+          materialName: row.name || "",
+          spec: row.spec || "",
+          invoiceStatus: row.invoiceStatus || "未开票",
+          invoiceTime: row.invoiceStatus === "已开票" ? (row.invoiceTime || "") : "",
+          shipStatus: row.shipStatus || "",
+          shipTime: row.inDate || "",
+          customerName: row.dept || "",
+          reason: row.invoiceStatus === "已开票" ? "财务确认已开票" : "发货后待财务开票确认"
+        };
+        var hit = false;
+        list = list.map(function(x){
+          var sameCode = item.materialCode && String(x.materialCode || "") === String(item.materialCode);
+          var sameLegacy = (x.contractNo && x.contractNo === item.contractNo) || (x.materialName && x.materialName === item.materialName);
+          if (sameCode || sameLegacy) {
+            hit = true;
+            return item;
+          }
+          return x;
+        });
+        if(!hit) list.push(item);
+        try { localStorage.setItem(key, JSON.stringify(list)); } catch(e) {}
+      }
+
+      function rowPrimaryKey(r, tabKey){
+        var t = tabKey != null ? tabKey : state.current;
+        if (t === "requisition") return String(r.reqNo || "");
+        if (t === "flow") return String(r.flowNo || "");
+        return String(r.code || r.assetNo || "");
+      }
+
+      function requisitionStatusTag(v){
+        var x = String(v || "");
+        var cls = "blue";
+        if (x === "领用中") cls = "orange";
+        else if (x === "已领用") cls = "green";
+        return '<span class="tag '+cls+'">'+esc(x)+'</span>';
+      }
+      function flowStatusTag(v){
+        var x = String(v || "");
+        var cls = "blue";
+        if (x === "审批中") cls = "orange";
+        else if (x === "待签收") cls = "blue";
+        else if (x === "已办结") cls = "green";
+        return '<span class="tag '+cls+'">'+esc(x)+'</span>';
+      }
+
+      function renderTable(rows){
+        var c = state.current, cfg = tabs[c], st = state.sort[c], page = state.page[c];
+        var maxPage = Math.max(1, Math.ceil(rows.length / PAGE_SIZE));
+        if(page > maxPage){ page = maxPage; state.page[c] = page; }
+        var start = (page-1)*PAGE_SIZE;
+        var view = rows.slice(start, start + PAGE_SIZE);
+
+        document.getElementById("thead").innerHTML = cfg.columns.map(function(col){
+          var k = col[0], title = col[1], mark = st.key===k ? (st.dir==="asc"?" ▲":" ▼") : " ↕";
+          return '<th data-sort="'+k+'">'+title+mark+'</th>';
+        }).join("") + "<th>操作</th>";
+
+        document.getElementById("tbody").innerHTML = view.map(function(r){
+          var key = esc(rowPrimaryKey(r, c));
+          var cells = cfg.columns.map(function(col){
+            var k=col[0], title=col[1], v=r[k];
+            if ((k === "code" || k === "materialCode") && (String(title || "").indexOf("物资类型编码") >= 0 || String(title || "").indexOf("物资类型编码") >= 0)) {
+              v = normalizeCategoryCode(v);
+            } else if ((k === "code" || k === "materialCode") && String(title || "").indexOf("物资编码") >= 0) {
+              v = normalizeMaterialCode(v);
+            }
+            if(k==="name"){
+              var nameTitle = c === "requisition" ? "领用产品名称" : "物资类型名称";
+              var nameVal = c === "requisition" ? requisitionProductNamesLabel(r) : v;
+              return '<td><span class="name-link" data-op="name-detail" data-key="'+key+'" title="'+nameTitle+'" style="color:#111;font-weight:400">'+esc(nameVal)+'</span></td>';
+            }
+            if(c==="flow" && k==="materialName"){
+              return "<td>"+esc(flowProductNamesLabel(r))+"</td>";
+            }
+            if(c==="ledger" && k==="invoiceStatus"){
+              return "<td>"+invoiceTag(v)+"</td>";
+            }
+            if(c==="ledger" && k==="shipStatus"){
+              return "<td>"+shipTag(v)+"</td>";
+            }
+            if(c==="ledger" && k==="status"){
+              return "<td>"+statusTag(v)+"</td>";
+            }
+            if(c==="ledger" && (k==="unitPriceExcl" || k==="unitPriceIncl")){
+              return "<td>"+esc(r.unitPriceIncl || rowUnitPriceIncl(r))+"</td>";
+            }
+            if(c==="requisition" && k==="status"){
+              return "<td>"+requisitionStatusTag(v)+"</td>";
+            }
+            if(c==="flow" && k==="flowStatus"){
+              return "<td>"+flowStatusTag(v)+"</td>";
+            }
+            return "<td>"+esc(v)+"</td>";
+          }).join("");
+          var opsHtml = (c === "requisition" || c === "flow")
+            ? '<button class="op-btn" data-op="detail" data-key="'+key+'">查看</button>'
+            : '<button class="op-btn" data-op="detail" data-key="'+key+'">查看</button>';
+          return "<tr>"+cells+'<td>'+opsHtml+'</td>'
+            +"</tr>";
+        }).join("") || '<tr><td colspan="'+(cfg.columns.length+1)+'" style="padding:24px;color:#94a3b8">暂无数据</td></tr>';
+
+        document.getElementById("pagerInfo").textContent = "共"+rows.length+"条，每页10条";
+        var pager = "";
+    for(var i=1;i<=maxPage;i++){
+          pager += '<button type="button" class="page-btn '+(i===page?"is-active":"")+'" data-page="'+i+'">'+i+'</button>';
+        }
+        document.getElementById("pager").innerHTML = pager;
+      }
+
+      function findRowByKey(key){
+        var rows = tabs[state.current].rows;
+        for(var i=0;i<rows.length;i++){
+          var r = rows[i];
+          if (state.current === "requisition") {
+            if (String(r.reqNo || "") === String(key)) return r;
+          } else if (state.current === "flow") {
+            if (String(r.flowNo || "") === String(key)) return r;
+          } else {
+            var k = r.code || r.assetNo || "";
+            if (String(k) === String(key)) return r;
+          }
+        }
+        return null;
+      }
+
+      function buildDetailGridByColumns(row, columns){
+        return (columns || []).map(function(col){
+          var key = col[0], label = col[1];
+          if (row && row.flowNo && key === "materialCode" && String(label || "").indexOf("物资编码") >= 0) {
+            label = "物资类型编码";
+          }
+          if (row && row.reqNo && key === "code") {
+            label = "物资类型编码";
+          }
+          var val = row && row[key] != null ? row[key] : "-";
+          if ((key === "unitPriceExcl" || key === "unitPriceIncl") && String(label || "").indexOf("含税") >= 0) {
+            val = row.unitPriceIncl || rowUnitPriceIncl(row);
+          }
+          if ((key === "code" || key === "materialCode") && (String(label || "").indexOf("物资类型编码") >= 0 || String(label || "").indexOf("物资类型编码") >= 0)) {
+            var src = row ? (row.code || row.materialCode || row.assetNo || val) : val;
+            val = normalizeCategoryCode(src);
+          } else if (row && row.reqNo && key === "code" && String(label || "").indexOf("物资类型编码") >= 0) {
+            var reqSrc = row ? (row.code || row.materialCode || row.assetNo || val) : val;
+            val = normalizeCategoryCode(reqSrc);
+          } else if ((key === "code" || key === "materialCode") && String(label || "").indexOf("物资编码") >= 0) {
+            val = normalizeMaterialCode(val);
+          }
+          return '<div class="k">'+esc(label)+'</div><div class="v">'+esc(val)+'</div>';
+        }).join("");
+      }
+      function buildTrackDetailRowsHtml(baseName, baseCode, count, inDeptLabel, omitInDeptColumn, fixedCodeVal, supplierName, invoiceStatus, legacyFullCols){
+        var omitInDept = !!omitInDeptColumn;
+        var fixedCell = esc(fixedCodeVal != null && String(fixedCodeVal) !== "" ? String(fixedCodeVal) : "—");
+        var supplierCell = esc(supplierName != null && String(supplierName) !== "" ? String(supplierName) : "—");
+        var invoiceCell = esc(invoiceStatus != null && String(invoiceStatus) !== "" ? String(invoiceStatus) : "—");
+        var n = Math.max(0, Math.min(500, Number(count) || 0));
+        var rows = [];
+        var normalizedCode = normalizeMaterialCode(String(baseCode || demoInstanceCode("办公类", "智能风机控制器", 1, 3)));
+        var normalizedName = String(baseName || "未命名物资").replace(/（批次[^）]*）/g, "");
+        var deptCell = esc(inDeptLabel != null && String(inDeptLabel) !== "" ? String(inDeptLabel) : "—");
+        var colspanEmpty = omitInDept ? 6 : (legacyFullCols ? 6 : 7);
+        for (var i = 1; i <= n; i++) {
+          var code = i === 1
+            ? normalizedCode
+            : (MCS ? MCS.instanceCodeWithOffset(normalizedCode, i - 1) : normalizedCode.replace(/(\d+)(?!.*\d)/, function(m){ return String(Number(m) + i - 1).padStart(8,"0"); }));
+          var name = normalizedName;
+          var trackTd = '<td style="padding:8px;border-bottom:1px solid #f0f2f5;text-align:center;white-space:nowrap"><span class="req-op-wrap"><a href="#" class="req-track-link" data-track-name="' + esc(name) + '" data-track-code="' + esc(code) + '" style="color:#1677ff;text-decoration:none">物资跟踪</a></span></td>';
+          if (omitInDept) {
+            rows.push(
+              "<tr>"
+              + '<td style="padding:8px;border-bottom:1px solid #f0f2f5">' + i + "</td>"
+              + '<td style="padding:8px;border-bottom:1px solid #f0f2f5">' + esc(name) + "</td>"
+              + '<td style="padding:8px;border-bottom:1px solid #f0f2f5">' + esc(code) + "</td>"
+              + '<td style="padding:8px;border-bottom:1px solid #f0f2f5">' + fixedCell + "</td>"
+              + trackTd
+              + "</tr>"
+            );
+          } else if (legacyFullCols) {
+            rows.push(
+              "<tr>"
+              + '<td style="padding:8px;border-bottom:1px solid #f0f2f5">' + i + "</td>"
+              + '<td style="padding:8px;border-bottom:1px solid #f0f2f5">' + esc(name) + "</td>"
+              + '<td style="padding:8px;border-bottom:1px solid #f0f2f5">' + esc(code) + "</td>"
+              + '<td style="padding:8px;border-bottom:1px solid #f0f2f5">' + fixedCell + "</td>"
+              + '<td style="padding:8px;border-bottom:1px solid #f0f2f5">' + deptCell + "</td>"
+              + trackTd
+              + "</tr>"
+            );
+          } else {
+            rows.push(
+              "<tr>"
+              + '<td style="padding:8px;border-bottom:1px solid #f0f2f5">' + i + "</td>"
+              + '<td style="padding:8px;border-bottom:1px solid #f0f2f5">' + esc(name) + "</td>"
+              + '<td style="padding:8px;border-bottom:1px solid #f0f2f5">' + esc(code) + "</td>"
+              + '<td style="padding:8px;border-bottom:1px solid #f0f2f5">' + supplierCell + "</td>"
+              + '<td style="padding:8px;border-bottom:1px solid #f0f2f5">' + deptCell + "</td>"
+              + '<td style="padding:8px;border-bottom:1px solid #f0f2f5">' + invoiceCell + "</td>"
+              + trackTd
+              + "</tr>"
+            );
+          }
+        }
+        if (!rows.length) {
+          rows.push('<tr><td colspan="' + colspanEmpty + '" style="padding:12px;color:#94a3b8;text-align:center">暂无明细</td></tr>');
+        }
+        return rows.join("");
+      }
+      function buildLedgerDetailViewRowsHtml(sourceRow, count, inDeptLabel, invoiceStatus) {
+        var thStyle = "text-align:left;padding:8px;border-bottom:1px solid #f0f2f5";
+        var details = buildLedgerDetailRowsFromSummary(sourceRow, count);
+        if (!details.length) {
+          return (
+            '<tr><td colspan="' +
+            (LEDGER_DETAIL_VIEW_HEADERS.length + 1) +
+            '" style="padding:12px;color:#94a3b8;text-align:center">暂无明细</td></tr>'
+          );
+        }
+        var inDeptCell = esc(inDeptLabel != null && String(inDeptLabel) !== "" ? String(inDeptLabel) : "—");
+        return details
+          .map(function (d) {
+            var trackTd =
+              '<td style="' +
+              thStyle +
+              ';text-align:center;white-space:nowrap">' +
+              '<span class="req-op-wrap">' +
+              '<a href="#" class="req-track-link" data-track-name="' +
+              esc(d.productName || "") +
+              '" data-track-code="' +
+              esc(d.productCode || "") +
+              '" style="color:#1677ff;text-decoration:none">物资跟踪</a>' +
+              "</span></td>";
+          return (
+              "<tr>" +
+              '<td style="' +
+              thStyle +
+              '">' +
+              esc(d.seq) +
+              "</td>" +
+              '<td style="' +
+              thStyle +
+              '">' +
+              esc(d.productName) +
+              "</td>" +
+              '<td style="' +
+              thStyle +
+              '">' +
+              esc(d.productModel) +
+              "</td>" +
+              '<td style="' +
+              thStyle +
+              '">' +
+              esc(d.productCode) +
+              "</td>" +
+              '<td style="' +
+              thStyle +
+              '">' +
+              esc(d.deviceUniqueCode) +
+              "</td>" +
+              '<td style="' +
+              thStyle +
+              '">' +
+              esc(d.typeName) +
+              "</td>" +
+              '<td style="' +
+              thStyle +
+              '">' +
+              esc(d.typeCode) +
+              "</td>" +
+              '<td style="' +
+              thStyle +
+              '">' +
+              esc(d.purchaseDept) +
+              "</td>" +
+              '<td style="' +
+              thStyle +
+              '">' +
+              esc(d.supplier) +
+              "</td>" +
+              '<td style="' +
+              thStyle +
+              '">' +
+              esc(d.unitPriceIncl) +
+              "</td>" +
+              '<td style="' +
+              thStyle +
+              '">' +
+              inDeptCell +
+              "</td>" +
+              '<td style="' +
+              thStyle +
+              '">' +
+              esc(d.invoiceStatus || invoiceStatus || "—") +
+              "</td>" +
+              '<td style="' +
+              thStyle +
+              '">' +
+              esc(d.userName || detailUserName(d) || "—") +
+              "</td>" +
+              '<td style="' +
+              thStyle +
+              '">' +
+              esc(assetTypeName(d)) +
+              "</td>" +
+              trackTd +
+              "</tr>"
+          );
+        })
+        .join("");
+      }
+      function buildLedgerDetailViewTableHtml(sourceRow, count, title, inDeptLabel, invoiceStatus) {
+        var thStyle = "text-align:left;padding:8px;border-bottom:1px solid #e9edf4";
+        var head =
+          "<thead><tr style=\"background:#f6f8fb\">" +
+          LEDGER_DETAIL_VIEW_HEADERS.map(function (h) {
+            return '<th style="' + thStyle + '">' + esc(h) + "</th>";
+          }).join("") +
+          "</tr></thead>";
+        return (
+          '<div style="margin-top:10px;font-weight:600;color:#1f3551">' +
+          esc(title || "领用物资明细表") +
+          "</div>" +
+          '<div style="margin-top:6px;border:1px solid #e9edf4;border-radius:8px;overflow:auto">' +
+          '<table class="ledger-detail-view-table" style="width:100%;min-width:900px;border-collapse:collapse;font-size:12px;background:#fff;table-layout:fixed">' +
+          head +
+          "<tbody>" +
+          buildLedgerDetailViewRowsHtml(sourceRow, count, inDeptLabel, invoiceStatus) +
+          "</tbody></table></div>" +
+          '<div id="reqTrackBox" style="display:none;margin-top:10px;border:1px solid #e9edf4;border-radius:8px;background:#fff;padding:10px 12px"></div>'
+        );
+      }
+      function restoreLedgerDetailOperationButtons() {
+        var title = document.getElementById("detailTitle");
+        if (!title || String(title.textContent || "").replace(/\s+/g, "").indexOf("物资详情-") !== 0) return;
+        document.querySelectorAll("#detailBody table").forEach(function (table) {
+          var heads = table.querySelectorAll("thead th");
+          var opIdx = -1;
+          heads.forEach(function (th, idx) {
+            if (String(th.textContent || "").replace(/\s+/g, "") === "操作") opIdx = idx;
+          });
+          if (opIdx < 0) return;
+          if (table.classList) table.classList.add("ledger-detail-view-table");
+          table.querySelectorAll("tbody tr").forEach(function (tr) {
+            var cells = tr.children || [];
+            var cell = cells[opIdx];
+            if (!cell) return;
+            var txt = String(cell.textContent || "").replace(/\s+/g, "");
+            if (txt.indexOf("物资跟踪") >= 0) {
+              cell.querySelectorAll("a.req-track-link").forEach(function (a) {
+                a.style.display = "inline-flex";
+                a.style.visibility = "visible";
+              });
+              var changeLinks = cell.querySelectorAll("a.req-user-change-link");
+              if (!changeLinks.length) {
+                var oldTrack = cell.querySelector("a.req-track-link");
+                var pn = oldTrack ? oldTrack.getAttribute("data-track-name") || "" : "";
+                var pc = oldTrack ? oldTrack.getAttribute("data-track-code") || "" : "";
+                cell.innerHTML =
+                  '<span class="req-op-wrap">' +
+                  '<a href="#" class="req-track-link" data-track-name="' +
+                  esc(pn) +
+                  '" data-track-code="' +
+                  esc(pc) +
+                  '" style="color:#1677ff;text-decoration:none">物资跟踪</a>' +
+                  '<a href="#" class="req-user-change-link" data-product-name="' +
+                  esc(pn) +
+                  '" data-product-code="' +
+                  esc(pc) +
+                  '" style="color:#1677ff;text-decoration:none">变更使用人</a>' +
+                  "</span>";
+              } else {
+                changeLinks.forEach(function (a) {
+                  a.style.display = "inline-flex";
+                  a.style.visibility = "visible";
+                });
+              }
+              return;
+            }
+            var productName = cells[1] ? String(cells[1].textContent || "").trim() : "";
+            var productCode = cells[3] ? String(cells[3].textContent || "").trim() : "";
+            cell.innerHTML =
+              '<span class="req-op-wrap">' +
+              '<a href="#" class="req-track-link" data-track-name="' +
+              esc(productName) +
+              '" data-track-code="' +
+              esc(productCode) +
+              '" style="color:#1677ff;text-decoration:none">物资跟踪</a>' +
+              '<a href="#" class="req-user-change-link" data-product-name="' +
+              esc(productName) +
+              '" data-product-code="' +
+              esc(productCode) +
+              '" style="color:#1677ff;text-decoration:none">变更使用人</a>' +
+              "</span>";
+          });
+        });
+      }
+      function buildTrackDetailTableHtml(baseName, baseCode, count, title, inDeptLabel, fixedCodeVal, supplierName, invoiceStatus, legacyFullCols){
+        var isFlow = !!legacyFullCols;
+        if (!isFlow) {
+          var stub = {
+            name: baseName,
+            code: baseCode,
+            spec: "",
+            category: "生产类",
+            supplier: supplierName,
+            inCurrentDept: inDeptLabel,
+            invoiceStatus: invoiceStatus,
+            stockQty: count
+          };
+          return buildLedgerDetailViewTableHtml(stub, count, title, inDeptLabel, invoiceStatus);
+        }
+        var thead =
+          '<thead><tr style="background:#f6f8fb"><th style="text-align:left;padding:8px;border-bottom:1px solid #e9edf4">序号</th><th style="text-align:left;padding:8px;border-bottom:1px solid #e9edf4">名称</th><th style="text-align:left;padding:8px;border-bottom:1px solid #e9edf4">物资编码</th><th style="text-align:left;padding:8px;border-bottom:1px solid #e9edf4">固定资产编码</th><th style="text-align:left;padding:8px;border-bottom:1px solid #e9edf4">是否在本部门</th><th style="text-align:left;padding:8px;border-bottom:1px solid #e9edf4">操作</th></tr></thead>';
+        return ''
+          + '<div style="margin-top:10px;font-weight:600;color:#1f3551">' + esc(title || "领用物资明细表") + '</div>'
+          + '<div style="margin-top:6px;border:1px solid #e9edf4;border-radius:8px;overflow:auto">'
+          + '<table style="width:100%;min-width:0;border-collapse:collapse;font-size:12px;background:#fff">'
+          + thead
+          + '<tbody id="reqDetailTbody">' + buildTrackDetailRowsHtml(baseName, baseCode, count, inDeptLabel, false, fixedCodeVal, supplierName, invoiceStatus, legacyFullCols) + '</tbody>'
+          + '</table>'
+          + '</div>'
+          + '<div id="reqTrackBox" style="display:none;margin-top:10px;border:1px solid #e9edf4;border-radius:8px;background:#fff;padding:10px 12px"></div>';
+      }
+
+
+      function reqRowWarehouseLoc(r) {
+        return String((r && (r.location || r.warehouse)) || "") || "—";
+      }
+
+      function requisitionProductNamesLabel(r) {
+        if (!r) return "";
+        if (r.productNames) return String(r.productNames);
+        if (r.detailLines && r.detailLines.length) {
+          var seen = {};
+          var names = [];
+          r.detailLines.forEach(function (d) {
+            var pn = String(d.productName || d.name || "").trim();
+            if (pn && !seen[pn]) {
+              seen[pn] = 1;
+              names.push(pn);
+            }
+          });
+          if (names.length) return names.join(".");
+        }
+        var n = Math.max(1, Number(r.receiveQty) || Number(r.qty) || 1);
+        var lines = buildLedgerDetailRowsFromSummary(
+          {
+            code: r.code,
+            name: r.name,
+            spec: r.spec,
+            category: normalizeAssetCategory(r.assetType || r.category || r.materialType || r.name || ""),
+            purchaseDept: r.purchaseDept || r.applyDept,
+            supplier: r.supplier,
+            unitPriceIncl: r.unitPriceIncl,
+            location: r.location
+          },
+          n
+        );
+        var seen2 = {};
+        var out = [];
+        lines.forEach(function (d) {
+          var pn = String(d.productName || d.name || "").trim();
+          if (pn && !seen2[pn]) {
+            seen2[pn] = 1;
+            out.push(pn);
+          }
+        });
+        return out.length ? out.join(".") : String(r.name || "");
+      }
+      function flowProductNamesLabel(r) {
+        if (!r) return "";
+        if (r.productNames) return String(r.productNames);
+        if (r.detailLines && r.detailLines.length) {
+          var seen = {};
+          var names = [];
+          r.detailLines.forEach(function (d) {
+            var pn = String(d.productName || d.name || "").trim();
+            if (pn && !seen[pn]) {
+              seen[pn] = 1;
+              names.push(pn);
+            }
+          });
+          if (names.length) return names.join(".");
+        }
+        var n = Math.max(1, Number(r.qty) || 1);
+        var lines = buildLedgerDetailRowsFromSummary(
+          {
+            code: r.materialCode,
+            name: r.materialName,
+            category: "固定资产",
+            purchaseDept: r.fromDept,
+            keeper: r.keeper,
+            location: r.warehouse
+          },
+          n
+        );
+        var seen2 = {};
+        var out = [];
+        lines.forEach(function (d) {
+          var pn = String(d.productName || d.name || "").trim();
+          if (pn && !seen2[pn]) {
+            seen2[pn] = 1;
+            out.push(pn);
+          }
+        });
+        return out.length ? out.join(".") : String(r.materialName || "");
+      }
+      function buildReqLedgerSummaryGridHtml(sourceRow, reqRow) {
+        var ledgerCols = (tabs.ledger && tabs.ledger.columns) || [];
+        var reqGridOmitKeys = {
+          code: 1,
+          spec: 1,
+          category: 1,
+          stockQty: 1,
+          unitPriceExcl: 1,
+          unitPriceIncl: 1,
+          requisitionTotal: 1
+        };
+        var colsForGrid = ledgerCols.filter(function (col) {
+          var k = col[0], t = col[1];
+          if (k === "name" || k === "status" || t === "当前状态" || reqGridOmitKeys[k]) return false;
+          return true;
+        });
+        var grid =
+          colsForGrid
+            .map(function (col) {
+              var key = col[0], title = col[1];
+              var raw = sourceRow && sourceRow[key] != null ? String(sourceRow[key]) : "";
+              return (
+                '<div class="k">' +
+                esc(title) +
+                '</div><div class="v"><input class="carrier-search" readonly style="background:#f5f5f5" value="' +
+                esc(raw) +
+                '" /></div>'
+              );
+            })
+            .join("") +
+          '<div class="k">领用日期</div><div class="v"><input class="carrier-search" readonly style="background:#f5f5f5" value="' +
+          esc((reqRow && reqRow.reqDate) || "") +
+          '" /></div>' +
+          '<div class="k">领用说明</div><div class="v"><input class="carrier-search" readonly style="background:#f5f5f5" value="' +
+          esc((reqRow && reqRow.remark) || "") +
+          '" /></div>';
+        return grid;
+      }
+
+      function buildReqMatListTableReadonlyHtml(listItems) {
+        var tdStyle = "padding:8px;border-bottom:1px solid #f0f2f5;color:#000";
+        var thStyle = "text-align:left;padding:8px;border-bottom:1px solid #e9edf4";
+        var head =
+          '<thead><tr style="background:#f6f8fb">' +
+          '<th style="' + thStyle + '">物资类型编码</th>' +
+          '<th style="' + thStyle + '">物资类型名称</th>' +
+          '<th style="' + thStyle + '">产品型号</th>' +
+          '<th style="' + thStyle + '">物资类别</th>' +
+          '<th style="' + thStyle + '">采购单价（含税）</th>' +
+          '<th style="' + thStyle + '">库存数量</th>' +
+          '<th style="' + thStyle + '">仓库</th>' +
+          '<th style="' + thStyle + '">领用数量</th>' +
+          "</tr></thead>";
+        var items = listItems || [];
+        var bodyRows = "";
+        if (!items.length) {
+          bodyRows =
+            '<tr><td colspan="8" style="padding:12px;color:#94a3b8;text-align:center">暂无物资</td></tr>';
+        } else {
+          bodyRows = items
+            .map(function (item) {
+              var r = item.row || {};
+              var code = String(r.code || r.assetNo || "");
+              return (
+                "<tr>" +
+                '<td style="' + tdStyle + '">' + esc(normalizeCategoryCode(code)) + "</td>" +
+                '<td style="' + tdStyle + '">' + esc(r.name || "") + "</td>" +
+                '<td style="' + tdStyle + '">' + esc(r.spec || "") + "</td>" +
+                '<td style="' + tdStyle + '">' + esc(r.category || "") + "</td>" +
+                '<td style="' + tdStyle + '">' + esc(rowUnitPriceIncl(r)) + "</td>" +
+                '<td style="' + tdStyle + '">' + esc(r.stockQty != null ? r.stockQty : "") + "</td>" +
+                '<td style="' + tdStyle + '">' + esc(reqRowWarehouseLoc(r)) + "</td>" +
+                '<td style="' + tdStyle + '">' + esc(item.qty != null ? item.qty : "") + "</td>" +
+                "</tr>"
+              );
+            })
+            .join("");
+        }
+        return (
+          '<div style="margin-top:10px;font-weight:600;color:#1f3551">领用物资列表</div>' +
+          '<div style="margin-top:6px;border:1px solid #e9edf4;border-radius:8px;overflow:auto">' +
+          '<table style="width:100%;min-width:0;border-collapse:collapse;font-size:12px;background:#fff">' +
+          head +
+          "<tbody>" +
+          bodyRows +
+          "</tbody></table></div>"
+        );
+      }
+
+      function getTrfCheckedDetailLines() {
+        var actionBody = document.getElementById("actionBody");
+        var all =
+          actionBody && typeof actionBody._trfSelectedDetailLines === "function"
+            ? actionBody._trfSelectedDetailLines()
+            : [];
+        return Array.isArray(all) ? all.slice() : [];
+      }
+
+      function buildTransferDetailRowsHtml(lines) {
+        var tdStyle = "padding:8px;border-bottom:1px solid #f0f2f5";
+        var list = lines || [];
+        var colspan = LEDGER_DETAIL_HEADERS.length;
+        if (!list.length) {
+          return (
+            '<tr><td colspan="' +
+            colspan +
+            '" style="padding:12px;color:#94a3b8;text-align:center">请先在弹窗中选择物资</td></tr>'
+          );
+        }
+        return list
+          .map(function (d, idx) {
+            var seq = idx + 1;
+            var trackTd =
+              '<td style="' +
+              tdStyle +
+              ';text-align:center;white-space:nowrap"><span class="req-op-wrap"><a href="#" class="req-track-link trf-track-link" data-track-name="' +
+              esc(d.productName || d.name || "") +
+              '" data-track-code="' +
+              esc(d.productCode || "") +
+              '" style="color:#1677ff;text-decoration:none">物资跟踪</a></span></td>';
+            return (
+              "<tr>" +
+              '<td style="' +
+              tdStyle +
+              '">' +
+              seq +
+              "</td>" +
+              '<td style="' +
+              tdStyle +
+              '">' +
+              esc(d.productName || d.name || "") +
+              "</td>" +
+              '<td style="' +
+              tdStyle +
+              '">' +
+              esc(d.productModel || d.spec || "") +
+              "</td>" +
+              '<td style="' +
+              tdStyle +
+              '">' +
+              esc(d.productCode || "") +
+              "</td>" +
+              '<td style="' +
+              tdStyle +
+              '">' +
+              esc(d.deviceUniqueCode || "") +
+              "</td>" +
+              '<td style="' +
+              tdStyle +
+              '">' +
+              esc(d.typeName || d.name || "") +
+              "</td>" +
+              '<td style="' +
+              tdStyle +
+              '">' +
+              esc(d.typeCode || d.code || "") +
+              "</td>" +
+              '<td style="' +
+              tdStyle +
+              '">' +
+              esc(d.purchaseDept || "") +
+              "</td>" +
+              '<td style="' +
+              tdStyle +
+              '">' +
+              esc(d.supplier || "") +
+              "</td>" +
+              '<td style="' +
+              tdStyle +
+              '">' +
+              esc(d.unitPriceIncl || rowUnitPriceIncl(d) || "") +
+              "</td>" +
+              '<td style="' +
+              tdStyle +
+              '">' +
+              esc(d.inboundTime || "") +
+              "</td>" +
+              '<td style="' +
+              tdStyle +
+              '">' +
+              esc(detailUserName(d)) +
+              "</td>" +
+              '<td style="' +
+              tdStyle +
+              '">' +
+              esc(detailUserName(d)) +
+              "</td>" +
+              '<td style="' +
+              tdStyle +
+              '">' +
+              esc(assetTypeName(d)) +
+              "</td>" +
+              '<td style="' +
+              tdStyle +
+              '">' +
+              esc(formatWarehouseName(d.warehouse || d.location || "")) +
+              "</td>" +
+              '<td style="' +
+              tdStyle +
+              '">' +
+              esc(d.inStock || "否") +
+              "</td>" +
+              '<td style="' +
+              tdStyle +
+              '">' +
+              esc(d.invoiceStatus || "—") +
+              "</td>" +
+              trackTd +
+              "</tr>"
+            );
+          })
+          .join("");
+      }
+      function buildReqMatDetailBlockFromLines(lines, blockTitle, opts) {
+        opts = opts || {};
+        var showUserCol = !!opts.showUserCol;
+        var thStyle = "text-align:left;padding:8px;border-bottom:1px solid #f0f2f5";
+        var thHeadStyle = "text-align:left;padding:8px;border-bottom:1px solid #e9edf4";
+        var list = lines || [];
+        var bodyRows = "";
+        if (!list.length) {
+          bodyRows =
+            '<tr><td colspan="' +
+            (LEDGER_DETAIL_HEADERS.length) +
+            '" style="padding:12px;color:#94a3b8;text-align:center">请先在弹窗中选择物资</td></tr>';
+        } else {
+          bodyRows = list
+            .map(function (d, idx) {
+              var seq = idx + 1;
+              var trackTd =
+                '<td style="' +
+                thStyle +
+                ';text-align:center;white-space:nowrap">' +
+                '<span class="req-op-wrap">' +
+                '<a href="#" class="req-track-link" data-track-name="' +
+                esc(d.productName || d.name || "") +
+                '" data-track-code="' +
+                esc(d.productCode || "") +
+                '" style="color:#1677ff;text-decoration:none">物资跟踪</a>' +
+                "</span></td>";
+              return (
+                "<tr>" +
+                '<td style="' +
+                thStyle +
+                '">' +
+                seq +
+                "</td>" +
+                '<td style="' +
+                thStyle +
+                '">' +
+                esc(d.productName || d.name || "") +
+                "</td>" +
+                '<td style="' +
+                thStyle +
+                '">' +
+                esc(d.productModel || d.spec || "") +
+                "</td>" +
+                '<td style="' +
+                thStyle +
+                '">' +
+                esc(d.productCode || "") +
+                "</td>" +
+                '<td style="' +
+                thStyle +
+                '">' +
+                esc(d.deviceUniqueCode || "") +
+                "</td>" +
+                '<td style="' +
+                thStyle +
+                '">' +
+                esc(d.typeName || d.name || "") +
+                "</td>" +
+                '<td style="' +
+                thStyle +
+                '">' +
+                esc(d.typeCode || d.code || "") +
+                "</td>" +
+                '<td style="' +
+                thStyle +
+                '">' +
+                esc(d.purchaseDept || "") +
+                "</td>" +
+                '<td style="' +
+                thStyle +
+                '">' +
+                esc(d.supplier || "") +
+                "</td>" +
+                '<td style="' +
+                thStyle +
+                '">' +
+                esc(d.unitPriceIncl || rowUnitPriceIncl(d) || "") +
+                "</td>" +
+                '<td style="' +
+                thStyle +
+                '">' +
+                esc(d.inboundTime || "") +
+                "</td>" +
+                '<td style="' +
+                thStyle +
+                '">' +
+                esc(d.handler || "") +
+                "</td>" +
+                '<td style="' +
+                thStyle +
+                '">' +
+                esc(detailUserName(d, opts.defaultUserName)) +
+                "</td>" +
+                '<td style="' +
+                thStyle +
+                '">' +
+                esc(assetTypeName(d)) +
+                "</td>" +
+                '<td style="' +
+                thStyle +
+                '">' +
+                esc(formatWarehouseName(d.warehouse || d.location || "")) +
+                "</td>" +
+                '<td style="' +
+                thStyle +
+                '">' +
+                esc(d.inStock || "否") +
+                "</td>" +
+                '<td style="' +
+                thStyle +
+                '">' +
+                esc(d.invoiceStatus || "—") +
+                "</td>" +
+                trackTd +
+                "</tr>"
+              );
+            })
+            .join("");
+        }
+        return (
+          '<div style="margin-top:10px;font-weight:600;color:#1f3551">' +
+          esc(blockTitle || "领用物资明细表") +
+          "</div>" +
+          '<div style="margin-top:6px;border:1px solid #e9edf4;border-radius:8px;overflow:auto">' +
+          '<table style="width:100%;min-width:1200px;border-collapse:collapse;font-size:12px;background:#fff">' +
+          '<thead><tr style="background:#f6f8fb">' +
+          LEDGER_DETAIL_HEADERS.map(function (h) {
+            return '<th style="' + thHeadStyle + '">' + esc(h) + "</th>";
+          }).join("") +
+          "</tr></thead><tbody>" +
+          bodyRows +
+          "</tbody></table></div>" +
+          '<div id="reqTrackBox" style="display:none;margin-top:10px;border:1px solid #e9edf4;border-radius:8px;background:#fff;padding:10px 12px"></div>'
+        );
+      }
+
+      function openDetail(row){
+        var body = document.getElementById("detailBody");
+        var detailProgressTopEl = document.getElementById("detailProgressTop");
+        if (detailProgressTopEl) detailProgressTopEl.style.display = "none";
+        if (row && row.flowNo) {
+          if (detailProgressTopEl) detailProgressTopEl.style.display = "";
+          var flowCols = (tabs.flow && tabs.flow.columns) || [];
+          var flowHead = '<div class="detail-grid">' + buildDetailGridByColumns(row, flowCols) + '</div>';
+          var flowCount = Math.max(0, Number(row.qty) || 0);
+          var flowDetailLines =
+            row.detailLines && row.detailLines.length
+              ? row.detailLines
+              : (function () {
+                  var ledgerRows = (tabs.ledger && tabs.ledger.rows) || [];
+                  var matched = null;
+                  var mc = String(row.materialCode || "").trim();
+                  if (mc) {
+                    for (var fi = 0; fi < ledgerRows.length; fi++) {
+                      var c = String(ledgerRows[fi].code || ledgerRows[fi].assetNo || "").trim();
+                      if (c && c === mc) {
+                        matched = ledgerRows[fi];
+                        break;
+                      }
+                    }
+                  }
+                  if (!matched && row.materialName) {
+                    for (var fj = 0; fj < ledgerRows.length; fj++) {
+                      if (String(ledgerRows[fj].name || "") === String(row.materialName || "")) {
+                        matched = ledgerRows[fj];
+                        break;
+                      }
+                    }
+                  }
+                  var src = matched || {
+                    name: row.materialName,
+                    code: row.materialCode,
+                    category: normalizeAssetCategory(row.assetType || row.category || row.materialName || ""),
+                    dept: row.fromDept,
+                    purchaseDept: row.fromDept,
+                    keeper: row.keeper,
+                    location: row.warehouse
+                  };
+                  return buildLedgerDetailRowsFromSummary(src, flowCount).slice(0, flowCount || 1);
+                })();
+          flowDetailLines = flowDetailLines.map(function (line) {
+            var copy = {};
+            for (var k in line) {
+              if (Object.prototype.hasOwnProperty.call(line, k)) copy[k] = line[k];
+            }
+            return copy;
+          });
+          flowDetailLines.forEach(function (line) {
+            line.userName = row.receiver || row.toKeeper || line.userName;
+            line.warehouse = row.toWarehouse || line.warehouse || line.location;
+            line.location = row.toWarehouse || line.location || line.warehouse;
+          });
+          var flowDetailTable = buildReqMatDetailBlockFromLines(flowDetailLines, "流转物资明细表", {
+            showUserCol: true,
+            defaultUserName: row.receiver || row.toKeeper || ""
+          });
+          body.innerHTML = flowHead + flowDetailTable;
+          document.getElementById("detailTitle").textContent = "流转记录 - " + (row.flowNo || "");
+          document.getElementById("detailMask").classList.add("show");
+          return;
+        }
+        if (row && row.reqNo) {
+          if (detailProgressTopEl) detailProgressTopEl.style.display = "";
+          var ledgerRows = (tabs.ledger && tabs.ledger.rows) || [];
+          var matched = null;
+          var reqCode = String(row.code || "").trim();
+          if (reqCode) {
+            for (var i = 0; i < ledgerRows.length; i++) {
+              var c = String(ledgerRows[i].code || ledgerRows[i].assetNo || "").trim();
+              if (c && c === reqCode) { matched = ledgerRows[i]; break; }
+            }
+          }
+          if (!matched) {
+            for (var j = 0; j < ledgerRows.length; j++) {
+              if (String(ledgerRows[j].name || "") === String(row.name || "")) { matched = ledgerRows[j]; break; }
+            }
+          }
+          var baseCodeReq = String((matched && (matched.code || matched.assetNo)) || row.code || "");
+          var baseNameReq = String((matched && matched.name) || row.name || "");
+          var detailCountReq = Math.max(0, Number(row.receiveQty) || Number(row.qty) || 0);
+          var fixedCodeReq =
+            matched && matched.fixedCode != null && String(matched.fixedCode) !== ""
+              ? String(matched.fixedCode)
+              : "—";
+          var sourceRow = {};
+          if (matched) {
+            for (var sk in matched) {
+              if (Object.prototype.hasOwnProperty.call(matched, sk)) sourceRow[sk] = matched[sk];
+            }
+          }
+          sourceRow.dept = (matched && matched.dept) || row.applyDept || sourceRow.dept || "";
+          sourceRow.keeper = (matched && matched.keeper) || row.applicant || sourceRow.keeper || "";
+          sourceRow.location = (matched && matched.location) || sourceRow.location || "";
+          var listSource = matched || {
+            code: baseCodeReq,
+            name: baseNameReq,
+            spec: row.spec || "",
+            category: normalizeAssetCategory(row.assetType || row.category || row.materialType || row.name || ""),
+            stockQty: row.stockQty,
+            location: "",
+            supplier: row.supplier || "",
+            purchaseDept: row.purchaseDept || row.applyDept || "",
+            unitPriceIncl: row.unitPriceIncl || "",
+            invoiceStatus: row.invoiceStatus || ""
+          };
+          var detailLines =
+            row.detailLines && row.detailLines.length
+              ? row.detailLines
+              : (function () {
+                  var joinedNames = String(row.productNames || "").trim();
+                  if (!joinedNames || joinedNames.indexOf(".") < 0) {
+                    return buildLedgerDetailRowsFromSummary(listSource, detailCountReq).slice(0, detailCountReq);
+                  }
+                  var names = joinedNames
+                    .split(".")
+                    .map(function (x) { return String(x || "").trim(); })
+                    .filter(Boolean);
+                  if (!names.length) {
+                    return buildLedgerDetailRowsFromSummary(listSource, detailCountReq).slice(0, detailCountReq);
+                  }
+                  var ledgerRows = (tabs.ledger && tabs.ledger.rows) || [];
+                  var lines = [];
+                  names.forEach(function (nm) {
+                    var hit = null;
+                    for (var ni = 0; ni < ledgerRows.length; ni++) {
+                      if (String(ledgerRows[ni].name || "").trim() === nm) {
+                        hit = ledgerRows[ni];
+                        break;
+                      }
+                    }
+                    var src = hit || {
+                      code: row.code || "",
+                      name: nm,
+                      spec: row.spec || "",
+                      category: normalizeAssetCategory(row.assetType || row.category || row.materialType || nm || ""),
+                      stockQty: row.stockQty,
+                      location: row.location || "",
+                      supplier: row.supplier || "",
+                      purchaseDept: row.purchaseDept || row.applyDept || "",
+                      unitPriceIncl: row.unitPriceIncl || "",
+                      invoiceStatus: row.invoiceStatus || ""
+                    };
+                    var one = buildLedgerDetailRowsFromSummary(src, 1).slice(0, 1);
+                    if (one.length) lines.push(one[0]);
+                  });
+                  return lines.length ? lines : buildLedgerDetailRowsFromSummary(listSource, detailCountReq).slice(0, detailCountReq);
+                })();
+          detailLines = detailLines.map(function (line) {
+            var copy = {};
+            for (var k in line) {
+              if (Object.prototype.hasOwnProperty.call(line, k)) copy[k] = line[k];
+            }
+            return copy;
+          });
+          detailLines.forEach(function (line) {
+            line.userName = row.applicant || sourceRow.keeper || line.userName;
+            line.warehouse = line.warehouse || sourceRow.location || row.warehouse || "";
+            line.location = line.location || line.warehouse || sourceRow.location || "";
+          });
+          body.innerHTML =
+            '<div class="detail-grid" style="margin-top:0">' +
+            buildReqLedgerSummaryGridHtml(sourceRow, row) +
+            "</div>" +
+            buildReqMatDetailBlockFromLines(detailLines, "领用物资明细表", {
+              showUserCol: true,
+              defaultUserName: row.applicant || sourceRow.keeper || ""
+            });
+          document.getElementById("detailTitle").textContent = "领用记录 - " + (row.reqNo || "");
+          document.getElementById("detailMask").classList.add("show");
+          return;
+        }
+        var ledgerCols = (tabs.ledger && tabs.ledger.columns) || [];
+        var head = '<div class="detail-grid">' + buildDetailGridByColumns(row, ledgerCols) + '</div>';
+        var baseCode = String(row.code || row.assetNo || "");
+        var extraQty = Number(state.addedQtyByCode[baseCode] || 0);
+        var mergedQty = Math.max(0, (Number(row.stockQty) || 0) + extraQty);
+        var inDeptLedger = row && row.inCurrentDept != null ? String(row.inCurrentDept) : "—";
+        var supplierLedger = row && row.supplier != null && String(row.supplier) !== "" ? String(row.supplier) : "—";
+        var invoiceLedger = row && row.invoiceStatus != null && String(row.invoiceStatus) !== "" ? String(row.invoiceStatus) : "—";
+        var detailTable = buildLedgerDetailViewTableHtml(row, mergedQty, "物资明细表", inDeptLedger, invoiceLedger);
+        body.innerHTML = head + detailTable;
+        document.getElementById("detailTitle").textContent = "物资详情 - " + (row.name || "未命名物资");
+        document.getElementById("detailMask").classList.add("show");
+        restoreLedgerDetailOperationButtons();
+      }
+      function closeDetail(){
+        document.getElementById("detailMask").classList.remove("show");
+        var detailProgressTopEl = document.getElementById("detailProgressTop");
+        if (detailProgressTopEl) detailProgressTopEl.style.display = "none";
+      }
+      var actionCtx = { mode:"", row:null };
+      function openActionModal(mode, row){
+        actionCtx.mode = mode;
+        actionCtx.row = row || null;
+        var titleEl = document.getElementById("actionTitle");
+        var bodyEl = document.getElementById("actionBody");
+        var okEl = document.getElementById("actionOk");
+        var progressEl = document.getElementById("actionProgress");
+        var progressTopEl = document.getElementById("actionProgressTop");
+        if (progressEl) progressEl.style.display = "none";
+        if (progressTopEl) progressTopEl.style.display = "none";
+        if(mode==="edit"){
+          if (row && row.reqNo) {
+            titleEl.textContent = "编辑领用记录";
+            okEl.style.display = "";
+            okEl.textContent = "保存";
+            if (progressEl) progressEl.style.display = "";
+            bodyEl.innerHTML =
+              '<div class="detail-grid">' +
+                '<div class="k">领用单号</div><div class="v"><input id="acReqNo" class="carrier-search" value="'+esc(row.reqNo||"")+'" readonly style="background:#f5f5f5"/></div>' +
+                '<div class="k">选择物资</div><div class="v"><input id="acName" class="carrier-search" value="'+esc(row.name||"")+'"/></div>' +
+                '<div class="k">领用日期</div><div class="v"><input id="acReqDate" class="carrier-search" value="'+esc(row.reqDate||"")+'"/></div>' +
+                '<div class="k">领用人</div><div class="v"><input id="acApplicant" class="carrier-search" value="'+esc(row.applicant||"")+'"/></div>' +
+                '<div class="k">领用部门</div><div class="v"><input id="acApplyDept" class="carrier-search" value="'+esc(row.applyDept||"")+'"/></div>' +
+                '<div class="k">领用状态</div><div class="v"><input id="acStatus" class="carrier-search" value="'+esc(row.status||"")+'"/></div>' +
+                '<div class="k">备注</div><div class="v"><input id="acRemark" class="carrier-search" value="'+esc(row.remark||"")+'"/></div>' +
+              '</div>';
+          } else {
+            titleEl.textContent = "编辑物资台账";
+            okEl.style.display = "";
+            okEl.textContent = "保存";
+            var nameSelHtml = buildLedgerMaterialNameOptionsHtml(row.name);
+            bodyEl.innerHTML =
+              '<div class="detail-grid">' +
+                '<div class="k">选择物资</div><div class="v"><select id="acNameSel" class="carrier-select" style="width:100%;max-width:100%;height:36px;border:1px solid #e9ecef;border-radius:8px;padding:0 10px">' + nameSelHtml + '</select></div>' +
+                '<div class="k">物资编码</div><div class="v"><input id="acCode" class="carrier-search" value="'+esc(row.code||"")+'" readonly style="background:#f5f5f5"/></div>' +
+                '<div class="k">合同编号</div><div class="v"><input id="acContractNo" class="carrier-search" value="'+esc(row.contractNo||"")+'"/></div>' +
+                '<div class="k">采购部门</div><div class="v"><input id="acPurchaseDept" class="carrier-search" value="'+esc(row.purchaseDept||"")+'"/></div>' +
+                '<div class="k">产品型号</div><div class="v"><input id="acSpec" class="carrier-search" value="'+esc(row.spec||"")+'"/></div>' +
+                '<div class="k">物资类别</div><div class="v"><input id="acCategory" class="carrier-search" value="'+esc(row.category||"")+'"/></div>' +
+                '<div class="k">采购单价（含税）</div><div class="v"><input id="acUnitPriceExcl" class="carrier-search" value="'+esc(row.unitPriceIncl!=null?row.unitPriceIncl:(row.unitPriceExcl!=null?row.unitPriceExcl:""))+'"/></div>' +
+                '<div class="k">库存数量</div><div class="v"><input id="acStockQty" class="carrier-search" value="'+esc(row.stockQty!=null?row.stockQty:"")+'"/></div>' +
+                '<div class="k">领用部门</div><div class="v"><input id="acDept" class="carrier-search" value="'+esc(row.dept||row.purchaseDept||"")+'"/></div>' +
+                '<div class="k">领用人</div><div class="v"><input id="acKeeper" class="carrier-search" value="'+esc(row.keeper||"")+'"/></div>' +
+                '<div class="k">存放地点</div><div class="v"><input id="acLoc" class="carrier-search" value="'+esc(row.location||row.loc||"")+'"/></div>' +
+                '<div class="k">固定资产编码</div><div class="v"><input id="acFixedCode" class="carrier-search" value="'+esc(row.fixedCode||"")+'"/></div>' +
+                '<div class="k">供应商</div><div class="v"><input id="acSupplier" class="carrier-search" value="'+esc(row.supplier||"")+'"/></div>' +
+                '<div class="k">备注</div><div class="v"><input id="acRemark" class="carrier-search" value="'+esc(row.remark||"")+'"/></div>' +
+              '</div>';
+            (function bindEditNameSync(){
+              var nameSel = document.getElementById("acNameSel");
+              var codeIn = document.getElementById("acCode");
+              if (!nameSel) return;
+              nameSel.value = String(row.name || "");
+              nameSel.addEventListener("change", function () {
+                var n = String(nameSel.value || "").trim();
+                var hit = null;
+                var lr = tabs.ledger.rows || [];
+                for (var i = 0; i < lr.length; i++) {
+                  if (String(lr[i].name || "") === n) { hit = lr[i]; break; }
+                }
+                if (hit && codeIn) {
+                  codeIn.value = String(hit.code || hit.assetNo || "");
+                }
+              });
+            })();
+          }
+        } else if(mode==="delete"){
+          titleEl.textContent = "删除确认";
+          okEl.style.display = "";
+          okEl.textContent = "确认删除";
+          if (row && row.reqNo) {
+            bodyEl.innerHTML = '<div style="font-size:14px;line-height:1.8;color:#1f2d3d">是否确认删除该条领用记录？</div>'
+              + '<div style="margin-top:8px;color:#64748b">领用单号：'+esc(row.reqNo||"-")+'<br>物资类型名称：'+esc(row.name||"-")+'</div>';
+          } else {
+            bodyEl.innerHTML = '<div style="font-size:14px;line-height:1.8;color:#1f2d3d">是否确认删除该条物资台账记录？</div>'
+              + '<div style="margin-top:8px;color:#64748b">物资类型编码：'+esc(row.code||row.assetNo||"-")+'<br>物资类型名称：'+esc(row.name||"-")+'</div>';
+          }
+        } else if(mode==="requisition"){
+          titleEl.textContent = "新增领用";
+          okEl.style.display = "";
+          okEl.textContent = "确定";
+          if (progressTopEl) progressTopEl.style.display = "";
+          var ledgerRows = tabs.ledger.rows || [];
+          var reqMaterialDdRows = ledgerRows.concat(getReqCpuGpuDdRows());
+          var ledgerCols = tabs.ledger.columns || [];
+          // 「当前状态」由系统自动生成，新增领用弹窗中禁止人工填写
+          var reqGridOmitKeys = {
+            code: 1,
+            spec: 1,
+            category: 1,
+            stockQty: 1,
+            unitPriceExcl: 1,
+            unitPriceIncl: 1,
+            requisitionTotal: 1
+          };
+          var colsForGrid = ledgerCols.filter(function(col){
+            var k = col[0], t = col[1];
+            if (k === "name" || k === "status" || t === "当前状态" || reqGridOmitKeys[k]) return false;
+            return true;
+          });
+          var gridHtml = colsForGrid.map(function(col){
+            var key = col[0], title = col[1];
+            return '<div class="k">'+esc(title)+'</div><div class="v"><input class="carrier-search req-col" data-k="'+esc(key)+'" readonly style="background:#f5f5f5" /></div>';
+          }).join("");
+          bodyEl.innerHTML =
+            '<div class="field" style="flex-direction:column;align-items:stretch;gap:8px;max-width:100%">'
+            + '<label style="font-size:12px;color:#64748b">可选物资</label>'
+            + '<div><button type="button" class="btn primary" id="btnReqPickMaterial">可选物资</button></div>'
+            + '<p class="req-pick-summary" id="reqMaterialPickTip">未选择物资</p>'
+            + '<input type="hidden" id="reqMaterialSel" value="" />'
+            + '<div class="detail-grid" style="margin-top:8px">'+gridHtml
+            + '<div class="k">领用说明</div><div class="v"><input id="reqDescription" class="carrier-search" placeholder="请输入领用说明" autocomplete="off" /></div>'
+            + '</div>'
+            + '<div id="reqMatDetailBlockWrap" style="margin-top:10px"></div>'
+            + '<div id="actionReqTrackBox" style="display:none;margin-top:10px;border:1px solid #e9edf4;border-radius:8px;background:#fff;padding:10px 12px"></div>'
+            + "</div>";
+          (function bindReqPreview(){
+            bindReqMatPickerEventsOnce();
+            var reqSelectedRows = [];
+            function updateReqMaterialSelHidden() {
+              var sel = document.getElementById("reqMaterialSel");
+              if (sel) {
+                sel.value = reqSelectedRows
+                  .map(function (r) {
+                    return reqPickerDetailRowId(r);
+                  })
+                  .filter(Boolean)
+                  .join(",");
+              }
+            }
+            function renderReqDetailBlock() {
+              var wrap = document.getElementById("reqMatDetailBlockWrap");
+              if (wrap) wrap.innerHTML = buildReqMatDetailBlockFromLines(reqSelectedRows, null, { showUserCol: true });
+            }
+            function syncReqForm() {
+              updateReqMaterialSelHidden();
+              var row = reqSelectedRows[0] || null;
+              var tip = document.getElementById("reqMaterialPickTip");
+              var btn = document.getElementById("btnReqPickMaterial");
+              if (tip) {
+                tip.textContent = reqSelectedRows.length
+                  ? "已选 " + reqSelectedRows.length + " 条明细"
+                  : "未选择物资";
+              }
+              if (btn) {
+                btn.textContent = reqSelectedRows.length
+                  ? "已选 " + reqSelectedRows.length + " 条"
+                  : "可选物资";
+              }
+              Array.prototype.forEach.call(document.querySelectorAll(".req-col"), function (el) {
+                var k = el.getAttribute("data-k");
+                var raw = "";
+                if (row && row[k] != null) raw = String(row[k]);
+                else if (row && k === "dept" && row.purchaseDept) raw = String(row.purchaseDept);
+                else if (row && k === "keeper" && row.handler) raw = String(row.handler);
+                else if (row && k === "location" && row.warehouse) raw = String(row.warehouse);
+                el.value = raw;
+              });
+              renderReqDetailBlock();
+            }
+            var actionBody = document.getElementById("actionBody");
+            if (actionBody) {
+              actionBody._reqSelectedDetailLines = function () {
+                return reqSelectedRows.slice();
+              };
+            }
+            var pickBtn = document.getElementById("btnReqPickMaterial");
+            if (pickBtn) {
+              pickBtn.addEventListener("click", function () {
+                openReqMaterialPicker(reqMaterialDdRows, reqSelectedRows.slice(), function (picked) {
+                  reqSelectedRows = picked || [];
+                  syncReqForm();
+                });
+              });
+            }
+            syncReqForm();
+            Array.prototype.forEach.call(document.querySelectorAll("#actionBody .detail-grid .k"), function (lab) {
+              if ((lab.textContent || "").replace(/\s+/g, "") === "当前状态") {
+                var val = lab.nextElementSibling;
+                if (val && val.parentNode) val.parentNode.removeChild(val);
+                if (lab.parentNode) lab.parentNode.removeChild(lab);
+              }
+            });
+          })();
+        } else if(mode==="transfer"){
+          titleEl.textContent = "内部流转";
+          okEl.style.display = "";
+          okEl.textContent = "确定";
+          if (progressTopEl) progressTopEl.style.display = "";
+          var transferRows = tabs.ledger.rows || [];
+          bodyEl.innerHTML =
+            '<div class="field" style="flex-direction:column;align-items:stretch;gap:8px;max-width:100%">'
+            + '<label style="font-size:12px;color:#64748b">可选物资</label>'
+            + '<div><button type="button" class="btn primary" id="btnTrfPickMaterial">可选物资</button></div>'
+            + '<p id="trfMaterialPickTip" style="margin:0;font-size:12px;color:#64748b">未选择物资</p>'
+            + '<input type="hidden" id="trfMaterialSel" value="" />'
+            + '<div class="detail-grid" style="margin-top:8px">'
+            + '<div class="k">流转日期</div><div class="v"><input id="trfDate" class="carrier-search" value="'+esc(nowDate())+'" readonly style="background:#f5f5f5"/></div>'
+            + '<div class="k">转出部门</div><div class="v"><input id="trfFromDept" class="carrier-search" readonly style="background:#f5f5f5"/></div>'
+            + '<div class="k">转入部门<span style="color:#cf1322">*</span></div><div class="v"><select id="trfToDept" class="carrier-select" style="width:100%;max-width:100%;height:36px;border:1px solid #e9ecef;border-radius:8px;padding:0 10px"><option value="">请选择转入部门</option><option value="电控所">电控所</option><option value="机械所">机械所</option><option value="经营发展中心">经营发展中心</option><option value="运维中心">运维中心</option></select></div>'
+            + '<div class="k">转出仓库</div><div class="v"><input id="trfFromWarehouse" class="carrier-search" readonly style="background:#f5f5f5"/></div>'
+            + '<div class="k">转入仓库</div><div class="v"><input id="trfToWarehouse" class="carrier-search" placeholder="请输入转入仓库"/></div>'
+            + '<div class="k">转出保管人</div><div class="v"><input id="trfFromStoreKeeper" class="carrier-search" readonly style="background:#f5f5f5"/></div>'
+            + '<div class="k">转入保管人</div><div class="v"><input id="trfToStoreKeeper" class="carrier-search" placeholder="请输入转入保管人"/></div>'
+            + '<div class="k">转出人</div><div class="v"><input id="trfFromKeeper" class="carrier-search" readonly style="background:#f5f5f5"/></div>'
+            + '<div class="k">接收人<span style="color:#cf1322">*</span></div><div class="v"><input id="trfReceiver" class="carrier-search" placeholder="请输入接收人"/></div>'
+            + '<div class="k">流转原因</div><div class="v"><input id="trfReason" class="carrier-search" placeholder="例如：机械所流转至电控所用于测试替换"/></div>'
+            + "</div>"
+            + '<div style="margin-top:10px;font-weight:600;color:#1f3551">流转物资明细表</div>'
+            + '<div style="margin-top:6px;border:1px solid #e9edf4;border-radius:8px;overflow:auto">'
+            + '<table style="width:100%;min-width:1200px;border-collapse:collapse;font-size:12px;background:#fff">'
+            + '<thead><tr style="background:#f6f8fb">'
+            + LEDGER_DETAIL_HEADERS.map(function (h) {
+              return (
+                '<th style="text-align:left;padding:8px;border-bottom:1px solid #e9edf4">' + esc(h) + "</th>"
+              );
+            }).join("")
+            + "</tr></thead>"
+            + '<tbody id="trfDetailTbody"></tbody>'
+            + '</table>'
+            + '</div>'
+            + '<div style="display:flex;justify-content:flex-end;align-items:center;gap:8px;margin-top:8px"><span id="trfSelectedTip" style="font-size:12px;color:#64748b">未选择明细</span></div>'
+            + '<div id="trfTrackBox" style="display:none;margin-top:10px;border:1px solid #e9edf4;border-radius:8px;background:#fff;padding:10px 12px"></div>'
+            + "</div>";
+          (function bindTransferPreview(){
+            bindReqMatPickerEventsOnce();
+            var trfSelectedRows = [];
+            function syncTrfForm() {
+              var sel = document.getElementById("trfMaterialSel");
+              if (sel) {
+                sel.value = trfSelectedRows
+                  .map(function (r) {
+                    return reqPickerDetailRowId(r);
+                  })
+                  .filter(Boolean)
+                  .join(",");
+              }
+              var tip = document.getElementById("trfMaterialPickTip");
+              var btn = document.getElementById("btnTrfPickMaterial");
+              if (tip) {
+                tip.textContent = trfSelectedRows.length
+                  ? "已选 " + trfSelectedRows.length + " 条明细"
+                  : "未选择物资";
+              }
+              if (btn) {
+                btn.textContent = trfSelectedRows.length
+                  ? "已选 " + trfSelectedRows.length + " 条"
+                  : "可选物资";
+              }
+              var row = trfSelectedRows[0] || null;
+              var fromDept = document.getElementById("trfFromDept");
+              var fromKeeper = document.getElementById("trfFromKeeper");
+              var fromWarehouse = document.getElementById("trfFromWarehouse");
+              var fromStoreKeeper = document.getElementById("trfFromStoreKeeper");
+              var toDept = document.getElementById("trfToDept");
+              if (fromDept)
+                fromDept.value = row
+                  ? String(row.purchaseDept || row.dept || "机械所")
+                  : "";
+              if (fromKeeper) fromKeeper.value = row ? String(row.handler || row.keeper || "宋中波") : "";
+              if (fromWarehouse)
+                fromWarehouse.value = row ? String(row.warehouse || row.location || "") : "";
+              if (fromStoreKeeper)
+                fromStoreKeeper.value = row ? String(row.handler || row.keeper || "") : "";
+              if (toDept && fromDept && toDept.value && toDept.value === fromDept.value) toDept.value = "";
+              var tbody = document.getElementById("trfDetailTbody");
+              if (tbody) tbody.innerHTML = buildTransferDetailRowsHtml(trfSelectedRows);
+              var selTip = document.getElementById("trfSelectedTip");
+              if (selTip)
+                selTip.textContent = trfSelectedRows.length
+                  ? "已选 " + trfSelectedRows.length + " 条明细"
+                  : "未选择明细";
+              var box = document.getElementById("trfTrackBox");
+              if (box) box.style.display = "none";
+            }
+            var actionBody = document.getElementById("actionBody");
+            if (actionBody) {
+              actionBody._trfSelectedDetailLines = function () {
+                return trfSelectedRows.slice();
+              };
+            }
+            var pickBtn = document.getElementById("btnTrfPickMaterial");
+            if (pickBtn) {
+              pickBtn.addEventListener("click", function () {
+                openReqMaterialPicker(
+                  filterTransferableLedgerRows(transferRows),
+                  trfSelectedRows.slice(),
+                  function (picked) {
+                    trfSelectedRows = picked || [];
+                    syncTrfForm();
+                  },
+                  { variant: "transfer" }
+                );
+              });
+            }
+            syncTrfForm();
+          })();
+                } else {
+          titleEl.textContent = "提示";
+          okEl.style.display = "none";
+          bodyEl.innerHTML = '<div style="font-size:14px;line-height:1.8;color:#1f2d3d">无可用操作</div>';
+        }
+        document.getElementById("actionMask").classList.add("show");
+      }
+      function closeActionModal(){
+        document.getElementById("actionMask").classList.remove("show");
+        var progressTopEl = document.getElementById("actionProgressTop");
+        if (progressTopEl) progressTopEl.style.display = "none";
+        actionCtx = { mode:"", row:null };
+      }
+
+      function renderAll(){
+        var rows = getRows();
+        renderTabs();
+        renderFilters();
+        renderCards(rows);
+        renderTable(rows);
+      }
+
+      document.addEventListener("click", function(e){
+        var tab = e.target.closest("[data-tab]");
+        if(tab){
+          state.current = tab.getAttribute("data-tab");
+          try {
+            var u = new URL(location.href);
+            u.searchParams.set("tab", state.current);
+            history.replaceState(null, "", u.pathname + u.search + (u.hash || ""));
+          } catch (eUrl) {}
+          renderAll();
+          return;
+        }
+        if(e.target.id==="btnSearch"){
+          document.querySelectorAll("#filters [data-f]").forEach(function(input){
+            state.filters[state.current][input.getAttribute("data-f")] = input.value || "";
+          });
+          state.page[state.current] = 1;
+          renderAll();
+          return;
+        }
+        if(e.target.id==="btnReset"){
+          state.filters[state.current] = {};
+          state.page[state.current] = 1;
+          renderAll();
+          return;
+        }
+        if(e.target.id==="btnNewRequisition"){
+          openActionModal("requisition", null);
+          return;
+        }
+        if(e.target.id==="btnNewTransfer"){
+          openActionModal("transfer", null);
+          return;
+        }
+        if(e.target.id==="btnImport"){ alert("导入（演示）"); return; }
+        if(e.target.id==="btnTpl"){ alert("下载模板（演示）"); return; }
+        if(e.target.id==="btnExport"){ alert("已导出当前页签数据（演示）"); return; }
+        var trackLink = e.target && e.target.closest ? e.target.closest(".req-track-link") : null;
+        if (trackLink) {
+          e.preventDefault();
+          var n = trackLink.getAttribute("data-track-name") || "";
+          var c = trackLink.getAttribute("data-track-code") || "";
+          if (trackLink.classList && trackLink.classList.contains("trf-track-link")) {
+            var tbox = document.getElementById("trfTrackBox");
+            if (tbox) {
+              tbox.style.display = "";
+              tbox.innerHTML =
+                '<div style="font-weight:600;color:#1f3551;margin-bottom:8px">流转节点</div>'
+                + '<div style="display:flex;gap:10px;align-items:flex-start;margin-bottom:8px"><span style="width:10px;height:10px;border-radius:999px;background:#2563eb;display:inline-block;margin-top:6px"></span><div><div style="color:#111827">2026.4.20 入库：' + esc(n) + '（' + esc(c) + '）</div><div style="color:#6b7280;font-size:12px;margin-top:2px">存放中心库，待内部流转</div></div></div>'
+                + '<div style="display:flex;gap:10px;align-items:flex-start;margin-bottom:8px"><span style="width:10px;height:10px;border-radius:999px;background:#10b981;display:inline-block;margin-top:6px"></span><div><div style="color:#111827">2026.5.10 机械所发起内部流转</div><div style="color:#6b7280;font-size:12px;margin-top:2px">流转单：LZ-2026-0510（演示）</div></div></div>'
+                + '<div style="display:flex;gap:10px;align-items:flex-start"><span style="width:10px;height:10px;border-radius:999px;background:#0ea5e9;display:inline-block;margin-top:6px"></span><div><div style="color:#111827">2026.5.11 电控所签收完成</div><div style="color:#6b7280;font-size:12px;margin-top:2px">状态：已完成内部流转</div></div></div>';
+            }
+            return;
+          }
+          var inPicker = !!(trackLink.closest && trackLink.closest("#reqMatPickerMask"));
+          var inAction = !!(trackLink.closest && trackLink.closest("#actionBody"));
+          var box = inPicker
+            ? document.getElementById("reqMatPickerTrackBox")
+            : inAction
+              ? document.getElementById("actionReqTrackBox")
+              : document.getElementById("reqTrackBox");
+          if (!box && inAction) box = document.getElementById("reqTrackBox");
+          if (box) {
+            box.style.display = "";
+            box.innerHTML =
+              '<div style="font-weight:600;color:#1f3551;margin-bottom:8px">物资跟踪</div>'
+              + '<div style="display:flex;gap:10px;align-items:flex-start;margin-bottom:8px"><span style="width:10px;height:10px;border-radius:999px;background:#2563eb;display:inline-block;margin-top:6px"></span><div><div style="color:#111827">2026.4.20 入库：' + esc(n) + '（' + esc(c) + '）</div><div style="color:#6b7280;font-size:12px;margin-top:2px">存放山东风电中心仓库001货位</div></div></div>'
+              + '<div style="display:flex;gap:10px;align-items:flex-start;margin-bottom:8px"><span style="width:10px;height:10px;border-radius:999px;background:#10b981;display:inline-block;margin-top:6px"></span><div><div style="color:#111827">2026.5.10 被电控所领用</div><div style="color:#6b7280;font-size:12px;margin-top:2px">领用单：LY-2026-0510（演示）</div></div></div>'
+              + '<div style="display:flex;gap:10px;align-items:flex-start;margin-bottom:8px"><span style="width:10px;height:10px;border-radius:999px;background:#6366f1;display:inline-block;margin-top:6px"></span><div><div style="color:#111827">2026.5.12 使用人变更（初始保管人 → 张三）</div><div style="color:#6b7280;font-size:12px;margin-top:2px">变更原因：岗位调整</div></div></div>'
+              + '<div style="display:flex;gap:10px;align-items:flex-start;margin-bottom:8px"><span style="width:10px;height:10px;border-radius:999px;background:#f59e0b;display:inline-block;margin-top:6px"></span><div><div style="color:#111827">2026.5.18 使用人变更（张三 → 李四）</div><div style="color:#6b7280;font-size:12px;margin-top:2px">变更原因：岗位调动</div></div></div>';
+          }
+          return;
+        }
+        if (e.target.classList && (e.target.classList.contains("req-user-change-link") || (e.target.parentElement && e.target.parentElement.classList && e.target.parentElement.classList.contains("req-user-change-link")))) {
+          e.preventDefault();
+          var linkEl = e.target.classList && e.target.classList.contains("req-user-change-link") ? e.target : e.target.parentElement;
+          var pn = linkEl.getAttribute("data-product-name") || "";
+          var pc = linkEl.getAttribute("data-product-code") || "";
+          var oldMask = document.getElementById("reqUserChangeModalMask");
+          if (oldMask && oldMask.parentNode) oldMask.parentNode.removeChild(oldMask);
+          var maskHtml =
+            '<div class="modal-mask show" id="reqUserChangeModalMask" style="z-index:9999">' +
+              '<div class="modal" style="width:min(560px,92vw);max-height:82vh;overflow:auto">' +
+                '<div class="modal-hd"><span>变更使用人</span><button type="button" class="x-btn" data-close-user-change="1">×</button></div>' +
+                '<div class="modal-bd">' +
+                  '<div style="font-size:12px;color:#64748b;margin-bottom:8px">物资：' + esc(pn || "-") + '（' + esc(pc || "-") + '）</div>' +
+                  '<input class="carrier-search req-user-search" placeholder="输入姓名搜索" autocomplete="off" style="width:100%;height:36px;border:1px solid #e9ecef;border-radius:8px;padding:0 10px;box-sizing:border-box;font-family:inherit;font-size:13px;margin-bottom:8px" />' +
+                  '<div class="req-user-options" style="border:1px solid #e9ecef;border-radius:8px;overflow:hidden;background:#fff">' +
+                    ["张三","李四","王五","赵六","宋中波","成明锴"].map(function (name, idx) {
+                      return '<label class="req-user-option" style="display:flex;align-items:center;gap:8px;height:34px;border-bottom:' + (idx === 5 ? '0' : '1px solid #f0f2f5') + ';background:#fff;padding:0 10px;cursor:pointer;font-size:13px;color:#262626"><input type="radio" name="reqChangeUser" value="' + esc(name) + '"' + (idx === 0 ? ' checked' : '') + '/><span>' + esc(name) + '</span></label>';
+                    }).join("") +
+                  '</div>' +
+                  '<div style="margin-top:10px;font-size:12px;color:#64748b;margin-bottom:4px">变更原因</div>' +
+                  '<textarea id="reqUserChangeReason" class="carrier-search" placeholder="请输入变更原因" style="width:100%;height:72px;border:1px solid #e9ecef;border-radius:8px;padding:8px 10px;box-sizing:border-box;font-family:inherit;font-size:13px;resize:vertical"></textarea>' +
+                '</div>' +
+                '<div class="modal-ft"><button type="button" class="btn secondary" data-close-user-change="1">取消</button><button type="button" class="btn primary" data-ok-user-change="1">确定</button></div>' +
+              '</div>' +
+            '</div>';
+          document.body.insertAdjacentHTML("beforeend", maskHtml);
+          var modalMask = document.getElementById("reqUserChangeModalMask");
+          var userSearch = modalMask ? modalMask.querySelector(".req-user-search") : null;
+          var userOptions = modalMask ? modalMask.querySelectorAll(".req-user-option") : [];
+          function closeUserChangeModal() {
+            var m = document.getElementById("reqUserChangeModalMask");
+            if (m && m.parentNode) m.parentNode.removeChild(m);
+          }
+          if (userSearch) {
+            userSearch.addEventListener("input", function () {
+              var kw = String(userSearch.value || "").trim();
+              Array.prototype.forEach.call(userOptions, function (label) {
+                label.style.display = !kw || String(label.textContent || "").indexOf(kw) >= 0 ? "flex" : "none";
+              });
+            });
+          }
+          if (modalMask) {
+            modalMask.addEventListener("click", function (ev) {
+              if (ev.target === modalMask || (ev.target && ev.target.getAttribute("data-close-user-change") === "1")) closeUserChangeModal();
+              if (ev.target && ev.target.getAttribute("data-ok-user-change") === "1") closeUserChangeModal();
+            });
+          }
+          return;
+        }
+        if (e.target.classList && e.target.classList.contains("trf-track-link")) {
+          e.preventDefault();
+          var tn = e.target.getAttribute("data-track-name") || "";
+          var tc = e.target.getAttribute("data-track-code") || "";
+          var tbox = document.getElementById("trfTrackBox");
+          if (tbox) {
+            tbox.style.display = "";
+            tbox.innerHTML =
+              '<div style="font-weight:600;color:#1f3551;margin-bottom:8px">流转节点</div>'
+              + '<div style="display:flex;gap:10px;align-items:flex-start;margin-bottom:8px"><span style="width:10px;height:10px;border-radius:999px;background:#2563eb;display:inline-block;margin-top:6px"></span><div><div style="color:#111827">2026.4.20 入库：' + esc(tn) + '（' + esc(tc) + '）</div><div style="color:#6b7280;font-size:12px;margin-top:2px">存放中心库，待内部流转</div></div></div>'
+              + '<div style="display:flex;gap:10px;align-items:flex-start;margin-bottom:8px"><span style="width:10px;height:10px;border-radius:999px;background:#10b981;display:inline-block;margin-top:6px"></span><div><div style="color:#111827">2026.5.10 机械所发起内部流转</div><div style="color:#6b7280;font-size:12px;margin-top:2px">流转单：LZ-2026-0510（演示）</div></div></div>'
+              + '<div style="display:flex;gap:10px;align-items:flex-start"><span style="width:10px;height:10px;border-radius:999px;background:#0ea5e9;display:inline-block;margin-top:6px"></span><div><div style="color:#111827">2026.5.11 电控所签收完成</div><div style="color:#6b7280;font-size:12px;margin-top:2px">状态：已完成内部流转</div></div></div>';
+          }
+          return;
+        }
+        if(e.target.id==="btnDeleteBatch"){
+          alert("当前页面已移除多选列，请在操作列逐条删除。");
+          return;
+        }
+        if(e.target.id==="detailProgressInline"){
+          if (typeof window.openUnifiedProgressModal === "function" && window.openUnifiedProgressModal()) return;
+          alert("流程进度（演示）");
+          return;
+        }
+        if(e.target.id==="detailProgressTop"){
+          if (typeof window.openUnifiedProgressModal === "function" && window.openUnifiedProgressModal()) return;
+          alert("流程进度（演示）");
+          return;
+        }
+        if(e.target.id==="reqProgressInline"){
+          if (typeof window.openUnifiedProgressModal === "function" && window.openUnifiedProgressModal()) return;
+          alert("流程进度（演示）");
+          return;
+        }
+        if(e.target.id==="detailClose" || e.target.id==="detailX"){ closeDetail(); return; }
+        if(e.target.id==="detailMask" && e.target===document.getElementById("detailMask")){ closeDetail(); return; }
+        if(e.target.id==="actionCancel" || e.target.id==="actionX"){ closeActionModal(); return; }
+        if(e.target.id==="actionProgress"){
+          if (typeof window.openUnifiedProgressModal === "function" && window.openUnifiedProgressModal()) return;
+          alert("流程进度（演示）");
+          return;
+        }
+        if(e.target.id==="actionProgressTop"){
+          if (typeof window.openUnifiedProgressModal === "function" && window.openUnifiedProgressModal()) return;
+          alert("流程进度（演示）");
+          return;
+        }
+        if(e.target.id==="actionMask" && e.target===document.getElementById("actionMask")){ closeActionModal(); return; }
+        if(e.target.id==="actionOk"){
+          if(!actionCtx.mode){ closeActionModal(); return; }
+          if(actionCtx.mode==="requisition"){
+            var sel = document.getElementById("reqMaterialSel");
+            var codesRaw = sel ? String(sel.value || "").trim() : "";
+            var codes = codesRaw ? codesRaw.split(",").filter(Boolean) : [];
+            if(!codes.length){ alert("请选择物资"); return; }
+            var actionBody = document.getElementById("actionBody");
+            var detailLines = actionBody && typeof actionBody._reqSelectedDetailLines === "function"
+              ? actionBody._reqSelectedDetailLines()
+              : [];
+            if(!detailLines.length){ alert("请选择物资"); return; }
+            closeActionModal();
+            alert("已提交领用申请（演示）：已选 " + detailLines.length + " 条领用物资明细");
+            return;
+          }
+          if(actionCtx.mode==="transfer"){
+            var detailLines = getTrfCheckedDetailLines();
+            if (!detailLines.length) {
+              alert("请选择物资");
+              return;
+            }
+            var tFrom = document.getElementById("trfFromDept");
+            var tTo = document.getElementById("trfToDept");
+            var tReceiver = document.getElementById("trfReceiver");
+            if (!tTo || !String(tTo.value || "").trim()) {
+              alert("请选择转入部门");
+              return;
+            }
+            if (tFrom && String(tFrom.value || "") === String(tTo.value || "")) {
+              alert("转入部门不能与转出部门相同");
+              return;
+            }
+            if (!tReceiver || !String(tReceiver.value || "").trim()) {
+              alert("请输入接收人");
+              return;
+            }
+            var firstLine = detailLines[0] || {};
+            var flowNo = "LZ-2026-" + String(5000 + (tabs.flow.rows.length + 1)).padStart(4, "0");
+            tabs.flow.rows.unshift({
+              flowNo: flowNo,
+              bizType: "内部流转",
+              materialCode: firstLine.typeCode || firstLine.code || "",
+              materialName: firstLine.typeName || firstLine.productName || firstLine.name || "",
+              fromDept: tFrom ? tFrom.value : "机械所",
+              toDept: tTo ? tTo.value : "",
+              warehouse:
+                (document.getElementById("trfFromWarehouse") &&
+                  document.getElementById("trfFromWarehouse").value) ||
+                firstLine.warehouse ||
+                "",
+              keeper:
+                (document.getElementById("trfFromStoreKeeper") &&
+                  document.getElementById("trfFromStoreKeeper").value) ||
+                firstLine.handler ||
+                "",
+              toWarehouse:
+                (document.getElementById("trfToWarehouse") &&
+                  document.getElementById("trfToWarehouse").value) ||
+                "",
+              toKeeper:
+                (document.getElementById("trfToStoreKeeper") &&
+                  document.getElementById("trfToStoreKeeper").value) ||
+                "",
+              qty: detailLines.length,
+              detailLines: detailLines.slice(),
+              transferBy:
+                (document.getElementById("trfFromKeeper") &&
+                  document.getElementById("trfFromKeeper").value) ||
+                "宋中波",
+              receiver: tReceiver ? tReceiver.value : "",
+              flowStatus: "审批中",
+              applyTime: nowDate() + " 10:00",
+              finishTime: "—",
+              reason:
+                (document.getElementById("trfReason") &&
+                  document.getElementById("trfReason").value) ||
+                "明细数量 " + detailLines.length + " 条"
+            });
+            closeActionModal();
+            alert(
+              "已提交内部流转（演示）：已选 " +
+                detailLines.length +
+                " 条明细；" +
+                (tFrom ? tFrom.value : "机械所") +
+                " → " +
+                (tTo ? tTo.value : "电控所")
+            );
+            renderAll();
+            return;
+          }
+          if(!actionCtx.row){ closeActionModal(); return; }
+          if(actionCtx.mode==="edit"){
+            if (actionCtx.row.reqNo) {
+              actionCtx.row.name = document.getElementById("acName").value || actionCtx.row.name;
+              actionCtx.row.reqDate = document.getElementById("acReqDate").value || actionCtx.row.reqDate;
+              actionCtx.row.applicant = document.getElementById("acApplicant").value || actionCtx.row.applicant;
+              actionCtx.row.applyDept = document.getElementById("acApplyDept").value || actionCtx.row.applyDept;
+              actionCtx.row.status = document.getElementById("acStatus").value || actionCtx.row.status;
+              actionCtx.row.remark = document.getElementById("acRemark").value || actionCtx.row.remark;
+            } else {
+              function val(id){ var el=document.getElementById(id); return el ? el.value : ""; }
+              var acNameSel = document.getElementById("acNameSel");
+              actionCtx.row.name = (acNameSel && acNameSel.value) ? acNameSel.value : actionCtx.row.name;
+              actionCtx.row.spec = document.getElementById("acSpec").value || actionCtx.row.spec;
+              actionCtx.row.dept = document.getElementById("acDept").value || actionCtx.row.dept;
+              actionCtx.row.keeper = document.getElementById("acKeeper").value || actionCtx.row.keeper;
+              actionCtx.row.loc = document.getElementById("acLoc").value || actionCtx.row.loc;
+              actionCtx.row.location = document.getElementById("acLoc").value || actionCtx.row.location;
+              actionCtx.row.contractNo = val("acContractNo") || actionCtx.row.contractNo;
+              actionCtx.row.purchaseDept = val("acPurchaseDept") || actionCtx.row.purchaseDept;
+              actionCtx.row.category = val("acCategory") || actionCtx.row.category;
+              actionCtx.row.unitPriceExcl = val("acUnitPriceExcl") || actionCtx.row.unitPriceExcl;
+              actionCtx.row.stockQty = val("acStockQty") || actionCtx.row.stockQty;
+              actionCtx.row.fixedCode = val("acFixedCode") || actionCtx.row.fixedCode;
+              actionCtx.row.supplier = val("acSupplier") || actionCtx.row.supplier;
+              actionCtx.row.remark = document.getElementById("acRemark").value || actionCtx.row.remark;
+            }
+            closeActionModal();
+            renderAll();
+            return;
+          }
+          if(actionCtx.mode==="delete"){
+            var listDel = tabs[state.current].rows;
+            var kDel = rowPrimaryKey(actionCtx.row, state.current);
+            tabs[state.current].rows = listDel.filter(function(x){ return rowPrimaryKey(x, state.current) !== String(kDel); });
+            closeActionModal();
+            renderAll();
+            return;
+          }
+          closeActionModal();
+          return;
+        }
+
+        var th = e.target.closest("[data-sort]");
+        if(th){
+          var key = th.getAttribute("data-sort"), st = state.sort[state.current];
+          if(st.key===key){ st.dir = st.dir==="asc"?"desc":"asc"; }
+          else { st.key = key; st.dir = "asc"; }
+          renderAll();
+          return;
+        }
+        var pageBtn = e.target.closest("[data-page]");
+        if(pageBtn){
+          state.page[state.current] = Number(pageBtn.getAttribute("data-page")) || 1;
+          renderAll();
+          return;
+        }
+        var op = e.target.getAttribute("data-op");
+        if(op){
+          var row = findRowByKey(e.target.getAttribute("data-key") || "");
+          if(!row) return;
+          if(op==="detail" || op==="name-detail"){ openDetail(row); return; }
+          if(op==="edit"){ openActionModal("edit", row); return; }
+          if(op==="delete"){
+            openActionModal("delete", row);
+            return;
+          }
+          window.location.href = jump(op,row);
+        }
+      });
+
+      bindReqMatPickerEventsOnce();
+      (function bindLedgerDetailRestoreOnce() {
+        var detailBody = document.getElementById("detailBody");
+        if (!detailBody || detailBody.__ledgerDetailRestoreBound) return;
+        detailBody.__ledgerDetailRestoreBound = true;
+        var pending = false;
+        new MutationObserver(function () {
+          if (pending) return;
+          pending = true;
+          setTimeout(function () {
+            pending = false;
+            restoreLedgerDetailOperationButtons();
+          }, 0);
+        }).observe(detailBody, { childList: true, subtree: true });
+      })();
+      renderAll();
+})();
+  </script>
+</body>
+</html>

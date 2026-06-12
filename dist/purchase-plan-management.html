@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>采购信息台帐 - 新能源物资供应链管理系统</title>
+  <link rel="stylesheet" href="css/vendor/fa-all.min.css" />
+  <link rel="stylesheet" href="css/subpage-base.css" />
+  <link rel="stylesheet" href="css/carrier-management.css" />
+  <link rel="stylesheet" href="css/source-navbar-header.css" />
+  <style>
+    .ppm-role-bar {
+      display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 10px;
+      font-size: 13px; color: #516a87;
+    }
+    .ppm-role-bar select { height: 32px; border-radius: 6px; border: 1px solid #d9d9d9; padding: 0 8px; min-width: 260px; }
+    .ppm-toolbar-grid {
+      display: flex; flex-wrap: wrap; gap: 10px; align-items: flex-end; margin-bottom: 12px;
+      padding: 12px; background: #fff; border: 1px solid #edf2f8; border-radius: 8px;
+    }
+    .ppm-toolbar-grid label { display: block; font-size: 12px; color: #62788f; margin-bottom: 4px; }
+    .ppm-hint {
+      display: inline-flex; align-items: center; justify-content: center; width: 16px; height: 16px;
+      margin-left: 4px; border-radius: 50%; border: 1px solid #91caff; color: #1677ff; font-size: 11px;
+      cursor: help; position: relative; vertical-align: middle;
+      overflow: visible;
+    }
+    /* 表头两列考核点「?」：提示在图标下方展开，避免压住列标题或被表头区域裁切 */
+    .ppm-hint-tip {
+      display: none; position: absolute; left: 0; top: 100%; bottom: auto; margin-top: 14px; margin-bottom: 0;
+      z-index: 300;
+      width: 280px; padding: 8px 10px; background: #1f2d3d; color: #fff; font-size: 12px; line-height: 1.5;
+      border-radius: 6px; box-shadow: 0 8px 24px rgba(0,0,0,.2); font-weight: 400;
+    }
+    .carrier-table thead th { overflow: visible; }
+    /* 表格拉宽支持横向滚动 */
+    .carrier-table-wrap { overflow-x: auto !important; max-width: 100%; }
+    .carrier-table { min-width: 1800px !important; width: max-content !important; table-layout: auto !important; }
+    .carrier-table th, .carrier-table td { white-space: nowrap !important; }
+    .ppm-hint:hover .ppm-hint-tip, .ppm-hint:focus .ppm-hint-tip { display: block; }
+    .ppm-ops { display: inline-flex; flex-wrap: wrap; gap: 8px; align-items: center; max-width: none; justify-content: flex-start; }
+    .ppm-ops .carrier-btn-add{
+      min-height:auto;padding:0;border:none;background:transparent;box-shadow:none;
+      color:#1677ff;font-size:14px;font-weight:600;line-height:1.2;text-decoration:none;
+    }
+    .ppm-ops .carrier-btn-add:hover{ color:#4096ff; text-decoration:underline; }
+    /* 防止操作列按钮（尤其删除）被挤压截断 */
+    .carrier-table th:last-child,
+    .carrier-table td:last-child { min-width: 280px !important; }
+    .carrier-table td:last-child { white-space: normal !important; }
+    .cell-num { text-align: right; font-variant-numeric: tabular-nums; }
+    .ppm-empty { text-align: center; padding: 24px !important; color: #8c8c8c; }
+    .ppm-note { font-size: 12px; color: #62788f; margin-bottom: 10px; line-height: 1.6; }
+    .ppm-form-grid { display: grid; gap: 10px; margin-bottom: 10px; }
+    .ppm-form-grid-2 { grid-template-columns: 1fr 1fr; }
+    @media (max-width: 900px) { .ppm-form-grid-2 { grid-template-columns: 1fr; } }
+    .ppm-form-full { grid-column: 1 / -1; }
+    .ppm-form label { display:block; font-size:13px; color:#516a87; margin-bottom:4px; }
+    .ppm-form label .ppm-label-fix { color:#516a87; font-size:13px; }
+    .ppm-form-seg { margin: 14px 0 8px; font-size: 14px; color: #1f3551; border-left: 3px solid #1677ff; padding-left: 8px; }
+    .ppm-req { color: #cf1322; }
+    .ppm-modal-mask {
+      position: fixed; inset: 0; background: rgba(0,0,0,.45); z-index: 2400; display: none;
+      align-items: center; justify-content: center; padding: 16px; box-sizing: border-box;
+    }
+    .ppm-modal-mask.show { display: flex; }
+    .ppm-dialog {
+      background: #fff; border-radius: 10px; max-height: 92vh; overflow: hidden; display: flex;
+      flex-direction: column; box-shadow: 0 16px 48px rgba(0,0,0,.2); width: 100%;
+    }
+    .ppm-dialog--w800 { max-width: 800px; }
+    .ppm-dialog--w700 { max-width: 700px; }
+    .ppm-dialog--w600 { max-width: 600px; }
+    .ppm-dialog-hd { padding: 12px 16px; border-bottom: 1px solid #edf2f8; font-weight: 600; display: flex; justify-content: space-between; align-items: center; color:#1f3551; }
+    .ppm-dialog-bd { padding: 14px 16px; overflow-y: auto; font-size: 13px; }
+    #ppmModalDelete .ppm-dialog-bd { color:#1f2d3d !important; min-height:56px; display:flex; align-items:center; }
+    #ppmDeleteText { margin:0 !important; line-height:1.8 !important; color:#1f2d3d !important; font-size:14px !important; }
+    .ppm-dialog-ft { padding: 10px 16px; border-top: 1px solid #edf2f8; display: flex; justify-content: flex-end; gap: 8px; flex-wrap: wrap; }
+    .ppm-steps { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; align-items: center; }
+    .ppm-step {
+      padding: 6px 10px; border-radius: 6px; background: #fafafa; border: 1px solid #d9d9d9; font-size: 12px; color: #8c8c8c;
+    }
+    .ppm-step.done { background: #f6ffed; border-color: #b7eb8f; color: #389e0d; }
+    .ppm-step.active { background: #e6f4ff; border-color: #91caff; color: #1677ff; }
+    .ppm-step.is-reject { background: #fff2f0; border-color: #ffccc7; color: #cf1322; }
+    .ppm-toolbar-settings {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-left: 8px;
+      vertical-align: middle;
+    }
+    .ppm-toolbar-settings .ppm-settings-btn {
+      min-width: 36px;
+      padding: 4px 10px;
+    }
+    .ppm-toolbar-settings .ppm-hint-tip { width: 260px; }
+    .ppm-field-cfg-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+    .ppm-field-cfg-head label { margin: 0; font-size: 13px; color: #516a87; }
+    .ppm-field-cfg-list {
+      max-height: 320px;
+      overflow-y: auto;
+      padding: 2px 0;
+    }
+    .ppm-field-cfg-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+    .ppm-field-cfg-row .ppm-field-cfg-input {
+      flex: 1;
+      min-width: 0;
+    }
+    .ppm-field-cfg-add {
+      flex-shrink: 0;
+      min-width: 36px;
+      padding: 4px 10px !important;
+      background: #fff !important;
+      color: #1677ff !important;
+      border: 1px solid #91caff !important;
+    }
+    .ppm-field-cfg-del {
+      flex-shrink: 0;
+      min-width: 36px;
+      padding: 4px 10px !important;
+      background: #fff !important;
+      color: #cf1322 !important;
+      border: 1px solid #ffccc7 !important;
+      font-size: 16px;
+      line-height: 1;
+      font-weight: 600;
+    }
+    .ppm-field-cfg-reserve {
+      min-height: 100px;
+      margin-top: 14px;
+    }
+  </style>
+</head>
+<body class="page-source-navbar page-subpage page-logistics">
+  <div class="page-bg" aria-hidden="true"></div>
+  <div class="app">
+    <header class="header">
+      <div class="header-left">
+        <button type="button" class="header-hamburger" aria-label="菜单"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+        <a class="header-logo" href="index-portal-screen-alt.html"><img src="assets/logo-chenergy.png" width="220" height="40" alt="" /></a>
+        <div class="header-source-brand"><p>新能源物资供应链管理系统</p></div>
+      </div>
+      <div class="header-right">
+        <span class="clock" id="clock"></span>
+        <div class="user-avatar" title="用户">用</div>
+      </div>
+    </header>
+    <div class="layout">
+      <aside class="sidebar" aria-label="主导航">
+        <div class="nav-item nav-item--module-active" title="采购管理"><span class="nav-label">采购管理</span></div>
+      </aside>
+      <main class="main-scroll">
+        <nav class="subpage-breadcrumb" aria-label="面包屑">
+          <a href="index-portal-screen-alt.html">首页</a><span class="sep">/</span><span>采购管理</span><span class="sep">/</span><span>采购信息台帐</span>
+        </nav>
+        <div class="carrier-main-inner">
+          <h1 class="carrier-page-title">采购信息台帐</h1>
+          <div class="ppm-toolbar-grid">
+            <div>
+              <label for="ppmFName">项目名称</label>
+              <input id="ppmFName" class="carrier-search" placeholder="模糊搜索" />
+            </div>
+            <div>
+              <label for="ppmFDept">业务部门</label>
+              <select id="ppmFDept" class="carrier-select"></select>
+            </div>
+            <div>
+              <label for="ppmFMethod">采购方式</label>
+              <select id="ppmFMethod" class="carrier-select">
+                <option value="">全部</option>
+                <option>招标</option>
+                <option>询价</option>
+                <option>单一来源</option>
+              </select>
+            </div>
+            <div>
+              <label for="ppmFFlow">采购流程进度</label>
+              <select id="ppmFFlow" class="carrier-select" aria-label="采购流程进度筛选"></select>
+            </div>
+            <div style="display:flex;gap:8px;align-items:flex-end;padding-top:18px;flex-wrap:wrap">
+              <button type="button" class="carrier-btn-add" id="ppmBtnSearch">搜索</button>
+              <button type="button" class="carrier-btn-add" id="ppmBtnReset" style="background:#fff;color:#1677ff;border:1px solid #91caff">重置</button>
+            </div>
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin:-2px 0 10px">
+            <button type="button" class="carrier-btn-add" id="ppmBtnTopAdd"><i class="fa-solid fa-plus" aria-hidden="true"></i> 新增</button>
+            <button type="button" class="carrier-btn-add" id="ppmBtnImport" style="background:#fff;color:#389e0d;border:1px solid #b7eb8f"><i class="fa-solid fa-file-import" aria-hidden="true"></i> 导入</button>
+            <button type="button" class="carrier-btn-add" id="ppmBtnTpl" style="background:#fff;color:#1677ff;border:1px solid #91caff"><i class="fa-solid fa-download" aria-hidden="true"></i> 下载模板</button>
+            <button type="button" class="carrier-btn-add" id="ppmBtnExport" style="background:#fff;color:#1677ff;border:1px solid #91caff"><i class="fa-solid fa-file-export" aria-hidden="true"></i> 导出</button>
+            <button type="button" class="carrier-btn-add" id="ppmBtnDeleteBatch" style="background:#fff1f0;color:#cf1322;border:1px solid #ffccc7">删除</button>
+            <span class="ppm-toolbar-settings" aria-label="字段配置入口">
+              <button type="button" class="carrier-btn-add ppm-settings-btn" id="ppmBtnFieldSettings" style="background:#fff;color:#595959;border:1px solid #d9d9d9" title="字段配置">
+                <i class="fa-solid fa-screwdriver-wrench" aria-hidden="true"></i>
+              </button>
+              <span class="ppm-hint" tabindex="0" aria-label="字段配置说明">?
+                <span class="ppm-hint-tip">点击扳手打开「字段配置」：用于维护本页筛选、填报等用到的候选项（每行一条）。</span>
+              </span>
+            </span>
+          </div>
+          <input type="file" id="ppmFileImport" accept=".xlsx,.xls,.csv" hidden aria-hidden="true" />
+
+          <div class="carrier-table-wrap">
+            <table class="carrier-table" style="min-width:1680px">
+              <thead>
+                <tr>
+                  <th style="width:48px"><input type="checkbox" id="ppmChkAll" /></th>
+                  <th style="width:48px">序号</th>
+                  <th>项目名称</th>
+                  <th>采购方式</th>
+                  <th>采购标的类别</th>
+                  <th>业务部门</th>
+                  <th>业务经办人</th>
+                  <th>是否框架</th>
+                  <th>项目类别</th>
+                  <th>预算（万元）</th>
+                  <th>是否限价</th>
+                  <th>是否科技项目</th>
+                  <th>科技项目名称</th>
+                  <th>项目/WBS编码</th>
+                  <th>是否西安公司</th>
+                  <th>龙源OA审批表时间</th>
+                  <th>龙源OA审查纪要时间</th>
+                  <th>采委会计划通过期数</th>
+                  <th>SRM提报时间</th>
+                  <th>采购流程进度</th>
+                  <th>挂网时间</th>
+                  <th>挂网网址</th>
+                  <th>采购依据</th>
+                  <th>采购标包号</th>
+                  <th>招标/采购编码</th>
+                  <th>开标时间</th>
+                  <th>定标时间</th>
+                  <th>招标公示时间</th>
+                  <th>中标/成交通知书下发时间</th>
+                  <th>中标/成交金额</th>
+                  <th>中标/成交供应商</th>
+                  <th>是否关联年度计划</th>
+                  <th>合同用印时间</th>
+                  <th>考核点1：采购时长 <span class="ppm-hint" tabindex="0" aria-label="说明">?<span class="ppm-hint-tip">等于：SRM提报时间 - 采购合同签订时间</span></span></th>
+                  <th>考核点2：合同签订时长 <span class="ppm-hint" tabindex="0" aria-label="说明">?<span class="ppm-hint-tip">等于：合同用印时间 - 中标/成交通知书下发时间</span></span></th>
+                  <th>考核点备注</th>
+                  <th>备注</th>
+                  <th style="min-width:280px">操作</th>
+                </tr>
+              </thead>
+              <tbody id="ppmTableBody"></tbody>
+            </table>
+          </div>
+          <div style="margin-top:10px;display:none">
+            <button type="button" class="carrier-btn-add" id="ppmBtnAddRow"><i class="fa-solid fa-plus" aria-hidden="true"></i> 添加行</button>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- 新建/编辑 -->
+  <div id="ppmModalEdit" class="ppm-modal-mask" role="dialog" aria-modal="true">
+    <div class="ppm-dialog ppm-dialog--w800">
+      <div class="ppm-dialog-hd"><span id="ppmModalEditTitle">新建采购计划</span><button type="button" class="carrier-btn-add" style="padding:4px 10px" data-close>&times;</button></div>
+      <div class="ppm-dialog-bd" id="ppmModalEditBody"></div>
+      <div class="ppm-dialog-ft" id="ppmModalEditFt">
+        <button type="button" class="carrier-btn-add" data-form-act="submit">保存</button>
+        <button type="button" class="carrier-btn-add" data-close style="background:#fff;color:#595959;border:1px solid #d9d9d9">取消</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 提交审批确认 -->
+  <div id="ppmModalSubmit" class="ppm-modal-mask" role="dialog">
+    <div class="ppm-dialog" style="max-width:440px">
+      <div class="ppm-dialog-hd">确认提交 <button type="button" class="carrier-btn-add" style="padding:4px 10px" data-close>&times;</button></div>
+      <div class="ppm-dialog-bd">
+        <p style="margin:0;line-height:1.6">确认提交审批吗？提交后将无法编辑，请确认信息填写完整。</p>
+      </div>
+      <div class="ppm-dialog-ft">
+        <button type="button" class="carrier-btn-add" id="ppmModalSubmitOk">确认提交</button>
+        <button type="button" class="carrier-btn-add" data-close style="background:#fff;color:#595959;border:1px solid #d9d9d9">取消</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 撤回 -->
+  <div id="ppmModalWithdraw" class="ppm-modal-mask" role="dialog">
+    <div class="ppm-dialog" style="max-width:440px">
+      <div class="ppm-dialog-hd">撤回确认 <button type="button" class="carrier-btn-add" style="padding:4px 10px" data-close>&times;</button></div>
+      <div class="ppm-dialog-bd">
+        <p style="margin:0;line-height:1.6">确认撤回该采购计划申请吗？撤回后状态将变为草稿，可重新编辑提交。</p>
+      </div>
+      <div class="ppm-dialog-ft">
+        <button type="button" class="carrier-btn-add" id="ppmModalWithdrawOk">确认撤回</button>
+        <button type="button" class="carrier-btn-add" data-close style="background:#fff;color:#595959;border:1px solid #d9d9d9">取消</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 删除 -->
+  <div id="ppmModalDelete" class="ppm-modal-mask" role="dialog">
+    <div class="ppm-dialog" style="max-width:400px">
+      <div class="ppm-dialog-hd"><span id="ppmDeleteTitle">删除确认</span><button type="button" class="carrier-btn-add" style="padding:4px 10px" data-close>&times;</button></div>
+      <div class="ppm-dialog-bd">
+        <p id="ppmDeleteText" style="margin:0;line-height:1.6">是否确认删除该条数据？</p>
+      </div>
+      <div class="ppm-dialog-ft">
+        <button type="button" class="carrier-btn-add" id="ppmModalDeleteOk" style="background:#fff1f0;color:#cf1322;border:1px solid #ffccc7">确认删除</button>
+        <button type="button" class="carrier-btn-add" data-close style="background:#fff;color:#595959;border:1px solid #d9d9d9">取消</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 字段配置（采购流程进度候选项等） -->
+  <div id="ppmModalFieldCfg" class="ppm-modal-mask" role="dialog" aria-modal="true">
+    <div class="ppm-dialog ppm-dialog--w600">
+      <div class="ppm-dialog-hd">
+        <span data-ppm-title="1">字段配置</span>
+        <button type="button" class="carrier-btn-add" style="padding:4px 10px" data-close>&times;</button>
+      </div>
+      <div class="ppm-dialog-bd">
+        <div class="ppm-field-cfg-head">
+          <label>采购流程进度 · 候选项</label>
+          <button type="button" class="carrier-btn-add ppm-field-cfg-add" id="ppmFieldCfgAdd" title="新增一项">
+            <i class="fa-solid fa-plus" aria-hidden="true"></i>
+          </button>
+        </div>
+        <div id="ppmFieldCfgList" class="ppm-field-cfg-list"></div>
+        <div class="ppm-field-cfg-reserve" aria-hidden="true"></div>
+      </div>
+      <div class="ppm-dialog-ft">
+        <button type="button" class="carrier-btn-add" id="ppmFieldCfgSave">保存</button>
+        <button type="button" class="carrier-btn-add" data-close style="background:#fff;color:#595959;border:1px solid #d9d9d9">取消</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 审批进度 -->
+  <div id="ppmModalProgress" class="ppm-modal-mask" role="dialog">
+    <div class="ppm-dialog ppm-dialog--w700">
+      <div class="ppm-dialog-hd">审批进度 <button type="button" class="carrier-btn-add" style="padding:4px 10px" data-close>&times;</button></div>
+      <div class="ppm-dialog-bd">
+        <p style="font-size:12px;color:#62788f;margin-bottom:8px">流程：部门专责提报 → 部门主管审核 → 主管领导审核 → 公司采购主管审核 → 公司采购专责汇总</p>
+        <div class="ppm-steps" id="ppmProgressSteps" aria-label="流程步骤"></div>
+        <div class="carrier-table-wrap">
+          <table class="carrier-table">
+            <thead>
+              <tr><th>节点名称</th><th>审批人</th><th>审批时间</th><th>审批结果</th><th>审批意见</th></tr>
+            </thead>
+            <tbody id="ppmProgressRecords"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="ppm-dialog-ft"><button type="button" class="carrier-btn-add" data-close>取消</button></div>
+    </div>
+  </div>
+
+  <!-- 审批 -->
+  <div id="ppmModalApprove" class="ppm-modal-mask" role="dialog">
+    <div class="ppm-dialog ppm-dialog--w600">
+      <div class="ppm-dialog-hd">采购计划审批 <button type="button" class="carrier-btn-add" style="padding:4px 10px" data-close>&times;</button></div>
+      <div class="ppm-dialog-bd">
+        <p id="ppmApprInfo" style="font-size:13px;margin-bottom:10px"></p>
+        <p style="margin:0 0 6px"><button type="button" class="carrier-btn-add" id="ppmApprToggle" style="padding:4px 10px;font-size:12px;background:#fafafa;color:#495057;border:1px solid #d9d9d9">展开/折叠 表单预览</button></p>
+        <div id="ppmApprPreview" style="margin-bottom:8px"></div>
+        <div id="ppmApprDetail" style="display:none;overflow:auto;max-height:240px;margin-bottom:10px"></div>
+        <label for="ppmApprOpinion">审批意见（必填）</label>
+        <textarea id="ppmApprOpinion" rows="3" style="width:100%;box-sizing:border-box;border:1px solid #d9d9d9;border-radius:6px;padding:8px;margin-top:4px"></textarea>
+        <p style="margin-top:10px;font-size:12px;color:#62788f">附件上传：<input type="file" /></p>
+        <p style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">
+          <button type="button" class="carrier-btn-add" style="background:#f6ffed;color:#389e0d;border:1px solid #b7eb8f" id="ppmApprPass">通过</button>
+          <button type="button" class="carrier-btn-add" style="background:#fff1f0;color:#cf1322;border:1px solid #ffccc7" id="ppmApprReject">驳回</button>
+        </p>
+      </div>
+      <div class="ppm-dialog-ft">
+        <button type="button" class="carrier-btn-add" id="ppmApprOk">提交审批结果</button>
+        <button type="button" class="carrier-btn-add" data-close style="background:#fff;color:#595959;border:1px solid #d9d9d9">取消</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/sidebar-actions.js"></script>
+  <script src="js/subpage-feature-title.js"></script>
+  <script src="js/site-footer.js"></script>
+  <script src="js/subpage-clock.js"></script>
+  <script src="js/purchase-plan-management-prototype.js"></script>
+</body>
+</html>

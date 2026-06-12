@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>采购汇总表</title>
+  <link rel="stylesheet" href="css/subpage-base.css" />
+  <link rel="stylesheet" href="css/source-navbar-header.css" />
+  <style>
+    .subpage-panel{padding:10px 12px 12px;background:#f5f6f8}
+    .ps-toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:8px}
+    .ps-left{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+    .ps-left select,.ps-left input{height:30px;border:1px solid #d9d9d9;border-radius:3px;padding:0 8px;font-size:12px;background:#fff}
+    .ps-btn{height:30px;border:1px solid #d9d9d9;border-radius:4px;background:#fff;padding:0 12px;font-size:12px;cursor:pointer}
+    .ps-btn.pri{background:#1890ff;border-color:#1890ff;color:#fff}
+    .subpage-table-wrap{border:1px solid #dde3ea;border-radius:4px;overflow:auto;background:#fff}
+    .subpage-table{min-width:1950px;font-size:12px;background:#fff}
+    .subpage-table thead tr{background:#f2f5f9}
+    .subpage-table th,.subpage-table td{border-bottom:1px solid #edf1f6;padding:8px 8px;text-align:center;white-space:nowrap}
+    .subpage-table th{color:#5a6677;font-weight:600}
+    .subpage-table a{color:#1677ff;text-decoration:none;font-weight:500}
+    .subpage-table a:hover{text-decoration:underline}
+    .ps-acc-tag{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-width:74px;
+      height:30px;
+      padding:0 12px;
+      border-radius:999px;
+      border:1px solid #d9d9d9;
+      font-size:12px;
+      font-weight:600;
+      box-sizing:border-box;
+      background:#fff;
+    }
+    .ps-acc-pass{ color:#389e0d; border-color:#b7eb8f; background:#f6ffed; }
+    .ps-acc-pending{ color:#d48806; border-color:#f3d7a1; background:#fff8e6; }
+    .ps-acc-partial{ color:#1677ff; border-color:#91caff; background:#e6f4ff; }
+    .ps-acc-review{ color:#722ed1; border-color:#d3adf7; background:#f9f0ff; }
+    .table-foot{margin-top:8px;font-size:12px;color:#6c7786}
+    .ps-analytics{margin-top:12px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+    .ps-chart-card{background:#fff;border:1px solid #dde3ea;border-radius:6px;padding:10px 12px}
+    .ps-chart-title{font-size:13px;font-weight:600;color:#334155;margin:0 0 10px}
+    .ps-kpi-row{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+    .ps-kpi{background:#f8fafc;border:1px solid #e5edf7;border-radius:6px;padding:10px}
+    .ps-kpi-label{font-size:12px;color:#64748b}
+    .ps-kpi-val{margin-top:6px;font-size:20px;line-height:1.2;color:#1677ff;font-weight:700}
+    .ps-bars{display:flex;align-items:flex-end;gap:16px;height:180px;padding:10px 6px 0}
+    .ps-bar-col{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;gap:6px}
+    .ps-bar-stack{width:42px;height:140px;border:1px solid #e6edf5;border-radius:6px;background:#f8fafc;display:flex;flex-direction:column-reverse;overflow:hidden}
+    .ps-bar-done{background:#52c41a}
+    .ps-bar-left{background:#faad14}
+    .ps-bar-lab{font-size:11px;color:#64748b;text-align:center;line-height:1.3}
+    .ps-legend{display:flex;gap:12px;flex-wrap:wrap;font-size:12px;color:#64748b;margin-top:8px}
+    .ps-dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:4px}
+    .ps-pie-wrap{display:flex;align-items:center;gap:14px}
+    .ps-pie{width:140px;height:140px;border-radius:50%;border:1px solid #e6edf5;flex-shrink:0}
+    .ps-pie-list{font-size:12px;color:#475569;line-height:1.9}
+    .ps-top-list{display:grid;grid-template-columns:1fr;gap:8px}
+    .ps-top-item{display:grid;grid-template-columns:90px 1fr 44px;align-items:center;gap:8px;font-size:12px;color:#475569}
+    .ps-top-track{height:8px;border-radius:999px;background:#edf2f7;overflow:hidden}
+    .ps-top-bar{height:100%;background:#1677ff}
+    @media (max-width: 1200px){ .ps-analytics{grid-template-columns:1fr} .ps-kpi-row{grid-template-columns:repeat(2,minmax(0,1fr));} }
+  </style>
+</head>
+<body class="page-source-navbar page-subpage">
+  <div class="app">
+    <header class="header"><div class="header-left"><button class="header-hamburger"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button><a class="header-logo" href="#"><img src="assets/logo-chenergy.png" width="220" height="40" alt="" /></a><div class="header-source-brand"><p>新能源供应链管理系统</p></div></div><div class="header-right"><span class="clock" id="clock"></span><div class="user-avatar">用</div></div></header>
+    <div class="layout">
+      <aside class="sidebar"><div class="nav-item"><span class="nav-label">采购管理</span></div></aside>
+      <main class="main-scroll">
+        <div class="subpage-panel">
+          <div class="ps-toolbar">
+            <div class="ps-left">
+              <select id="year"><option>2026</option><option>2025</option><option>2024</option></select>
+              <select id="supplier"><option>全部供应商</option><option>联合动力</option><option>东风</option></select>
+              <select id="cat"><option>全部类别</option><option>风机整机</option><option>齿轮箱</option><option>变流器</option></select>
+              <button class="ps-btn pri" id="btnQuery">筛选</button>
+              <button class="ps-btn" id="btnReset">重置</button>
+              <button class="ps-btn" id="btnExport">导出Excel</button>
+            </div>
+            </div>
+          <div class="subpage-table-wrap">
+            <table class="subpage-table">
+              <thead><tr><th>计划编号</th><th>采购部门</th><th>剩余执行数量</th><th>已执行数量</th><th>订单编号</th><th>提报单位</th><th>场站名称</th><th>合同编号</th><th>子合同编号</th><th>供应商</th><th>入库状态</th><th>货物编号</th><th>物资名称</th><th>存放状态</th><th>验收编号</th><th>验收状态</th><th>操作</th></tr></thead>
+              <tbody id="reportBody"></tbody>
+              </table>
+            </div>
+          <div class="table-foot">当前默认展示 10 行数据（可继续扩展分页）。</div>
+          <section class="ps-analytics">
+            <article class="ps-chart-card" style="grid-column:1 / -1">
+              <h3 class="ps-chart-title">核心统计</h3>
+              <div class="ps-kpi-row" id="kpiRow"></div>
+            </article>
+            <article class="ps-chart-card">
+              <h3 class="ps-chart-title">部门执行进度（已执行 vs 剩余）</h3>
+              <div class="ps-bars" id="deptBars"></div>
+              <div class="ps-legend">
+                <span><i class="ps-dot" style="background:#52c41a"></i>已执行</span>
+                <span><i class="ps-dot" style="background:#faad14"></i>剩余执行</span>
+              </div>
+            </article>
+            <article class="ps-chart-card">
+              <h3 class="ps-chart-title">入库状态分布</h3>
+              <div class="ps-pie-wrap">
+                <div class="ps-pie" id="inboundPie"></div>
+                <div class="ps-pie-list" id="inboundLegend"></div>
+              </div>
+            </article>
+            <article class="ps-chart-card">
+              <h3 class="ps-chart-title">验收状态分布</h3>
+              <div class="ps-pie-wrap">
+                <div class="ps-pie" id="acceptPie"></div>
+                <div class="ps-pie-list" id="acceptLegend"></div>
+              </div>
+            </article>
+            <article class="ps-chart-card">
+              <h3 class="ps-chart-title">供应商供货次数 TOP</h3>
+              <div class="ps-top-list" id="supplierTop"></div>
+            </article>
+          </section>
+        </div>
+      </main>
+    </div>
+  </div>
+  <script src="js/sidebar-actions.js"></script><script src="js/subpage-feature-title.js"></script><script src="js/site-footer.js"></script>
+<script src="js/subpage-clock.js"></script>
+  <script>
+    const reportRows = [
+      ["CGJH-2026-001","经营发展中心",70,50,"ORD2026001","河南能源","新安风电场","HT-2026-301","SUB-2026-001","联合动力","已入库","G-2026-001","齿轮箱总成","在库","QA-2026-201","通过"],
+      ["CGJH-2026-002","经营发展中心",40,20,"ORD2026002","华中电力","嵩县风电场","HT-2026-302","SUB-2026-002","东方电气","部分入库","G-2026-002","发电机组","在途","QA-2026-202","待验收"],
+      ["CGJH-2026-003","设备管理部",88,36,"ORD2026003","山西能源","黎城风电场","HT-2026-303","SUB-2026-003","金风科技","已入库","G-2026-003","塔筒组件","在库","QA-2026-203","通过"],
+      ["CGJH-2026-004","设备管理部",26,14,"ORD2026004","内蒙绿能","苏尼特风场","HT-2026-304","SUB-2026-004","明阳智能","待入库","G-2026-004","主轴总成","待收货","QA-2026-204","待验收"],
+      ["CGJH-2026-005","生产运维部",53,47,"ORD2026005","豫北新能源","林州风电场","HT-2026-305","SUB-2026-005","联合动力","已入库","G-2026-005","液压站","在库","QA-2026-205","通过"],
+      ["CGJH-2026-006","生产运维部",65,30,"ORD2026006","鲁西电力","菏泽风电场","HT-2026-306","SUB-2026-006","远景能源","部分入库","G-2026-006","变流柜","在途","QA-2026-206","部分通过"],
+      ["CGJH-2026-007","经营发展中心",35,35,"ORD2026007","晋东能源","长治风电场","HT-2026-307","SUB-2026-007","运达股份","已入库","G-2026-007","叶片组件","在库","QA-2026-207","通过"],
+      ["CGJH-2026-008","设备管理部",90,10,"ORD2026008","陇东电力","平凉风电场","HT-2026-308","SUB-2026-008","三一重能","待入库","G-2026-008","偏航系统","待收货","QA-2026-208","待验收"],
+      ["CGJH-2026-009","生产运维部",42,18,"ORD2026009","河北绿电","张北风电场","HT-2026-309","SUB-2026-009","海装风电","部分入库","G-2026-009","变桨系统","在途","QA-2026-209","待复验"],
+      ["CGJH-2026-010","经营发展中心",30,28,"ORD2026010","西北电建","酒泉风电场","HT-2026-310","SUB-2026-010","上海电气","已入库","G-2026-010","法兰连接件","在库","QA-2026-210","通过"]
+    ];
+
+    function renderRows(rows){
+      const tbody = document.getElementById("reportBody");
+      function renderAcceptTag(status){
+        var txt = String(status || "");
+        var cls = "ps-acc-tag ps-acc-pending";
+        if (txt === "通过") cls = "ps-acc-tag ps-acc-pass";
+        else if (txt === "部分通过") cls = "ps-acc-tag ps-acc-partial";
+        else if (txt === "待复验") cls = "ps-acc-tag ps-acc-review";
+        return '<span class="' + cls + '">' + txt + "</span>";
+      }
+      tbody.innerHTML = rows.map(function(r){
+        return "<tr>"
+          + "<td>"+r[0]+"</td>"
+          + "<td>"+r[1]+"</td>"
+          + "<td>"+r[2]+"</td>"
+          + "<td>"+r[3]+"</td>"
+          + "<td><a href=\"material-procurement-hub.html?tab=m3\">"+r[4]+"</a></td>"
+          + "<td>"+r[5]+"</td>"
+          + "<td>"+r[6]+"</td>"
+          + "<td><a href=\"purchase-ledger.html\">"+r[7]+"</a></td>"
+          + "<td>"+r[8]+"</td>"
+          + "<td>"+r[9]+"</td>"
+          + "<td>"+r[10]+"</td>"
+          + "<td><a href=\"purchase-ledger.html?tab=ledger\">"+r[11]+"</a></td>"
+          + "<td>"+r[12]+"</td>"
+          + "<td>"+r[13]+"</td>"
+          + "<td><a href=\"proc-quality-accept.html\">"+r[14]+"</a></td>"
+          + "<td>"+renderAcceptTag(r[15])+"</td>"
+          + "<td><a href=\"proc-shipment.html\">查看</a></td>"
+          + "</tr>";
+      }).join("");
+    }
+
+    function calcStats(rows){
+      var total = rows.length;
+      var doneSum = 0;
+      var leftSum = 0;
+      var inboundMap = {};
+      var acceptMap = {};
+      var supplierMap = {};
+      var deptMap = {};
+
+      rows.forEach(function(r){
+        leftSum += Number(r[2]) || 0;
+        doneSum += Number(r[3]) || 0;
+        inboundMap[r[10]] = (inboundMap[r[10]] || 0) + 1;
+        acceptMap[r[15]] = (acceptMap[r[15]] || 0) + 1;
+        supplierMap[r[9]] = (supplierMap[r[9]] || 0) + 1;
+        if (!deptMap[r[1]]) deptMap[r[1]] = { done:0, left:0 };
+        deptMap[r[1]].done += Number(r[3]) || 0;
+        deptMap[r[1]].left += Number(r[2]) || 0;
+      });
+
+      return {
+        total: total,
+        doneSum: doneSum,
+        leftSum: leftSum,
+        doneRate: (doneSum + leftSum) ? ((doneSum / (doneSum + leftSum)) * 100).toFixed(1) : "0.0",
+        inboundMap: inboundMap,
+        acceptMap: acceptMap,
+        supplierMap: supplierMap,
+        deptMap: deptMap
+      };
+    }
+
+    function buildPie(map, elPie, elLegend, colors){
+      var keys = Object.keys(map);
+      var total = keys.reduce(function(s,k){ return s + map[k]; }, 0) || 1;
+      var start = 0;
+      var segs = [];
+      var legend = [];
+      keys.forEach(function(k, idx){
+        var val = map[k];
+        var pct = (val / total) * 100;
+        var end = start + pct;
+        var color = colors[idx % colors.length];
+        segs.push(color + " " + start.toFixed(2) + "% " + end.toFixed(2) + "%");
+        legend.push('<div><i class="ps-dot" style="background:'+color+'"></i>'+k+'：'+val+'（'+pct.toFixed(1)+'%）</div>');
+        start = end;
+      });
+      document.getElementById(elPie).style.background = "conic-gradient(" + segs.join(",") + ")";
+      document.getElementById(elLegend).innerHTML = legend.join("");
+    }
+
+    function renderAnalytics(rows){
+      var s = calcStats(rows);
+      document.getElementById("kpiRow").innerHTML = [
+        {k:"计划条数",v:s.total},
+        {k:"已执行总量",v:s.doneSum},
+        {k:"剩余执行总量",v:s.leftSum},
+        {k:"整体执行率",v:s.doneRate + "%"}
+      ].map(function(x){
+        return '<div class="ps-kpi"><div class="ps-kpi-label">'+x.k+'</div><div class="ps-kpi-val">'+x.v+'</div></div>';
+      }).join("");
+
+      var deptKeys = Object.keys(s.deptMap);
+      var maxTotal = 1;
+      deptKeys.forEach(function(k){
+        var t = s.deptMap[k].done + s.deptMap[k].left;
+        if (t > maxTotal) maxTotal = t;
+      });
+      document.getElementById("deptBars").innerHTML = deptKeys.map(function(k){
+        var it = s.deptMap[k];
+        var doneH = Math.round((it.done / maxTotal) * 140);
+        var leftH = Math.round((it.left / maxTotal) * 140);
+        return '<div class="ps-bar-col">'
+          + '<div class="ps-bar-stack">'
+          + '<div class="ps-bar-done" style="height:'+doneH+'px"></div>'
+          + '<div class="ps-bar-left" style="height:'+leftH+'px"></div>'
+          + '</div>'
+          + '<div class="ps-bar-lab">'+k+'</div>'
+          + '</div>';
+      }).join("");
+
+      buildPie(s.inboundMap, "inboundPie", "inboundLegend", ["#1677ff","#52c41a","#faad14","#f5222d","#722ed1"]);
+      buildPie(s.acceptMap, "acceptPie", "acceptLegend", ["#52c41a","#faad14","#1677ff","#f5222d","#13c2c2"]);
+
+      var tops = Object.keys(s.supplierMap).map(function(k){ return {name:k,val:s.supplierMap[k]}; })
+        .sort(function(a,b){ return b.val - a.val; })
+        .slice(0,5);
+      var max = tops.length ? tops[0].val : 1;
+      document.getElementById("supplierTop").innerHTML = tops.map(function(x){
+        var w = Math.max(8, Math.round((x.val / max) * 100));
+        return '<div class="ps-top-item"><span>'+x.name+'</span><span class="ps-top-track"><span class="ps-top-bar" style="width:'+w+'%"></span></span><b>'+x.val+'</b></div>';
+      }).join("");
+    }
+    renderRows(reportRows);
+    renderAnalytics(reportRows);
+
+    document.getElementById("btnQuery").addEventListener("click", function () {
+      alert("已按筛选条件更新报表（演示）");
+    });
+    document.getElementById("btnReset").addEventListener("click", function () {
+      document.getElementById("year").selectedIndex = 0;
+      document.getElementById("supplier").selectedIndex = 0;
+      document.getElementById("cat").selectedIndex = 0;
+      alert("已重置筛选条件（演示）");
+    });
+    document.getElementById("btnExport").addEventListener("click", function () {
+      alert("已导出采购汇总报表 Excel（演示）");
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,1973 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-proc-tab="m1">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>物资采购 - 新能源物资供应链管理系统</title>
+    <link rel="stylesheet" href="css/vendor/fa-all.min.css" />
+  <link rel="stylesheet" href="css/subpage-base.css" />
+  <link rel="stylesheet" href="css/carrier-management.css" />
+<link rel="stylesheet" href="css/source-navbar-header.css" />
+  <link rel="stylesheet" href="css/module-hub.css" />
+  <style>
+    .proc-grid { display: grid; gap: 12px; }
+    .proc-card { border: 1px solid #e6edf6; border-radius: 10px; background: #fff; }
+    .proc-card .carrier-toolbar { border-bottom: 1px solid #edf2f8; margin-bottom: 0; }
+    .proc-card .carrier-table-wrap { margin-top: 0; border: none; }
+    .tag-soft { padding: 2px 8px; border-radius: 999px; font-size: 12px; font-weight: 500; }
+    .tag-pending { background: #fff7e6; color: #d48806; border: 1px solid #ffd591; }
+    .tag-draft { background: #fafafa; color: #595959; border: 1px solid #d9d9d9; }
+    .tag-done { background: #f6ffed; color: #389e0d; border: 1px solid #b7eb8f; }
+    .tag-reject { background: #fff1f0; color: #cf1322; border: 1px solid #ffccc7; }
+    .tag-blue { background: #e6f4ff; color: #1677ff; border: 1px solid #91caff; }
+    .tag-cyan { background: #e6fffb; color: #08979c; border: 1px solid #87e8de; }
+    .tag-flow { background: #fff1f0; color: #cf1322; border: 1px solid #ffa39e; }
+    .tag-warn { background: #fff7e6; color: #d48806; border: 1px solid #ffd591; }
+    .tag-expire { background: #fff7e6; color: #d46b08; border: 1px solid #ffd591; }
+    .kpi-line { font-size: 13px; color: #516a87; margin: 0 0 10px; }
+    .proc-section { margin-bottom: 14px; }
+    .proc-section-title { margin: 0 0 8px; font-size: 16px; color: #1f3551; font-weight: 600; }
+    /* 子功能按钮样式：对齐系统其它业务页视觉 */
+    .proc-card .carrier-toolbar .carrier-btn-add,
+    .proc-card .carrier-toolbar a.carrier-btn-add {
+      border: 1px solid #d7e1ee;
+      background: #fff;
+      color: #2b4664;
+      border-radius: 6px;
+      height: 32px;
+      line-height: 30px;
+      padding: 0 12px;
+      font-size: 13px;
+      font-weight: 500;
+      box-sizing: border-box;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: all .15s ease;
+      box-shadow: 0 1px 2px rgba(15, 35, 70, .06);
+    }
+    .proc-card .carrier-toolbar .carrier-btn-add:hover,
+    .proc-card .carrier-toolbar a.carrier-btn-add:hover {
+      border-color: #91caff;
+      color: #1677ff;
+      background: #f7fbff;
+    }
+    .proc-card .carrier-toolbar .carrier-btn-add[data-op^="新增"],
+    .proc-card .carrier-toolbar .carrier-btn-add[data-op^="发起"],
+    .proc-card .carrier-toolbar .carrier-btn-add[data-op^="进入"] {
+      background: #1890ff;
+      border-color: #1890ff;
+      color: #fff;
+    }
+    .proc-card .carrier-toolbar .carrier-btn-add[data-op^="新增"]:hover,
+    .proc-card .carrier-toolbar .carrier-btn-add[data-op^="发起"]:hover,
+    .proc-card .carrier-toolbar .carrier-btn-add[data-op^="进入"]:hover {
+      background: #40a9ff;
+      border-color: #40a9ff;
+      color: #fff;
+    }
+    .proc-card .carrier-toolbar .carrier-btn-add[data-op^="导出"] {
+      color: #2b4664;
+      background: #fff;
+    }
+    .proc-card .carrier-toolbar .carrier-btn-add[data-op^="查询"] {
+      background: #1890ff;
+      border-color: #1890ff;
+      color: #fff;
+      min-width: 64px;
+    }
+    .proc-card .carrier-toolbar .carrier-btn-add[data-op^="查询"]:hover {
+      background: #40a9ff;
+      border-color: #40a9ff;
+    }
+    .proc-card .carrier-table a.js-op,
+    .proc-card .carrier-table .proc-ops-row .carrier-btn-add {
+      color: #1677ff;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 14px;
+      margin-right: 8px;
+      border: none;
+      background: transparent;
+      box-shadow: none;
+      padding: 0;
+      min-height: auto;
+      height: auto;
+      line-height: 1.2;
+    }
+    .proc-card .carrier-table a.js-op:hover,
+    .proc-card .carrier-table .proc-ops-row .carrier-btn-add:hover {
+      text-decoration: underline;
+      color: #4096ff;
+      background: transparent;
+    }
+    /* 操作列：多链接同一水平行（m1–m10 共用本页） */
+    .proc-card .carrier-table {
+      min-width: 0;
+      width: 100%;
+      table-layout: fixed;
+    }
+    .proc-card .carrier-table thead th:last-child,
+    .proc-card .carrier-table tbody td:last-child {
+      min-width: 0;
+      max-width: none;
+      width: 12%;
+      white-space: nowrap;
+      text-align: center;
+      vertical-align: middle;
+    }
+    .proc-card .carrier-table thead th:last-child {
+      text-align: center;
+    }
+    .proc-card .carrier-table tbody td:last-child a.js-op {
+      white-space: nowrap;
+    }
+    .proc-card .carrier-table .proc-ops-row {
+      display: inline-flex;
+      flex-wrap: nowrap;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .proc-card .carrier-table .proc-ops-row .js-op {
+      margin-right: 0;
+    }
+    /* 订单需求管理 m3：筛选 + 右侧「生成订单」；操作列较窄 */
+    #proc-m3 .proc-m3-filters {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px 12px;
+      flex: 1;
+      min-width: 0;
+    }
+    #proc-m3 .proc-filter-label {
+      font-size: 13px;
+      color: #4c6077;
+      white-space: nowrap;
+    }
+    #proc-m3 .proc-m3-order-input {
+      width: min(220px, 100%);
+      max-width: 100%;
+    }
+    #proc-m3 .carrier-toolbar .carrier-btn-add[data-op="生成订单"] {
+      background: #1890ff;
+      border-color: #1890ff;
+      color: #fff;
+    }
+    #proc-m3 .carrier-toolbar .carrier-btn-add[data-op="生成订单"]:hover {
+      background: #40a9ff;
+      border-color: #40a9ff;
+      color: #fff;
+    }
+    #proc-m3 .proc-order-no {
+      color: #1677ff;
+      font-weight: 500;
+      text-decoration: none;
+    }
+    #proc-m3 .proc-order-no:hover {
+      text-decoration: underline;
+      color: #4096ff;
+    }
+    #proc-m3 .carrier-table thead th:last-child,
+    #proc-m3 .carrier-table tbody td:last-child {
+      min-width: 108px;
+      max-width: 160px;
+    }
+    /* 订单需求管理 m3：操作列按钮统一成“查看”样式 */
+    #proc-m3 .proc-ops-row a {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 !important;
+      border: none !important;
+      background: transparent !important;
+      box-shadow: none !important;
+      color: #1677ff !important;
+      font-size: 14px !important;
+      font-weight: 600 !important;
+      line-height: 1.2 !important;
+      text-decoration: none !important;
+      cursor: pointer;
+      margin-right: 16px;
+    }
+    #proc-m3 .proc-ops-row a:last-child {
+      margin-right: 0;
+    }
+    #proc-m3 .proc-ops-row a:hover {
+      color: #4096ff !important;
+      text-decoration: none !important;
+    }
+    /* 合同管理 m6：筛选 + 查询/重置（图标）+ 右上「新增合同」 */
+    #proc-m6 .proc-m6-filters {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px 12px;
+      flex: 1;
+      min-width: 0;
+    }
+    #proc-m6 .proc-filter-label {
+      font-size: 13px;
+      color: #4c6077;
+      white-space: nowrap;
+    }
+    #proc-m6 .proc-m6-contract-input {
+      width: min(220px, 100%);
+      max-width: 100%;
+    }
+    #proc-m6 .proc-btn-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+    #proc-m6 .proc-btn-icon i {
+      font-size: 13px;
+      opacity: 0.95;
+    }
+    #proc-m6 .carrier-btn-add.btn-sub {
+      color: rgba(0, 0, 0, 0.88);
+      border-color: #d9d9d9;
+      background: #fff;
+    }
+    #proc-m6 .carrier-btn-add.btn-sub:hover {
+      border-color: #1890ff;
+      color: #1890ff;
+      background: #fff;
+    }
+    #proc-m6 .carrier-toolbar .carrier-btn-add[data-op="新增合同"] {
+      background: #1890ff;
+      border-color: #1890ff;
+      color: #fff;
+    }
+    #proc-m6 .carrier-toolbar .carrier-btn-add[data-op="新增合同"]:hover {
+      background: #40a9ff;
+      border-color: #40a9ff;
+      color: #fff;
+    }
+    #proc-m6 .proc-ops-row a.js-op {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+    #proc-m6 .proc-ops-row a.js-op i {
+      font-size: 13px;
+      opacity: 0.9;
+    }
+    /* 主区已有 h1 动态标题，隐藏与各 tab 重复的 h2 */
+    .proc-section > .proc-section-title {
+      display: none;
+    }
+    /* 无 JS 时由 head 内脚本写入；默认仅显示一个子模块，避免一屏堆叠全部区块 */
+    html[data-proc-tab] .proc-section[data-tab-key] { display: none !important; }
+    html[data-proc-tab="m1"] #proc-m1,
+    html[data-proc-tab="m2"] #proc-m2,
+    html[data-proc-tab="m3"] #proc-m3,
+    html[data-proc-tab="m4"] #proc-m4,
+    html[data-proc-tab="m5"] #proc-m5,
+    html[data-proc-tab="m6"] #proc-m6,
+    html[data-proc-tab="m7"] #proc-m7,
+    html[data-proc-tab="m8"] #proc-m8,
+    html[data-proc-tab="m9"] #proc-m9,
+    html[data-proc-tab="m10"] #proc-m10 { display: block !important; }
+    .proc-toolbar-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px 12px;
+      margin-bottom: 10px;
+    }
+    .proc-toolbar-row .carrier-search,
+    .proc-toolbar-row .carrier-select {
+      min-width: 140px;
+    }
+    .proc-modal-mask {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 1200;
+      background: rgba(0, 0, 0, 0.45);
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+    .proc-modal-mask.is-open { display: flex; }
+    .proc-modal-box {
+      background: #fff;
+      border-radius: 10px;
+      max-width: 920px;
+      width: 100%;
+      max-height: 90vh;
+      overflow: auto;
+      box-shadow: 0 8px 28px rgba(0, 0, 0, 0.12);
+    }
+    /* 入库/库存详情弹窗（非全屏审批单）：加宽以展示物资列表回显 */
+    .proc-modal-mask:not(.qa-accept-mode) .proc-modal-box {
+      max-width: min(1280px, 96vw);
+      width: min(1280px, 96vw);
+    }
+    .proc-modal-box.fullscreen {
+      width: 96vw;
+      max-width: none;
+      height: 88vh;
+      max-height: 88vh;
+      border-radius: 10px;
+    }
+    .proc-modal-head {
+      padding: 14px 18px;
+      border-bottom: 1px solid #edf2f8;
+      font-size: 16px;
+      font-weight: 600;
+      color: #1f3551;
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+      gap: 8px;
+      min-width: 0;
+    }
+    /* 标题过长时省略，避免把「流程进度」与关闭挤出可视区 */
+    .proc-modal-head #procModalTitle {
+      flex: 1;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .proc-modal-head .proc-modal-head-action,
+    .proc-modal-head #procModalFlow,
+    .proc-modal-head #procModalX {
+      flex-shrink: 0;
+    }
+    /* 顶栏常驻「流程进度」（由 JS 控制 hidden），不依赖动态插入，避免缓存/布局导致看不见 */
+    #procModalFlow.proc-modal-flow-btn {
+      border: none;
+      background: transparent;
+      color: #1677ff;
+      font-size: 12px;
+      font-weight: 600;
+      line-height: 1;
+      padding: 0;
+      min-height: auto;
+      height: auto;
+      box-shadow: none;
+      cursor: pointer;
+      margin-left: auto;
+    }
+    .proc-modal-body { padding: 16px 18px; font-size: 13px; color: #3e536c; }
+    .proc-modal-foot {
+      padding: 12px 18px;
+      border-top: 1px solid #edf2f8;
+      text-align: right;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: flex-end;
+    }
+    .proc-modal-body .field-row {
+      display: grid;
+      grid-template-columns: 120px 1fr;
+      gap: 8px 12px;
+      margin-bottom: 10px;
+      align-items: center;
+    }
+    .proc-modal-body label { color: #516a87; }
+    .proc-modal-body input[type="text"],
+    .proc-modal-body input[type="date"],
+    .proc-modal-body input[type="number"],
+    .proc-modal-body select,
+    .proc-modal-body textarea {
+      width: 100%;
+      max-width: 100%;
+      box-sizing: border-box;
+      border: 1px solid #d9d9d9;
+      border-radius: 4px;
+      padding: 6px 10px;
+      font-size: 13px;
+    }
+    .proc-modal-body textarea { min-height: 72px; resize: vertical; }
+    /* 库存管理（m10）· 审批单全屏：高度随表单收缩，底栏紧贴表单；超长时在 .qa-accept-wrap 内滚动（避免 body 滚动导致合同编号等原生下拉向上错位） */
+    .proc-modal-mask.qa-accept-mode .proc-modal-head {
+      display: none !important;
+    }
+    .proc-modal-mask.qa-accept-mode .proc-modal-box.fullscreen {
+      display: flex;
+      flex-direction: column;
+      height: auto;
+      max-height: 88vh;
+      overflow: hidden;
+    }
+    .proc-modal-mask.qa-accept-mode .proc-modal-body {
+      flex: 0 1 auto;
+      min-height: 0;
+      padding: 0;
+      overflow: visible;
+      max-height: none;
+    }
+    .proc-modal-mask.qa-accept-mode .proc-modal-foot {
+      display: flex !important;
+      flex-shrink: 0;
+      justify-content: flex-end;
+      gap: 10px;
+      padding: 10px 16px;
+      border-top: 1px solid #e8eef5;
+      background: #fafbfd;
+    }
+    .proc-modal-mask.qa-accept-mode .proc-modal-box {
+      max-width: min(1020px, 96vw);
+      width: 100%;
+    }
+    .qa-accept-wrap {
+      padding: 12px 16px 14px;
+      background: #f5f7fa;
+      box-sizing: border-box;
+    }
+    /* 滚动放在 wrap 上，避免 #procModalBody 滚动导致原生 <select> 下拉向上错位 */
+    .proc-modal-mask.qa-accept-mode .qa-accept-wrap {
+      max-height: calc(88vh - 56px);
+      min-height: 0;
+      overflow-x: hidden;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    .qa-accept-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 14px;
+    }
+    .qa-accept-toolbar-left {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+    .qa-accept-btn-primary {
+      min-height: 32px;
+      padding: 0 18px;
+      font-size: 13px;
+      border-radius: 4px;
+      border: 1px solid #1890ff;
+      background: #1890ff;
+      color: #fff;
+      cursor: pointer;
+      font-family: inherit;
+    }
+    .qa-accept-btn-primary:hover {
+      background: #40a9ff;
+      border-color: #40a9ff;
+    }
+    .qa-accept-link-flow {
+      border: none;
+      background: transparent;
+      padding: 0;
+      font-size: 13px;
+      font-weight: 600;
+      color: #1677ff;
+      cursor: pointer;
+      font-family: inherit;
+      text-decoration: none;
+    }
+    .qa-accept-link-flow:hover {
+      color: #4096ff;
+      text-decoration: underline;
+    }
+    .proc-m10-table-wrap {
+      overflow-x: hidden;
+    }
+    .proc-m10-subtabs {
+      display: flex;
+      gap: 8px;
+      padding: 4px 2px 14px;
+      border-bottom: 1px solid #e8eef5;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .proc-m10-subtab {
+      border: 1px solid #d9d9d9;
+      background: #fff;
+      border-radius: 999px;
+      padding: 6px 18px;
+      font-size: 13px;
+      cursor: pointer;
+      color: #1f3551;
+      font-family: inherit;
+      transition: background 0.15s, border-color 0.15s, color 0.15s;
+    }
+    .proc-m10-subtab:hover {
+      border-color: #91caff;
+      color: #1677ff;
+    }
+    .proc-m10-subtab.is-active {
+      background: #1677ff;
+      border-color: #1677ff;
+      color: #fff;
+    }
+    .proc-m10-pane {
+      display: none;
+    }
+    .proc-m10-pane.is-active {
+      display: block;
+    }
+    .m10-contract-th {
+      white-space: nowrap;
+      position: relative;
+    }
+    .m10-help-wrap {
+      display: inline-block;
+      position: relative;
+      vertical-align: middle;
+      margin-left: 4px;
+    }
+    .m10-contract-help {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      border: 1px solid #2f9bff;
+      color: #1677ff;
+      background: #fff;
+      font-size: 11px;
+      font-weight: 700;
+      line-height: 1;
+      cursor: pointer;
+      font-family: inherit;
+      flex-shrink: 0;
+    }
+    .m10-help-tip {
+      position: absolute;
+      top: -10px;
+      left: 22px;
+      display: none;
+      min-width: 210px;
+      max-width: 260px;
+      background: rgba(0, 0, 0, 0.82);
+      color: #fff;
+      border-radius: 6px;
+      padding: 8px 10px;
+      font-size: 12px;
+      font-weight: 500;
+      line-height: 1.45;
+      z-index: 20;
+      text-align: left;
+    }
+    .m10-help-tip::before {
+      content: "";
+      position: absolute;
+      left: -6px;
+      top: 11px;
+      border-width: 6px;
+      border-style: solid;
+      border-color: transparent rgba(0, 0, 0, 0.82) transparent transparent;
+    }
+    .m10-help-wrap.is-open .m10-help-tip {
+      display: block;
+    }
+    /* 物资类别「?」：悬停黑底说明（fixed，避免表格滚动区域裁切） */
+    .m10-category-floating-tip {
+      display: none;
+      position: fixed;
+      z-index: 3000;
+      min-width: 268px;
+      max-width: 360px;
+      background: rgba(0, 0, 0, 0.88);
+      color: #fff;
+      border-radius: 8px;
+      padding: 10px 12px 12px;
+      font-size: 12px;
+      line-height: 1.55;
+      font-weight: 500;
+      box-shadow: 0 10px 28px rgba(0, 0, 0, 0.28);
+      pointer-events: none;
+      text-align: left;
+    }
+    .m10-category-floating-tip__title {
+      font-weight: 700;
+      font-size: 13px;
+      margin-bottom: 8px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    .m10-category-floating-tip__row {
+      margin-top: 8px;
+    }
+    .m10-category-floating-tip__k {
+      display: block;
+      color: rgba(255, 255, 255, 0.72);
+      font-size: 11px;
+      margin-bottom: 2px;
+      font-weight: 600;
+    }
+    .m10-contract-code {
+      font-size: 13px;
+      line-height: 1.25;
+      font-weight: 600;
+      color: #1f3551;
+      letter-spacing: 0.01em;
+      word-break: break-all;
+      cursor: pointer;
+      display: inline-block;
+    }
+    .m10-contract-exec-cell .m10-exec-list {
+      display: none;
+      line-height: 1.5;
+      color: #1f3551;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    .m10-ledger-row.is-open .m10-contract-exec-cell .m10-exec-list {
+      display: block;
+    }
+    .m10-contract-exec-cell .m10-exec-empty {
+      color: #8c8c8c;
+    }
+    .m10-ledger-row.is-open .m10-contract-exec-cell .m10-exec-empty {
+      display: none;
+    }
+    /* 库存台账操作列：确保「详情」链接不被裁切或继承为不可见 */
+    #proc-m10-ledger-table tbody td.proc-ops-cell {
+      overflow: visible !important;
+    }
+    #proc-m10-ledger-table tbody td.proc-ops-cell a.js-op {
+      display: inline !important;
+      visibility: visible !important;
+      opacity: 1 !important;
+      color: #1677ff !important;
+    }
+    /* 实物入库列表：操作列「查看」纵向对齐同一条线 */
+    #proc-m10-inbound-table thead th:last-child,
+    #proc-m10-inbound-table tbody td.proc-ops-cell {
+      width: 72px;
+      min-width: 72px;
+      max-width: 72px;
+      text-align: left;
+      padding-left: 12px;
+      vertical-align: middle;
+      box-sizing: border-box;
+    }
+    #proc-m10-inbound-table tbody td.proc-ops-cell .proc-ops-row {
+      display: inline-flex;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 4px;
+      width: 100%;
+    }
+    #proc-m10-inbound-table tbody td.proc-ops-cell .proc-ops-row a.js-op[data-op="验收查看详情"] {
+      flex: 0 0 28px;
+      text-align: left;
+    }
+    .qa-accept-toolbar-title {
+      flex: 1;
+      text-align: center;
+      font-size: 20px;
+      font-weight: 600;
+      color: #1f3551;
+      letter-spacing: 0.02em;
+      min-width: 200px;
+    }
+    .qa-accept-legend {
+      margin: 0 0 10px;
+      padding: 0 2px;
+      font-size: 12px;
+      color: #8c8c8c;
+      line-height: 1.5;
+    }
+    .qa-accept-legend .qa-legend-dot {
+      display: inline-block;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #bfbfbf;
+      margin: 0 4px 0 0;
+      vertical-align: middle;
+    }
+    .qa-accept-btn-close {
+      min-height: 32px;
+      width: 36px;
+      padding: 0;
+      line-height: 1;
+      font-size: 22px;
+      font-weight: 400;
+      border-radius: 6px;
+      border: 1px solid #d9d9d9;
+      background: #fff;
+      color: rgba(0, 0, 0, 0.55);
+      cursor: pointer;
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+      flex-shrink: 0;
+    }
+    .qa-accept-btn-close:hover {
+      color: #1677ff;
+      border-color: #91caff;
+      background: #f0f7ff;
+    }
+    .qa-accept-form-shell {
+      background: #fff;
+      border: 1px solid #e8eef5;
+      border-radius: 4px;
+      overflow: visible;
+    }
+    .qa-accept-grid {
+      width: 100%;
+      border-collapse: collapse;
+      table-layout: fixed;
+      font-size: 13px;
+    }
+    .qa-accept-grid td {
+      border: 1px solid #e8eef5;
+      padding: 0;
+      vertical-align: middle;
+    }
+    .qa-accept-grid .qa-lab {
+      width: 17%;
+      background: #f5f7fa;
+      color: #3f5366;
+      padding: 10px 12px;
+      text-align: right;
+      font-weight: 500;
+      box-sizing: border-box;
+      position: relative;
+    }
+    .qa-accept-grid .qa-lab .req {
+      color: #ff4d4f;
+      margin-right: 2px;
+    }
+    .qa-accept-grid .qa-lab .qa-dot-hint {
+      position: absolute;
+      left: 50%;
+      top: 6px;
+      transform: translateX(-50%);
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: #ff4d4f;
+    }
+    .qa-accept-grid tr:nth-child(2) .qa-lab {
+      padding-top: 18px;
+    }
+    .qa-accept-grid .qa-val {
+      width: 33%;
+      padding: 6px 10px;
+      background: #fff;
+      box-sizing: border-box;
+    }
+    .qa-accept-grid .qa-val-empty {
+      background: #fafafa;
+    }
+    .qa-accept-grid .qa-inp:not(.qa-inp--auto):not(textarea) {
+      width: 100%;
+      height: 32px;
+      border: 1px solid #d9d9d9;
+      border-radius: 4px;
+      padding: 0 10px;
+      font-size: 13px;
+      color: #262626;
+      box-sizing: border-box;
+      background: #fff;
+      outline: none;
+    }
+    .qa-accept-grid .qa-inp--auto,
+    .qa-accept-grid .qa-inp[readonly].qa-inp--auto {
+      background: #ebebeb !important;
+      border-color: #d9d9d9;
+      color: #8c8c8c !important;
+      cursor: not-allowed;
+    }
+    .qa-accept-grid .qa-lab .qa-auto-mark {
+      display: inline-block;
+      margin-left: 4px;
+      color: #bfbfbf;
+      font-size: 12px;
+      line-height: 1;
+      vertical-align: middle;
+      cursor: default;
+    }
+    .qa-accept-grid select.qa-select {
+      width: 100%;
+      height: 32px;
+      border: 1px solid #d9d9d9;
+      border-radius: 4px;
+      padding: 0 8px;
+      font-size: 13px;
+      color: #262626;
+      background: #fff;
+      box-sizing: border-box;
+      outline: none;
+      cursor: pointer;
+    }
+    .qa-accept-grid select.qa-select:focus {
+      border-color: #1890ff;
+      box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.12);
+    }
+    /* 合同编号：自定义下拉，始终在按钮下方展开（避免原生 <select> 在滚动容器内向上弹出） */
+    .qa-contract-dd {
+      position: relative;
+      width: 100%;
+    }
+    .qa-contract-dd__btn {
+      display: block;
+      width: 100%;
+      height: 32px;
+      line-height: 30px;
+      text-align: left;
+      font-family: inherit;
+      font-size: 13px;
+      color: #262626;
+      cursor: pointer;
+      box-sizing: border-box;
+      border: 1px solid #d9d9d9;
+      border-radius: 4px;
+      padding: 0 8px;
+      background: #fff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .qa-contract-dd__btn:focus {
+      border-color: #1890ff;
+      box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.12);
+      outline: none;
+    }
+    .qa-contract-dd__panel {
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: calc(100% + 2px);
+      z-index: 50;
+      margin: 0;
+      padding: 4px 0;
+      list-style: none;
+      background: #fff;
+      border: 1px solid #d9d9d9;
+      border-radius: 4px;
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+      max-height: 220px;
+      overflow-y: auto;
+      box-sizing: border-box;
+    }
+    .qa-contract-dd__opt {
+      display: block;
+      width: 100%;
+      margin: 0;
+      padding: 8px 12px;
+      border: none;
+      background: transparent;
+      text-align: left;
+      font-size: 13px;
+      color: #262626;
+      font-family: inherit;
+      cursor: pointer;
+      box-sizing: border-box;
+    }
+    .qa-contract-dd__opt:hover {
+      background: #f5f5f5;
+    }
+    /* 执行合同编号：多选下拉（框架协议下多条执行号） */
+    .qa-exec-dd {
+      position: relative;
+      width: 100%;
+    }
+    .qa-exec-dd__btn {
+      width: 100%;
+    }
+    .qa-exec-dd__panel {
+      top: calc(100% + 2px);
+    }
+    .qa-exec-dd__row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      margin: 0;
+      cursor: pointer;
+      font-size: 13px;
+      color: #262626;
+      box-sizing: border-box;
+    }
+    .qa-exec-dd__row:hover {
+      background: #f5f5f5;
+    }
+    .qa-exec-dd__chk {
+      flex-shrink: 0;
+      width: 14px;
+      height: 14px;
+      margin: 0;
+      cursor: pointer;
+    }
+    /* 选择合同：表格下拉 + 按名称/编号搜索 */
+    .qa-cname-dd {
+      position: relative;
+      width: 100%;
+    }
+    .qa-cname-dd__btn {
+      width: 100%;
+    }
+    .qa-cname-dd__panel {
+      top: calc(100% + 2px);
+      padding: 0;
+      min-width: min(100%, 360px);
+    }
+    .qa-cname-dd__search {
+      padding: 8px 10px;
+      border-bottom: 1px solid #e8eef5;
+      background: #fafbfd;
+    }
+    .qa-cname-dd__search-inp {
+      width: 100%;
+      height: 30px;
+      box-sizing: border-box;
+      border: 1px solid #d9d9d9;
+      border-radius: 4px;
+      padding: 0 8px;
+      font-size: 13px;
+      font-family: inherit;
+      outline: none;
+    }
+    .qa-cname-dd__search-inp:focus {
+      border-color: #1890ff;
+      box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.12);
+    }
+    .qa-cname-dd__table-wrap {
+      max-height: 220px;
+      overflow: auto;
+    }
+    .qa-cname-dd__table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+    .qa-cname-dd__table th {
+      position: sticky;
+      top: 0;
+      z-index: 1;
+      background: #f5f7fa;
+      color: #64748b;
+      font-weight: 600;
+      text-align: left;
+      padding: 8px 10px;
+      border-bottom: 1px solid #e8eef5;
+    }
+    .qa-cname-dd__table td {
+      padding: 8px 10px;
+      border-bottom: 1px solid #f0f2f5;
+      color: #262626;
+    }
+    .qa-cname-dd__tr {
+      cursor: pointer;
+    }
+    .qa-cname-dd__tr:hover {
+      background: #f0f7ff;
+    }
+    .qa-cname-dd__tr--ph td {
+      color: #94a3b8;
+      font-size: 12px;
+    }
+    /* 入库类型：自定义下拉 + 问号黑色说明 */
+    .qa-inbound-type-dd {
+      position: relative;
+      width: 100%;
+    }
+    .qa-inbound-type-dd__panel {
+      padding: 0;
+      top: calc(100% + 2px);
+      overflow: visible;
+      max-height: none;
+    }
+    .qa-inbound-type-dd__opt--full {
+      display: block;
+      width: 100%;
+      margin: 0;
+      padding: 8px 12px;
+      border: none;
+      border-bottom: 1px solid #f0f2f5;
+      background: #fff;
+      text-align: left;
+      font-size: 13px;
+      color: #262626;
+      font-family: inherit;
+      cursor: pointer;
+      box-sizing: border-box;
+    }
+    .qa-inbound-type-dd__opt--full:hover {
+      background: #f5f5f5;
+    }
+    .qa-inbound-type-dd__row {
+      display: flex;
+      align-items: stretch;
+      border-bottom: 1px solid #f0f2f5;
+      background: #fff;
+    }
+    .qa-inbound-type-dd__row:last-child {
+      border-bottom: none;
+    }
+    .qa-inbound-type-dd__opt {
+      flex: 1;
+      min-width: 0;
+      margin: 0;
+      padding: 8px 6px 8px 12px;
+      border: none;
+      background: transparent;
+      text-align: left;
+      font-size: 13px;
+      color: #262626;
+      font-family: inherit;
+      cursor: pointer;
+      box-sizing: border-box;
+    }
+    .qa-inbound-type-dd__opt:hover {
+      background: #f0f7ff;
+    }
+    .qa-inbound-type-dd__help {
+      flex-shrink: 0;
+      width: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      cursor: default;
+      align-self: stretch;
+    }
+    .qa-inbound-type-dd__qm {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      border: 1px solid #bfbfbf;
+      color: #8c8c8c;
+      font-size: 11px;
+      font-weight: 700;
+      line-height: 1;
+      background: #fafafa;
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    }
+    .qa-inbound-type-dd__help:hover .qa-inbound-type-dd__qm,
+    .qa-inbound-type-dd__help:focus-within .qa-inbound-type-dd__qm {
+      border-color: #1677ff;
+      color: #1677ff;
+      background: #f0f7ff;
+    }
+    .qa-inbound-type-dd__bubble {
+      display: none;
+      position: absolute;
+      right: 4px;
+      bottom: calc(100% + 8px);
+      min-width: 200px;
+      max-width: 280px;
+      padding: 8px 10px;
+      background: rgba(0, 0, 0, 0.88);
+      color: #fff;
+      font-size: 12px;
+      line-height: 1.5;
+      font-weight: 500;
+      border-radius: 6px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+      z-index: 80;
+      text-align: left;
+      pointer-events: none;
+      white-space: normal;
+    }
+    .qa-inbound-type-dd__help:hover .qa-inbound-type-dd__bubble,
+    .qa-inbound-type-dd__help:focus-within .qa-inbound-type-dd__bubble {
+      display: block;
+    }
+    .qa-accept-grid .qa-ta {
+      width: 100%;
+      min-height: 52px;
+      border: 1px solid #d9d9d9;
+      border-radius: 4px;
+      padding: 8px 10px;
+      font-size: 13px;
+      color: #262626;
+      line-height: 1.5;
+      box-sizing: border-box;
+      resize: vertical;
+      font-family: inherit;
+      background: #fff;
+      outline: none;
+    }
+    .qa-mat-lines-block {
+      padding: 10px 12px 12px;
+      margin: 0 0 12px;
+      border: 1px solid #e8eef5;
+      border-radius: 4px;
+      background: #fff;
+    }
+    .qa-mat-lines-toolbar {
+      margin-top: 16px;
+      margin-bottom: 10px;
+    }
+    .qa-mat-lines-toolbar .carrier-btn-add {
+      height: 32px;
+      line-height: 30px;
+      padding: 0 14px;
+      font-size: 13px;
+    }
+    .qa-mat-pick-dd.pl-dd {
+      display: inline-block;
+      width: 200px;
+      max-width: 100%;
+      vertical-align: top;
+    }
+    .qa-mat-pick-dd .pl-dd__btn.carrier-btn-add {
+      width: 100%;
+      min-width: 0;
+      box-sizing: border-box;
+      height: 32px;
+      line-height: 30px;
+      padding: 0 14px;
+      font-size: 13px;
+      font-weight: 500;
+      border: 1px solid #d7e1ee;
+      border-radius: 6px;
+      background: #fff;
+      color: #2b4664;
+      box-shadow: 0 1px 2px rgba(15, 35, 70, 0.06);
+    }
+    .qa-mat-pick-dd .pl-dd__btn.carrier-btn-add:hover {
+      border-color: #91caff;
+      color: #1677ff;
+      background: #f7fbff;
+    }
+    .qa-mat-pick-dd .pl-dd__panel {
+      min-width: 400px;
+      width: 400px;
+      left: 0;
+      right: auto;
+    }
+    .qa-mat-lines-table-wrap {
+      border: 1px solid #e8eef5;
+      border-radius: 4px;
+      overflow: auto;
+      max-height: 280px;
+    }
+    .qa-mat-lines-table {
+      width: 100%;
+      min-width: 1380px;
+      border-collapse: collapse;
+      font-size: 12px;
+    }
+    .qa-mat-lines-table thead th {
+      background: #e8f4fc;
+      color: #3f5366;
+      font-weight: 600;
+      padding: 8px 6px;
+      border: 1px solid #d9e8f5;
+      text-align: center;
+      white-space: nowrap;
+    }
+    .qa-mat-lines-table thead th .req {
+      color: #ff4d4f;
+      margin-right: 2px;
+    }
+    .qa-mat-lines-block--readonly .qa-inp,
+    .qa-mat-lines-block--readonly .qa-select {
+      background: #ebebeb !important;
+      border-color: #d9d9d9 !important;
+      color: #8c8c8c !important;
+      cursor: not-allowed;
+    }
+    .proc-modal-mask.qa-accept-mode .qa-mat-detail-list-block .qa-detail-ro {
+      display: block;
+      color: #262626;
+      line-height: 28px;
+      min-height: 28px;
+    }
+    .proc-modal-mask.qa-accept-mode .qa-mat-lines-block--readonly .qa-inp,
+    .proc-modal-mask.qa-accept-mode .qa-mat-lines-block--readonly .qa-select {
+      color: #262626 !important;
+    }
+    .proc-modal-mask.qa-accept-mode .qa-mat-detail-list-block .proc-mini-table th:nth-child(6),
+    .proc-modal-mask.qa-accept-mode .qa-mat-detail-list-block .proc-mini-table tbody td:nth-child(6) {
+      min-width: 248px;
+      width: 248px;
+    }
+    .qa-mat-detail-list-block .qa-inp.qa-detail-factory-code,
+    .qa-mat-detail-list-block .qa-inp.qa-detail-fa-code {
+      width: 100%;
+      min-width: 120px;
+      height: 28px;
+      font-size: 12px;
+      box-sizing: border-box;
+      background: #fff;
+      border: 1px solid #d9d9d9;
+      color: #262626;
+    }
+    .proc-modal-mask.qa-accept-mode .qa-mat-detail-list-block .qa-inp.qa-detail-factory-code {
+      min-width: 232px;
+    }
+    .qa-mat-detail-list-block .qa-inp.qa-detail-factory-code::placeholder {
+      color: #bfbfbf;
+    }
+    .qa-mat-lines-table .qa-line-shipqty::placeholder,
+    .qa-mat-lines-table .qa-line-recvqty::placeholder {
+      color: #bfbfbf;
+    }
+    .qa-mat-lines-table tbody td {
+      border: 1px solid #e8eef5;
+      padding: 4px 6px;
+      vertical-align: middle;
+      background: #fff;
+    }
+    .qa-mat-lines-table .qa-inp:not(.qa-inp--auto),
+    .qa-mat-lines-table .qa-select {
+      width: 100%;
+      min-width: 72px;
+      height: 28px;
+      font-size: 12px;
+    }
+    .qa-mat-lines-table div.qa-inp,
+    .qa-mat-lines-table textarea.qa-inp--auto {
+      height: auto;
+      min-height: 28px;
+    }
+    .qa-mat-lines-table .qa-inp.qa-inp--auto,
+    .qa-mat-lines-table .qa-inp[readonly].qa-inp--auto {
+      background: #ebebeb !important;
+      border-color: #d9d9d9;
+      color: #8c8c8c !important;
+      cursor: not-allowed;
+    }
+    .qa-mat-lines-table thead th:last-child,
+    .qa-mat-lines-table tbody td.qa-line-ops {
+      min-width: 72px;
+      width: 72px;
+      text-align: center;
+      vertical-align: middle;
+      white-space: nowrap;
+      position: sticky;
+      right: 0;
+      z-index: 2;
+      background: #fff;
+      box-shadow: -3px 0 6px rgba(15, 35, 70, 0.06);
+    }
+    .qa-mat-lines-table thead th:last-child {
+      z-index: 3;
+      background: #e8f4fc;
+    }
+    .qa-mat-lines-table button.qa-line-del {
+      display: inline-block !important;
+      visibility: visible !important;
+      opacity: 1 !important;
+      min-width: 0;
+      height: auto;
+      line-height: 1.4;
+      padding: 0;
+      font-size: 12px;
+      font-weight: 600;
+      color: #1677ff !important;
+      background: transparent !important;
+      border: none !important;
+      border-radius: 0;
+      cursor: pointer;
+      box-sizing: border-box;
+      box-shadow: none !important;
+    }
+    .qa-mat-lines-table button.qa-line-del:hover {
+      color: #4096ff !important;
+      background: transparent !important;
+      text-decoration: underline;
+    }
+    /* 入库记录·详情弹窗 · 物资列表：加宽弹窗内表格，灰色回显完整展示 */
+    .proc-modal-mask:not(.qa-accept-mode) .qa-mat-lines-table-wrap {
+      overflow-x: hidden;
+      max-height: none;
+    }
+    .proc-modal-mask:not(.qa-accept-mode) .qa-mat-lines-table {
+      min-width: 100%;
+      width: 100%;
+      table-layout: auto;
+      font-size: 12px;
+    }
+    .proc-modal-mask:not(.qa-accept-mode) .qa-mat-lines-table thead th {
+      white-space: nowrap;
+      padding: 6px 8px;
+      line-height: 1.35;
+      font-size: 12px;
+    }
+    .proc-modal-mask:not(.qa-accept-mode) .qa-mat-lines-table tbody td {
+      padding: 5px 8px;
+      vertical-align: middle;
+    }
+    .proc-modal-mask:not(.qa-accept-mode) .qa-mat-lines-table .qa-inp,
+    .proc-modal-mask:not(.qa-accept-mode) .qa-mat-lines-table .qa-select,
+    .proc-modal-mask:not(.qa-accept-mode) .qa-mat-lines-table div.qa-inp {
+      min-width: 0;
+      width: 100%;
+      height: auto;
+      min-height: 28px;
+      font-size: 12px;
+      padding: 4px 8px;
+      box-sizing: border-box;
+      line-height: 1.35;
+      overflow: visible;
+      text-overflow: clip;
+      white-space: normal;
+    }
+    .qa-accept-grid .qa-val-lines {
+      padding: 0;
+      background: #fff;
+    }
+    .proc-mini-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+      margin-top: 8px;
+    }
+    .proc-mini-table th,
+    .proc-mini-table td {
+      border: 1px solid #e6edf6;
+      padding: 6px 8px;
+      text-align: left;
+    }
+    .proc-mini-table th { background: #f6f8fb; }
+    /* 库存台账详情 · 物资明细表：压缩列宽，弹窗内不横向滚动即可看全 */
+    .proc-ledger-detail-table-wrap {
+      overflow-x: hidden;
+      max-width: 100%;
+    }
+    .proc-ledger-detail-table-wrap .proc-mini-table {
+      width: 100%;
+      table-layout: fixed;
+      font-size: 10px;
+      margin-top: 8px;
+    }
+    .proc-ledger-detail-table-wrap .proc-mini-table th,
+    .proc-ledger-detail-table-wrap .proc-mini-table td {
+      white-space: normal;
+      word-break: break-word;
+      overflow: visible;
+      text-overflow: clip;
+      max-width: none;
+      padding: 3px 2px;
+      line-height: 1.25;
+      vertical-align: top;
+    }
+    .proc-ledger-detail-table-wrap .proc-mini-table th {
+      font-size: 10px;
+      font-weight: 600;
+      background: #f6f8fb;
+    }
+    .proc-ledger-detail-table-wrap .proc-mini-table th:nth-child(1),
+    .proc-ledger-detail-table-wrap .proc-mini-table td:nth-child(1) {
+      width: 4%;
+    }
+    .proc-ledger-detail-table-wrap .proc-mini-table th:nth-child(4),
+    .proc-ledger-detail-table-wrap .proc-mini-table td:nth-child(4),
+    .proc-ledger-detail-table-wrap .proc-mini-table th:nth-child(5),
+    .proc-ledger-detail-table-wrap .proc-mini-table td:nth-child(5),
+    .proc-ledger-detail-table-wrap .proc-mini-table th:nth-child(6),
+    .proc-ledger-detail-table-wrap .proc-mini-table td:nth-child(6),
+    .proc-ledger-detail-table-wrap .proc-mini-table th:nth-child(7),
+    .proc-ledger-detail-table-wrap .proc-mini-table td:nth-child(7),
+    .proc-ledger-detail-table-wrap .proc-mini-table th:nth-child(9),
+    .proc-ledger-detail-table-wrap .proc-mini-table td:nth-child(9) {
+      word-break: break-all;
+      font-size: 9px;
+    }
+    .proc-ledger-detail-table-wrap .proc-mini-table th:nth-child(19),
+    .proc-ledger-detail-table-wrap .proc-mini-table td:nth-child(19) {
+      white-space: nowrap;
+      width: 6%;
+    }
+    .proc-btn {
+      height: 32px;
+      padding: 0 14px;
+      border-radius: 6px;
+      font-size: 13px;
+      cursor: pointer;
+      border: 1px solid #d9d9d9;
+      background: #fff;
+    }
+    .proc-btn-primary {
+      background: #1890ff;
+      border-color: #1890ff;
+      color: #fff;
+    }
+    .proc-btn-ghost { border-color: #91caff; color: #1677ff; background: #fff; }
+  </style>
+  <script>
+    (function () {
+      function resolveProcTab() {
+        var labelMap = {
+          采购计划: "m1",
+          采购计划管理: "m1",
+          采购申请: "m2",
+          "订单/需求管理": "m3",
+          订单需求管理: "m3",
+          寻源管理: "m4",
+          供应商管理: "m5",
+          合同管理: "m6",
+          招投标管理: "m7",
+          采购付款: "m8",
+          退货换货管理: "m9",
+          库存管理: "m10",
+          采购环节质量验收: "m10",
+          采购订单: "m3"
+        };
+        var tab = "";
+        try {
+          var sp = new URLSearchParams(window.location.search);
+          tab = (sp.get("tab") || "").trim();
+          if (!tab) {
+            var ps = (sp.get("pageSub") || "").trim();
+            tab = labelMap[ps] || "";
+          }
+          if (!tab) {
+            var n = String(window.name || "");
+            if (n.indexOf("tab=") >= 0) {
+              tab = decodeURIComponent((n.split("tab=")[1] || "").split("&")[0] || "");
+            }
+          }
+          if (!tab) {
+            tab = sessionStorage.getItem("demoPurchaseTab") || "";
+          }
+        } catch (e0) {}
+        if (!/^m(10|[1-9])$/.test(tab)) tab = "m1";
+        try {
+          /* 切勿用 getElementById('#proc-m*') 校验：本脚本在 <head> 同步执行时主内容尚未解析，会恒为 null，导致永远落在 m1 */
+          document.documentElement.setAttribute("data-proc-tab", tab);
+          sessionStorage.setItem("demoPurchaseTab", tab);
+        } catch (e1) {
+          document.documentElement.setAttribute("data-proc-tab", "m1");
+        }
+      }
+      resolveProcTab();
+    })();
+  </script>
+</head>
+<body class="page-source-navbar page-subpage page-logistics" data-breadcrumb="none">
+  <div class="page-bg" aria-hidden="true"></div>
+  <div class="app">
+    <header class="header">
+      <div class="header-left">
+        <button type="button" class="header-hamburger" aria-label="菜单"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+        <a class="header-logo" href="#"><img src="assets/logo-chenergy.png" alt="" width="220" height="40" /></a>
+        <div class="header-source-brand"><p>新能源供应链管理系统</p></div>
+      </div>
+      <div class="header-right"><span class="clock" id="clock"></span><div class="user-avatar">用</div></div>
+    </header>
+    <div class="layout">
+      <aside class="sidebar" aria-label="主导航">
+<div class="nav-item" title="我的资产"><span class="nav-label">我的资产</span></div>
+        <div class="nav-item" title="我的任务"><span class="nav-label">我的任务</span></div>
+        <a class="nav-item" href="index-portal-screen-alt.html"><span class="nav-label">首页</span></a>
+        <a class="nav-item" href="cockpit-analytics.html"><span class="nav-label">驾驶舱</span></a>
+        <div class="nav-item" title="采购管理"><span class="nav-label">采购管理</span></div>
+        <a class="nav-item" href="carrier-management.html"><span class="nav-label">物流管理</span></a>
+        <a class="nav-item" href="warehouse.html"><span class="nav-label">仓储管理</span></a>
+        <div class="nav-item nav-item--module-active" title="物资采购"><span class="nav-label">物资采购</span></div>
+        <div class="nav-item" title="物资出库与处置"><span class="nav-label">物资出库与处置</span></div>
+        <div class="nav-item" title="绩效考核"><span class="nav-label">绩效考核</span></div>
+        <div class="nav-item" title="公告管理"><span class="nav-label">公告管理</span></div>
+        <div class="nav-item" title="综合业务管理"><span class="nav-label">综合业务管理</span></div>
+        <div class="nav-item" title="数据管理"><span class="nav-label">数据管理</span></div>
+        <div class="nav-item" title="开发工具"><span class="nav-label">开发工具</span></div>
+        <div class="nav-item" title="设置"><span class="nav-label">设置</span></div>
+        <div class="nav-item" title="系统管理"><span class="nav-label">系统管理</span></div>
+      </aside>
+      <main class="main-scroll">
+        <nav class="subpage-breadcrumb" aria-label="面包屑"><a href="index-portal-screen-alt.html">首页</a><span class="sep">/</span><span id="breadcrumbMod">实物管理</span><span class="sep">/</span><span id="breadcrumbPage">库存管理</span></nav>
+        <div class="carrier-main-inner">
+          <h1 class="carrier-page-title" id="procPageTitle">采购计划</h1>
+          <section class="proc-section" id="proc-m1" data-tab-key="m1"><h2 class="proc-section-title">采购计划</h2>
+            <div class="proc-card">
+              <div class="carrier-toolbar">
+                <div><button type="button" class="carrier-btn-add js-op" data-op="新增计划">新增计划</button></div>
+                <div class="carrier-toolbar-right proc-toolbar-row">
+                  <select class="carrier-select" aria-label="计划年度"><option>2026</option><option>2025</option><option>2024</option></select>
+                  <select class="carrier-select" aria-label="计划状态"><option>全部</option><option>待审批</option><option>已通过</option><option>已驳回</option></select>
+                  <button type="button" class="carrier-btn-add js-op" data-op="查询计划">查询</button>
+                  <button type="button" class="carrier-btn-add js-op" data-op="重置筛选">重置</button>
+                </div>
+              </div>
+              <div class="carrier-table-wrap"><table class="carrier-table"><thead><tr><th>项目名称</th><th>采购方式</th><th>采购标的类别</th><th>业务部门</th><th>业务经办人</th><th>是否框架</th><th>项目类别</th><th>预算（万元）</th><th>是否限价</th><th>是否科技项目</th><th>科技项目名称</th><th>项目/WBS编码</th><th>是否西安公司</th><th>龙源OA审批表时间</th><th>龙源OA审查纪要时间</th><th>采委会计划通过期数</th><th>SRM提报时间</th><th>流程进度</th><th>挂网时间</th><th>挂网网址</th><th>采购依据</th><th>采购标包号</th><th>招标/采购编码</th><th>开标时间</th><th>定标时间</th><th>招标公示时间</th><th>中标/成交通知书下发时间</th><th>中标/成交金额</th><th>中标/成交供应商</th><th>是否关联年度计划</th><th>合同用印时间</th><th>考核点1：采购时长</th><th>考核点2：合同签订时长</th><th>考核点备注</th><th>备注</th><th>操作</th></tr></thead><tbody>
+                <tr><td>年度备件采购计划</td><td>公开招标</td><td>物资</td><td>经营发展中心</td><td>王卿明</td><td>是</td><td>年度项目</td><td>520</td><td>是</td><td>否</td><td>-</td><td>WBS-2026-001</td><td>否</td><td>2025-12-10</td><td>2025-12-18</td><td>第3期</td><td>2026-01-05</td><td>执行中</td><td>2026-01-15</td><td>https://srm.example.com/bid/2026-001</td><td>年度框架采购</td><td>PKG-01</td><td>ZB-2026-001</td><td>2026-01-22</td><td>2026-01-25</td><td>2026-01-26</td><td>2026-01-28</td><td>486</td><td>远景能源</td><td>是</td><td>2026-02-01</td><td>20</td><td>7</td><td>按期推进</td><td>-</td><td class="proc-ops-cell"><span class="proc-ops-row"><a href="#" class="js-op" data-op="计划查看详情">查看详情</a><a href="#" class="js-op" data-op="计划编辑">编辑</a></span></td></tr>
+                <tr><td>大部件维修备件计划</td><td>竞争性谈判</td><td>物资</td><td>运维中心</td><td>李哲</td><td>否</td><td>临采项目</td><td>180</td><td>否</td><td>否</td><td>-</td><td>WBS-2026-002</td><td>否</td><td>2025-12-15</td><td>2025-12-20</td><td>第4期</td><td>2026-01-10</td><td>审批中</td><td>-</td><td>-</td><td>故障备件</td><td>PKG-02</td><td>TP-2026-011</td><td>-</td><td>-</td><td>-</td><td>-</td><td>0</td><td>-</td><td>否</td><td>-</td><td>-</td><td>-</td><td>待审批</td><td>-</td><td class="proc-ops-cell"><span class="proc-ops-row"><a href="#" class="js-op" data-op="计划查看详情">查看详情</a><a href="#" class="js-op" data-op="计划提交审批">提交审批</a></span></td></tr>
+              </tbody></table></div>
+            </div>
+          </section>
+          <section class="proc-section" id="proc-m2" data-tab-key="m2"><h2 class="proc-section-title">采购申请</h2>
+            <div class="proc-card">
+              <div class="carrier-toolbar">
+                <div><button type="button" class="carrier-btn-add js-op" data-op="新增申请">新增申请</button></div>
+                <div class="carrier-toolbar-right proc-toolbar-row">
+                  <input class="carrier-search" type="search" placeholder="申请单号" aria-label="申请单号" />
+                  <select class="carrier-select" aria-label="申请部门"><option>全部部门</option><option>供应链管理部</option><option>运维中心</option><option>华北场站</option></select>
+                  <select class="carrier-select" aria-label="审批状态"><option>全部</option><option>草稿</option><option>审批中</option><option>已通过</option><option>已驳回</option></select>
+                  <button type="button" class="carrier-btn-add js-op" data-op="查询申请">查询</button>
+                  <button type="button" class="carrier-btn-add js-op" data-op="重置筛选">重置</button>
+                </div>
+              </div>
+              <div class="carrier-table-wrap"><table class="carrier-table"><thead><tr><th>申请单号</th><th>项目名称</th><th>物资名称</th><th>规格型号</th><th>物资类别</th><th>计划数量</th><th>单位</th><th>预算单价（元）</th><th>预算总价（元）</th><th>需求日期</th><th>申请部门</th><th>申请人</th><th>申请时间</th><th>紧急程度</th><th>是否关联年度计划</th><th>审批状态</th><th>备注</th><th>操作</th></tr></thead><tbody>
+                <tr><td>PA20260321001</td><td>检修保障采购</td><td>主轴轴承等1项</td><td>SKF-7320</td><td>生产类</td><td>4</td><td>套</td><td>30000.00</td><td>120000.00</td><td>2026-04-10</td><td>供应链管理部</td><td>张明</td><td>2026-03-15 10:20</td><td>普通</td><td>是</td><td><span class="tag-soft tag-pending">审批中</span></td><td>备件更换</td><td class="proc-ops-cell"><span class="proc-ops-row"><a href="#" class="js-op" data-op="新增申请">新增</a><a href="#" class="js-op" data-op="申请编辑">编辑</a><a href="#" class="js-op" data-op="申请删除">删除</a><a href="#" class="js-op" data-op="申请查看详情">查看</a></span></td></tr>
+                <tr><td>PA20260321002</td><td>场站改造采购</td><td>变流器模块等2项</td><td>V2.0</td><td>生产类</td><td>12</td><td>件</td><td>35000.00</td><td>420000.00</td><td>2026-04-18</td><td>运维中心</td><td>李哲</td><td>2026-03-18 14:05</td><td>紧急</td><td>否</td><td><span class="tag-soft tag-blue">已通过</span></td><td>场站改造</td><td class="proc-ops-cell"><span class="proc-ops-row"><a href="#" class="js-op" data-op="新增申请">新增</a><a href="#" class="js-op" data-op="申请编辑">编辑</a><a href="#" class="js-op" data-op="申请删除">删除</a><a href="#" class="js-op" data-op="申请查看详情">查看</a></span></td></tr>
+              </tbody></table></div>
+            </div>
+          </section>
+          <section class="proc-section" id="proc-m3" data-tab-key="m3"><h2 class="proc-section-title">订单/需求管理</h2>
+            <div class="proc-card">
+              <div class="carrier-toolbar">
+                <div class="toolbar-left proc-m3-filters">
+                  <span class="proc-filter-label">订单号</span>
+                  <input class="carrier-search proc-m3-order-input" type="search" placeholder="请输入订单号" aria-label="订单号" />
+                  <span class="proc-filter-label">提报单位</span>
+                  <select class="carrier-select" aria-label="提报单位"><option>全部</option><option>河南能源</option><option>天津能源</option></select>
+                  <span class="proc-filter-label">状态</span>
+                  <select class="carrier-select" aria-label="状态"><option>全部</option><option>待确认</option><option>已确认</option><option>已发货</option><option>已完成</option></select>
+                  <span class="proc-filter-label">角色</span>
+                  <select class="carrier-select" id="m3Role" aria-label="角色"><option value="project">项目公司用户</option><option value="biz">业务部门专责</option></select>
+                  <button type="button" class="carrier-btn-add js-op" data-op="查询采购订单">查询</button>
+                  <button type="button" class="carrier-btn-add js-op" data-op="重置筛选">重置</button>
+                </div>
+                <div class="carrier-toolbar-right">
+                  <button type="button" class="carrier-btn-add js-op" data-op="新增订单">新增订单</button>
+                </div>
+              </div>
+              <div class="carrier-table-wrap"><table class="carrier-table"><thead><tr><th>提报人</th><th>部门</th><th>公司</th><th>日期</th><th>场站名称</th><th>设备清单（物资名称、规格型号、数量）</th><th>订单状态</th><th>当前处理人</th><th>物流单号</th><th>销售合同号</th><th>销售合同编号</th><th>操作</th></tr></thead><tbody>
+                <tr data-order-row="ORD2026001"><td>张明</td><td>电控所</td><td>河北龙源</td><td>2026-04-01</td><td>麒麟山风电场</td><td>变流器模块×2、IGBT×5</td><td data-order-status-text>待确认</td><td data-order-owner>业务部门专责</td><td data-order-logistics-no>WL20260401</td><td data-order-sales-no>XSHT-2026-001</td><td data-order-sales-code>SC-001</td><td class="proc-ops-cell" data-order-op></td></tr>
+                <tr data-order-row="ORD2026002"><td>李芳</td><td>机械所</td><td>天津龙源</td><td>2026-04-10</td><td>沙井子风电场</td><td>主控板×3</td><td data-order-status-text>已确认</td><td data-order-owner>业务部门专责</td><td data-order-logistics-no>WL20260410</td><td data-order-sales-no>XSHT-2026-002</td><td data-order-sales-code>SC-002</td><td class="proc-ops-cell" data-order-op></td></tr>
+              </tbody></table></div>
+            </div>
+          </section>
+          <section class="proc-section" id="proc-m4" data-tab-key="m4"><h2 class="proc-section-title">寻源管理</h2>
+            <div class="proc-card">
+              <div class="carrier-toolbar">
+                <div><button type="button" class="carrier-btn-add js-op" data-op="新增寻源">新增寻源</button></div>
+                <div class="carrier-toolbar-right proc-toolbar-row">
+                  <input class="carrier-search" type="search" placeholder="寻源编号" aria-label="寻源编号" />
+                  <input class="carrier-search" type="search" placeholder="项目名称" aria-label="项目名称" />
+                  <select class="carrier-select" aria-label="状态"><option>全部</option><option>进行中</option><option>已完成</option><option>已流标</option></select>
+                  <button type="button" class="carrier-btn-add js-op" data-op="查询寻源">查询</button>
+                  <button type="button" class="carrier-btn-add js-op" data-op="重置筛选">重置</button>
+                </div>
+              </div>
+              <div class="carrier-table-wrap"><table class="carrier-table"><thead><tr><th>寻源编号</th><th>项目名称</th><th>寻源方式</th><th>发布日期</th><th>截止日期</th><th>状态</th><th>操作</th></tr></thead><tbody>
+                <tr><td>XY-2026-011</td><td>齿轮箱采购寻源</td><td>询价</td><td>2026-03-10</td><td>2026-03-30</td><td><span class="tag-soft tag-blue">进行中</span></td><td class="proc-ops-cell"><span class="proc-ops-row"><a href="#" class="js-op" data-op="寻源查看详情">查看详情</a><a href="#" class="js-op" data-op="寻源编辑">编辑</a><a href="#" class="js-op" data-op="寻源发布询价">发布询价</a><a href="#" class="js-op" data-op="寻源查看报价">查看报价</a><a href="#" class="js-op" data-op="寻源比价决标">比价决标</a></span></td></tr>
+                <tr><td>XY-2026-018</td><td>电缆批次采购比选</td><td>招标</td><td>2026-03-05</td><td>2026-03-25</td><td><span class="tag-soft tag-done">已完成</span></td><td class="proc-ops-cell"><span class="proc-ops-row"><a href="#" class="js-op" data-op="寻源查看详情">查看详情</a><a href="#" class="js-op" data-op="寻源查看报价">查看报价</a></span></td></tr>
+              </tbody></table></div>
+            </div>
+          </section>
+          <section class="proc-section" id="proc-m5" data-tab-key="m5"><h2 class="proc-section-title">供应商管理</h2>
+            <div class="proc-card">
+              <div class="carrier-toolbar">
+                <div><button type="button" class="carrier-btn-add js-op" data-op="新增供应商">新增供应商</button></div>
+                <div class="carrier-toolbar-right proc-toolbar-row">
+                  <input class="carrier-search" type="search" placeholder="供应商名称" aria-label="供应商名称" />
+                  <select class="carrier-select" aria-label="合作状态"><option>全部</option><option>合作中</option><option>已终止</option></select>
+                  <button type="button" class="carrier-btn-add js-op" data-op="查询供应商">查询</button>
+                  <button type="button" class="carrier-btn-add js-op" data-op="重置筛选">重置</button>
+                </div>
+              </div>
+              <div class="carrier-table-wrap"><table class="carrier-table"><thead><tr><th>供应商编码</th><th>供应商名称</th><th>统一社会信用代码</th><th>联系人</th><th>联系电话</th><th>合作状态</th><th>准入日期</th><th>操作</th></tr></thead><tbody>
+                <tr><td>GYS001</td><td>华通物流有限公司</td><td>91310110MA1G8T9X2P</td><td>刘倩</td><td>13800001234</td><td><span class="tag-soft tag-done">合作中</span></td><td>2025-01-08</td><td class="proc-ops-cell"><span class="proc-ops-row"><a href="#" class="js-op" data-op="供应商查看详情">查看详情</a><a href="#" class="js-op" data-op="供应商编辑">编辑</a><a href="#" class="js-op" data-op="供应商禁用">禁用</a></span></td></tr>
+                <tr><td>GYS002</td><td>远景能源有限公司</td><td>91110000MA01234567</td><td>周强</td><td>010-88881234</td><td><span class="tag-soft tag-done">合作中</span></td><td>2024-11-20</td><td class="proc-ops-cell"><span class="proc-ops-row"><a href="#" class="js-op" data-op="供应商查看详情">查看详情</a><a href="#" class="js-op" data-op="供应商编辑">编辑</a><a href="#" class="js-op" data-op="供应商禁用">禁用</a></span></td></tr>
+                <tr><td>GYS003</td><td>联程供应链科技</td><td>91310000MA1K2AB3CD</td><td>赵敏</td><td>13900009988</td><td><span class="tag-soft tag-reject">已终止</span></td><td>2023-06-01</td><td class="proc-ops-cell"><span class="proc-ops-row"><a href="#" class="js-op" data-op="供应商查看详情">查看详情</a><a href="#" class="js-op" data-op="供应商编辑">编辑</a><a href="#" class="js-op" data-op="供应商启用">启用</a></span></td></tr>
+              </tbody></table></div>
+            </div>
+          </section>
+          <section class="proc-section" id="proc-m6" data-tab-key="m6"><h2 class="proc-section-title">合同信息管理</h2>
+            <div class="proc-card">
+              <div class="carrier-toolbar">
+                <div class="toolbar-left proc-m6-filters">
+                  <span class="proc-filter-label">合同编号</span>
+                  <input class="carrier-search proc-m6-contract-input" type="search" placeholder="请输入合同编号" aria-label="合同编号" />
+                  <span class="proc-filter-label">供应商</span>
+                  <select class="carrier-select" aria-label="供应商"><option>全部供应商</option><option>宏达物资有限公司</option><option>远景能源</option><option>华通物流有限公司</option></select>
+                  <span class="proc-filter-label">合同状态</span>
+                  <select class="carrier-select" aria-label="合同状态"><option>全部</option><option>生效中</option><option>即将到期</option><option>已过期</option></select>
+                  <button type="button" class="carrier-btn-add js-op proc-btn-icon" data-op="查询合同"><i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i> 查询</button>
+                  <button type="button" class="carrier-btn-add js-op proc-btn-icon btn-sub" data-op="重置筛选"><i class="fa-solid fa-arrow-rotate-right" aria-hidden="true"></i> 重置</button>
+                </div>
+                <div class="carrier-toolbar-right">
+                  <button type="button" class="carrier-btn-add js-op" data-op="新增合同">新增合同</button>
+                </div>
+              </div>
+              <div class="carrier-table-wrap"><table class="carrier-table"><thead><tr><th>合同编号</th><th>合同名称</th><th>合同类型</th><th>供应商名称</th><th>相对方</th><th>签订时间</th><th>合同金额</th><th>付款方式</th><th>付款比例</th><th>合同有效期</th><th>质保期</th><th>入账时间</th><th>入账进度</th><th>支付金额</th><th>支付时间</th><th>支付进度</th><th>阶段号</th><th>物资名称</th><th>规格型号</th><th>物资类别</th><th>采购数量</th><th>采购单价（含税）</th><th>税率</th><th>采购总价（含税）</th><th>备注</th><th>操作</th></tr></thead><tbody>
+                <tr><td>HT-CG-2026-001</td><td>风机备件采购合同</td><td>框架协议</td><td>远景能源</td><td>远景能源有限公司</td><td>2026-03-10</td><td>2,680,000</td><td>银行转账</td><td>100%</td><td>2026-03-10~2026-12-31</td><td>12个月</td><td>2026-03-12</td><td>60%</td><td>1,600,000</td><td>2026-04-10</td><td>59.7%</td><td>S1</td><td>变流器模块</td><td>V2.0</td><td>电子产品</td><td>10</td><td>35,000</td><td>13%</td><td>350,000</td><td>-</td><td class="proc-ops-cell"><span class="proc-ops-row"><a href="#" class="js-op" data-op="合同查看详情">查看详情</a><a href="#" class="js-op" data-op="合同编辑">编辑</a></span></td></tr>
+                <tr><td>HT-CG-2026-002</td><td>电子元器件采购合同</td><td>常规合同</td><td>华强电子</td><td>华强电子有限公司</td><td>2026-03-20</td><td>156,000</td><td>银行转账</td><td>100%</td><td>2026-03-20~2026-09-30</td><td>6个月</td><td>2026-03-25</td><td>20%</td><td>31,200</td><td>2026-04-05</td><td>20%</td><td>S1</td><td>IGBT驱动板</td><td>V3.1</td><td>电子元件</td><td>100</td><td>280</td><td>13%</td><td>28,000</td><td>首批</td><td class="proc-ops-cell"><span class="proc-ops-row"><a href="#" class="js-op" data-op="合同查看详情">查看详情</a><a href="#" class="js-op" data-op="合同下载附件">下载附件</a></span></td></tr>
+              </tbody></table></div>
+            </div>
+          </section>
+          <section class="proc-section" id="proc-m7" data-tab-key="m7"><h2 class="proc-section-title">招投标管理</h2>
+            <div class="proc-card">
+              <div class="carrier-toolbar">
+                <div><button type="button" class="carrier-btn-add js-op" data-op="新增招标项目">新增项目</button></div>
+                <div class="carrier-toolbar-right proc-toolbar-row">
+                  <input class="carrier-search" type="search" placeholder="项目编号" aria-label="项目编号" />
+                  <input class="carrier-search" type="search" placeholder="项目名称" aria-label="项目名称" />
+                  <select class="carrier-select" aria-label="状态"><option>全部</option><option>进行中</option><option>已结束</option><option>已流标</option></select>
+                  <button type="button" class="carrier-btn-add js-op" data-op="查询招标">查询</button>
+                  <button type="button" class="carrier-btn-add js-op" data-op="重置筛选">重置</button>
+                </div>
+              </div>
+              <div class="carrier-table-wrap"><table class="carrier-table"><thead><tr><th>项目编号</th><th>项目名称</th><th>招标方式</th><th>预算金额（元）</th><th>投标截止日期</th><th>开标日期</th><th>状态</th><th>操作</th></tr></thead><tbody>
+                <tr><td>ZB-2026-004</td><td>风机主轴备件采购</td><td>公开招标</td><td>2,800,000</td><td>2026-03-28 17:00</td><td>2026-04-02 09:30</td><td><span class="tag-soft tag-blue">进行中</span></td><td class="proc-ops-cell"><span class="proc-ops-row"><a href="#" class="js-op" data-op="招标查看详情">查看详情</a><a href="#" class="js-op" data-op="招标发布公告">发布公告</a><a href="#" class="js-op" data-op="招标查看投标">查看投标</a><a href="#" class="js-op" data-op="招标开标记录">开标记录</a></span></td></tr>
+              </tbody></table></div>
+            </div>
+          </section>
+          <section class="proc-section" id="proc-m8" data-tab-key="m8"><h2 class="proc-section-title">采购付款</h2>
+            <div class="proc-card">
+              <div class="carrier-toolbar">
+                <div><button type="button" class="carrier-btn-add js-op" data-op="新增付款申请">新增付款申请</button></div>
+                <div class="carrier-toolbar-right proc-toolbar-row">
+                  <input class="carrier-search" type="search" placeholder="付款申请号" aria-label="付款申请号" />
+                  <input class="carrier-search" type="search" placeholder="采购订单号" aria-label="采购订单号" />
+                  <select class="carrier-select" aria-label="付款状态"><option>全部</option><option>待审批</option><option>待付款</option><option>已付款</option><option>已驳回</option></select>
+                  <button type="button" class="carrier-btn-add js-op" data-op="查询采购付款">查询</button>
+                  <button type="button" class="carrier-btn-add js-op" data-op="重置筛选">重置</button>
+                </div>
+              </div>
+              <div class="carrier-table-wrap"><table class="carrier-table"><thead><tr><th>付款申请号</th><th>采购订单号</th><th>供应商</th><th>申请金额（元）</th><th>实付金额（元）</th><th>付款状态</th><th>申请日期</th><th>申请人</th><th>操作</th></tr></thead><tbody>
+                <tr><td>FK-CG-2026-002</td><td>CG-2026-001</td><td>远景能源</td><td>410,000</td><td>—</td><td><span class="tag-soft tag-pending">待审批</span></td><td>2026-04-01</td><td>张明</td><td class="proc-ops-cell"><span class="proc-ops-row"><a href="#" class="js-op" data-op="付款查看详情">查看详情</a><a href="#" class="js-op" data-op="付款审批">审批</a><a href="#" class="js-op" data-op="付款编辑">编辑</a><a href="#" class="js-op" data-op="付款撤回">撤回</a></span></td></tr>
+                <tr><td>FK-CG-2026-001</td><td>PO-2026-0099</td><td>联程供应链</td><td>50,000</td><td>50,000</td><td><span class="tag-soft tag-blue">待付款</span></td><td>2026-03-25</td><td>李华</td><td class="proc-ops-cell"><span class="proc-ops-row"><a href="#" class="js-op" data-op="付款查看详情">查看详情</a><a href="#" class="js-op" data-op="付款确认付款">确认付款</a></span></td></tr>
+              </tbody></table></div>
+            </div>
+          </section>
+          <section class="proc-section" id="proc-m9" data-tab-key="m9"><h2 class="proc-section-title">退货换货管理</h2>
+            <div class="proc-card">
+              <div class="carrier-toolbar">
+                <div><button type="button" class="carrier-btn-add js-op" data-op="新增退货申请">新增退货申请</button></div>
+                <div class="carrier-toolbar-right proc-toolbar-row">
+                  <input class="carrier-search" type="search" placeholder="退货单号" aria-label="退货单号" />
+                  <input class="carrier-search" type="search" placeholder="采购订单号" aria-label="采购订单号" />
+                  <select class="carrier-select" aria-label="状态"><option>全部</option><option>待审批</option><option>已通过</option><option>已驳回</option></select>
+                  <button type="button" class="carrier-btn-add js-op" data-op="查询退换货">查询</button>
+                  <button type="button" class="carrier-btn-add js-op" data-op="重置筛选">重置</button>
+                </div>
+              </div>
+              <p class="kpi-line">业务规则：退货需质检确认；换货将重新生成订单。</p>
+              <div class="carrier-table-wrap"><table class="carrier-table"><thead><tr><th>退货单号</th><th>采购订单号</th><th>供应商</th><th>退货原因</th><th>退货数量</th><th>退货金额（元）</th><th>状态</th><th>操作</th></tr></thead><tbody>
+                <tr><td>TH-2026-001</td><td>PO-2026-0099</td><td>联程供应链</td><td>质检不合格</td><td>2</td><td>12,600</td><td><span class="tag-soft tag-pending">待审批</span></td><td class="proc-ops-cell"><span class="proc-ops-row"><a href="#" class="js-op" data-op="退货查看详情">查看详情</a><a href="#" class="js-op" data-op="退货审批">审批</a><a href="#" class="js-op" data-op="退货撤回">撤回</a></span></td></tr>
+              </tbody></table></div>
+            </div>
+          </section>
+          <section class="proc-section" id="proc-m10" data-tab-key="m10"><h2 class="proc-section-title">库存管理</h2>
+            <div class="proc-card">
+              <div class="proc-m10-subtabs" role="tablist" aria-label="库存管理子页签">
+                <button type="button" class="proc-m10-subtab is-active" role="tab" aria-selected="true" data-m10-sub-tab="ledger">库存台账</button>
+                <button type="button" class="proc-m10-subtab" role="tab" aria-selected="false" data-m10-sub-tab="inbound">实物入库</button>
+              </div>
+
+              <div class="proc-m10-pane is-active" data-m10-sub-pane="ledger" role="tabpanel">
+              <div class="carrier-toolbar">
+                  <div class="proc-m10-toolbar-btns" style="display:flex;flex-wrap:wrap;gap:8px;align-items:center">
+                    <button type="button" class="carrier-btn-add js-op" data-op="库存管理导入" style="background:#fff;color:#389e0d;border:1px solid #b7eb8f">导入</button>
+                    <button type="button" class="carrier-btn-add js-op" data-op="库存管理下载模版" style="background:#fff;color:#1677ff;border:1px solid #91caff">下载模版</button>
+                    <button type="button" class="carrier-btn-add js-op" data-op="库存管理导出" style="background:#fff;color:#1677ff;border:1px solid #91caff">导出</button>
+                  </div>
+                  <div class="carrier-toolbar-right proc-toolbar-row" style="margin-left:0;width:100%;justify-content:flex-start">
+                    <input class="carrier-search" type="search" placeholder="物资类型名称" aria-label="物资类型名称" />
+                    <button type="button" class="carrier-btn-add js-op" data-op="查询质量验收">筛选/搜索</button>
+                  <button type="button" class="carrier-btn-add js-op" data-op="重置筛选">重置</button>
+                </div>
+              </div>
+                <div class="carrier-table-wrap proc-m10-table-wrap">
+                  <table class="carrier-table" id="proc-m10-ledger-table">
+                    <thead>
+                      <tr>
+                        <th>物资类型编码</th>
+                        <th>物资类型名称</th>
+                        <th>物资类别<button type="button" class="m10-contract-help m10-category-help-trigger" data-m10-category-scope="header" aria-label="物资类别说明">?</button></th>
+                        <th>采购单价（含税）</th>
+                        <th>采购总价（含税）</th>
+                        <th>库存数量</th>
+                        <th>采购数量</th>
+                        <th>备注</th>
+                        <th>操作</th>
+                      </tr>
+                    </thead>
+                    <tbody id="proc-m10-ledger-tbody"></tbody>
+                  </table>
+                </div>
+              </div>
+
+              <div class="proc-m10-pane" data-m10-sub-pane="inbound" role="tabpanel">
+                <div class="carrier-toolbar">
+                  <div class="proc-m10-toolbar-btns" style="display:flex;flex-wrap:wrap;gap:8px;align-items:center">
+                    <button type="button" class="carrier-btn-add js-op" data-op="新增">新增入库</button>
+                  </div>
+                  <div class="carrier-toolbar-right proc-toolbar-row" style="margin-left:0;width:100%;justify-content:flex-start">
+                    <input class="carrier-search" type="search" placeholder="入库单号" aria-label="入库单号" />
+                    <input class="carrier-search" type="search" placeholder="合同编号/产品名称" aria-label="合同编号/产品名称" />
+                    <select class="carrier-select" aria-label="验收状态"><option>全部状态</option><option>待验收</option><option>验收中</option><option>已验收</option></select>
+                    <button type="button" class="carrier-btn-add js-op" data-op="查询质量验收">筛选/搜索</button>
+                    <button type="button" class="carrier-btn-add js-op" data-op="重置筛选">重置</button>
+                  </div>
+                </div>
+                <div class="carrier-table-wrap proc-m10-table-wrap">
+                  <table class="carrier-table" id="proc-m10-inbound-table">
+                    <thead>
+                      <tr>
+                        <th style="width:36px"><input type="checkbox" aria-label="全选（演示）" disabled /></th>
+                        <th>入库单号</th>
+                        <th>框架协议号/常规合同编号</th>
+                        <th>执行合同编号</th>
+                        <th>供应商名称</th>
+                        <th>产品名称</th>
+                        <th>入库类型</th>
+                        <th>验收状态</th>
+                        <th>入库时间</th>
+                        <th>入库人</th>
+                        <th>备注</th>
+                        <th>操作</th>
+                      </tr>
+                    </thead>
+                    <tbody id="proc-m10-inbound-tbody">
+                      <tr data-m10-spec="V2.0" data-m10-ship-qty="100" data-m10-recv-qty="100" data-m10-warehouse="公司中心库 / A区-01-01" data-m10-keeper="宋中波" data-m10-receiver="宋中波" data-m10-mat-type="生产类" data-m10-type-code="A0100100001" data-m10-logistics="WL60428-01" data-m10-recv-time="2026-04-28 14:20" data-m10-primary-name="变流器模块" data-m10-products="变流器模块.IGBT驱动板"><td><input type="checkbox" disabled /></td>
+    <td>RK-YC-20260428-01</td>
+    <td>KJ-2026-001</td>
+    <td>ZX-2026-001-01</td>
+    <td>远景能源</td>
+    <td>变流器模块.IGBT驱动板</td>
+    <td>采购入库</td>
+    <td><span class="tag-soft tag-done">已入库</span></td>
+    <td>2026-04-28 14:20</td>
+    <td>宋中波</td>
+    <td>首批到货（分批第1笔）</td>
+    <td class="proc-ops-cell"><span class="proc-ops-row" data-m10-op></span></td></tr>
+                      <tr data-m10-spec="V2.0" data-m10-ship-qty="100" data-m10-recv-qty="100" data-m10-warehouse="公司中心库 / A区-01-01" data-m10-keeper="宋中波" data-m10-receiver="宋中波" data-m10-mat-type="生产类" data-m10-type-code="A0100100001" data-m10-logistics="WL60429-02" data-m10-recv-time="2026-04-29 09:00" data-m10-primary-name="变流器模块" data-m10-products="变流器模块.支架组件"><td><input type="checkbox" disabled /></td>
+    <td>RK-YC-20260429-02</td>
+    <td>KJ-2026-001</td>
+    <td>ZX-2026-001-02</td>
+    <td>远景能源</td>
+    <td>变流器模块.支架组件</td>
+    <td>采购入库</td>
+    <td><span class="tag-soft tag-done">已入库</span></td>
+    <td>2026-04-29 09:00</td>
+    <td>宋中波</td>
+    <td>第二批到货（分批第2笔）</td>
+    <td class="proc-ops-cell"><span class="proc-ops-row" data-m10-op></span></td></tr>
+                      <tr data-m10-spec="XH-105" data-m10-ship-qty="60" data-m10-recv-qty="60" data-m10-warehouse="公司中心库 / B区-02" data-m10-keeper="赵六" data-m10-receiver="赵六" data-m10-mat-type="生产类" data-m10-type-code="A0100100002" data-m10-logistics="WL2026-014" data-m10-recv-time="2026-04-28 15:40" data-m10-primary-name="支架组件" data-m10-products="支架组件.机舱温控模块"><td><input type="checkbox" disabled /></td>
+    <td>RK-2026-014</td>
+    <td>KJ-2026-010</td>
+    <td>ZX-2026-010-01</td>
+    <td>华驰电力</td>
+    <td>支架组件.机舱温控模块</td>
+    <td>自研入库</td>
+    <td><span class="tag-soft tag-done">已入库</span></td>
+    <td>2026-04-28 15:40</td>
+    <td>赵六</td>
+    <td>—</td>
+    <td class="proc-ops-cell"><span class="proc-ops-row" data-m10-op></span></td></tr>
+                      <tr data-m10-flow-return="1" data-m10-spec="GW66-1500" data-m10-ship-qty="100" data-m10-recv-qty="100" data-m10-warehouse="公司中心库 / 山东风电中心001货位" data-m10-keeper="宋波" data-m10-receiver="宋波" data-m10-mat-type="生产类" data-m10-type-code="A0100100002" data-m10-logistics="WL2026-012" data-m10-recv-time="2026-04-29 10:12" data-m10-primary-name="IGBT驱动板" data-m10-products="IGBT驱动板"><td><input type="checkbox" disabled /></td>
+    <td>RK-2026-012</td>
+    <td>KJ-2026-002</td>
+    <td>ZX-2026-002-01</td>
+    <td>远景能源</td>
+    <td>IGBT驱动板.变流器散热组件</td>
+    <td>采购入库</td>
+    <td><span class="tag-soft tag-pending">入库中</span></td>
+    <td>2026-04-29 10:12</td>
+    <td>李泽</td>
+    <td>—</td>
+    <td class="proc-ops-cell"><span class="proc-ops-row" data-m10-op></span></td></tr>
+                      <tr data-m10-spec="XH-104" data-m10-ship-qty="25" data-m10-recv-qty="0" data-m10-warehouse="华北备件库 / D-03" data-m10-keeper="王五" data-m10-receiver="王五" data-m10-mat-type="销售类" data-m10-type-code="A0100200001" data-m10-logistics="WL2026-013" data-m10-recv-time="2026-04-29 11:05" data-m10-primary-name="预制连接子" data-m10-products="预制连接子.汇流箱"><td><input type="checkbox" disabled /></td>
+    <td>RK-2026-013</td>
+    <td>KJ-2026-009</td>
+    <td>ZX-2026-009-01</td>
+    <td>许继电气</td>
+    <td>预制连接子.汇流箱</td>
+    <td>调拨入库</td>
+    <td><span class="tag-soft tag-draft">草稿</span></td>
+    <td>2026-04-29 11:05</td>
+    <td>王五</td>
+    <td>合同配套</td>
+    <td class="proc-ops-cell"><span class="proc-ops-row" data-m10-op></span></td></tr>
+                      <tr data-m10-spec="V2.0" data-m10-ship-qty="120" data-m10-recv-qty="0" data-m10-warehouse="公司中心库 / 待上架区" data-m10-keeper="宋中波" data-m10-receiver="宋中波" data-m10-mat-type="生产类" data-m10-type-code="A0100100001" data-m10-logistics="WL2026-001" data-m10-recv-time="2026-04-29 16:00" data-m10-primary-name="变流器模块" data-m10-products="变流器模块.功率调节执行器"><td><input type="checkbox" disabled /></td>
+    <td>RK-2026-001</td>
+    <td>KJ-2026-301</td>
+    <td>ZX-2026-301-01</td>
+    <td>远景能源</td>
+    <td>变流器模块.功率调节执行器</td>
+    <td>采购入库</td>
+    <td><span class="tag-soft tag-pending">待入库</span></td>
+    <td>2026-04-29 16:00</td>
+    <td>宋中波</td>
+    <td>待到货确认后过账</td>
+    <td class="proc-ops-cell"><span class="proc-ops-row" data-m10-op></span></td></tr>
+                      <tr data-m10-spec="XH-102" data-m10-ship-qty="15" data-m10-recv-qty="0" data-m10-warehouse="项目现场仓 / E-01" data-m10-keeper="钱七" data-m10-receiver="钱七" data-m10-mat-type="办公类" data-m10-type-code="A0400100001" data-m10-logistics="WL-2026002" data-m10-recv-time="2026-04-29 08:20" data-m10-primary-name="电缆" data-m10-products="电缆.工业级交换机"><td><input type="checkbox" disabled /></td>
+    <td>NO-2026002</td>
+    <td>CG-2026-002-02</td>
+    <td></td>
+    <td>金风科技</td>
+    <td>电缆.工业级交换机</td>
+    <td>采购入库</td>
+    <td><span class="tag-soft tag-pending">待入库</span></td>
+    <td>2026-04-29 08:20</td>
+    <td>钱七</td>
+    <td>办公区改造</td>
+    <td class="proc-ops-cell"><span class="proc-ops-row" data-m10-op></span></td></tr>
+                      <tr data-m10-spec="XH-103" data-m10-ship-qty="20" data-m10-recv-qty="0" data-m10-warehouse="华东分仓 / F-02" data-m10-keeper="孙八" data-m10-receiver="孙八" data-m10-mat-type="生产类" data-m10-type-code="A0100200001" data-m10-logistics="WL-2026003" data-m10-recv-time="2026-04-29 14:02" data-m10-primary-name="汇流箱" data-m10-products="汇流箱.场站通信网关"><td><input type="checkbox" disabled /></td>
+    <td>NO-2026003</td>
+    <td>CG-2026-003-01</td>
+    <td></td>
+    <td>联合动力</td>
+    <td>汇流箱.场站通信网关</td>
+    <td>采购入库</td>
+    <td><span class="tag-soft tag-pending">待确认</span></td>
+    <td>2026-04-29 14:02</td>
+    <td>孙八</td>
+    <td>现场补件</td>
+    <td class="proc-ops-cell"><span class="proc-ops-row" data-m10-op></span></td></tr>
+</tbody>
+                  </table>
+                </div>
+              </div>
+          </div>
+          </section>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <div id="procModalMask" class="proc-modal-mask" aria-hidden="true">
+    <div class="proc-modal-box" role="dialog" aria-modal="true" aria-labelledby="procModalTitle">
+      <div class="proc-modal-head">
+        <span id="procModalTitle">提示</span>
+        <button type="button" id="procModalFlow" class="proc-modal-flow-btn" hidden aria-hidden="true">
+          流程进度
+        </button>
+        <button type="button" class="proc-btn" id="procModalX" aria-label="关闭">×</button>
+      </div>
+      <div class="proc-modal-body" id="procModalBody"></div>
+      <div class="proc-modal-foot" id="procModalFoot">
+        <button type="button" class="proc-btn" id="procModalClose">取消</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/sidebar-actions.js"></script>
+  <script src="js/demo-list-form-modal.js"></script>
+  <script src="js/subpage-feature-title.js"></script>
+  <script src="js/site-footer.js"></script>
+  <script src="js/subpage-clock.js"></script>
+  <script src="js/material-code-scheme.js"></script>
+  <script src="js/demo-two-col-dd.js"></script>
+  <script src="js/demo-product-catalog-data.js"></script>
+  <script src="js/demo-product-catalog-picker.js"></script>
+  <script src="js/material-procurement-hub.js?v=20260515-qa-line-spec-auto"></script>
+  <script>
+    (function () {
+      try {
+        var titleMap = {
+          m1: "采购计划",
+          m2: "采购申请",
+          m3: "订单/需求管理",
+          m4: "寻源管理",
+          m5: "供应商管理",
+          m6: "合同信息管理",
+          m7: "招投标管理",
+          m8: "采购付款",
+          m9: "退货换货管理",
+          m10: "库存管理"
+        };
+        var tab = document.documentElement.getAttribute("data-proc-tab") || "m1";
+        var h1 = document.getElementById("procPageTitle");
+        if (h1 && titleMap[tab]) {
+          h1.textContent = titleMap[tab];
+        }
+        // 更新面包屑
+        var breadcrumbPage = document.getElementById("breadcrumbPage");
+        if (breadcrumbPage && titleMap[tab]) {
+          breadcrumbPage.textContent = titleMap[tab];
+        }
+        try {
+          document.title = titleMap[tab] + " - 新能源物资供应链管理系统";
+        } catch (eTitle) {}
+        var sc = document.querySelector(".main-scroll");
+        if (sc) sc.scrollTop = 0;
+      } catch (eTab) {}
+    })();
+  </script>
+  <script>
+    (function () {
+      var m2Tbody = document.querySelector("#proc-m2 tbody");
+      var roleSel = document.getElementById("m3Role");
+      var tbody = document.querySelector("#proc-m3 tbody");
+      if (!roleSel || !tbody || !m2Tbody) return;
+
+      function txt(v) { return (v || "").trim(); }
+
+      function ensureM2TenRows() {
+        var rows = Array.prototype.slice.call(m2Tbody.querySelectorAll("tr"));
+        if (rows.length >= 10) return;
+        var presets = [
+          ["草稿", "tag-draft"],
+          ["审批中", "tag-pending"],
+          ["已驳回", "tag-reject"],
+          ["已通过", "tag-blue"],
+          ["已撤回", "tag-draft"]
+        ];
+        var i = 0;
+        while (rows.length < 10) {
+          var p = presets[i % presets.length];
+          var no = "PA2026042" + (100 + i);
+          var tr = document.createElement("tr");
+          tr.innerHTML =
+            "<td>" + no + "</td><td>示例采购项目" + (i + 1) + "</td><td>示例物资等2项</td><td>STD-" + (i + 1) + "</td><td>生产类</td><td>10</td><td>件</td><td>12000.00</td><td>120000.00</td><td>2026-05-20</td><td>经营发展中心</td><td>李哲</td><td>2026-04-20 10:20</td><td>普通</td><td>否</td><td><span class=\"tag-soft " + p[1] + "\">" + p[0] + "</span></td><td>—</td><td class=\"proc-ops-cell\"><span class=\"proc-ops-row\" data-m2-op></span></td>";
+          m2Tbody.appendChild(tr);
+          rows = Array.prototype.slice.call(m2Tbody.querySelectorAll("tr"));
+          i++;
+        }
+      }
+
+      function renderM2Ops() {
+        Array.prototype.slice.call(m2Tbody.querySelectorAll("tr")).forEach(function (tr) {
+          var st = txt(tr.children[15] ? tr.children[15].textContent : "");
+          var ops = ['<a href="#" class="js-op" data-op="申请查看详情">查看</a>'];
+          if (st === "草稿" || st === "已驳回" || st === "已撤回") {
+            ops.push('<a href="#" class="js-op" data-op="申请编辑">编辑</a>');
+            ops.push('<a href="#" class="js-op" data-op="申请删除">删除</a>');
+          }
+          var opWrap = tr.querySelector("[data-m2-op]") || tr.querySelector(".proc-ops-row");
+          if (opWrap) opWrap.innerHTML = ops.join("");
+        });
+      }
+
+      function ensureM3TenRows() {
+        var rows = Array.prototype.slice.call(tbody.querySelectorAll("tr"));
+        if (rows.length >= 10) return;
+        var statusList = ["待确认", "已确认", "已发货", "已完成"];
+        var i = 0;
+        while (rows.length < 10) {
+          var st = statusList[i % statusList.length];
+          var tr = document.createElement("tr");
+          tr.setAttribute("data-order-row", "ORD2026X" + (100 + i));
+          tr.innerHTML =
+            "<td>张明</td><td>经营发展中心</td><td>河北龙源</td><td>2026-04-2" + (i % 9) + "</td><td>示例场站</td><td>示例设备×" + (i + 1) + '</td><td data-order-status-text>' + st + '</td><td data-order-owner>业务部门专责</td><td data-order-logistics-no>WL2026042' + (i % 9) + '</td><td data-order-sales-no>XSHT-2026-00' + ((i % 3) + 1) + '</td><td data-order-sales-code>SC-00' + ((i % 3) + 1) + '</td><td class="proc-ops-cell" data-order-op></td>';
+          tbody.appendChild(tr);
+          rows = Array.prototype.slice.call(tbody.querySelectorAll("tr"));
+          i++;
+        }
+      }
+
+      function renderM3Ops() {
+        Array.prototype.slice.call(tbody.querySelectorAll("tr")).forEach(function (tr) {
+          tr.querySelector("[data-order-op]").innerHTML = '<a href="#" class="js-op" data-op="订单查看详情">查看</a>';
+        });
+      }
+      tbody.addEventListener("click", function (e) {
+        var a = e.target.closest("[data-a]");
+        if (!a) return;
+        e.preventDefault();
+        var act = a.getAttribute("data-a") || "";
+        if (act === "new-order" || act === "edit-order" || act === "trace-order" || act === "delete-order") return;
+      });
+      roleSel.addEventListener("change", renderM3Ops);
+      ensureM2TenRows();
+      renderM2Ops();
+      ensureM3TenRows();
+      renderM3Ops();
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,1452 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>采购计划审批单 - 新能源物资供应链管理系统</title>
+  <link rel="stylesheet" href="css/vendor/fa-all.min.css" />
+  <link rel="stylesheet" href="css/subpage-base.css" />
+  <link rel="stylesheet" href="css/carrier-management.css" />
+<link rel="stylesheet" href="css/source-navbar-header.css" />
+  <style>
+    .pph .carrier-main-inner { padding: 12px 14px 20px; max-width: 1100px; margin: 0 auto; }
+    .pph-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    .pph-toolbar-left { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .pph-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 32px;
+      padding: 0 16px;
+      font-size: 13px;
+      border-radius: 4px;
+      cursor: pointer;
+      border: 1px solid #d9d9d9;
+      background: #fff;
+      color: rgba(0, 0, 0, 0.88);
+      font-family: inherit;
+    }
+    .pph-btn--primary {
+      background: #1890ff;
+      border-color: #1890ff;
+      color: #fff;
+    }
+    .pph-btn--primary:hover { background: #40a9ff; border-color: #40a9ff; }
+    .pph-btn--ghost:hover { border-color: #1890ff; color: #1890ff; }
+    .pph-title {
+      text-align: center;
+      font-size: 20px;
+      font-weight: 600;
+      color: #1f3551;
+      margin: 6px 0 14px;
+      letter-spacing: 0.02em;
+    }
+    .pph-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 14px;
+      font-size: 13px;
+      color: #4c6077;
+    }
+    .pph-meta select {
+      height: 30px;
+      border: 1px solid #d9d9d9;
+      border-radius: 4px;
+      padding: 0 8px;
+      font-size: 13px;
+      color: #333;
+      background: #fff;
+      min-width: 120px;
+    }
+    .pph-form-wrap {
+      background: #fff;
+      border: 1px solid #e8eef5;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    .pph-grid {
+      width: 100%;
+      border-collapse: collapse;
+      table-layout: fixed;
+      font-size: 13px;
+    }
+    .pph-grid td {
+      border: 1px solid #e8eef5;
+      padding: 0;
+      vertical-align: middle;
+    }
+    .pph-label {
+      width: 18%;
+      background: #f5f7fa;
+      color: #3f5366;
+      padding: 10px 12px;
+      text-align: right;
+      font-weight: 500;
+      box-sizing: border-box;
+    }
+    .pph-label .req { color: #ff4d4f; margin-right: 2px; }
+    .pph-cell {
+      width: 32%;
+      padding: 6px 10px;
+      background: #fff;
+      box-sizing: border-box;
+    }
+    .pph-cell--full { width: auto; }
+    .pph-input {
+      width: 100%;
+      height: 32px;
+      border: 1px solid #d9d9d9;
+      border-radius: 4px;
+      padding: 0 10px;
+      font-size: 13px;
+      color: #333;
+      box-sizing: border-box;
+      outline: none;
+    }
+    .pph-input:focus { border-color: #1890ff; box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.12); }
+    .pph-radio-row {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      min-height: 32px;
+    }
+    .pph-radio-row label {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      font-weight: 400;
+      color: #333;
+    }
+    .pph-upload {
+      display: flex;
+      justify-content: center;
+      padding: 16px 12px;
+      border-top: 1px solid #e8eef5;
+      background: #fafbfd;
+    }
+    .pph-upload .pph-btn--primary {
+      background: #e6f4ff;
+      border-color: #91caff;
+      color: #1677ff;
+    }
+    .pph-upload .pph-btn--primary:hover {
+      background: #bae0ff;
+      border-color: #69b1ff;
+      color: #0958d9;
+    }
+    .pph-toast {
+      position: fixed;
+      left: 50%;
+      bottom: 28px;
+      transform: translateX(-50%);
+      padding: 10px 18px;
+      background: rgba(0, 0, 0, 0.75);
+      color: #fff;
+      border-radius: 6px;
+      font-size: 13px;
+      z-index: 10000;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s;
+    }
+    .pph-toast.show { opacity: 1; }
+
+    /* 审批弹窗「提示」 */
+    .pph-modal-mask {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 10050;
+      background: rgba(15, 25, 45, 0.45);
+      backdrop-filter: blur(2px);
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+    .pph-modal-mask.is-open { display: flex; }
+    .pph-modal {
+      width: min(520px, 100%);
+      max-height: min(92vh, 720px);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 12px 40px rgba(15, 35, 70, 0.18);
+      border: 1px solid #e8eef5;
+    }
+    .pph-modal-hd {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      padding: 14px 40px 12px;
+      border-bottom: 1px solid #f0f2f5;
+      flex-shrink: 0;
+    }
+    .pph-modal-hd h3 {
+      margin: 0;
+      font-size: 16px;
+      font-weight: 600;
+      color: #1f3551;
+    }
+    .pph-modal-x {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 32px;
+      height: 32px;
+      border: none;
+      background: transparent;
+      font-size: 22px;
+      line-height: 1;
+      color: #8c9aad;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+    .pph-modal-x:hover { color: #1f3551; background: #f5f7fa; }
+    .pph-modal-bd {
+      padding: 16px 18px;
+      overflow-y: auto;
+      font-size: 13px;
+      color: #1f3551;
+    }
+    .pph-modal-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+    .pph-modal-row:last-child { margin-bottom: 0; }
+    .pph-modal-row--block { flex-direction: column; gap: 8px; }
+    .pph-modal-label {
+      flex: 0 0 72px;
+      padding-top: 6px;
+      font-weight: 500;
+      color: #1f3551;
+    }
+    .pph-modal-row--block .pph-modal-label { padding-top: 0; }
+    .pph-modal-checks {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 14px 18px;
+      padding-top: 4px;
+    }
+    .pph-modal-checks label {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      font-weight: 400;
+      color: #333;
+    }
+    .pph-modal-hint {
+      margin: 6px 0 0;
+      font-size: 12px;
+      line-height: 1.5;
+      color: #ff4d4f;
+    }
+    .pph-cc-btn {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      border: none;
+      background: #1890ff;
+      color: #fff;
+      font-size: 18px;
+      line-height: 1;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      margin-top: 2px;
+    }
+    .pph-cc-btn:hover { background: #40a9ff; }
+    .pph-modal-textarea {
+      width: 100%;
+      min-height: 96px;
+      padding: 10px 12px;
+      border: 1px solid #d9d9d9;
+      border-radius: 6px;
+      font-size: 13px;
+      font-family: inherit;
+      color: #333;
+      resize: vertical;
+      box-sizing: border-box;
+      outline: none;
+    }
+    .pph-modal-textarea:focus {
+      border-color: #1890ff;
+      box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.12);
+    }
+    .pph-quick-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 4px;
+    }
+    .pph-tag {
+      padding: 4px 12px;
+      font-size: 12px;
+      border: 1px solid #91caff;
+      border-radius: 999px;
+      background: #e6f4ff;
+      color: #1677ff;
+      cursor: pointer;
+      font-family: inherit;
+    }
+    .pph-tag:hover {
+      background: #bae0ff;
+      border-color: #69b1ff;
+    }
+    .pph-modal-ft {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 14px 16px 16px;
+      border-top: 1px solid #f0f2f5;
+      flex-shrink: 0;
+      background: #fafbfd;
+    }
+    .pph-ft-btn {
+      min-width: 72px;
+      height: 32px;
+      padding: 0 14px;
+      font-size: 13px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-family: inherit;
+      border: 1px solid transparent;
+    }
+    .pph-ft-btn--primary {
+      background: #1890ff;
+      border-color: #1890ff;
+      color: #fff;
+    }
+    .pph-ft-btn--primary:hover { background: #40a9ff; border-color: #40a9ff; }
+    .pph-ft-btn--danger {
+      background: #ff4d4f;
+      border-color: #ff4d4f;
+      color: #fff;
+    }
+    .pph-ft-btn--danger:hover { background: #ff7875; border-color: #ff7875; }
+    .pph-ft-btn--ghost {
+      background: #fff;
+      border-color: #d9d9d9;
+      color: rgba(0, 0, 0, 0.85);
+    }
+    .pph-ft-btn--ghost:hover {
+      border-color: #1890ff;
+      color: #1890ff;
+    }
+    .pph-pending-wrap {
+      margin-top: 12px;
+      background: #fff;
+      border: 1px solid #e8eef5;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    .pph-pending-hd {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 10px 12px;
+      background: #f7f9fc;
+      border-bottom: 1px solid #e8eef5;
+      color: #1f3551;
+      font-size: 14px;
+      font-weight: 600;
+    }
+    .pph-pending-table-wrap { overflow-x: auto; }
+    .pph-pending-table {
+      width: 100%;
+      min-width: 920px;
+      border-collapse: collapse;
+      font-size: 13px;
+      background: #fff;
+    }
+    .pph-pending-table th, .pph-pending-table td {
+      border: 1px solid #edf2f8;
+      padding: 8px 10px;
+      text-align: left;
+      color: #3f5366;
+      white-space: nowrap;
+    }
+    .pph-pending-table th { background: #fafbfd; color: #4c6077; }
+    .pph-pending-empty {
+      padding: 16px 12px;
+      font-size: 13px;
+      color: #8b99ad;
+    }
+    .pph-track-mask {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 10060;
+      background: rgba(15, 25, 45, 0.42);
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+      box-sizing: border-box;
+    }
+    .pph-track-mask.is-open { display: flex; }
+    .pph-track {
+      width: min(1080px, 96vw);
+      max-height: 88vh;
+      background: #fff;
+      border: 1px solid #e8eef5;
+      border-radius: 10px;
+      box-shadow: 0 16px 48px rgba(15, 35, 70, 0.2);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .pph-track-hd {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 16px;
+      border-bottom: 1px solid #edf2f8;
+      font-size: 20px;
+      font-weight: 600;
+      color: #1f3551;
+    }
+    .pph-track-tabs {
+      display: flex;
+      gap: 18px;
+      border-bottom: 1px solid #edf2f8;
+      padding: 0 16px;
+    }
+    .pph-track-tab {
+      padding: 12px 2px 10px;
+      background: transparent;
+      border: none;
+      border-bottom: 2px solid transparent;
+      font-size: 24px;
+      color: #4c6077;
+      cursor: pointer;
+    }
+    .pph-track-tab.is-active { color: #1677ff; border-bottom-color: #1677ff; }
+    .pph-track-bd { padding: 12px 14px; overflow: auto; }
+    .pph-track-pane { display: none; }
+    .pph-track-pane.is-active { display: block; }
+    .pph-flow-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 980px;
+      padding: 10px 6px 14px;
+      border-bottom: 1px solid #edf2f8;
+      overflow-x: auto;
+    }
+    .pph-flow-node {
+      min-width: 170px;
+      max-width: 220px;
+      min-height: 58px;
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1px solid #d9e7da;
+      background: #e8f6eb;
+      color: #365c40;
+      font-size: 16px;
+      text-align: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      line-height: 1.4;
+      box-sizing: border-box;
+    }
+    .pph-flow-node.is-pending {
+      border-color: #f6e7be;
+      background: #fff6df;
+      color: #9a6a00;
+    }
+    .pph-flow-node.is-future {
+      border-color: #e5e9f2;
+      background: #f7f9fc;
+      color: #8b99ad;
+    }
+    .pph-flow-arrow { color: #8ea0b8; font-size: 18px; font-weight: 700; }
+    .pph-track-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    .pph-track-table th, .pph-track-table td {
+      border: 1px solid #edf2f8;
+      padding: 10px 8px;
+      text-align: left;
+      color: #3f5366;
+    }
+    .pph-track-table th { background: #f7f9fc; color: #4c6077; }
+    .pph-track-ft {
+      border-top: 1px solid #edf2f8;
+      padding: 12px 16px;
+      display: flex;
+      justify-content: flex-end;
+      background: #fafbfd;
+    }
+  </style>
+</head>
+<body class="page-source-navbar page-subpage page-logistics pph">
+  <div class="page-bg" aria-hidden="true"></div>
+  <div class="app">
+    <header class="header">
+      <div class="header-left">
+        <button type="button" class="header-hamburger" aria-label="菜单"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+        <a class="header-logo" href="#"><img src="assets/logo-chenergy.png" alt="" width="220" height="40" /></a>
+        <div class="header-source-brand"><p>新能源供应链管理系统</p></div>
+      </div>
+      <div class="header-right"><span class="clock" id="clock"></span><div class="user-avatar" title="用户">用</div></div>
+    </header>
+    <div class="layout">
+      <aside class="sidebar" aria-label="主导航">
+<div class="nav-item" title="我的资产"><span class="nav-label">我的资产</span></div>
+<div class="nav-item nav-item--module-active" title="我的任务"><span class="nav-label">我的任务</span></div>
+        <a class="nav-item" href="index-portal-screen-alt.html"><span class="nav-label">首页</span></a>
+        <a class="nav-item" href="cockpit-analytics.html"><span class="nav-label">驾驶舱</span></a>
+        <div class="nav-item" title="采购管理"><span class="nav-label">采购管理</span></div>
+        <a class="nav-item" href="carrier-management.html"><span class="nav-label">物流管理</span></a>
+        <a class="nav-item" href="warehouse.html"><span class="nav-label">仓储管理</span></a>
+        <div class="nav-item" title="物资采购"><span class="nav-label">物资采购</span></div>
+        <div class="nav-item" title="物资出库与处置"><span class="nav-label">物资出库与处置</span></div>
+        <div class="nav-item" title="绩效考核"><span class="nav-label">绩效考核</span></div>
+        <div class="nav-item" title="公告管理"><span class="nav-label">公告管理</span></div>
+        <div class="nav-item" title="综合业务管理"><span class="nav-label">综合业务管理</span></div>
+        <div class="nav-item" title="数据管理"><span class="nav-label">数据管理</span></div>
+        <div class="nav-item" title="开发工具"><span class="nav-label">开发工具</span></div>
+        <div class="nav-item" title="设置"><span class="nav-label">设置</span></div>
+        <div class="nav-item" title="系统管理"><span class="nav-label">系统管理</span></div>
+      </aside>
+      <main class="main-scroll">
+        <div class="carrier-main-inner">
+          <div class="pph-toolbar">
+            <div class="pph-toolbar-left">
+              <button type="button" class="pph-btn pph-btn--primary" id="pphBtnApprove">审批</button>
+              <button type="button" class="pph-btn pph-btn--primary" id="pphBtnHandoff" hidden>发起流转</button>
+              <button type="button" class="pph-btn pph-btn--primary" id="pphBtnTrack">流程进度</button>
+            </div>
+            <a class="pph-btn pph-btn--ghost" href="my-tasks-prototype-list.html?scene=todo" id="pphBtnBack">返回</a>
+          </div>
+          <h2 class="pph-title">采购计划审批单</h2>
+          <div class="pph-form-wrap">
+            <table class="pph-grid" role="presentation">
+              <tbody id="pphFormTbody">
+                <tr>
+                  <td class="pph-label"><span class="req">*</span>提报人</td>
+                  <td class="pph-cell"><input class="pph-input" type="text" name="reporter" value="张三" autocomplete="off" /></td>
+                  <td class="pph-label"><span class="req">*</span>提报时间</td>
+                  <td class="pph-cell"><input class="pph-input" type="text" name="reportTime" value="2024-12-03 11:00:00" readonly /></td>
+                </tr>
+                <tr>
+                  <td class="pph-label"><span class="req">*</span>联系方式</td>
+                  <td class="pph-cell"><input class="pph-input" type="text" name="contact" value="010-88886666" autocomplete="off" /></td>
+                  <td class="pph-label"><span class="req">*</span>提报单位</td>
+                  <td class="pph-cell"><input class="pph-input" type="text" name="unit" value="经营发展中心" autocomplete="off" /></td>
+                </tr>
+                <tr>
+                  <td class="pph-label"><span class="req">*</span>项目名称</td>
+                  <td class="pph-cell pph-cell--full" colspan="3"><input class="pph-input" type="text" name="projectName" value="年度备件集中采购计划" autocomplete="off" /></td>
+                </tr>
+                <tr>
+                  <td class="pph-label"><span class="req">*</span>采购范围</td>
+                  <td class="pph-cell pph-cell--full" colspan="3"><input class="pph-input" type="text" name="scope" value="风机备件、电气元件及耗材" autocomplete="off" /></td>
+                </tr>
+                <tr>
+                  <td class="pph-label"><span class="req">*</span>计划类型</td>
+                  <td class="pph-cell"><input class="pph-input" type="text" name="planType" value="批次计划" autocomplete="off" /></td>
+                  <td class="pph-label"><span class="req">*</span>项目类别</td>
+                  <td class="pph-cell"><input class="pph-input" type="text" name="projectCat" value="物资类" autocomplete="off" /></td>
+                </tr>
+                <tr>
+                  <td class="pph-label"><span class="req">*</span>专业板块</td>
+                  <td class="pph-cell"><input class="pph-input" type="text" name="sector" value="新能源" autocomplete="off" /></td>
+                  <td class="pph-label"><span class="req">*</span>本部专业部门</td>
+                  <td class="pph-cell"><input class="pph-input" type="text" name="hqDept" value="运维管理部" autocomplete="off" /></td>
+                </tr>
+                <tr>
+                  <td class="pph-label"><span class="req">*</span>标的类别</td>
+                  <td class="pph-cell"><input class="pph-input" type="text" name="targetCat" value="货物" autocomplete="off" /></td>
+                  <td class="pph-label"><span class="req">*</span>预算/限价（万元）</td>
+                  <td class="pph-cell"><input class="pph-input" type="text" name="budget" value="520" inputmode="decimal" autocomplete="off" /></td>
+                </tr>
+                <tr>
+                  <td class="pph-label"><span class="req">*</span>采购方式</td>
+                  <td class="pph-cell"><input class="pph-input" type="text" name="method" value="公开招标" autocomplete="off" /></td>
+                  <td class="pph-label"><span class="req">*</span>是否有最高限价</td>
+                  <td class="pph-cell">
+                    <div class="pph-radio-row">
+                      <label><input type="radio" name="maxPrice" value="yes" checked /> 是</label>
+                      <label><input type="radio" name="maxPrice" value="no" /> 否</label>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <div class="pph-upload">
+              <input type="file" id="pphFile" hidden multiple />
+              <button type="button" class="pph-btn pph-btn--primary" id="pphPickFile">选择文件</button>
+            </div>
+          </div>
+          <div class="pph-pending-wrap" id="pphPendingWrap" hidden>
+            <div class="pph-pending-hd">
+              <span id="pphPendingTitle" title="业务顺序：电控所须先完成本部门领用，再发起内部流转；本表含已转入目标部门的待领用批次">待领用物资清单（含内部流转转入）</span>
+              <button type="button" class="pph-btn pph-btn--primary" id="pphUseSelected">选中后发起领用申请</button>
+            </div>
+            <div class="pph-pending-table-wrap">
+              <table class="pph-pending-table">
+                <thead id="pphPendingHead">
+                  <tr>
+                    <th style="width:48px;">选择</th>
+                    <th>合同编号</th>
+                    <th>物资名称</th>
+                    <th>规格型号</th>
+                    <th>可领用数量</th>
+                    <th>流转批次号</th>
+                    <th>上游流转部门</th>
+                    <th>流转时间</th>
+                  </tr>
+                </thead>
+                <tbody id="pphPendingBody"></tbody>
+              </table>
+            </div>
+            <div class="pph-pending-empty" id="pphPendingEmpty" hidden>当前无待领用物资（含内部流转转入）。</div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+  <div class="pph-toast" id="pphToast" role="status" aria-live="polite"></div>
+
+  <div class="pph-modal-mask" id="pphApproveModal" aria-hidden="true">
+    <div class="pph-modal" role="dialog" aria-modal="true" aria-labelledby="pphModalTitle">
+      <div class="pph-modal-hd">
+        <h3 id="pphModalTitle">提示</h3>
+        <button type="button" class="pph-modal-x" id="pphModalCloseX" aria-label="关闭">×</button>
+      </div>
+      <div class="pph-modal-bd">
+        <div class="pph-modal-row">
+          <span class="pph-modal-label">消息提醒</span>
+          <div class="pph-modal-checks">
+            <label><input type="checkbox" name="pphNotify" value="site" checked /> 站内信</label>
+            <label><input type="checkbox" name="pphNotify" value="mail" /> 邮件</label>
+            <label><input type="checkbox" name="pphNotify" value="sms" /> 短信</label>
+          </div>
+        </div>
+        <div class="pph-modal-row pph-modal-row--block">
+          <span class="pph-modal-label">附件</span>
+          <div>
+            <input type="file" id="pphModalFile" hidden multiple />
+            <button type="button" class="pph-btn pph-btn--primary" id="pphModalPickFile">选取文件</button>
+            <p class="pph-modal-hint">请上传 大小不超过 20MB 格式为 doc/xls/ppt/txt/pdf/xlsx/docx/zip 的文件</p>
+          </div>
+        </div>
+        <div class="pph-modal-row">
+          <span class="pph-modal-label">抄送</span>
+          <button type="button" class="pph-cc-btn" id="pphCcAdd" title="添加抄送人">+</button>
+        </div>
+        <div class="pph-modal-row pph-modal-row--block">
+          <label class="pph-modal-label" for="pphOpinion">审批意见</label>
+          <textarea id="pphOpinion" class="pph-modal-textarea" rows="4" placeholder="请输入审批意见"></textarea>
+          <div class="pph-quick-tags" id="pphQuickTags">
+            <button type="button" class="pph-tag" data-text="同意">同意</button>
+            <button type="button" class="pph-tag" data-text="驳回">驳回</button>
+            <button type="button" class="pph-tag" data-text="转办">转办</button>
+            <button type="button" class="pph-tag" data-text="加签">加签</button>
+            <button type="button" class="pph-tag" data-text="终止">终止</button>
+            <button type="button" class="pph-tag" data-text="不同意">不同意</button>
+            <button type="button" class="pph-tag" data-text="已阅">已阅</button>
+          </div>
+        </div>
+      </div>
+      <div class="pph-modal-ft">
+        <button type="button" class="pph-ft-btn pph-ft-btn--primary" data-pph-ft="submit">提交</button>
+        <button type="button" class="pph-ft-btn pph-ft-btn--primary" data-pph-ft="delegate">委托</button>
+        <button type="button" class="pph-ft-btn pph-ft-btn--primary" data-pph-ft="transfer">转办</button>
+        <button type="button" class="pph-ft-btn pph-ft-btn--danger" data-pph-ft="terminate">终止</button>
+        <button type="button" class="pph-ft-btn pph-ft-btn--danger" data-pph-ft="return">退回</button>
+        <button type="button" class="pph-ft-btn pph-ft-btn--ghost" id="pphModalCancel">取消</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="pph-modal-mask" id="pphHandoffModal" aria-hidden="true">
+    <div class="pph-modal" role="dialog" aria-modal="true" aria-labelledby="pphHandoffTitle">
+      <div class="pph-modal-hd">
+        <h3 id="pphHandoffTitle">发起流转</h3>
+        <button type="button" class="pph-modal-x" id="pphHandoffCloseX" aria-label="关闭">×</button>
+      </div>
+      <div class="pph-modal-bd">
+        <p style="margin:0 0 14px;font-size:13px;color:#4a5f78;line-height:1.6;">业务顺序：<strong>电控所须先完成本部门领用</strong>，再将实物在部门间<strong>内部流转</strong>至目标部门（如机械所）；目标部门在待办中办理后续领用/接收。</p>
+        <div class="pph-modal-row">
+          <span class="pph-modal-label">来源部门</span>
+          <div style="padding-top:6px;color:#1f3551;" id="pphFromDept">电控所</div>
+        </div>
+        <div class="pph-modal-row">
+          <label class="pph-modal-label" for="pphToDept">业务部门</label>
+          <div style="flex:1">
+            <select id="pphToDept" class="pph-input">
+              <option value="">请选择业务部门</option>
+              <option value="经营发展中心">经营发展中心</option>
+              <option value="电控所">电控所</option>
+              <option value="机械所">机械所</option>
+              <option value="新能源事业部">新能源事业部</option>
+              <option value="运维中心">运维中心</option>
+            </select>
+          </div>
+        </div>
+        <div class="pph-modal-row pph-modal-row--block">
+          <label class="pph-modal-label" for="pphHandoffRemark">流转说明</label>
+          <textarea id="pphHandoffRemark" class="pph-modal-textarea" rows="3" placeholder="选填：补充流转说明"></textarea>
+        </div>
+      </div>
+      <div class="pph-modal-ft">
+        <button type="button" class="pph-ft-btn pph-ft-btn--primary" id="pphHandoffSubmit">确认发起</button>
+        <button type="button" class="pph-ft-btn pph-ft-btn--ghost" id="pphHandoffCancel">取消</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="pph-track-mask" id="pphTrackModal" aria-hidden="true">
+    <div class="pph-track" role="dialog" aria-modal="true" aria-labelledby="pphTrackTitle">
+      <div class="pph-track-hd">
+        <span id="pphTrackTitle">审批记录</span>
+        <button type="button" class="pph-modal-x" id="pphTrackCloseX" aria-label="关闭">×</button>
+      </div>
+      <div class="pph-track-tabs" id="pphTrackTabs">
+        <button type="button" class="pph-track-tab is-active" data-track-tab="flow">流程图</button>
+        <button type="button" class="pph-track-tab" data-track-tab="info">审批信息</button>
+      </div>
+      <div class="pph-track-bd">
+        <div class="pph-track-pane is-active" data-track-pane="flow">
+          <div class="pph-flow-row" id="pphFlowRow"></div>
+        </div>
+        <div class="pph-track-pane" data-track-pane="info">
+          <table class="pph-track-table">
+            <thead><tr><th>节点名称</th><th>处理人</th><th>处理时间</th><th>处理结果</th><th>处理意见</th></tr></thead>
+            <tbody id="pphTrackInfoBody"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="pph-track-ft">
+        <button type="button" class="pph-ft-btn pph-ft-btn--ghost" id="pphTrackCloseBtn">关闭</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/sidebar-actions.js"></script>
+  <script src="js/subpage-feature-title.js"></script>
+  <script src="js/site-footer.js"></script>
+  <script src="js/subpage-clock.js"></script>
+  <script src="js/cross-dept-handoff-demo.js"></script>
+  <script>
+    (function () {
+      function toast(msg) {
+        var el = document.getElementById("pphToast");
+        if (!el) return;
+        el.textContent = msg;
+        el.classList.add("show");
+        clearTimeout(toast._t);
+        toast._t = setTimeout(function () {
+          el.classList.remove("show");
+        }, 2200);
+      }
+      var qs = new URLSearchParams(window.location.search || "");
+      var taskName = qs.get("task") || "采购计划审批";
+      var rowNo = qs.get("row") || "";
+      var hidQS = qs.get("hid") || "";
+      var isInternalHandoffTask = !!hidQS;
+      var ORDER_HANDLE_TASKS = {
+        "订单需求管理审批": 1,
+        "录入销售合同单号": 1,
+        "录入物流单号": 1
+      };
+      var taskConfigMap = {
+        "采购计划审批": [
+          ["提报人", "张三", true], ["提报时间", "2024-12-03 11:00:00", true],
+          ["联系方式", "010-88886666", true], ["提报单位", "经营发展中心", true],
+          ["项目名称", "年度备件集中采购计划", true, true], ["采购范围", "风机备件、电气元件及耗材", true, true],
+          ["计划类型", "批次计划", true], ["项目类别", "物资类", true],
+          ["专业板块", "新能源", true], ["本部专业部门", "运维管理部", true],
+          ["标的类别", "货物", true], ["预算/限价（万元）", "520", true],
+          ["采购方式", "公开招标", true], ["是否有最高限价", "是", true]
+        ],
+        "采购环节质量验收审批": [
+          ["验收单号", "YS-20260423-08", true], ["提报时间", "2024-12-09 11:06:33", true],
+          ["合同编号", "HT-2026-301", true], ["供应商", "远景能源", true],
+          ["物资名称", "变流器模块", true], ["规格型号", "V2.0", true],
+          ["发货数量", "120", true], ["实收数量", "118", true],
+          ["收货时间", "2026-04-10 09:40", true], ["收货人", "宋中波", true],
+          ["当前验收状态", "确认中", true], ["待确认部门", "业务部门", true]
+        ],
+        "公司层面入库审批": [
+          ["入库单号", "RK-202604-031", true], ["提报时间", "2024-12-09 11:12:30", true],
+          ["项目公司", "华北项目公司", true], ["供应商", "金风科技", true],
+          ["物资名称", "智能风机控制器", true], ["规格型号", "V2.0", true],
+          ["到货数量", "20", true], ["入库数量", "20", true],
+          ["库区/货位", "A-03-12", true], ["入库时间", "2026-04-12 16:20", true],
+          ["办理部门", "电控所", true], ["备注", "已完成核对", false]
+        ],
+        "领用申请审批": [
+          ["领用单号", "LY-202604-087", true], ["提报时间", "2024-12-09 11:17:23", true],
+          ["领用部门", "机械所", true], ["领用人", "王五", true],
+          ["合同编号", "HT-2026-309", true], ["流转批次号", "BATCH-202604-03", true],
+          ["上游流转部门", "电控所", true], ["流转时间", "2026-04-27 16:05", true],
+          ["物资名称", "IGBT驱动板", true], ["规格型号", "V3.1", true],
+          ["申请数量", "12", true], ["库存数量", "80", true],
+          ["领用用途", "故障维修", true], ["要求到货时间", "2026-05-02", false]
+        ],
+        "货物台帐审批": [
+          ["台帐编号", "HWTZ-2026-044", true], ["提报时间", "2024-12-09 11:20:06", true],
+          ["所属合同", "HT-2026-309", true], ["供应商", "海装风电", true],
+          ["物资名称", "变桨系统", true], ["规格型号", "XH-109", true],
+          ["在途数量", "42", true], ["在库数量", "18", true],
+          ["存放状态", "在途", true], ["验收状态", "待复验", true]
+        ],
+        "订单需求管理审批": [
+          ["办理人", "张明", true], ["部门", "电控所", true],
+          ["公司", "内蒙能源", true], ["场站名称", "新安风电场", true],
+          ["提报日期", "2026/04/01", true], ["物流单号", "WL20260401", true],
+          ["销售合同号", "XSHT-2026-001", true], ["销售合同编号", "SC-001", true],
+          ["指定业务部门", "经营发展中心", true], ["确认人", "张明（经营发展中心）", true]
+        ],
+        "录入销售合同单号": [
+          ["办理人", "张明", true], ["部门", "电控所", true],
+          ["公司", "内蒙能源", true], ["场站名称", "新安风电场", true],
+          ["提报日期", "2026/04/01", true], ["物流单号", "WL20260401", true],
+          ["销售合同号", "XSHT-2026-001", true], ["销售合同编号", "SC-001", true],
+          ["指定业务部门", "经营发展中心", true], ["确认人", "张明（经营发展中心）", true]
+        ],
+        "录入物流单号": [
+          ["办理人", "张明", true], ["部门", "电控所", true],
+          ["公司", "内蒙能源", true], ["场站名称", "新安风电场", true],
+          ["提报日期", "2026/04/01", true], ["物流单号", "WL20260401", true],
+          ["销售合同号", "XSHT-2026-001", true], ["销售合同编号", "SC-001", true],
+          ["指定业务部门", "经营发展中心", true], ["确认人", "张明（经营发展中心）", true]
+        ],
+        "货物质量验收审批": [
+          ["验收单号", "QA-2026-209", true], ["提报时间", "2024-12-09 11:35:00", true],
+          ["合同编号", "HT-2026-309", true], ["物资名称", "变桨系统", true],
+          ["规格型号", "XH-109", true], ["到货数量", "42", true],
+          ["抽检数量", "10", true], ["合格数量", "8", true],
+          ["验收结论", "待复验", true], ["验收说明", "需机械所复核", false, true]
+        ],
+        "项目公司入库审批": [
+          ["入库单号", "XMGS-RK-2026-011", true], ["提报时间", "2024-12-09 11:38:11", true],
+          ["项目公司", "华北项目公司", true], ["物资名称", "预制连接子", true],
+          ["规格型号", "XH-104", true], ["入库数量", "25", true],
+          ["存放库位", "B-02-08", true], ["经办人", "赵六", true]
+        ],
+        "退换货管理审批": [
+          ["退换货单号", "TH-20260420-0008", true], ["退换类型", "采购退货", true],
+          ["关联合同/订单", "请选择已生效合同/订单", true, true],
+          ["供应商/客户名称", "远景能源", true], ["申请部门", "新能源事业部", true],
+          ["申请人", "宋中波", true], ["申请时间", "2026-04-20 10:20", true],
+          ["期望处理日期", "年 / 月 / 日", false], ["退换原因说明", "到货抽检不合格", true, true],
+          ["备注", "", false, true]
+        ]
+      };
+      function renderFormByTask() {
+        var list = taskConfigMap[taskName] || taskConfigMap["采购计划审批"];
+        var tbody = document.getElementById("pphFormTbody");
+        if (!tbody) return;
+        var html = "";
+        for (var i = 0; i < list.length; i += 2) {
+          var l = list[i];
+          var r = list[i + 1];
+          html += "<tr>";
+          function buildCell(x) {
+            if (!x) return '<td class="pph-label"></td><td class="pph-cell"></td>';
+            var label = x[0], val = x[1], required = !!x[2], full = !!x[3];
+            if (full) {
+              return (
+                '<td class="pph-label">' + (required ? '<span class="req">*</span>' : "") + label + '</td>' +
+                '<td class="pph-cell pph-cell--full" colspan="3"><input class="pph-input" data-field-label="' + String(label || "").replace(/"/g, "&quot;") + '" type="text" value="' + String(val || "").replace(/"/g, "&quot;") + '" autocomplete="off" /></td>'
+              );
+            }
+            return (
+              '<td class="pph-label">' + (required ? '<span class="req">*</span>' : "") + label + '</td>' +
+              '<td class="pph-cell"><input class="pph-input" data-field-label="' + String(label || "").replace(/"/g, "&quot;") + '" type="text" value="' + String(val || "").replace(/"/g, "&quot;") + '" autocomplete="off" /></td>'
+            );
+          }
+          if (l && l[3]) {
+            html += buildCell(l);
+          } else if (r && r[3]) {
+            html += buildCell(r);
+          } else {
+            html += buildCell(l) + buildCell(r);
+          }
+          html += "</tr>";
+        }
+        tbody.innerHTML = html;
+      }
+      var displayTaskName = isInternalHandoffTask ? "内部流转" : taskName;
+      document.querySelector(".pph-title").textContent = displayTaskName + "单";
+      document.title = displayTaskName + "单 - 新能源物资供应链管理系统";
+      renderFormByTask();
+      var pendingMaterials = [
+        { contractNo: "HT-2026-309", materialName: "变桨系统", spec: "XH-109", qty: "18", batchNo: "BATCH-202604-03", fromDept: "电控所", transferAt: "2026-04-27 16:05" },
+        { contractNo: "HT-2026-311", materialName: "IGBT驱动板", spec: "V3.1", qty: "12", batchNo: "BATCH-202604-05", fromDept: "电控所", transferAt: "2026-04-28 09:22" }
+      ];
+      var orderDeviceRows = [
+        { code: "VZ-SYW-20260420-001", contractNo: "HT-2026-100", purchaseDept: "经营发展中心", name: "移变方舱", spec: "V2.0", cat: "办公类", unitExcl: "18,500.00", useTotal: "2", stockQty: "10", status: "在库", invoiceAt: "2026-04-29", keeperDept: "经营发展中心", keeper: "王文中", location: "中心库-A1", assetCode: "FA-2026-001", originalValue: "80,000", netValue: "76,800", depreciation: "年限平均法", inboundDate: "2026-04-10", supplier: "东风动力", lastCheckAt: "2026-04-29 10:20", lastCheckResult: "账实一致" },
+        { code: "VZ-SYW-20260420-002", contractNo: "HT-2026-101", purchaseDept: "电控所", name: "液压泵总成", spec: "V3.1", cat: "生产类", unitExcl: "14,200.00", useTotal: "3", stockQty: "11", status: "在库", invoiceAt: "2026-04-29", keeperDept: "电控所", keeper: "应雨", location: "中心库-B2", assetCode: "FA-2026-002", originalValue: "86,500", netValue: "83,300", depreciation: "年限平均法", inboundDate: "2026-04-11", supplier: "汉龙动力", lastCheckAt: "2026-04-29 10:20", lastCheckResult: "账实一致" }
+      ];
+      var returnExchangeRows = [
+        { name: "偏航电机", spec: "V2.0", contractQty: "12", unit: "台", returnedQty: "4", thisQty: "4", reason: "质量问题", method: "退货退款", remark: "" },
+        { name: "", spec: "", contractQty: "", unit: "", returnedQty: "", thisQty: "", reason: "", method: "", remark: "" },
+        { name: "", spec: "", contractQty: "", unit: "", returnedQty: "", thisQty: "", reason: "", method: "", remark: "" }
+      ];
+      if (hidQS && window.DemoCrossDeptHandoff && taskName.indexOf("领用申请") >= 0) {
+        var ht0 = DemoCrossDeptHandoff.getTaskById(hidQS);
+        if (ht0 && String(ht0.handoff_status || "") === "待领用") {
+          pendingMaterials = [
+            {
+              contractNo: ht0.contractNo || "HT-2026-309",
+              materialName: ht0.materialName,
+              spec: ht0.spec,
+              qty: ht0.qty || "",
+              batchNo: ht0.batchNo,
+              fromDept: ht0.fromDept,
+              transferAt: ht0.handoff_at
+            }
+          ].concat(
+            pendingMaterials.filter(function (p) {
+              return String(p.batchNo || "") !== String(ht0.batchNo || "");
+            })
+          );
+        }
+      }
+      function setFieldValue(label, value) {
+        var input = document.querySelector('.pph-input[data-field-label="' + label.replace(/"/g, '\\"') + '"]');
+        if (!input) return;
+        input.value = value == null ? "" : String(value);
+      }
+      function getFieldValue(label) {
+        var input = document.querySelector('.pph-input[data-field-label="' + label.replace(/"/g, '\\"') + '"]');
+        return input ? String(input.value || "").trim() : "";
+      }
+      function setReadonlyByLabel(label, readOnly) {
+        var input = document.querySelector('.pph-input[data-field-label="' + label.replace(/"/g, '\\"') + '"]');
+        if (!input) return;
+        if (input.tagName === "SELECT") input.disabled = !!readOnly;
+        else input.readOnly = !!readOnly;
+        input.style.background = readOnly ? "#f5f7fa" : "#fff";
+        input.style.color = readOnly ? "#5b6b7b" : "#111827";
+      }
+      function bindSalesContractRelation() {
+        if (!ORDER_HANDLE_TASKS[taskName]) return;
+        var salesInput = document.querySelector('.pph-input[data-field-label="销售合同号"]');
+        var salesCodeInput = document.querySelector('.pph-input[data-field-label="销售合同编号"]');
+        if (!salesInput || !salesCodeInput) return;
+        var salesMap = {
+          "XSHT-2026-001": "SC-001",
+          "XSHT-2026-002": "SC-002",
+          "XSHT-2026-003": "SC-003"
+        };
+        var sel = document.createElement("select");
+        sel.className = "pph-input";
+        ["XSHT-2026-001", "XSHT-2026-002", "XSHT-2026-003"].forEach(function (v) {
+          var op = document.createElement("option");
+          op.value = v;
+          op.textContent = v;
+          sel.appendChild(op);
+        });
+        sel.value = salesInput.value || "XSHT-2026-001";
+        salesInput.parentNode.replaceChild(sel, salesInput);
+        sel.setAttribute("data-field-label", "销售合同号");
+        function syncCode() {
+          salesCodeInput.value = salesMap[sel.value] || "";
+        }
+        sel.addEventListener("change", syncCode);
+        syncCode();
+      }
+      function applyOrderHandleFieldPermissions() {
+        if (!ORDER_HANDLE_TASKS[taskName]) return;
+        var editableMap = {
+          "订单需求管理审批": { "销售合同号": 1, "物流单号": 1 },
+          "录入销售合同单号": { "销售合同号": 1 },
+          "录入物流单号": { "物流单号": 1 }
+        };
+        var editable = editableMap[taskName] || {};
+        [
+          "办理人",
+          "部门",
+          "公司",
+          "场站名称",
+          "提报日期",
+          "物流单号",
+          "销售合同号",
+          "销售合同编号",
+          "指定业务部门",
+          "确认人"
+        ].forEach(function (label) {
+          setReadonlyByLabel(label, !editable[label]);
+        });
+        setReadonlyByLabel("销售合同编号", true);
+      }
+      var runtimeHandoffRecord = null;
+      function makeBatchNo() {
+        var d = new Date();
+        function p(n){ return String(n).padStart(2, "0"); }
+        var ymd = d.getFullYear() + p(d.getMonth()+1) + p(d.getDate());
+        var seq = String((Math.floor(Math.random() * 900) + 100)).padStart(3, "0");
+        return "BATCH-" + ymd + "-" + seq;
+      }
+      function renderPendingMaterials() {
+        var wrap = document.getElementById("pphPendingWrap");
+        if (!wrap) return;
+        var isUseTask = taskName.indexOf("领用申请") >= 0;
+        var isOrderTask = !!ORDER_HANDLE_TASKS[taskName];
+        var isReturnTask = taskName.indexOf("退换货管理审批") >= 0;
+        wrap.hidden = !(isUseTask || isOrderTask || isReturnTask);
+        if (!(isUseTask || isOrderTask || isReturnTask)) return;
+        var titleEl = document.getElementById("pphPendingTitle");
+        var btn = document.getElementById("pphUseSelected");
+        var head = document.getElementById("pphPendingHead");
+        var body = document.getElementById("pphPendingBody");
+        var empty = document.getElementById("pphPendingEmpty");
+        if (!body) return;
+        if (isReturnTask) {
+          if (titleEl) titleEl.textContent = "退换货物资明细";
+          if (btn) btn.hidden = true;
+          if (head) {
+            head.innerHTML =
+              "<tr><th style='width:48px'>选择</th><th>物资名称</th><th>规格型号</th><th>原采购/销售数量</th><th>单位</th><th>已退换数量</th><th>本次退换数量 <span class='req'>*</span></th><th>退换原因</th><th>处理方式</th><th>备注</th><th>操作</th></tr>";
+          }
+          body.innerHTML = returnExchangeRows.map(function (x) {
+            return (
+              "<tr>" +
+              "<td><input type='checkbox' /></td>" +
+              "<td>" + (x.name || "") + "</td>" +
+              "<td>" + (x.spec || "") + "</td>" +
+              "<td>" + (x.contractQty || "") + "</td>" +
+              "<td>" + (x.unit || "") + "</td>" +
+              "<td>" + (x.returnedQty || "") + "</td>" +
+              "<td><input class='pph-input' type='text' value='" + (x.thisQty || "") + "' /></td>" +
+              "<td><select class='pph-input'><option" + (x.reason === "质量问题" ? " selected" : "") + ">质量问题</option><option>规格不符</option><option>到货异常</option></select></td>" +
+              "<td><select class='pph-input'><option" + (x.method === "退货退款" ? " selected" : "") + ">退货退款</option><option>换货补发</option></select></td>" +
+              "<td><input class='pph-input' type='text' value='" + (x.remark || "") + "' /></td>" +
+              "<td><a href='#' style='color:#1677ff;text-decoration:none'>删除</a></td>" +
+              "</tr>"
+            );
+          }).join("");
+          if (empty) empty.hidden = true;
+          return;
+        }
+        if (isOrderTask) {
+          if (titleEl) titleEl.textContent = "设备清单筛选";
+          if (btn) btn.hidden = true;
+          if (head) {
+            head.innerHTML = "<tr><th>物资编码</th><th>合同编号</th><th>采购部门</th><th>物资名称</th><th>规格型号</th><th>物资类别</th><th>采购平均单价（不含税）</th><th>领用总数</th><th>库存数量</th><th>当前状态</th><th>开票时间</th><th>保管部门</th><th>保管人</th><th>存放地点</th><th>固定资产编码</th><th>原值</th><th>当前净值</th><th>折旧方法</th><th>入库日期</th><th>供应商</th><th>最后盘点时间</th><th>最后盘点结果</th></tr>";
+          }
+          body.innerHTML = orderDeviceRows.map(function (x) {
+            return "<tr><td>" + x.code + "</td><td>" + x.contractNo + "</td><td>" + x.purchaseDept + "</td><td>" + x.name + "</td><td>" + x.spec + "</td><td>" + x.cat + "</td><td>" + x.unitExcl + "</td><td>" + x.useTotal + "</td><td>" + x.stockQty + "</td><td>" + x.status + "</td><td>" + x.invoiceAt + "</td><td>" + x.keeperDept + "</td><td>" + x.keeper + "</td><td>" + x.location + "</td><td>" + x.assetCode + "</td><td>" + x.originalValue + "</td><td>" + x.netValue + "</td><td>" + x.depreciation + "</td><td>" + x.inboundDate + "</td><td>" + x.supplier + "</td><td>" + x.lastCheckAt + "</td><td>" + x.lastCheckResult + "</td></tr>";
+          }).join("");
+          if (empty) empty.hidden = true;
+          return;
+        }
+        if (titleEl) titleEl.textContent = "待领用物资清单（含内部流转转入）";
+        if (btn) btn.hidden = false;
+        if (head) {
+          head.innerHTML = "<tr><th style='width:48px;'>选择</th><th>合同编号</th><th>物资名称</th><th>规格型号</th><th>可领用数量</th><th>流转批次号</th><th>上游流转部门</th><th>流转时间</th></tr>";
+        }
+        if (!pendingMaterials.length) {
+          body.innerHTML = "";
+          if (empty) empty.hidden = false;
+          return;
+        }
+        if (empty) empty.hidden = true;
+        body.innerHTML = pendingMaterials.map(function (x, idx) {
+          return (
+            "<tr>" +
+            '<td><input type="radio" name="pphPendingPick" value="' + idx + '" /></td>' +
+            "<td>" + x.contractNo + "</td>" +
+            "<td>" + x.materialName + "</td>" +
+            "<td>" + x.spec + "</td>" +
+            "<td>" + x.qty + "</td>" +
+            "<td>" + x.batchNo + "</td>" +
+            "<td>" + x.fromDept + "</td>" +
+            "<td>" + x.transferAt + "</td>" +
+            "</tr>"
+          );
+        }).join("");
+      }
+      function bindPendingActions() {
+        var btn = document.getElementById("pphUseSelected");
+        if (!btn) return;
+        btn.addEventListener("click", function () {
+          if (ORDER_HANDLE_TASKS[taskName]) return;
+          var picked = document.querySelector('input[name="pphPendingPick"]:checked');
+          if (!picked) {
+            toast("请先选择待领用物资");
+            return;
+          }
+          var row = pendingMaterials[Number(picked.value)];
+          if (!row) return;
+          setFieldValue("合同编号", row.contractNo);
+          setFieldValue("物资名称", row.materialName);
+          setFieldValue("规格型号", row.spec);
+          setFieldValue("申请数量", row.qty);
+          setFieldValue("流转批次号", row.batchNo);
+          setFieldValue("上游流转部门", row.fromDept);
+          setFieldValue("流转时间", row.transferAt);
+          setFieldValue("领用部门", "机械所");
+          toast("已带入待领用物资信息");
+        });
+      }
+      renderPendingMaterials();
+      bindPendingActions();
+      bindSalesContractRelation();
+      applyOrderHandleFieldPermissions();
+
+      var modal = document.getElementById("pphApproveModal");
+      function openApproveModal() {
+        if (!modal) return;
+        modal.classList.add("is-open");
+        modal.setAttribute("aria-hidden", "false");
+        document.body.style.overflow = "hidden";
+        try {
+          var ta = document.getElementById("pphOpinion");
+          if (ta) setTimeout(function () { ta.focus(); }, 100);
+        } catch (e) {}
+      }
+      function closeApproveModal() {
+        if (!modal) return;
+        modal.classList.remove("is-open");
+        modal.setAttribute("aria-hidden", "true");
+        document.body.style.overflow = "";
+      }
+      document.getElementById("pphBtnApprove").addEventListener("click", openApproveModal);
+      document.getElementById("pphModalCloseX").addEventListener("click", closeApproveModal);
+      document.getElementById("pphModalCancel").addEventListener("click", closeApproveModal);
+      modal.addEventListener("click", function (e) {
+        if (e.target === modal) closeApproveModal();
+      });
+      document.addEventListener("keydown", function (e) {
+        if (e.key !== "Escape") return;
+        if (modal && modal.classList.contains("is-open")) closeApproveModal();
+        if (trackMask && trackMask.classList.contains("is-open")) closeTrackModal();
+      });
+      document.getElementById("pphModalPickFile").addEventListener("click", function () {
+        document.getElementById("pphModalFile").click();
+      });
+      document.getElementById("pphModalFile").addEventListener("change", function () {
+        var n = this.files && this.files.length;
+        toast(n ? "已选择 " + n + " 个附件（演示）" : "未选择文件");
+      });
+      document.getElementById("pphCcAdd").addEventListener("click", function () {
+        toast("演示：选择抄送人");
+      });
+      document.getElementById("pphQuickTags").addEventListener("click", function (e) {
+        var btn = e.target.closest(".pph-tag");
+        if (!btn) return;
+        var t = btn.getAttribute("data-text") || "";
+        var ta = document.getElementById("pphOpinion");
+        if (!ta || !t) return;
+        var cur = ta.value.trim();
+        ta.value = cur ? cur + " " + t : t;
+      });
+      var ftLabels = {
+        submit: "提交",
+        delegate: "委托",
+        transfer: "转办",
+        terminate: "终止",
+        return: "退回"
+      };
+      modal.querySelector(".pph-modal-ft").addEventListener("click", function (e) {
+        var b = e.target.closest("[data-pph-ft]");
+        if (!b) return;
+        var k = b.getAttribute("data-pph-ft");
+        if (k === "return" || k === "terminate") {
+          toast("演示：" + (ftLabels[k] || k) + "（原型未接后端）");
+          closeApproveModal();
+          return;
+        }
+        if (k === "submit") {
+          try {
+            var hidSub = qs.get("hid") || "";
+            if (hidSub && window.DemoCrossDeptHandoff && taskName.indexOf("领用申请") >= 0) {
+              DemoCrossDeptHandoff.updateHandoffStatus(hidSub, "已发起领用申请");
+            }
+          } catch (eSub) {}
+          try {
+            if (typeof window.mapDemoResetTaskReminder === "function") window.mapDemoResetTaskReminder();
+          } catch (eMr2) {}
+          toast("演示：已提交审批意见（原型）");
+          closeApproveModal();
+          return;
+        }
+        toast("演示：" + (ftLabels[k] || k) + "（原型）");
+      });
+
+      var handoffBtn = document.getElementById("pphBtnHandoff");
+      var handoffMask = document.getElementById("pphHandoffModal");
+      var handoffToDept = document.getElementById("pphToDept");
+      var handoffRemark = document.getElementById("pphHandoffRemark");
+      var handoffFromDeptEl = document.getElementById("pphFromDept");
+      function isCompanyInboundTask() {
+        return taskName.indexOf("公司层面入库审批") >= 0;
+      }
+      function openHandoffModal() {
+        if (!handoffMask) return;
+        var fromDept = getFieldValue("办理部门") || "电控所";
+        if (handoffFromDeptEl) handoffFromDeptEl.textContent = fromDept;
+        if (handoffToDept) handoffToDept.value = "";
+        if (handoffRemark) handoffRemark.value = "";
+        handoffMask.classList.add("is-open");
+        handoffMask.setAttribute("aria-hidden", "false");
+        document.body.style.overflow = "hidden";
+      }
+      function closeHandoffModal() {
+        if (!handoffMask) return;
+        handoffMask.classList.remove("is-open");
+        handoffMask.setAttribute("aria-hidden", "true");
+        document.body.style.overflow = "";
+      }
+      if (handoffBtn) {
+        handoffBtn.hidden = !(isCompanyInboundTask() || isInternalHandoffTask);
+        if (!handoffBtn.hidden) {
+          handoffBtn.addEventListener("click", openHandoffModal);
+        }
+      }
+      var forceHideHandoffTasks = {
+        "领用申请审批": 1,
+        "订单需求管理审批": 1,
+        "货物质量验收审批": 1,
+        "退换货管理审批": 1
+      };
+      if (forceHideHandoffTasks[taskName] && !isInternalHandoffTask && handoffBtn) {
+        handoffBtn.hidden = true;
+        handoffBtn.style.display = "none";
+        handoffBtn.disabled = true;
+      }
+      if (ORDER_HANDLE_TASKS[taskName]) {
+        var approveBtn = document.getElementById("pphBtnApprove");
+        var trackBtn = document.getElementById("pphBtnTrack");
+        if (approveBtn) approveBtn.hidden = false;
+        if (trackBtn) trackBtn.hidden = false;
+        if (handoffBtn) handoffBtn.hidden = true;
+      }
+      document.getElementById("pphHandoffCloseX").addEventListener("click", closeHandoffModal);
+      document.getElementById("pphHandoffCancel").addEventListener("click", closeHandoffModal);
+      handoffMask.addEventListener("click", function (e) {
+        if (e.target === handoffMask) closeHandoffModal();
+      });
+      document.getElementById("pphHandoffSubmit").addEventListener("click", function () {
+        var fromDept = getFieldValue("办理部门") || "电控所";
+        var toDept = handoffToDept ? String(handoffToDept.value || "").trim() : "";
+        if (!toDept) {
+          toast("请选择目标部门");
+          return;
+        }
+        if (toDept === fromDept) {
+          toast("目标部门不能与来源部门相同");
+          return;
+        }
+        var batchNo = makeBatchNo();
+        var now = (function(){
+          var d = new Date(); function p(n){ return String(n).padStart(2, "0"); }
+          return d.getFullYear() + "-" + p(d.getMonth()+1) + "-" + p(d.getDate()) + " " + p(d.getHours()) + ":" + p(d.getMinutes());
+        })();
+        runtimeHandoffRecord = {
+          fromDept: fromDept,
+          toDept: toDept,
+          batchNo: batchNo,
+          at: now,
+          remark: (handoffRemark && handoffRemark.value || "").trim()
+        };
+        if (window.DemoCrossDeptHandoff) {
+          DemoCrossDeptHandoff.appendHandoffTask({
+            fromDept: fromDept,
+            toDept: toDept,
+            batchNo: batchNo,
+            handoff_at: now,
+            materialName: getFieldValue("物资名称"),
+            spec: getFieldValue("规格型号"),
+            qty: getFieldValue("入库数量"),
+            inboundNo: getFieldValue("入库单号"),
+            contractNo: getFieldValue("合同编号") || "",
+            remark: runtimeHandoffRecord.remark
+          });
+        }
+        setFieldValue("备注", "已完成核对；电控所已领用后内部流转：" + fromDept + "→" + toDept);
+        closeHandoffModal();
+        toast("已发起内部流转至" + toDept);
+        try {
+          if (typeof window.mapDemoResetTaskReminder === "function") window.mapDemoResetTaskReminder();
+        } catch (eMr) {}
+      });
+
+      var trackMask = document.getElementById("pphTrackModal");
+      function getTrackDemo(task) {
+        if (task.indexOf("公司层面入库审批") >= 0) {
+          var baseRecords = [
+            ["公司层面入库提报", "电控所-王工", "2026-04-12 16:20", "通过", "完成入库核对"],
+            ["电控所部门领用", "电控所-王工", "2026-04-12 17:05", "完成", "物资先在电控所完成本部门领用，实物入账保管"]
+          ];
+          if (runtimeHandoffRecord) {
+            baseRecords.push([
+              "发起内部流转（目标部门待办）",
+              runtimeHandoffRecord.fromDept + " → " + runtimeHandoffRecord.toDept,
+              runtimeHandoffRecord.at,
+              "已发起",
+              (runtimeHandoffRecord.remark ? runtimeHandoffRecord.remark : runtimeHandoffRecord.batchNo || "—")
+            ]);
+            baseRecords.push([
+              "目标部门待办",
+              runtimeHandoffRecord.toDept + "专责",
+              "—",
+              "待处理",
+              "【我的待办】办理领用/接收（承接内部流转）"
+            ]);
+          } else {
+            baseRecords.push(["发起内部流转", "电控所 → 机械所", "—", "待处理", "电控所领用完成后，在本单点击【发起内部流转】"]);
+          }
+          return {
+            nodes: [
+              ["公司层面入库", "done"],
+              ["电控所领用完成", "done"],
+              ["内部流转·待目标部门办理", runtimeHandoffRecord ? "done" : "pending"],
+              ["目标部门领用·闭环", runtimeHandoffRecord ? "pending" : "future"],
+              ["结束", "future"]
+            ],
+            records: baseRecords
+          };
+        }
+        if (task.indexOf("领用申请") >= 0) {
+          return {
+            nodes: [
+              ["供应商发货", "done"],
+              ["技术公司验收入库（电控所）", "done"],
+              ["电控所部门领用完成", "done"],
+              ["内部流转至机械所（待机械所办理）", "done"],
+              ["机械所发起领用申请", "pending"],
+              ["业务部门负责人审批", "future"],
+              ["结束", "future"]
+            ],
+            records: [
+              ["供应商发货", "供应商-联合动力", "2026-04-27 09:10", "完成", "按合同批次发货"],
+              ["技术公司验收入库（电控所）", "电控所-王工", "2026-04-27 14:36", "通过", "验收合格并完成入库"],
+              ["电控所部门领用", "电控所-王工", "2026-04-27 15:20", "完成", "电控所先完成本部门领用，实物在电控所保管"],
+              ["发起内部流转", "电控所 → 机械所", "2026-04-27 16:05", "已发起", "领用完成后发起部门间内部流转，机械所在待办办理后续领用"],
+              ["机械所发起领用申请", "机械所专责", "—", "待处理", "在【我的待办】办理，物资信息自动带入"],
+              ["业务部门负责人审批", "机械所负责人", "—", "待处理", "提交后进入审批"]
+            ]
+          };
+        }
+        if (task.indexOf("质量验收") >= 0 || task.indexOf("验收") >= 0) {
+          return {
+            nodes: [
+              ["申请人", "done"],
+              ["电控所验收", "done"],
+              ["机械所复核入库", "pending"],
+              ["业务部门负责人意见", "future"],
+              ["结束", "future"]
+            ],
+            records: [
+              ["申请人提报", "陈蕾", "2026-04-29 09:20", "已提交", "发起验收审批"],
+              ["电控所验收", "王工", "2026-04-29 10:15", "通过", "首轮验收完成，转机械所"],
+              ["机械所复核入库", "李工", "—", "待处理", "待复核并确认入库"],
+              ["业务部门负责人意见", "张主管", "—", "待处理", "待机械所完成后流转"]
+            ]
+          };
+        }
+        return {
+          nodes: [
+            ["申请人", "done"],
+            ["部门负责人意见及签字", "done"],
+            ["管理处部门专项意见及签字", "pending"],
+            ["管理处领导意见及签字", "future"],
+            ["结束", "future"]
+          ],
+          records: [
+            ["申请人", "张三", "2024-12-03 11:00", "提交", "已发起审批"],
+            ["部门负责人意见及签字", "张主管", "2024-12-03 13:10", "同意", "同意上报"],
+            ["管理处部门专项意见及签字", "王卿明", "—", "待处理", "待专项意见"],
+            ["管理处领导意见及签字", "曾总", "—", "待处理", "待最终审批"]
+          ]
+        };
+      }
+      function renderTrackModal() {
+        var data = getTrackDemo(taskName);
+        var row = document.getElementById("pphFlowRow");
+        var info = document.getElementById("pphTrackInfoBody");
+        if (row) {
+          row.innerHTML = data.nodes.map(function (n, idx) {
+            var cls = n[1] === "pending" ? " is-pending" : (n[1] === "future" ? " is-future" : "");
+            return '<div class="pph-flow-node' + cls + '">' + n[0] + "</div>" + (idx < data.nodes.length - 1 ? '<div class="pph-flow-arrow">→</div>' : "");
+          }).join("");
+        }
+        if (info) {
+          info.innerHTML = data.records.map(function (r) {
+            return "<tr><td>" + r[0] + "</td><td>" + r[1] + "</td><td>" + r[2] + "</td><td>" + r[3] + "</td><td>" + r[4] + "</td></tr>";
+          }).join("");
+        }
+      }
+      function openTrackModal() {
+        renderTrackModal();
+        trackMask.classList.add("is-open");
+        trackMask.setAttribute("aria-hidden", "false");
+        document.body.style.overflow = "hidden";
+      }
+      function closeTrackModal() {
+        trackMask.classList.remove("is-open");
+        trackMask.setAttribute("aria-hidden", "true");
+        document.body.style.overflow = "";
+      }
+      var trackBtn = document.getElementById("pphBtnTrack");
+      trackBtn.addEventListener("click", function (e) {
+        if (e) {
+          e.preventDefault();
+          e.stopPropagation();
+          if (typeof e.stopImmediatePropagation === "function") e.stopImmediatePropagation();
+        }
+        openTrackModal();
+      }, true);
+      window.openUnifiedProgressModal = function () {
+        openTrackModal();
+        return true;
+      };
+      document.getElementById("pphTrackCloseX").addEventListener("click", closeTrackModal);
+      document.getElementById("pphTrackCloseBtn").addEventListener("click", closeTrackModal);
+      trackMask.addEventListener("click", function (e) {
+        if (e.target === trackMask) closeTrackModal();
+      });
+      document.getElementById("pphTrackTabs").addEventListener("click", function (e) {
+        var tab = e.target.closest("[data-track-tab]");
+        if (!tab) return;
+        var key = tab.getAttribute("data-track-tab");
+        trackMask.querySelectorAll("[data-track-tab]").forEach(function (x) {
+          x.classList.toggle("is-active", x === tab);
+        });
+        trackMask.querySelectorAll("[data-track-pane]").forEach(function (x) {
+          x.classList.toggle("is-active", x.getAttribute("data-track-pane") === key);
+        });
+      });
+      document.getElementById("pphPickFile").addEventListener("click", function () {
+        document.getElementById("pphFile").click();
+      });
+      document.getElementById("pphFile").addEventListener("change", function () {
+        var n = this.files && this.files.length;
+        toast(n ? "已选择 " + n + " 个文件（演示）" : "未选择文件");
+      });
+    })();
+  </script>
+</body>
+</html>

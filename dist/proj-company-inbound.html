@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>项目公司入库</title>
+  <link rel="stylesheet" href="css/subpage-base.css" />
+  <link rel="stylesheet" href="css/source-navbar-header.css" />
+  <style>
+    body.page-subpage { background:#f5f7fb; }
+    .main-scroll { padding:14px; }
+    .carrier-card { border-radius:12px; box-shadow:0 8px 26px rgba(15,35,95,.06); border:1px solid #e8edf5; overflow:hidden; }
+    .carrier-head { padding:14px 16px; border-bottom:1px solid #edf2f8; background:#fff; }
+    .carrier-title { margin:0; font-size:24px; color:#1f2d3d; font-weight:700; }
+    .carrier-toolbar { display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap; padding:12px 16px; background:#fff; border-bottom:1px solid #edf2f8; }
+    .toolbar-left,.toolbar-right { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+    .carrier-search,.carrier-select { height:34px; border:1px solid #d9e2ef; border-radius:8px; padding:0 10px; min-width:180px; font-size:13px; background:#fff; }
+    .carrier-btn-add { height:34px; min-width:84px; border-radius:8px; border:1px solid #bcd7ff; background:#fff; color:#1677ff; padding:0 12px; font-size:14px; font-weight:600; cursor:pointer; }
+    #btnAdd { background:#1677ff; border-color:#1677ff; color:#fff; }
+    #btnImport { border-color:#95de64; color:#389e0d; }
+    #btnDeleteBatch { border-color:#ffccc7; color:#cf1322; background:#fff5f5; }
+    .metrics { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:10px; padding:12px 16px; background:#fff; border-bottom:1px solid #edf2f8; }
+    .metric { border:1px solid #edf2f8; border-radius:10px; padding:10px 12px; background:#fafcff; }
+    .metric .k { font-size:12px; color:#64748b; margin-bottom:4px; }
+    .metric .v { font-size:30px; color:#1f7a55; font-weight:700; line-height:1; }
+    .carrier-table-wrap { background:#fff; padding:0 8px 10px; }
+    .carrier-table { width:100%; border-collapse:collapse; min-width:1120px; }
+    .carrier-table th,.carrier-table td { border:1px solid #edf2f7; padding:8px 6px; font-size:13px; text-align:center; white-space:nowrap; }
+    .carrier-table th { background:#f8fbff; color:#334155; font-weight:700; }
+    .status-pill { display:inline-flex; align-items:center; justify-content:center; min-width:74px; height:28px; border-radius:999px; border:1px solid #d9d9d9; font-size:12px; font-weight:700; padding:0 10px; box-sizing:border-box; }
+    .status-draft { color:#262626; border-color:#d9d9d9; background:#fff; }
+    .status-pending { color:#d48806; border-color:#f3d7a1; background:#fff8e6; }
+    .status-pass { color:#1677ff; border-color:#91caff; background:#e6f4ff; }
+    .map-op-cell a { color:#1677ff; text-decoration:none; font-weight:600; margin-right:14px; }
+    .map-op-cell a:last-child { margin-right:0; }
+    .map-op-cell a:hover { color:#4096ff; }
+    #inboundMask {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.45);
+      z-index: 2600;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      box-sizing: border-box;
+    }
+    #inboundMask.show { display: flex; }
+    #inboundMask .modal {
+      width: min(980px, 94vw);
+      max-height: 88vh;
+      background: #fff;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 16px 48px rgba(0, 0, 0, 0.2);
+      display: flex;
+      flex-direction: column;
+    }
+    #inboundMask .modal-hd {
+      padding: 12px 16px;
+      border-bottom: 1px solid #edf2f8;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-weight: 600;
+      color: #1f3551;
+    }
+    #inboundMask .modal-bd {
+      padding: 14px 16px;
+      overflow: auto;
+      max-height: calc(88vh - 104px);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+    #inboundMask .modal-ft {
+      padding: 10px 16px;
+      border-top: 1px solid #edf2f8;
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    #inboundMask .x-btn,
+    #inboundMask .btn {
+      height: 32px;
+      min-width: 80px;
+      border-radius: 6px;
+      border: 1px solid #d9d9d9;
+      background: #fff;
+      color: #595959;
+      cursor: pointer;
+    }
+    #inboundMask .btn.primary {
+      background: #1677ff;
+      color: #fff;
+      border-color: #1677ff;
+    }
+    #inboundMask .btn.danger {
+      background: #fff1f0;
+      color: #cf1322;
+      border-color: #ffccc7;
+    }
+  </style>
+</head>
+<body class="page-source-navbar page-subpage">
+  <div class="app">
+    <header class="header">
+      <div class="header-left">
+        <button class="header-hamburger"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+        <a class="header-logo" href="#"><img src="assets/logo-chenergy.png" width="220" height="40" alt="" /></a>
+        <div class="header-source-brand"><p>新能源物资供应链管理系统</p></div>
+      </div>
+      <div class="header-right"><span id="clock"></span><div class="user-avatar">用</div></div>
+    </header>
+    <div class="layout">
+      <aside class="sidebar"></aside>
+      <main class="main-scroll">
+        <section class="carrier-card">
+          <div class="carrier-toolbar">
+            <div class="toolbar-left">
+              <button type="button" class="carrier-btn-add" id="btnAdd">新增</button>
+              <button type="button" class="carrier-btn-add" id="btnImport">导入</button>
+              <button type="button" class="carrier-btn-add" id="btnTpl">下载模板</button>
+              <button type="button" class="carrier-btn-add" id="btnExport">导出</button>
+              <button type="button" class="carrier-btn-add" id="btnDeleteBatch">删除</button>
+            </div>
+            <div class="toolbar-right">
+              <input class="carrier-search" id="qNo" placeholder="请输入入库单号" />
+              <input class="carrier-search" id="qSupplier" placeholder="请输入供应商" />
+              <select class="carrier-select" id="qStatus">
+                <option value="">全部状态</option>
+                <option>草稿</option>
+                <option>待入库</option>
+                <option>待确认</option>
+                <option>已确认</option>
+              </select>
+              <button type="button" class="carrier-btn-add" id="btnSearch">搜索</button>
+              <button type="button" class="carrier-btn-add" id="btnReset">重置</button>
+            </div>
+          </div>
+          <div class="metrics">
+            <div class="metric"><div class="k">入库总单数</div><div class="v" id="mTotal">0</div></div>
+            <div class="metric"><div class="k">待入库</div><div class="v" id="mPending">0</div></div>
+            <div class="metric"><div class="k">待确认</div><div class="v" id="mReview">0</div></div>
+            <div class="metric"><div class="k">已确认</div><div class="v" id="mDone">0</div></div>
+          </div>
+          <div class="carrier-table-wrap">
+            <table class="carrier-table">
+              <thead>
+                <tr>
+                  <th><input type="checkbox" id="chkAll" /></th>
+                  <th>入库单号</th>
+                  <th>采购订单号</th>
+                  <th>供应商</th>
+                  <th>到货日期</th>
+                  <th>验收状态</th>
+                  <th>入库状态</th>
+                  <th>关联部门</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody id="tb"></tbody>
+            </table>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+  <div class="modal-mask" id="inboundMask" aria-hidden="true">
+    <div class="modal">
+      <div class="modal-hd"><span id="inboundTitle">新增项目公司入库</span><button class="x-btn" id="inboundX" aria-label="关闭">×</button></div>
+      <div class="modal-bd" id="inboundBody"></div>
+      <div class="modal-ft">
+        <button class="btn" id="inboundCancel">取消</button>
+        <button class="btn primary" id="inboundSave">保存</button>
+      </div>
+    </div>
+  </div>
+  <script src="js/sidebar-actions.js"></script>
+  <script src="js/subpage-feature-title.js"></script>
+  <script src="js/subpage-clock.js"></script>
+  <script>
+    (function () {
+      var rows = [
+        { no: "PI-2026-001", po: "PO-2026-1001", supplier: "中车电气", date: "2026-04-18", qa: "已通过", st: "待入库", dept: "工程部" },
+        { no: "PI-2026-002", po: "PO-2026-1002", supplier: "远景能源", date: "2026-04-19", qa: "已通过", st: "待确认", dept: "物资部" },
+        { no: "PI-2026-003", po: "PO-2026-1003", supplier: "金风科技", date: "2026-04-20", qa: "已通过", st: "已确认", dept: "财务部" }
+      ];
+      while (rows.length < 10) {
+        var i = rows.length + 1;
+        rows.push({
+          no: "PI-2026-" + String(100 + i),
+          po: "PO-2026-" + String(2000 + i),
+          supplier: ["中车电气", "远景能源", "金风科技", "许继电气"][i % 4],
+          date: "2026-04-" + String(10 + (i % 18)).padStart(2, "0"),
+          qa: "已通过",
+          st: ["草稿", "待入库", "待确认", "已确认"][i % 4],
+          dept: ["工程部", "物资部", "财务部", "经营发展中心"][i % 4]
+        });
+      }
+
+      function esc(v) { return String(v == null ? "" : v).replace(/[&<>"']/g, function (s) { return ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" })[s]; }); }
+      function statusClass(st) {
+        if (st === "待入库" || st === "待确认") return "status-pending";
+        if (st === "已确认") return "status-pass";
+        return "status-draft";
+      }
+      function ops(st) {
+        if (st === "草稿") return '<a href="#" data-op="view">查看</a> <a href="#" data-op="edit">编辑</a> <a href="#" data-op="delete">删除</a>';
+        return '<a href="#" data-op="view">查看</a>';
+      }
+      function byNo(no) {
+        for (var i = 0; i < rows.length; i++) if (rows[i].no === no) return rows[i];
+        return null;
+      }
+      function formHtml(data, readonly) {
+        var d = data || { no: "", po: "", supplier: "", date: "", qa: "已通过", st: "草稿", dept: "" };
+        var ro = readonly ? " readonly " : "";
+        var dis = readonly ? " disabled " : "";
+        var bg = readonly ? "background:#f5f5f5;" : "";
+        function opt(v, cur) { return "<option" + (v === cur ? " selected" : "") + ">" + v + "</option>"; }
+        return (
+          '<div style="display:grid;grid-template-columns:130px 1fr;gap:10px 12px;font-size:13px;">' +
+          "<label>入库单号</label><input class='carrier-search' id='fNo' value='" + esc(d.no) + "' " + ro + " style='" + bg + "min-width:0'>" +
+          "<label>采购订单号</label><input class='carrier-search' id='fPo' value='" + esc(d.po) + "' " + ro + " style='" + bg + "min-width:0'>" +
+          "<label>供应商</label><input class='carrier-search' id='fSupplier' value='" + esc(d.supplier) + "' " + ro + " style='" + bg + "min-width:0'>" +
+          "<label>到货日期</label><input type='date' class='carrier-search' id='fDate' value='" + esc(d.date) + "' " + (readonly ? "disabled" : "") + " style='" + bg + "min-width:0'>" +
+          "<label>验收状态</label><select class='carrier-select' id='fQa' " + dis + " style='" + bg + "min-width:0'>" + opt("已通过", d.qa || "已通过") + opt("待验收", d.qa || "") + "</select>" +
+          "<label>入库状态</label><select class='carrier-select' id='fSt' " + dis + " style='" + bg + "min-width:0'>" + opt("草稿", d.st || "草稿") + opt("待入库", d.st || "") + opt("待确认", d.st || "") + opt("已确认", d.st || "") + "</select>" +
+          "<label>关联部门</label><select class='carrier-select' id='fDept' " + dis + " style='" + bg + "min-width:0'>" + opt("工程部", d.dept || "") + opt("物资部", d.dept || "") + opt("财务部", d.dept || "") + opt("经营发展中心", d.dept || "") + "</select>" +
+          "</div>"
+        );
+      }
+      var formMode = "add";
+      var formRefNo = "";
+      function deleteHtml(row) {
+        var d = row || {};
+        return (
+          '<div style="font-size:14px;line-height:1.9;color:#1f2d3d;padding:8px 2px">' +
+          "<div>是否确认删除该条数据？</div>" +
+          "<div style='margin-top:10px;color:#64748b;font-size:13px'>入库单号：" + esc(d.no || "—") + "</div>" +
+          "<div style='color:#64748b;font-size:13px'>采购订单号：" + esc(d.po || "—") + "</div>" +
+          "<div style='color:#64748b;font-size:13px'>供应商：" + esc(d.supplier || "—") + "</div>" +
+          "</div>"
+        );
+      }
+      function openForm(mode, row) {
+        formMode = mode;
+        formRefNo = row && row.no ? row.no : "";
+        var saveBtn = document.getElementById("inboundSave");
+        if (mode === "delete") {
+          document.getElementById("inboundTitle").textContent = "删除项目公司入库";
+          document.getElementById("inboundBody").innerHTML = deleteHtml(row);
+          saveBtn.style.display = "";
+          saveBtn.textContent = "确认删除";
+          saveBtn.classList.add("danger");
+          saveBtn.classList.remove("primary");
+        } else {
+          document.getElementById("inboundTitle").textContent = mode === "edit" ? "编辑项目公司入库" : (mode === "view" ? "查看项目公司入库" : "新增项目公司入库");
+          document.getElementById("inboundBody").innerHTML = formHtml(row, mode === "view");
+          saveBtn.textContent = "保存";
+          saveBtn.classList.remove("danger");
+          saveBtn.classList.add("primary");
+          saveBtn.style.display = mode === "view" ? "none" : "";
+        }
+        var mask = document.getElementById("inboundMask");
+        mask.classList.add("show");
+        mask.setAttribute("aria-hidden", "false");
+      }
+      function closeForm() {
+        var mask = document.getElementById("inboundMask");
+        mask.classList.remove("show");
+        mask.setAttribute("aria-hidden", "true");
+      }
+      function updateMetrics(list) {
+        document.getElementById("mTotal").textContent = String(list.length);
+        document.getElementById("mPending").textContent = String(list.filter(function (x) { return x.st === "待入库"; }).length);
+        document.getElementById("mReview").textContent = String(list.filter(function (x) { return x.st === "待确认"; }).length);
+        document.getElementById("mDone").textContent = String(list.filter(function (x) { return x.st === "已确认"; }).length);
+      }
+      function render() {
+        var n = document.getElementById("qNo").value.trim();
+        var s = document.getElementById("qSupplier").value.trim();
+        var st = document.getElementById("qStatus").value.trim();
+        var list = rows.filter(function (r) {
+          if (n && r.no.indexOf(n) < 0) return false;
+          if (s && r.supplier.indexOf(s) < 0) return false;
+          if (st && r.st !== st) return false;
+          return true;
+        });
+        updateMetrics(list);
+        document.getElementById("tb").innerHTML = list.map(function (r) {
+          return "<tr data-no='" + esc(r.no) + "'>" +
+            "<td><input type='checkbox' class='row-chk' data-no='" + esc(r.no) + "'></td>" +
+            "<td>" + esc(r.no) + "</td><td>" + esc(r.po) + "</td><td>" + esc(r.supplier) + "</td><td>" + esc(r.date) + "</td>" +
+            "<td><span class='status-pill status-pass'>" + esc(r.qa) + "</span></td><td><span class='status-pill " + statusClass(r.st) + "'>" + esc(r.st) + "</span></td><td>" + esc(r.dept) + "</td>" +
+            "<td class='map-op-cell'>" + ops(r.st) + "</td></tr>";
+        }).join("");
+      }
+
+      document.addEventListener("click", function (e) {
+        if (e.target.id === "btnSearch") { render(); return; }
+        if (e.target.id === "btnReset") { document.getElementById("qNo").value = ""; document.getElementById("qSupplier").value = ""; document.getElementById("qStatus").value = ""; render(); return; }
+        if (e.target.id === "btnAdd") { openForm("add"); return; }
+        if (e.target.id === "btnImport") { alert("导入弹窗（演示）"); return; }
+        if (e.target.id === "btnTpl") { alert("下载模板（演示）"); return; }
+        if (e.target.id === "btnExport") { alert("导出（演示）"); return; }
+        if (e.target.id === "btnDeleteBatch") { alert("批量删除（演示）"); return; }
+        if (e.target.id === "chkAll") {
+          var ck = !!e.target.checked;
+          Array.prototype.forEach.call(document.querySelectorAll(".row-chk"), function (c) { c.checked = ck; });
+          return;
+        }
+        var op = e.target.getAttribute("data-op");
+        if (!op) return;
+        e.preventDefault();
+        var tr = e.target.closest("tr[data-no]");
+        var row = tr ? byNo(tr.getAttribute("data-no")) : null;
+        if (op === "view") openForm("view", row);
+        if (op === "edit") openForm("edit", row);
+        if (op === "delete") openForm("delete", row);
+      });
+      document.getElementById("inboundX").addEventListener("click", closeForm);
+      document.getElementById("inboundCancel").addEventListener("click", closeForm);
+      document.getElementById("inboundMask").addEventListener("click", function (e) {
+        if (e.target === this) closeForm();
+      });
+      document.getElementById("inboundSave").addEventListener("click", function () {
+        var no = (document.getElementById("fNo").value || "").trim() || ("PI-2026-" + String(Math.floor(Math.random() * 900 + 100)));
+        if (formMode === "delete" && formRefNo) {
+          rows = rows.filter(function (x) { return x.no !== formRefNo; });
+          closeForm();
+          render();
+          return;
+        }
+        var row = {
+          no: no,
+          po: (document.getElementById("fPo").value || "").trim(),
+          supplier: (document.getElementById("fSupplier").value || "").trim(),
+          date: (document.getElementById("fDate").value || "").trim(),
+          qa: (document.getElementById("fQa").value || "已通过").trim(),
+          st: (document.getElementById("fSt").value || "草稿").trim(),
+          dept: (document.getElementById("fDept").value || "").trim()
+        };
+        if (formMode === "edit" && formRefNo) {
+          var old = byNo(formRefNo);
+          if (old) {
+            old.no = row.no; old.po = row.po; old.supplier = row.supplier; old.date = row.date; old.qa = row.qa; old.st = row.st; old.dept = row.dept;
+          }
+        } else {
+          rows.unshift(row);
+        }
+        closeForm();
+        render();
+      });
+      render();
+    })();
+  </script>
+</body>
+</html>

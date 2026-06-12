@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>发货管理 - 新能源物资供应链管理系统</title>
+  <link rel="stylesheet" href="css/vendor/fa-all.min.css" />
+  <link rel="stylesheet" href="css/subpage-base.css" />
+  <link rel="stylesheet" href="css/carrier-management.css" />
+  <link rel="stylesheet" href="css/source-navbar-header.css" />
+  <style>
+    .s-mask{position:fixed;inset:0;background:rgba(0,0,0,.35);display:none;align-items:center;justify-content:center;z-index:2600}
+    .s-mask.show{display:flex}
+    .s-box{width:min(560px,94vw);background:#fff;border-radius:10px;overflow:hidden}
+    .s-hd{padding:12px 16px;border-bottom:1px solid #edf2f8;font-weight:600}
+    .s-bd{padding:12px 16px}
+    .s-ft{padding:10px 16px;border-top:1px solid #edf2f8;display:flex;justify-content:flex-end;gap:8px}
+    .s-row{display:grid;grid-template-columns:110px 1fr;gap:8px;align-items:center;margin-bottom:8px;font-size:13px}
+    .s-row input{height:30px;border:1px solid #d9d9d9;border-radius:4px;padding:0 8px}
+    .proc-ship-ops .carrier-btn-add{
+      border:none;background:transparent;box-shadow:none;padding:0;min-height:auto;height:auto;line-height:1.2;
+      color:#1677ff;font-size:14px;font-weight:600;text-decoration:none;
+    }
+    .proc-ship-ops .carrier-btn-add:hover{ color:#4096ff; text-decoration:underline; background:transparent; }
+  </style>
+</head>
+<body class="page-source-navbar page-subpage page-logistics">
+  <div class="page-bg" aria-hidden="true"></div>
+  <div class="app">
+    <header class="header"><div class="header-left"><button class="header-hamburger"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button><a class="header-logo" href="#"><img src="assets/logo-chenergy.png" width="220" height="40" alt=""/></a><div class="header-source-brand"><p>新能源供应链管理系统</p></div></div><div class="header-right"><span class="clock" id="clock"></span><div class="user-avatar">用</div></div></header>
+    <div class="layout"><aside class="sidebar"><div class="nav-item nav-item--module-active"><span class="nav-label">采购管理</span></div></aside><main class="main-scroll"><div class="carrier-main-inner">
+      <h1 class="carrier-page-title">发货管理（XQ-PROC-6）</h1>
+      <div class="carrier-toolbar">
+        <div>
+          <button class="carrier-btn-add" id="shipBtnAdd"><i class="fa-solid fa-plus"></i> 新增</button>
+          <button class="carrier-btn-add" id="shipBtnImport" style="background:#fff;color:#389e0d;border:1px solid #b7eb8f"><i class="fa-solid fa-file-import"></i> 导入</button>
+          <button class="carrier-btn-add" id="shipBtnTpl" style="background:#fff;color:#1677ff;border:1px solid #91caff"><i class="fa-solid fa-download"></i> 下载模板</button>
+          <button class="carrier-btn-add" id="shipBtnExport" style="background:#fff;color:#1677ff;border:1px solid #91caff"><i class="fa-solid fa-file-export"></i> 导出</button>
+          <button class="carrier-btn-add" id="shipBtnBatchDelete" style="background:#fff1f0;color:#cf1322;border:1px solid #ffccc7">删除</button>
+        </div>
+        <div class="carrier-toolbar-right">
+          <select class="carrier-select" id="shipRole"><option value="biz">业务部门专责</option><option value="project">项目公司</option></select>
+          <input class="carrier-search" id="shipKeyword" placeholder="发货编号/关联订单"/>
+          <select class="carrier-select" id="shipStatus"><option>全部状态</option><option>草稿</option><option>待发货</option><option>已发货</option><option>已签收</option></select>
+          <button class="carrier-btn-add" id="shipBtnSearch">搜索</button>
+          <button class="carrier-btn-add" id="shipBtnReset" style="background:#fff;color:#1677ff;border:1px solid #91caff">重置</button>
+        </div>
+      </div>
+      <div class="carrier-table-wrap"><table class="carrier-table"><thead><tr><th>发货单号</th><th>销售合同编号</th><th>客户名称</th><th>发货类型</th><th>物资名称</th><th>规格型号</th><th>发货数量</th><th>单位</th><th>物流方式</th><th>物流公司</th><th>物流单号</th><th>发货状态</th><th>发货时间</th><th>预计送达时间</th><th>发货人</th><th>备注</th><th>操作</th></tr></thead><tbody id="tb">
+        <tr><td>FH-2026-101</td><td>HT-XS-2026-001</td><td>天津龙源</td><td>仓库发货</td><td>IGBT驱动板</td><td>V3.1</td><td>30</td><td>个</td><td>公路运输</td><td>顺丰物流</td><td>SF123456789</td><td data-status><span class="tag-status tag-status--to-shelf">待发货</span></td><td>-</td><td>2026-04-20</td><td>-</td><td>-</td><td><span class="proc-ship-ops" data-ops style="display:inline-flex;align-items:center;gap:8px;flex-wrap:wrap"></span></td></tr>
+      </tbody></table></div>
+    </div></main></div>
+  </div>
+  <div class="s-mask" id="shipMask"><div class="s-box"><div class="s-hd">发货出库确认</div><div class="s-bd" id="shipBody"></div><div class="s-ft"><button class="carrier-btn-add" id="shipCancel">取消</button><button class="carrier-btn-add" id="shipOk">确认发货</button></div></div></div>
+  <script src="js/sidebar-actions.js"></script><script src="js/subpage-feature-title.js"></script><script src="js/site-footer.js"></script>
+<script src="js/subpage-clock.js"></script>
+  <script>
+    (function(){
+      var cur=null,mask=document.getElementById("shipMask"),body=document.getElementById("shipBody");
+      document.getElementById("shipBtnAdd").addEventListener("click", function () {
+        openQuickModal("新增发货单", '<div class="s-row"><span>销售合同编号</span><input /></div><div class="s-row"><span>物资名称</span><input /></div><div class="s-row"><span>发货数量</span><input /></div>');
+      });
+      document.getElementById("shipBtnImport").addEventListener("click", function () { alert("导入发货数据（演示）"); });
+      document.getElementById("shipBtnTpl").addEventListener("click", function () { alert("下载模板（演示）"); });
+      document.getElementById("shipBtnExport").addEventListener("click", function () { alert("导出发货数据（演示）"); });
+      document.getElementById("shipBtnBatchDelete").addEventListener("click", function () { alert("批量删除（演示）"); });
+      document.getElementById("shipBtnSearch").addEventListener("click", function () { alert("按条件搜索（演示）"); });
+      document.getElementById("shipBtnReset").addEventListener("click", function () {
+        var kw = document.getElementById("shipKeyword");
+        var st = document.getElementById("shipStatus");
+        if (kw) kw.value = "";
+        if (st) st.selectedIndex = 0;
+      });
+      function openQuickModal(title, bodyHtml){
+        var id="shipQuickMask", qm=document.getElementById(id);
+        if(!qm){
+          qm=document.createElement("div");
+          qm.id=id;
+          qm.className="s-mask";
+          qm.innerHTML='<div class="s-box"><div class="s-hd" id="shipQuickTitle"></div><div class="s-bd" id="shipQuickBody"></div><div class="s-ft"><button class="carrier-btn-add" data-close-quick="1">取消</button></div></div>';
+          document.body.appendChild(qm);
+          qm.addEventListener("click", function(e){
+            if(e.target===qm || (e.target && e.target.getAttribute("data-close-quick")==="1")) qm.classList.remove("show");
+          });
+        }
+        qm.querySelector("#shipQuickTitle").textContent = title || "提示";
+        qm.querySelector("#shipQuickBody").innerHTML = bodyHtml || "";
+        qm.classList.add("show");
+      }
+      function close(){mask.classList.remove("show");cur=null;}
+      function nowText(){
+        var d = new Date();
+        function p(n){ return String(n).padStart(2,"0"); }
+        return d.getFullYear()+"-"+p(d.getMonth()+1)+"-"+p(d.getDate())+" "+p(d.getHours())+":"+p(d.getMinutes())+":"+p(d.getSeconds());
+      }
+      function saveInvoicePendingFromShipment(tr){
+        if(!tr) return;
+        var item = {
+          contractNo: (tr.children[1] && tr.children[1].textContent || "").trim(),
+          customerName: (tr.children[2] && tr.children[2].textContent || "").trim(),
+          materialName: (tr.children[4] && tr.children[4].textContent || "").trim(),
+          spec: (tr.children[5] && tr.children[5].textContent || "").trim(),
+          shipTime: (tr.children[12] && tr.children[12].textContent || "").trim(),
+          shipStatus: "已发货",
+          invoiceStatus: "未开票",
+          invoiceTime: "",
+          reason: "发货后待财务开票确认"
+        };
+        var key = "map_invoice_updates_v1";
+        var list = [];
+        try { list = JSON.parse(localStorage.getItem(key) || "[]"); } catch(e) { list = []; }
+        var hit = false;
+        list = list.map(function(x){
+          if (String(x.contractNo||"") === String(item.contractNo||"") && String(x.materialName||"") === String(item.materialName||"")) {
+            hit = true;
+            return item;
+          }
+          return x;
+        });
+        if(!hit) list.push(item);
+        try { localStorage.setItem(key, JSON.stringify(list)); } catch(e) {}
+      }
+      document.getElementById("shipCancel").onclick=close;
+      mask.onclick=function(e){ if(e.target===mask) close(); };
+      function statusOf(tr){
+        var t = (tr.querySelector("[data-status]")||tr.children[11]).textContent.trim();
+        if (t.indexOf("草稿")>=0) return "草稿";
+        if (t.indexOf("待发货")>=0) return "待发货";
+        if (t.indexOf("已发货")>=0) return "已发货";
+        if (t.indexOf("已签收")>=0) return "已签收";
+        return "待发货";
+      }
+      function renderOps(){
+        var role = document.getElementById("shipRole").value;
+        Array.prototype.slice.call(document.querySelectorAll("#tb tr")).forEach(function(tr){
+          var st = statusOf(tr);
+          var ops = ['<button type="button" class="carrier-btn-add" data-a="detail">查看</button>'];
+          if (st === "草稿") {
+            ops.push('<button type="button" class="carrier-btn-add" data-a="edit">编辑</button>');
+            ops.push('<button type="button" class="carrier-btn-add" data-a="delete">删除</button>');
+          } else if (st === "待发货") {
+            ops.push('<button type="button" class="carrier-btn-add" data-a="edit">编辑</button>');
+            ops.push('<button type="button" class="carrier-btn-add" data-a="ship">确认发货</button>');
+          }
+          if (role === "project") ops = ['<button type="button" class="carrier-btn-add" data-a="detail">查看</button>'];
+          tr.querySelector("[data-ops]").innerHTML = ops.join("");
+        });
+      }
+      document.getElementById("tb").addEventListener("click", function (e) {
+        var detailEl = e.target.closest ? e.target.closest("[data-a='detail']") : null;
+        if (detailEl) {
+          e.preventDefault();
+          var tr=detailEl.closest("tr");
+          openQuickModal("发货详情",
+            '<div class="s-row"><span>发货单号</span><b>'+tr.children[0].textContent+'</b></div>'+
+            '<div class="s-row"><span>销售合同编号</span><span>'+tr.children[1].textContent+'</span></div>'+
+            '<div class="s-row"><span>客户名称</span><span>'+tr.children[2].textContent+'</span></div>'+
+            '<div class="s-row"><span>物流方式</span><span>'+tr.children[8].textContent+'</span></div>'+
+            '<div class="s-row"><span>物流公司</span><span>'+tr.children[9].textContent+'</span></div>'+
+            '<div class="s-row"><span>物流单号</span><span>'+tr.children[10].textContent+'</span></div>'
+          );
+          return;
+        }
+        var editEl = e.target.closest ? e.target.closest("[data-a='edit']") : null;
+        if (editEl) {
+          e.preventDefault();
+          var trEdit=editEl.closest("tr");
+          openQuickModal("编辑发货单",
+            '<div class="s-row"><span>发货单号</span><b>'+trEdit.children[0].textContent+'</b></div>'+
+            '<div class="s-row"><span>备注</span><input value="'+(trEdit.children[15].textContent||"")+'" /></div>'+
+            '<p style="font-size:12px;color:#8c8c8c;margin:6px 0 0;">演示弹窗：可继续扩展为完整编辑表单。</p>'
+          );
+          return;
+        }
+        var deleteEl = e.target.closest ? e.target.closest("[data-a='delete']") : null;
+        if (deleteEl) {
+          e.preventDefault();
+          var trDel=deleteEl.closest("tr");
+          openQuickModal("删除确认", '<p>是否确认删除发货单：<strong>'+trDel.children[0].textContent+'</strong>（演示）？</p>');
+          return;
+        }
+        var shipEl = e.target.closest ? e.target.closest("[data-a='ship']") : null;
+        if (shipEl) {
+          e.preventDefault();
+          cur = shipEl.closest("tr");
+          body.innerHTML =
+            '<div class="s-row"><span>发货单号</span><b>'+cur.children[0].textContent+'</b></div>'+
+            '<div class="s-row"><span>客户名称</span><span>'+cur.children[2].textContent+'</span></div>'+
+            '<div class="s-row"><span>物资名称</span><span>'+cur.children[4].textContent+'</span></div>'+
+            '<div class="s-row"><span>发货数量</span><span>'+cur.children[6].textContent+" "+cur.children[7].textContent+'</span></div>'+
+            '<p style="margin:4px 0 0;color:#8c8c8c;font-size:12px;">确认发货后将自动写入“开票状态=未开票”。</p>';
+          mask.classList.add("show");
+          return;
+        }
+        return;
+      });
+      document.getElementById("shipOk").onclick=function(){
+        if(cur){
+          cur.children[11].innerHTML = '<span class="tag-status tag-status--to-review">已发货</span>';
+          cur.children[12].textContent = nowText();
+          cur.children[14].textContent = "业务专责";
+          saveInvoicePendingFromShipment(cur);
+        }
+        close();
+      };
+      document.getElementById("shipRole").addEventListener("change", renderOps);
+      renderOps();
+    })();
+  </script>
+</body>
+</html>

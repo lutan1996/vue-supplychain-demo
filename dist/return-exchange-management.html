@@ -1,0 +1,1267 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>退换货物管理 - 新能源物资供应链管理系统</title>
+  <link rel="stylesheet" href="css/vendor/fa-all.min.css" />
+  <link rel="stylesheet" href="css/subpage-base.css" />
+  <link rel="stylesheet" href="css/carrier-management.css" />
+  <link rel="stylesheet" href="css/source-navbar-header.css" />
+  <link rel="stylesheet" href="css/modal-system.css" />
+  <style>
+    .rx-search {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      gap: 10px 12px;
+      padding: 12px;
+      background: #fff;
+      border: 1px solid #e6edf6;
+      border-radius: 10px;
+      margin-bottom: 12px;
+    }
+    @media (max-width: 1200px) {
+      .rx-search { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    }
+    @media (max-width: 720px) {
+      .rx-search { grid-template-columns: 1fr; }
+    }
+    .rx-search label { display: block; font-size: 12px; color: #62788f; margin-bottom: 4px; }
+    .rx-search .rx-span-2 { grid-column: span 2; }
+    .rx-search-actions {
+      grid-column: 1 / -1;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      padding-top: 4px;
+      border-top: 1px dashed #edf2f8;
+      margin-top: 4px;
+    }
+    .rx-tag {
+      display: inline-flex;
+      padding: 2px 8px;
+      border-radius: 10px;
+      font-size: 12px;
+      border: 1px solid transparent;
+    }
+    .rx-tag--draft { background: #fafafa; color: #595959; border-color: #d9d9d9; }
+    .rx-tag--pending { background: #fff7e6; color: #d48806; border-color: #ffd591; }
+    .rx-tag--approved { background: #e6f4ff; color: #0958d9; border-color: #91caff; }
+    .rx-tag--done { background: #f6ffed; color: #389e0d; border-color: #b7eb8f; }
+    .rx-tag--rejected { background: #fff2f0; color: #cf1322; border-color: #ffccc7; }
+    .rx-ops { display: inline-flex; flex-wrap: wrap; gap: 6px; align-items: center; justify-content: flex-start; }
+    .rx-ops .carrier-btn-add {
+      padding: 0;
+      min-height: auto;
+      height: auto;
+      border: none;
+      background: transparent;
+      box-shadow: none;
+      color: #1677ff;
+      font-size: 13px;
+      font-weight: 600;
+      line-height: 1.3;
+      text-decoration: none;
+    }
+    .rx-ops .carrier-btn-add:hover { color: #4096ff; text-decoration: underline; }
+    .rx-modal-mask {
+      position: fixed;
+      inset: 0;
+      z-index: 2400;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      box-sizing: border-box;
+      background: rgba(0, 0, 0, 0.45);
+      backdrop-filter: blur(2px);
+    }
+    .rx-modal-mask.show { display: flex; }
+    .rx-dialog {
+      background: #fff;
+      border-radius: 10px;
+      max-height: 92vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 16px 48px rgba(0, 0, 0, 0.2);
+      width: 100%;
+    }
+    .rx-dialog--900 { max-width: 900px; }
+    .rx-dialog--800 { max-width: 800px; }
+    .rx-dialog--700 { max-width: 700px; }
+    .rx-dialog--600 { max-width: 600px; }
+    .rx-dialog--500 { max-width: 500px; }
+    .rx-dialog--400 { max-width: 400px; }
+    .rx-dialog-hd {
+      padding: 12px 16px;
+      border-bottom: 1px solid #edf2f8;
+      font-weight: 600;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-shrink: 0;
+    }
+    /* 强制保障各弹窗标题可见，避免被全局样式覆盖成空白 */
+    .rx-dialog-hd,
+    .rx-dialog-hd span,
+    #rxConfirmTitle {
+      color: #1f3551 !important;
+      font-size: 16px !important;
+      font-weight: 600 !important;
+      line-height: 1.35 !important;
+      opacity: 1 !important;
+      visibility: visible !important;
+      text-indent: 0 !important;
+      white-space: nowrap !important;
+    }
+    .rx-dialog-bd { padding: 14px 16px; overflow-y: auto; font-size: 13px; flex: 1; min-height: 0; }
+    .rx-dialog-ft {
+      padding: 10px 16px;
+      border-top: 1px solid #edf2f8;
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      flex-wrap: wrap;
+      flex-shrink: 0;
+      background: #fafcff;
+    }
+    .rx-form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px 14px;
+    }
+    @media (max-width: 640px) { .rx-form-grid { grid-template-columns: 1fr; } }
+    .rx-form-grid label { display: block; font-size: 12px; color: #62788f; margin-bottom: 4px; }
+    .rx-form-grid .rx-full { grid-column: 1 / -1; }
+    .rx-seg {
+      margin: 12px 0 8px;
+      font-size: 14px;
+      color: #1f3551;
+      border-left: 3px solid #1677ff;
+      padding-left: 8px;
+      font-weight: 600;
+    }
+    .rx-subtable-wrap { overflow-x: auto; border: 1px solid #edf2f8; border-radius: 8px; margin-top: 8px; }
+    .rx-subtable { width: 100%; border-collapse: collapse; font-size: 12px; }
+    .rx-subtable th,
+    .rx-subtable td { border-bottom: 1px solid #edf2f8; padding: 8px 6px; text-align: left; }
+    .rx-subtable th { background: #f5f9ff; color: #3d4f66; font-weight: 600; white-space: nowrap; }
+    .rx-subtable tr:last-child td { border-bottom: none; }
+    .rx-tabs { display: flex; gap: 4px; border-bottom: 1px solid #edf2f8; margin-bottom: 12px; flex-wrap: wrap; }
+    .rx-tabs button {
+      padding: 8px 14px;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      font-size: 13px;
+      color: #62788f;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -1px;
+    }
+    .rx-tabs button.is-active { color: #1677ff; font-weight: 600; border-bottom-color: #1677ff; }
+    .rx-flow {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+    }
+    .rx-flow-step {
+      flex: 1;
+      min-width: 120px;
+      text-align: center;
+      padding: 10px 8px;
+      border-radius: 8px;
+      font-size: 12px;
+      border: 1px solid #e6edf6;
+      background: #fafafa;
+      color: #8c8c8c;
+    }
+    .rx-flow-step--done { background: #f6ffed; border-color: #b7eb8f; color: #389e0d; }
+    .rx-flow-step--active { background: #e6f4ff; border-color: #91caff; color: #0958d9; font-weight: 600; }
+    .rx-close {
+      border: none;
+      background: transparent;
+      font-size: 20px;
+      line-height: 1;
+      color: #8c9aad;
+      cursor: pointer;
+      padding: 4px 8px;
+    }
+    .rx-close:hover { color: #262626; }
+  </style>
+</head>
+<body class="page-source-navbar page-subpage page-logistics">
+  <div class="page-bg" aria-hidden="true"></div>
+  <div class="app">
+    <header class="header">
+      <div class="header-left">
+        <button type="button" class="header-hamburger" aria-label="菜单"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+        <a class="header-logo" href="#"><img src="assets/logo-chenergy.png" width="220" height="40" alt="" /></a>
+        <div class="header-source-brand"><p>新能源供应链管理系统</p></div>
+      </div>
+      <div class="header-right"><span class="clock" id="clock"></span><div class="user-avatar">用</div></div>
+    </header>
+    <div class="layout">
+      <aside class="sidebar" aria-label="主导航">
+        <div class="nav-item" title="我的资产"><span class="nav-label">我的资产</span></div>
+        <div class="nav-item" title="我的任务"><span class="nav-label">我的任务</span></div>
+        <a class="nav-item" href="index-portal-screen-alt.html" title="首页"><span class="nav-label">首页</span></a>
+        <div class="nav-item" title="驾驶舱"><span class="nav-label">驾驶舱</span></div>
+        <div class="nav-item nav-item--module-active" title="采购管理"><span class="nav-label">采购管理</span></div>
+      </aside>
+      <main class="main-scroll">
+        <div class="carrier-main-inner">
+          <h1 class="carrier-page-title">退换货物管理</h1>
+
+          <div class="rx-search" aria-label="搜索条件">
+            <div><label for="rxQNo">退换货单号</label><input type="text" class="carrier-search" id="rxQNo" placeholder="TH-20260423-0001" style="width:100%;box-sizing:border-box;" /></div>
+            <div><label for="rxQContract">关联合同/订单号</label><input type="text" class="carrier-search" id="rxQContract" placeholder="HT-2026-301" style="width:100%;box-sizing:border-box;" /></div>
+            <div><label for="rxQParty">供应商/客户名称</label><input type="text" class="carrier-search" id="rxQParty" placeholder="关键词" style="width:100%;box-sizing:border-box;" /></div>
+            <div>
+              <label for="rxQType">退换类型</label>
+              <select class="carrier-select" id="rxQType" style="width:100%;">
+                <option value="">全部</option>
+                <option>采购退货</option>
+                <option>采购换货</option>
+                <option>销售退货</option>
+                <option>销售换货</option>
+              </select>
+            </div>
+            <div>
+              <label for="rxQStatus">处理状态</label>
+              <select class="carrier-select" id="rxQStatus" style="width:100%;">
+                <option value="">全部</option>
+                <option>草稿</option>
+                <option>待审核</option>
+                <option>审核通过</option>
+                <option>已完成</option>
+                <option>已拒绝</option>
+              </select>
+            </div>
+            <div class="rx-span-2">
+              <label>申请时间范围</label>
+              <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+                <input type="date" class="carrier-search" id="rxQDateFrom" style="flex:1;min-width:120px;" />
+                <span>至</span>
+                <input type="date" class="carrier-search" id="rxQDateTo" style="flex:1;min-width:120px;" />
+              </div>
+            </div>
+            <div class="rx-search-actions">
+              <button type="button" class="carrier-btn-add" id="rxBtnSearch"><i class="fa-solid fa-magnifying-glass"></i> 搜索</button>
+              <button type="button" class="carrier-btn-add" id="rxBtnReset">重置</button>
+              <button type="button" class="carrier-btn-add" id="rxBtnNew"><i class="fa-solid fa-plus"></i> 新建申请</button>
+            </div>
+          </div>
+
+          <div class="carrier-table-wrap">
+            <table class="carrier-table">
+              <thead>
+                <tr>
+                  <th>序号</th>
+                  <th>退换货单号</th>
+                  <th>关联合同/订单号</th>
+                  <th>供应商/客户名称</th>
+                  <th>退换类型</th>
+                  <th>物资名称</th>
+                  <th>退换数量</th>
+                  <th>退换金额（万元）</th>
+                  <th>处理状态</th>
+                  <th>申请人</th>
+                  <th>申请时间</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody id="rxTb">
+                <tr data-row
+                    data-id="1"
+                    data-status="draft"
+                    data-applicant="宋中波"
+                    data-no="TH-20260420-0008"
+                    data-contract="HT-2026-301"
+                    data-party="远景能源"
+                    data-type="采购退货"
+                    data-material="变流器模块"
+                    data-mcount="1"
+                    data-qty="12"
+                    data-amt="2.4"
+                    data-time="2026-04-20 10:20"
+                    data-reason="到货抽检不合格"
+                    data-dept="新能源事业部">
+                  <td>1</td>
+                  <td>TH-20260420-0008</td>
+                  <td>HT-2026-301</td>
+                  <td>远景能源</td>
+                  <td>采购退货</td>
+                  <td>变流器模块</td>
+                  <td>12</td>
+                  <td>2.40</td>
+                  <td data-st-cell><span class="rx-tag rx-tag--draft">草稿</span></td>
+                  <td>宋中波</td>
+                  <td>2026-04-20 10:20</td>
+                  <td><div class="rx-ops" data-ops></div></td>
+                </tr>
+                <tr data-row
+                    data-id="2"
+                    data-status="pending"
+                    data-applicant="李专责"
+                    data-no="TH-20260421-0003"
+                    data-contract="HT-2026-288"
+                    data-party="金风科技"
+                    data-type="采购换货"
+                    data-material="叶片螺栓套件"
+                    data-mcount="2"
+                    data-qty="86"
+                    data-amt="0.0"
+                    data-time="2026-04-21 14:05"
+                    data-reason="规格与合同不符"
+                    data-dept="工程建设部">
+                  <td>2</td>
+                  <td>TH-20260421-0003</td>
+                  <td>HT-2026-288</td>
+                  <td>金风科技</td>
+                  <td>采购换货</td>
+                  <td>叶片螺栓套件 等2项</td>
+                  <td>86</td>
+                  <td>—</td>
+                  <td data-st-cell><span class="rx-tag rx-tag--pending">待审核</span></td>
+                  <td>李专责</td>
+                  <td>2026-04-21 14:05</td>
+                  <td><div class="rx-ops" data-ops></div></td>
+                </tr>
+                <tr data-row
+                    data-id="3"
+                    data-status="approved"
+                    data-applicant="宋中波"
+                    data-no="TH-20260422-0012"
+                    data-contract="HT-XS-2026-015"
+                    data-party="天津龙源"
+                    data-type="销售退货"
+                    data-material="IGBT驱动板"
+                    data-mcount="1"
+                    data-qty="30"
+                    data-amt="1.2"
+                    data-time="2026-04-22 09:00"
+                    data-reason="运输损坏"
+                    data-dept="新能源事业部">
+                  <td>3</td>
+                  <td>TH-20260422-0012</td>
+                  <td>HT-XS-2026-015</td>
+                  <td>天津龙源</td>
+                  <td>销售退货</td>
+                  <td>IGBT驱动板</td>
+                  <td>30</td>
+                  <td>1.20</td>
+                  <td data-st-cell><span class="rx-tag rx-tag--approved">审核通过</span></td>
+                  <td>宋中波</td>
+                  <td>2026-04-22 09:00</td>
+                  <td><div class="rx-ops" data-ops></div></td>
+                </tr>
+                <tr data-row
+                    data-id="4"
+                    data-status="done"
+                    data-applicant="王五"
+                    data-no="TH-20260410-0099"
+                    data-contract="HT-2026-199"
+                    data-party="中车永济"
+                    data-type="销售换货"
+                    data-material="冷却风机"
+                    data-mcount="1"
+                    data-qty="6"
+                    data-amt="0.35"
+                    data-time="2026-04-10 16:40"
+                    data-reason="质量问题"
+                    data-dept="运维中心">
+                  <td>4</td>
+                  <td>TH-20260410-0099</td>
+                  <td>HT-2026-199</td>
+                  <td>中车永济</td>
+                  <td>销售换货</td>
+                  <td>冷却风机</td>
+                  <td>6</td>
+                  <td>0.35</td>
+                  <td data-st-cell><span class="rx-tag rx-tag--done">已完成</span></td>
+                  <td>王五</td>
+                  <td>2026-04-10 16:40</td>
+                  <td><div class="rx-ops" data-ops></div></td>
+                </tr>
+                <tr data-row
+                    data-id="5"
+                    data-status="rejected"
+                    data-applicant="宋中波"
+                    data-no="TH-20260418-0004"
+                    data-contract="HT-2026-240"
+                    data-party="阳光电源"
+                    data-type="采购退货"
+                    data-material="汇流箱"
+                    data-mcount="1"
+                    data-qty="4"
+                    data-amt="0.8"
+                    data-time="2026-04-18 11:00"
+                    data-reason="发错货"
+                    data-dept="新能源事业部">
+                  <td>5</td>
+                  <td>TH-20260418-0004</td>
+                  <td>HT-2026-240</td>
+                  <td>阳光电源</td>
+                  <td>采购退货</td>
+                  <td>汇流箱</td>
+                  <td>4</td>
+                  <td>0.80</td>
+                  <td data-st-cell><span class="rx-tag rx-tag--rejected">已拒绝</span></td>
+                  <td>宋中波</td>
+                  <td>2026-04-18 11:00</td>
+                  <td><div class="rx-ops" data-ops></div></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- 新建/编辑 -->
+  <div class="rx-modal-mask" id="rxMaskForm" aria-hidden="true">
+    <div class="rx-dialog rx-dialog--900" role="dialog" aria-modal="true" aria-labelledby="rxFormTitle">
+      <div class="rx-dialog-hd"><span id="rxFormTitle">新建退换货申请</span><button type="button" class="rx-close" data-close="rxMaskForm" aria-label="关闭">×</button></div>
+      <div class="rx-dialog-bd">
+        <div class="rx-seg">申请基本信息</div>
+        <div class="rx-form-grid">
+          <div><label>退换货单号</label><input type="text" class="carrier-search" id="rxFNo" readonly style="width:100%;box-sizing:border-box;background:#f5f5f5;" /></div>
+          <div>
+            <label>退换类型 <span style="color:#cf1322">*</span></label>
+            <select class="carrier-select" id="rxFType" style="width:100%;">
+              <option value="">请选择</option>
+              <option>采购退货</option>
+              <option>采购换货</option>
+              <option>销售退货</option>
+              <option>销售换货</option>
+            </select>
+          </div>
+          <div class="rx-full">
+            <label>关联合同/订单 <span style="color:#cf1322">*</span></label>
+            <select class="carrier-select" id="rxFContract" style="width:100%;">
+              <option value="">请选择已生效合同/订单</option>
+              <option value="HT-2026-301|远景能源">HT-2026-301（采购）— 远景能源</option>
+              <option value="HT-XS-2026-015|天津龙源">HT-XS-2026-015（销售）— 天津龙源</option>
+              <option value="HT-2026-288|金风科技">HT-2026-288（采购）— 金风科技</option>
+            </select>
+          </div>
+          <div><label>供应商/客户名称</label><input type="text" class="carrier-search" id="rxFParty" readonly style="width:100%;box-sizing:border-box;background:#f5f5f5;" /></div>
+          <div>
+            <label>申请部门</label>
+            <select class="carrier-select" id="rxFDept" style="width:100%;">
+              <option>新能源事业部</option>
+              <option>工程建设部</option>
+              <option>运维中心</option>
+            </select>
+          </div>
+          <div><label>申请人</label><input type="text" class="carrier-search" id="rxFApplicant" readonly style="width:100%;box-sizing:border-box;background:#f5f5f5;" /></div>
+          <div><label>申请时间</label><input type="text" class="carrier-search" id="rxFTime" readonly style="width:100%;box-sizing:border-box;background:#f5f5f5;" /></div>
+          <div><label>期望处理日期</label><input type="date" class="carrier-search" id="rxFHope" style="width:100%;box-sizing:border-box;" /></div>
+          <div class="rx-full">
+            <label>退换原因说明 <span style="color:#cf1322">*</span></label>
+            <textarea class="carrier-search" id="rxFReason" rows="3" style="width:100%;box-sizing:border-box;resize:vertical;min-height:72px;"></textarea>
+          </div>
+          <div class="rx-full">
+            <label>备注</label>
+            <textarea class="carrier-search" id="rxFRemark" rows="2" style="width:100%;box-sizing:border-box;resize:vertical;"></textarea>
+          </div>
+        </div>
+        <div class="rx-seg">退换货物资明细</div>
+        <button type="button" class="carrier-btn-add" id="rxAddMat" style="margin-bottom:8px;"><i class="fa-solid fa-plus"></i> 添加物资</button>
+        <div class="rx-subtable-wrap">
+          <table class="rx-subtable" id="rxMatTable">
+            <thead>
+              <tr>
+                <th>物资名称</th>
+                <th>规格型号</th>
+                <th>原采购/销售数量</th>
+                <th>单位</th>
+                <th>已退换数量</th>
+                <th>本次退换数量 <span style="color:#cf1322">*</span></th>
+                <th>退换原因</th>
+                <th>处理方式</th>
+                <th>备注</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody id="rxMatBody"></tbody>
+          </table>
+        </div>
+        <div class="rx-seg">附件上传</div>
+        <p style="margin:0 0 8px;color:#62788f;font-size:12px;">上传证明材料（图片、PDF，支持多文件，原型仅占位）</p>
+        <input type="file" multiple accept="image/*,.pdf" />
+      </div>
+      <div class="rx-dialog-ft">
+        <button type="button" class="carrier-btn-add" id="rxSaveDraft">保存草稿</button>
+        <button type="button" class="carrier-btn-add" id="rxSubmitFlow">提交审批</button>
+        <button type="button" class="carrier-btn-add" data-close="rxMaskForm">取消</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 审批 -->
+  <div class="rx-modal-mask" id="rxMaskApprove" aria-hidden="true">
+    <div class="rx-dialog rx-dialog--600" role="dialog" aria-modal="true">
+      <div class="rx-dialog-hd">审批退换货申请<button type="button" class="rx-close" data-close="rxMaskApprove">×</button></div>
+      <div class="rx-dialog-bd" id="rxApprovePreview"></div>
+      <div class="rx-dialog-bd" style="border-top:1px solid #edf2f8;">
+        <label>审批意见 <span style="color:#cf1322">*</span></label>
+        <textarea class="carrier-search" id="rxApproveOpinion" rows="3" style="width:100%;box-sizing:border-box;margin-top:4px;"></textarea>
+        <p style="margin:10px 0 6px;font-weight:600;">审批结果</p>
+        <div style="display:flex;gap:12px;flex-wrap:wrap;">
+          <label><input type="radio" name="rxAprRes" value="pass" checked /> 通过</label>
+          <label><input type="radio" name="rxAprRes" value="reject" /> 拒绝</label>
+        </div>
+        <p style="margin:10px 0 4px;font-size:12px;color:#62788f;">附件上传（审批依据，原型占位）</p>
+        <input type="file" multiple accept="image/*,.pdf" />
+      </div>
+      <div class="rx-dialog-ft">
+        <button type="button" class="carrier-btn-add" id="rxApproveOk">确定</button>
+        <button type="button" class="carrier-btn-add" data-close="rxMaskApprove">取消</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 驳回 -->
+  <div class="rx-modal-mask" id="rxMaskReject" aria-hidden="true">
+    <div class="rx-dialog rx-dialog--500" role="dialog" aria-modal="true">
+      <div class="rx-dialog-hd">驳回退换货申请<button type="button" class="rx-close" data-close="rxMaskReject">×</button></div>
+      <div class="rx-dialog-bd">
+        <label>驳回原因 <span style="color:#cf1322">*</span></label>
+        <textarea class="carrier-search" id="rxRejectReason" rows="2" style="width:100%;box-sizing:border-box;margin-top:4px;"></textarea>
+        <label style="margin-top:10px;display:block;">驳回意见</label>
+        <textarea class="carrier-search" id="rxRejectOpinion" rows="3" style="width:100%;box-sizing:border-box;margin-top:4px;"></textarea>
+      </div>
+      <div class="rx-dialog-ft">
+        <button type="button" class="carrier-btn-add" id="rxRejectOk">确认驳回</button>
+        <button type="button" class="carrier-btn-add" data-close="rxMaskReject">取消</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 确认完成 -->
+  <div class="rx-modal-mask" id="rxMaskComplete" aria-hidden="true">
+    <div class="rx-dialog rx-dialog--700" role="dialog" aria-modal="true">
+      <div class="rx-dialog-hd">确认完成退换货<button type="button" class="rx-close" data-close="rxMaskComplete">×</button></div>
+      <div class="rx-dialog-bd">
+        <div class="rx-seg" style="margin-top:0;">完成确认</div>
+        <div class="rx-form-grid">
+          <div><label>退换货单号</label><input type="text" class="carrier-search" id="rxCNo" readonly style="width:100%;background:#f5f5f5;box-sizing:border-box;" /></div>
+          <div><label>退换类型</label><input type="text" class="carrier-search" id="rxCType" readonly style="width:100%;background:#f5f5f5;box-sizing:border-box;" /></div>
+          <div><label>实际退换数量</label><input type="number" class="carrier-search" id="rxCQty" min="1" style="width:100%;box-sizing:border-box;" /></div>
+          <div><label>实际退款金额（万元）</label><input type="number" step="0.01" class="carrier-search" id="rxCRefund" style="width:100%;box-sizing:border-box;" placeholder="退货类填写" /></div>
+          <div class="rx-full"><label>换货新单号</label><input type="text" class="carrier-search" id="rxCNewNo" style="width:100%;box-sizing:border-box;" placeholder="换货类填写，关联新合同/订单" /></div>
+          <div><label>完成时间</label><input type="datetime-local" class="carrier-search" id="rxCTime" style="width:100%;box-sizing:border-box;" /></div>
+          <div class="rx-full"><label>处理结果说明</label><textarea class="carrier-search" id="rxCNote" rows="3" style="width:100%;box-sizing:border-box;"></textarea></div>
+        </div>
+        <p style="font-size:12px;color:#62788f;margin:8px 0;">上传处理凭证（附件，原型占位）</p>
+        <input type="file" multiple accept="image/*,.pdf" />
+        <p style="font-size:12px;color:#1677ff;margin-top:10px;">确认后将触发：合同台账执行数量更新、物资台账库存调整、货物台账入库状态更新；采购/销售退货时提示财务退款流程（模拟）。</p>
+      </div>
+      <div class="rx-dialog-ft">
+        <button type="button" class="carrier-btn-add" id="rxCompleteOk">确认完成</button>
+        <button type="button" class="carrier-btn-add" data-close="rxMaskComplete">取消</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 详情 -->
+  <div class="rx-modal-mask" id="rxMaskDetail" aria-hidden="true">
+    <div class="rx-dialog rx-dialog--800" role="dialog" aria-modal="true">
+      <div class="rx-dialog-hd">退换货申请详情<a href="#" id="rxDetailProgressLink" style="margin-left:auto;margin-right:10px;color:#1677ff;font-size:12px;text-decoration:none;font-weight:600;">流程进度</a><button type="button" class="rx-close" data-close="rxMaskDetail">×</button></div>
+      <div class="rx-dialog-bd">
+        <div class="rx-tabs" role="tablist">
+          <button type="button" class="is-active" data-tab="d1">申请信息</button>
+          <button type="button" data-tab="d2">物资明细</button>
+          <button type="button" data-tab="d3">处理记录</button>
+        </div>
+        <div id="rxDetailP1"></div>
+        <div id="rxDetailP2" style="display:none;"></div>
+        <div id="rxDetailP3" style="display:none;"></div>
+      </div>
+      <div class="rx-dialog-ft">
+        <button type="button" class="carrier-btn-add" data-close="rxMaskDetail">取消</button>
+        <button type="button" class="carrier-btn-add" id="rxDetailPrint">打印申请单</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 进度 -->
+  <div class="rx-modal-mask" id="rxMaskProgress" aria-hidden="true">
+    <div class="rx-dialog rx-dialog--700" role="dialog" aria-modal="true">
+      <div class="rx-dialog-hd">审批进度<button type="button" class="rx-close" data-close="rxMaskProgress">×</button></div>
+      <div class="rx-dialog-bd">
+        <p style="margin:0 0 10px;font-size:12px;color:#62788f;">流程：业务部门专责提报 → 公司采购专责审核 → 公司物资专责确认完成 → 结束</p>
+        <div class="rx-flow" id="rxFlowBar"></div>
+        <div class="rx-subtable-wrap">
+          <table class="rx-subtable">
+            <thead><tr><th>节点名称</th><th>处理人</th><th>处理时间</th><th>处理结果</th><th>处理意见</th></tr></thead>
+            <tbody id="rxFlowTb"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="rx-dialog-ft"><button type="button" class="carrier-btn-add" data-close="rxMaskProgress">取消</button></div>
+    </div>
+  </div>
+
+  <!-- 通用确认 -->
+  <div class="rx-modal-mask" id="rxMaskConfirm" aria-hidden="true">
+    <div class="rx-dialog rx-dialog--400" role="dialog" aria-modal="true">
+      <div class="rx-dialog-hd" id="rxConfirmTitle">确认</div>
+      <div class="rx-dialog-bd" id="rxConfirmBody"></div>
+      <div class="rx-dialog-ft">
+        <button type="button" class="carrier-btn-add" id="rxConfirmOk">确定</button>
+        <button type="button" class="carrier-btn-add" data-close="rxMaskConfirm">取消</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 添加物资（多选模拟） -->
+  <div class="rx-modal-mask" id="rxMaskPickMat" aria-hidden="true">
+    <div class="rx-dialog rx-dialog--500" role="dialog" aria-modal="true">
+      <div class="rx-dialog-hd">从合同选择物资<button type="button" class="rx-close" data-close="rxMaskPickMat">×</button></div>
+      <div class="rx-dialog-bd">
+        <label><input type="checkbox" class="rx-pick" data-name="变流器模块" data-spec="V2.0" data-unit="个" data-orig="120" data-done="8" /> 变流器模块 / V2.0 / 120个 / 已退换8</label><br /><br />
+        <label><input type="checkbox" class="rx-pick" data-name="通讯防雷器" data-spec="T1" data-unit="套" data-orig="40" data-done="0" /> 通讯防雷器 / T1 / 40套</label>
+      </div>
+      <div class="rx-dialog-ft">
+        <button type="button" class="carrier-btn-add" id="rxPickOk">加入明细</button>
+        <button type="button" class="carrier-btn-add" data-close="rxMaskPickMat">取消</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/sidebar-actions.js"></script>
+  <script src="js/subpage-feature-title.js"></script>
+  <script src="js/site-footer.js"></script>
+  <script src="js/subpage-clock.js"></script>
+  <script>
+    (function () {
+      var tb = document.getElementById("rxTb");
+      var curRow = null;
+      var formMode = "new";
+      var confirmAction = null;
+
+      /** 与顶栏「角色切换」（subpage-clock getCurrentRole）对齐，驱动操作列 */
+      function mapOrgRoleToPage() {
+        try {
+          if (typeof window.getCurrentRole === "function") {
+            var r = window.getCurrentRole();
+            var id = (r && r.id) || "";
+            var person = (r && r.person) || "宋中波";
+            if (id === "corp_purchase_specialist") return { role: "purchase", user: "王卿明" };
+            if (id === "corp_material_specialist") return { role: "material", user: "宋中波" };
+            if (
+              id === "value_asset_specialist" ||
+              id === "value_material_specialist" ||
+              id === "value_leader" ||
+              id === "value_dept_head"
+            ) {
+              return { role: "finance", user: person };
+            }
+            if (r.modules === "all" || id === "gm_zeng" || id === "director_feng") return { role: "gm", user: person };
+            return { role: "biz", user: person };
+          }
+        } catch (eMap) {}
+        return { role: "biz", user: "宋中波" };
+      }
+
+      function currentUserName() {
+        return mapOrgRoleToPage().user;
+      }
+      function currentRole() {
+        return mapOrgRoleToPage().role;
+      }
+
+      function statusZh(st) {
+        var m = { draft: "草稿", pending: "待审核", approved: "审核通过", done: "已完成", rejected: "已拒绝" };
+        return m[st] || st;
+      }
+      function esc(v) {
+        return String(v == null ? "" : v)
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;")
+          .replace(/'/g, "&#39;");
+      }
+      function setRowStatus(tr, st) {
+        tr.setAttribute("data-status", st);
+        var cell = tr.querySelector("[data-st-cell]");
+        var cls = "rx-tag--draft";
+        if (st === "pending") cls = "rx-tag--pending";
+        else if (st === "approved") cls = "rx-tag--approved";
+        else if (st === "done") cls = "rx-tag--done";
+        else if (st === "rejected") cls = "rx-tag--rejected";
+        if (cell) cell.innerHTML = '<span class="rx-tag ' + cls + '">' + statusZh(st) + "</span>";
+        renderOps();
+      }
+
+      function renderOps() {
+        var uname = currentUserName();
+        var role = currentRole();
+        Array.prototype.forEach.call(tb.querySelectorAll("tr[data-row]"), function (tr) {
+          var st = tr.getAttribute("data-status");
+          var applicant = tr.getAttribute("data-applicant");
+          var ops = [];
+          var financeOrGm = role === "finance" || role === "gm";
+
+          if (financeOrGm) {
+            ops.push('<button type="button" class="carrier-btn-add" data-op="new">新增</button>');
+            ops.push('<button type="button" class="carrier-btn-add" data-op="edit">编辑</button>');
+            ops.push('<button type="button" class="carrier-btn-add" data-op="delete">删除</button>');
+            ops.push('<button type="button" class="carrier-btn-add" data-op="detail">查看</button>');
+          } else if ((st === "draft" || st === "rejected") && applicant === uname && role === "biz") {
+            ops.push('<button type="button" class="carrier-btn-add" data-op="new">新增</button>');
+            ops.push('<button type="button" class="carrier-btn-add" data-op="detail">查看</button>');
+            ops.push('<button type="button" class="carrier-btn-add" data-op="edit">编辑</button>');
+            ops.push('<button type="button" class="carrier-btn-add" data-op="delete">删除</button>');
+          } else if (st === "pending" && role === "purchase") {
+            ops.push('<button type="button" class="carrier-btn-add" data-op="new">新增</button>');
+            ops.push('<button type="button" class="carrier-btn-add" data-op="edit">编辑</button>');
+            ops.push('<button type="button" class="carrier-btn-add" data-op="delete">删除</button>');
+            ops.push('<button type="button" class="carrier-btn-add" data-op="detail">查看</button>');
+          } else if (st === "approved" && role === "material") {
+            ops.push('<button type="button" class="carrier-btn-add" data-op="new">新增</button>');
+            ops.push('<button type="button" class="carrier-btn-add" data-op="edit">编辑</button>');
+            ops.push('<button type="button" class="carrier-btn-add" data-op="delete">删除</button>');
+            ops.push('<button type="button" class="carrier-btn-add" data-op="detail">查看</button>');
+            ops.push('<button type="button" class="carrier-btn-add" data-op="complete">确认完成</button>');
+          } else {
+            ops.push('<button type="button" class="carrier-btn-add" data-op="new">新增</button>');
+            ops.push('<button type="button" class="carrier-btn-add" data-op="edit">编辑</button>');
+            ops.push('<button type="button" class="carrier-btn-add" data-op="delete">删除</button>');
+            ops.push('<button type="button" class="carrier-btn-add" data-op="detail">查看</button>');
+          }
+          var wrap = tr.querySelector("[data-ops]");
+          if (wrap) wrap.innerHTML = ops.join("");
+        });
+      }
+
+      function openMask(id) {
+        var m = document.getElementById(id);
+        if (m) {
+          var titleMap = {
+            rxMaskApprove: "审批退换货申请",
+            rxMaskReject: "驳回退换货申请",
+            rxMaskComplete: "确认完成退换货",
+            rxMaskDetail: "退换货申请详情",
+            rxMaskProgress: "审批进度",
+            rxMaskPickMat: "从合同选择物资",
+            rxMaskConfirm: "确认"
+          };
+          if (id === "rxMaskForm") {
+            document.getElementById("rxFormTitle").textContent =
+              formMode === "edit" ? "编辑退换货申请" : formMode === "view" ? "查看退换货申请" : "新建退换货申请";
+          } else if (id === "rxMaskConfirm") {
+            var t = document.getElementById("rxConfirmTitle");
+            if (t && !String(t.textContent || "").trim()) t.textContent = titleMap[id];
+          } else {
+            var hd = m.querySelector(".rx-dialog-hd");
+            if (hd) {
+              var closeBtn = hd.querySelector(".rx-close");
+              var progressLink = hd.querySelector("#rxDetailProgressLink");
+              var title = titleMap[id] || "";
+              if (closeBtn) {
+                var oldSpan = hd.querySelector("[data-rx-title='1']");
+                if (!oldSpan) {
+                  oldSpan = document.createElement("span");
+                  oldSpan.setAttribute("data-rx-title", "1");
+                  hd.insertBefore(oldSpan, hd.firstChild);
+                }
+                oldSpan.textContent = title;
+                Array.prototype.forEach.call(hd.childNodes, function (n) {
+                  if (n && n.nodeType === 3 && String(n.textContent || "").trim()) n.textContent = "";
+                });
+                if (progressLink) progressLink.style.marginLeft = "auto";
+              } else if (!String(hd.textContent || "").trim()) {
+                hd.textContent = title;
+              }
+            }
+          }
+          m.classList.add("show");
+          m.setAttribute("aria-hidden", "false");
+        }
+      }
+      function closeMask(id) {
+        var m = document.getElementById(id);
+        if (m) {
+          m.classList.remove("show");
+          m.setAttribute("aria-hidden", "true");
+        }
+      }
+      document.body.addEventListener("click", function (e) {
+        var c = e.target.closest("[data-close]");
+        if (c) {
+          e.preventDefault();
+          closeMask(c.getAttribute("data-close"));
+        }
+      });
+
+      function genNo() {
+        var d = new Date();
+        var y = d.getFullYear();
+        var m = String(d.getMonth() + 1).padStart(2, "0");
+        var day = String(d.getDate()).padStart(2, "0");
+        var r = String(Math.floor(Math.random() * 9000) + 1000);
+        return "TH-" + y + m + day + "-" + r;
+      }
+
+      function defaultMatRows() {
+        document.getElementById("rxMatBody").innerHTML =
+          '<tr data-mid="1">' +
+          '<td>变流器模块</td><td>V2.0</td><td>120</td><td>个</td><td>8</td>' +
+          '<td><input type="number" class="carrier-search rx-line-qty" min="1" value="4" style="width:72px;box-sizing:border-box;" data-max="112" /></td>' +
+          '<td><select class="carrier-select rx-line-reason" style="min-width:100px;"><option>质量问题</option><option>发错货</option><option>运输损坏</option><option>其他</option></select></td>' +
+          '<td><select class="carrier-select rx-line-way" style="min-width:100px;"><option>退货退款</option><option>换货</option><option>维修</option></select></td>' +
+          '<td><input type="text" class="carrier-search rx-line-note" style="width:80px;" /></td>' +
+          '<td><button type="button" class="carrier-btn-add" data-rm-mat>删除行</button></td></tr>';
+      }
+
+      function setFormReadonly(readonly) {
+        var form = document.getElementById("rxMaskForm");
+        if (!form) return;
+        var controls = form.querySelectorAll("input,select,textarea,button");
+        Array.prototype.forEach.call(controls, function (el) {
+          if (!el || !el.id) return;
+          if (el.id === "rxFNo" || el.id === "rxSaveDraft" || el.id === "rxSubmitFlow") return;
+          if (el.getAttribute("data-close") === "rxMaskForm") return;
+          if (el.id === "rxAddMat" || el.getAttribute("data-rm-mat") !== null) {
+            el.style.display = readonly ? "none" : "";
+            return;
+          }
+          if (readonly) {
+            if (el.tagName === "SELECT" || el.type === "checkbox" || el.type === "radio" || el.type === "number" || el.type === "date" || el.type === "text") {
+              el.setAttribute("disabled", "disabled");
+            } else {
+              el.setAttribute("readonly", "readonly");
+            }
+            if (el.classList && (el.classList.contains("carrier-search") || el.classList.contains("carrier-select"))) {
+              el.style.background = "#f5f5f5";
+            }
+          } else {
+            el.removeAttribute("disabled");
+            el.removeAttribute("readonly");
+            if (el.classList && (el.classList.contains("carrier-search") || el.classList.contains("carrier-select"))) {
+              el.style.background = "";
+            }
+          }
+        });
+        var saveBtn = document.getElementById("rxSaveDraft");
+        var submitBtn = document.getElementById("rxSubmitFlow");
+        if (saveBtn) saveBtn.style.display = readonly ? "none" : "";
+        if (submitBtn) submitBtn.style.display = readonly ? "none" : "";
+      }
+
+      function openForm(mode, tr) {
+        formMode = mode;
+        curRow = (mode === "edit" || mode === "view") && tr ? tr : null;
+        document.getElementById("rxFormTitle").textContent =
+          mode === "edit" ? "编辑退换货申请" : mode === "view" ? "查看退换货申请" : "新建退换货申请";
+        if (mode === "new") {
+          document.getElementById("rxFNo").value = genNo();
+          document.getElementById("rxFType").value = "";
+          document.getElementById("rxFContract").value = "";
+          document.getElementById("rxFParty").value = "";
+          document.getElementById("rxFApplicant").value = currentUserName();
+          document.getElementById("rxFTime").value = new Date().toISOString().slice(0, 19).replace("T", " ");
+          document.getElementById("rxFReason").value = "";
+          document.getElementById("rxFRemark").value = "";
+          defaultMatRows();
+        } else if (tr) {
+          document.getElementById("rxFNo").value = tr.getAttribute("data-no") || "";
+          document.getElementById("rxFType").value = tr.getAttribute("data-type") || "";
+          document.getElementById("rxFParty").value = tr.getAttribute("data-party") || "";
+          document.getElementById("rxFApplicant").value = tr.getAttribute("data-applicant") || "";
+          document.getElementById("rxFDept").value = tr.getAttribute("data-dept") || "新能源事业部";
+          document.getElementById("rxFTime").value = tr.getAttribute("data-time") || "";
+          document.getElementById("rxFReason").value = tr.getAttribute("data-reason") || "";
+          document.getElementById("rxFRemark").value = "";
+          defaultMatRows();
+        }
+        setFormReadonly(mode === "view");
+        openMask("rxMaskForm");
+      }
+
+      document.getElementById("rxFContract").addEventListener("change", function () {
+        var v = this.value;
+        document.getElementById("rxFParty").value = v.split("|")[1] || "";
+      });
+
+      document.getElementById("rxBtnNew").onclick = function () {
+        curRow = null;
+        openForm("new");
+      };
+      document.getElementById("rxAddMat").onclick = function () {
+        openMask("rxMaskPickMat");
+      };
+      document.getElementById("rxMatBody").addEventListener("click", function (e) {
+        if (e.target.closest("[data-rm-mat]")) {
+          e.preventDefault();
+          var tr = e.target.closest("tr");
+          if (tr && tr.parentNode) tr.parentNode.removeChild(tr);
+        }
+      });
+      document.getElementById("rxPickOk").onclick = function () {
+        var body = document.getElementById("rxMatBody");
+        Array.prototype.forEach.call(document.querySelectorAll(".rx-pick:checked"), function (cb) {
+          var max = Number(cb.getAttribute("data-orig")) - Number(cb.getAttribute("data-done"));
+          var tr = document.createElement("tr");
+          tr.innerHTML =
+            "<td>" +
+            cb.getAttribute("data-name") +
+            "</td><td>" +
+            cb.getAttribute("data-spec") +
+            "</td><td>" +
+            cb.getAttribute("data-orig") +
+            "</td><td>" +
+            cb.getAttribute("data-unit") +
+            "</td><td>" +
+            cb.getAttribute("data-done") +
+            '</td><td><input type="number" class="carrier-search rx-line-qty" min="1" value="1" style="width:72px;box-sizing:border-box;" data-max="' +
+            max +
+            '" /></td>' +
+            '<td><select class="carrier-select rx-line-reason" style="min-width:100px;"><option>质量问题</option><option>发错货</option><option>运输损坏</option><option>其他</option></select></td>' +
+            '<td><select class="carrier-select rx-line-way" style="min-width:100px;"><option>退货退款</option><option>换货</option><option>维修</option></select></td>' +
+            '<td><input type="text" class="carrier-search rx-line-note" style="width:80px;" /></td>' +
+            '<td><button type="button" class="carrier-btn-add" data-rm-mat>删除行</button></td>';
+          body.appendChild(tr);
+        });
+        closeMask("rxMaskPickMat");
+      };
+
+      function validateMat() {
+        var ok = true;
+        Array.prototype.forEach.call(document.querySelectorAll("#rxMatBody .rx-line-qty"), function (inp) {
+          var max = Number(inp.getAttribute("data-max"));
+          var q = Number(inp.value);
+          if (!(q > 0)) ok = false;
+          if (q > max) ok = false;
+        });
+        return ok;
+      }
+
+      document.getElementById("rxSaveDraft").onclick = function () {
+        if (!document.getElementById("rxFType").value || !document.getElementById("rxFContract").value) {
+          alert("请填写退换类型与关联合同（草稿也建议填完整）。");
+          return;
+        }
+        if (!validateMat()) {
+          alert("物资明细：本次退换数量须大于 0，且不能大于 原数量−已退换数量。");
+          return;
+        }
+        alert("已保存草稿（演示）。");
+        closeMask("rxMaskForm");
+      };
+
+      document.getElementById("rxSubmitFlow").onclick = function () {
+        if (!document.getElementById("rxFType").value || !document.getElementById("rxFContract").value) {
+          alert("请填写退换类型、关联合同/订单。");
+          return;
+        }
+        if (!document.getElementById("rxFReason").value.trim()) {
+          alert("请填写退换原因说明。");
+          return;
+        }
+        if (!validateMat()) {
+          alert("物资明细校验未通过。");
+          return;
+        }
+        confirmAction = "submitForm";
+        document.getElementById("rxConfirmTitle").textContent = "提交审批";
+        document.getElementById("rxConfirmBody").innerHTML =
+          "<p style='margin:0;line-height:1.6;'>确认提交审批吗？提交后将无法编辑，请确认信息填写完整。</p>";
+        openMask("rxMaskConfirm");
+      };
+
+      document.getElementById("rxConfirmOk").onclick = function () {
+        if (confirmAction === "submitForm") {
+          if (curRow) setRowStatus(curRow, "pending");
+          else alert("演示：新建单提交后将出现在列表为「待审核」（此处未追加行，仅交互提示）。");
+          closeMask("rxMaskConfirm");
+          closeMask("rxMaskForm");
+          curRow = null;
+        } else if (confirmAction === "deleteRow") {
+          if (curRow && curRow.parentNode) curRow.parentNode.removeChild(curRow);
+          closeMask("rxMaskConfirm");
+          curRow = null;
+          renderOps();
+        } else if (confirmAction === "withdraw") {
+          if (curRow) setRowStatus(curRow, "draft");
+          closeMask("rxMaskConfirm");
+          curRow = null;
+        }
+        confirmAction = null;
+      };
+
+      function fillApprovePreview(tr) {
+        document.getElementById("rxApprovePreview").innerHTML =
+          "<p><b>单号</b> " +
+          tr.getAttribute("data-no") +
+          "</p><p><b>类型</b> " +
+          tr.getAttribute("data-type") +
+          " &nbsp; <b>合同/订单</b> " +
+          tr.getAttribute("data-contract") +
+          "</p><p><b>相对方</b> " +
+          tr.getAttribute("data-party") +
+          "</p><p><b>物资</b> " +
+          tr.getAttribute("data-material") +
+          " 等" +
+          tr.getAttribute("data-mcount") +
+          "项，<b>数量合计</b> " +
+          tr.getAttribute("data-qty") +
+          "</p>";
+        document.getElementById("rxApproveOpinion").value = "";
+        var radios = document.getElementsByName("rxAprRes");
+        if (radios[0]) radios[0].checked = true;
+      }
+
+      function fillDetail(tr) {
+        try {
+          var no = esc(tr.getAttribute("data-no") || "—");
+          var type = esc(tr.getAttribute("data-type") || "—");
+          var contract = esc(tr.getAttribute("data-contract") || "—");
+          var party = esc(tr.getAttribute("data-party") || "—");
+          var dept = esc(tr.getAttribute("data-dept") || "—");
+          var applicant = esc(tr.getAttribute("data-applicant") || "—");
+          var time = esc(tr.getAttribute("data-time") || "—");
+          var reason = esc(tr.getAttribute("data-reason") || "—");
+          var material = esc(tr.getAttribute("data-material") || "—");
+          var qty = esc(tr.getAttribute("data-qty") || "—");
+          var amt = esc(tr.getAttribute("data-amt") || "—");
+          var st = tr.getAttribute("data-status");
+
+          document.getElementById("rxDetailP1").innerHTML =
+            '<div class="rx-subtable-wrap"><table class="rx-subtable"><tbody>' +
+            "<tr><th>退换货单号</th><td>" + no + "</td><th>退换类型</th><td>" + type + "</td></tr>" +
+            "<tr><th>关联合同/订单</th><td>" + contract + "</td><th>供应商/客户</th><td>" + party + "</td></tr>" +
+            "<tr><th>申请部门</th><td>" + dept + "</td><th>申请人</th><td>" + applicant + "</td></tr>" +
+            "<tr><th>申请时间</th><td>" + time + "</td><th>状态</th><td>" + esc(statusZh(st)) + "</td></tr>" +
+            '<tr><th>退换原因说明</th><td colspan="3">' + reason + "</td></tr>" +
+            "</tbody></table></div>";
+
+          document.getElementById("rxDetailP2").innerHTML =
+            '<div class="rx-subtable-wrap"><table class="rx-subtable"><thead><tr><th>物资名称</th><th>规格型号</th><th>原数量</th><th>单位</th><th>本次退换数量</th><th>退换原因</th><th>处理方式</th></tr></thead><tbody><tr><td>' +
+            material +
+            "</td><td>—</td><td>（合同）</td><td>件</td><td>" +
+            qty +
+            "</td><td>质量问题</td><td>退货退款</td></tr></tbody></table></div>";
+
+          document.getElementById("rxDetailP3").innerHTML =
+            '<p style="font-weight:600;margin-bottom:8px;">审批记录</p><div class="rx-subtable-wrap"><table class="rx-subtable"><thead><tr><th>审批人</th><th>审批时间</th><th>审批结果</th><th>审批意见</th></tr></thead><tbody><tr><td>王卿明</td><td>2026-04-22 10:00</td><td>' +
+            (st === "rejected" ? "拒绝" : st === "draft" ? "—" : "通过") +
+            "</td><td>（演示）</td></tr></tbody></table></div>" +
+            '<p style="font-weight:600;margin:12px 0 8px;">完成记录</p><div class="rx-subtable-wrap"><table class="rx-subtable"><thead><tr><th>完成人</th><th>完成时间</th><th>实际退换数量</th><th>退款金额</th><th>换货新单号</th></tr></thead><tbody><tr><td>' +
+            (st === "done" ? "宋中波" : "—") +
+            "</td><td>" +
+            (st === "done" ? "2026-04-12 15:00" : "—") +
+            "</td><td>" +
+            (st === "done" ? qty : "—") +
+            "</td><td>" +
+            (st === "done" ? amt : "—") +
+            "</td><td>" +
+            (st === "done" && String(type).indexOf("换") >= 0 ? "HT-NEW-001" : "—") +
+            "</td></tr></tbody></table></div>";
+        } catch (err) {
+          document.getElementById("rxDetailP1").innerHTML = '<p style="color:#cf1322">详情内容加载失败，请关闭后重试。</p>';
+          document.getElementById("rxDetailP2").innerHTML = "";
+          document.getElementById("rxDetailP3").innerHTML = "";
+        }
+        Array.prototype.forEach.call(document.querySelectorAll(".rx-tabs button"), function (b, i) {
+          b.classList.toggle("is-active", i === 0);
+        });
+        document.getElementById("rxDetailP1").style.display = "block";
+        document.getElementById("rxDetailP2").style.display = "none";
+        document.getElementById("rxDetailP3").style.display = "none";
+      }
+
+      document.querySelector(".rx-tabs").addEventListener("click", function (e) {
+        var btn = e.target.closest("button[data-tab]");
+        if (!btn) return;
+        e.preventDefault();
+        var k = btn.getAttribute("data-tab");
+        Array.prototype.forEach.call(document.querySelectorAll(".rx-tabs button"), function (b) {
+          b.classList.toggle("is-active", b === btn);
+        });
+        document.getElementById("rxDetailP1").style.display = k === "d1" ? "block" : "none";
+        document.getElementById("rxDetailP2").style.display = k === "d2" ? "block" : "none";
+        document.getElementById("rxDetailP3").style.display = k === "d3" ? "block" : "none";
+      });
+
+      function fillProgress(tr) {
+        var st = tr.getAttribute("data-status");
+        var s1 = "rx-flow-step--done",
+          s2 = "rx-flow-step",
+          s3 = "rx-flow-step",
+          s4 = "rx-flow-step";
+        if (st === "pending") {
+          s2 = "rx-flow-step--active";
+        } else if (st === "approved") {
+          s2 = "rx-flow-step--done";
+          s3 = "rx-flow-step--active";
+        } else if (st === "done") {
+          s2 = s3 = "rx-flow-step--done";
+          s4 = "rx-flow-step--done";
+        } else if (st === "rejected") {
+          s2 = "rx-flow-step--done";
+          s3 = s4 = "rx-flow-step";
+        } else if (st !== "draft") {
+          s2 = "rx-flow-step--active";
+        }
+        if (st === "draft") {
+          s1 = "rx-flow-step--active";
+          s2 = s3 = s4 = "rx-flow-step";
+        }
+        document.getElementById("rxFlowBar").innerHTML =
+          '<div class="rx-flow-step ' +
+          s1 +
+          '">申请人提报</div><div class="rx-flow-step ' +
+          s2 +
+          '">采购专责审核</div><div class="rx-flow-step ' +
+          s3 +
+          '">物资专责确认</div><div class="rx-flow-step ' +
+          s4 +
+          '">结束</div>';
+        var rows =
+          "<tr><td>申请人提报</td><td>" +
+          tr.getAttribute("data-applicant") +
+          "</td><td>" +
+          tr.getAttribute("data-time") +
+          "</td><td>提交</td><td>—</td></tr>";
+        if (st !== "draft") {
+          rows +=
+            "<tr><td>采购专责审核</td><td>王卿明</td><td>2026-04-22 10:00</td><td>" +
+            (st === "rejected" ? "驳回" : "通过") +
+            "</td><td>（演示）</td></tr>";
+        }
+        if (st === "approved" || st === "done") {
+          rows += "<tr><td>物资专责确认</td><td>宋中波</td><td>" + (st === "done" ? "2026-04-12 15:00" : "—") + "</td><td>" + (st === "done" ? "已完成" : "待办") + "</td><td>—</td></tr>";
+        }
+        document.getElementById("rxFlowTb").innerHTML = rows;
+      }
+
+      tb.addEventListener("click", function (e) {
+        var btn = e.target.closest("[data-op]");
+        if (!btn) return;
+        e.preventDefault();
+        var tr = btn.closest("tr[data-row]");
+        if (!tr) return;
+        var op = btn.getAttribute("data-op");
+        curRow = tr;
+        if (op === "new") {
+          openForm("new");
+        } else if (op === "edit") {
+          openForm("edit", tr);
+        } else if (op === "submit") {
+          confirmAction = "submitForm";
+          document.getElementById("rxConfirmTitle").textContent = "提交审批";
+          document.getElementById("rxConfirmBody").innerHTML =
+            "<p style='margin:0;line-height:1.6;'>确认提交审批吗？提交后将无法编辑，请确认信息填写完整。</p>";
+          openMask("rxMaskConfirm");
+        } else if (op === "delete") {
+          confirmAction = "deleteRow";
+          document.getElementById("rxConfirmTitle").textContent = "删除退换货申请";
+          document.getElementById("rxConfirmBody").innerHTML =
+            "<p style='margin:0;line-height:1.6;'>确认删除该退换货申请吗？删除后不可恢复。</p>";
+          openMask("rxMaskConfirm");
+        } else if (op === "withdraw") {
+          confirmAction = "withdraw";
+          document.getElementById("rxConfirmTitle").textContent = "撤回确认";
+          document.getElementById("rxConfirmBody").innerHTML =
+            "<p style='margin:0;line-height:1.6;'>确认撤回该退换货申请吗？撤回后状态将变为草稿，可重新编辑提交。</p>";
+          openMask("rxMaskConfirm");
+        } else if (op === "detail") {
+          openForm("view", tr);
+        } else if (op === "approve") {
+          fillApprovePreview(tr);
+          openMask("rxMaskApprove");
+        } else if (op === "reject") {
+          document.getElementById("rxRejectReason").value = "";
+          document.getElementById("rxRejectOpinion").value = "";
+          openMask("rxMaskReject");
+        } else if (op === "complete") {
+          document.getElementById("rxCNo").value = tr.getAttribute("data-no") || "";
+          document.getElementById("rxCType").value = tr.getAttribute("data-type") || "";
+          document.getElementById("rxCQty").value = tr.getAttribute("data-qty") || "1";
+          document.getElementById("rxCRefund").value = "";
+          document.getElementById("rxCNewNo").value = "";
+          var now = new Date();
+          document.getElementById("rxCTime").value = now.toISOString().slice(0, 16);
+          document.getElementById("rxCNote").value = "";
+          openMask("rxMaskComplete");
+        }
+      });
+
+      document.getElementById("rxApproveOk").onclick = function () {
+        if (!document.getElementById("rxApproveOpinion").value.trim()) {
+          alert("请填写审批意见。");
+          return;
+        }
+        var pass = document.querySelector('input[name="rxAprRes"]:checked').value === "pass";
+        if (curRow) setRowStatus(curRow, pass ? "approved" : "rejected");
+        closeMask("rxMaskApprove");
+        if (!pass) alert("已拒绝：申请人可修改后重新提交（演示）。");
+      };
+
+      document.getElementById("rxRejectOk").onclick = function () {
+        if (!document.getElementById("rxRejectReason").value.trim()) {
+          alert("请填写驳回原因。");
+          return;
+        }
+        if (curRow) setRowStatus(curRow, "rejected");
+        closeMask("rxMaskReject");
+      };
+
+      document.getElementById("rxCompleteOk").onclick = function () {
+        var q = Number(document.getElementById("rxCQty").value);
+        if (!(q > 0)) {
+          alert("实际退换数量须大于 0。");
+          return;
+        }
+        if (curRow && q > Number(curRow.getAttribute("data-qty"))) {
+          alert("实际退换数量不能超过申请数量。");
+          return;
+        }
+        alert("已确认完成：合同台账 / 物资台账 / 货物台账 将联动更新（演示提示）。");
+        if (curRow) setRowStatus(curRow, "done");
+        closeMask("rxMaskComplete");
+      };
+
+      document.getElementById("rxDetailPrint").onclick = function () {
+        alert("打开打印申请单（演示）。");
+      };
+      document.getElementById("rxDetailProgressLink").onclick = function (e) {
+        e.preventDefault();
+        if (typeof window.openUnifiedProgressModal === "function" && window.openUnifiedProgressModal()) return;
+        var flowMask = document.getElementById("mapUnifiedProgressModal");
+        if (!flowMask && typeof window.ensureUnifiedProgressModal === "function") flowMask = window.ensureUnifiedProgressModal();
+        if (flowMask) flowMask.classList.add("show");
+      };
+
+      document.getElementById("rxBtnSearch").onclick = function () {
+        alert("搜索为演示：可按单号、合同、相对方等过滤（未接后端）。");
+      };
+      document.getElementById("rxBtnReset").onclick = function () {
+        document.getElementById("rxQNo").value = "";
+        document.getElementById("rxQContract").value = "";
+        document.getElementById("rxQParty").value = "";
+        document.getElementById("rxQType").value = "";
+        document.getElementById("rxQStatus").value = "";
+        document.getElementById("rxQDateFrom").value = "";
+        document.getElementById("rxQDateTo").value = "";
+      };
+
+      window.addEventListener("demo-org-role-change", function () {
+        renderOps();
+      });
+      renderOps();
+    })();
+  </script>
+</body>
+</html>

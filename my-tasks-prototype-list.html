@@ -1,0 +1,1319 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>我的任务 - 新能源物资供应链管理系统</title>
+    <link rel="stylesheet" href="css/vendor/fa-all.min.css" />
+  <link rel="stylesheet" href="css/subpage-base.css" />
+  <link rel="stylesheet" href="css/carrier-management.css" />
+  <link rel="stylesheet" href="css/source-navbar-header.css" />
+  <style>
+    .mt .main-scroll { overflow: hidden; background: #f5f7fb; }
+    .mt .carrier-main-inner { padding: 10px 12px 12px; overflow: hidden; background: #f5f7fb; }
+    .mt .carrier-page-title { margin-bottom: 8px; font-size: 18px; }
+    .mt-search { display: grid; grid-template-columns: repeat(5, minmax(200px, 1fr)); gap: 8px; margin-bottom: 8px; }
+    .mt-item { display: grid; grid-template-columns: 80px minmax(220px, 1fr); align-items: center; gap: 6px; }
+    .mt-item label { font-size: 12px; color: #4d6480; }
+    .mt-item input { height: 26px; border: 1px solid #dbe6f3; border-radius: 2px; padding: 0 6px; font-size: 12px; }
+    .mt-tools { display: flex; align-items: center; gap: 6px; margin-bottom: 8px; }
+    .mt-btn { border: 1px solid #dbe6f3; background: #fff; border-radius: 2px; color: #4d6480; font-size: 12px; padding: 4px 9px; cursor: pointer; }
+    .mt-btn.primary { background: #1890ff; border-color: #1890ff; color: #fff; }
+    .mt-table-wrap { border: 1px solid #e7ecf3; border-radius: 3px; overflow: hidden; height: calc(100vh - 190px); display: flex; flex-direction: column; background: #fff; }
+    .mt-table-layout { display: grid; grid-template-columns: 160px 1fr; min-height: 0; flex: 1; }
+    .mt-tree-wrap { border-right: 1px solid #edf1f6; padding: 4px 6px; overflow: auto; }
+    .mt-tree-search { width: 100%; height: 24px; border: 1px solid #e6eaf1; border-radius: 2px; padding: 0 6px; font-size: 11px; margin-bottom: 6px; }
+    .mt-tree-list { list-style: none; margin: 0; padding: 0; font-size: 11px; color: #5a6f87; line-height: 1.8; }
+    .mt-tree-list li { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .mt-tree-list li::before { content: "- "; color: #9eb1c7; }
+    .mt-table { width: 100%; border-collapse: collapse; table-layout: fixed; font-size: 12px; }
+    .mt-table th, .mt-table td { border-bottom: 1px solid #edf1f6; padding: 8px 6px; text-align: center; color: #1f1f1f; }
+    .mt-table thead { background: #f6f8fb; }
+    .mt-table td { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .mt-col-check { width: 26px; }
+    .mt-status { display: inline-block; border-radius: 2px; padding: 1px 6px; font-size: 10px; }
+    .mt-s1 { color: #389e0d; background: #f6ffed; }
+    .mt-s2 { color: #1677ff; background: #e6f4ff; }
+    .mt-s3 { color: #cf1322; background: #fff1f0; }
+    .mt-action { display:inline-flex; align-items:center; justify-content:center; gap: 4px; min-width: 50px; height: 22px; background:#4ea7ff; color:#fff; border-radius:3px; padding:0 10px; font-size:11px; border: 1px solid rgba(78,167,255,0.65); box-sizing: border-box; }
+    .mt-icon-btn {
+      color: #1890ff;
+      text-decoration: none;
+      margin: 0 4px;
+      font-size: 14px;
+      line-height: 1;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      vertical-align: middle;
+    }
+    .mt-icon-btn:hover { color: #40a9ff; }
+    .mt-icon-btn i { font-weight: 400; }
+    .mt-pager { margin-top: auto; display:flex; align-items:center; justify-content:flex-end; gap: 10px; padding: 10px 10px; font-size: 12px; color: #617894; border-top: 1px solid #edf1f6; }
+    .mt-pager select { height: 24px; border: 1px solid #e1e8f2; border-radius: 2px; font-size: 12px; padding: 0 6px; background: #fff; color: #4d6480; }
+    .mt-page-btns { display: inline-flex; align-items: center; gap: 4px; }
+    .mt-page-btns button { min-width: 22px; height: 22px; border: 1px solid #e1e8f2; background: #fff; border-radius: 2px; cursor: pointer; font-size: 12px; color:#4d6480; }
+    .mt-page-btns button.is-current { background: #1890ff; border-color: #1890ff; color: #fff; }
+    .mt-goto { display:inline-flex; align-items:center; gap: 6px; }
+    .mt-goto input { width: 34px; height: 22px; border: 1px solid #e1e8f2; border-radius: 2px; text-align:center; font-size: 12px; }
+    /* 我的待办 · 库存管理审批单全屏弹窗（与 material-procurement-hub 审批单一致） */
+    #mtQaAcceptMask {
+      position: fixed;
+      inset: 0;
+      z-index: 10000;
+      display: none;
+      flex-direction: column;
+      background: rgba(0, 0, 0, 0.45);
+      box-sizing: border-box;
+    }
+    #mtQaAcceptMask.is-open { display: flex; }
+    #mtQaAcceptMask .mt-qa-dialog {
+      flex: 1;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      margin: 0;
+      width: 100%;
+      max-width: none;
+      background: #fff;
+      overflow: hidden;
+    }
+    #mtQaAcceptMask .mt-qa-body {
+      flex: 1;
+      min-height: 0;
+      overflow: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    #mtQaAcceptMask .mt-qa-foot {
+      flex-shrink: 0;
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      padding: 10px 16px;
+      border-top: 1px solid #e8eef5;
+      background: #fafbfd;
+    }
+    #mtQaAcceptMask .mt-qa-btn {
+      height: 32px;
+      padding: 0 16px;
+      border-radius: 4px;
+      border: 1px solid #d9d9d9;
+      background: #fff;
+      font-size: 13px;
+      cursor: pointer;
+      font-family: inherit;
+      color: #262626;
+    }
+    #mtQaAcceptMask .mt-qa-btn-primary {
+      border-color: #1890ff;
+      background: #1890ff;
+      color: #fff;
+    }
+    #mtQaAcceptMask .mt-qa-btn-primary:hover { background: #40a9ff; border-color: #40a9ff; }
+    #mtQaAcceptMask .qa-accept-wrap {
+      padding: 12px 16px 14px;
+      background: #f5f7fa;
+      box-sizing: border-box;
+      min-height: 100%;
+    }
+    #mtQaAcceptMask .qa-accept-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 14px;
+    }
+    #mtQaAcceptMask .qa-accept-toolbar-left { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+    #mtQaAcceptMask .qa-accept-btn-primary {
+      min-height: 32px;
+      padding: 0 18px;
+      font-size: 13px;
+      border-radius: 4px;
+      border: 1px solid #1890ff;
+      background: #1890ff;
+      color: #fff;
+      cursor: pointer;
+      font-family: inherit;
+    }
+    #mtQaAcceptMask .qa-accept-btn-primary:hover { background: #40a9ff; border-color: #40a9ff; }
+    #mtQaAcceptMask .qa-accept-link-flow {
+      border: none;
+      background: transparent;
+      padding: 0;
+      font-size: 13px;
+      font-weight: 600;
+      color: #1677ff;
+      cursor: pointer;
+      font-family: inherit;
+    }
+    #mtQaAcceptMask .qa-accept-toolbar-title {
+      flex: 1;
+      text-align: center;
+      font-size: 20px;
+      font-weight: 600;
+      color: #1f3551;
+      letter-spacing: 0.02em;
+      min-width: 200px;
+    }
+    #mtQaAcceptMask .qa-accept-legend {
+      margin: 0 0 10px;
+      padding: 0 2px;
+      font-size: 12px;
+      color: #8c8c8c;
+      line-height: 1.5;
+    }
+    #mtQaAcceptMask .qa-accept-legend .qa-legend-dot {
+      display: inline-block;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #bfbfbf;
+      margin: 0 4px 0 0;
+      vertical-align: middle;
+    }
+    #mtQaAcceptMask .qa-accept-btn-close {
+      min-height: 32px;
+      width: 36px;
+      padding: 0;
+      line-height: 1;
+      font-size: 22px;
+      font-weight: 400;
+      border-radius: 6px;
+      border: 1px solid #d9d9d9;
+      background: #fff;
+      color: rgba(0, 0, 0, 0.55);
+      cursor: pointer;
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+      flex-shrink: 0;
+    }
+    #mtQaAcceptMask .qa-accept-btn-close:hover {
+      color: #1677ff;
+      border-color: #91caff;
+      background: #f0f7ff;
+    }
+    #mtQaAcceptMask .qa-accept-form-shell {
+      background: #fff;
+      border: 1px solid #e8eef5;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    #mtQaAcceptMask .qa-accept-grid {
+      width: 100%;
+      border-collapse: collapse;
+      table-layout: fixed;
+      font-size: 13px;
+    }
+    #mtQaAcceptMask .qa-accept-grid td {
+      border: 1px solid #e8eef5;
+      padding: 0;
+      vertical-align: middle;
+    }
+    #mtQaAcceptMask .qa-accept-grid .qa-lab {
+      width: 17%;
+      background: #f5f7fa;
+      color: #3f5366;
+      padding: 10px 12px;
+      text-align: right;
+      font-weight: 500;
+      box-sizing: border-box;
+      position: relative;
+    }
+    #mtQaAcceptMask .qa-accept-grid .qa-lab .req { color: #ff4d4f; margin-right: 2px; }
+    #mtQaAcceptMask .qa-accept-grid .qa-lab .qa-dot-hint {
+      position: absolute;
+      left: 50%;
+      top: 6px;
+      transform: translateX(-50%);
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: #ff4d4f;
+    }
+    #mtQaAcceptMask .qa-accept-grid tr:nth-child(2) .qa-lab { padding-top: 18px; }
+    #mtQaAcceptMask .qa-accept-grid .qa-val {
+      width: 33%;
+      padding: 6px 10px;
+      background: #fff;
+      box-sizing: border-box;
+    }
+    #mtQaAcceptMask .qa-accept-grid .qa-val-empty { background: #fafafa; }
+    #mtQaAcceptMask .qa-accept-grid .qa-inp:not(.qa-inp--auto):not(textarea) {
+      width: 100%;
+      height: 32px;
+      border: 1px solid #d9d9d9;
+      border-radius: 4px;
+      padding: 0 10px;
+      font-size: 13px;
+      color: #262626;
+      box-sizing: border-box;
+      background: #fff;
+      outline: none;
+    }
+    #mtQaAcceptMask .qa-accept-grid .qa-inp--auto,
+    #mtQaAcceptMask .qa-accept-grid .qa-inp[readonly].qa-inp--auto {
+      background: #ebebeb !important;
+      border-color: #d9d9d9;
+      color: #8c8c8c !important;
+      cursor: not-allowed;
+    }
+    #procModalMask.proc-modal-mask {
+      position: fixed;
+      inset: 0;
+      z-index: 10000;
+      display: none;
+      align-items: stretch;
+      justify-content: stretch;
+      background: rgba(0, 0, 0, 0.45);
+      box-sizing: border-box;
+    }
+    #procModalMask.proc-modal-mask.is-open { display: flex; }
+    #procModalMask .proc-modal-box {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+      margin: 0;
+      width: 100%;
+      max-width: none;
+      background: #fff;
+      border-radius: 0;
+      overflow: hidden;
+    }
+    #procModalMask .proc-modal-head {
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 16px;
+      border-bottom: 1px solid #e8eef5;
+      background: #fafbfd;
+    }
+    #procModalMask .proc-modal-body {
+      flex: 1;
+      min-height: 0;
+      overflow: auto;
+      padding: 0;
+    }
+    #procModalMask .proc-modal-foot {
+      flex-shrink: 0;
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      padding: 10px 16px;
+      border-top: 1px solid #e8eef5;
+      background: #fafbfd;
+    }
+    #procModalMask .proc-btn {
+      height: 32px;
+      padding: 0 16px;
+      border-radius: 4px;
+      border: 1px solid #d9d9d9;
+      background: #fff;
+      font-size: 13px;
+      cursor: pointer;
+    }
+    #procModalMask .proc-btn-primary {
+      border-color: #1890ff;
+      background: #1890ff;
+      color: #fff;
+    }
+    #procModalMask.qa-accept-mode .qa-accept-wrap {
+      padding: 12px 16px 14px;
+      background: #f5f7fa;
+      min-height: 100%;
+      box-sizing: border-box;
+    }
+    #procModalMask .qa-mat-lines-block {
+      padding: 10px 12px 12px;
+      margin: 0 0 12px;
+      border: 1px solid #e8eef5;
+      border-radius: 4px;
+      background: #fff;
+    }
+    #procModalMask .qa-mat-lines-table-wrap {
+      border: 1px solid #e8eef5;
+      border-radius: 4px;
+      overflow: auto;
+      max-height: 280px;
+    }
+    #procModalMask .qa-mat-lines-table {
+      width: 100%;
+      min-width: 1380px;
+      border-collapse: collapse;
+      font-size: 12px;
+    }
+    #procModalMask .qa-mat-lines-table thead th {
+      background: #e8f4fc;
+      padding: 8px 6px;
+      border: 1px solid #d9e8f5;
+      text-align: center;
+      white-space: nowrap;
+    }
+    #procModalMask .qa-mat-lines-table thead th .req { color: #ff4d4f; margin-right: 2px; }
+    #procModalMask .qa-mat-lines-table tbody td {
+      border: 1px solid #e8eef5;
+      padding: 4px 6px;
+      vertical-align: middle;
+    }
+    #procModalMask .qa-inp:not(.qa-inp--auto):not(textarea) {
+      width: 100%;
+      height: 28px;
+      border: 1px solid #d9d9d9;
+      border-radius: 4px;
+      padding: 0 8px;
+      font-size: 12px;
+      box-sizing: border-box;
+    }
+    #procModalMask div.qa-inp,
+    #procModalMask textarea.qa-inp--auto {
+      width: 100%;
+      height: auto;
+      min-height: 28px;
+      border: 1px solid #d9d9d9;
+      border-radius: 4px;
+      padding: 4px 8px;
+      font-size: 12px;
+      box-sizing: border-box;
+    }
+    #procModalMask .qa-inp.qa-inp--auto,
+    #procModalMask .qa-mat-lines-block--readonly .qa-inp,
+    #procModalMask .qa-mat-lines-block--readonly .qa-select {
+      background: #ebebeb !important;
+      color: #8c8c8c !important;
+      cursor: not-allowed;
+    }
+    #procModalMask.qa-accept-mode .qa-detail-ro {
+      display: block;
+      color: #262626;
+      line-height: 28px;
+    }
+    #procModalMask.qa-accept-mode .qa-mat-lines-block--readonly .qa-inp,
+    #procModalMask.qa-accept-mode .qa-mat-lines-block--readonly .qa-select {
+      color: #262626 !important;
+    }
+    #procModalMask.qa-accept-mode .qa-mat-detail-list-block .proc-mini-table th:nth-child(6),
+    #procModalMask.qa-accept-mode .qa-mat-detail-list-block .proc-mini-table tbody td:nth-child(6) {
+      min-width: 248px;
+      width: 248px;
+    }
+    #procModalMask.qa-accept-mode .qa-inp.qa-detail-factory-code {
+      min-width: 232px;
+      color: #262626;
+    }
+    #procModalMask .qa-inp.qa-detail-factory-code::placeholder { color: #bfbfbf; }
+    #procModalMask .qa-line-shipqty::placeholder,
+    #procModalMask .qa-line-recvqty::placeholder { color: #bfbfbf; }
+    #procModalMask.qa-accept-mode .proc-modal-head { display: none !important; }
+    #procModalMask.qa-accept-mode .proc-modal-box.fullscreen {
+      max-width: min(1200px, 98vw);
+      width: 100%;
+      margin: 4vh auto;
+      max-height: 92vh;
+      border-radius: 4px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);
+    }
+    #procModalMask.qa-accept-mode .proc-modal-body { padding: 0; overflow: visible; }
+    #procModalMask .qa-accept-wrap { padding: 12px 16px 14px; background: #f5f7fa; box-sizing: border-box; }
+    #procModalMask .qa-accept-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+    #procModalMask .qa-accept-toolbar-title {
+      flex: 1;
+      text-align: center;
+      font-size: 20px;
+      font-weight: 600;
+      color: #1f3551;
+    }
+    #procModalMask .qa-accept-form-shell {
+      background: #fff;
+      border: 1px solid #e8eef5;
+      border-radius: 4px;
+    }
+    #procModalMask .qa-accept-grid {
+      width: 100%;
+      border-collapse: collapse;
+      table-layout: fixed;
+      font-size: 13px;
+    }
+    #procModalMask .qa-accept-grid td { border: 1px solid #e8eef5; padding: 0; vertical-align: middle; }
+    #procModalMask .qa-accept-grid .qa-lab {
+      width: 17%;
+      background: #f5f7fa;
+      color: #3f5366;
+      padding: 10px 12px;
+      text-align: right;
+      font-weight: 500;
+    }
+    #procModalMask .qa-accept-grid .qa-lab .req { color: #ff4d4f; margin-right: 2px; }
+    #procModalMask .qa-accept-grid .qa-val { padding: 6px 10px; background: #fff; }
+    #procModalMask .qa-accept-grid .qa-inp,
+    #procModalMask .qa-accept-grid .qa-ta {
+      width: 100%;
+      border: 1px solid #d9d9d9;
+      border-radius: 4px;
+      font-size: 13px;
+      box-sizing: border-box;
+    }
+    #procModalMask .qa-accept-grid .qa-inp:not(.qa-inp--auto):not(textarea) { height: 32px; padding: 0 10px; }
+    #procModalMask .qa-accept-grid .qa-ta { padding: 8px 10px; min-height: 56px; resize: vertical; }
+    #procModalMask .qa-mat-detail-list-block { margin-top: 4px; }
+    #mtQaAcceptMask .qa-accept-grid .qa-lab .qa-auto-mark {
+      display: inline-block;
+      margin-left: 4px;
+      color: #bfbfbf;
+      font-size: 12px;
+      vertical-align: middle;
+      cursor: default;
+    }
+    #mtQaAcceptMask .qa-accept-grid select.qa-select {
+      width: 100%;
+      height: 32px;
+      border: 1px solid #d9d9d9;
+      border-radius: 4px;
+      padding: 0 8px;
+      font-size: 13px;
+      color: #262626;
+      background: #fff;
+      box-sizing: border-box;
+      outline: none;
+      cursor: pointer;
+    }
+    #mtQaAcceptMask .qa-accept-grid .qa-ta {
+      width: 100%;
+      min-height: 52px;
+      border: 1px solid #d9d9d9;
+      border-radius: 4px;
+      padding: 8px 10px;
+      font-size: 13px;
+      color: #262626;
+      box-sizing: border-box;
+      resize: vertical;
+      font-family: inherit;
+      background: #fff;
+      outline: none;
+    }
+    #mtQaToast {
+      position: fixed;
+      bottom: 80px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 10001;
+      padding: 10px 18px;
+      border-radius: 6px;
+      background: rgba(0, 0, 0, 0.78);
+      color: #fff;
+      font-size: 13px;
+      display: none;
+      max-width: 90vw;
+      pointer-events: none;
+    }
+    #mtQaToast.show { display: block; }
+  </style>
+</head>
+<body class="page-subpage page-logistics mt page-source-navbar">
+  <div class="page-bg" aria-hidden="true"></div>
+  <div class="app">
+    <header class="header">
+      <div class="header-left">
+        <button type="button" class="header-hamburger" aria-label="菜单"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+        <a class="header-logo" href="#"><img src="assets/logo-chenergy.png" alt="" width="220" height="40" /></a>
+        <div class="header-source-brand"><p>新能源供应链管理系统</p></div>
+      </div>
+      <div class="header-right"><span class="clock" id="clock"></span><div class="user-avatar" title="用户">用</div></div>
+    </header>
+    <div class="layout">
+      <aside class="sidebar" aria-label="主导航">
+<div class="nav-item" title="我的资产"><span class="nav-label">我的资产</span></div>
+<div class="nav-item nav-item--module-active" title="我的任务"><span class="nav-label">我的任务</span></div>
+        <a class="nav-item" href="index-portal-screen-alt.html"><span class="nav-label">首页</span></a>
+        <a class="nav-item" href="cockpit-analytics.html"><span class="nav-label">驾驶舱</span></a>
+        <div class="nav-item" title="采购管理"><span class="nav-label">采购管理</span></div>
+        <a class="nav-item" href="carrier-management.html"><span class="nav-label">物流管理</span></a>
+        <a class="nav-item" href="warehouse.html"><span class="nav-label">仓储管理</span></a>
+        <div class="nav-item" title="物资采购"><span class="nav-label">物资采购</span></div>
+        <div class="nav-item" title="物资出库与处置"><span class="nav-label">物资出库与处置</span></div>
+        <div class="nav-item" title="绩效考核"><span class="nav-label">绩效考核</span></div>
+        <div class="nav-item" title="公告管理"><span class="nav-label">公告管理</span></div>
+        <div class="nav-item" title="综合业务管理"><span class="nav-label">综合业务管理</span></div>
+        <div class="nav-item" title="数据管理"><span class="nav-label">数据管理</span></div>
+        <div class="nav-item" title="开发工具"><span class="nav-label">开发工具</span></div>
+        <div class="nav-item" title="设置"><span class="nav-label">设置</span></div>
+        <div class="nav-item" title="系统管理"><span class="nav-label">系统管理</span></div>
+      </aside>
+      <main class="main-scroll">
+        <div class="carrier-main-inner" data-list-form-demo="1">
+          <h1 class="carrier-page-title" id="mtTitle">我发起的</h1>
+          <div class="mt-search" id="mtSearch"></div>
+          <div class="mt-tools">
+            <button class="mt-btn primary" type="button">搜索</button>
+            <button class="mt-btn" type="button">重置</button>
+          </div>
+          <div class="mt-table-wrap">
+            <div class="mt-table-layout" id="mtLayout">
+              <div class="mt-tree-wrap" id="mtTreeWrap" hidden>
+                <input class="mt-tree-search" type="text" placeholder="请输入流程分类名称" />
+                <ul class="mt-tree-list" id="mtTreeList"></ul>
+              </div>
+              <div style="overflow:auto;">
+                <table class="mt-table">
+                  <thead><tr id="mtHead"></tr></thead>
+                  <tbody id="mtBody"></tbody>
+                </table>
+              </div>
+            </div>
+            <div class="mt-pager" role="navigation" aria-label="分页">
+              <span>共 <span id="mtTotal">0</span> 条</span>
+              <select aria-label="每页条数" id="mtPageSize">
+                <option value="10" selected>10条/页</option>
+                <option value="15">15条/页</option>
+                <option value="20">20条/页</option>
+              </select>
+              <div class="mt-page-btns" id="mtPageBtns">
+                <button type="button" aria-label="上一页">&lt;</button>
+                <button type="button" class="is-current" aria-current="page">1</button>
+                <button type="button" aria-label="下一页">&gt;</button>
+              </div>
+              <span class="mt-goto">跳至 <input type="text" value="1" aria-label="页码" /> 页</span>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+  <div id="procModalMask" class="proc-modal-mask" aria-hidden="true">
+    <div class="proc-modal-box" role="dialog" aria-modal="true" aria-labelledby="procModalTitle">
+      <div class="proc-modal-head">
+        <span id="procModalTitle">提示</span>
+        <button type="button" id="procModalFlow" class="proc-modal-flow-btn" hidden aria-hidden="true">流程进度</button>
+        <button type="button" class="proc-btn" id="procModalX" aria-label="关闭">×</button>
+      </div>
+      <div class="proc-modal-body" id="procModalBody"></div>
+      <div class="proc-modal-foot" id="procModalFoot">
+        <button type="button" class="proc-btn" id="procModalClose">取消</button>
+      </div>
+    </div>
+  </div>
+  <div id="mtQaAcceptMask" aria-hidden="true">
+    <div class="mt-qa-dialog" role="dialog" aria-modal="true" aria-labelledby="mtQaAcceptTitle">
+      <div class="mt-qa-body" id="mtQaAcceptBody"></div>
+      <div class="mt-qa-foot">
+        <button type="button" class="mt-qa-btn" id="mtQaFootCancel">取消</button>
+        <button type="button" class="mt-qa-btn mt-qa-btn-primary" id="mtQaFootOk">确定</button>
+      </div>
+    </div>
+  </div>
+  <div id="mtQaToast" role="status" aria-live="polite"></div>
+  <script src="js/sidebar-actions.js"></script>
+  <script src="js/subpage-feature-title.js"></script>
+  <script src="js/demo-list-form-modal.js"></script>
+  <script src="js/site-footer.js"></script>
+  <script src="js/subpage-clock.js"></script>
+  <script src="js/cross-dept-handoff-demo.js"></script>
+  <script src="js/material-code-scheme.js"></script>
+  <script src="js/demo-two-col-dd.js"></script>
+  <script src="js/demo-product-catalog-data.js"></script>
+  <script src="js/demo-product-catalog-picker.js"></script>
+  <script src="js/material-procurement-hub.js"></script>
+   <script>
+    (function () {
+      var scene = "";
+      var bodyEl = document.body;
+      if (bodyEl && bodyEl.getAttribute("data-scene")) {
+        scene = bodyEl.getAttribute("data-scene") || "";
+      }
+      if (!scene) {
+        try {
+          var sp = new URLSearchParams(window.location.search);
+          scene = sp.get("scene") || "";
+        } catch (e) {}
+      }
+      if (!scene) {
+        try {
+          scene = sessionStorage.getItem("demoScene") || "";
+        } catch (e2) {}
+      }
+      if (!scene) {
+        try {
+          var nm = window.name || "";
+          if (nm) {
+            var sp2 = new URLSearchParams(nm);
+            scene = sp2.get("scene") || "";
+          }
+        } catch (e3) {}
+      }
+      if (!scene) scene = "initiated";
+      var cfgMap = {
+        initiated: {
+          title: "我发起的",
+          fields: ["流程定义名称", "流程定义KEY", "", "", ""],
+          cols: ["", "序号", "id", "流程定义名称", "流程定义KEY", "版本号", "状态", "流程状态", "启动时间", "结束时间", "操作"],
+          showTree: true,
+          total: 82,
+          page: "10条/页",
+          rows: [
+            ["", "1", "19201", "采购项目审定结果通知(非招标)v4.0", "cgjz0", "v4.0", "激活", "已驳回", "2025-09-12 14:26:55", "—", "icons"],
+            ["", "2", "19202", "平潭不采购面审批单v4.0", "cxcgspd", "v4.0", "激活", "审核中", "2025-02-26 16:33:54", "—", "icons"],
+            ["", "3", "19203", "重新不采购审批单v4.0", "cxcgspd", "v4.0", "激活", "已驳回", "2025-02-26 16:27:38", "—", "icons"],
+            ["", "4", "19204", "公司拟定采补充审批单v5.0", "qinggaiuchengm", "v5.0", "激活", "审核中", "2025-02-26 10:16:28", "—", "icons"],
+            ["", "5", "19205", "采购项目审定结果通知(下发)流程v4.0", "cgfz0", "v4.0", "激活", "待审批", "2025-02-26 09:50:36", "—", "icons"],
+            ["", "6", "19206", "虚拟采购审批单v4.0", "cxcgspd", "v4.0", "激活", "审核中", "2025-02-26 19:30:27", "—", "icons"],
+            ["", "7", "19207", "重新不采购审批单v4.0", "cxcgspd", "v4.0", "激活", "待审批", "2025-02-26 09:28:48", "—", "icons"],
+            ["", "8", "19208", "1扫招标零委会v7.0", "FB", "v7.0", "激活", "待审批", "2024-12-09 18:07:55", "—", "icons"],
+            ["", "9", "19209", "非招标零委会v7.0", "FH", "v7.0", "激活", "已驳回", "2024-12-19 17:10:10", "—", "icons"],
+            ["", "10", "19210", "15万以下不采购结果审定(项目单位)v4.0", "wyxcgjgsd", "v4.0", "激活", "审核中", "2024-12-19 14:22:29", "—", "icons"]
+          ],
+          tree: ["顶级节点", "OA", "1扫招标零委会", "重新不采购审批单", "公司拟定采补充审批单", "停止采购审批单", "长协领用结果使用审批单(华东)", "采购项目审定结果通知(非招标)", "本部月度下招标采购计划审批", "公司级采购计划审定(项目单位)", "15万以下不采购结果审定(项目单位)", "本部采购文件审查纪要", "招标零委会资料审批", "test", "test1"]
+        },
+        todo: {
+          title: "我的待办",
+          fields: ["任务名称", "流程定义名称", "流程定义KEY", "", ""],
+          cols: ["", "序号", "流程定义名称", "流程定义KEY", "任务名称", "办理人", "流程状态", "创建时间", "操作"],
+          total: 24,
+          page: "10条/页",
+          pageBtns: ["1", "2", "3"],
+          rows: [
+            ["", "1", "库存管理审批", "kcglsp", "库存管理审批", "业务部门专责", "待审批", "2024-12-09 11:02:22", "handle"],
+            ["", "2", "库存管理审批", "kcglsp", "库存管理审批", "业务部门专责", "待审批", "2024-12-09 11:06:33", "handle"],
+            ["", "3", "库存管理审批", "kcglsp", "库存管理审批", "业务部门专责", "待审批", "2024-12-09 11:12:30", "handle"],
+            ["", "4", "领用申请审批", "lysqsp", "领用申请审批", "业务部门专责", "待审批", "2024-12-09 11:17:23", "handle"],
+            ["", "5", "库存管理审批", "kcglsp", "库存管理审批", "业务部门专责", "待审批", "2024-12-09 11:20:06", "handle"],
+            ["", "6", "订单需求管理审批", "ddxqglsp", "订单需求管理审批", "业务部门专责", "待审批", "2024-12-09 11:24:38", "handle"],
+            ["", "7", "录入销售合同单号", "xshtsp", "录入销售合同单号", "业务部门专责", "待审批", "2024-12-09 11:28:42", "handle"],
+            ["", "8", "录入物流单号", "fhglsp", "录入物流单号", "业务部门专责", "待审批", "2024-12-09 11:31:36", "handle"],
+            ["", "9", "货物质量验收审批", "hwzlyspsp", "货物质量验收审批", "业务部门专责", "待审批", "2024-12-09 11:35:00", "handle"],
+            ["", "10", "退换货管理审批", "thhglsp", "退换货管理审批", "业务部门专责", "待审批", "2024-12-09 11:42:11", "handle"]
+          ]
+        },
+        done: {
+          title: "我的已办",
+          fields: ["任务名称", "流程定义名称", "流程定义KEY", "", ""],
+          cols: ["", "序号", "流程定义名称", "流程定义KEY", "任务名称", "办理人", "流程状态", "创建时间", "操作"],
+          total: 121,
+          page: "10条/页",
+          pageBtns: ["1", "2", "3", "4", "5", "6", "...", "13"],
+          rows: [
+            ["", "1", "采购项目审定结果通知(非招标)v4.0", "cgjz0", "采购项目审定结果通知(非招标)", "处理员", "已办结", "2024-12-03 11:02:22", "view"],
+            ["", "2", "采购项目审定结果通知(非招标)v4.0", "cgjz0", "采购项目审定结果通知(非招标)", "处理员", "已办结", "2024-12-03 10:56:33", "view"],
+            ["", "3", "采购项目审定结果通知(非招标)v4.0", "cgjz0", "采购项目审定结果通知(非招标)", "处理员", "已办结", "2024-12-03 09:33:30", "view"],
+            ["", "4", "公司级集采计划审批单v4.0", "cgjhspd", "公司级集采计划审批单", "处理员", "已办结", "2024-12-03 09:17:23", "view"],
+            ["", "5", "本部月度采购计划审批单v4.0", "bbmdcqjh", "本部月度采购计划审批单", "处理员", "已办结", "2024-12-03 09:10:06", "view"],
+            ["", "6", "15万以下采购结果审定(项目单位)v3.0", "wyxcqjgsd", "15万以下采购结果审定(项目单位)", "处理员", "已办结", "2024-11-29 19:09:38", "view"],
+            ["", "7", "15万以下采购结果审定(项目单位)v3.0", "wyxcqjgsd", "15万以下采购结果审定(项目单位)", "处理员", "已办结", "2024-11-29 18:56:42", "view"],
+            ["", "8", "15万以下采购结果审定(项目单位)v3.0", "wyxcqjgsd", "15万以下采购结果审定(项目单位)", "处理员", "已办结", "2024-11-29 14:54:36", "view"],
+            ["", "9", "非招标零委会v7.0", "FH", "非招标零委会", "处理员", "已办结", "2024-11-29 14:22:00", "view"],
+            ["", "10", "非招标零委会v7.0", "FH", "非招标零委会", "处理员", "已办结", "2024-11-29 14:21:11", "view"]
+          ]
+        },
+        cc: {
+          title: "我的抄送",
+          fields: ["任务名称", "流程定义名称", "流程定义KEY", "", ""],
+          cols: ["", "序号", "流程定义名称", "流程定义KEY", "任务名称", "办理人", "流程状态", "操作"],
+          total: 9,
+          page: "1条/页",
+          pageBtns: ["1"],
+          rows: [
+            ["", "1", "1扫招标零委会v2.0", "FB", "[已完成] 项目公司审批", "流程负责人", "待抄阅", "view"],
+            ["", "2", "长协采购结果使用审批单v2.0", "cxcgqyssypd", "[已签发] 对接主管部门任务签写", "流程负责人", "待抄阅", "view"]
+          ]
+        }
+      };
+      var cfg = cfgMap[scene] || cfgMap.initiated;
+
+      function mt$(id) {
+        return document.getElementById(id);
+      }
+      function mtQaToast(msg) {
+        var el = mt$("mtQaToast");
+        if (!el) {
+          alert(msg);
+          return;
+        }
+        el.textContent = msg;
+        el.classList.add("show");
+        clearTimeout(mtQaToast._t);
+        mtQaToast._t = setTimeout(function () {
+          el.classList.remove("show");
+        }, 2200);
+      }
+      var MT_QA_BY_CONTRACT = {
+        HT2026301: {
+          acceptNo: "YS2026042308",
+          material: "变流器模块",
+          supplier: "远景能源",
+          spec: "V2.0",
+          recvTime: "2026-04-10 09:40",
+          receiver: "宋中波",
+          status: "草稿",
+          materialLines: [
+            { name: "变流器模块", spec: "V2.0", recvTime: "2026-04-10 09:40", receiver: "宋中波" },
+            { name: "变流器控制单元", spec: "V2.1", recvTime: "2026-04-10 11:00", receiver: "宋中波" }
+          ]
+        },
+        HT2026315: {
+          acceptNo: "YS2026042401",
+          material: "IGBT驱动板",
+          supplier: "联合动力",
+          spec: "V3.1",
+          recvTime: "2026-04-12 14:20",
+          receiver: "李泽",
+          status: "草稿",
+          materialLines: [
+            { name: "IGBT驱动板", spec: "V3.1", recvTime: "2026-04-12 14:20", receiver: "李泽" },
+            { name: "IGBT散热模组", spec: "V3.0", recvTime: "2026-04-12 15:00", receiver: "李泽" }
+          ]
+        }
+      };
+      function mtMaterialLinesFor(contractKey) {
+        var m = contractKey ? MT_QA_BY_CONTRACT[contractKey] : null;
+        if (!m) return [];
+        if (m.materialLines && m.materialLines.length) return m.materialLines;
+        return [
+          { name: m.material, spec: m.spec, recvTime: m.recvTime, receiver: m.receiver }
+        ];
+      }
+      function mtRebuildMaterialSelect(contractKey) {
+        var sel = mt$("qaAutoMaterial");
+        if (!sel || sel.tagName !== "SELECT") return;
+        sel.innerHTML = "";
+        var lines = mtMaterialLinesFor(contractKey);
+        if (!lines.length) {
+          var ph = document.createElement("option");
+          ph.value = "";
+          ph.textContent = "请先选择合同编号";
+          sel.appendChild(ph);
+          return;
+        }
+        lines.forEach(function (ln) {
+          var opt = document.createElement("option");
+          opt.value = ln.name;
+          opt.textContent = ln.name;
+          sel.appendChild(opt);
+        });
+      }
+      function mtApplyMaterialLine(contractKey, materialName) {
+        var lines = mtMaterialLinesFor(contractKey);
+        var ln = null;
+        var i;
+        for (i = 0; i < lines.length; i++) {
+          if (String(lines[i].name) === String(materialName || "")) {
+            ln = lines[i];
+            break;
+          }
+        }
+        if (!ln && lines.length) ln = lines[0];
+        if (!ln) return;
+        function set(id, v) {
+          var el = mt$(id);
+          if (!el) return;
+          el.value = v == null || v === undefined ? "" : String(v);
+        }
+        set("qaAutoSpec", ln.spec);
+        set("qaAutoRecvTime", ln.recvTime);
+        set("qaAutoReceiver", ln.receiver);
+      }
+      function mtApplyQaContract(contractKey) {
+        var m = contractKey ? MT_QA_BY_CONTRACT[contractKey] : null;
+        function set(id, v) {
+          var el = mt$(id);
+          if (!el) return;
+          el.value = v == null || v === undefined ? "" : String(v);
+        }
+        if (!m) {
+          set("qaAutoAcceptNo", "");
+          set("qaAutoSupplier", "");
+          set("qaAutoSpec", "");
+          set("qaAutoRecvTime", "");
+          set("qaAutoReceiver", "");
+          set("qaAutoStatus", "");
+          mtRebuildMaterialSelect("");
+          return;
+        }
+        set("qaAutoAcceptNo", m.acceptNo);
+        set("qaAutoSupplier", m.supplier);
+        set("qaAutoStatus", m.status);
+        mtRebuildMaterialSelect(contractKey);
+        var lines = mtMaterialLinesFor(contractKey);
+        var defMat = m.material || "";
+        if (!defMat && lines[0]) defMat = lines[0].name;
+        var sel = mt$("qaAutoMaterial");
+        if (sel && sel.tagName === "SELECT") {
+          sel.value = defMat;
+        }
+        mtApplyMaterialLine(contractKey, defMat);
+      }
+      function mtValidateQaFields() {
+        var qmat = mt$("qaAutoMaterial");
+        if (qmat && qmat.tagName === "SELECT" && !String(qmat.value || "").trim()) {
+          mtQaToast("请选择物资");
+          return false;
+        }
+        var wh = mt$("qaFldWarehouse");
+        if (wh && !String(wh.value || "").trim()) {
+          mtQaToast("请选择仓库");
+          return false;
+        }
+        var mt = mt$("qaFldMatType");
+        if (mt && !String(mt.value || "").trim()) {
+          mtQaToast("请选择物资类型");
+          return false;
+        }
+        return true;
+      }
+      function mtQaHtmlSheet() {
+        var labAuto = '<span class="qa-auto-mark" title="选择合同编号后自动带入">●</span>';
+        return (
+          '<div class="qa-accept-wrap">' +
+          '<div class="qa-accept-toolbar">' +
+          '<div class="qa-accept-toolbar-left">' +
+          '<button type="button" class="qa-accept-btn-primary" id="qaAcceptBtnApprove">审批</button>' +
+          '<button type="button" class="qa-accept-link-flow" id="qaAcceptBtnFlow">流程进度</button>' +
+          "</div>" +
+          '<div class="qa-accept-toolbar-title" id="mtQaAcceptTitle">库存管理审批单</div>' +
+          '<button type="button" class="qa-accept-btn-close" id="qaAcceptBtnBack" aria-label="关闭" title="关闭">×</button>' +
+          "</div>" +
+          '<p class="qa-accept-legend"><span class="qa-legend-dot" aria-hidden="true"></span>灰色背景为选择「合同编号」后<strong>系统自动带入</strong>；白框为手填。</p>' +
+          '<div class="qa-accept-form-shell">' +
+          '<table class="qa-accept-grid" role="presentation">' +
+          "<tbody>" +
+          "<tr>" +
+          '<td class="qa-lab"><span class="req">*</span>验收单号' +
+          labAuto +
+          "</td>" +
+          '<td class="qa-val"><textarea class="qa-inp qa-inp--auto" id="qaAutoAcceptNo" readonly tabindex="-1" rows="1"></textarea></td>' +
+          '<td class="qa-val qa-val-empty" colspan="2"></td>' +
+          "</tr>" +
+          "<tr>" +
+          '<td class="qa-lab"><span class="qa-dot-hint" aria-hidden="true"></span><span class="req">*</span>合同编号</td>' +
+          '<td class="qa-val">' +
+          '<select class="qa-select" id="qaFldContractSel" aria-label="合同编号">' +
+          '<option value="">请选择合同编号</option>' +
+          '<option value="HT2026301">HT2026301 · 变流器框架</option>' +
+          '<option value="HT2026315">HT2026315 · IGBT年度备件</option>' +
+          "</select></td>" +
+          '<td class="qa-lab"><span class="req">*</span>供应商' +
+          labAuto +
+          "</td>" +
+          '<td class="qa-val"><textarea class="qa-inp qa-inp--auto" id="qaAutoSupplier" readonly tabindex="-1" rows="1"></textarea></td>' +
+          "</tr>" +
+          "<tr>" +
+          '<td class="qa-lab"><span class="req">*</span>选择物资' +
+          labAuto +
+          "</td>" +
+          '<td class="qa-val"><select class="qa-select" id="qaAutoMaterial" aria-label="选择物资">' +
+          '<option value="">请先选择合同编号</option>' +
+          "</select></td>" +
+          '<td class="qa-lab"><span class="req">*</span>规格型号' +
+          labAuto +
+          "</td>" +
+          '<td class="qa-val"><textarea class="qa-inp qa-inp--auto" id="qaAutoSpec" readonly tabindex="-1" rows="1"></textarea></td>' +
+          "</tr>" +
+          "<tr>" +
+          '<td class="qa-lab"><span class="req">*</span>发货数量</td>' +
+          '<td class="qa-val"><input class="qa-inp" id="qaFldShipQty" type="text" value="" autocomplete="off" /></td>' +
+          '<td class="qa-lab"><span class="req">*</span>验收数量</td>' +
+          '<td class="qa-val"><input class="qa-inp" id="qaFldRecvQty" type="text" value="" autocomplete="off" /></td>' +
+          "</tr>" +
+          "<tr>" +
+          '<td class="qa-lab"><span class="req">*</span>收货时间' +
+          labAuto +
+          "</td>" +
+          '<td class="qa-val"><textarea class="qa-inp qa-inp--auto" id="qaAutoRecvTime" readonly tabindex="-1" rows="1"></textarea></td>' +
+          '<td class="qa-lab"><span class="req">*</span>收货人' +
+          labAuto +
+          "</td>" +
+          '<td class="qa-val"><textarea class="qa-inp qa-inp--auto" id="qaAutoReceiver" readonly tabindex="-1" rows="1"></textarea></td>' +
+          "</tr>" +
+          "<tr>" +
+          '<td class="qa-lab"><span class="req">*</span>物流单号</td>' +
+          '<td class="qa-val"><input class="qa-inp" id="qaFldLogisticsNo" type="text" value="" autocomplete="off" /></td>' +
+          '<td class="qa-lab"><span class="req">*</span>入库人</td>' +
+          '<td class="qa-val"><input class="qa-inp" id="qaFldInbound" type="text" value="" autocomplete="off" /></td>' +
+          "</tr>" +
+          "<tr>" +
+          '<td class="qa-lab"><span class="req">*</span>入库状态' +
+          labAuto +
+          "</td>" +
+          '<td class="qa-val"><textarea class="qa-inp qa-inp--auto" id="qaAutoStatus" readonly tabindex="-1" rows="1"></textarea></td>' +
+          '<td class="qa-lab"><span class="req">*</span>仓库</td>' +
+          '<td class="qa-val">' +
+          '<select class="qa-select" id="qaFldWarehouse" aria-label="仓库">' +
+          '<option value="">请选择仓库</option>' +
+          '<option value="center">公司中心库</option>' +
+          '<option value="east">华东分仓</option>' +
+          '<option value="north">华北备件库</option>' +
+          '<option value="proj">项目现场仓（新能源示范）</option>' +
+          "</select></td>" +
+          "</tr>" +
+          "<tr>" +
+          '<td class="qa-lab"><span class="req">*</span>物资类型</td>' +
+          '<td class="qa-val">' +
+          '<select class="qa-select" id="qaFldMatType" aria-label="物资类型">' +
+          '<option value="">请选择物资类型</option>' +
+          '<option value="sales">销售类</option>' +
+          '<option value="prod">生产类</option>' +
+          '<option value="office">办公类</option>' +
+          "</select></td>" +
+          '<td class="qa-val qa-val-empty" colspan="2"></td>' +
+          "</tr>" +
+          "<tr>" +
+          '<td class="qa-lab">备注</td>' +
+          '<td class="qa-val" colspan="3"><textarea class="qa-ta" id="qaFldRemark" rows="2"></textarea></td>' +
+          "</tr>" +
+          "</tbody></table></div></div>"
+        );
+      }
+      function closeMtQaAcceptModal() {
+        var mask = mt$("mtQaAcceptMask");
+        var body = mt$("mtQaAcceptBody");
+        if (!mask) return;
+        mask.classList.remove("is-open");
+        mask.setAttribute("aria-hidden", "true");
+        document.body.style.overflow = "";
+        if (body) body.innerHTML = "";
+      }
+      function openMtQaAcceptModal() {
+        var mask = mt$("mtQaAcceptMask");
+        var body = mt$("mtQaAcceptBody");
+        if (!mask || !body) return;
+        body.innerHTML = mtQaHtmlSheet();
+        mask.classList.add("is-open");
+        mask.setAttribute("aria-hidden", "false");
+        document.body.style.overflow = "hidden";
+
+        var fc = mt$("mtQaFootCancel");
+        var fo = mt$("mtQaFootOk");
+        if (fc) fc.onclick = closeMtQaAcceptModal;
+        if (fo) {
+          fo.onclick = function () {
+            if (!mtValidateQaFields()) return;
+            mtQaToast("已保存（演示）");
+            closeMtQaAcceptModal();
+          };
+        }
+        var back = mt$("qaAcceptBtnBack");
+        if (back) back.onclick = closeMtQaAcceptModal;
+        var ap = mt$("qaAcceptBtnApprove");
+        if (ap) {
+          ap.onclick = function () {
+            if (!mtValidateQaFields()) return;
+            mtQaToast("已进入审批（演示）");
+          };
+        }
+        var fl = mt$("qaAcceptBtnFlow");
+        if (fl) {
+          fl.onclick = function (e) {
+            e.preventDefault();
+            alert("流程进度（演示）");
+          };
+        }
+        var csel = mt$("qaFldContractSel");
+        if (csel) {
+          csel.addEventListener("change", function () {
+            mtApplyQaContract(String(this.value || ""));
+          });
+        }
+        var mSel = mt$("qaAutoMaterial");
+        if (mSel && mSel.tagName === "SELECT") {
+          mSel.addEventListener("change", function () {
+            var code = csel ? String(csel.value || "") : "";
+            mtApplyMaterialLine(code, String(this.value || ""));
+          });
+        }
+      }
+      document.addEventListener("keydown", function (e) {
+        if (e.key !== "Escape") return;
+        var mask = mt$("mtQaAcceptMask");
+        if (mask && mask.classList.contains("is-open")) closeMtQaAcceptModal();
+      });
+
+      document.getElementById("mtTitle").textContent = cfg.title;
+      var s = document.getElementById("mtSearch");
+      cfg.fields.forEach(function (f) {
+        var item = document.createElement("div");
+        item.className = "mt-item";
+        item.innerHTML = "<label>" + (f || " ") + "</label>" + (f ? "<input placeholder='请输入" + f + "' />" : "<input style='visibility:hidden' />");
+        s.appendChild(item);
+      });
+      var treeWrap = document.getElementById("mtTreeWrap");
+      if (cfg.showTree) {
+        treeWrap.hidden = false;
+        (cfg.tree || []).forEach(function (t) {
+          var li = document.createElement("li");
+          li.textContent = t;
+          document.getElementById("mtTreeList").appendChild(li);
+        });
+      } else {
+        treeWrap.hidden = true;
+        document.getElementById("mtLayout").style.gridTemplateColumns = "1fr";
+      }
+      function getTableRows() {
+        var base = cfg.rows.slice();
+        if (scene !== "todo") return base;
+
+        var extraRows = [];
+
+        // 1) 跨部门物资流转：优先展示在最上方
+        if (window.DemoCrossDeptHandoff) {
+          var pend = DemoCrossDeptHandoff.getPendingForMech();
+          for (var hi = pend.length - 1; hi >= 0; hi -= 1) {
+            var t = pend[hi];
+            extraRows.push([
+              "",
+              "H" + (hi + 1),
+              "跨部门物资内部流转",
+              "handoff_" + t.id,
+              "办理内部流转领用",
+              "机械所专责",
+              "待领用",
+              t.handoff_at || "—",
+              "handle"
+            ]);
+          }
+          // 由于上面倒序 push，整体再反转一次保证观感更像“最新在上”
+          extraRows = extraRows.reverse();
+        }
+
+        // 2) 新建事项（本页 new-issue.html 提交产生）
+        try {
+          var roleId = sessionStorage.getItem("demoOrgRoleId") || "";
+          var tasks = JSON.parse(localStorage.getItem("map_new_issue_tasks_v1") || "[]");
+          var pend2 = tasks.filter(function (t) {
+            if (String(t.status || "") !== "待审批") return false;
+            var arr = t.assigneeRoleIds;
+            if (arr && Array.isArray(arr) && arr.length) return arr.indexOf(roleId) >= 0;
+            return true;
+          });
+          // 按时间倒序
+          pend2.sort(function (a, b) {
+            return String(b.createdAt || "").localeCompare(String(a.createdAt || ""));
+          });
+          for (var ni = 0; ni < pend2.length; ni += 1) {
+            var x = pend2[ni];
+            extraRows.push([
+              "",
+              String(ni + 1),
+              String(x.procName || x.taskName || "新建事项审批"),
+              String(x.id || ""),
+              String(x.requestCardId || x.requestType || ""),
+              "待审批人",
+              "待审批",
+              x.createdAt || "—",
+              "handle"
+            ]);
+          }
+        } catch (eNew) {}
+
+        return extraRows.concat(base);
+      }
+      function renderMtTable() {
+        var h = document.getElementById("mtHead");
+        h.innerHTML = "";
+        cfg.cols.forEach(function (x) {
+          var th = document.createElement("th");
+          th.textContent = x;
+          h.appendChild(th);
+        });
+        var b = document.getElementById("mtBody");
+        b.innerHTML = "";
+        var displayRows = getTableRows();
+        for (var i = 0; i < displayRows.length; i += 1) {
+          var tr = document.createElement("tr");
+          for (var j = 0; j < cfg.cols.length; j += 1) {
+            var td = document.createElement("td");
+            var val = displayRows[i][j];
+            if (j === 0) {
+              td.className = "mt-col-check";
+              td.innerHTML = "<input type='checkbox' aria-label='选择行' />";
+            } else if (cfg.cols[j] === "流程状态") {
+              var sClass =
+                val === "已驳回" ? "mt-s3" : val === "待审批" || val === "待领用" ? "mt-s2" : "mt-s1";
+              td.innerHTML = "<span class='mt-status " + sClass + "'>" + val + "</span>";
+            } else if (cfg.cols[j] === "状态") {
+              td.innerHTML = "<span class='mt-status mt-s1'>" + val + "</span>";
+            } else if (cfg.cols[j] === "办理人") {
+              td.innerHTML = "<span class='mt-status mt-s1'>" + val + "</span>";
+            } else if (cfg.cols[j] === "操作" && val === "icons") {
+              /* 我发起的：已驳回可改/删/看；待审核类（审核中、待审批等）仅查看 + 流程跟踪 */
+              var statusIdx = cfg.cols.indexOf("流程状态");
+              var procStatus = statusIdx >= 0 ? String(displayRows[i][statusIdx] || "") : "";
+              var canEdit = procStatus === "已驳回";
+              if (canEdit) {
+                td.innerHTML =
+                  "<a href='#' class='mt-icon-btn' title='编辑'><i class='fa-regular fa-pen-to-square' aria-hidden='true'></i></a>" +
+                  "<a href='#' class='mt-icon-btn' title='删除'><i class='fa-regular fa-trash-can' aria-hidden='true'></i></a>" +
+                  "<a href='#' class='mt-icon-btn' title='查看'><i class='fa-regular fa-eye' aria-hidden='true'></i></a>";
+              } else {
+                td.innerHTML =
+                  "<a href='#' class='mt-icon-btn' title='查看'><i class='fa-regular fa-eye' aria-hidden='true'></i></a>" +
+                  "<a href='#' class='mt-icon-btn' title='流程跟踪'><i class='fa-regular fa-file-lines' aria-hidden='true'></i></a>";
+              }
+            } else if (cfg.cols[j] === "操作") {
+              var txt = val === "handle" ? "办理" : "查看";
+              var ico = val === "handle" ? "fa-pen-to-square" : "fa-eye";
+              td.innerHTML = "<span class='mt-action'><i class='fa-regular " + ico + "'></i>" + txt + "</span>";
+            } else {
+              td.textContent = val;
+            }
+            tr.appendChild(td);
+          }
+          b.appendChild(tr);
+        }
+        var totalEl = document.getElementById("mtTotal");
+        totalEl.textContent = String(displayRows.length);
+      }
+      function handoffTodoExtraCount() {
+        if (scene !== "todo" || !window.DemoCrossDeptHandoff) return 0;
+        return DemoCrossDeptHandoff.getPendingForMech().length;
+      }
+      renderMtTable();
+      window.__mtCfg = cfg;
+      var ps = document.getElementById("mtPageSize");
+      try {
+        if (cfg.page && cfg.page.indexOf("条/页") >= 0) {
+          var n = parseInt(cfg.page, 10);
+          if (!isNaN(n)) ps.value = String(n);
+        }
+      } catch (ePage) {}
+      var btnWrap = document.getElementById("mtPageBtns");
+      if (btnWrap && cfg.pageBtns && cfg.pageBtns.length) {
+        btnWrap.innerHTML = "<button type='button' aria-label='上一页'>&lt;</button>";
+        cfg.pageBtns.forEach(function (x, idx) {
+          var isCurrent = idx === 0;
+          var cls = isCurrent ? " class='is-current'" : "";
+          var aria = isCurrent ? " aria-current='page'" : "";
+          btnWrap.innerHTML += "<button type='button'" + cls + aria + ">" + x + "</button>";
+        });
+        btnWrap.innerHTML += "<button type='button' aria-label='下一页'>&gt;</button>";
+      }
+
+      var M = window.DemoListFormModal;
+      if (M) {
+        var root = document.querySelector("[data-list-form-demo]");
+        if (root) {
+          root.addEventListener("click", function (e) {
+            var tr = e.target.closest("#mtBody tr");
+            if (!tr) return;
+            var cols = cfg.cols;
+            var map = M.collectRowMapFromTr(tr, cols);
+            var mod = document.getElementById("mtTitle").textContent.trim();
+            if (e.target.closest('a[title="删除"]')) {
+              e.preventDefault();
+              M.openDeleteConfirm(cols, map, function () {
+                var idx = Array.prototype.indexOf.call(tr.parentNode.children, tr);
+                var hc = handoffTodoExtraCount();
+                if (idx < hc) {
+                  alert("内部流转待办请在领用申请页办理，勿从此处删除（演示）");
+                  return;
+                }
+                cfg.rows.splice(idx - hc, 1);
+                renderMtTable();
+              });
+              return;
+            }
+            if (e.target.closest('a[title="编辑"]')) {
+              e.preventDefault();
+              M.openEditForm(mod, cols, map, function (newMap) {
+                var idx = Array.prototype.indexOf.call(tr.parentNode.children, tr);
+                var hc = handoffTodoExtraCount();
+                if (idx < hc) {
+                  alert("内部流转待办请在领用申请页办理（演示）");
+                  return;
+                }
+                var cfgIdx = idx - hc;
+                for (var j = 0; j < cols.length; j++) {
+                  var c = cols[j];
+                  if (!c || c === "操作") continue;
+                  if (newMap[c] != null && cfg.rows[cfgIdx]) cfg.rows[cfgIdx][j] = newMap[c];
+                }
+                renderMtTable();
+              });
+              return;
+            }
+            if (e.target.closest('a[title="查看"]')) {
+              e.preventDefault();
+              M.openDetailModal(mod, cols, map);
+              return;
+            }
+            if (e.target.closest('a[title="流程跟踪"]')) {
+              e.preventDefault();
+              alert("流程跟踪（演示）");
+              return;
+            }
+            var act = e.target.closest(".mt-action");
+            if (act) {
+              e.preventDefault();
+              var t = (act.textContent || "").replace(/\s+/g, "");
+              if (t.indexOf("办理") >= 0) {
+                var procName = map["流程定义名称"] || "";
+                var m3TaskMap = {
+                  "订单需求管理审批": 1,
+                  "录入销售合同单号": 1,
+                  "录入物流单号": 1
+                };
+                var m10TaskMap = {
+                  "库存管理审批": 1
+                };
+                var todoUnifiedForms = {
+                  "领用申请审批": 1,
+                  "货物质量验收审批": 1,
+                  "项目公司入库审批": 1,
+                  "退换货管理审批": 1
+                };
+                var procKey = map["流程定义KEY"] || "";
+                if (procKey.indexOf("handoff_") === 0) {
+                  var hid = procKey.replace(/^handoff_/, "");
+                  var destH =
+                    "purchase-plan-approval-handle.html?task=" +
+                    encodeURIComponent("领用申请审批") +
+                    "&row=1&hid=" +
+                    encodeURIComponent(hid);
+                  if (typeof window.__demoGo === "function") window.__demoGo(destH);
+                  else window.location.href = destH;
+                  return;
+                }
+                if (procName === "订单需求管理审批") {
+                  var destOrderHandle =
+                    "purchase-plan-approval-handle.html?task=" +
+                    encodeURIComponent(procName) +
+                    "&row=" +
+                    encodeURIComponent(map["序号"] || "");
+                  if (typeof window.__demoGo === "function") window.__demoGo(destOrderHandle);
+                  else window.location.href = destOrderHandle;
+                  return;
+                }
+                if (m10TaskMap[procName]) {
+                  if (window.M10QaInboundModal && typeof window.M10QaInboundModal.openReturnInitiator === "function") {
+                    window.M10QaInboundModal.openReturnInitiator();
+                  } else {
+                    openMtQaAcceptModal();
+                  }
+                  return;
+                }
+                if (m3TaskMap[procName]) {
+                  openMtQaAcceptModal();
+                  return;
+                }
+                if (procName.indexOf("采购计划审批单") >= 0 || todoUnifiedForms[procName]) {
+                  var rowNo = map["序号"] || "";
+                  var pName = procName ? encodeURIComponent(procName) : "";
+                  var qs = "?row=" + encodeURIComponent(rowNo || "") + (pName ? "&task=" + pName : "");
+                  var dest = "purchase-plan-approval-handle.html" + qs;
+                  if (typeof window.__demoGo === "function") window.__demoGo(dest);
+                  else window.location.href = dest;
+                  return;
+                }
+                M.openHandleFormModal(mod, map);
+              } else M.openDetailModal(mod, cols, map);
+            }
+          });
+        }
+      }
+    })();
+  </script>
+</body>
+</html>

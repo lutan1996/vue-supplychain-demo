@@ -1,0 +1,419 @@
+:root {
+  --bg: #060f22;
+  --panel: #0b1a36;
+  --panel-2: #12264b;
+  --text: #e9f2ff;
+  --muted: #9ab2d6;
+  --accent: #1fa8ff;
+  --accent-2: #00d4ff;
+  --border: rgba(130, 186, 255, 0.25);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  width: 100%;
+  min-height: 100%;
+  height: 100%;
+  font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  overflow: hidden;
+}
+
+#app {
+  width: 100%;
+  height: 100%;
+}
+
+/* 顶栏：对齐 SupplyChainManageView Navbar.vue（#0a3382 + 左 Logo/标题） */
+.topbar {
+  padding: 0;
+  border-bottom: 0;
+  background: #0a3382;
+  box-shadow: 0 1px 4px rgba(0, 21, 41, 0.08);
+  min-height: 3.75rem;
+}
+
+.navbar-ruoyi {
+  display: flex;
+  align-items: stretch;
+  justify-content: space-between;
+  min-height: 3.75rem;
+  color: #fff;
+}
+
+.navbar-ruoyi__left {
+  display: flex;
+  align-items: center;
+  flex: 0 0 auto;
+  padding-left: 8px;
+}
+
+.navbar-ruoyi__logo img {
+  height: 40px;
+  width: auto;
+  max-width: 182px;
+  display: block;
+  object-fit: contain;
+}
+
+.navbar-ruoyi__title {
+  border-left: 1px solid rgba(252, 252, 252, 0.17);
+  margin-left: 12px;
+  padding-left: 18px;
+  height: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.navbar-ruoyi__title p {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #fff;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.navbar-ruoyi__center {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 12px;
+}
+
+.navbar-ruoyi__center .current {
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: #e9f2ff;
+  max-width: 100%;
+}
+
+.navbar-ruoyi__right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-right: 12px;
+  flex: 0 0 auto;
+}
+
+.navbar-ruoyi__clock {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.92);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.navbar-ruoyi__avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.18);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 600;
+  flex-shrink: 0;
+  user-select: none;
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.actions a,
+.actions button {
+  height: 30px;
+  padding: 0 10px;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  background: rgba(0, 0, 0, 0.15);
+  color: #fff;
+  text-decoration: none;
+  font-size: 12px;
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.actions a:hover,
+.actions button:hover {
+  background: rgba(0, 0, 0, 0.25);
+  border-color: rgba(255, 255, 255, 0.55);
+}
+
+.bars {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 3px;
+  vertical-align: middle;
+}
+
+.bars i {
+  display: block;
+  width: 14px;
+  height: 2px;
+  background: currentColor;
+  border-radius: 1px;
+}
+
+.viewport {
+  min-width: 0;
+  min-height: 0;
+  height: 100%;
+  background: #071229;
+  display: flex;
+  flex-direction: column;
+}
+
+.viewport iframe {
+  width: 100%;
+  flex: 1 1 auto;
+  min-height: 0;
+  border: 0;
+  display: block;
+  background: #071229;
+}
+
+/* 截图模式：隐藏壳顶栏 */
+.map-demo-hide-shell-topbar .main {
+  grid-template-rows: 1fr !important;
+}
+.map-demo-hide-shell-topbar .main > .topbar {
+  display: none !important;
+}
+
+/* 顶栏紧凑样式（截图模式用） */
+.topbar-collapsed {
+  min-height: 38px !important;
+  height: 38px !important;
+  background: #0a1730 !important;
+}
+
+.topbar-collapsed .navbar-ruoyi {
+  min-height: 38px !important;
+  height: 38px !important;
+}
+
+.topbar-collapsed .navbar-ruoyi__left {
+  display: none !important;
+}
+
+.topbar-collapsed .navbar-ruoyi__center {
+  display: flex !important;
+  justify-content: flex-start !important;
+  padding: 0 10px !important;
+}
+
+.topbar-collapsed .navbar-ruoyi__center .current {
+  font-size: 12px !important;
+  color: #d6e6ff !important;
+  font-weight: 600 !important;
+}
+
+.topbar-collapsed .navbar-ruoyi__right {
+  padding-right: 8px !important;
+  gap: 6px !important;
+}
+
+.topbar-collapsed .navbar-ruoyi__avatar {
+  display: none !important;
+}
+
+.topbar-collapsed .actions a,
+.topbar-collapsed .actions button {
+  height: 24px !important;
+  padding: 0 8px !important;
+  font-size: 11px !important;
+  border-radius: 4px !important;
+}
+
+/* 侧栏折叠样式 */
+.sidebar {
+  border-right: 1px solid rgba(130, 186, 255, 0.25);
+  background: linear-gradient(180deg, #0a1730 0%, #091224 100%);
+  padding: 14px 12px;
+  overflow: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.sidebar::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+  display: none;
+}
+
+.title {
+  margin: 0 0 6px;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.desc {
+  margin: 0 0 14px;
+  font-size: 12px;
+  color: #9ab2d6;
+  line-height: 1.4;
+}
+
+.group-title {
+  margin: 14px 4px 8px;
+  font-size: 12px;
+  color: #b6cced;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+}
+
+.page-list {
+  display: grid;
+  gap: 8px;
+}
+
+.page-btn {
+  width: 100%;
+  padding: 10px 10px;
+  border: 1px solid rgba(130, 186, 255, 0.25);
+  border-radius: 8px;
+  background: linear-gradient(180deg, #0b1a36 0%, #12264b 100%);
+  color: #e9f2ff;
+  font-size: 13px;
+  text-align: left;
+  cursor: pointer;
+  transition: 0.18s ease;
+}
+
+.page-btn:hover {
+  border-color: rgba(74, 199, 255, 0.55);
+  transform: translateY(-1px);
+}
+
+.page-btn.active {
+  border-color: #00d4ff;
+  box-shadow: inset 0 0 0 1px rgba(0, 212, 255, 0.25);
+}
+
+.hint {
+  margin-top: 14px;
+  font-size: 12px;
+  color: #9ab2d6;
+  line-height: 1.5;
+}
+
+/* 角色切换菜单样式 */
+.shell-org-role-switch {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  margin-right: 2px;
+  vertical-align: middle;
+}
+
+.shell-org-role-btn {
+  height: 24px;
+  padding: 0 8px;
+  font-size: 11px;
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  background: transparent;
+  color: #e8f2ff;
+  cursor: pointer;
+  font-family: inherit;
+  white-space: nowrap;
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.shell-org-role-btn:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.65);
+  color: #fff;
+}
+
+.shell-org-role-menu {
+  position: absolute;
+  left: 0;
+  top: 28px;
+  width: min(320px, calc(100vw - 24px));
+  max-height: min(320px, 50vh);
+  overflow: auto;
+  background: #fff;
+  border: 1px solid #dbe6f3;
+  border-radius: 8px;
+  box-shadow: 0 12px 30px rgba(8, 27, 50, 0.25);
+  padding: 6px;
+  display: none;
+  z-index: 20050;
+}
+
+.shell-org-role-menu.is-open {
+  display: block;
+}
+
+.shell-org-role-item {
+  width: 100%;
+  text-align: left;
+  border: none;
+  background: #fff;
+  padding: 7px 8px;
+  border-radius: 6px;
+  color: #29405a;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.shell-org-role-item:hover {
+  background: #f1f6ff;
+}
+
+.shell-org-role-item.is-active {
+  background: #e6f4ff;
+  color: #0958d9;
+  font-weight: 600;
+}
+
+/* iframe 加载中动画 */
+.viewport.is-loading {
+  position: relative;
+}
+
+.viewport.is-loading::after {
+  content: '';
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  width: 18px;
+  height: 18px;
+  margin-top: -9px;
+  border: 2px solid rgba(219, 230, 243, 0.5);
+  border-top-color: #1677ff;
+  border-radius: 50%;
+  animation: demo-shell-spin 0.55s linear infinite;
+  z-index: 10;
+}
+
+@keyframes demo-shell-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

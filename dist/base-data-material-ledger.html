@@ -1,0 +1,1892 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>物资类型 - 新能源物资供应链管理系统</title>
+  <link rel="stylesheet" href="css/subpage-base.css" />
+  <link rel="stylesheet" href="css/carrier-management.css" />
+  <link rel="stylesheet" href="css/source-navbar-header.css" />
+  <style>
+    .bd-tabs { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:0; border:1px solid #e8edf4; border-radius:4px; overflow:hidden; margin-bottom:8px; }
+    .bd-tab { height:34px; border:0; border-right:1px solid #e8edf4; background:#f7f9fc; color:#4b5563; font-size:12px; cursor:pointer; }
+    .bd-tab:nth-child(5n) { border-right:0; }
+    .bd-tab.is-active { background:#1677ff; color:#fff; font-weight:600; }
+    .bd-kpis { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:8px; margin-bottom:8px; }
+    .bd-kpi { border:1px solid #e8edf4; border-radius:4px; background:#fff; min-height:64px; display:flex; flex-direction:column; justify-content:center; align-items:center; }
+    .bd-kpi .k { font-size:11px; color:#8b9ab0; margin-bottom:6px; }
+    .bd-kpi .v { font-size:22px; color:#1677ff; font-weight:700; line-height:1; }
+    .bd-tip { border:1px dashed #91caff; background:#e6f4ff; color:#0958d9; border-radius:4px; padding:8px 10px; font-size:12px; margin-bottom:8px; }
+    .bd-filters { border:1px solid #e8edf4; border-radius:4px; background:#fff; padding:8px; margin-bottom:8px; }
+    .bd-filters .row { display:grid; grid-template-columns:repeat(6,minmax(0,1fr)); gap:8px; }
+    .bd-filters input,.bd-filters select { width:100%; height:28px; border:1px solid #d9e0ea; border-radius:4px; padding:0 8px; font-size:12px; color:#334155; }
+    .bd-toolbar { display:flex; align-items:center; gap:8px; margin-bottom:8px; }
+    .bd-btn { height:28px; border:1px solid #d9e0ea; border-radius:4px; background:#fff; color:#334155; font-size:12px; padding:0 10px; cursor:pointer; }
+    .bd-btn.pri { background:#1677ff; border-color:#1677ff; color:#fff; }
+    .bd-btn.ok { background:#52c41a; border-color:#52c41a; color:#fff; }
+    .bd-btn.warn { background:#fff7e6; border-color:#ffd591; color:#d46b08; }
+    .bd-op-link { color:#1677ff; text-decoration:none; font-weight:500; margin-right:0; }
+    .bd-op-link:hover { text-decoration:underline; }
+    .bd-op-btn { border:0; background:transparent; color:#1677ff; font-size:13px; font-weight:500; padding:0 4px; cursor:pointer; font-family:inherit; line-height:1.4; flex-shrink:0; }
+    .bd-op-btn:hover { text-decoration:underline; }
+    .bd-op-btn--del { color:#d46b08; }
+    .bd-op-actions { display:flex; align-items:center; flex-wrap:nowrap; gap:10px; white-space:nowrap; }
+    .bd-supplier-view .carrier-table-wrap { overflow-x:auto; }
+    .bd-supplier-view .carrier-table thead th.bd-op-th,
+    .bd-supplier-view .carrier-table tbody td.bd-op-cell {
+      position:sticky; right:0; z-index:2; background:#fff; white-space:nowrap;
+      min-width:186px; width:186px; box-shadow:-8px 0 12px rgba(15,23,42,.08);
+    }
+    .bd-supplier-view .carrier-table thead th.bd-op-th { z-index:3; background:#f5f5f5; }
+    /* subpage-clock 会按「合作状态」把编辑/删除 display:none，此处强制显示 */
+    .bd-supplier-view #bdBody td.bd-op-cell .bd-op-btn {
+      display:inline-block !important;
+      visibility:visible !important;
+      opacity:1 !important;
+      pointer-events:auto !important;
+      max-width:none !important;
+      width:auto !important;
+      height:auto !important;
+      overflow:visible !important;
+    }
+    .bd-form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+    .bd-form-item label{display:block;font-size:12px;color:#5b6b7f;margin-bottom:4px}
+    .bd-form-item input{width:100%;height:30px;border:1px solid #d9e0ea;border-radius:4px;padding:0 8px;font-size:12px;box-sizing:border-box}
+    .bd-toast{position:fixed;left:50%;bottom:80px;transform:translateX(-50%);background:rgba(0,0,0,.75);color:#fff;padding:8px 12px;border-radius:6px;font-size:12px;display:none;z-index:2700}
+    .bd-filter-actions{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+    .bd-sup-status--ok{color:#52c41a;font-weight:500}
+    .bd-sup-status--pause{color:#d46b08;font-weight:500}
+    .bd-sup-status--stop{color:#f5222d;font-weight:500}
+    .bd-sup-muted{color:#8c8c8c}
+    .bd-sup-modal-mask{position:fixed;inset:0;background:rgba(15,23,42,.45);z-index:2950;display:none;align-items:center;justify-content:center;padding:20px}
+    .bd-sup-modal-mask.show{display:flex}
+    .bd-sup-modal{width:720px;max-width:96vw;max-height:90vh;background:#fff;border-radius:8px;box-shadow:0 12px 40px rgba(15,23,42,.18);display:flex;flex-direction:column;overflow:hidden}
+    .bd-sup-modal-hd{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid #e8edf4;font-size:14px;font-weight:600;color:#1f3551}
+    .bd-sup-modal-close{border:none;background:transparent;font-size:22px;line-height:1;color:#8b9ab0;cursor:pointer;padding:4px 8px}
+    .bd-sup-modal-close:hover{color:#1f3551}
+    .bd-sup-modal-bd{padding:14px 16px 16px;overflow-y:auto}
+    .bd-sup-section{margin-bottom:16px}
+    .bd-sup-section-hd{font-size:13px;font-weight:600;color:#1f3551;margin:0 0 8px;padding-bottom:8px;border-bottom:1px solid #e8edf4}
+    .bd-sup-info-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 16px;font-size:13px;line-height:1.65}
+    .bd-sup-info-item .k{color:#5b6b7f}
+    .bd-sup-info-item .v{color:#334155}
+    .bd-sup-info-item .v strong{font-weight:600}
+    .bd-sup-info-item .v .hl{color:#1677ff;font-weight:500}
+    .bd-sup-table{width:100%;border-collapse:collapse;font-size:12px;color:#333;background:#fff}
+    .bd-sup-table th,.bd-sup-table td{border:1px solid #e8edf4;padding:8px 10px;text-align:left}
+    .bd-sup-table th{background:#f5f7fa;color:#333;font-weight:600}
+    .bd-sup-contract-ok{color:#52c41a;font-weight:500}
+    .bd-filters.bd-filters--supplier{display:flex;align-items:center;gap:8px}
+    .bd-filters.bd-filters--supplier .row{display:flex;align-items:center;gap:8px;grid-template-columns:none;flex:0 0 auto}
+    .bd-filters.bd-filters--supplier .row input[data-sup-idx="0"]{width:160px!important}
+    .bd-filters.bd-filters--supplier .row select[data-sup-idx="1"]{width:160px!important}
+    .bd-filters.bd-filters--supplier #bdFilterActions{display:flex;margin:0!important;flex:0 0 auto}
+    .bd-sup-modal-ft{padding:10px 16px 14px;display:flex;justify-content:flex-end;border-top:1px solid #e8edf4}
+
+    /* 产品目录（仅 product 页签） */
+    .bd-product-catalog{display:none;border:1px solid #e8edf4;border-radius:4px;background:#fff;min-height:560px}
+    .bd-product-catalog.is-show{display:flex}
+    .bd-pc-layout{display:flex;min-height:560px;width:100%}
+    .bd-pc-tree{width:280px;flex-shrink:0;border-right:1px solid #e8edf4;background:#fafbfc;display:flex;flex-direction:column}
+    .bd-pc-tree-hd{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 10px;border-bottom:1px solid #e8edf4}
+    .bd-pc-tree-title{font-size:13px;font-weight:600;color:#1f3551;white-space:nowrap}
+    .bd-pc-tree-actions{display:flex;align-items:center;gap:4px;flex-shrink:0}
+    .bd-pc-icon-btn{width:24px;height:24px;border:none;border-radius:4px;background:transparent;color:#4f95cf;font-size:14px;line-height:1;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;padding:0;position:relative}
+    .bd-pc-icon-btn:hover:not(:disabled){color:#1677ff;background:#eef4ff}
+    .bd-pc-icon-btn:disabled{opacity:.4;cursor:not-allowed}
+    .bd-pc-icon-btn::after{content:attr(data-tip);position:absolute;left:50%;bottom:calc(100% + 8px);transform:translateX(-50%);display:none;white-space:nowrap;background:rgba(31,41,55,.94);color:#fff;border-radius:4px;padding:4px 7px;font-size:12px;font-weight:400;line-height:1.2;z-index:20;pointer-events:none}
+    .bd-pc-icon-btn::before{content:"";position:absolute;left:50%;bottom:calc(100% + 3px);transform:translateX(-50%);display:none;border:5px solid transparent;border-top-color:rgba(31,41,55,.94);z-index:20;pointer-events:none}
+    .bd-pc-icon-btn:hover::after,.bd-pc-icon-btn:hover::before{display:block}
+    .bd-pc-tree-body{flex:1;overflow:auto;padding:8px 6px 12px}
+    .bd-pc-node{user-select:none}
+    .bd-pc-node-row{display:flex;align-items:center;gap:4px;padding:5px 6px;border-radius:4px;cursor:pointer;font-size:13px;color:#334155;line-height:1.4}
+    .bd-pc-node-row:hover{background:#eef4ff}
+    .bd-pc-node-row.is-active{background:#e6f4ff;color:#1677ff;font-weight:600}
+    .bd-pc-toggle{width:16px;height:16px;border:none;background:transparent;color:#8b9ab0;cursor:pointer;font-size:10px;padding:0;flex-shrink:0}
+    .bd-pc-toggle.is-leaf{visibility:hidden}
+    .bd-pc-label{flex:1;min-width:0}
+    .bd-pc-row-actions{display:none;align-items:center;gap:2px;margin-left:auto;flex-shrink:0}
+    .bd-pc-node-row:hover .bd-pc-row-actions,.bd-pc-node-row.is-active .bd-pc-row-actions{display:inline-flex}
+    .bd-pc-row-action{width:22px;height:22px;border:none;border-radius:4px;background:transparent;color:#4f95cf;font-size:13px;line-height:1;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;padding:0;position:relative;flex-shrink:0}
+    .bd-pc-row-action:hover:not(:disabled){color:#1677ff;background:#eef4ff}
+    .bd-pc-row-action.danger{color:#4f95cf}
+    .bd-pc-row-action.danger:hover:not(:disabled){color:#1677ff;background:#eef4ff}
+    .bd-pc-row-action svg{display:block;pointer-events:none}
+    .bd-pc-row-action:disabled{opacity:.4;cursor:not-allowed;background:#f5f5f5}
+    .bd-pc-row-action::after{content:attr(data-tip);position:absolute;left:50%;bottom:calc(100% + 8px);transform:translateX(-50%);display:none;white-space:nowrap;background:rgba(31,41,55,.94);color:#fff;border-radius:4px;padding:4px 7px;font-size:12px;font-weight:400;line-height:1.2;z-index:10;pointer-events:none}
+    .bd-pc-row-action::before{content:"";position:absolute;left:50%;bottom:calc(100% + 3px);transform:translateX(-50%);display:none;border:5px solid transparent;border-top-color:rgba(31,41,55,.94);z-index:10;pointer-events:none}
+    .bd-pc-row-action:hover::after,.bd-pc-row-action:hover::before{display:block}
+    .bd-pc-count{color:#8b9ab0;font-size:12px;font-weight:400;margin-left:2px}
+    .bd-pc-node-row.is-active .bd-pc-count{color:#5b8fd9}
+    .bd-pc-children{margin-left:18px;display:none}
+    .bd-pc-children.is-open{display:block}
+    .bd-pc-code-readonly{background:#f5f7fa!important;color:#334155!important;letter-spacing:.5px}
+    .bd-pc-modal-mask{position:fixed;inset:0;background:rgba(15,23,42,.45);z-index:2900;display:none;align-items:center;justify-content:center}
+    .bd-pc-modal-mask.show{display:flex}
+    .bd-pc-modal{width:400px;max-width:92vw;background:#fff;border-radius:8px;box-shadow:0 12px 40px rgba(15,23,42,.18);overflow:hidden}
+    .bd-pc-modal-hd{padding:12px 16px;border-bottom:1px solid #e8edf4;font-size:14px;font-weight:600;color:#1f3551}
+    .bd-pc-modal-bd{padding:14px 16px}
+    .bd-pc-modal-bd .bd-pc-form-item{margin-bottom:12px}
+    .bd-pc-confirm-text{font-size:13px;color:#334155;line-height:1.7;margin:0}
+    .bd-pc-code-preview{font-size:12px;color:#5b6b7f;margin-bottom:12px;padding:8px 10px;background:#f8fafc;border-radius:4px}
+    .bd-pc-code-preview strong{color:#1677ff;font-family:ui-monospace,monospace}
+    .bd-pc-modal-ft{padding:10px 16px 14px;display:flex;justify-content:flex-end;gap:8px;border-top:1px solid #e8edf4}
+    .bd-pc-main{flex:1;min-width:0;min-height:0;padding:16px 20px 20px;display:flex;flex-direction:column;overflow-y:auto}
+    .bd-pc-banner{display:none;margin-bottom:12px;border-radius:4px;padding:8px 12px;font-size:12px;line-height:1.6}
+    .bd-pc-banner.is-show{display:block}
+    .bd-pc-banner--tip{border:1px dashed #91caff;background:#e6f4ff;color:#0958d9}
+    .bd-pc-banner--used{border:1px solid #ffccc7;background:#fff2f0;color:#cf1322;font-weight:600}
+    .bd-pc-banner--folder{border:1px solid #e8edf4;background:#f8fafc;color:#5b6b7f}
+    .bd-pc-banner--pending{border:1px dashed #faad14;background:#fffbe6;color:#d46b08}
+    .bd-pc-banner--approved{border:1px solid #b7eb8f;background:#f6ffed;color:#52c41a}
+    .bd-pc-banner--rejected{border:1px solid #ffa39e;background:#fff1f0;color:#f5222d}
+    .bd-pc-form.is-folder{display:none}
+    .bd-pc-form{flex:1}
+    .bd-pc-form-item{margin-bottom:14px}
+    .bd-pc-form-item label{display:block;font-size:13px;color:#5b6b7f;margin-bottom:6px}
+    .bd-pc-form-item label .req{color:#ff4d4f;margin-right:2px}
+    .bd-pc-form-item input,.bd-pc-form-item select,.bd-pc-form-item textarea{width:100%;box-sizing:border-box;border:1px solid #d9e0ea;border-radius:4px;font-size:13px;color:#334155}
+    .bd-pc-form-item input{height:32px;padding:0 10px}
+    .bd-pc-form-item select{height:32px;padding:0 8px;background:#fff}
+    .bd-pc-form-item textarea{min-height:88px;padding:8px 10px;resize:vertical}
+    .bd-pc-form-item input[readonly]{background:#f5f7fa;color:#5b6b7f}
+    .bd-pc-hint{font-size:12px;color:#8b9ab0;margin-top:4px}
+    .bd-pc-meta{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+    .bd-pc-meta .bd-pc-view-line{padding:8px 10px;background:#f8fafc;border:1px solid #eef2f6;border-radius:4px;font-size:13px;color:#334155}
+    .bd-pc-switch{display:inline-flex;align-items:center;gap:14px}
+    .bd-pc-switch > label{display:inline-flex;align-items:center;margin:0;margin-bottom:0;cursor:pointer;flex-shrink:0}
+    .bd-pc-switch input{display:none}
+    .bd-pc-switch-ui{width:40px;height:20px;border-radius:10px;background:#eef2f6;border:1px solid #c5ced8;position:relative;cursor:pointer;overflow:hidden;flex-shrink:0;transition:background .2s,border-color .2s}
+    .bd-pc-switch-ui::after{content:"";position:absolute;top:1px;left:1px;width:16px;height:16px;border-radius:50%;background:#fff;border:1px solid #d0d7e2;box-shadow:0 1px 2px rgba(15,23,42,.1);transition:transform .2s}
+    .bd-pc-switch input:checked + .bd-pc-switch-ui{background:#1677ff;border-color:#1677ff}
+    .bd-pc-switch input:checked + .bd-pc-switch-ui::after{transform:translateX(20px);border-color:#fff}
+    .bd-pc-switch-text{font-size:13px;color:#334155;flex-shrink:0;line-height:20px}
+    .bd-pc-view-text{font-size:13px;color:#1f2937;line-height:1.65;padding:8px 0;border-bottom:1px dashed #eef2f6}
+    .bd-pc-form.is-view .bd-pc-edit-only{display:none!important}
+    .bd-pc-form.is-view .bd-pc-view-only{display:block!important}
+    .bd-pc-view-only{display:none}
+    .bd-pc-ft{margin-top:auto;padding-top:16px;display:flex;justify-content:flex-end;gap:10px;flex-shrink:0}
+    .bd-pc-ft .bd-btn{height:32px;padding:0 16px;font-size:13px}
+    .bd-pc-ft .bd-btn.danger{background:#ff4d4f;border-color:#ff4d4f;color:#fff}
+    .bd-pc-ft.is-hidden{display:none}
+    .bd-pc-approval-status{display:flex;align-items:center;gap:8px}
+    .bd-pc-status-tag{display:inline-flex;align-items:center;height:24px;padding:0 10px;border-radius:4px;font-size:12px;font-weight:500}
+    .bd-pc-status--pending{background:#fffbe6;border:1px solid #faad14;color:#d46b08}
+    .bd-pc-status--approved{background:#f6ffed;border:1px solid #b7eb8f;color:#52c41a}
+    .bd-pc-status--rejected{background:#fff1f0;border:1px solid #ffa39e;color:#f5222d}
+    .bd-pc-status--disabled{background:#f5f5f5;border:1px solid #d9d9d9;color:#8c8c8c}
+    .bd-pc-status--new{background:#e6f4ff;border:1px solid #91caff;color:#1677ff}
+    .bd-pc-ft .bd-btn#pcBtnSubmitApproval{background:#fff7e6;border-color:#ffd591;color:#d46b08}
+    .bd-pc-ft .bd-btn#pcBtnResubmit{background:#fff7e6;border-color:#ffd591;color:#d46b08}
+    .bd-pc-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;padding-top:4px}
+    .bd-pc-header-title{font-size:14px;font-weight:600;color:#1f3551}
+    .bd-pc-header-actions{display:flex;align-items:center;gap:8px;margin-top:2px}
+    .bd-pc-header-actions .bd-btn{height:28px;padding:0 12px;font-size:12px;border-radius:4px;line-height:26px}
+    .bd-pc-header-actions .bd-btn#pcHeaderFlowProgress{background:#1677ff;border-color:#1677ff;color:#fff}
+    .bd-pc-header-actions .bd-btn#pcHeaderFlowProgress:hover{background:#40a9ff}
+    .bd-pc-header-actions .bd-btn#pcHeaderResubmit{background:#fff7e6;border-color:#ffd591;color:#d46b08}
+    .bd-pc-header-actions.is-hidden{display:none}
+    /* Override map-op-view-link styles that may be injected by subpage scripts */
+    .bd-pc-header-actions .bd-btn.map-op-view-link,
+    .bd-pc-header-actions .bd-btn#pcHeaderFlowProgress.map-op-view-link{background:#1677ff!important;border:1px solid #1677ff!important;color:#fff!important;padding:0 12px!important;border-radius:4px!important}
+    .bd-pc-header-actions .bd-btn#pcHeaderFlowProgress.map-op-view-link:hover{background:#40a9ff!important}
+    .bd-pc-header-actions .bd-btn#pcHeaderResubmit.map-op-view-link{background:#fff7e6!important;border:1px solid #ffd591!important;color:#d46b08!important;padding:0 12px!important;border-radius:4px!important}
+  </style>
+</head>
+<body class="page-source-navbar page-subpage page-logistics">
+  <div class="page-bg" aria-hidden="true"></div>
+  <div class="app">
+    <header class="header"><div class="header-left"><button type="button" class="header-hamburger" aria-label="菜单"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button><a class="header-logo" href="#"><img src="assets/logo-chenergy.png" alt="" width="220" height="40" /></a><div class="header-source-brand"><p>新能源供应链管理系统</p></div></div><div class="header-right"><span class="clock" id="clock"></span><div class="user-avatar">用</div></div></header>
+    <div class="layout">
+      <aside class="sidebar" aria-label="主导航">
+        <div class="nav-item" title="我的资产"><span class="nav-label">我的资产</span></div>
+        <div class="nav-item" title="我的任务"><span class="nav-label">我的任务</span></div>
+        <a class="nav-item" href="index-portal-screen-alt.html" title="首页"><span class="nav-label">首页</span></a>
+        <div class="nav-item" title="驾驶舱"><span class="nav-label">驾驶舱</span></div>
+        <div class="nav-item" title="采购管理"><span class="nav-label">采购管理</span></div>
+        <div class="nav-item" title="物流管理"><span class="nav-label">物流管理</span></div>
+        <div class="nav-item" title="仓储管理"><span class="nav-label">仓储管理</span></div>
+        <div class="nav-item" title="物资采购"><span class="nav-label">物资采购</span></div>
+        <div class="nav-item" title="物资出库与处置"><span class="nav-label">物资出库与处置</span></div>
+        <div class="nav-item" title="绩效考核"><span class="nav-label">绩效考核</span></div>
+        <div class="nav-item" title="公告管理"><span class="nav-label">公告管理</span></div>
+        <div class="nav-item" title="综合业务管理"><span class="nav-label">综合业务管理</span></div>
+        <div class="nav-item nav-item--module-active" title="数据管理"><span class="nav-label">数据管理</span></div>
+        <div class="nav-item" title="开发工具"><span class="nav-label">开发工具</span></div>
+        <div class="nav-item" title="设置"><span class="nav-label">设置</span></div>
+        <div class="nav-item" title="系统管理"><span class="nav-label">系统管理</span></div>
+      </aside>
+      <main class="main-scroll">
+        <div class="carrier-main-inner">
+          <h1 class="carrier-page-title">物资类型</h1>
+          <div class="bd-tabs" id="bdTabs"></div>
+
+          <div class="bd-product-catalog" id="bdProductCatalog" aria-hidden="true">
+            <div class="bd-pc-layout">
+              <aside class="bd-pc-tree">
+                <div class="bd-pc-tree-hd">
+                  <span class="bd-pc-tree-title">物资类型</span>
+                  <div class="bd-pc-tree-actions">
+                    <button type="button" class="bd-pc-icon-btn" id="pcBtnAddBig" data-tip="添加大类" aria-label="添加大类"></button>
+                  </div>
+                </div>
+                <div class="bd-pc-tree-body" id="pcTreeRoot"></div>
+              </aside>
+              <section class="bd-pc-main" id="pcMainPanel">
+                <div class="bd-pc-header" id="pcHeaderBar">
+                  <span class="bd-pc-header-title" id="pcHeaderTitle">物资类型详情</span>
+                </div>
+                <div id="pcLeafHint" style="display:none;margin:0 0 10px;color:#5b6b7f;font-size:12px">请在左侧树选择第三级“小类”节点后进行操作。</div>
+                <form class="bd-pc-form" id="pcForm" autocomplete="off">
+                  <div class="bd-pc-form-item">
+                    <label><span class="req">*</span>物资类型名称</label>
+                    <input type="text" class="bd-pc-edit-only" id="pcName" placeholder="请输入物资类型名称" />
+                  </div>
+                  <div class="bd-pc-form-item">
+                    <label>物资类型定义</label>
+                    <textarea class="bd-pc-edit-only" id="pcDef" placeholder="选填"></textarea>
+                  </div>
+                  <div class="bd-pc-form-item">
+                    <label>物资类型码</label>
+                    <input type="text" class="bd-pc-edit-only bd-pc-code-readonly" id="pcCode" readonly placeholder="A0100100001" />
+                    <div class="bd-pc-hint bd-pc-edit-only">A + 3位大类 + 3位中类 + 4位小类，共 11 位</div>
+                  </div>
+                  <div class="bd-pc-form-item">
+                    <label><span class="req">*</span>物资计量单位</label>
+                    <select class="bd-pc-edit-only" id="pcUnit">
+                      <option value="">请选择</option>
+                      <option value="个">个</option>
+                      <option value="套">套</option>
+                      <option value="台">台</option>
+                    </select>
+                  </div>
+                  <div class="bd-pc-form-item">
+                    <label>状态</label>
+                    <div class="bd-pc-edit-only bd-pc-switch">
+                      <label><input type="checkbox" id="pcStatus" checked /><span class="bd-pc-switch-ui"></span></label>
+                      <span class="bd-pc-switch-text" id="pcStatusText">启用</span>
+                    </div>
+                    <div class="bd-pc-hint bd-pc-edit-only">禁用后不可被新物资选择</div>
+                  </div>
+                </form>
+                <div class="bd-pc-ft" id="pcFormFt"></div>
+              </section>
+            </div>
+            <div class="bd-pc-modal-mask" id="pcAddMask" aria-hidden="true">
+              <div class="bd-pc-modal" role="dialog" aria-labelledby="pcAddModalTitle">
+                <div class="bd-pc-modal-hd" id="pcAddModalTitle">新增</div>
+                <div class="bd-pc-modal-bd">
+                  <p class="bd-pc-code-preview">完整物资分类码（A码）：<strong id="pcAddCodePreview">—</strong></p>
+                  <div class="bd-pc-form-item">
+                    <label><span class="req">*</span>节点名称</label>
+                    <input type="text" id="pcAddName" placeholder="请输入物资类型名称" />
+                  </div>
+                  <div class="bd-pc-form-item">
+                    <label><span class="req">*</span>编码末位</label>
+                    <input type="text" id="pcAddSuffix" maxlength="3" placeholder="小类填3位数字，如 001" />
+                  </div>
+                </div>
+                <div class="bd-pc-modal-ft">
+                  <button type="button" class="bd-btn" id="pcAddCancel">取消</button>
+                  <button type="button" class="bd-btn pri" id="pcAddOk">确定</button>
+                </div>
+              </div>
+            </div>
+            <div class="bd-pc-modal-mask" id="pcEditMask" aria-hidden="true">
+              <div class="bd-pc-modal" role="dialog" aria-labelledby="pcEditModalTitle">
+                <div class="bd-pc-modal-hd" id="pcEditModalTitle">修改</div>
+                <div class="bd-pc-modal-bd">
+                  <div class="bd-pc-form-item">
+                    <label><span class="req">*</span>节点名称</label>
+                    <input type="text" id="pcEditName" placeholder="请输入节点名称" />
+                  </div>
+                </div>
+                <div class="bd-pc-modal-ft">
+                  <button type="button" class="bd-btn" id="pcEditCancel">取消</button>
+                  <button type="button" class="bd-btn pri" id="pcEditOk">确定</button>
+                </div>
+              </div>
+            </div>
+            <div class="bd-pc-modal-mask" id="pcDeleteMask" aria-hidden="true">
+              <div class="bd-pc-modal" role="dialog" aria-labelledby="pcDeleteModalTitle">
+                <div class="bd-pc-modal-hd" id="pcDeleteModalTitle">删除</div>
+                <div class="bd-pc-modal-bd">
+                  <p class="bd-pc-confirm-text" id="pcDeleteText">确认删除该节点？</p>
+                </div>
+                <div class="bd-pc-modal-ft">
+                  <button type="button" class="bd-btn" id="pcDeleteCancel">取消</button>
+                  <button type="button" class="bd-btn danger" id="pcDeleteOk">删除</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div id="bdDefaultView">
+          <div class="bd-kpis" id="bdKpis"></div>
+          <div class="bd-filters">
+            <div class="row" id="bdFilters"></div>
+            <div class="bd-filter-actions" id="bdFilterActions" style="display:none;flex-wrap:nowrap;margin:0">
+              <input id="bdSupplierContact" data-sup-idx="2" placeholder="联系人" style="width:110px;flex:0 0 110px;height:28px;border:1px solid #d9e0ea;border-radius:4px;padding:0 8px;font-size:12px;color:#334155" />
+              <button class="bd-btn pri" id="btnSearchSupplier">搜索</button>
+              <button class="bd-btn" id="btnResetSupplier">重置</button>
+            </div>
+          </div>
+          <div class="bd-toolbar">
+            <button class="bd-btn pri" id="btnSearch">搜索</button><button class="bd-btn" id="btnReset">重置</button><button class="bd-btn pri" id="btnAdd">新增</button><button class="bd-btn" id="btnEdit">编辑</button><button class="bd-btn" id="btnView">查看</button><button class="bd-btn warn" id="btnDelete">删除</button><button class="bd-btn ok" id="btnExport">导出Excel</button><button class="bd-btn" id="btnDownloadTemplate">下载模板</button><button class="bd-btn" id="btnImport">导入</button>
+          </div>
+          <div class="carrier-table-wrap"><table class="carrier-table"><thead id="bdHead"></thead><tbody id="bdBody"></tbody></table></div>
+          <div class="carrier-pagination"><span id="bdTotal">共 0 条</span><span>每页</span><select><option>10 条/页</option></select><div class="carrier-page-btns"><button id="pagePrev">&lt;</button><button class="is-current" id="pageCurrent">1</button><button id="pageNext">&gt;</button></div></div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+  <div class="bd-modal-mask" id="bdModalMask">
+    <div class="bd-modal">
+      <div class="bd-modal-hd"><span id="bdModalTitle">详情</span><button class="bd-btn" id="bdModalClose">关闭</button></div>
+      <div class="bd-modal-bd"><div class="bd-form-grid" id="bdFormGrid"></div></div>
+      <div class="bd-modal-ft"><button class="bd-btn" id="bdModalCancel">取消</button><button class="bd-btn pri" id="bdModalOk">保存</button></div>
+    </div>
+  </div>
+  <div class="bd-sup-modal-mask" id="bdSupplierModalMask" aria-hidden="true">
+    <div class="bd-sup-modal" role="dialog" aria-labelledby="bdSupplierModalTitle">
+      <div class="bd-sup-modal-hd">
+        <span id="bdSupplierModalTitle">供应商数据详情</span>
+        <button type="button" class="bd-sup-modal-close" id="bdSupplierModalClose" aria-label="关闭">×</button>
+      </div>
+      <div class="bd-sup-modal-bd" id="bdSupplierModalBd"></div>
+      <div class="bd-sup-modal-ft">
+        <button type="button" class="bd-btn" id="bdSupplierModalFooterClose">关闭</button>
+      </div>
+    </div>
+  </div>
+  <div class="bd-toast" id="bdToast"></div>
+  <script src="js/map-demo-toast.js"></script>
+  <script src="js/sidebar-actions.js"></script>
+  <script src="js/demo-manufacturer-data.js"></script>
+  <script src="js/site-footer.js"></script>
+  <script src="js/subpage-clock.js"></script>
+  <script src="js/subpage-feature-title.js"></script>
+  <script>
+    (function () {
+      var tab = "product";
+      try {
+        var q = new URLSearchParams(location.search).get("tab");
+        if (q) tab = String(q).trim();
+      } catch (e) {}
+      var label = tab === "supplier" ? "供应商数据" : tab === "manufacturer" ? "制造商数据" : tab === "product" ? "物资类型" : "";
+      if (!label) return;
+      var crumb = document.querySelector(".subpage-breadcrumb");
+      if (crumb) {
+        var segs = crumb.querySelectorAll("a, span:not(.sep)");
+        if (segs.length) segs[segs.length - 1].textContent = label;
+      }
+      try { document.title = label + " - 新能源物资供应链管理系统"; } catch (e2) {}
+      var h1 = document.querySelector(".carrier-page-title");
+      if (h1) h1.textContent = label;
+    })();
+  </script>
+  <script>
+    (function () {
+      var tabs = [
+        { key: "supplier", title: "供应商管理", kpis: [], filters: [], cols: [], rows: [] },
+        { key: "manufacturer", title: "制造商管理", kpis: [], filters: [], cols: [], rows: [] },
+        { key: "product", title: "产品类别管理", kpis: [["产品总数","386"],["风机整机","22"],["零部件","301"],["本月新增","16"]],
+          filters:["产品编号","产品名称","产品类别","规格型号","单位","适用机型"],
+          cols:["产品编号","产品名称","产品类别","规格型号","单位","适用机型","备注","操作"],
+          rows:[["PRD-1001","风机整机A","风机整机","GW-5.0","台","5MW","主流机型","查看"],["PRD-2041","齿轮箱总成","齿轮箱","GBX-220","套","3MW/5MW","备件","查看"]] },
+        { key: "personnel", title: "人员数据", kpis: [["人员总数","912"],["在岗","876"],["离岗","36"],["本月入职","28"]],
+          filters:["人员编号","姓名","部门","岗位","状态","手机号"],
+          cols:["人员编号","姓名","所属部门","岗位","状态","手机号","邮箱","操作"],
+          rows:[["P-0011","张三","华北运维部","资产专责","在岗","13900001111","zs@demo.com","查看"],["P-0034","王芳","综合管理部","采购专责","在岗","13900002222","wf@demo.com","查看"]] },
+        { key: "department", title: "公司部门数据", kpis: [["部门总数","42"],["一级部门","12"],["二级部门","30"],["本月调整","2"]],
+          filters:["部门编号","部门名称","上级部门","负责人","状态","关键词"],
+          cols:["部门编号","部门名称","上级部门","负责人","联系电话","状态","备注","操作"],
+          rows:[["D-010","华北运维部","运维中心","马凯","13600001111","有效","区域运维","查看"],["D-021","经营发展中心","总部","刘静","13600002222","有效","经营分析","查看"]] },
+        { key: "company", title: "项目公司管理", kpis: [["公司总数","26"],["省公司","8"],["项目公司","18"],["下属场站","152"]],
+          filters:["公司编号","公司名称","公司类型","所属区域","负责人","联系电话"],
+          cols:["公司编号","公司名称","公司类型","所属区域","负责人","联系电话","地址","下属场站数","操作"],
+          rows:[["C-1001","河南能源","省公司","华北","周总","0371-88886666","郑州","23","查看"],["C-2008","天津能源","项目公司","华北","李总","022-66668888","天津","11","查看"]] },
+        { key: "station", title: "场站管理", kpis: [["场站总数","152"],["风电场","126"],["光伏电站","26"],["总装机(MW)","10240"]],
+          filters:["场站编号","场站名称","所属项目公司","场站类型","场站负责人","联系电话"],
+          cols:["场站编号","场站名称","所属项目公司","场站类型","装机容量(MW)","风机数量","场站负责人","联系电话","地址","经纬度","操作"],
+          rows:[["WT-0101","张北风电场","河北项目公司","风电场","500","180","赵凯","0313-88886666","张北","115.03,41.15","查看"],["WT-0220","连云港光伏站","江苏项目公司","光伏电站","120","0","钱峰","0518-66668888","连云港","119.22,34.61","查看"]] },
+        { key: "dict", title: "物资类别字典", kpis: [["字典总项","215"],["固定资产类","68"],["销售物资类","42"],["应急物资类","31"]],
+          filters:["类别编号","类别名称","上级类别","类别属性","状态","关键词"],
+          cols:["类别编号","类别名称","上级类别","类别属性","备注","操作"],
+          rows:[["DICT-01","固定资产类","一级","固定资产","电脑、仪器仪表","查看"],["DICT-05","应急物资类","一级","应急物资","应急储备物资","查看"]] },
+        { key: "carrier", title: "承运商管理", kpis: [["承运商总数","42"],["正常合作","36"],["暂停合作","6"],["覆盖区域","19"]],
+          filters:["承运商编号","承运商名称","承运商类型","联系人","联系电话","合作状态"],
+          cols:["承运商编号","承运商名称","承运商类型","联系人","联系电话","服务区域","合作状态","操作"],
+          rows:[["CAR-001","顺丰物流","快递","王晨","400-111-1111","全国","正常合作","查看"],["CAR-007","华北专线物流","专车","赵鑫","400-777-7777","华北/西北","暂停合作","查看"]] },
+        { key: "rateTax", title: "汇率税率配置", kpis: [["配置总数","18"],["有效","15"],["即将失效","2"],["已失效","1"]],
+          filters:["配置编号","配置类型","配置名称","生效日期","失效日期","状态"],
+          cols:["配置编号","配置类型","配置名称","配置值","生效日期","失效日期","状态","操作"],
+          rows:[["CFG-001","税率","增值税率","13","2026-01-01","2030-12-31","有效","查看"],["CFG-002","汇率","进口汇率(USD/CNY)","7.12","2026-04-01","2026-06-30","有效","查看"]] },
+        { key: "codeRule", title: "编码规则管理", kpis: [["编码规则","9"],["固定资产编码","3"],["物资编码","4"],["风机编码","2"]],
+          filters:["编码类型","编码前缀","编码规则","当前序号","状态","关键词"],
+          cols:["编码类型","编码前缀","编码规则","当前序号","操作"],
+          rows:[["固定资产编码","GD","GD-{YYYY}-{SEQ4}","1256","查看"],["物资编码","MZ","MZ-{CAT}-{SEQ5}","8921","查看"]] }
+      ];
+      var tabNavKeys = ["supplier", "product", "personnel", "department", "company"];
+      var SUPPLIER_STORAGE = "map-demo-suppliers-v2";
+      var SUPPLIER_DEFAULTS = [
+        { id: "SUP-0001", code: "SUP-0001", name: "大华", uscc: "91330108304666302B", type: "软件类", contact: "陈达", phone: "13800001111", address: "杭州", status: "正常合作", remark: "监控系统" },
+        { id: "SUP-0002", code: "SUP-0002", name: "东风", uscc: "91420100MA4KLD2X3P", type: "零部件生产商", contact: "李明", phone: "13800002222", address: "武汉", status: "正常合作", remark: "发电机配件" },
+        { id: "SUP-0003", code: "SUP-0003", name: "远景能源", uscc: "91310000MA1FL5A01X", type: "零部件生产商", contact: "王磊", phone: "13800003333", address: "上海", status: "正常合作", remark: "机舱供货" },
+        { id: "SUP-0004", code: "SUP-0004", name: "金风科技", uscc: "911100007109302832", type: "零部件生产商", contact: "赵敏", phone: "13800004444", address: "北京", status: "正常合作", remark: "整机配套" },
+        { id: "SUP-0005", code: "SUP-0005", name: "亨通光电", uscc: "91320500608296911W", type: "物资类", contact: "孙浩", phone: "13800005555", address: "苏州", status: "正常合作", remark: "电缆" },
+        { id: "SUP-0006", code: "SUP-0006", name: "中车电气", uscc: "91430100MA4L2K8X2H", type: "零部件生产商", contact: "周婷", phone: "13800006666", address: "株洲", status: "正常合作", remark: "变流器" },
+        { id: "SUP-0007", code: "SUP-0007", name: "联合动力", uscc: "91110108700067234R", type: "零部件生产商", contact: "吴刚", phone: "13800007777", address: "北京", status: "暂停合作", remark: "齿轮箱" },
+        { id: "SUP-0008", code: "SUP-0008", name: "华科工程", uscc: "91440300MA5F8K9X1P", type: "工程类", contact: "郑丽", phone: "13800008888", address: "深圳", status: "正常合作", remark: "施工服务" },
+        { id: "SUP-0009", code: "SUP-0009", name: "明阳智能", uscc: "91442000MA4UM9X52L", type: "零部件生产商", contact: "冯强", phone: "13800009999", address: "中山", status: "正常合作", remark: "叶片" },
+        { id: "SUP-0010", code: "SUP-0010", name: "宁德时代", uscc: "91350900MA2YH9KX3A", type: "物资类", contact: "钱芳", phone: "13800010000", address: "宁德", status: "正常合作", remark: "储能电池" }
+      ];
+      function loadSupplierRecords() {
+        try {
+          var raw = localStorage.getItem(SUPPLIER_STORAGE);
+          if (raw) {
+            var parsed = JSON.parse(raw);
+            if (Array.isArray(parsed) && parsed.length) return parsed;
+          }
+        } catch (eLoad) {}
+        return SUPPLIER_DEFAULTS.map(function (r) {
+          return Object.assign({}, r);
+        });
+      }
+      function saveSupplierRecords() {
+        try {
+          localStorage.setItem(SUPPLIER_STORAGE, JSON.stringify(supplierRecords));
+        } catch (eSave) {}
+      }
+      var supplierRecords = loadSupplierRecords();
+      try {
+        if (!localStorage.getItem(SUPPLIER_STORAGE)) saveSupplierRecords();
+      } catch (eSeed) {}
+      var supplierFilterState = ["", ""];
+      var supplierFiltered = supplierRecords.slice();
+      var manufacturerRecords = window.DemoManufacturerData ? DemoManufacturerData.load() : [];
+      if (window.DemoManufacturerData) DemoManufacturerData.ensureSeeded();
+      function saveManufacturerRecords() {
+        if (window.DemoManufacturerData) DemoManufacturerData.save(manufacturerRecords);
+      }
+      var manufacturerFilterState = ["", ""];
+      var manufacturerFiltered = manufacturerRecords.slice();
+      var tabKey = "product";
+      var kpiEl = document.getElementById("bdKpis");
+      var bdTabsEl = document.getElementById("bdTabs");
+      var bdFilterActions = document.getElementById("bdFilterActions");
+      var filtersEl = document.getElementById("bdFilters");
+      var headEl = document.getElementById("bdHead");
+      var bodyEl = document.getElementById("bdBody");
+      var totalEl = document.getElementById("bdTotal");
+      var filterStateByTab = {};
+      var selectedIndex = -1;
+      var filteredRows = [];
+      var page = 1;
+      var pageSize = 10;
+      var modalMask = document.getElementById("bdModalMask");
+      var modalTitle = document.getElementById("bdModalTitle");
+      var formGrid = document.getElementById("bdFormGrid");
+      var modalOk = document.getElementById("bdModalOk");
+      var modalCancel = document.getElementById("bdModalCancel");
+      var bdDefaultView = document.getElementById("bdDefaultView");
+      var bdProductCatalog = document.getElementById("bdProductCatalog");
+      var pcTreeRoot = document.getElementById("pcTreeRoot");
+      var pcSelectedId = "a01-01-001";
+      var pcAddParentId = null;
+      var pcEditNodeId = null;
+      var pcDeleteNodeId = null;
+      var productTreeData = [
+        {
+          id: "a01", codePart: "A01", label: "A01大型成套设备", open: true, matCount: 0, children: [
+            { id: "a01-01", codePart: "01", label: "01风力发电机组", open: true, matCount: 0, children: [
+              { id: "a01-01-001", codePart: "001", label: "001风力发电机组整机", matCount: 2, category: "生产类", name: "风力发电机组整机", def: "指风电机组整机，包含机舱、叶片、塔筒等整套机组设备。", code: "A0100100001", unit: "台", status: true },
+              { id: "a01-01-002", codePart: "002", label: "002机舱", matCount: 0, category: "生产类", name: "机舱", def: "不包含叶片、轮毂、塔筒。", code: "A0100100002", unit: "台", status: true }
+            ]},
+            { id: "a01-02", codePart: "02", label: "02叶片", open: true, matCount: 0, children: [
+              { id: "a01-02-001", codePart: "001", label: "001叶片", matCount: 0, category: "生产类", name: "叶片", def: "", code: "A0100200001", unit: "台", status: true }
+            ]},
+            { id: "a01-03", codePart: "03", label: "03变桨轴承", open: true, matCount: 0, children: [
+              { id: "a01-03-001", codePart: "001", label: "001变桨轴承", matCount: 0, category: "生产类", name: "变桨轴承", def: "又叫叶根轴承", code: "A0100300001", unit: "台", status: true }
+            ]},
+            { id: "a01-04", codePart: "04", label: "04主轴总成", open: true, matCount: 0, children: [
+              { id: "a01-04-001", codePart: "001", label: "001主轴总成", matCount: 0, category: "生产类", name: "主轴总成", def: "", code: "A0100400001", unit: "台", status: true }
+            ]},
+            { id: "a01-05", codePart: "05", label: "05主齿轮箱", open: false, matCount: 0, children: [
+              { id: "a01-05-001", codePart: "001", label: "001主齿轮箱本体", matCount: 0, category: "生产类", name: "主齿轮箱本体", def: "", code: "A0100500001", unit: "台", status: true }
+            ]},
+            { id: "a01-06", codePart: "06", label: "06发电机", open: false, matCount: 0, children: [
+              { id: "a01-06-001", codePart: "001", label: "001发电机", matCount: 0, category: "生产类", name: "发电机", def: "", code: "A0100600001", unit: "台", status: true }
+            ]}
+          ]
+        },
+        { id: "a02", codePart: "A02", label: "A02小型设备", matCount: 0, children: [] },
+        { id: "a03", codePart: "A03", label: "A03工器具", matCount: 0, children: [] },
+        { id: "a04", codePart: "A04", label: "A04消防安防设备", matCount: 0, children: [] }
+      ];
+      function pcFindNode(list, id, parent) {
+        for (var i = 0; i < list.length; i++) {
+          var n = list[i];
+          if (n.id === id) return { node: n, parent: parent, list: list, index: i };
+          if (n.children && n.children.length) {
+            var hit = pcFindNode(n.children, id, n);
+            if (hit) return hit;
+          }
+        }
+        return null;
+      }
+      function pcIsLeaf(n) {
+        return !(n.children && n.children.length);
+      }
+      function pcIsSmallClassLeaf(n) {
+        return pcIsLeaf(n) && /^\d{3}$/.test(String(n.codePart || ""));
+      }
+      function pcTreeLabel(codePart, name) {
+        return String(codePart || "") + String(name || "").trim();
+      }
+      function pcMatCount(n) {
+        return n.matCount != null ? Number(n.matCount) : 0;
+      }
+      function pcAggCount(n) {
+        if (!n.children || !n.children.length) return pcMatCount(n);
+        var sum = 0;
+        for (var i = 0; i < n.children.length; i++) {
+          sum += pcAggCount(n.children[i]);
+        }
+        return sum;
+      }
+      function pcEsc(s) {
+        return String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+      }
+      function pcAncestorChain(nodeId) {
+        var chain = [];
+        function walk(list, ancestors) {
+          for (var i = 0; i < list.length; i++) {
+            var n = list[i];
+            var path = ancestors.concat([n]);
+            if (n.id === nodeId) {
+              chain = path;
+              return true;
+            }
+            if (n.children && n.children.length && walk(n.children, path)) return true;
+          }
+          return false;
+        }
+        walk(productTreeData, []);
+        return chain;
+      }
+      function pcBuildACode(chain, suffixDigits) {
+        if (!chain.length) return "";
+        var MCS = window.MaterialCodeScheme;
+        var major = String(chain[0].codePart || "01");
+        if (chain.length >= 3) {
+          var medium = String(chain[1].codePart || "");
+          var small = String(chain[2].codePart || "");
+          return MCS
+            ? MCS.buildACode(major, medium, small)
+            : "A" +
+                major.replace(/\D/g, "").padStart(3, "0").slice(-3) +
+                medium.replace(/\D/g, "").padStart(3, "0").slice(-3) +
+                small.replace(/\D/g, "").padStart(4, "0").slice(-4);
+        }
+        if (chain.length === 2) {
+          var medium2 = String(chain[1].codePart || "");
+          var small2 = String(suffixDigits || "0001");
+          return MCS
+            ? MCS.buildACode(major, medium2, small2)
+            : "A" +
+                major.replace(/\D/g, "").padStart(3, "0").slice(-3) +
+                medium2.replace(/\D/g, "").padStart(3, "0").slice(-3) +
+                small2.replace(/\D/g, "").padStart(4, "0").slice(-4);
+        }
+        var medium1 = String(suffixDigits || "001");
+        return MCS
+          ? MCS.buildACode(major, medium1, "0001")
+          : "A" +
+              major.replace(/\D/g, "").padStart(3, "0").slice(-3) +
+              medium1.replace(/\D/g, "").padStart(3, "0").slice(-3) +
+              "0001";
+      }
+      function pcNextCodePart(parentNode, depth) {
+        var children = parentNode.children || [];
+        var used = {};
+        var len = depth === 1 ? 2 : 3;
+        children.forEach(function (c) {
+          if (c.codePart) used[String(c.codePart)] = true;
+        });
+        for (var i = 1; i <= (depth === 1 ? 99 : 999); i++) {
+          var seg = depth === 1
+            ? (i < 10 ? "0" : "") + String(i)
+            : String(i).padStart(3, "0");
+          if (!used[seg]) return seg;
+        }
+        return depth === 1 ? "99" : "999";
+      }
+      function pcNodeUsed(n) {
+        return pcMatCount(n) > 0;
+      }
+      function pcSetFormFooter(mode) {
+        var ft = document.getElementById("pcFormFt");
+        if (!ft) return;
+        ft.innerHTML = "";
+        ft.classList.remove("is-hidden");
+        if (mode === "edit") {
+          ft.innerHTML = '<button type="button" class="bd-btn pri" id="pcBtnSaveLeaf">保存</button>';
+          var btnSave = document.getElementById("pcBtnSaveLeaf");
+          if (btnSave) btnSave.onclick = pcSaveSelectedNode;
+          return;
+        }
+        ft.classList.add("is-hidden");
+      }
+      function pcSaveSelectedNode() {
+        var hit = pcFindNode(productTreeData, pcSelectedId, null);
+        var isSmallLeaf = !!(hit && hit.node && pcIsSmallClassLeaf(hit.node));
+        if (!isSmallLeaf) {
+          toast("请先选择第三级“小类”节点");
+          return false;
+        }
+        var name = document.getElementById("pcName").value.trim();
+        var def = document.getElementById("pcDef").value.trim();
+        var code = document.getElementById("pcCode").value.trim();
+        var unit = document.getElementById("pcUnit").value;
+        if (!name) { toast("请填写物资类型名称"); return false; }
+        if (!unit) { toast("请选择物资计量单位"); return false; }
+        var n = hit.node;
+        n.name = name;
+        n.label = pcTreeLabel(n.codePart, name);
+        n.def = def;
+        n.code = code || n.code || "";
+        n.unit = unit;
+        n.status = document.getElementById("pcStatus").checked;
+        pcRenderTree();
+        pcApplyForm();
+        if (typeof window.mapDemoToast === "function") window.mapDemoToast("已保存！");
+        else toast("已保存");
+        return true;
+      }
+      function pcSyncToolbar() {}
+      var PC_ICON_PLUS = '<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M8 3.5v9M3.5 8h9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>';
+      var PC_ICON_EDIT = '<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><rect x="3" y="3" width="8" height="8" rx="1" fill="none" stroke="currentColor" stroke-width="1.2"/><path d="M9 7l4 4M11.5 4.5l1 1" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>';
+      var PC_ICON_DEL = '<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M5.5 6.5v5M8 6.5v5M10.5 6.5v5M4 4.5h8l-.5 8.5a1 1 0 0 1-1 .9H5.5a1 1 0 0 1-1-.9L4 4.5zM6.5 4.5V3.8a1 1 0 0 1 1-.8h1a1 1 0 0 1 1 .8v.7" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+      function pcRowActionBtn(act, id, tip) {
+        var cls = "bd-pc-row-action" + (act === "del" ? " danger" : "");
+        var icon = act === "add" ? PC_ICON_PLUS : (act === "edit" ? PC_ICON_EDIT : PC_ICON_DEL);
+        return '<button type="button" class="' + cls + '" data-row-act="' + act + '" data-id="' + pcEsc(id) + '" data-tip="' + pcEsc(tip) + '" aria-label="' + pcEsc(tip) + '">' + icon + "</button>";
+      }
+      function pcBuildRowActions(n) {
+        var isSmall = pcIsSmallClassLeaf(n);
+        var html = '<span class="bd-pc-row-actions">';
+        if (!isSmall) {
+          html += pcRowActionBtn("add", n.id, "新增子类");
+          html += pcRowActionBtn("edit", n.id, "编辑子类");
+          html += pcRowActionBtn("del", n.id, "删除子类");
+        } else {
+          html += pcRowActionBtn("edit", n.id, "编辑");
+          html += pcRowActionBtn("del", n.id, "删除");
+        }
+        return html + "</span>";
+      }
+      function pcRenderTreeNodes(nodes, depth) {
+        depth = depth || 1;
+        return nodes.map(function (n) {
+          var hasChild = n.children && n.children.length;
+          var isLeaf = !hasChild;
+          var open = !!n.open;
+          var active = n.id === pcSelectedId ? " is-active" : "";
+          var cnt = pcAggCount(n);
+          var countHtml = '<span class="bd-pc-count"> (' + cnt + ")</span>";
+          var actionsHtml = pcBuildRowActions(n);
+          var childHtml = hasChild
+            ? '<div class="bd-pc-children' + (open ? " is-open" : "") + '">' + pcRenderTreeNodes(n.children, depth + 1) + "</div>"
+            : "";
+          return (
+            '<div class="bd-pc-node" data-id="' + pcEsc(n.id) + '">' +
+              '<div class="bd-pc-node-row' + active + '" data-id="' + pcEsc(n.id) + '">' +
+                '<button type="button" class="bd-pc-toggle' + (isLeaf ? " is-leaf" : "") + '" data-toggle="' + pcEsc(n.id) + '" aria-label="展开收起">' + (open ? "▼" : "▶") + "</button>" +
+                '<span class="bd-pc-label">' + pcEsc(n.label) + countHtml + "</span>" +
+                actionsHtml +
+              "</div>" +
+              childHtml +
+            "</div>"
+          );
+        }).join("");
+      }
+      function pcRenderTree() {
+        pcTreeRoot.innerHTML = pcRenderTreeNodes(productTreeData);
+      }
+      function pcUpdateStatusLabel() {
+        var on = document.getElementById("pcStatus").checked;
+        document.getElementById("pcStatusText").textContent = on ? "启用" : "禁用";
+      }
+      function pcNowStr() {
+        var d = new Date();
+        var p = function (n) { return n < 10 ? "0" + n : String(n); };
+        return d.getFullYear() + "-" + p(d.getMonth() + 1) + "-" + p(d.getDate()) + " " + p(d.getHours()) + ":" + p(d.getMinutes()) + ":" + p(d.getSeconds());
+      }
+      function pcApplyForm() {
+        var hit = pcFindNode(productTreeData, pcSelectedId, null);
+        var form = document.getElementById("pcForm");
+        var hint = document.getElementById("pcLeafHint");
+        pcSyncToolbar();
+
+        var hasNode = !!(hit && hit.node);
+        var n = hasNode ? hit.node : null;
+        var isSmallLeaf = !!(n && pcIsSmallClassLeaf(n));
+
+        if (!isSmallLeaf) {
+          if (form) form.style.display = "none";
+          if (hint) hint.style.display = "block";
+          pcSetFormFooter("none");
+          return;
+        }
+
+        if (hint) hint.style.display = "none";
+        if (form) form.style.display = "";
+
+        var nameEl = document.getElementById("pcName");
+        var defEl = document.getElementById("pcDef");
+        var codeEl = document.getElementById("pcCode");
+        var unitEl = document.getElementById("pcUnit");
+        var statusEl = document.getElementById("pcStatus");
+
+        if (nameEl) nameEl.value = n.name || (n.label || "").replace(/^\S+\s+/, "");
+        if (defEl) defEl.value = n.def || "";
+        if (codeEl) {
+          var chainCode = pcBuildACode(pcAncestorChain(n.id));
+          codeEl.value = n.code || chainCode || "";
+          if (!n.code && chainCode) n.code = chainCode;
+        }
+        if (unitEl) unitEl.value = n.unit || "";
+        if (statusEl) statusEl.checked = n.status !== false;
+        pcUpdateStatusLabel();
+        pcSetFormFooter("edit");
+      }
+      function pcSelectNode(id) {
+        pcSelectedId = id;
+        pcRenderTree();
+        pcApplyForm();
+      }
+      function pcHandleRowAction(e, act, id) {
+        if (e) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+        var hit = pcFindNode(productTreeData, id, null);
+        if (!hit || !hit.node) return;
+        pcSelectedId = id;
+        if (act === "add") {
+          pcOpenAddModal(id);
+          return;
+        }
+        if (act === "edit") {
+          pcRenameNode(id);
+          return;
+        }
+        if (act === "del") {
+          pcRequestDeleteNode(id);
+        }
+      }
+      window.__pcRowAction = pcHandleRowAction;
+      function pcUpdateAddCodePreview() {
+        var el = document.getElementById("pcAddCodePreview");
+        if (!el || !pcAddParentId) return;
+        var suffix = (document.getElementById("pcAddSuffix").value || "").replace(/\D/g, "");
+        if (pcAddParentId === "__root__") {
+          el.textContent = suffix ? ("A" + suffix.padStart(2, "0").slice(-2)) : "A__";
+          return;
+        }
+        var chain = pcAncestorChain(pcAddParentId);
+        if (chain.length === 1) {
+          el.textContent = pcBuildACode(chain, suffix ? suffix.slice(0, 2) : "");
+        } else if (chain.length === 2) {
+          el.textContent = pcBuildACode(chain.concat([{ codePart: suffix.padStart(3, "0").slice(-3) }]));
+        } else {
+          el.textContent = "—";
+        }
+      }
+      function pcOpenAddModal(parentId) {
+        if (parentId === "__root__") {
+          pcAddParentId = "__root__";
+        } else {
+          var pid = parentId || pcSelectedId;
+          var hit = pcFindNode(productTreeData, pid, null);
+        if (!hit || !hit.node) {
+          toast("请先选择树节点");
+          return;
+        }
+          pcAddParentId = pid;
+        }
+        document.getElementById("pcAddName").value = "";
+        document.getElementById("pcAddSuffix").value = "";
+        pcUpdateAddCodePreview();
+        document.getElementById("pcAddMask").classList.add("show");
+        document.getElementById("pcAddMask").setAttribute("aria-hidden", "false");
+        document.getElementById("pcAddName").focus();
+      }
+      function pcCloseAddModal() {
+        document.getElementById("pcAddMask").classList.remove("show");
+        document.getElementById("pcAddMask").setAttribute("aria-hidden", "true");
+        pcAddParentId = null;
+      }
+      function pcOpenEditModal(nodeId) {
+        var hit = pcFindNode(productTreeData, nodeId, null);
+        if (!hit || !hit.node) return;
+        if (pcNodeUsed(hit.node)) {
+          toast("该节点已被使用，不可编辑名称");
+          return;
+        }
+        pcEditNodeId = nodeId;
+        document.getElementById("pcEditName").value = hit.node.label || "";
+        document.getElementById("pcEditMask").classList.add("show");
+        document.getElementById("pcEditMask").setAttribute("aria-hidden", "false");
+        document.getElementById("pcEditName").focus();
+      }
+      function pcCloseEditModal() {
+        document.getElementById("pcEditMask").classList.remove("show");
+        document.getElementById("pcEditMask").setAttribute("aria-hidden", "true");
+        pcEditNodeId = null;
+      }
+      function pcConfirmEditNode() {
+        var hit = pcFindNode(productTreeData, pcEditNodeId, null);
+        if (!hit || !hit.node) return;
+        var label = document.getElementById("pcEditName").value.trim();
+        if (!label) { toast("请填写节点名称"); return; }
+        hit.node.label = label;
+        if (pcIsLeaf(hit.node) && hit.node.name) hit.node.name = label;
+        pcCloseEditModal();
+        pcRenderTree();
+        pcApplyForm();
+        toast("节点名称已更新");
+      }
+      function pcOpenDeleteModal(nodeId) {
+        var hit = pcFindNode(productTreeData, nodeId, null);
+        if (!hit || !hit.node) return;
+        if (pcMatCount(hit.node) > 0) {
+          toast("该节点已被使用，不可删除");
+          return;
+        }
+        pcDeleteNodeId = nodeId;
+        document.getElementById("pcDeleteText").textContent = "确认删除节点「" + hit.node.label + "」？";
+        document.getElementById("pcDeleteMask").classList.add("show");
+        document.getElementById("pcDeleteMask").setAttribute("aria-hidden", "false");
+      }
+      function pcCloseDeleteModal() {
+        document.getElementById("pcDeleteMask").classList.remove("show");
+        document.getElementById("pcDeleteMask").setAttribute("aria-hidden", "true");
+        pcDeleteNodeId = null;
+      }
+      function pcConfirmAddChild() {
+        if (!pcAddParentId) return;
+        var label = document.getElementById("pcAddName").value.trim();
+        var suffixRaw = document.getElementById("pcAddSuffix").value.trim().replace(/\D/g, "");
+        if (!label) { toast("请填写节点名称"); return; }
+        var nid = "n-" + Date.now();
+        var codePart = "";
+        var code = "";
+        if (pcAddParentId === "__root__") {
+          if (suffixRaw.length < 2) { toast("大类编码请填写2位数字"); return; }
+          codePart = "A" + suffixRaw.padStart(2, "0").slice(-2);
+          productTreeData.push({
+            id: nid,
+            codePart: codePart,
+            label: pcTreeLabel(codePart, label),
+            matCount: 0,
+            children: [],
+            open: false
+          });
+          pcCloseAddModal();
+          pcSelectedId = nid;
+          pcRenderTree();
+          pcApplyForm();
+          toast("已新增大类（演示）");
+          return;
+        }
+        var pHit = pcFindNode(productTreeData, pcAddParentId, null);
+        if (!pHit || !pHit.node) return;
+        var chain = pcAncestorChain(pcAddParentId);
+        if (!pHit.node.children) pHit.node.children = [];
+        var depth = chain.length;
+        if (depth === 1) {
+          if (suffixRaw.length < 2) { toast("中类编码请填写2位数字"); return; }
+          codePart = suffixRaw.padStart(2, "0").slice(-2);
+          code = pcBuildACode(chain, codePart);
+        } else if (depth === 2) {
+          if (suffixRaw.length < 3) { toast("小类编码请填写3位数字"); return; }
+          codePart = suffixRaw.padStart(3, "0").slice(-3);
+          code = pcBuildACode(chain.concat([{ codePart: codePart }]));
+        } else {
+          toast("仅支持在大类或中类下新增子节点");
+          return;
+        }
+        var child = {
+          id: nid,
+          codePart: codePart,
+          label: pcTreeLabel(codePart, label),
+          matCount: 0,
+          name: depth === 2 ? label : undefined,
+          code: depth === 2 ? code : "",
+          unit: depth === 2 ? "" : undefined,
+          def: depth === 2 ? "" : undefined,
+          status: depth === 2 ? true : undefined
+        };
+        if (pcIsLeaf(pHit.node) && depth === 2) {
+          pHit.node.children.push(child);
+        } else if (!pcIsLeaf(pHit.node)) {
+          pHit.node.children.push(child);
+        } else {
+          toast("请在大类或中类节点下新增");
+          return;
+        }
+        pHit.node.open = true;
+        pcCloseAddModal();
+        pcSelectedId = nid;
+        pcRenderTree();
+        pcApplyForm();
+        toast("已新增子节点，请完善右侧信息并保存");
+      }
+      function pcRenameNode(nodeId) {
+        pcOpenEditModal(nodeId);
+      }
+      function pcDeleteNode(nodeId) {
+        var hit = pcFindNode(productTreeData, nodeId, null);
+        if (!hit || !hit.node) return;
+        if (pcMatCount(hit.node) > 0) {
+          toast("该节点已被使用，不可删除");
+          return;
+        }
+        hit.list.splice(hit.index, 1);
+        var fallback = productTreeData[0];
+        if (fallback.children && fallback.children[0]) {
+          var c0 = fallback.children[0];
+          pcSelectedId = (c0.children && c0.children[0] && c0.children[0].id) || c0.id;
+        } else {
+          pcSelectedId = fallback.id;
+        }
+        pcRenderTree();
+        pcApplyForm();
+        toast("删除成功（演示）");
+      }
+      function pcRequestDeleteNode(nodeId) {
+        pcOpenDeleteModal(nodeId);
+      }
+      function pcInitProductCatalog() {
+        pcRenderTree();
+        pcApplyForm();
+
+        pcTreeRoot.addEventListener("click", function (e) {
+          var target = e.target && e.target.nodeType === 1 ? e.target : e.target.parentElement;
+          var rowAction = target && target.closest ? target.closest("[data-row-act]") : null;
+          if (rowAction) {
+            if (rowAction.disabled) return;
+            pcHandleRowAction(e, rowAction.getAttribute("data-row-act"), rowAction.getAttribute("data-id"));
+            return;
+          }
+          var toggle = target && target.closest ? target.closest("[data-toggle]") : null;
+          if (toggle) {
+            e.stopPropagation();
+            var tid = toggle.getAttribute("data-toggle");
+            var tHit = pcFindNode(productTreeData, tid, null);
+            if (tHit && tHit.node) {
+              tHit.node.open = !tHit.node.open;
+              pcRenderTree();
+            }
+            return;
+          }
+          var row = target && target.closest ? target.closest(".bd-pc-node-row") : null;
+          if (row) pcSelectNode(row.getAttribute("data-id"));
+        });
+
+        pcTreeRoot.addEventListener("contextmenu", function (e) {
+          e.preventDefault();
+        });
+        pcTreeRoot.addEventListener("dblclick", function (e) {
+          var row = e.target.closest(".bd-pc-node-row");
+          if (!row) return;
+          var hit = pcFindNode(productTreeData, row.getAttribute("data-id"), null);
+          if (hit && hit.node && pcNodeUsed(hit.node)) {
+            e.preventDefault();
+          }
+        });
+
+        var pcBtnAddBig = document.getElementById("pcBtnAddBig");
+        if (pcBtnAddBig) {
+          pcBtnAddBig.innerHTML = PC_ICON_PLUS;
+          pcBtnAddBig.addEventListener("click", function (e) {
+            e.stopPropagation();
+            pcOpenAddModal("__root__");
+          });
+        }
+
+        document.getElementById("pcAddCancel").addEventListener("click", pcCloseAddModal);
+        document.getElementById("pcAddOk").addEventListener("click", pcConfirmAddChild);
+        document.getElementById("pcAddMask").addEventListener("click", function (e) {
+          if (e.target.id === "pcAddMask") pcCloseAddModal();
+        });
+        document.getElementById("pcEditCancel").addEventListener("click", pcCloseEditModal);
+        document.getElementById("pcEditOk").addEventListener("click", pcConfirmEditNode);
+        document.getElementById("pcEditMask").addEventListener("click", function (e) {
+          if (e.target.id === "pcEditMask") pcCloseEditModal();
+        });
+        document.getElementById("pcDeleteCancel").addEventListener("click", pcCloseDeleteModal);
+        document.getElementById("pcDeleteOk").addEventListener("click", function () {
+          var id = pcDeleteNodeId;
+          pcCloseDeleteModal();
+          pcDeleteNode(id);
+        });
+        document.getElementById("pcDeleteMask").addEventListener("click", function (e) {
+          if (e.target.id === "pcDeleteMask") pcCloseDeleteModal();
+        });
+        document.getElementById("pcAddSuffix").addEventListener("input", function () {
+          this.value = this.value.replace(/\D/g, "").slice(0, 3);
+          pcUpdateAddCodePreview();
+        });
+
+        document.getElementById("pcStatus").addEventListener("change", pcUpdateStatusLabel);
+      }
+      var pcInited = false;
+      function toast(msg){
+        var el = document.getElementById("bdToast");
+        el.textContent = msg;
+        el.style.display = "block";
+        clearTimeout(el._t);
+        el._t = setTimeout(function(){ el.style.display = "none"; }, 1800);
+      }
+      function getByKey(key) { return tabs.find(function (x) { return x.key === key; }) || tabs[0]; }
+      function option(v) { return '<option>' + v + "</option>"; }
+      function openModal(mode){
+        // 供应商：用 supplierRecords 做新增/编辑/查看，且合作状态展示为开关
+        if (tabKey === "supplier") {
+          var readOnly = mode === "view";
+          var rec = selectedIndex >= 0 ? supplierRecords[selectedIndex] : null;
+          modalTitle.textContent = mode === "add" ? "新增供应商" : (mode === "view" ? "查看详情" : "编辑");
+
+          var code = rec ? rec.code : "";
+          var name = rec ? rec.name : "";
+          var uscc = rec ? rec.uscc : "";
+          var contact = rec ? rec.contact : "";
+          var phone = rec ? rec.phone : "";
+          var address = rec ? rec.address : "";
+          var status = rec ? rec.status : "正常合作";
+          var remark = rec ? rec.remark : "";
+          var statusChecked = status === "正常合作";
+
+          var ro = readOnly ? 'readonly style="background:#f5f5f5"' : "";
+          var dis = readOnly ? "disabled" : "";
+
+          formGrid.innerHTML =
+            '<div class="bd-form-item"><label>供应商编号</label><input data-sup-field="code" placeholder="如SUP-0001" value="' + String(code).replace(/"/g, "&quot;") + '" ' + ro + " /></div>" +
+            '<div class="bd-form-item"><label>供应商名称</label><input data-sup-field="name" placeholder="请输入供应商全称" value="' + String(name).replace(/"/g, "&quot;") + '" ' + ro + " /></div>" +
+            '<div class="bd-form-item"><label>统一社会信用代码</label><input data-sup-field="uscc" placeholder="18位统一社会信用代码" value="' + String(uscc).replace(/"/g, "&quot;") + '" ' + ro + " /></div>" +
+            '<div class="bd-form-item"><label>联系人</label><input data-sup-field="contact" placeholder="请输入联系人姓名" value="' + String(contact).replace(/"/g, "&quot;") + '" ' + ro + " /></div>" +
+            '<div class="bd-form-item"><label>联系方式</label><input data-sup-field="phone" placeholder="请输入联系电话" value="' + String(phone).replace(/"/g, "&quot;") + '" ' + ro + " /></div>" +
+            '<div class="bd-form-item"><label>地址</label><input data-sup-field="address" placeholder="请输入供应商地址" value="' + String(address).replace(/"/g, "&quot;") + '" ' + ro + " /></div>" +
+            '<div class="bd-form-item"><label>合作状态</label>' +
+              '<div class="bd-pc-switch">' +
+                '<label><input type="checkbox" data-sup-field="status" ' + (statusChecked ? "checked" : "") + " " + dis + ' /><span class="bd-pc-switch-ui"></span></label>' +
+                '<span class="bd-pc-switch-text" id="bdSupplierCoopText">' + (statusChecked ? "正常合作" : "暂停合作") + "</span>" +
+              "</div>" +
+            "</div>" +
+            '<div class="bd-form-item"><label>备注</label><textarea data-sup-field="remark" rows="3" placeholder="如：整机配套，2023年起合作，质量稳定；或填写暂停合作原因等" style="width:100%;box-sizing:border-box;border:1px solid #d9e0ea;border-radius:4px;padding:8px;font-size:13px;resize:vertical" ' + (ro ? "readonly" : "") + ">" + String(remark).replace(/"/g, "&quot;") + "</textarea></div>";
+
+          modalOk.style.display = readOnly ? "none" : "";
+          modalMask.classList.add("show");
+
+          // 绑定保存
+          modalOk.onclick = function () {
+            var inp = function (field) {
+              var el = formGrid.querySelector('input[data-sup-field="' + field + '"],textarea[data-sup-field="' + field + '"]');
+              return el ? String(el.value || "").trim() : "";
+            };
+            var nextStatusIp = formGrid.querySelector('input[data-sup-field="status"]');
+            var nextStatus = nextStatusIp && nextStatusIp.checked ? "正常合作" : "暂停合作";
+
+            var nextRec = {
+              id: rec ? rec.id : inp("code") || ("SUP-" + Date.now()),
+              code: inp("code") || "",
+              name: inp("name") || "",
+              uscc: inp("uscc") || "",
+              type: rec ? rec.type : "",
+              contact: inp("contact") || "",
+              phone: inp("phone") || "",
+              address: inp("address") || "",
+              status: nextStatus,
+              remark: inp("remark") || ""
+            };
+
+            if (mode === "add") {
+              supplierRecords.unshift(nextRec);
+            } else if (selectedIndex >= 0) {
+              supplierRecords[selectedIndex] = nextRec;
+            }
+            saveSupplierRecords();
+
+            modalMask.classList.remove("show");
+            toast(mode === "add" ? "新增成功（演示）" : "保存成功（演示）");
+            render();
+          };
+          return;
+        }
+
+        if (tabKey === "manufacturer") {
+          var readOnlyM = mode === "view";
+          var recM = selectedIndex >= 0 ? manufacturerRecords[selectedIndex] : null;
+          modalTitle.textContent = mode === "add" ? "新增制造商" : mode === "view" ? "查看详情" : "编辑";
+          var codeM = recM ? recM.code : "";
+          var nameM = recM ? recM.name : "";
+          var usccM = recM ? recM.uscc : "";
+          var typeM = recM ? recM.type : "";
+          var contactM = recM ? recM.contact : "";
+          var phoneM = recM ? recM.phone : "";
+          var addressM = recM ? recM.address : "";
+          var sourceM = recM ? recM.source : "";
+          var statusM = recM ? recM.status : "正常合作";
+          var remarkM = recM ? recM.remark : "";
+          var statusCheckedM = statusM === "正常合作";
+          var roM = readOnlyM ? 'readonly style="background:#f5f5f5"' : "";
+          var disM = readOnlyM ? "disabled" : "";
+          formGrid.innerHTML =
+            '<div class="bd-form-item"><label>制造商编号</label><input data-mfr-field="code" placeholder="如MFR-0001" value="' +
+            String(codeM).replace(/"/g, "&quot;") +
+            '" ' +
+            roM +
+            " /></div>" +
+            '<div class="bd-form-item"><label>制造商名称</label><input data-mfr-field="name" placeholder="请输入制造商全称" value="' +
+            String(nameM).replace(/"/g, "&quot;") +
+            '" ' +
+            roM +
+            " /></div>" +
+            '<div class="bd-form-item"><label>来源</label><input data-mfr-field="source" placeholder="国产/进口/合资" value="' +
+            String(sourceM).replace(/"/g, "&quot;") +
+            '" ' +
+            roM +
+            " /></div>" +
+            '<div class="bd-form-item"><label>备注</label><textarea data-mfr-field="remark" rows="3" placeholder="如：整机供货，2023年起合作，质量稳定；或填写其他说明" style="width:100%;box-sizing:border-box;border:1px solid #d9e0ea;border-radius:4px;padding:8px;font-size:13px;resize:vertical" ' + (roM ? "readonly" : "") + ">" + String(remarkM).replace(/"/g, "&quot;") + "</textarea></div>";
+          modalOk.style.display = readOnlyM ? "none" : "";
+          modalMask.classList.add("show");
+          modalOk.onclick = function () {
+            var inpM = function (field) {
+              var el = formGrid.querySelector('input[data-mfr-field="' + field + '"],textarea[data-mfr-field="' + field + '"]');
+              return el ? String(el.value || "").trim() : "";
+            };
+            var nextRecM = {
+              id: recM ? recM.id : inpM("code") || "MFR-" + Date.now(),
+              code: inpM("code") || "",
+              name: inpM("name") || "",
+              uscc: recM ? recM.uscc : "",
+              type: recM ? recM.type : "",
+              contact: recM ? recM.contact : "",
+              phone: recM ? recM.phone : "",
+              address: recM ? recM.address : "",
+              source: inpM("source") || "",
+              status: recM ? recM.status : "正常合作",
+              remark: inpM("remark") || ""
+            };
+            if (mode === "add") manufacturerRecords.unshift(nextRecM);
+            else if (selectedIndex >= 0) manufacturerRecords[selectedIndex] = nextRecM;
+            saveManufacturerRecords();
+            modalMask.classList.remove("show");
+            toast(mode === "add" ? "新增成功（演示）" : "保存成功（演示）");
+            render();
+          };
+          return;
+        }
+
+        var c = getByKey(tabKey);
+        var row = selectedIndex >= 0 ? (c.rows[selectedIndex] || []) : [];
+        modalTitle.textContent = mode === "add" ? ("新增" + c.title.replace("管理","")) : (mode === "view" ? "查看详情" : "编辑");
+        var readOnly = mode === "view";
+        formGrid.innerHTML = c.cols.filter(function(x){ return x !== "操作"; }).map(function(col, idx){
+          var val = row[idx] || "";
+          return '<div class="bd-form-item"><label>'+col+'</label><input data-col-idx="'+idx+'" value="'+String(val).replace(/"/g,'&quot;')+'" '+(readOnly?'readonly style="background:#f5f5f5"':'')+' /></div>';
+        }).join("");
+        modalOk.style.display = readOnly ? "none" : "";
+        modalMask.classList.add("show");
+        modalOk.onclick = function(){
+          var vals = Array.prototype.slice.call(formGrid.querySelectorAll("input")).map(function(ip){ return ip.value.trim() || "—"; });
+          if (mode === "add") {
+            vals.push("查看");
+            c.rows.unshift(vals);
+          } else if (selectedIndex >= 0) {
+            c.rows[selectedIndex] = vals.concat(["查看"]);
+          }
+          modalMask.classList.remove("show");
+          toast(mode === "add" ? "新增成功（演示）" : "保存成功（演示）");
+          render();
+        };
+      }
+      function applyFilter(c){
+        var vals = filterStateByTab[tabKey] || [];
+        var keys = vals.map(function(x){ return (x || "").trim(); }).filter(function(x){ return x && x !== "全部"; });
+        filteredRows = c.rows.filter(function(r){
+          if (!keys.length) return true;
+          var s = r.join(" ");
+          return keys.every(function(k){ return s.indexOf(k) >= 0; });
+        });
+      }
+      function escHtml(s) {
+        return String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/"/g, "&quot;");
+      }
+      function renderTabs() {
+        if (!bdTabsEl) return;
+        if (tabKey === "product") {
+          bdTabsEl.style.display = "none";
+          bdTabsEl.innerHTML = "";
+          return;
+        }
+        if (tabKey === "supplier") {
+          bdTabsEl.style.display = "none";
+          bdTabsEl.innerHTML = "";
+          return;
+        }
+        if (tabKey === "manufacturer") {
+          bdTabsEl.style.display = "none";
+          bdTabsEl.innerHTML = "";
+          return;
+        }
+        bdTabsEl.style.display = "";
+        bdTabsEl.style.gridTemplateColumns = "repeat(5,minmax(0,1fr))";
+        bdTabsEl.innerHTML = tabNavKeys.map(function (k) {
+          var t = getByKey(k);
+          return '<button type="button" class="bd-tab' + (tabKey === k ? " is-active" : "") + '" data-tab="' + k + '">' + escHtml(t.title) + "</button>";
+        }).join("");
+      }
+      function supplierCoopClass(status) {
+        if (status === "正常合作") return "bd-sup-status--ok";
+        if (status === "暂停合作") return "bd-sup-status--pause";
+        if (status === "终止合作") return "bd-sup-status--stop";
+        return "";
+      }
+      function applySupplierFilter() {
+        var f = supplierFilterState;
+        var codeKw = (f[0] || "").trim();
+        var contactKw = (f[1] || "").trim();
+        supplierFiltered = supplierRecords.filter(function (r) {
+          if (codeKw && r.code.indexOf(codeKw) < 0) return false;
+          if (contactKw && r.contact.indexOf(contactKw) < 0) return false;
+          return true;
+        });
+      }
+      function renderSupplierFilters() {
+        var f = supplierFilterState;
+        var wrap = filtersEl.parentElement;
+        if (wrap) wrap.classList.add("bd-filters--supplier");
+        filtersEl.innerHTML =
+          '<input placeholder="供应商编号" data-sup-idx="0" value="' + escHtml(f[0]) + '">';
+        var contactEl = document.getElementById("bdSupplierContact");
+        if (contactEl) {
+          contactEl.value = String(f[1] || "");
+          contactEl.placeholder = "联系人";
+          contactEl.setAttribute("data-sup-idx", "1");
+          contactEl.removeAttribute("data-mfr-idx");
+        }
+      }
+      function readSupplierFilterFromDom() {
+        var allEls = Array.prototype.slice.call(filtersEl.querySelectorAll("[data-sup-idx]")).concat(
+          Array.prototype.slice.call(bdFilterActions.querySelectorAll("[data-sup-idx]"))
+        );
+        allEls.forEach(function (el) {
+          var i = Number(el.getAttribute("data-sup-idx"));
+          supplierFilterState[i] = el.value || "";
+        });
+      }
+      function restoreSupplierOpButtons() {
+        if (tabKey !== "supplier") return;
+        document.querySelectorAll("#bdBody td.bd-op-cell .bd-op-btn").forEach(function (btn) {
+          btn.style.setProperty("display", "inline-block", "important");
+          btn.style.setProperty("visibility", "visible", "important");
+        });
+      }
+      function renderSupplierTable() {
+        var cols = [
+          "供应商编号",
+          "供应商名称",
+          "统一社会信用代码",
+          "联系人",
+          "联系方式",
+          "地址",
+          "合作状态",
+          "备注",
+          "操作"
+        ];
+        headEl.innerHTML =
+          "<tr>" +
+          cols
+            .map(function (x) {
+              if (x === "操作") return '<th class="bd-op-th">' + x + "</th>";
+              return "<th>" + x + "</th>";
+            })
+            .join("") +
+          "</tr>";
+        var start = (page - 1) * pageSize;
+        var list = supplierFiltered.slice(start, start + pageSize);
+        bodyEl.innerHTML = list.map(function (r) {
+          var realIdx = supplierRecords.findIndex(function (x) { return x.id === r.id; });
+          var stCls = supplierCoopClass(r.status);
+          var checked = r.status === "正常合作";
+          var coopText = checked ? "正常合作" : "暂停合作";
+          var coopUi =
+            '<div class="bd-pc-switch">' +
+            '<label><input type="checkbox" data-sup-coop-switch="1" data-sup-idx="' + realIdx + '"' + (checked ? " checked" : "") + ' /><span class="bd-pc-switch-ui"></span></label>' +
+            '<span class="bd-pc-switch-text">' + coopText + "</span>" +
+            "</div>";
+          return "<tr data-idx=\"" + realIdx + "\">" +
+            "<td>" + escHtml(r.code) + "</td>" +
+            "<td>" + escHtml(r.name) + "</td>" +
+            "<td>" + escHtml(r.uscc) + "</td>" +
+            "<td>" + escHtml(r.contact) + "</td>" +
+            "<td>" + escHtml(r.phone) + "</td>" +
+            "<td>" + escHtml(r.address) + "</td>" +
+            "<td>" + coopUi + "</td>" +
+            "<td>" + escHtml(r.remark) + "</td>" +
+            '<td class="bd-op-cell"><div class="bd-op-actions">' +
+            '<button type="button" class="bd-op-btn" data-sup-view="1" data-sup-id="' + escHtml(r.id) + '">查看</button>' +
+            '<button type="button" class="bd-op-btn" data-sup-edit="1" data-sup-id="' + escHtml(r.id) + '">编辑</button>' +
+            '<button type="button" class="bd-op-btn bd-op-btn--del" data-sup-del="1" data-sup-id="' + escHtml(r.id) + '">删除</button>' +
+            "</div></td></tr>";
+        }).join("");
+        totalEl.textContent = "共 " + supplierFiltered.length + " 条";
+        var maxPage = Math.max(1, Math.ceil(supplierFiltered.length / pageSize));
+        if (page > maxPage) page = maxPage;
+        document.getElementById("pageCurrent").textContent = String(page);
+        restoreSupplierOpButtons();
+        setTimeout(restoreSupplierOpButtons, 0);
+        setTimeout(restoreSupplierOpButtons, 150);
+        setTimeout(restoreSupplierOpButtons, 350);
+      }
+      if (!bodyEl.__bdSupOpGuard) {
+        bodyEl.__bdSupOpGuard = new MutationObserver(function () {
+          if (tabKey === "supplier") restoreSupplierOpButtons();
+        });
+        bodyEl.__bdSupOpGuard.observe(bodyEl, {
+          childList: true,
+          subtree: true,
+          attributes: true,
+          attributeFilter: ["style", "class"]
+        });
+      }
+      function openSupplierDetailModal(rec) {
+        var infoItem = function (label, valueHtml) {
+          return '<div class="bd-sup-info-item"><span class="k">' + escHtml(label) + '：</span><span class="v">' + valueHtml + "</span></div>";
+        };
+        var stCls = supplierCoopClass(rec.status);
+        var checked = rec.status === "正常合作";
+        var coopText = checked ? "正常合作" : "暂停合作";
+        var coopUi =
+          '<div class="bd-pc-switch">' +
+          '<label><input type="checkbox"' + (checked ? " checked" : "") + ' disabled /><span class="bd-pc-switch-ui"></span></label>' +
+          '<span class="bd-pc-switch-text">' + coopText + "</span>" +
+          "</div>";
+        document.getElementById("bdSupplierModalTitle").textContent = "供应商数据详情";
+        document.getElementById("bdSupplierModalBd").innerHTML =
+          '<section class="bd-sup-section"><h3 class="bd-sup-section-hd">基础信息</h3><div class="bd-sup-info-grid">' +
+          infoItem("供应商编号", escHtml(rec.code)) +
+          infoItem("供应商名称", "<strong>" + escHtml(rec.name) + "</strong>") +
+          infoItem("统一社会信用代码", escHtml(rec.uscc)) +
+          infoItem("联系人", escHtml(rec.contact)) +
+          infoItem("联系方式", escHtml(rec.phone)) +
+          infoItem("地址", escHtml(rec.address)) +
+          infoItem("合作状态", coopUi) +
+          infoItem("备注", escHtml(rec.remark)) +
+          "</div></section>";
+        var mask = document.getElementById("bdSupplierModalMask");
+        mask.classList.add("show");
+        mask.setAttribute("aria-hidden", "false");
+      }
+      function closeSupplierDetailModal() {
+        var mask = document.getElementById("bdSupplierModalMask");
+        mask.classList.remove("show");
+        mask.setAttribute("aria-hidden", "true");
+      }
+      function renderSupplierPage() {
+        if (bdProductCatalog) {
+          bdProductCatalog.classList.remove("is-show");
+          bdProductCatalog.setAttribute("aria-hidden", "true");
+          bdProductCatalog.style.display = "none";
+        }
+        if (bdDefaultView) bdDefaultView.style.display = "";
+        var bdView = document.getElementById("bdDefaultView");
+        if (bdView) bdView.classList.add("bd-supplier-view");
+        kpiEl.innerHTML = "";
+        kpiEl.style.display = "none";
+        // 供应商列表：仅顶部「新增」；编辑/删除在行操作列
+        var btnAdd = document.getElementById("btnAdd");
+        if (btnAdd) btnAdd.style.display = "";
+        ["btnEdit", "btnDelete"].forEach(function (id) {
+          var btn = document.getElementById(id);
+          if (btn) btn.style.display = "none";
+        });
+        ["btnView", "btnExport", "btnDownloadTemplate", "btnImport"].forEach(function (id) {
+          var btn = document.getElementById(id);
+          if (btn) btn.style.display = "none";
+        });
+        var toolbar = document.querySelector(".bd-toolbar");
+        if (toolbar) toolbar.style.display = "";
+        var btnSearch = document.getElementById("btnSearch");
+        var btnReset = document.getElementById("btnReset");
+        if (btnSearch) btnSearch.style.display = "none";
+        if (btnReset) btnReset.style.display = "none";
+        if (bdFilterActions) bdFilterActions.style.display = "flex";
+        var crumb = document.querySelector(".subpage-breadcrumb");
+        if (crumb) {
+          var segs = crumb.querySelectorAll("a, span:not(.sep)");
+          if (segs.length) segs[segs.length - 1].textContent = "供应商数据";
+        }
+        var pageTitle = document.querySelector(".carrier-page-title");
+        if (pageTitle) pageTitle.textContent = "供应商数据";
+        renderSupplierFilters();
+        applySupplierFilter();
+        renderSupplierTable();
+      }
+      function applyManufacturerFilter() {
+        var f = manufacturerFilterState;
+        var codeKw = (f[0] || "").trim();
+        var contactKw = (f[1] || "").trim();
+        manufacturerFiltered = manufacturerRecords.filter(function (r) {
+          if (codeKw && r.code.indexOf(codeKw) < 0) return false;
+          if (contactKw && r.contact.indexOf(contactKw) < 0) return false;
+          return true;
+        });
+      }
+      function renderManufacturerFilters() {
+        var f = manufacturerFilterState;
+        var wrap = filtersEl.parentElement;
+        if (wrap) wrap.classList.add("bd-filters--supplier");
+        filtersEl.innerHTML =
+          '<input placeholder="制造商编号" data-mfr-idx="0" value="' + escHtml(f[0]) + '">';
+        var contactEl = document.getElementById("bdSupplierContact");
+        if (contactEl) {
+          contactEl.value = String(f[1] || "");
+          contactEl.placeholder = "联系人";
+          contactEl.setAttribute("data-mfr-idx", "1");
+          contactEl.removeAttribute("data-sup-idx");
+        }
+      }
+      function readManufacturerFilterFromDom() {
+        var allEls = Array.prototype.slice.call(filtersEl.querySelectorAll("[data-mfr-idx]")).concat(
+          Array.prototype.slice.call(bdFilterActions.querySelectorAll("[data-mfr-idx]"))
+        );
+        allEls.forEach(function (el) {
+          var i = Number(el.getAttribute("data-mfr-idx"));
+          manufacturerFilterState[i] = el.value || "";
+        });
+      }
+      function restoreManufacturerOpButtons() {
+        if (tabKey !== "manufacturer") return;
+        document.querySelectorAll("#bdBody td.bd-op-cell .bd-op-btn").forEach(function (btn) {
+          btn.style.setProperty("display", "inline-block", "important");
+          btn.style.setProperty("visibility", "visible", "important");
+        });
+      }
+      function renderManufacturerTable() {
+        var cols = [
+          "制造商编号",
+          "制造商名称",
+          "来源",
+          "备注",
+          "操作"
+        ];
+        headEl.innerHTML =
+          "<tr>" +
+          cols
+            .map(function (x) {
+              if (x === "操作") return '<th class="bd-op-th">' + x + "</th>";
+              return "<th>" + x + "</th>";
+            })
+            .join("") +
+          "</tr>";
+        var start = (page - 1) * pageSize;
+        var list = manufacturerFiltered.slice(start, start + pageSize);
+        bodyEl.innerHTML = list
+          .map(function (r) {
+            var realIdx = manufacturerRecords.findIndex(function (x) {
+              return x.id === r.id;
+            });
+            return (
+              '<tr data-idx="' +
+              realIdx +
+              '">' +
+              "<td>" +
+              escHtml(r.code) +
+              "</td><td>" +
+              escHtml(r.name) +
+              "</td><td>" +
+              escHtml(r.source) +
+              "</td><td>" +
+              escHtml(r.remark) +
+              "</td>" +
+              '<td class="bd-op-cell"><div class="bd-op-actions">' +
+              '<button type="button" class="bd-op-btn" data-mfr-view="1" data-mfr-id="' +
+              escHtml(r.id) +
+              '">查看</button>' +
+              '<button type="button" class="bd-op-btn" data-mfr-edit="1" data-mfr-id="' +
+              escHtml(r.id) +
+              '">编辑</button>' +
+              '<button type="button" class="bd-op-btn bd-op-btn--del" data-mfr-del="1" data-mfr-id="' +
+              escHtml(r.id) +
+              '">删除</button>' +
+              "</div></td></tr>"
+            );
+          })
+          .join("");
+        totalEl.textContent = "共 " + manufacturerFiltered.length + " 条";
+        var maxPage = Math.max(1, Math.ceil(manufacturerFiltered.length / pageSize));
+        if (page > maxPage) page = maxPage;
+        document.getElementById("pageCurrent").textContent = String(page);
+        restoreManufacturerOpButtons();
+        setTimeout(restoreManufacturerOpButtons, 0);
+        setTimeout(restoreManufacturerOpButtons, 150);
+      }
+      function openManufacturerDetailModal(rec) {
+        var infoItem = function (label, valueHtml) {
+          return '<div class="bd-sup-info-item"><span class="k">' + escHtml(label) + '：</span><span class="v">' + valueHtml + "</span></div>";
+        };
+        document.getElementById("bdSupplierModalTitle").textContent = "制造商数据详情";
+        document.getElementById("bdSupplierModalBd").innerHTML =
+          '<section class="bd-sup-section"><h3 class="bd-sup-section-hd">基础信息</h3><div class="bd-sup-info-grid">' +
+          infoItem("制造商编号", escHtml(rec.code)) +
+          infoItem("制造商名称", "<strong>" + escHtml(rec.name) + "</strong>") +
+          infoItem("来源", escHtml(rec.source)) +
+          infoItem("备注", escHtml(rec.remark)) +
+          "</div></section>";
+        var mask = document.getElementById("bdSupplierModalMask");
+        mask.classList.add("show");
+        mask.setAttribute("aria-hidden", "false");
+      }
+      function renderManufacturerPage() {
+        if (bdDefaultView) bdDefaultView.style.display = "";
+        var bdView = document.getElementById("bdDefaultView");
+        if (bdView) bdView.classList.add("bd-supplier-view");
+        kpiEl.innerHTML = "";
+        kpiEl.style.display = "none";
+        var btnAdd = document.getElementById("btnAdd");
+        if (btnAdd) btnAdd.style.display = "";
+        ["btnEdit", "btnDelete"].forEach(function (id) {
+          var btn = document.getElementById(id);
+          if (btn) btn.style.display = "none";
+        });
+        ["btnView", "btnExport", "btnDownloadTemplate", "btnImport"].forEach(function (id) {
+          var btn = document.getElementById(id);
+          if (btn) btn.style.display = "none";
+        });
+        var toolbar = document.querySelector(".bd-toolbar");
+        if (toolbar) toolbar.style.display = "";
+        var btnSearch = document.getElementById("btnSearch");
+        var btnReset = document.getElementById("btnReset");
+        if (btnSearch) btnSearch.style.display = "none";
+        if (btnReset) btnReset.style.display = "none";
+        if (bdFilterActions) bdFilterActions.style.display = "flex";
+        var crumb = document.querySelector(".subpage-breadcrumb");
+        if (crumb) {
+          var segs = crumb.querySelectorAll("a, span:not(.sep)");
+          if (segs.length) segs[segs.length - 1].textContent = "制造商数据";
+        }
+        var pageTitle = document.querySelector(".carrier-page-title");
+        if (pageTitle) pageTitle.textContent = "制造商数据";
+        renderManufacturerFilters();
+        applyManufacturerFilter();
+        renderManufacturerTable();
+      }
+      function render() {
+        renderTabs();
+        var isProduct = tabKey === "product";
+        bdProductCatalog.classList.toggle("is-show", isProduct);
+        bdProductCatalog.setAttribute("aria-hidden", isProduct ? "false" : "true");
+        bdProductCatalog.style.display = isProduct ? "" : "none";
+        bdDefaultView.style.display = isProduct ? "none" : "";
+        var bdViewEl = document.getElementById("bdDefaultView");
+        if (bdViewEl) bdViewEl.classList.remove("bd-supplier-view");
+        if (isProduct) {
+          if (filtersEl.parentElement) filtersEl.parentElement.classList.remove("bd-filters--supplier");
+          if (bdFilterActions) bdFilterActions.style.display = "none";
+          kpiEl.innerHTML = "";
+          kpiEl.style.display = "none";
+          var toolbarP = document.querySelector(".bd-toolbar");
+          if (toolbarP) toolbarP.style.display = "none";
+          ["btnAdd", "btnEdit", "btnView", "btnDelete", "btnExport", "btnDownloadTemplate", "btnImport", "btnSearch", "btnReset"].forEach(function (id) {
+            var btn = document.getElementById(id);
+            if (btn) btn.style.display = "none";
+          });
+          var pageTitleP = document.querySelector(".carrier-page-title");
+          if (pageTitleP) pageTitleP.textContent = "物资类型";
+          if (!pcInited) { pcInitProductCatalog(); pcInited = true; }
+          pcRenderTree();
+          pcApplyForm();
+          return;
+        }
+        var isSupplier = tabKey === "supplier";
+        if (isSupplier) {
+          renderSupplierPage();
+          return;
+        }
+        var isManufacturer = tabKey === "manufacturer";
+        if (isManufacturer) {
+          renderManufacturerPage();
+          return;
+        }
+        if (filtersEl.parentElement) filtersEl.parentElement.classList.remove("bd-filters--supplier");
+        if (bdFilterActions) bdFilterActions.style.display = "none";
+        var toolbarG = document.querySelector(".bd-toolbar");
+        if (toolbarG) toolbarG.style.display = "";
+        var btnSearchG = document.getElementById("btnSearch");
+        var btnResetG = document.getElementById("btnReset");
+        if (btnSearchG) btnSearchG.style.display = "";
+        if (btnResetG) btnResetG.style.display = "";
+        ["btnAdd", "btnEdit", "btnView", "btnDelete", "btnExport", "btnDownloadTemplate", "btnImport"].forEach(function (id) {
+          var btn = document.getElementById(id);
+          if (btn) btn.style.display = "";
+        });
+        var c = getByKey(tabKey);
+        var pageTitleG = document.querySelector(".carrier-page-title");
+        if (pageTitleG) pageTitleG.textContent = "物资类型";
+        kpiEl.style.display = "grid";
+        kpiEl.innerHTML = c.kpis.map(function (x) { return '<div class="bd-kpi"><div class="k">' + x[0] + '</div><div class="v">' + x[1] + "</div></div>"; }).join("");
+        filtersEl.innerHTML = c.filters.map(function (x, idx) {
+          return idx % 2 === 0 ? '<input placeholder="' + x + '">' : "<select>" + option(x) + option("全部") + "</select>";
+        }).join("");
+        var controls = Array.prototype.slice.call(filtersEl.querySelectorAll("input,select"));
+        var saved = filterStateByTab[tabKey] || [];
+        controls.forEach(function (ctrl, i) {
+          ctrl.value = saved[i] || "";
+        });
+        applyFilter(c);
+        headEl.innerHTML = "<tr>" + c.cols.map(function (x) { return "<th>" + x + "</th>"; }).join("") + "</tr>";
+        var start = (page - 1) * pageSize;
+        var list = filteredRows.slice(start, start + pageSize);
+        bodyEl.innerHTML = list.map(function (r, i) {
+          var realIndex = start + i;
+          return '<tr data-idx="'+realIndex+'">' + r.map(function (td, tdIdx) {
+            if (tdIdx === r.length - 1) return '<td><a href="#" class="bd-op-link" data-act="view">查看</a><a href="#" class="bd-op-link" data-act="edit">编辑</a><a href="#" class="bd-op-link" data-act="del">删除</a></td>';
+            return "<td>" + td + "</td>";
+          }).join("") + "</tr>";
+        }).join("");
+        totalEl.textContent = "共 " + filteredRows.length + " 条";
+        document.getElementById("pageCurrent").textContent = String(page);
+      }
+      var qs = new URLSearchParams(window.location.search);
+      var qsTab = (qs.get("tab") || "").trim();
+      if (qsTab === "supplier" || qsTab === "manufacturer" || (qsTab && tabs.some(function (x) { return x.key === qsTab; }))) {
+        tabKey = qsTab;
+      }
+      if (bdTabsEl) {
+        bdTabsEl.addEventListener("click", function (e) {
+          var btn = e.target.closest("[data-tab]");
+          if (!btn) return;
+          var next = btn.getAttribute("data-tab");
+          if (!next || next === tabKey) return;
+          tabKey = next;
+          page = 1;
+          selectedIndex = -1;
+          render();
+        });
+      }
+      document.getElementById("btnSearchSupplier").addEventListener("click", function () {
+        if (tabKey === "manufacturer") {
+          readManufacturerFilterFromDom();
+          page = 1;
+          applyManufacturerFilter();
+          renderManufacturerTable();
+          toast("已按条件搜索（演示）");
+          return;
+        }
+        readSupplierFilterFromDom();
+        page = 1;
+        applySupplierFilter();
+        renderSupplierTable();
+        toast("已按条件搜索（演示）");
+      });
+      document.getElementById("btnResetSupplier").addEventListener("click", function () {
+        if (tabKey === "manufacturer") {
+          manufacturerFilterState = ["", "", ""];
+          page = 1;
+          renderManufacturerPage();
+          toast("筛选已重置（演示）");
+          return;
+        }
+        supplierFilterState = ["", "", ""];
+        page = 1;
+        renderSupplierPage();
+        toast("筛选已重置（演示）");
+      });
+      document.getElementById("bdSupplierModalClose").addEventListener("click", closeSupplierDetailModal);
+      document.getElementById("bdSupplierModalFooterClose").addEventListener("click", closeSupplierDetailModal);
+      document.getElementById("bdSupplierModalMask").addEventListener("click", function (e) {
+        if (e.target.id === "bdSupplierModalMask") closeSupplierDetailModal();
+      });
+      document.getElementById("btnSearch").addEventListener("click", function(){
+        if (tabKey === "supplier" || tabKey === "manufacturer") return;
+        filterStateByTab[tabKey] = Array.prototype.slice.call(filtersEl.querySelectorAll("input,select")).map(function(x){ return x.value || ""; });
+        page = 1;
+        render();
+        toast("已按条件搜索（演示）");
+      });
+      document.getElementById("btnReset").addEventListener("click", function(){
+        if (tabKey === "supplier" || tabKey === "manufacturer") return;
+        filterStateByTab[tabKey] = []; page = 1; render(); toast("筛选已重置（演示）");
+      });
+      document.getElementById("btnExport").addEventListener("click", function(){ toast("已导出Excel（演示）"); });
+      document.getElementById("btnDownloadTemplate").addEventListener("click", function(){ toast("已下载导入模板（演示）"); });
+      document.getElementById("btnImport").addEventListener("click", function(){ toast("请选择文件导入（演示）"); });
+      document.getElementById("btnAdd").addEventListener("click", function(){ openModal("add"); });
+      document.getElementById("btnView").addEventListener("click", function(){ if(selectedIndex<0){toast("请先选择一行");return;} openModal("view"); });
+      document.getElementById("btnEdit").addEventListener("click", function(){ if(selectedIndex<0){toast("请先选择一行");return;} openModal("edit"); });
+      document.getElementById("btnDelete").addEventListener("click", function(){
+        if(selectedIndex<0){toast("请先选择一行");return;}
+        if (tabKey === "supplier") {
+          if (window.confirm("确认删除当前记录？")) {
+            supplierRecords.splice(selectedIndex, 1);
+            saveSupplierRecords();
+            selectedIndex = -1;
+            render();
+            toast("删除成功（演示）");
+          }
+          return;
+        }
+        if (tabKey === "manufacturer") {
+          if (window.confirm("确认删除当前记录？")) {
+            manufacturerRecords.splice(selectedIndex, 1);
+            saveManufacturerRecords();
+            selectedIndex = -1;
+            render();
+            toast("删除成功（演示）");
+          }
+          return;
+        }
+        if (window.confirm("确认删除当前记录？")) {
+          getByKey(tabKey).rows.splice(selectedIndex,1);
+          selectedIndex = -1;
+          render();
+          toast("删除成功（演示）");
+        }
+      });
+      bodyEl.addEventListener("change", function (e) {
+        if (tabKey === "manufacturer") {
+          var ipM = e.target && e.target.matches ? e.target : null;
+          if (!ipM || !ipM.matches("input[data-mfr-coop-switch]")) return;
+          var idxM = Number(ipM.getAttribute("data-mfr-idx"));
+          if (Number.isNaN(idxM) || !manufacturerRecords[idxM]) return;
+          manufacturerRecords[idxM].status = ipM.checked ? "正常合作" : "暂停合作";
+          saveManufacturerRecords();
+          renderManufacturerTable();
+          return;
+        }
+        if (tabKey !== "supplier") return;
+        var ip = e.target && e.target.matches ? e.target : null;
+        if (!ip || !ip.matches("input[data-sup-coop-switch]")) return;
+        var idx = Number(ip.getAttribute("data-sup-idx"));
+        if (Number.isNaN(idx) || !supplierRecords[idx]) return;
+        supplierRecords[idx].status = ip.checked ? "正常合作" : "暂停合作";
+        saveSupplierRecords();
+        renderSupplierTable();
+      });
+      bodyEl.addEventListener("click", function(e){
+        if (tabKey === "manufacturer") {
+          var viewM = e.target.closest("[data-mfr-view]");
+          if (viewM) {
+            e.preventDefault();
+            var mid = viewM.getAttribute("data-mfr-id");
+            var recM = manufacturerRecords.find(function (x) { return x.id === mid; });
+            if (recM) openManufacturerDetailModal(recM);
+            return;
+          }
+          var editM = e.target.closest("[data-mfr-edit]");
+          if (editM) {
+            e.preventDefault();
+            var midE = editM.getAttribute("data-mfr-id");
+            selectedIndex = manufacturerRecords.findIndex(function (x) { return x.id === midE; });
+            if (selectedIndex >= 0) openModal("edit");
+            return;
+          }
+          var delM = e.target.closest("[data-mfr-del]");
+          if (delM) {
+            e.preventDefault();
+            var midD = delM.getAttribute("data-mfr-id");
+            selectedIndex = manufacturerRecords.findIndex(function (x) { return x.id === midD; });
+            if (selectedIndex < 0) return;
+            if (window.confirm("确认删除该制造商？")) {
+              manufacturerRecords.splice(selectedIndex, 1);
+              saveManufacturerRecords();
+              selectedIndex = -1;
+              render();
+              toast("删除成功（演示）");
+            }
+            return;
+          }
+          return;
+        }
+        if (tabKey === "supplier") {
+          var viewLink = e.target.closest("[data-sup-view]");
+          if (viewLink) {
+            e.preventDefault();
+            var sid = viewLink.getAttribute("data-sup-id");
+            var rec = supplierRecords.find(function (x) { return x.id === sid; });
+            if (rec) openSupplierDetailModal(rec);
+            return;
+          }
+          var editLink = e.target.closest("[data-sup-edit]");
+          if (editLink) {
+            e.preventDefault();
+            var sidE = editLink.getAttribute("data-sup-id");
+            selectedIndex = supplierRecords.findIndex(function (x) { return x.id === sidE; });
+            if (selectedIndex >= 0) openModal("edit");
+            return;
+          }
+          var delLink = e.target.closest("[data-sup-del]");
+          if (delLink) {
+            e.preventDefault();
+            var sidD = delLink.getAttribute("data-sup-id");
+            selectedIndex = supplierRecords.findIndex(function (x) { return x.id === sidD; });
+            if (selectedIndex < 0) return;
+            if (window.confirm("确认删除该供应商？")) {
+              supplierRecords.splice(selectedIndex, 1);
+              saveSupplierRecords();
+              selectedIndex = -1;
+              render();
+              toast("删除成功（演示）");
+            }
+            return;
+          }
+          return;
+        }
+        var tr = e.target.closest("tr[data-idx]");
+        if (tr) selectedIndex = Number(tr.getAttribute("data-idx"));
+        var act = e.target.getAttribute("data-act");
+        if (!act) return;
+        e.preventDefault();
+        if (act === "view") openModal("view");
+        if (act === "edit") openModal("edit");
+        if (act === "del") {
+          if (window.confirm("确认删除该记录？")) {
+            getByKey(tabKey).rows.splice(selectedIndex,1);
+            selectedIndex = -1;
+            render();
+            toast("删除成功（演示）");
+          }
+        }
+      });
+      document.getElementById("pagePrev").addEventListener("click", function(){
+        if (page > 1) {
+          page--;
+          if (tabKey === "supplier") renderSupplierTable();
+          else if (tabKey === "manufacturer") renderManufacturerTable();
+          else render();
+        }
+      });
+      document.getElementById("pageNext").addEventListener("click", function(){
+        var total = tabKey === "supplier" ? supplierFiltered.length : tabKey === "manufacturer" ? manufacturerFiltered.length : filteredRows.length;
+        var maxPage = Math.max(1, Math.ceil(total / pageSize));
+        if (page < maxPage) {
+          page++;
+          if (tabKey === "supplier") renderSupplierTable();
+          else if (tabKey === "manufacturer") renderManufacturerTable();
+          else render();
+        }
+      });
+      document.getElementById("bdModalClose").addEventListener("click", function(){ modalMask.classList.remove("show"); });
+      modalCancel.addEventListener("click", function(){ modalMask.classList.remove("show"); });
+      modalMask.addEventListener("click", function(e){ if(e.target===modalMask) modalMask.classList.remove("show"); });
+      render();
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
+<title>公司资产 - 新能源物资供应链管理系统</title>
+<link href="css/vendor/fa-all.min.css" rel="stylesheet"/>
+<link href="css/subpage-toolbar.css" rel="stylesheet"/>
+<link href="css/subpage-base.css" rel="stylesheet"/>
+<link href="css/source-navbar-header.css" rel="stylesheet"/>
+<link href="css/asset-pages.css" rel="stylesheet"/>
+<link href="css/modal-system.css" rel="stylesheet"/>
+</head>
+<body class="page-source-navbar page-subpage page-assets">
+<div aria-hidden="true" class="page-bg"></div>
+<div class="app">
+<header class="header">
+<div class="header-left">
+<button aria-label="菜单" class="header-hamburger" title="菜单" type="button">
+<svg aria-hidden="true" viewbox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"></path></svg>
+</button>
+<a aria-label="国家能源集团" class="header-logo" href="#">
+<img alt="国家能源集团 CHN ENERGY" height="40" src="assets/logo-chenergy.png" width="220"/>
+</a>
+<div class="header-source-brand"><p>新能源供应链管理系统</p></div>
+</div>
+<div class="header-right">
+<span class="clock" id="clock"></span>
+<div class="user-avatar" title="用户">用</div>
+</div>
+</header>
+<div class="layout">
+<aside aria-label="主导航" class="sidebar">
+<div class="nav-item nav-item--module-active" title="我的资产">
+<span class="nav-label">我的资产</span>
+</div>
+<div class="nav-item" title="我的任务">
+<span aria-hidden="true" class="nav-icon"><svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M9 2h6a1 1 0 0 1 1 1v1H8V3a1 1 0 0 1 1-1z"></path><rect height="17" rx="1.5" width="14" x="5" y="5"></rect><path d="M8 9h8M8 12.5h8M8 16h6"></path></svg></span>
+<span class="nav-label">我的任务</span>
+</div>
+<a class="nav-item" href="index-portal-screen-alt.html" title="首页">
+<span aria-hidden="true" class="nav-icon"><svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M3 10.5L12 3l9 7.5V20a1.5 1.5 0 0 1-1.5 1.5H15v-7H9v7H4.5A1.5 1.5 0 0 1 3 20v-9.5z"></path></svg></span>
+<span class="nav-label">首页</span>
+</a>
+<div class="nav-item" data-nav="cockpit" title="驾驶舱">
+<span aria-hidden="true" class="nav-icon"><svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><rect height="7.5" rx="1" width="7.5" x="3" y="3"></rect><rect height="7.5" rx="1" width="7.5" x="13.5" y="3"></rect><rect height="7.5" rx="1" width="7.5" x="3" y="13.5"></rect><rect height="7.5" rx="1" width="7.5" x="13.5" y="13.5"></rect></svg></span>
+<span class="nav-label">驾驶舱</span>
+</div>
+<div class="nav-item" title="采购管理">
+<span aria-hidden="true" class="nav-icon"><svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M6 6h14l-1.2 9H7.2L6 6z"></path><path d="M6 6V5a1 1 0 0 1 1-1h2"></path><circle cx="9" cy="20" r="1.25"></circle><circle cx="17" cy="20" r="1.25"></circle></svg></span>
+<span class="nav-label">采购管理</span>
+</div>
+<a class="nav-item" href="carrier-management.html" title="物流管理">
+<span aria-hidden="true" class="nav-icon"><svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M1 16h11.5V8.5H5V7h11.5v5h2.5l3.5 4.5"></path><circle cx="6.5" cy="17.5" r="1.75"></circle><circle cx="16.5" cy="17.5" r="1.75"></circle></svg></span>
+<span class="nav-label">物流管理</span>
+</a>
+<div class="nav-item" data-nav="warehouse" id="navWarehouse" title="仓储管理">
+<span aria-hidden="true" class="nav-icon"><svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M3 21h18V10.5L12 6 3 10.5V21z"></path><path d="M9 21v-7h6v7"></path></svg></span>
+<span class="nav-label">仓储管理</span>
+</div>
+<div class="nav-item" title="物资采购">
+<span aria-hidden="true" class="nav-icon"><svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M4 6a2 2 0 0 1 2-2h6v16H6a2 2 0 0 1-2-2V6z"></path><path d="M20 6a2 2 0 0 0-2-2h-6v16h6a2 2 0 0 0 2-2V6z"></path><path d="M12 4v16"></path><path d="M7 9h3M7 12.5h3M7 16h2M14 9h3M14 12.5h3M14 16h2"></path></svg></span>
+<span class="nav-label">物资采购</span>
+</div>
+<div class="nav-item" title="物资出库与处置">
+<span aria-hidden="true" class="nav-icon"><svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M21 12a9 9 0 0 0-9-9 9.5 9.5 0 0 0-7 3"></path><path d="M3 3v5h5"></path><path d="M3 12a9 9 0 0 0 9 9 9.5 9.5 0 0 0 7-3"></path><path d="M16 16h5v5"></path></svg></span>
+<span class="nav-label">物资出库与处置</span>
+</div>
+<div class="nav-item" title="绩效考核">
+<span aria-hidden="true" class="nav-icon"><svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><rect height="18" rx="1.5" width="12" x="6" y="3"></rect><path d="M9 8h6M9 12h6M9 16h5"></path></svg></span>
+<span class="nav-label">绩效考核</span>
+</div>
+<div class="nav-item" title="公告管理">
+<span aria-hidden="true" class="nav-icon"><svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M4 6h12a2 2 0 0 1 2 2v10H6a2 2 0 0 0-2 2v2"></path><path d="M4 6V5a1 1 0 0 1 1-1h2"></path><path d="M8 10h8M8 14h6"></path></svg></span>
+<span class="nav-label">公告管理</span>
+</div>
+<div class="nav-item" title="综合业务管理">
+<span aria-hidden="true" class="nav-icon"><svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><rect height="8" rx="1" width="8" x="2" y="2"></rect><rect height="8" rx="1" width="8" x="14" y="2"></rect><rect height="8" rx="1" width="8" x="2" y="14"></rect><rect height="8" rx="1" width="8" x="14" y="14"></rect></svg></span>
+<span class="nav-label">综合业务管理</span>
+</div>
+<div class="nav-item" title="数据管理">
+<span aria-hidden="true" class="nav-icon"><svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><ellipse cx="12" cy="5" rx="9" ry="2.5"></ellipse><path d="M3 5v6c0 1.6 4 3 9 3s9-1.4 9-3V5"></path><path d="M3 11v6c0 1.6 4 3 9 3s9-1.4 9-3V11"></path><path d="M3 17v2c0 1.6 4 3 9 3s9-1.4 9-3v-2"></path></svg></span>
+<span class="nav-label">数据管理</span>
+</div>
+<div class="nav-item" title="开发工具">
+<span aria-hidden="true" class="nav-icon"><svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M16 18l6-6-6-6"></path><path d="M8 6 2 12l6 6"></path></svg></span>
+<span class="nav-label">开发工具</span>
+</div>
+<div class="nav-item" title="设置">
+<span aria-hidden="true" class="nav-icon"><svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="3"></circle><path d="M12 1v2.5M12 20.5V23M4.2 4.2l1.8 1.8M18 18l1.8 1.8M1 12h2.5M20.5 12H23M4.2 19.8 6 18M18 6l1.8-1.8"></path></svg></span>
+<span class="nav-label">设置</span>
+</div>
+<div class="nav-item" title="系统管理">
+<span aria-hidden="true" class="nav-icon"><svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="9" r="3.5"></circle><path d="M5 20.5v-1a7 7 0 0 1 14 0v1"></path></svg></span>
+<span class="nav-label">系统管理</span>
+</div>
+</aside>
+<main class="main-scroll">
+<div class="asset-page-head">
+<h1 class="asset-page-title">公司资产</h1>
+</div>
+<div class="asset-inner">
+<div aria-label="公司资产概览" class="asset-info-bar asset-info-bar--company" role="region">
+<span><em>资产总数</em> 1,256</span>
+<span><em>资产总值</em> ¥ 8,965,200.00</span>
+<span><em>净值合计</em> ¥ 6,234,800.00</span>
+</div>
+<div class="asset-panel">
+<div class="asset-filter-grid">
+<div class="wh-field"><label for="ac-code">资产编号</label><input id="ac-code" placeholder="请输入资产编号" type="text"/></div>
+<div class="wh-field"><label for="ac-unique">物资唯一码</label><input id="ac-unique" placeholder="请输入物资唯一码" type="text"/></div>
+<div class="wh-field"><label for="ac-name">资产名称</label><input id="ac-name" placeholder="请输入资产名称" type="text"/></div>
+<div class="wh-field"><label for="ac-type">物资类型名称</label><select id="ac-type"><option>全部类型</option><option>固定资产</option><option>存货</option><option>无形资产</option></select></div>
+<div class="wh-field"><label for="ac-user">使用人</label><input id="ac-user" placeholder="请输入使用人" type="text"/></div>
+<div class="wh-field"><label for="ac-loc">存放地点</label><input id="ac-loc" placeholder="请输入存放地点" type="text"/></div>
+</div>
+<div class="asset-action-row">
+<button class="asset-btn asset-btn--search-green" type="button">搜索</button>
+<button class="asset-btn asset-btn--reset" type="button">重置</button>
+<button class="asset-btn asset-btn--export" type="button">导入</button>
+<button class="asset-btn asset-btn--export-orange" type="button">导出</button>
+<button class="asset-btn asset-btn--export-orange" type="button">下载模版</button>
+</div>
+<div class="asset-table-wrap">
+<table class="wh-table">
+<thead>
+<tr><th>资产编号</th><th>物资唯一码</th><th>资产名称</th><th>规格型号</th><th>物资类型名称</th><th>使用人</th><th>存放地点</th><th>累计购置价值(元)</th><th>净值(元)</th><th>资本化日期</th><th style="width:90px">操作</th></tr>
+</thead>
+<tbody>
+<tr><td>20240022001</td><td>C00000003001</td><td>主变压器巡检仪</td><td>ZX-500A</td><td>固定资产</td><td>张三</td><td>华北运维中心库房</td><td>32,500.00</td><td>28,750.00</td><td>2024-03-15</td><td><a class="asset-op-btn asset-op-btn--green asset-op-view" href="#">查看</a></td></tr>
+<tr><td>20240022002</td><td>C00000003002</td><td>箱变综合测试仪</td><td>BX-PRO</td><td>固定资产</td><td>王五</td><td>张北场站库房</td><td>41,200.00</td><td>36,800.00</td><td>2024-04-10</td><td><a class="asset-op-btn asset-op-btn--green asset-op-view" href="#">查看</a></td></tr>
+<tr><td>20240022003</td><td>C00000003003</td><td>安全绳及防坠器套装</td><td>SAFE-R8</td><td>存货</td><td>赵六</td><td>酒泉备件库</td><td>2,400.00</td><td>2,050.00</td><td>2024-05-22</td><td><a class="asset-op-btn asset-op-btn--green asset-op-view" href="#">查看</a></td></tr>
+<tr><td>20230022201</td><td>C00000003004</td><td>电缆故障定位车单元</td><td>CFU-8K</td><td>固定资产</td><td>刘洋</td><td>南通仓储中心</td><td>88,000.00</td><td>72,300.00</td><td>2023-08-30</td><td><a class="asset-op-btn asset-op-btn--green asset-op-view" href="#">查看</a></td></tr>
+<tr><td>20210022089</td><td>C00000003005</td><td>退役风机主轴组件</td><td>SP-2MW</td><td>固定资产</td><td>陈静</td><td>退役资产暂存区</td><td>120,000.00</td><td>18,000.00</td><td>2021-06-12</td><td><a class="asset-op-btn asset-op-btn--green asset-op-view" href="#">查看</a></td></tr>
+<tr><td>20240022078</td><td>C00000003006</td><td>备品滤芯（箱）</td><td>FLT-X3</td><td>存货</td><td>周琪</td><td>粤西中心仓</td><td>5,600.00</td><td>5,100.00</td><td>2024-03-08</td><td><a class="asset-op-btn asset-op-btn--green asset-op-view" href="#">查看</a></td></tr>
+<tr><td>20240022033</td><td>C00000003007</td><td>继电保护校验仪</td><td>RPT-700</td><td>固定资产</td><td>马强</td><td>南京检修基地</td><td>27,800.00</td><td>25,400.00</td><td>2024-02-14</td><td><a class="asset-op-btn asset-op-btn--green asset-op-view" href="#">查看</a></td></tr>
+<tr><td>20200022044</td><td>C00000003008</td><td>退役箱变壳体</td><td>BX-OLD1</td><td>固定资产</td><td>孙磊</td><td>退役堆放场</td><td>65,000.00</td><td>9,800.00</td><td>2020-11-02</td><td><a class="asset-op-btn asset-op-btn--green asset-op-view" href="#">查看</a></td></tr>
+<tr><td>20230022256</td><td>C00000003009</td><td>应急照明及发电一体机</td><td>EMG-L200</td><td>存货</td><td>张三</td><td>承德场站</td><td>6,200.00</td><td>5,400.00</td><td>2023-12-01</td><td><a class="asset-op-btn asset-op-btn--green asset-op-view" href="#">查看</a></td></tr>
+<tr><td>20240022091</td><td>C00000003010</td><td>齿轮箱内窥检测系统</td><td>GB-INS3</td><td>固定资产</td><td>钱伟</td><td>盐城运维中心</td><td>52,000.00</td><td>48,600.00</td><td>2024-06-18</td><td><a class="asset-op-btn asset-op-btn--green asset-op-view" href="#">查看</a></td></tr>
+</tbody>
+</table>
+</div>
+<div class="wh-pagination">
+<span>共 1,256 条</span>
+<select aria-label="每页条数">
+<option>10条/页</option>
+<option>20条/页</option>
+</select>
+<div class="wh-page-btns">
+<button aria-label="上一页" type="button">&lt;</button>
+<button aria-current="page" class="is-current" type="button">1</button>
+<button type="button">2</button>
+<button type="button">3</button>
+<span>…</span>
+<button type="button">126</button>
+<button aria-label="下一页" type="button">&gt;</button>
+</div>
+<span class="wh-goto">前往 <input aria-label="页码" type="text" value="1"/> 页</span>
+</div>
+</div>
+</div>
+</main>
+</div>
+</div>
+<div aria-hidden="true" class="asset-modal-mask" id="scanModalMask">
+<div aria-labelledby="scanModalTitle" aria-modal="true" class="asset-modal" role="dialog">
+<div class="asset-modal__header">
+<h2 class="asset-modal__title" id="scanModalTitle">扫码盘点</h2>
+<button aria-label="关闭" class="asset-modal__close" id="btnCloseScanModal" type="button">×</button>
+</div>
+<div class="asset-modal__body">
+<p class="asset-scan-tip">在公司资产台账中扫码或输入编号，快速核对实物与账面信息（存放地点等），提交实盘结果。（演示环境支持手动输入或模拟扫码）</p>
+<div class="asset-scan-frame">
+<div aria-hidden="true" class="asset-scan-frame__icon">▣</div>
+<p class="asset-scan-frame__text">将条码/二维码对准采集框</p>
+<p class="asset-scan-frame__hint">移动端可调用摄像头；PC 端建议配合扫码枪或手动输入</p>
+</div>
+<div class="asset-scan-row">
+<label for="scanAssetCode">资产编号</label>
+<input autocomplete="off" id="scanAssetCode" placeholder="扫码自动填入，或手动输入如 GD-2024-056" type="text"/>
+</div>
+<div class="asset-scan-actions">
+<button class="asset-btn asset-btn--search-orange" id="btnScanSimulate" type="button">模拟扫码成功</button>
+<button class="asset-btn asset-btn--reset" id="btnScanCamera" type="button">调起摄像头（演示）</button>
+</div>
+<div aria-live="polite" class="asset-scan-result" id="scanResultPanel">
+<h4>台账信息</h4>
+<dl class="asset-scan-kv" id="scanResultKv"></dl>
+<div class="asset-scan-row">
+<label for="scanActualStatus">实盘状态</label>
+<select id="scanActualStatus">
+<option value="normal">账实相符 · 正常使用</option>
+<option value="idle">账实相符 · 闲置</option>
+<option value="move">存放地点变更</option>
+<option value="missing">盘亏 / 未找到实物</option>
+</select>
+</div>
+<div class="asset-scan-row" style="align-items:flex-start;">
+<label for="scanRemark">备注</label>
+<textarea id="scanRemark" placeholder="可填写现场照片编号、异常说明等"></textarea>
+</div>
+</div>
+</div>
+<div class="asset-modal__footer">
+<button class="asset-btn asset-btn--reset" id="btnScanCancel" type="button">关闭</button>
+<button class="asset-btn asset-btn--search-orange" disabled="" id="btnScanSubmit" type="button">确认盘点录入</button>
+</div>
+</div>
+</div>
+<div aria-hidden="true" class="asset-modal-mask" id="statsModalMask">
+<div aria-labelledby="statsModalTitle" aria-modal="true" class="asset-modal asset-modal--wide" role="dialog">
+<div class="asset-modal__header">
+<h2 class="asset-modal__title" id="statsModalTitle">统计分析 — 公司资产分布</h2>
+<button aria-label="关闭" class="asset-modal__close" id="btnCloseStatsModal" type="button">×</button>
+</div>
+<div class="asset-modal__body">
+<p class="asset-scan-tip" style="margin-top:0;">以下统计基于全公司台账汇总（演示数据，共 1,256 条），与列表筛选条件无关。</p>
+<div class="asset-stats-grid">
+<div class="asset-stats-card">
+<h3 class="asset-stats-card__title">状态分布</h3>
+<div class="stat-bar-row">
+<span class="stat-bar-label">正常使用</span>
+<div class="stat-bar-track"><div class="stat-bar-fill stat-bar-fill--g" style="width:100%"></div></div>
+<span class="stat-bar-num">942</span>
+</div>
+<div class="stat-bar-row">
+<span class="stat-bar-label">闲置</span>
+<div class="stat-bar-track"><div class="stat-bar-fill stat-bar-fill--o" style="width:10.6%"></div></div>
+<span class="stat-bar-num">100</span>
+</div>
+<div class="stat-bar-row">
+<span class="stat-bar-label">待交接</span>
+<div class="stat-bar-track"><div class="stat-bar-fill stat-bar-fill--b" style="width:2.7%"></div></div>
+<span class="stat-bar-num">25</span>
+</div>
+<div class="stat-bar-row">
+<span class="stat-bar-label">已退役</span>
+<div class="stat-bar-track"><div class="stat-bar-fill stat-bar-fill--p" style="width:20.1%"></div></div>
+<span class="stat-bar-num">189</span>
+</div>
+</div>
+<div class="asset-stats-card">
+<h3 class="asset-stats-card__title">使用人 TOP5</h3>
+<div class="stat-bar-row">
+<span class="stat-bar-label">张三</span>
+<div class="stat-bar-track"><div class="stat-bar-fill stat-bar-fill--b" style="width:100%"></div></div>
+<span class="stat-bar-num">156</span>
+</div>
+<div class="stat-bar-row">
+<span class="stat-bar-label">王五</span>
+<div class="stat-bar-track"><div class="stat-bar-fill stat-bar-fill--c" style="width:91%"></div></div>
+<span class="stat-bar-num">142</span>
+</div>
+<div class="stat-bar-row">
+<span class="stat-bar-label">赵六</span>
+<div class="stat-bar-track"><div class="stat-bar-fill stat-bar-fill--g" style="width:82.1%"></div></div>
+<span class="stat-bar-num">128</span>
+</div>
+<div class="stat-bar-row">
+<span class="stat-bar-label">刘洋</span>
+<div class="stat-bar-track"><div class="stat-bar-fill stat-bar-fill--o" style="width:73.7%"></div></div>
+<span class="stat-bar-num">115</span>
+</div>
+<div class="stat-bar-row">
+<span class="stat-bar-label">陈静</span>
+<div class="stat-bar-track"><div class="stat-bar-fill stat-bar-fill--m" style="width:62.8%"></div></div>
+<span class="stat-bar-num">98</span>
+</div>
+</div>
+<div class="asset-stats-card">
+<h3 class="asset-stats-card__title">类型分布</h3>
+<div class="stat-donut-wrap">
+<div aria-label="固定资产约六成八，领用物资约三成二" class="stat-donut stat-donut--type-company" role="img"></div>
+<ul class="stat-legend">
+<li><span class="stat-legend__dot" style="background:#52c41a"></span>固定资产 · 856 台/件（68%）</li>
+<li><span class="stat-legend__dot" style="background:#faad14"></span>领用物资 · 400 台/件（32%）</li>
+</ul>
+</div>
+</div>
+<div class="asset-stats-card">
+<h3 class="asset-stats-card__title">存放地点分布（TOP）</h3>
+<div class="stat-loc-bars">
+<div class="stat-loc-item">
+<div class="stat-loc-col" style="height:100px"><div class="stat-loc-fill" style="height:100%"></div></div>
+<span class="stat-loc-val">320</span>
+<span class="stat-loc-name">华北运维中心库房</span>
+</div>
+<div class="stat-loc-item">
+<div class="stat-loc-col" style="height:100px"><div class="stat-loc-fill" style="height:87.5%"></div></div>
+<span class="stat-loc-val">280</span>
+<span class="stat-loc-name">华东中心仓</span>
+</div>
+<div class="stat-loc-item">
+<div class="stat-loc-col" style="height:100px"><div class="stat-loc-fill" style="height:62%"></div></div>
+<span class="stat-loc-val">198</span>
+<span class="stat-loc-name">西北备件库</span>
+</div>
+<div class="stat-loc-item">
+<div class="stat-loc-col" style="height:100px"><div class="stat-loc-fill" style="height:52%"></div></div>
+<span class="stat-loc-val">165</span>
+<span class="stat-loc-name">华南中心仓</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="asset-modal__footer">
+<button class="asset-btn asset-btn--search-orange" id="btnStatsOk" type="button">知道了</button>
+</div>
+</div>
+</div>
+<div aria-hidden="true" class="asset-modal-mask" id="assetDetailMask">
+<div aria-labelledby="assetDetailTitle" aria-modal="true" class="asset-modal" role="dialog">
+<div class="asset-modal__header">
+<h2 class="asset-modal__title" id="assetDetailTitle">资产详情</h2>
+<button aria-label="关闭" class="asset-modal__close" id="btnCloseAssetDetail" type="button">×</button>
+</div>
+<div class="asset-modal__body" id="assetDetailBody"></div>
+<div class="asset-modal__footer">
+<button class="asset-btn asset-btn--reset" id="btnAssetDetailOk" type="button">关闭</button>
+</div>
+</div>
+</div>
+<script src="js/sidebar-actions.js"></script>
+<script src="js/subpage-feature-title.js"></script>
+<script src="js/site-footer.js"></script>
+<script src="js/subpage-clock.js"></script>
+<script>
+    (function () {
+      function normalizeAssetCompanyLatest() {
+        var info = document.querySelector(".asset-info-bar--company");
+        if (info) {
+          Array.prototype.forEach.call(info.querySelectorAll("span"), function (span) {
+            var txt = (span.textContent || "").replace(/\s+/g, "");
+            if (txt.indexOf("所属公司") >= 0 || txt.indexOf("部门总数") >= 0) {
+              span.parentNode.removeChild(span);
+            }
+          });
+        }
+        var filters = document.querySelector(".asset-filter-grid");
+        if (filters) {
+          filters.innerHTML =
+            '<div class="wh-field"><label for="ac-code">资产编号</label><input id="ac-code" placeholder="请输入资产编号" type="text"/></div>' +
+            '<div class="wh-field"><label for="ac-unique">物资唯一码</label><input id="ac-unique" placeholder="请输入物资唯一码" type="text"/></div>' +
+            '<div class="wh-field"><label for="ac-name">资产名称</label><input id="ac-name" placeholder="请输入资产名称" type="text"/></div>' +
+            '<div class="wh-field"><label for="ac-type">物资类型名称</label><select id="ac-type"><option>全部类型</option><option>固定资产</option><option>存货</option><option>无形资产</option></select></div>' +
+            '<div class="wh-field"><label for="ac-user">使用人</label><input id="ac-user" placeholder="请输入使用人" type="text"/></div>' +
+            '<div class="wh-field"><label for="ac-loc">存放地点</label><input id="ac-loc" placeholder="请输入存放地点" type="text"/></div>';
+        }
+        var table = document.querySelector(".asset-panel .asset-table-wrap table");
+        if (!table) return;
+        var oldRows = Array.prototype.slice.call(table.querySelectorAll("tbody tr"));
+        var rows = oldRows.map(function (tr, idx) {
+          var tds = tr.children || [];
+          function txt(i) {
+            return tds[i] ? (tds[i].textContent || "").trim() : "";
+          }
+          if (tds.length === 11) {
+            return [txt(0), txt(1), txt(2), txt(3), txt(4), txt(5), txt(6), txt(7), txt(8), txt(9)];
+          }
+          var n = String(idx + 1).padStart(4, "0");
+          return [
+            "2024002" + n,
+            "C" + String(idx + 3001).padStart(11, "0"),
+            txt(3),
+            txt(4),
+            txt(5),
+            txt(8),
+            txt(9),
+            txt(12),
+            txt(14),
+            txt(16)
+          ];
+        });
+        table.innerHTML =
+          '<thead><tr><th>资产编号</th><th>物资唯一码</th><th>资产名称</th><th>规格型号</th><th>物资类型名称</th><th>使用人</th><th>存放地点</th><th>累计购置价值(元)</th><th>净值(元)</th><th>资本化日期</th><th style="width:90px">操作</th></tr></thead>' +
+          '<tbody>' + rows.map(function (r) {
+            return '<tr>' + r.map(function (v) { return '<td>' + v + '</td>'; }).join("") + '<td><a class="asset-op-btn asset-op-btn--green asset-op-view" href="#">查看</a></td></tr>';
+          }).join("") + '</tbody>';
+      }
+      normalizeAssetCompanyLatest();
+      document.querySelectorAll(".asset-pill-row").forEach(function (row) {
+        row.querySelectorAll(".asset-pill").forEach(function (p) {
+          p.addEventListener("click", function () {
+            row.querySelectorAll(".asset-pill").forEach(function (x) {
+              x.classList.remove("is-active");
+            });
+            p.classList.add("is-active");
+            var region = (p.textContent || "").trim();
+            applyRegionFilter(region);
+          });
+        });
+      });
+      var companyTableWrap = document.querySelector(".asset-panel .asset-table-wrap");
+      var companyTableBody = companyTableWrap ? companyTableWrap.querySelector("tbody") : null;
+      var regionSelect = document.getElementById("ac-region");
+      var allowedRegions = [];
+
+      function applyRegionFilter(regionName) {
+        if (!companyTableBody) return;
+        companyTableBody.querySelectorAll("tr").forEach(function (tr) {
+          var td = tr.children[4];
+          var rowRegion = td ? (td.textContent || "").trim() : "";
+          var okRegion =
+            !regionName ||
+            regionName === "全部" ||
+            rowRegion === regionName ||
+            rowRegion.indexOf(regionName) >= 0;
+          tr.style.display = okRegion ? "" : "none";
+        });
+      }
+
+      function applyCompanyRegionAcl() {
+        var role = typeof window.getDemoOrgRole === "function" ? window.getDemoOrgRole() : null;
+        if (!role) return;
+        var map = {
+          director_feng: [],
+          gm_zeng: [],
+          corp_asset_head: [],
+          corp_asset_specialist: [],
+          value_leader: [],
+          value_dept_head: [],
+          value_asset_specialist: [],
+          dept_head: ["华北"],
+          dept_asset_specialist: ["华北"],
+          leader_supervisor: ["华北", "华东"]
+        };
+        allowedRegions = map[role.id] || [];
+
+        var tipOld = document.getElementById("assetCompanyAclTip");
+        if (tipOld && tipOld.parentNode) tipOld.parentNode.removeChild(tipOld);
+        if (allowedRegions.length) {
+          var infoBar = document.querySelector(".asset-info-bar--company");
+          if (infoBar) {
+            var tip = document.createElement("span");
+            tip.id = "assetCompanyAclTip";
+            tip.innerHTML = "<em>区域权限</em> " + allowedRegions.join(" / ");
+            infoBar.appendChild(tip);
+          }
+        }
+
+        document.querySelectorAll(".asset-pill-row .asset-pill").forEach(function (pill) {
+          var txt = (pill.textContent || "").trim();
+          var can =
+            !allowedRegions.length ||
+            txt === "全部" ||
+            allowedRegions.some(function (r) {
+              return txt.indexOf(r) >= 0 || r.indexOf(txt) >= 0;
+            });
+          pill.style.display = can ? "" : "none";
+        });
+
+        if (regionSelect) {
+          Array.prototype.slice.call(regionSelect.options).forEach(function (opt, idx) {
+            if (idx === 0) return;
+            var txt = (opt.textContent || "").trim();
+            var can =
+              !allowedRegions.length ||
+              allowedRegions.some(function (r) {
+                return txt.indexOf(r) >= 0 || r.indexOf(txt) >= 0;
+              });
+            opt.disabled = !can;
+          });
+        }
+
+        if (!allowedRegions.length) return;
+        if (companyTableBody) {
+          companyTableBody.querySelectorAll("tr").forEach(function (tr) {
+            var td = tr.children[4];
+            var rowRegion = td ? (td.textContent || "").trim() : "";
+            var can = allowedRegions.some(function (r) {
+              return rowRegion.indexOf(r) >= 0;
+            });
+            tr.style.display = can ? "" : "none";
+          });
+        }
+      }
+      applyCompanyRegionAcl();
+      window.addEventListener("demo-org-role-change", function () {
+        applyCompanyRegionAcl();
+      });
+
+      var scanMask = document.getElementById("scanModalMask");
+      var statsMask = document.getElementById("statsModalMask");
+      var scanCodeInput = document.getElementById("scanAssetCode");
+      var scanResultPanel = document.getElementById("scanResultPanel");
+      var scanResultKv = document.getElementById("scanResultKv");
+      var btnScanSubmit = document.getElementById("btnScanSubmit");
+
+      var demoAssets = {
+        "GD-2024-001": { name: "主变压器巡检仪", model: "ZX-500A", region: "华东区域", dept: "华北区域运维部", keeper: "张三", location: "华北运维中心库房", status: "正常使用" },
+        "GD-2024-056": { name: "箱变综合测试仪", model: "BX-PRO", region: "华北区域", dept: "华北区域运维部", keeper: "王五", location: "张北场站库房", status: "正常使用" },
+        "LY-2024-112": { name: "安全绳及防坠器套装", model: "SAFE-R8", region: "西北区域", dept: "西北物资部", keeper: "赵六", location: "酒泉备件库", status: "待交接" },
+        "GD-2023-201": { name: "电缆故障定位车单元", model: "CFU-8K", region: "华东区域", dept: "华东检修中心", keeper: "刘洋", location: "南通仓储中心", status: "闲置" },
+        "GD-2021-089": { name: "退役风机主轴组件", model: "SP-2MW", region: "华北区域", dept: "华北区域运维部", keeper: "陈静", location: "退役资产暂存区", status: "已退役" }
+      };
+
+      function openScanModal() {
+        scanMask.classList.add("is-open");
+        scanMask.setAttribute("aria-hidden", "false");
+        scanCodeInput.value = "";
+        scanResultPanel.classList.remove("is-visible");
+        btnScanSubmit.disabled = true;
+        document.getElementById("scanRemark").value = "";
+        document.getElementById("scanActualStatus").value = "normal";
+        setTimeout(function () { scanCodeInput.focus(); }, 100);
+      }
+      function closeScanModal() {
+        scanMask.classList.remove("is-open");
+        scanMask.setAttribute("aria-hidden", "true");
+      }
+      function openStatsModal() {
+        statsMask.classList.add("is-open");
+        statsMask.setAttribute("aria-hidden", "false");
+      }
+      function closeStatsModal() {
+        statsMask.classList.remove("is-open");
+        statsMask.setAttribute("aria-hidden", "true");
+      }
+
+      function showScanResult(code) {
+        var info = demoAssets[code];
+        if (!info) {
+          info = {
+            name: "（演示）未建档编号",
+            model: "—",
+            region: "—",
+            dept: "—",
+            keeper: "—",
+            location: "—",
+            status: "待核实"
+          };
+        }
+        scanResultKv.innerHTML =
+          "<dt>资产编号</dt><dd>" + code + "</dd>" +
+          "<dt>资产名称</dt><dd>" + info.name + "</dd>" +
+          "<dt>型号规格</dt><dd>" + info.model + "</dd>" +
+          "<dt>使用人</dt><dd>" + info.keeper + "</dd>" +
+          "<dt>系统存放地点</dt><dd>" + info.location + "</dd>" +
+          "<dt>账面状态</dt><dd>" + info.status + "</dd>";
+        scanResultPanel.classList.add("is-visible");
+        btnScanSubmit.disabled = false;
+      }
+
+      var btnOpenScanModal = document.getElementById("btnOpenScanModal");
+      if (btnOpenScanModal) btnOpenScanModal.addEventListener("click", openScanModal);
+      document.getElementById("btnCloseScanModal").addEventListener("click", closeScanModal);
+      document.getElementById("btnScanCancel").addEventListener("click", closeScanModal);
+      var btnOpenStatsModal = document.getElementById("btnOpenStatsModal");
+      if (btnOpenStatsModal) btnOpenStatsModal.addEventListener("click", openStatsModal);
+      document.getElementById("btnCloseStatsModal").addEventListener("click", closeStatsModal);
+      document.getElementById("btnStatsOk").addEventListener("click", closeStatsModal);
+
+      scanMask.addEventListener("click", function (e) {
+        if (e.target === scanMask) closeScanModal();
+      });
+      statsMask.addEventListener("click", function (e) {
+        if (e.target === statsMask) closeStatsModal();
+      });
+
+      document.getElementById("btnScanSimulate").addEventListener("click", function () {
+        var raw = (scanCodeInput.value || "").trim().toUpperCase();
+        var code = raw || "GD-2024-056";
+        scanCodeInput.value = code;
+        showScanResult(code);
+      });
+
+      document.getElementById("btnScanCamera").addEventListener("click", function () {
+        alert("演示环境：实际部署时将调用设备摄像头或外接扫码枪 SDK。\n\n您可点击「模拟扫码成功」或手动输入资产编号后继续。");
+      });
+
+      scanCodeInput.addEventListener("keydown", function (e) {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          var raw = (scanCodeInput.value || "").trim().toUpperCase();
+          if (raw) showScanResult(raw);
+        }
+      });
+
+      btnScanSubmit.addEventListener("click", function () {
+        var code = (scanCodeInput.value || "").trim();
+        if (!code) return;
+        alert("已记录盘点结果（演示）：\n资产 " + code + "\n实盘：" + document.getElementById("scanActualStatus").selectedOptions[0].textContent);
+        closeScanModal();
+      });
+
+      function cellText(td) {
+        if (!td) return "";
+        var tag = td.querySelector(".tag-asset");
+        return (tag ? tag.textContent : td.textContent).trim();
+      }
+      function detailRow(k, v) {
+        return '<div class="asset-detail-row"><span class="asset-detail-k">' + k + '</span><span class="asset-detail-v">' + (v || "—") + "</span></div>";
+      }
+      function fixedLedgerDetailRows(tds, scope) {
+        var assetNo = cellText(tds[0]);
+        var uniqueCode = cellText(tds[1]);
+        var name = cellText(tds[2]);
+        var spec = cellText(tds[3]);
+        var typeName = cellText(tds[4]);
+        var userName = cellText(tds[5]);
+        var location = cellText(tds[6]);
+        var origin = cellText(tds[7]);
+        var net = cellText(tds[8]);
+        var capDate = cellText(tds[9]);
+        return detailRow("公司代码", "6691") +
+          detailRow("资产名称", name) +
+          detailRow("资产编号", assetNo) +
+          detailRow("物资唯一码", uniqueCode) +
+          detailRow("规格型号", spec) +
+          detailRow("存放地点", location) +
+          detailRow("资本化日期", capDate) +
+          detailRow("累计购置价值", origin) +
+          detailRow("累计折旧期末金额（新）", "-1,179.20") +
+          detailRow("累计折旧", "-1,179.20") +
+          detailRow("累计折旧期初金额（新）", "0.00") +
+          detailRow("减值准备（新）", "0.00") +
+          detailRow("净值（新）(累计购置价值-累计期末折旧)", net) +
+          detailRow("净值", net) +
+          detailRow("减值准备", "0.00") +
+          detailRow("净额(净值-减值准备)", net) +
+          detailRow("净残值率", typeName === "固定资产" ? "5%" : "0%") +
+          detailRow("净残值", typeName === "固定资产" ? "1,200.00" : "0.00") +
+          detailRow("折旧码", typeName === "无形资产" ? "Z003" : "Z000") +
+          detailRow("折旧年限", typeName === "无形资产" ? "10" : "5") +
+          detailRow("折旧月份", "0") +
+          detailRow("已计提月份", "4") +
+          detailRow("剩余使用年限", typeName === "无形资产" ? "9" : "4") +
+          detailRow("剩余使用月份", typeName === "无形资产" ? "8" : "7") +
+          detailRow("资产使用情况", "在用") +
+          detailRow("不活动日期", "—") +
+          detailRow("开始折旧日期", "2026-01-01") +
+          detailRow("原始资产卡片编号", "—") +
+          detailRow("本月折旧", "-235.84") +
+          detailRow("会计年度", "2026") +
+          detailRow("利润中心", "6691001000") +
+          detailRow("利润中心名称", "龙源（北京）新能源工程技术有限公司") +
+          detailRow("成本中心", "6691001016") +
+          detailRow("成本中心名称", scope + "-劳务成本") +
+          detailRow("责任成本中心", "6691001016") +
+          detailRow("责任成本中心名称", scope + "-劳务成本") +
+          detailRow("资产类别", typeName === "无形资产" ? "00580000" : "00130000") +
+          detailRow("资产类别名称", typeName === "无形资产" ? "无形资产-软件" : "固定资产-通用设备") +
+          detailRow("物资类型名称", typeName) +
+          detailRow("资产目录编码", typeName === "无形资产" ? "5800000001" : "1301060001") +
+          detailRow("资产目录名称", typeName === "无形资产" ? "无形资产-软件" : "通用设备-工器具") +
+          detailRow("投资订单", "—") +
+          detailRow("内部订单", "QT6691000022") +
+          detailRow("内部订单名称", "检修工器具配置") +
+          detailRow("补充文本", "演示台账数据") +
+          detailRow("使用寿命", typeName === "无形资产" ? "120" : "60") +
+          detailRow("资产状态", "0000") +
+          detailRow("资产次级编号", "0000") +
+          detailRow("资产主号文本", name) +
+          detailRow("序列号", uniqueCode) +
+          detailRow("预转固资产", "—") +
+          detailRow("供应商", "0030010335") +
+          detailRow("供应商名称", "华北能源装备有限公司") +
+          detailRow("制造商", "国能装备制造有限公司") +
+          detailRow("船舶吨位", "—") +
+          detailRow("执照牌号", "—") +
+          detailRow("人员编号", "20066471") +
+          detailRow("人员描述", userName) +
+          detailRow("库存注记", "—") +
+          detailRow("EAM编码", uniqueCode) +
+          detailRow("类别", typeName) +
+          detailRow("电力资产标识", "—") +
+          detailRow("专项资金", "—") +
+          detailRow("EAM资产分类", typeName) +
+          detailRow("原成本类型", "—") +
+          detailRow("原成本类型名称", "—") +
+          detailRow("租赁类型", "—") +
+          detailRow("租赁类型描述", "—") +
+          detailRow("以前年度累计折旧", "0.00") +
+          detailRow("本年度累计折旧", "-1,179.20") +
+          detailRow("折旧码描述", "国家能源集团直线折旧法、下月开始折旧") +
+          detailRow("录入人", "FRP通讯账号") +
+          detailRow("录入日期", capDate) +
+          detailRow("是否冻结", "否") +
+          detailRow("净值(累计购置价值-累计折旧)", net) +
+          detailRow("最后库存日", "—") +
+          detailRow("资产取得方式", "直接购入") +
+          detailRow("计划折旧月份合计", typeName === "无形资产" ? "120" : "60") +
+          detailRow("设备编号", "—") +
+          detailRow("WBS元素", "E66910006001010302") +
+          detailRow("WBS元素描述", "试制仪器、设备采购") +
+          detailRow("关联设备（全）", "—") +
+          detailRow("组织机构主数据编码", "669100") +
+          detailRow("WBS要素(成本)", "—") +
+          detailRow("WBS要素(成本)描述", "—") +
+          detailRow("本年正常折旧金额（新）", "-1,179.20") +
+          detailRow("本年其他折旧调整金额（新）", "0.00") +
+          detailRow("使用人", userName);
+      }
+      function closeAssetDetail() {
+        document.getElementById("assetDetailMask").classList.remove("is-open");
+        document.getElementById("assetDetailMask").setAttribute("aria-hidden", "true");
+      }
+      if (companyTableWrap) {
+        companyTableWrap.addEventListener("click", function (e) {
+          var el = e.target && e.target.nodeType === 3 ? e.target.parentElement : e.target;
+          var a = el && el.closest ? el.closest("a.asset-op-view") : null;
+          if (!a) return;
+          e.preventDefault();
+          var tr = a.closest("tr");
+          if (!tr) return;
+          var tds = tr.querySelectorAll("td");
+          document.getElementById("assetDetailBody").innerHTML =
+            '<div class="asset-detail-kv">' +
+            fixedLedgerDetailRows(tds, "公司资产") +
+            "</div>";
+          document.getElementById("assetDetailMask").classList.add("is-open");
+          document.getElementById("assetDetailMask").setAttribute("aria-hidden", "false");
+        });
+      }
+      var btnCloseAssetDetail = document.getElementById("btnCloseAssetDetail");
+      var btnAssetDetailOk = document.getElementById("btnAssetDetailOk");
+      var assetDetailMask = document.getElementById("assetDetailMask");
+      if (btnCloseAssetDetail) btnCloseAssetDetail.addEventListener("click", closeAssetDetail);
+      if (btnAssetDetailOk) btnAssetDetailOk.addEventListener("click", closeAssetDetail);
+      if (assetDetailMask) {
+        assetDetailMask.addEventListener("click", function (e) {
+          if (e.target.id === "assetDetailMask") closeAssetDetail();
+        });
+      }
+    })();
+  </script>
+</body>
+</html>

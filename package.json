@@ -1,0 +1,18 @@
+{
+  "name": "vue-map-demo",
+  "version": "1.0.0",
+  "description": "离线演示总入口 - Vue 3 移植版",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build && node scripts/postbuild.js",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "vue": "^3.4.21"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^5.0.4",
+    "vite": "^5.2.0"
+  }
+}
