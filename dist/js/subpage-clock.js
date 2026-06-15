@@ -1035,6 +1035,10 @@
       'procurement-application.html': 'purchaseMgmt',
       'purchase-management-hub.html': 'purchaseMgmt',
       'purchase-material-info-management.html': 'purchaseMgmt',
+      'sales-material-list.html': 'salesMgmt',
+      'sales-order-management.html': 'salesMgmt',
+      'sales-purchased-materials.html': 'salesMgmt',
+      'sales-contract-report.html': 'salesMgmt',
       'purchase-prototype-list.html': 'purchaseMgmt',
       'purchase-pm-nonbid.html': 'purchaseMgmt',
       'purchase-pm-plan.html': 'purchaseMgmt',
@@ -1331,6 +1335,10 @@
           if (tab === "m10") return "库存管理";
         }
         if (fileName === "order-demand-management.html") return "订单需求管理";
+        if (fileName === "sales-material-list.html") return "物资列表";
+        if (fileName === "sales-order-management.html") return "订单管理";
+        if (fileName === "sales-purchased-materials.html") return "购入物资";
+        if (fileName === "sales-contract-report.html") return "合同报表管理";
         if (fileName === "contract-management.html") return "合同信息管理";
         if (fileName === "purchase-material-info-management.html") return "物资采购信息管理";
         if (fileName === "purchase-plan-management.html") return "采购信息台帐";
