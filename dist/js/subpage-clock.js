@@ -1922,10 +1922,10 @@
 
   function patchInventoryInboundProgressFlow(mask) {
     if (!mask || !isM10InventoryInboundFlowScope()) return;
-    var row = mask.querySelector(".map-flow-row");
+    var track = mask.querySelector(".map-flow-track");
     var info = mask.querySelector(".map-flow-info");
-    if (!row) return;
-    var newRow = '<div class="map-flow-row" style="grid-template-columns:repeat(17,1fr)">' +
+    if (!track) return;
+    track.innerHTML = '<div class="map-flow-row" style="grid-template-columns:repeat(17,1fr)">' +
       '<span class="map-flow-dot"></span>' +
       '<span class="map-flow-node">业务部门物资负责人录入设备清单，提交申请入库</span>' +
       '<span class="map-flow-arrow">→</span>' +
@@ -1944,7 +1944,6 @@
       '<span class="map-flow-node end">结束</span>' +
       '<span class="map-flow-dot end"></span>' +
       '</div>';
-    row.outerHTML = newRow;
     if (info) {
       info.innerHTML =
         '<div>1、业务部门物资负责人录入设备清单，提交申请入库（2026-03-20 09:12）（附件：风机采购合同）</div>' +
