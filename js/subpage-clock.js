@@ -1925,35 +1925,26 @@
     var track = mask.querySelector(".map-flow-track");
     var info = mask.querySelector(".map-flow-info");
     if (!track) return;
-    track.innerHTML = '<div class="map-flow-row" style="grid-template-columns:repeat(17,1fr)">' +
+    track.innerHTML = '<div class="map-flow-row" style="grid-template-columns:repeat(11,1fr)">' +
       '<span class="map-flow-dot"></span>' +
       '<span class="map-flow-node">业务部门物资负责人录入设备清单，提交申请入库</span>' +
       '<span class="map-flow-arrow">→</span>' +
-      '<span class="map-flow-node">业务部门负责人审批，同意入库</span>' +
+      '<span class="map-flow-node">业务部门负责人审批，同意入库（审核物资是否符合采购的要求）</span>' +
       '<span class="map-flow-arrow">→</span>' +
-      '<span class="map-flow-node">物资管理部门物资负责人审核分类</span>' +
+      '<span class="map-flow-node">物资管理部门物资负责人审核分类，同意入库</span>' +
       '<span class="map-flow-arrow">→</span>' +
-      '<span class="map-flow-node">分管领导部门负责人审批，同意</span>' +
+      '<span class="map-flow-node">物资管理部门负责人审批，同意</span>' +
       '<span class="map-flow-arrow">→</span>' +
-      '<span class="map-flow-node">部门领导审批，审批通过</span>' +
-      '<span class="map-flow-arrow">→</span>' +
-      '<span class="map-flow-node">库管员接收物资，物资到货</span>' +
-      '<span class="map-flow-arrow">→</span>' +
-      '<span class="map-flow-node">验收员验收入库</span>' +
-      '<span class="map-flow-arrow">→</span>' +
-      '<span class="map-flow-node end">结束</span>' +
+      '<span class="map-flow-node end">入公司库结束</span>' +
       '<span class="map-flow-dot end"></span>' +
       '</div>';
     if (info) {
       info.innerHTML =
-        '<div>1、业务部门物资负责人录入设备清单，提交申请入库（2026-03-20 09:12）（附件：风机采购合同）</div>' +
-        '<div>2、业务部门负责人张磊审批：已审批，同意入库（2026-03-20 10:03）</div>' +
-        '<div>3、物资管理部门物资负责人陈志远审核分类：已审核（2026-03-20 10:28）</div>' +
-        '<div>4、分管领导部门负责人王立军审批：已审批，同意（2026-03-20 10:48）</div>' +
-        '<div>5、部门领导审批：审批通过（2026-03-20 11:05）</div>' +
-        '<div>6、库管员接收物资：物资到货（2026-03-20 11:32）</div>' +
-        '<div>7、验收员验收：验收入库（2026-03-20 12:05）</div>' +
-        '<div>8、结束（—）</div>';
+        '<div>1、业务部门物资负责人刘建国录入设备清单，提交申请入库（2026-03-20 09:12）（附件：风机采购合同）</div>' +
+        '<div>2、业务部门负责人张磊审批：同意入库，审核物资符合采购要求（2026-03-20 10:03）</div>' +
+        '<div>3、物资管理部门物资负责人陈志远审核分类：同意入库（2026-03-20 10:28）</div>' +
+        '<div>4、物资管理部门负责人王立军审批：同意（2026-03-20 10:48）</div>' +
+        '<div>5、入公司库结束（2026-03-20 11:05）</div>';
     }
   }
 
