@@ -94,6 +94,7 @@
     if (allowed.indexOf("task") === -1) allowed.push("task");
     if (allowed.indexOf("cockpit") === -1) allowed.push("cockpit");
     if (moduleKey === "physicalMgmt" && allowed.indexOf("purchaseMgmt") >= 0) return true;
+    if (moduleKey === "salesMgmt" && allowed.indexOf("purchaseMgmt") >= 0) return true;
     return allowed.indexOf(moduleKey) >= 0;
   }
 
@@ -110,6 +111,7 @@
     if (action === "cargo-ledger") return "purchaseMgmt";
     if (/^(asset-)/.test(action)) return "asset";
     if (/^(logistics-)/.test(action)) return "logistics";
+    if (/^(sales-)/.test(action)) return "salesMgmt";
     if (/^(purchase-|cargo-|proc-|material-|purchaseMgmt)/.test(action)) return "purchaseMgmt";
     if (/^(slot|receive|scan|inventory-check|stock|maintenance|idle|warehouse)/.test(action)) return "warehouse";
     if (/^(retired-|goods-transfer)/.test(action)) return "retired";
@@ -265,6 +267,7 @@
         '<div class="nav-item" title="我的待办"><span class="nav-label">我的待办</span></div>' +
         '<div class="nav-item" title="物资采购"><span class="nav-label">物资采购</span></div>' +
         '<div class="nav-item" title="实物管理"><span class="nav-label">实物管理</span></div>' +
+        '<div class="nav-item" title="销售管理"><span class="nav-label">销售管理</span></div>' +
         '<div class="nav-item" title="资产管理"><span class="nav-label">资产管理</span></div>' +
         '<div class="nav-item" title="物流管理"><span class="nav-label">物流管理</span></div>' +
         '<div class="nav-item" title="仓储管理"><span class="nav-label">仓储管理</span></div>' +
@@ -294,6 +297,8 @@
           '<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M6 8h12M6 12h8"/></svg>',
         '实物管理':
           '<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M4 8h16v12H4V8z"/><path d="M8 8V6a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M9 12h6M9 16h4"/></svg>',
+        '销售管理':
+          '<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M5 5h14v14H5V5z"/><path d="M8 9h8M8 13h5"/><path d="M16 16.5c1.8 0 3-1 3-2.5s-1.2-2.5-3-2.5-3-1-3-2.5 1.2-2.5 3-2.5"/><path d="M16 4v17"/></svg>',
         '物流管理':
           '<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M1 16h11.5V8.5H5V7h11.5v5h2.5l3.5 4.5"/><circle cx="6.5" cy="17.5" r="1.75"/><circle cx="16.5" cy="17.5" r="1.75"/></svg>',
         '仓储管理':
@@ -553,6 +558,19 @@
         aclModuleKey: 'purchaseMgmt',
         rowHtml: PHYSICAL_MGMT_ROW_HTML
       },
+      salesMgmt: {
+        text: '销售管理',
+        panel: secondaryPanel,
+        aclModuleKey: 'purchaseMgmt',
+        rowHtml:
+          '<button type="button" class="warehouse-secondary-link" data-action="sales-material-list" data-label="物资列表">物资列表</button>' +
+          '<span class="warehouse-secondary-pipe" aria-hidden="true">|</span>' +
+          '<button type="button" class="warehouse-secondary-link" data-action="sales-order-manage" data-label="订单管理">订单管理</button>' +
+          '<span class="warehouse-secondary-pipe" aria-hidden="true">|</span>' +
+          '<button type="button" class="warehouse-secondary-link" data-action="sales-purchase-material" data-label="购入物资">购入物资</button>' +
+          '<span class="warehouse-secondary-pipe" aria-hidden="true">|</span>' +
+          '<button type="button" class="warehouse-secondary-link" data-action="sales-contract-report" data-label="合同报表管理">合同报表管理</button>'
+      },
       logistics: {
         text: '物流管理',
         panel: secondaryPanel,
@@ -742,6 +760,7 @@
       cockpit: "cockpit",
       purchaseMgmt: "purchaseMgmt",
       physicalMgmt: "physicalMgmt",
+      salesMgmt: "salesMgmt",
       logistics: "logistics",
       warehouse: "warehouse",
       retired: "retired",

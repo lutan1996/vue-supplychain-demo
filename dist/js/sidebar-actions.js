@@ -89,6 +89,10 @@
     "purchase-ledger": "purchase-data-ledger.html",
     "cargo-ledger": "cargo-ledger.html",
     "purchase-summary-report": "purchase-summary-report.html",
+    "sales-material-list": "purchase-material-info-management.html",
+    "sales-order-manage": "order-demand-management.html",
+    "sales-purchase-material": "proc-acceptance-inbound.html",
+    "sales-contract-report": "purchase-summary-report.html",
     // 物流
     "logistics-carrier": "carrier-management.html",
     "logistics-contract": "logistics-contract.html",
