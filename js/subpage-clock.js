@@ -1875,7 +1875,10 @@
       '          <span class="map-flow-node">业务部门负责人审批，同意入库</span><span class="map-flow-arrow">→</span>' +
       '          <span class="map-flow-node">物资管理部门物资负责人审核分类</span><span class="map-flow-arrow">→</span>' +
       '          <span class="map-flow-node">分管领导部门负责人审批，同意</span><span class="map-flow-arrow">→</span>' +
-      '          <span class="map-flow-node end">入公司库结束</span><span class="map-flow-dot end"></span>' +
+      '          <span class="map-flow-node">部门领导审批，审批通过</span><span class="map-flow-arrow">→</span>' +
+      '          <span class="map-flow-node">库管员接收物资，物资到货</span><span class="map-flow-arrow">→</span>' +
+      '          <span class="map-flow-node">验收员验收入库</span><span class="map-flow-arrow">→</span>' +
+      '          <span class="map-flow-node end">结束</span><span class="map-flow-dot end"></span>' +
       "        </div>" +
       "      </div>" +
       "    </div>" +
@@ -1885,7 +1888,7 @@
       "        <div>2、业务部门负责人张磊审批：已审批，同意入库（2026-03-20 10:03）</div>" +
       "        <div>3、物资管理部门物资负责人陈志远审核分类：已审核（2026-03-20 10:28）</div>" +
       "        <div>4、分管领导部门负责人王立军审批：已审批，同意（2026-03-20 10:48）</div>" +
-      "        <div>5、入公司库结束（—）</div>" +
+      "        <div>5、结束（—）</div>" +
       "      </div>" +
       "    </div>" +
       "  </div>" +
