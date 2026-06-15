@@ -1867,26 +1867,26 @@
       '    <div class="map-flow-tabs">' +
       '      <button type="button" class="map-flow-tab is-active" data-tab="flow">流程图</button>' +
       '      <button type="button" class="map-flow-tab" data-tab="info">审批信息</button>' +
-      "    </div>" +
+      '    </div>' +
       '    <div class="map-flow-pane is-active" data-pane="flow">' +
       '      <div class="map-flow-track">' +
       '        <div class="map-flow-row">' +
-      '          <span class="map-flow-dot"></span><span class="map-flow-node">申请人</span><span class="map-flow-arrow">→</span>' +
-      '          <span class="map-flow-node">部门主管审核意见及签字</span><span class="map-flow-arrow">→</span>' +
-      '          <span class="map-flow-node">主管领导审核意见及签字</span><span class="map-flow-arrow">→</span>' +
-      '          <span class="map-flow-node">公司专责汇总意见及签字</span><span class="map-flow-arrow">→</span>' +
-      '          <span class="map-flow-node">公司主管审核意见及签字</span><span class="map-flow-arrow">→</span>' +
-      '          <span class="map-flow-node end">结束</span><span class="map-flow-dot end"></span>' +
+      '          <span class="map-flow-dot"></span><span class="map-flow-node">业务部门物资负责人设备清单，提交申请入库</span><span class="map-flow-arrow">→</span>' +
+      '          <span class="map-flow-node">业务部门负责人审批，同意入库</span><span class="map-flow-arrow">→</span>' +
+      '          <span class="map-flow-node">物资管理部门物资负责人审核分类</span><span class="map-flow-arrow">→</span>' +
+      '          <span class="map-flow-node">分管领导部门负责人审批，同意</span><span class="map-flow-arrow">→</span>' +
+      '          <span class="map-flow-node end">入公司库结束</span><span class="map-flow-dot end"></span>' +
       "        </div>" +
       "      </div>" +
       "    </div>" +
       '    <div class="map-flow-pane" data-pane="info">' +
       '      <div class="map-flow-info">' +
-      "        <div>申请人：王卿明（2026-03-20 09:12）</div>" +
-      "        <div>部门主管审核：已审批，同意（2026-03-20 10:03）</div>" +
-      "        <div>主管领导审核：已审批，同意（2026-03-20 10:28）</div>" +
-      "        <div>公司专责汇总：已审批，同意（2026-03-20 10:48）</div>" +
-      "        <div>公司主管审核：待审批（—）</div>" +
+      "        <div>附件：上传的采购合同</div>" +
+      "        <div>1、业务部门物资负责人设备清单，提交申请入库（2026-03-20 09:12）</div>" +
+      "        <div>2、业务部门负责人审批：已审批，同意入库（2026-03-20 10:03）</div>" +
+      "        <div>3、物资管理部门物资负责人审核分类：已审核（2026-03-20 10:28）</div>" +
+      "        <div>4、分管领导部门负责人审批：已审批，同意（2026-03-20 10:48）</div>" +
+      "        <div>5、入公司库结束（—）</div>" +
       "      </div>" +
       "    </div>" +
       "  </div>" +
