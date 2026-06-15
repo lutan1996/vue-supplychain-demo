@@ -53,7 +53,9 @@
   function openModal(title, body, foot, small) {
     var mask = ensureModal();
     var box = mask.querySelector(".sales-modal");
-    box.classList.toggle("sales-modal--small", !!small);
+    box.classList.remove("sales-modal--small", "sales-modal--wide");
+    if (small === "wide") box.classList.add("sales-modal--wide");
+    else if (small) box.classList.add("sales-modal--small");
     document.getElementById("salesModalTitle").textContent = title;
     document.getElementById("salesModalBody").innerHTML = body;
     document.getElementById("salesModalFoot").innerHTML = foot || '<button type="button" class="sales-btn" data-close>关闭</button>';
@@ -96,13 +98,56 @@
       return '<div class="sales-field' + (String(row[i] || "").length > 22 ? " sales-field--full" : "") + '"><label>' + esc(k) + '</label><input readonly value="' + esc(row[i] || "—") + '"></div>';
     }).join("") + "</div>";
   }
-  function trackHtml(name, code, orderNo) {
+  function purchasedDetailHtml(row) {
+    return '<div class="sales-detail-head">' +
+      '<div class="sales-detail-card"><div class="sales-detail-label">物资名称</div><div class="sales-detail-value">' + esc(row[5]) + '</div></div>' +
+      '<div class="sales-detail-card"><div class="sales-detail-label">购入单号</div><div class="sales-detail-value">' + esc(row[0]) + '</div></div>' +
+      '<div class="sales-detail-card"><div class="sales-detail-label">销售合同编号</div><div class="sales-detail-value">' + esc(row[9]) + '</div></div>' +
+      '<div class="sales-detail-card"><div class="sales-detail-label">当前状态</div><div class="sales-detail-value">' + esc(row[17]) + '</div></div>' +
+      '</div>' +
+      '<div class="sales-section-title">基础信息</div>' +
+      '<table class="sales-detail-table"><tbody>' +
+      '<tr><th>订单编号</th><td>' + esc(row[1]) + '</td><th>下单公司</th><td>' + esc(row[2]) + '</td></tr>' +
+      '<tr><th>场站名称</th><td>' + esc(row[3]) + '</td><th>存放地点</th><td>' + esc(row[16]) + '</td></tr>' +
+      '<tr><th>物资编码</th><td>' + esc(row[4]) + '</td><th>产品编码</th><td>' + esc(row[7]) + '</td></tr>' +
+      '<tr><th>规格型号</th><td>' + esc(row[6]) + '</td><th>制造商</th><td>' + esc(row[8]) + '</td></tr>' +
+      '<tr><th>购入数量</th><td>' + esc(row[10] + row[11]) + '</td><th>购入金额</th><td>' + esc(row[13]) + '</td></tr>' +
+      '<tr><th>收货日期</th><td>' + esc(row[14]) + '</td><th>物流单号</th><td>' + esc(row[15]) + '</td></tr>' +
+      '</tbody></table>' +
+      '<div class="sales-section-title">业务说明</div>' +
+      '<table class="sales-detail-table"><tbody>' +
+      '<tr><th>销售路径</th><td>销售管理订单确认后，由工程技术公司组织发货，项目公司完成收货确认。</td></tr>' +
+      '<tr><th>台账口径</th><td>收货后形成项目公司购入物资台账，可继续追踪后续在用、调拨和退换货状态。</td></tr>' +
+      '</tbody></table>';
+  }
+  function trackHtml(row) {
+    var name = row[5];
+    var code = row[4];
+    var orderNo = row[1];
+    var logisticsNo = row[15];
+    var status = row[17];
     return '<div class="sales-track">' +
-      '<div class="sales-track-title">物资跟踪</div>' +
-      '<div class="sales-track-item"><span class="sales-track-dot" style="background:#2563eb"></span><div><div class="sales-track-main">2026.4.20 入库：' + esc(name || "销售类物资") + '（' + esc(code || "—") + '）</div><div class="sales-track-sub">存放龙源工程技术公司中心库，形成可销售库存。</div></div></div>' +
-      '<div class="sales-track-item"><span class="sales-track-dot" style="background:#10b981"></span><div><div class="sales-track-main">2026.6.10 项目公司下单</div><div class="sales-track-sub">关联订单：' + esc(orderNo || "XSORD-2026-003") + '，进入销售订单管理。</div></div></div>' +
-      '<div class="sales-track-item"><span class="sales-track-dot" style="background:#6366f1"></span><div><div class="sales-track-main">2026.6.14 发货确认</div><div class="sales-track-sub">物流单号 WL2026061401，发货路径：直发现场/项目公司。</div></div></div>' +
-      '<div class="sales-track-item"><span class="sales-track-dot" style="background:#f59e0b"></span><div><div class="sales-track-main">2026.6.15 项目公司收货</div><div class="sales-track-sub">状态更新为已购入，进入购入物资台账。</div></div></div>' +
+      '<div class="sales-track-map">' +
+      '<svg viewBox="0 0 1000 360" preserveAspectRatio="none" aria-hidden="true"><path d="M120 270 C 285 120, 445 125, 585 190 S 830 260, 895 126" fill="none" stroke="#1689ff" stroke-width="7" stroke-linecap="round" stroke-dasharray="12 12"/></svg>' +
+      '<div class="sales-track-point sales-track-point--start">发货地</div>' +
+      '<div class="sales-track-point sales-track-point--current">当前位置</div>' +
+      '<div class="sales-track-point sales-track-point--end">收货地</div>' +
+      '</div>' +
+      '<div class="sales-track-info">' +
+      '<div>运单号：<span>' + esc(logisticsNo || "WL2026061401") + '</span></div>' +
+      '<div>关联订单号：<span>' + esc(orderNo || "XSORD-2026-003") + '</span></div>' +
+      '<div>承运商：<span>华通物流有限公司</span></div>' +
+      '<div>起始地：<span>北京市朝阳区物流园A区</span></div>' +
+      '<div>目的地：<span>' + esc(row[3] || "项目公司场站") + '</span></div>' +
+      '<div>当前状态：<span>' + esc(status || "运输中") + '</span></div>' +
+      '<div>最后更新时间：<span>2026-06-15 11:20</span></div>' +
+      '<div>数据来源：<span>销售发货单同步</span></div>' +
+      '<div>当前位置（轨迹示意）：<span>济南中转仓</span></div>' +
+      '</div>' +
+      '<div class="sales-track-detail-grid">' +
+      '<div class="sales-track-panel"><h4>物资信息</h4><ul class="sales-track-list"><li>物资名称：' + esc(name || "—") + '</li><li>物资编码：' + esc(code || "—") + '</li><li>规格型号：' + esc(row[6] || "—") + '</li><li>销售合同编号：' + esc(row[9] || "—") + '</li></ul></div>' +
+      '<div class="sales-track-panel"><h4>流转节点</h4><ul class="sales-track-list"><li>2026-06-14 工程技术公司完成发货确认</li><li>2026-06-15 到达济南中转仓，等待干线转运</li><li>预计 2026-06-16 送达项目公司场站</li></ul></div>' +
+      '</div>' +
       '</div>';
   }
 
@@ -326,9 +371,9 @@
       var row = rows.find(function (r) { return r[0] === btn.getAttribute("data-id"); });
       if (!row) return;
       if (btn.getAttribute("data-action") === "track") {
-        openModal("物资轨迹", trackHtml(row[5], row[4], row[1]), '<button class="sales-btn" data-close>关闭</button>');
+        openModal("轨迹示意 - " + (row[15] || row[1]), trackHtml(row), '<button class="sales-btn" data-close>关闭</button>', "wide");
       } else {
-        openModal("查看购入物资", infoGridHtml(["购入单号","订单编号","下单公司","场站名称","物资编码","物资名称","规格型号","产品编码","制造商名称","销售合同编号","购入数量","单位","购入单价","购入金额","收货日期","物流单号","存放地点","当前状态"], row), '<button class="sales-btn" data-close>关闭</button>');
+        openModal("查看购入物资", purchasedDetailHtml(row), '<button class="sales-btn" data-close>关闭</button>', "wide");
       }
     });
   }
