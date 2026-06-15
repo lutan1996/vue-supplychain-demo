@@ -1929,7 +1929,7 @@
   function patchProgressModalForPage(mask) {
     if (!mask) return;
     var file = (location.pathname || "").split("/").pop();
-    if (file !== "proc-use-approval.html") return;
+    if (file !== "warehouse-stock-ledger.html" && file !== "receipt-inbound.html") return;
     var row = mask.querySelector(".map-flow-row");
     var info = mask.querySelector(".map-flow-info");
     if (!row) return;
@@ -1945,33 +1945,15 @@
       '<span class="map-flow-arrow">→</span>' +
       '<span class="map-flow-node">部门领导审批，审批通过</span>' +
       '<span class="map-flow-dot end"></span>' +
-      '</div>' +
-      '<div class="map-flow-row" style="grid-template-columns:repeat(11,1fr)">' +
-      '<span class="map-flow-dot"></span>' +
-      '<span class="map-flow-node">库管员接收物资，物资到货</span>' +
-      '<span class="map-flow-arrow">→</span>' +
-      '<span class="map-flow-node">验收员验收入库</span>' +
-      '<span class="map-flow-arrow">→</span>' +
-      '<span class="map-flow-node">物资管理部门办理出库</span>' +
-      '<span class="map-flow-arrow">→</span>' +
-      '<span class="map-flow-node">业务部门领料人确认签收</span>' +
-      '<span class="map-flow-arrow">→</span>' +
-      '<span class="map-flow-node">库管员登记出库台账，完成</span>' +
-      '<span class="map-flow-dot end"></span>' +
       '</div>';
     row.outerHTML = newRow;
     if (info) {
       info.innerHTML =
-        '<div>1、业务部门物资负责人刘建国录入设备清单，提交申请入库（2026-03-20 09:12）（附件：风机采购合同）</div>' +
+        '<div>1、业务部门物资负责人录入设备清单，提交申请入库（2026-03-20 09:12）（附件：风机采购合同）</div>' +
         '<div>2、业务部门负责人张磊审批：已审批，同意入库（2026-03-20 10:03）</div>' +
         '<div>3、物资管理部门物资负责人陈志远审核分类：已审核（2026-03-20 10:28）</div>' +
         '<div>4、分管领导部门负责人王立军审批：已审批，同意（2026-03-20 10:48）</div>' +
-        '<div>5、部门领导审批：审批通过（2026-03-20 11:05）</div>' +
-        '<div>6、库管员接收物资，物资到货（2026-03-20 14:20）</div>' +
-        '<div>7、验收员验收入库（2026-03-20 15:00）</div>' +
-        '<div>8、物资管理部门办理出库（2026-03-21 09:00）</div>' +
-        '<div>9、业务部门领料人确认签收（2026-03-21 10:15）</div>' +
-        '<div>10、库管员登记出库台账，完成（2026-03-21 11:00）</div>';
+        '<div>5、部门领导审批：审批通过（2026-03-20 11:05）</div>';
     }
   }
 
