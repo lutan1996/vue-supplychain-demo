@@ -488,6 +488,9 @@
       function normalizeAssetCategory(v) {
         return assetTypeName({ assetType: v });
       }
+      function setPurchaseLedgerProgressScope(scope) {
+        window.__mapProgressFlowScope = scope || "";
+      }
       function ledgerDetailProductCode(baseCode, idx) {
         if (MCS && /^B\d{8}$/i.test(String(baseCode || ""))) {
           return MCS.instanceCodeWithOffset(baseCode, idx - 1);
@@ -2648,8 +2651,10 @@
         var body = document.getElementById("detailBody");
         var detailProgressTopEl = document.getElementById("detailProgressTop");
         if (detailProgressTopEl) detailProgressTopEl.style.display = "none";
+        setPurchaseLedgerProgressScope("");
         if (row && row.flowNo) {
           if (detailProgressTopEl) detailProgressTopEl.style.display = "";
+          setPurchaseLedgerProgressScope("purchase-ledger-transfer");
           var flowCols = (tabs.flow && tabs.flow.columns) || [];
           var flowHead = '<div class="detail-grid">' + buildDetailGridByColumns(row, flowCols) + '</div>';
           var flowCount = Math.max(0, Number(row.qty) || 0);
@@ -2711,6 +2716,7 @@
         }
         if (row && row.reqNo) {
           if (detailProgressTopEl) detailProgressTopEl.style.display = "";
+          setPurchaseLedgerProgressScope("purchase-ledger-requisition");
           var ledgerRows = (tabs.ledger && tabs.ledger.rows) || [];
           var matched = null;
           var reqCode = String(row.code || "").trim();
@@ -2837,6 +2843,7 @@
         document.getElementById("detailMask").classList.remove("show");
         var detailProgressTopEl = document.getElementById("detailProgressTop");
         if (detailProgressTopEl) detailProgressTopEl.style.display = "none";
+        setPurchaseLedgerProgressScope("");
       }
       var actionCtx = { mode:"", row:null };
       function openActionModal(mode, row){
@@ -2917,6 +2924,7 @@
               + '<div style="margin-top:8px;color:#64748b">物资类型编码：'+esc(row.code||row.assetNo||"-")+'<br>物资类型名称：'+esc(row.name||"-")+'</div>';
           }
         } else if(mode==="requisition"){
+          setPurchaseLedgerProgressScope("purchase-ledger-requisition");
           titleEl.textContent = "新增领用";
           okEl.style.display = "";
           okEl.textContent = "确定";
@@ -3024,6 +3032,7 @@
             });
           })();
         } else if(mode==="transfer"){
+          setPurchaseLedgerProgressScope("purchase-ledger-transfer");
           titleEl.textContent = "内部流转";
           okEl.style.display = "";
           okEl.textContent = "确定";
@@ -3147,6 +3156,7 @@
         document.getElementById("actionMask").classList.remove("show");
         var progressTopEl = document.getElementById("actionProgressTop");
         if (progressTopEl) progressTopEl.style.display = "none";
+        setPurchaseLedgerProgressScope("");
         actionCtx = { mode:"", row:null };
       }
 

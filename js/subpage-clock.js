@@ -1958,8 +1958,77 @@
     }
   }
 
+  function isPurchaseLedgerFlowScope(scope) {
+    var file = (location.pathname || "").split("/").pop();
+    return file === "purchase-ledger.html" && window.__mapProgressFlowScope === scope;
+  }
+
+  function patchRequisitionProgressFlow(mask) {
+    if (!mask || !isPurchaseLedgerFlowScope("purchase-ledger-requisition")) return;
+    var row = mask.querySelector(".map-flow-row");
+    var info = mask.querySelector(".map-flow-info");
+    if (!row) return;
+    row.outerHTML =
+      '<div class="map-flow-row" style="grid-template-columns:repeat(11,1fr)">' +
+      '<span class="map-flow-node">使用部门负责人任向人发起领用流程，从公司库中选取物资清单</span>' +
+      '<span class="map-flow-arrow">→</span>' +
+      '<span class="map-flow-node">使用部门负责人审批，通过</span>' +
+      '<span class="map-flow-arrow">→</span>' +
+      '<span class="map-flow-node">物资管理部门专责核对清单，无误</span>' +
+      '<span class="map-flow-arrow">→</span>' +
+      '<span class="map-flow-node">物资管理部门负责人审核，同意</span>' +
+      '<span class="map-flow-arrow">→</span>' +
+      '<span class="map-flow-node end">领用结束，物资归入使用部门名下</span>' +
+      '<span class="map-flow-dot end"></span>' +
+      '</div>';
+    if (info) {
+      info.innerHTML =
+        '<div>1、电控所负责人任向人发起领用流程，从公司库中选取物资清单（2026-05-10 09:12）</div>' +
+        '<div>2、电控所负责人张磊审批：通过（2026-05-10 10:03）</div>' +
+        '<div>3、物资管理部门专责陈志远核对清单：无误（2026-05-10 10:28）</div>' +
+        '<div>4、物资管理部门负责人王立军审核：同意（2026-05-10 10:48）</div>' +
+        '<div>5、领用结束，物资归入电控所名下（2026-05-10 11:05）</div>';
+    }
+  }
+
+  function patchTransferProgressFlow(mask) {
+    if (!mask || !isPurchaseLedgerFlowScope("purchase-ledger-transfer")) return;
+    var row = mask.querySelector(".map-flow-row");
+    var track = mask.querySelector(".map-flow-track");
+    var info = mask.querySelector(".map-flow-info");
+    if (!row || !track) return;
+    row.outerHTML =
+      '<div class="map-flow-row" style="grid-template-columns:repeat(11,1fr)">' +
+      '<span class="map-flow-node">电控所发起申请，将机械所物资转入本部门</span>' +
+      '<span class="map-flow-arrow">→</span>' +
+      '<span class="map-flow-node">电控所负责人审批，通过</span>' +
+      '<span class="map-flow-arrow">→</span>' +
+      '<span class="map-flow-node">机械所物资专责审批，通过</span>' +
+      '<span class="map-flow-arrow">→</span>' +
+      '<span class="map-flow-node">机械所负责人审批，通过</span>' +
+      '<span class="map-flow-arrow">→</span>' +
+      '<span class="map-flow-node">物资管理部门物资专责确认</span>' +
+      '<span class="map-flow-arrow">→</span>' +
+      '</div>' +
+      '<div class="map-flow-row" style="grid-template-columns:repeat(11,1fr);margin-top:18px">' +
+      '<span class="map-flow-node end">公司内部流转结束</span>' +
+      '<span class="map-flow-dot end"></span>' +
+      '</div>';
+    if (info) {
+      info.innerHTML =
+        '<div>1、电控所发起申请：电控所流转到机械所（2026-05-10 09:12）</div>' +
+        '<div>2、电控所负责人审批：通过（2026-05-10 10:03）</div>' +
+        '<div>3、机械所物资专责审批：通过（2026-05-10 10:28）</div>' +
+        '<div>4、机械所负责人审批：通过（2026-05-10 10:48）</div>' +
+        '<div>5、物资管理部门物资专责确认：已确认（2026-05-10 11:05）</div>' +
+        '<div>6、公司内部流转结束（2026-05-10 11:30）</div>';
+    }
+  }
+
   function patchProgressModalForPage(mask) {
     patchInventoryInboundProgressFlow(mask);
+    patchRequisitionProgressFlow(mask);
+    patchTransferProgressFlow(mask);
   }
 
   function openUnifiedProgressModalGlobal() {
