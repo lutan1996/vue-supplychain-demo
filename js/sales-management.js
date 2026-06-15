@@ -12,6 +12,7 @@
     receive: '<svg viewBox="0 0 16 16"><path d="M3 3h10v10H3z" fill="none" stroke="currentColor" stroke-width="1.2"/><path d="M5 8l2 2 4-5" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>',
     track: '<svg viewBox="0 0 16 16"><path d="M3 3v10M3 4h7l-1 2 1 2H3M6 13h7" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>'
   };
+  var cartItems = [];
 
   function esc(v) {
     return String(v == null ? "" : v).replace(/[&<>"']/g, function (m) {
@@ -56,6 +57,8 @@
     box.classList.remove("sales-modal--small", "sales-modal--wide");
     if (small === "wide") box.classList.add("sales-modal--wide");
     else if (small) box.classList.add("sales-modal--small");
+    var oldHeadAction = mask.querySelector(".sales-modal-head-action");
+    if (oldHeadAction) oldHeadAction.remove();
     document.getElementById("salesModalTitle").textContent = title;
     document.getElementById("salesModalBody").innerHTML = body;
     document.getElementById("salesModalFoot").innerHTML = foot || '<button type="button" class="sales-btn" data-close>关闭</button>';
@@ -70,6 +73,17 @@
   }
   document.addEventListener("click", function (e) {
     if (e.target && e.target.closest && e.target.closest("[data-close]")) closeModal();
+  });
+  document.addEventListener("click", function (e) {
+    var close = e.target && e.target.closest ? e.target.closest("[data-sales-flow-close]") : null;
+    if (close) closeSalesFlowModal();
+    var tab = e.target && e.target.closest ? e.target.closest(".sales-flow-tab") : null;
+    if (!tab) return;
+    var mask = document.getElementById("salesFlowMask");
+    if (!mask) return;
+    var key = tab.getAttribute("data-tab");
+    mask.querySelectorAll(".sales-flow-tab").forEach(function (x) { x.classList.toggle("is-active", x === tab); });
+    mask.querySelectorAll(".sales-flow-pane").forEach(function (x) { x.classList.toggle("is-active", x.getAttribute("data-pane") === key); });
   });
 
   function productDetailHtml(p) {
@@ -124,8 +138,6 @@
     var name = row[5];
     var code = row[4];
     var orderNo = row[1];
-    var logisticsNo = row[15];
-    var status = row[17];
     return '<div class="sales-track">' +
       '<div class="sales-track-map">' +
       '<svg viewBox="0 0 1000 360" preserveAspectRatio="none" aria-hidden="true"><path d="M120 260 C 275 108, 435 118, 565 178 S 805 250, 895 124" fill="none" stroke="#1689ff" stroke-width="7" stroke-linecap="round" stroke-dasharray="12 12"/></svg>' +
@@ -134,22 +146,117 @@
       '<div class="sales-track-point sales-track-point--end">收货地</div>' +
       '</div>' +
       '<div class="sales-track-title">物资跟踪</div>' +
-      '<div class="sales-track-info">' +
-      '<div>运单号：<span>' + esc(logisticsNo || "WL2026061401") + '</span></div>' +
-      '<div>关联订单号：<span>' + esc(orderNo || "XSORD-2026-003") + '</span></div>' +
-      '<div>承运商：<span>华通物流有限公司</span></div>' +
-      '<div>起始地：<span>北京市朝阳区物流园A区</span></div>' +
-      '<div>目的地：<span>' + esc(row[3] || "项目公司场站") + '</span></div>' +
-      '<div>当前状态：<span>' + esc(status || "运输中") + '</span></div>' +
-      '<div>最后更新时间：<span>2026-06-15 11:20</span></div>' +
-      '<div>数据来源：<span>销售发货单同步</span></div>' +
-      '<div>当前位置（轨迹示意）：<span>济南中转仓</span></div>' +
-      '</div>' +
-      '<div class="sales-track-detail-grid">' +
-      '<div class="sales-track-panel"><h4>物资信息</h4><ul class="sales-track-list"><li>物资名称：' + esc(name || "—") + '</li><li>物资编码：' + esc(code || "—") + '</li><li>规格型号：' + esc(row[6] || "—") + '</li><li>销售合同编号：' + esc(row[9] || "—") + '</li></ul></div>' +
-      '<div class="sales-track-panel"><h4>流转节点</h4><ul class="sales-track-list"><li>2026-06-14 工程技术公司完成发货确认</li><li>2026-06-15 到达济南中转仓，等待干线转运</li><li>预计 2026-06-16 送达项目公司场站</li></ul></div>' +
-      '</div>' +
+      '<div class="sales-track-item"><span class="sales-track-dot" style="background:#2563eb"></span><div><div class="sales-track-main">2026.4.20 入库：' + esc(name || "销售类物资") + '（' + esc(code || "—") + '）</div><div class="sales-track-sub">存放龙源工程技术公司中心库，形成可销售库存。</div></div></div>' +
+      '<div class="sales-track-item"><span class="sales-track-dot" style="background:#10b981"></span><div><div class="sales-track-main">2026.6.10 项目公司下单</div><div class="sales-track-sub">关联订单：' + esc(orderNo || "XSORD-2026-003") + '，进入销售订单管理。</div></div></div>' +
+      '<div class="sales-track-item"><span class="sales-track-dot" style="background:#6366f1"></span><div><div class="sales-track-main">2026.6.14 发货确认</div><div class="sales-track-sub">物流单号 WL2026061401，发货路径：直发现场/项目公司。</div></div></div>' +
+      '<div class="sales-track-item"><span class="sales-track-dot" style="background:#f59e0b"></span><div><div class="sales-track-main">2026.6.15 项目公司收货</div><div class="sales-track-sub">状态更新为已购入，进入购入物资台账。</div></div></div>' +
       '</div>';
+  }
+  function updateCartButton() {
+    var btn = document.getElementById("salesCartBtn");
+    if (!btn) return;
+    var total = cartItems.reduce(function (s, x) { return s + Number(x.qty || 0); }, 0);
+    btn.innerHTML = total ? '<span class="sales-cart-count">' + total + '</span>' : "";
+  }
+  function addToCart(product, qty) {
+    var old = cartItems.find(function (x) { return x.id === product.id; });
+    if (old) old.qty += qty;
+    else cartItems.push({
+      id: product.id,
+      productName: product.productName,
+      mfrName: product.mfrName,
+      model: product.model,
+      code: product.b,
+      stockQty: product.stockQty,
+      qty: qty
+    });
+    updateCartButton();
+  }
+  function openAddCartModal(product) {
+    openModal("加购数量", '<div class="sales-qty-box"><div class="sales-field"><label>物资名称</label><input readonly value="' + esc(product.productName) + '"></div><div class="sales-field"><label>加购数量</label><input id="salesAddQty" type="number" min="1" value="1"></div></div>', '<button class="sales-btn" data-close>取消</button><button class="sales-btn sales-btn-primary" id="salesAddCartOk">确定</button>', true);
+    var ok = document.getElementById("salesAddCartOk");
+    if (ok) ok.addEventListener("click", function () {
+      var qtyEl = document.getElementById("salesAddQty");
+      var qty = Math.max(1, Number(qtyEl && qtyEl.value || 1));
+      addToCart(product, qty);
+      closeModal();
+      toast("已加入购物车");
+    });
+  }
+  function cartHtml() {
+    if (!cartItems.length) return '<div class="sales-empty">暂无加购物资</div>';
+    var total = cartItems.reduce(function (s, x) { return s + Number(x.qty || 0); }, 0);
+    return '<div class="sales-cart-summary"><span>已加购 ' + cartItems.length + ' 类物资，共 ' + total + ' 件</span></div>' +
+      '<table class="sales-cart-table"><thead><tr><th>序号</th><th>物资名称</th><th>制造商</th><th>规格型号</th><th>产品编码</th><th>库存数量</th><th>加购数量</th></tr></thead><tbody>' +
+      cartItems.map(function (x, i) {
+        return '<tr><td>' + (i + 1) + '</td><td>' + esc(x.productName) + '</td><td>' + esc(x.mfrName) + '</td><td>' + esc(x.model) + '</td><td>' + esc(x.code) + '</td><td>' + esc(x.stockQty) + '</td><td>' + esc(x.qty) + '</td></tr>';
+      }).join("") + '</tbody></table>' +
+      '<div class="sales-section-title">提交信息</div>' +
+      '<div class="sales-form-grid"><div class="sales-field"><label>提交部门</label><input readonly value="电控所"></div><div class="sales-field"><label>收货单位</label><input readonly value="山西龙源"></div><div class="sales-field"><label>发货路径</label><select><option>工程技术公司发货</option><option>供应商直发</option></select></div><div class="sales-field"><label>期望发货日期</label><input type="date" value="2026-06-20"></div><div class="sales-field sales-field--full"><label>备注</label><textarea>销售类物资统一加购后提交审核。</textarea></div></div>';
+  }
+  function openCartModal() {
+    var foot = cartItems.length ? '<button class="sales-btn" data-close>取消</button><button class="sales-btn sales-btn-primary" id="salesCartSubmit">确定提交，提交审核</button>' : '<button class="sales-btn" data-close>关闭</button>';
+    openModal("购物车", cartHtml(), foot, "wide");
+    if (cartItems.length) {
+      var hd = document.querySelector("#salesModalMask .sales-modal-hd");
+      var close = document.querySelector("#salesModalMask .sales-modal-close");
+      if (hd && close) {
+        var headBtn = document.createElement("button");
+        headBtn.type = "button";
+        headBtn.className = "sales-flow-link sales-modal-head-action";
+        headBtn.id = "salesCartFlowBtn";
+        headBtn.textContent = "流程进度";
+        hd.insertBefore(headBtn, close);
+      }
+    }
+    var flow = document.getElementById("salesCartFlowBtn");
+    if (flow) flow.addEventListener("click", openSalesFlowModal);
+    var submit = document.getElementById("salesCartSubmit");
+    if (submit) submit.addEventListener("click", function () {
+      toast("已提交审核");
+      closeModal();
+    });
+  }
+  function ensureSalesFlowModal() {
+    var mask = document.getElementById("salesFlowMask");
+    if (mask) return mask;
+    mask = document.createElement("div");
+    mask.id = "salesFlowMask";
+    mask.className = "sales-flow-mask";
+    var nodes = [
+      "电控所从本部门所属“销售类”物资中选取物资进行销售提交订单",
+      "电控所负责人同意",
+      "签订销售合同",
+      "电控所发货",
+      "山西龙源收货，验收通过",
+      "销售结束，系统上传销售合同",
+      "流程结束"
+    ];
+    mask.innerHTML = '<div class="sales-flow-dialog" role="dialog" aria-label="审批记录">' +
+      '<div class="sales-flow-hd"><span>审批记录</span><button type="button" class="sales-flow-close" data-sales-flow-close="1">&times;</button></div>' +
+      '<div class="sales-flow-body"><div class="sales-flow-tabs"><button type="button" class="sales-flow-tab is-active" data-tab="flow">流程图</button><button type="button" class="sales-flow-tab" data-tab="info">审批信息</button></div>' +
+      '<div class="sales-flow-pane is-active" data-pane="flow"><div class="sales-flow-track"><div class="sales-flow-row">' +
+      nodes.map(function (n, i) {
+        return (i === 0 ? '<span class="sales-flow-dot"></span>' : '<span class="sales-flow-arrow">→</span>') + '<span class="sales-flow-node' + (i === nodes.length - 1 ? " end" : "") + '">' + esc(n) + '</span>' + (i === nodes.length - 1 ? '<span class="sales-flow-dot end"></span>' : "");
+      }).join("") +
+      '</div></div></div><div class="sales-flow-pane" data-pane="info"><div class="sales-flow-info">' +
+      '<p>1. 电控所物资专责从本部门所属销售类物资中选取物资，填写加购数量并提交销售订单。</p>' +
+      '<p>2. 电控所负责人审核销售物资清单、库存数量和销售用途，审批结论：同意。</p>' +
+      '<p>3. 经营人员与山西龙源完成销售合同签订，并登记销售合同编号。</p>' +
+      '<p>4. 电控所依据合同安排发货，更新物流信息。</p>' +
+      '<p>5. 山西龙源完成收货和验收，验收结论：通过。</p>' +
+      '<p>6. 销售结束后系统上传销售合同，流程归档结束。</p>' +
+      '</div></div></div><div class="sales-flow-ft"><button type="button" data-sales-flow-close="1">关闭</button></div></div>';
+    document.body.appendChild(mask);
+    mask.addEventListener("click", function (e) { if (e.target === mask) closeSalesFlowModal(); });
+    return mask;
+  }
+  function openSalesFlowModal() {
+    ensureSalesFlowModal().classList.add("show");
+  }
+  function closeSalesFlowModal() {
+    var mask = document.getElementById("salesFlowMask");
+    if (mask) mask.classList.remove("show");
   }
 
   function initMaterialList() {
@@ -282,7 +389,7 @@
       renderProducts();
     });
     document.getElementById("salesCartBtn").addEventListener("click", function () {
-      toast("已打开加购清单（演示）");
+      openCartModal();
     });
     tbody.addEventListener("click", function (e) {
       var btn = e.target.closest("[data-action]");
@@ -291,11 +398,12 @@
       var act = btn.getAttribute("data-action");
       if (!p) return;
       if (act === "view-product") openModal("查看物资", productDetailHtml(p), '<button class="sales-btn" data-close>关闭</button>');
-      if (act === "cart") toast("已将「" + p.productName + "」加入购物车");
+      if (act === "cart") openAddCartModal(p);
       if (act === "direct") openOrderForm(p);
     });
     renderTree();
     renderProducts();
+    updateCartButton();
   }
 
   function openOrderForm(product) {
