@@ -1451,6 +1451,7 @@
       ".map-flow-row{display:grid;grid-template-columns:repeat(17,1fr);align-items:stretch;gap:6px;}" +
       ".map-flow-node{min-width:0;max-width:none;padding:8px 8px;border-radius:10px;border:1px solid #cfe8cf;background:#edf8ed;color:#315c35;font-size:11.5px;line-height:1.3;text-align:center;white-space:normal;display:flex;align-items:center;justify-content:center;word-break:break-word;grid-column:span 1;min-height:42px;}" +
       ".map-flow-node.end{background:#fff8e6;border-color:#f0dca8;color:#7a5a14;}" +
+      "/* map-flow-bust:20260615-v4 */" +
       ".map-flow-dot{width:10px;height:10px;border-radius:999px;border:1px solid #7bc67b;background:#ddf5dd;flex:none;}" +
       ".map-flow-dot.end{border-color:#e89292;background:#ffe8e8;}" +
       ".map-flow-arrow{color:#8ca0b3;font-size:16px;line-height:1;display:inline-flex;align-items:center;justify-content:center;flex:none;padding:0 2px;}" +
