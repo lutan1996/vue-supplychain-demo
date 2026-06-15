@@ -17,8 +17,7 @@
 .sales-btn-primary:hover{background:#1677d2;border-color:#1677d2}
 .sales-btn-danger{color:#cf1322;border-color:#ffccc7;background:#fff7f6}
 .sales-cart-btn{width:36px;padding:0;position:relative;justify-content:center}
-.sales-cart-btn::before{content:"";width:16px;height:13px;border:2px solid currentColor;border-top:0;border-radius:2px;display:block;box-sizing:border-box;transform:translateY(1px)}
-.sales-cart-btn::after{content:"";position:absolute;width:6px;height:6px;border-left:2px solid currentColor;border-top:2px solid currentColor;left:10px;top:8px;transform:rotate(-12deg)}
+.sales-cart-icon{width:20px;height:20px;display:block;pointer-events:none}
 .sales-cart-count{position:absolute;right:-6px;top:-6px;min-width:18px;height:18px;padding:0 5px;border-radius:999px;background:#ff4d4f;color:#fff;font-size:11px;line-height:18px;text-align:center;box-shadow:0 0 0 2px #fff;box-sizing:border-box}
 .sales-table-wrap{border:1px solid #dde3ea;border-radius:4px;overflow:auto;background:#fff;max-width:100%}
 .sales-table{width:max-content;min-width:1280px;border-collapse:collapse;font-size:12px;background:#fff;table-layout:auto}
