@@ -1875,7 +1875,8 @@
       '          <span class="map-flow-node">业务部门负责人审批，同意入库</span><span class="map-flow-arrow">→</span>' +
       '          <span class="map-flow-node">物资管理部门物资负责人审核分类</span><span class="map-flow-arrow">→</span>' +
       '          <span class="map-flow-node">分管领导部门负责人审批，同意</span><span class="map-flow-arrow">→</span>' +
-      '          <span class="map-flow-node end">入公司库结束</span><span class="map-flow-dot end"></span>' +
+      '          <span class="map-flow-node">部门领导审批，审批通过</span><span class="map-flow-arrow">→</span>' +
+      '          <span class="map-flow-node end">结束</span><span class="map-flow-dot end"></span>' +
       "        </div>" +
       "      </div>" +
       "    </div>" +
