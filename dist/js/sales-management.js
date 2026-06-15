@@ -300,7 +300,7 @@
   function openOrderForm(product) {
     var name = product ? product.productName + " ×1" : "请选择物资";
     openModal("新增订单", '<div class="sales-form-grid">' +
-      '<div class="sales-field"><label>发货/销售路径</label><select id="salesPath"><option>直发现场/项目公司</option><option>先发龙源工程技术公司，再由龙源销售给项目公司</option></select></div>' +
+      '<div class="sales-field"><label>发货路径</label><select id="salesPath"><option>工程技术公司发货</option><option>供应商直发</option></select></div>' +
       '<div class="sales-field"><label>下单公司</label><select><option>河北龙源</option><option>天津龙源</option><option>甘肃龙源</option></select></div>' +
       '<div class="sales-field"><label>场站名称</label><input value="麒麟山风电场"></div>' +
       '<div class="sales-field"><label>期望到货日期</label><input type="date" value="2026-06-30"></div>' +
