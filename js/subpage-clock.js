@@ -1965,10 +1965,10 @@
 
   function patchRequisitionProgressFlow(mask) {
     if (!mask || !isPurchaseLedgerFlowScope("purchase-ledger-requisition")) return;
-    var row = mask.querySelector(".map-flow-row");
+    var track = mask.querySelector(".map-flow-track");
     var info = mask.querySelector(".map-flow-info");
-    if (!row) return;
-    row.outerHTML =
+    if (!track) return;
+    track.innerHTML =
       '<div class="map-flow-row" style="grid-template-columns:repeat(11,1fr)">' +
       '<span class="map-flow-node">电控所负责人张军发起领用流程，从公司库中选取物资清单</span>' +
       '<span class="map-flow-arrow">→</span>' +
@@ -1993,11 +1993,10 @@
 
   function patchTransferProgressFlow(mask) {
     if (!mask || !isPurchaseLedgerFlowScope("purchase-ledger-transfer")) return;
-    var row = mask.querySelector(".map-flow-row");
     var track = mask.querySelector(".map-flow-track");
     var info = mask.querySelector(".map-flow-info");
-    if (!row || !track) return;
-    row.outerHTML =
+    if (!track) return;
+    track.innerHTML =
       '<div class="map-flow-row" style="grid-template-columns:repeat(11,1fr)">' +
       '<span class="map-flow-node">电控所发起申请，将机械所物资转入本部门</span>' +
       '<span class="map-flow-arrow">→</span>' +
