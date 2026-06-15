@@ -13,6 +13,11 @@
     track: '<svg viewBox="0 0 16 16"><path d="M3 3v10M3 4h7l-1 2 1 2H3M6 13h7" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>'
   };
   var cartItems = [];
+  try {
+    cartItems = JSON.parse(localStorage.getItem("salesCartItems") || "[]") || [];
+  } catch (eCartStore) {
+    cartItems = [];
+  }
 
   function esc(v) {
     return String(v == null ? "" : v).replace(/[&<>"']/g, function (m) {
@@ -158,6 +163,10 @@
     var total = cartItems.reduce(function (s, x) { return s + Number(x.qty || 0); }, 0);
     btn.innerHTML = '<svg class="sales-cart-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6h15l-2 8H8L6 3H3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="9" cy="20" r="1.6" fill="currentColor"/><circle cx="18" cy="20" r="1.6" fill="currentColor"/></svg>' + (total ? '<span class="sales-cart-count">' + total + '</span>' : "");
   }
+  function saveCart() {
+    try { localStorage.setItem("salesCartItems", JSON.stringify(cartItems)); } catch (eCartStore) {}
+    updateCartButton();
+  }
   function addToCart(product, qty) {
     var old = cartItems.find(function (x) { return x.id === product.id; });
     if (old) old.qty += qty;
@@ -170,7 +179,7 @@
       stockQty: product.stockQty,
       qty: qty
     });
-    updateCartButton();
+    saveCart();
   }
   function openAddCartModal(product) {
     openModal("加购数量", '<div class="sales-qty-box"><div class="sales-field"><label>物资名称</label><input readonly value="' + esc(product.productName) + '"></div><div class="sales-field"><label>加购数量</label><input id="salesAddQty" type="number" min="1" value="1"></div></div>', '<button class="sales-btn" data-close>取消</button><button class="sales-btn sales-btn-primary" id="salesAddCartOk">确定</button>', true);
@@ -187,15 +196,65 @@
     if (!cartItems.length) return '<div class="sales-empty">暂无加购物资</div>';
     var total = cartItems.reduce(function (s, x) { return s + Number(x.qty || 0); }, 0);
     return '<div class="sales-cart-summary"><span>已加购 ' + cartItems.length + ' 类物资，共 ' + total + ' 件</span></div>' +
-      '<table class="sales-cart-table"><thead><tr><th>序号</th><th>物资名称</th><th>制造商</th><th>规格型号</th><th>产品编码</th><th>库存数量</th><th>加购数量</th></tr></thead><tbody>' +
+      '<table class="sales-cart-table"><thead><tr><th>序号</th><th>物资名称</th><th>制造商</th><th>规格型号</th><th>产品编码</th><th>库存数量</th><th>加购数量</th><th>操作</th></tr></thead><tbody>' +
       cartItems.map(function (x, i) {
-        return '<tr><td>' + (i + 1) + '</td><td>' + esc(x.productName) + '</td><td>' + esc(x.mfrName) + '</td><td>' + esc(x.model) + '</td><td>' + esc(x.code) + '</td><td>' + esc(x.stockQty) + '</td><td>' + esc(x.qty) + '</td></tr>';
+        return '<tr data-cart-id="' + esc(x.id) + '"><td>' + (i + 1) + '</td><td>' + esc(x.productName) + '</td><td>' + esc(x.mfrName) + '</td><td>' + esc(x.model) + '</td><td>' + esc(x.code) + '</td><td>' + esc(x.stockQty) + '</td><td><div class="sales-cart-qty"><button type="button" data-cart-minus="' + esc(x.id) + '">-</button><input type="number" min="1" value="' + esc(x.qty) + '" data-cart-qty="' + esc(x.id) + '"><button type="button" data-cart-plus="' + esc(x.id) + '">+</button></div></td><td><button type="button" class="sales-cart-remove" data-cart-remove="' + esc(x.id) + '">删除</button></td></tr>';
       }).join("") + '</tbody></table>' +
       '<div class="sales-section-title">提交信息</div>' +
       '<div class="sales-form-grid"><div class="sales-field"><label>提交部门</label><input readonly value="电控所"></div><div class="sales-field"><label>收货单位</label><input readonly value="山西龙源"></div><div class="sales-field"><label>发货路径</label><select><option>工程技术公司发货</option><option>供应商直发</option></select></div><div class="sales-field"><label>期望发货日期</label><input type="date" value="2026-06-20"></div><div class="sales-field sales-field--full"><label>备注</label><textarea>销售类物资统一加购后提交审核。</textarea></div></div>';
   }
+  function refreshCartModal() {
+    var body = document.getElementById("salesModalBody");
+    var foot = document.getElementById("salesModalFoot");
+    if (!body || !foot) return;
+    body.innerHTML = cartHtml();
+    foot.innerHTML = cartItems.length ? '<button class="sales-btn" data-close>取消</button><button class="sales-btn sales-btn-primary" id="salesCartSubmit">确定提交</button>' : '<button class="sales-btn" data-close>关闭</button>';
+    bindCartModalEvents();
+  }
+  function changeCartQty(id, nextQty) {
+    var item = cartItems.find(function (x) { return x.id === id; });
+    if (!item) return;
+    item.qty = Math.max(1, Number(nextQty || 1));
+    saveCart();
+    refreshCartModal();
+  }
+  function removeCartItem(id) {
+    cartItems = cartItems.filter(function (x) { return x.id !== id; });
+    saveCart();
+    refreshCartModal();
+  }
+  function bindCartModalEvents() {
+    var body = document.getElementById("salesModalBody");
+    if (body) {
+      body.querySelectorAll("[data-cart-minus]").forEach(function (btn) {
+        btn.addEventListener("click", function () {
+          var id = btn.getAttribute("data-cart-minus");
+          var item = cartItems.find(function (x) { return x.id === id; });
+          if (item) changeCartQty(id, Number(item.qty) - 1);
+        });
+      });
+      body.querySelectorAll("[data-cart-plus]").forEach(function (btn) {
+        btn.addEventListener("click", function () {
+          var id = btn.getAttribute("data-cart-plus");
+          var item = cartItems.find(function (x) { return x.id === id; });
+          if (item) changeCartQty(id, Number(item.qty) + 1);
+        });
+      });
+      body.querySelectorAll("[data-cart-qty]").forEach(function (inp) {
+        inp.addEventListener("change", function () { changeCartQty(inp.getAttribute("data-cart-qty"), inp.value); });
+      });
+      body.querySelectorAll("[data-cart-remove]").forEach(function (btn) {
+        btn.addEventListener("click", function () { removeCartItem(btn.getAttribute("data-cart-remove")); });
+      });
+    }
+    var submit = document.getElementById("salesCartSubmit");
+    if (submit) submit.addEventListener("click", function () {
+      toast("已提交审核");
+      closeModal();
+    });
+  }
   function openCartModal() {
-    var foot = cartItems.length ? '<button class="sales-btn" data-close>取消</button><button class="sales-btn sales-btn-primary" id="salesCartSubmit">确定提交，提交审核</button>' : '<button class="sales-btn" data-close>关闭</button>';
+    var foot = cartItems.length ? '<button class="sales-btn" data-close>取消</button><button class="sales-btn sales-btn-primary" id="salesCartSubmit">确定提交</button>' : '<button class="sales-btn" data-close>关闭</button>';
     openModal("购物车", cartHtml(), foot, "wide");
     if (cartItems.length) {
       var hd = document.querySelector("#salesModalMask .sales-modal-hd");
@@ -211,11 +270,7 @@
     }
     var flow = document.getElementById("salesCartFlowBtn");
     if (flow) flow.addEventListener("click", openSalesFlowModal);
-    var submit = document.getElementById("salesCartSubmit");
-    if (submit) submit.addEventListener("click", function () {
-      toast("已提交审核");
-      closeModal();
-    });
+    bindCartModalEvents();
   }
   function ensureSalesFlowModal() {
     var mask = document.getElementById("salesFlowMask");
