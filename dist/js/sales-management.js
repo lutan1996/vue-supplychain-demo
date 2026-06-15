@@ -43,7 +43,7 @@
     mask = document.createElement("div");
     mask.id = "salesModalMask";
     mask.className = "sales-modal-mask";
-    mask.innerHTML = '<div class="sales-modal"><div class="sales-modal-hd" id="salesModalTitle"></div><div class="sales-modal-bd" id="salesModalBody"></div><div class="sales-modal-ft" id="salesModalFoot"></div></div>';
+    mask.innerHTML = '<div class="sales-modal"><div class="sales-modal-hd"><span id="salesModalTitle"></span><button type="button" class="sales-modal-close" data-close aria-label="关闭">×</button></div><div class="sales-modal-bd" id="salesModalBody"></div><div class="sales-modal-ft" id="salesModalFoot"></div></div>';
     document.body.appendChild(mask);
     mask.addEventListener("click", function (e) {
       if (e.target === mask) closeModal();
@@ -90,6 +90,20 @@
     return '<table class="sales-table" style="min-width:0"><tbody>' + rows.map(function (r) {
       return "<tr><th>" + esc(r[0]) + "</th><td>" + esc(r[1] || "—") + "</td></tr>";
     }).join("") + "</tbody></table>";
+  }
+  function infoGridHtml(labels, row) {
+    return '<div class="sales-form-grid">' + labels.map(function (k, i) {
+      return '<div class="sales-field' + (String(row[i] || "").length > 22 ? " sales-field--full" : "") + '"><label>' + esc(k) + '</label><input readonly value="' + esc(row[i] || "—") + '"></div>';
+    }).join("") + "</div>";
+  }
+  function trackHtml(name, code, orderNo) {
+    return '<div class="sales-track">' +
+      '<div class="sales-track-title">物资跟踪</div>' +
+      '<div class="sales-track-item"><span class="sales-track-dot" style="background:#2563eb"></span><div><div class="sales-track-main">2026.4.20 入库：' + esc(name || "销售类物资") + '（' + esc(code || "—") + '）</div><div class="sales-track-sub">存放龙源工程技术公司中心库，形成可销售库存。</div></div></div>' +
+      '<div class="sales-track-item"><span class="sales-track-dot" style="background:#10b981"></span><div><div class="sales-track-main">2026.6.10 项目公司下单</div><div class="sales-track-sub">关联订单：' + esc(orderNo || "XSORD-2026-003") + '，进入销售订单管理。</div></div></div>' +
+      '<div class="sales-track-item"><span class="sales-track-dot" style="background:#6366f1"></span><div><div class="sales-track-main">2026.6.14 发货确认</div><div class="sales-track-sub">物流单号 WL2026061401，发货路径：直发现场/项目公司。</div></div></div>' +
+      '<div class="sales-track-item"><span class="sales-track-dot" style="background:#f59e0b"></span><div><div class="sales-track-main">2026.6.15 项目公司收货</div><div class="sales-track-sub">状态更新为已购入，进入购入物资台账。</div></div></div>' +
+      '</div>';
   }
 
   function initMaterialList() {
@@ -282,15 +296,15 @@
       if (!row) return;
       var act = btn.getAttribute("data-action");
       if (act === "view-order") {
-        openModal("查看订单", '<div class="sales-form-grid">' + ["订单编号","下单人","下单公司","场站名称","下单日期","物资清单","订单数量","订单金额","订单状态","当前处理人","销售合同号","销售合同编号","物流单号","发货日期","收货日期","发货/销售路径"].map(function (k, i) {
-          return '<div class="sales-field' + (i === 5 || i === 15 ? " sales-field--full" : "") + '"><label>' + k + '</label><input readonly value="' + esc(row[i]) + '"></div>';
-        }).join("") + "</div>", '<button class="sales-btn" data-close>关闭</button>');
+        openModal("查看订单", infoGridHtml(["订单编号","下单人","下单公司","场站名称","下单日期","物资清单","订单数量","订单金额","订单状态","当前处理人","销售合同号","销售合同编号","物流单号","发货日期","收货日期","发货/销售路径"], row), '<button class="sales-btn" data-close>关闭</button>');
       } else if (act === "approve-order") {
         openModal("订单审核", '<div class="sales-form-grid"><div class="sales-field"><label>审批结论</label><select><option>同意销售</option><option>驳回</option></select></div><div class="sales-field"><label>销售合同号</label><input value="' + esc(row[10]) + '"></div><div class="sales-field sales-field--full"><label>审批意见</label><textarea>同意销售，进入合同上传及发货环节。</textarea></div></div>', '<button class="sales-btn" data-close>取消</button><button class="sales-btn sales-btn-primary" data-close>确认提交</button>');
       } else if (act === "upload-contract") {
         openModal("上传销售合同", '<div class="sales-form-grid"><div class="sales-field"><label>销售合同号</label><input value="' + esc(row[10]) + '"></div><div class="sales-field"><label>销售合同编号</label><input value="' + esc(row[11]) + '"></div><div class="sales-field sales-field--full"><label>合同附件</label><input type="file"></div></div>', '<button class="sales-btn" data-close>取消</button><button class="sales-btn sales-btn-primary" data-close>上传</button>', true);
-      } else {
-        toast(btn.title + "完成（演示）");
+      } else if (act === "ship-order") {
+        openModal("发货确认", '<div class="sales-form-grid"><div class="sales-field"><label>订单编号</label><input readonly value="' + esc(row[0]) + '"></div><div class="sales-field"><label>物流单号</label><input value="' + esc(row[12] || "WL2026061801") + '"></div><div class="sales-field"><label>发货日期</label><input type="date" value="2026-06-18"></div><div class="sales-field"><label>发货人</label><input value="王立军"></div><div class="sales-field sales-field--full"><label>发货备注</label><textarea>按销售合同要求完成发货。</textarea></div></div>', '<button class="sales-btn" data-close>取消</button><button class="sales-btn sales-btn-primary" data-close>确认发货</button>');
+      } else if (act === "receive-order") {
+        openModal("确认收货", '<div class="sales-form-grid"><div class="sales-field"><label>订单编号</label><input readonly value="' + esc(row[0]) + '"></div><div class="sales-field"><label>收货日期</label><input type="date" value="2026-06-19"></div><div class="sales-field"><label>收货人</label><input value="' + esc(row[1]) + '"></div><div class="sales-field"><label>验收方式</label><input readonly value="线下验收"></div><div class="sales-field sales-field--full"><label>收货说明</label><textarea>项目公司已线下完成验收，确认收货。</textarea></div></div>', '<button class="sales-btn" data-close>取消</button><button class="sales-btn sales-btn-primary" data-close>确认收货</button>');
       }
     });
     render();
@@ -309,7 +323,13 @@
     document.getElementById("salesPurchasedBody").addEventListener("click", function (e) {
       var btn = e.target.closest("[data-action]");
       if (!btn) return;
-      toast(btn.title + "（演示）");
+      var row = rows.find(function (r) { return r[0] === btn.getAttribute("data-id"); });
+      if (!row) return;
+      if (btn.getAttribute("data-action") === "track") {
+        openModal("物资轨迹", trackHtml(row[5], row[4], row[1]), '<button class="sales-btn" data-close>关闭</button>');
+      } else {
+        openModal("查看购入物资", infoGridHtml(["购入单号","订单编号","下单公司","场站名称","物资编码","物资名称","规格型号","产品编码","制造商名称","销售合同号","销售合同编号","购入数量","单位","购入单价","购入金额","收货日期","物流单号","存放地点","当前状态"], row), '<button class="sales-btn" data-close>关闭</button>');
+      }
     });
   }
 
