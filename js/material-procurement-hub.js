@@ -140,6 +140,7 @@
         btn.addEventListener("click", function (e) {
           e.preventDefault();
           e.stopPropagation();
+          if (item.label === "流程进度") syncProgressFlowScopeFromCurrentModal();
           handler();
         });
       })(item.onClick);
@@ -167,6 +168,21 @@
       return;
     }
     flowMask.classList.add("show");
+  }
+
+  function setProgressFlowScope(scope) {
+    window.__mapProgressFlowScope = scope || "";
+  }
+
+  function syncProgressFlowScopeFromCurrentModal() {
+    var t = cleanText(titleEl ? titleEl.textContent || "" : "");
+    if (mask && mask.classList && mask.classList.contains("qa-accept-mode")) {
+      setProgressFlowScope("m10-inbound-initiate");
+    } else if (t.indexOf("库存台账") >= 0 && t.indexOf("详情") >= 0) {
+      setProgressFlowScope("m10-ledger-detail");
+    } else if (t.indexOf("入库记录") >= 0 && t.indexOf("详情") >= 0) {
+      setProgressFlowScope("m10-inbound-detail");
+    }
   }
 
   function openProcModal(title, bodyHtml, footHtml, opts) {
@@ -209,6 +225,7 @@
     if (box) box.classList.remove("fullscreen");
     clearHeadActions();
     setProcModalFlowVisible(false);
+    setProgressFlowScope("");
     if (titleEl) titleEl.textContent = "提示";
     if (footEl) footEl.innerHTML = '<button type="button" class="proc-btn" id="procModalClose">取消</button>';
     bodyEl.innerHTML = "";
@@ -1344,6 +1361,7 @@
   function openQaAcceptInitiateModal(mode) {
     if (!ensureRefs()) return;
     qaInboundModalMode = mode === "returnInitiator" ? "returnInitiator" : "initiate";
+    setProgressFlowScope("m10-inbound-initiate");
     qaInboundContextTr = null;
     if (mask && mask._qaContractNameDdTeardown) {
       try {
@@ -1387,6 +1405,7 @@
     if (fl) {
       fl.addEventListener("click", function (e) {
         e.preventDefault();
+        syncProgressFlowScopeFromCurrentModal();
         openUnifiedProgress();
       });
     }
@@ -4028,6 +4047,7 @@
       var tr = el && el.closest ? el.closest("tr") : null;
       var table = tr && tr.closest ? tr.closest("table") : null;
       var title = table && table.id === "proc-m10-ledger-table" ? "库存台账 · 详情" : "入库记录 · 详情";
+      setProgressFlowScope(table && table.id === "proc-m10-ledger-table" ? "m10-ledger-detail" : "m10-inbound-detail");
       var body =
         table && table.id === "proc-m10-inbound-table"
           ? buildM10InboundDetailHtml(tr)

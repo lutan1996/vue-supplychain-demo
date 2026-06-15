@@ -1451,6 +1451,7 @@
       ".map-flow-row{display:grid;grid-template-columns:repeat(11,1fr);align-items:stretch;gap:6px;}" +
       ".map-flow-node{min-width:0;max-width:none;padding:8px 8px;border-radius:10px;border:1px solid #cfe8cf;background:#edf8ed;color:#315c35;font-size:11.5px;line-height:1.3;text-align:center;white-space:normal;display:flex;align-items:center;justify-content:center;word-break:break-word;grid-column:span 1;}" +
       ".map-flow-node.end{background:#fff8e6;border-color:#f0dca8;color:#7a5a14;}" +
+      "/* map-flow-bust:20260615-v4 */" +
       ".map-flow-dot{width:10px;height:10px;border-radius:999px;border:1px solid #7bc67b;background:#ddf5dd;flex:none;}" +
       ".map-flow-dot.end{border-color:#e89292;background:#ffe8e8;}" +
       ".map-flow-arrow{color:#8ca0b3;font-size:16px;line-height:1;display:inline-flex;align-items:center;justify-content:center;flex:none;padding:0 2px;}" +
@@ -1886,7 +1887,7 @@
       "        <div>2、业务部门负责人张磊审批：已审批，同意入库（2026-03-20 10:03）</div>" +
       "        <div>3、物资管理部门物资负责人陈志远审核分类：已审核（2026-03-20 10:28）</div>" +
       "        <div>4、分管领导部门负责人王立军审批：已审批，同意（2026-03-20 10:48）</div>" +
-      "        <div>5、部门领导审批：审批通过（2026-03-20 11:05）</div>" +
+      "        <div>5、结束（—）</div>" +
       "      </div>" +
       "    </div>" +
       "  </div>" +
@@ -1911,26 +1912,20 @@
     return mask;
   }
 
-  function openUnifiedProgressModalGlobal() {
-    try {
-      var mask = ensureUnifiedProgressModal();
-      if (!mask) return false;
-      patchProgressModalForPage(mask);
-      mask.classList.add("show");
-      return true;
-    } catch (e) {
-      return false;
-    }
+  function isM10InventoryInboundFlowScope() {
+    var file = (location.pathname || "").split("/").pop();
+    if (file === "warehouse-stock-ledger.html" || file === "receipt-inbound.html") return true;
+    if (file !== "material-procurement-hub.html") return false;
+    var scope = window.__mapProgressFlowScope || "";
+    return scope === "m10-ledger-detail" || scope === "m10-inbound-detail" || scope === "m10-inbound-initiate";
   }
 
-  function patchProgressModalForPage(mask) {
-    if (!mask) return;
-    var file = (location.pathname || "").split("/").pop();
-    if (file !== "warehouse-stock-ledger.html" && file !== "receipt-inbound.html") return;
+  function patchInventoryInboundProgressFlow(mask) {
+    if (!mask || !isM10InventoryInboundFlowScope()) return;
     var row = mask.querySelector(".map-flow-row");
     var info = mask.querySelector(".map-flow-info");
     if (!row) return;
-    var newRow = '<div class="map-flow-row" style="grid-template-columns:repeat(11,1fr)">' +
+    var newRow = '<div class="map-flow-row" style="grid-template-columns:repeat(17,1fr)">' +
       '<span class="map-flow-dot"></span>' +
       '<span class="map-flow-node">业务部门物资负责人录入设备清单，提交申请入库</span>' +
       '<span class="map-flow-arrow">→</span>' +
@@ -1941,6 +1936,12 @@
       '<span class="map-flow-node">分管领导部门负责人审批，同意</span>' +
       '<span class="map-flow-arrow">→</span>' +
       '<span class="map-flow-node">部门领导审批，审批通过</span>' +
+      '<span class="map-flow-arrow">→</span>' +
+      '<span class="map-flow-node">库管员接收物资，物资到货</span>' +
+      '<span class="map-flow-arrow">→</span>' +
+      '<span class="map-flow-node">验收员验收入库</span>' +
+      '<span class="map-flow-arrow">→</span>' +
+      '<span class="map-flow-node end">结束</span>' +
       '<span class="map-flow-dot end"></span>' +
       '</div>';
     row.outerHTML = newRow;
@@ -1950,7 +1951,26 @@
         '<div>2、业务部门负责人张磊审批：已审批，同意入库（2026-03-20 10:03）</div>' +
         '<div>3、物资管理部门物资负责人陈志远审核分类：已审核（2026-03-20 10:28）</div>' +
         '<div>4、分管领导部门负责人王立军审批：已审批，同意（2026-03-20 10:48）</div>' +
-        '<div>5、部门领导审批：审批通过（2026-03-20 11:05）</div>';
+        '<div>5、部门领导审批：审批通过（2026-03-20 11:05）</div>' +
+        '<div>6、库管员接收物资：物资到货（2026-03-20 11:32）</div>' +
+        '<div>7、验收员验收：验收入库（2026-03-20 12:05）</div>' +
+        '<div>8、结束（—）</div>';
+    }
+  }
+
+  function patchProgressModalForPage(mask) {
+    patchInventoryInboundProgressFlow(mask);
+  }
+
+  function openUnifiedProgressModalGlobal() {
+    try {
+      var mask = ensureUnifiedProgressModal();
+      if (!mask) return false;
+      patchProgressModalForPage(mask);
+      mask.classList.add("show");
+      return true;
+    } catch (e) {
+      return false;
     }
   }
 
@@ -1973,6 +1993,7 @@
         e.preventDefault();
         e.stopPropagation();
         var mask = ensureUnifiedProgressModal();
+        patchProgressModalForPage(mask);
         mask.classList.add("show");
       },
       true
