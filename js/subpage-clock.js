@@ -1438,7 +1438,7 @@
       ".map-op-cell .cm-ops button,.map-op-cell .ppm-ops button,.map-op-cell .ml-ops button{margin-right:0!important;}" +
       ".map-flow-mask{position:fixed;inset:0;background:rgba(10,20,40,.42);z-index:2147483647;display:none;align-items:center;justify-content:center;padding:18px;}" +
       ".map-flow-mask.show{display:flex;}" +
-      ".map-flow-dialog{width:min(920px,94vw);background:#fff;border-radius:8px;box-shadow:0 20px 56px rgba(0,0,0,.26);overflow:hidden;}" +
+      ".map-flow-dialog{width:min(1240px,96vw);background:#fff;border-radius:8px;box-shadow:0 20px 56px rgba(0,0,0,.26);overflow:hidden;}" +
       ".map-flow-hd{display:flex;justify-content:space-between;align-items:center;padding:14px 16px;border-bottom:1px solid #edf2f8;font-size:20px;font-weight:700;color:#1f2d3d;}" +
       ".map-flow-close{border:none;background:transparent;color:#8c8c8c;font-size:22px;cursor:pointer;line-height:1;}" +
       ".map-flow-body{padding:10px 14px 16px;}" +
@@ -1447,9 +1447,9 @@
       ".map-flow-tab.is-active{color:#1677ff;text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:8px;}" +
       ".map-flow-pane{display:none;padding-top:14px;}" +
       ".map-flow-pane.is-active{display:block;}" +
-      ".map-flow-track{border:1px solid #f0f2f5;border-radius:8px;padding:26px 22px;overflow:auto;}" +
-      ".map-flow-row{display:flex;align-items:stretch;gap:10px;min-width:980px;}" +
-      ".map-flow-node{min-width:160px;max-width:220px;padding:10px 12px;border-radius:10px;border:1px solid #cfe8cf;background:#edf8ed;color:#315c35;font-size:12px;line-height:1.35;text-align:center;white-space:normal;display:flex;align-items:center;justify-content:center;word-break:break-word;}" +
+      ".map-flow-track{border:1px solid #f0f2f5;border-radius:8px;padding:22px 18px;overflow:visible;}" +
+      ".map-flow-row{display:grid;grid-template-columns:repeat(11,1fr);align-items:stretch;gap:6px;}" +
+      ".map-flow-node{min-width:0;max-width:none;padding:8px 8px;border-radius:10px;border:1px solid #cfe8cf;background:#edf8ed;color:#315c35;font-size:11.5px;line-height:1.3;text-align:center;white-space:normal;display:flex;align-items:center;justify-content:center;word-break:break-word;grid-column:span 1;}" +
       ".map-flow-node.end{background:#fff8e6;border-color:#f0dca8;color:#7a5a14;}" +
       ".map-flow-dot{width:10px;height:10px;border-radius:999px;border:1px solid #7bc67b;background:#ddf5dd;flex:none;}" +
       ".map-flow-dot.end{border-color:#e89292;background:#ffe8e8;}" +
@@ -1871,7 +1871,7 @@
       '    <div class="map-flow-pane is-active" data-pane="flow">' +
       '      <div class="map-flow-track">' +
       '        <div class="map-flow-row">' +
-      '          <span class="map-flow-dot"></span><span class="map-flow-node">业务部门物资负责人设备清单，提交申请入库</span><span class="map-flow-arrow">→</span>' +
+      '          <span class="map-flow-dot"></span><span class="map-flow-node">业务部门物资负责人录入设备清单，提交申请入库</span><span class="map-flow-arrow">→</span>' +
       '          <span class="map-flow-node">业务部门负责人审批，同意入库</span><span class="map-flow-arrow">→</span>' +
       '          <span class="map-flow-node">物资管理部门物资负责人审核分类</span><span class="map-flow-arrow">→</span>' +
       '          <span class="map-flow-node">分管领导部门负责人审批，同意</span><span class="map-flow-arrow">→</span>' +
@@ -1881,11 +1881,10 @@
       "    </div>" +
       '    <div class="map-flow-pane" data-pane="info">' +
       '      <div class="map-flow-info">' +
-      "        <div>附件：上传的采购合同</div>" +
-      "        <div>1、业务部门物资负责人设备清单，提交申请入库（2026-03-20 09:12）</div>" +
-      "        <div>2、业务部门负责人审批：已审批，同意入库（2026-03-20 10:03）</div>" +
-      "        <div>3、物资管理部门物资负责人审核分类：已审核（2026-03-20 10:28）</div>" +
-      "        <div>4、分管领导部门负责人审批：已审批，同意（2026-03-20 10:48）</div>" +
+      "        <div>1、业务部门物资负责人刘建国录入设备清单，提交申请入库（2026-03-20 09:12）（附件：风机采购合同）</div>" +
+      "        <div>2、业务部门负责人张磊审批：已审批，同意入库（2026-03-20 10:03）</div>" +
+      "        <div>3、物资管理部门物资负责人陈志远审核分类：已审核（2026-03-20 10:28）</div>" +
+      "        <div>4、分管领导部门负责人王立军审批：已审批，同意（2026-03-20 10:48）</div>" +
       "        <div>5、入公司库结束（—）</div>" +
       "      </div>" +
       "    </div>" +
