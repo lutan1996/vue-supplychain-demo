@@ -271,11 +271,46 @@
         var no = a.getAttribute("data-wsl-view");
         var row = rows.filter(function (r) { return r.no === no; })[0];
         if (!row) return;
+        var attachment =
+          '<div style="margin-top:6px;margin-bottom:14px;padding:8px 12px;background:#f6f8fb;border:1px solid #e9edf4;border-radius:4px;font-size:12px;color:#1f3551">' +
+          '<span style="font-weight:600;margin-right:6px">附件：</span>' +
+          '<span style="color:#2a5db0">📎 上传的采购合同</span>' +
+          '</div>';
+
+        var flowItems = [
+          { no: "1", text: "业务部门物资负责人设备清单，提交申请入库。" },
+          { no: "2", text: "业务部门负责人审批，同意入库。" },
+          { no: "3", text: "物资管理部门物资负责人审核分类。" },
+          { no: "4", text: "分管领导部门负责人审批，同意。" },
+          { no: "5", text: "入公司库结束。" }
+        ];
+
+        var flowStyle =
+          '<style>' +
+          '.wsl-flow{display:flex;flex-direction:column;gap:6px;margin-top:6px}' +
+          '.wsl-flow-row{display:flex;align-items:center;gap:10px;padding:10px 12px;background:#f6f8fb;border:1px solid #e9edf4;border-radius:6px;font-size:12px;color:#1f3551;line-height:1.5}' +
+          '.wsl-flow-num{flex:0 0 22px;height:22px;line-height:22px;text-align:center;background:#2a5db0;color:#fff;border-radius:50%;font-weight:600;font-size:12px}' +
+          '.wsl-flow-arrow{display:flex;justify-content:center;color:#2a5db0;font-size:14px;line-height:1;height:10px;align-items:center}' +
+          '.wsl-flow-arrow::before{content:"▼"}' +
+          '.wsl-flow-title{font-weight:600;margin:4px 0 6px;color:#1f3551;font-size:13px}' +
+          '</style>';
+
+        var flowHtml = flowStyle +
+          '<div class="wsl-flow-title">流程进度</div>' +
+          '<div class="wsl-flow">' +
+          flowItems.map(function (it, i) {
+            var row = '<div class="wsl-flow-row"><span class="wsl-flow-num">' + it.no + '</span><span>' + it.text + '</span></div>';
+            if (i < flowItems.length - 1) row += '<div class="wsl-flow-arrow"></div>';
+            return row;
+          }).join("") +
+          '</div>';
+
         var html =
           '<div style="font-weight:600;margin-bottom:8px;color:#1f3551">物资明细表</div>' +
           '<table style="width:100%;border-collapse:collapse;font-size:12px;background:#fff">' +
           '<thead><tr style="background:#f6f8fb"><th style="padding:8px;border:1px solid #e9edf4">物资编号</th><th style="padding:8px;border:1px solid #e9edf4">物资名称</th><th style="padding:8px;border:1px solid #e9edf4">规格/型号</th><th style="padding:8px;border:1px solid #e9edf4">资产类型</th><th style="padding:8px;border:1px solid #e9edf4">剩余数量</th><th style="padding:8px;border:1px solid #e9edf4">存放仓库</th></tr></thead>' +
-          '<tbody><tr><td style="padding:8px;border:1px solid #e9edf4">' + row.no + '</td><td style="padding:8px;border:1px solid #e9edf4">' + row.name + '</td><td style="padding:8px;border:1px solid #e9edf4">' + row.spec + '</td><td style="padding:8px;border:1px solid #e9edf4">' + row.assetType + '</td><td style="padding:8px;border:1px solid #e9edf4">' + fmtNum(row.rem) + '</td><td style="padding:8px;border:1px solid #e9edf4">' + row.wh + '</td></tr></tbody></table>';
+          '<tbody><tr><td style="padding:8px;border:1px solid #e9edf4">' + row.no + '</td><td style="padding:8px;border:1px solid #e9edf4">' + row.name + '</td><td style="padding:8px;border:1px solid #e9edf4">' + row.spec + '</td><td style="padding:8px;border:1px solid #e9edf4">' + row.assetType + '</td><td style="padding:8px;border:1px solid #e9edf4">' + fmtNum(row.rem) + '</td><td style="padding:8px;border:1px solid #e9edf4">' + row.wh + '</td></tr></tbody></table>' +
+          attachment + flowHtml;
         if (typeof showActionModal === "function") showActionModal("库存台账详情", html);
         else alert("库存台账详情：" + row.name + "，资产类型：" + row.assetType);
       });
