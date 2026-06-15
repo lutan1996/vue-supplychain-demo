@@ -1448,8 +1448,8 @@
       ".map-flow-pane{display:none;padding-top:14px;}" +
       ".map-flow-pane.is-active{display:block;}" +
       ".map-flow-track{border:1px solid #f0f2f5;border-radius:8px;padding:22px 18px;overflow:visible;}" +
-      ".map-flow-row{display:grid;grid-template-columns:repeat(11,1fr);align-items:stretch;gap:6px;}" +
-      ".map-flow-node{min-width:0;max-width:none;padding:8px 8px;border-radius:10px;border:1px solid #cfe8cf;background:#edf8ed;color:#315c35;font-size:11.5px;line-height:1.3;text-align:center;white-space:normal;display:flex;align-items:center;justify-content:center;word-break:break-word;grid-column:span 1;}" +
+      ".map-flow-row{display:grid;grid-template-columns:repeat(17,1fr);align-items:stretch;gap:6px;}" +
+      ".map-flow-node{min-width:0;max-width:none;padding:8px 8px;border-radius:10px;border:1px solid #cfe8cf;background:#edf8ed;color:#315c35;font-size:11.5px;line-height:1.3;text-align:center;white-space:normal;display:flex;align-items:center;justify-content:center;word-break:break-word;grid-column:span 1;min-height:42px;}" +
       ".map-flow-node.end{background:#fff8e6;border-color:#f0dca8;color:#7a5a14;}" +
       ".map-flow-dot{width:10px;height:10px;border-radius:999px;border:1px solid #7bc67b;background:#ddf5dd;flex:none;}" +
       ".map-flow-dot.end{border-color:#e89292;background:#ffe8e8;}" +
