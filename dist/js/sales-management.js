@@ -128,11 +128,12 @@
     var status = row[17];
     return '<div class="sales-track">' +
       '<div class="sales-track-map">' +
-      '<svg viewBox="0 0 1000 360" preserveAspectRatio="none" aria-hidden="true"><path d="M120 270 C 285 120, 445 125, 585 190 S 830 260, 895 126" fill="none" stroke="#1689ff" stroke-width="7" stroke-linecap="round" stroke-dasharray="12 12"/></svg>' +
+      '<svg viewBox="0 0 1000 360" preserveAspectRatio="none" aria-hidden="true"><path d="M120 260 C 275 108, 435 118, 565 178 S 805 250, 895 124" fill="none" stroke="#1689ff" stroke-width="7" stroke-linecap="round" stroke-dasharray="12 12"/></svg>' +
       '<div class="sales-track-point sales-track-point--start">发货地</div>' +
       '<div class="sales-track-point sales-track-point--current">当前位置</div>' +
       '<div class="sales-track-point sales-track-point--end">收货地</div>' +
       '</div>' +
+      '<div class="sales-track-title">物资跟踪</div>' +
       '<div class="sales-track-info">' +
       '<div>运单号：<span>' + esc(logisticsNo || "WL2026061401") + '</span></div>' +
       '<div>关联订单号：<span>' + esc(orderNo || "XSORD-2026-003") + '</span></div>' +
