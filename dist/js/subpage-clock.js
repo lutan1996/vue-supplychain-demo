@@ -1970,20 +1970,20 @@
     if (!row) return;
     row.outerHTML =
       '<div class="map-flow-row" style="grid-template-columns:repeat(11,1fr)">' +
-      '<span class="map-flow-node">使用部门负责人任向人发起领用流程，从公司库中选取物资清单</span>' +
+      '<span class="map-flow-node">电控所负责人张军发起领用流程，从公司库中选取物资清单</span>' +
       '<span class="map-flow-arrow">→</span>' +
-      '<span class="map-flow-node">使用部门负责人审批，通过</span>' +
+      '<span class="map-flow-node">电控所负责人审批，通过</span>' +
       '<span class="map-flow-arrow">→</span>' +
       '<span class="map-flow-node">物资管理部门专责核对清单，无误</span>' +
       '<span class="map-flow-arrow">→</span>' +
       '<span class="map-flow-node">物资管理部门负责人审核，同意</span>' +
       '<span class="map-flow-arrow">→</span>' +
-      '<span class="map-flow-node end">领用结束，物资归入使用部门名下</span>' +
+      '<span class="map-flow-node end">领用结束，物资归入电控所名下</span>' +
       '<span class="map-flow-dot end"></span>' +
       '</div>';
     if (info) {
       info.innerHTML =
-        '<div>1、电控所负责人任向人发起领用流程，从公司库中选取物资清单（2026-05-10 09:12）</div>' +
+        '<div>1、电控所负责人张军发起领用流程，从公司库中选取物资清单（2026-05-10 09:12）</div>' +
         '<div>2、电控所负责人张磊审批：通过（2026-05-10 10:03）</div>' +
         '<div>3、物资管理部门专责陈志远核对清单：无误（2026-05-10 10:28）</div>' +
         '<div>4、物资管理部门负责人王立军审核：同意（2026-05-10 10:48）</div>' +
