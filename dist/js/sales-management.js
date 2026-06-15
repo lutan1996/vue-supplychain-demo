@@ -269,9 +269,9 @@
   }
 
   var orderRows = [
-    ["XSORD-2026-001","张明","河北龙源","麒麟山风电场","2026-06-10","风力发电机组整机×1、叶片×3","4","1,250,000","待确认","业务部门专责","XSHT-2026-001","SC-001","WL2026061001","—","—","直发现场/项目公司"],
-    ["XSORD-2026-002","李芳","天津龙源","沙井子风电场","2026-06-12","机舱×1","1","920,000","待上传合同","经营发展中心","XSHT-2026-002","SC-002","WL2026061201","—","—","先发龙源工程技术公司，再由龙源销售给项目公司"],
-    ["XSORD-2026-003","王宁","甘肃龙源","酒泉场站","2026-06-14","工业级交换机×6","6","122,040","已发货","项目公司收货人","XSHT-2026-003","SC-003","WL2026061401","2026-06-15","—","直发现场/项目公司"]
+    ["XSORD-2026-001","张明","河北龙源","麒麟山风电场","2026-06-10","风力发电机组整机×1、叶片×3","4","1,250,000","待确认","业务部门专责","XSHT-2026-001","WL2026061001","—","—","直发现场/项目公司"],
+    ["XSORD-2026-002","李芳","天津龙源","沙井子风电场","2026-06-12","机舱×1","1","920,000","待上传合同","经营发展中心","XSHT-2026-002","WL2026061201","—","—","先发龙源工程技术公司，再由龙源销售给项目公司"],
+    ["XSORD-2026-003","王宁","甘肃龙源","酒泉场站","2026-06-14","工业级交换机×6","6","122,040","已发货","项目公司收货人","XSHT-2026-003","WL2026061401","2026-06-15","—","直发现场/项目公司"]
   ];
   function initOrders() {
     var tbody = document.getElementById("salesOrderBody");
@@ -282,7 +282,7 @@
         if (r[8] === "待上传合同") ops += iconBtn("upload", "上传销售合同", "upload-contract", r[0]);
         if (r[8] === "已确认" || r[8] === "待发货") ops += iconBtn("truck", "发货", "ship-order", r[0]);
         if (r[8] === "已发货") ops += iconBtn("receive", "确认收货", "receive-order", r[0]);
-        return "<tr>" + r.slice(0, 16).map(function (c, idx) { return "<td>" + (idx === 8 ? tag(c) : esc(c)) + "</td>"; }).join("") + '<td><span class="sales-op-row">' + ops + "</span></td></tr>";
+        return "<tr>" + r.slice(0, 15).map(function (c, idx) { return "<td>" + (idx === 8 ? tag(c) : esc(c)) + "</td>"; }).join("") + '<td><span class="sales-op-row">' + ops + "</span></td></tr>";
       }).join("");
     }
     document.getElementById("salesOrderAdd").addEventListener("click", function () { openOrderForm(null); });
@@ -296,13 +296,13 @@
       if (!row) return;
       var act = btn.getAttribute("data-action");
       if (act === "view-order") {
-        openModal("查看订单", infoGridHtml(["订单编号","下单人","下单公司","场站名称","下单日期","物资清单","订单数量","订单金额","订单状态","当前处理人","销售合同号","销售合同编号","物流单号","发货日期","收货日期","发货/销售路径"], row), '<button class="sales-btn" data-close>关闭</button>');
+        openModal("查看订单", infoGridHtml(["订单编号","下单人","下单公司","场站名称","下单日期","物资清单","订单数量","订单金额","订单状态","当前处理人","销售合同编号","物流单号","发货日期","收货日期","发货/销售路径"], row), '<button class="sales-btn" data-close>关闭</button>');
       } else if (act === "approve-order") {
-        openModal("订单审核", '<div class="sales-form-grid"><div class="sales-field"><label>审批结论</label><select><option>同意销售</option><option>驳回</option></select></div><div class="sales-field"><label>销售合同号</label><input value="' + esc(row[10]) + '"></div><div class="sales-field sales-field--full"><label>审批意见</label><textarea>同意销售，进入合同上传及发货环节。</textarea></div></div>', '<button class="sales-btn" data-close>取消</button><button class="sales-btn sales-btn-primary" data-close>确认提交</button>');
+        openModal("订单审核", '<div class="sales-form-grid"><div class="sales-field"><label>审批结论</label><select><option>同意销售</option><option>驳回</option></select></div><div class="sales-field"><label>销售合同编号</label><input value="' + esc(row[10]) + '"></div><div class="sales-field sales-field--full"><label>审批意见</label><textarea>同意销售，进入合同上传及发货环节。</textarea></div></div>', '<button class="sales-btn" data-close>取消</button><button class="sales-btn sales-btn-primary" data-close>确认提交</button>');
       } else if (act === "upload-contract") {
-        openModal("上传销售合同", '<div class="sales-form-grid"><div class="sales-field"><label>销售合同号</label><input value="' + esc(row[10]) + '"></div><div class="sales-field"><label>销售合同编号</label><input value="' + esc(row[11]) + '"></div><div class="sales-field sales-field--full"><label>合同附件</label><input type="file"></div></div>', '<button class="sales-btn" data-close>取消</button><button class="sales-btn sales-btn-primary" data-close>上传</button>', true);
+        openModal("上传销售合同", '<div class="sales-form-grid"><div class="sales-field"><label>销售合同编号</label><input value="' + esc(row[10]) + '"></div><div class="sales-field sales-field--full"><label>合同附件</label><input type="file"></div></div>', '<button class="sales-btn" data-close>取消</button><button class="sales-btn sales-btn-primary" data-close>上传</button>', true);
       } else if (act === "ship-order") {
-        openModal("发货确认", '<div class="sales-form-grid"><div class="sales-field"><label>订单编号</label><input readonly value="' + esc(row[0]) + '"></div><div class="sales-field"><label>物流单号</label><input value="' + esc(row[12] || "WL2026061801") + '"></div><div class="sales-field"><label>发货日期</label><input type="date" value="2026-06-18"></div><div class="sales-field"><label>发货人</label><input value="王立军"></div><div class="sales-field sales-field--full"><label>发货备注</label><textarea>按销售合同要求完成发货。</textarea></div></div>', '<button class="sales-btn" data-close>取消</button><button class="sales-btn sales-btn-primary" data-close>确认发货</button>');
+        openModal("发货确认", '<div class="sales-form-grid"><div class="sales-field"><label>订单编号</label><input readonly value="' + esc(row[0]) + '"></div><div class="sales-field"><label>物流单号</label><input value="' + esc(row[11] || "WL2026061801") + '"></div><div class="sales-field"><label>发货日期</label><input type="date" value="2026-06-18"></div><div class="sales-field"><label>发货人</label><input value="王立军"></div><div class="sales-field sales-field--full"><label>发货备注</label><textarea>按销售合同要求完成发货。</textarea></div></div>', '<button class="sales-btn" data-close>取消</button><button class="sales-btn sales-btn-primary" data-close>确认发货</button>');
       } else if (act === "receive-order") {
         openModal("确认收货", '<div class="sales-form-grid"><div class="sales-field"><label>订单编号</label><input readonly value="' + esc(row[0]) + '"></div><div class="sales-field"><label>收货日期</label><input type="date" value="2026-06-19"></div><div class="sales-field"><label>收货人</label><input value="' + esc(row[1]) + '"></div><div class="sales-field"><label>验收方式</label><input readonly value="线下验收"></div><div class="sales-field sales-field--full"><label>收货说明</label><textarea>项目公司已线下完成验收，确认收货。</textarea></div></div>', '<button class="sales-btn" data-close>取消</button><button class="sales-btn sales-btn-primary" data-close>确认收货</button>');
       }
@@ -312,11 +312,11 @@
 
   function initPurchased() {
     var rows = [
-      ["GWMZ-2026-001","XSORD-2026-003","甘肃龙源","酒泉场站","A0200100001","工业级交换机","V2.0","B00000006","联合动力","XSHT-2026-003","SC-003","6","台","20,340","122,040","2026-06-15","WL2026061401","酒泉场站库房","已购入"],
-      ["GWMZ-2026-002","XSORD-2026-004","河北龙源","麒麟山风电场","A0100200001","叶片","SW64-2.0","B00000005","中材科技","XSHT-2026-004","SC-004","3","支","350,000","1,050,000","2026-06-13","WL2026061301","麒麟山风电场","在用"]
+      ["GWMZ-2026-001","XSORD-2026-003","甘肃龙源","酒泉场站","A0200100001","工业级交换机","V2.0","B00000006","联合动力","XSHT-2026-003","6","台","20,340","122,040","2026-06-15","WL2026061401","酒泉场站库房","已购入"],
+      ["GWMZ-2026-002","XSORD-2026-004","河北龙源","麒麟山风电场","A0100200001","叶片","SW64-2.0","B00000005","中材科技","XSHT-2026-004","3","支","350,000","1,050,000","2026-06-13","WL2026061301","麒麟山风电场","在用"]
     ];
     document.getElementById("salesPurchasedBody").innerHTML = rows.map(function (r) {
-      return "<tr>" + r.map(function (c, i) { return "<td>" + (i === 18 ? tag(c) : esc(c)) + "</td>"; }).join("") + '<td><span class="sales-op-row">' + iconBtn("view", "查看", "view-purchased", r[0]) + iconBtn("track", "物资轨迹", "track", r[0]) + "</span></td></tr>";
+      return "<tr>" + r.map(function (c, i) { return "<td>" + (i === 17 ? tag(c) : esc(c)) + "</td>"; }).join("") + '<td><span class="sales-op-row">' + iconBtn("view", "查看", "view-purchased", r[0]) + iconBtn("track", "物资轨迹", "track", r[0]) + "</span></td></tr>";
     }).join("");
     document.getElementById("salesPurchasedQuery").addEventListener("click", function () { toast("已按条件查询购入物资（演示）"); });
     document.getElementById("salesPurchasedExport").addEventListener("click", function () { toast("已导出购入物资台账（演示）"); });
@@ -328,7 +328,7 @@
       if (btn.getAttribute("data-action") === "track") {
         openModal("物资轨迹", trackHtml(row[5], row[4], row[1]), '<button class="sales-btn" data-close>关闭</button>');
       } else {
-        openModal("查看购入物资", infoGridHtml(["购入单号","订单编号","下单公司","场站名称","物资编码","物资名称","规格型号","产品编码","制造商名称","销售合同号","销售合同编号","购入数量","单位","购入单价","购入金额","收货日期","物流单号","存放地点","当前状态"], row), '<button class="sales-btn" data-close>关闭</button>');
+        openModal("查看购入物资", infoGridHtml(["购入单号","订单编号","下单公司","场站名称","物资编码","物资名称","规格型号","产品编码","制造商名称","销售合同编号","购入数量","单位","购入单价","购入金额","收货日期","物流单号","存放地点","当前状态"], row), '<button class="sales-btn" data-close>关闭</button>');
       }
     });
   }

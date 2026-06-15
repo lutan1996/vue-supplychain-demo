@@ -822,21 +822,21 @@
           ["办理人", "张明", true], ["部门", "电控所", true],
           ["公司", "内蒙能源", true], ["场站名称", "新安风电场", true],
           ["提报日期", "2026/04/01", true], ["物流单号", "WL20260401", true],
-          ["销售合同号", "XSHT-2026-001", true], ["销售合同编号", "SC-001", true],
+          ["销售合同编号", "XSHT-2026-001", true],
           ["指定业务部门", "经营发展中心", true], ["确认人", "张明（经营发展中心）", true]
         ],
         "录入销售合同单号": [
           ["办理人", "张明", true], ["部门", "电控所", true],
           ["公司", "内蒙能源", true], ["场站名称", "新安风电场", true],
           ["提报日期", "2026/04/01", true], ["物流单号", "WL20260401", true],
-          ["销售合同号", "XSHT-2026-001", true], ["销售合同编号", "SC-001", true],
+          ["销售合同编号", "XSHT-2026-001", true],
           ["指定业务部门", "经营发展中心", true], ["确认人", "张明（经营发展中心）", true]
         ],
         "录入物流单号": [
           ["办理人", "张明", true], ["部门", "电控所", true],
           ["公司", "内蒙能源", true], ["场站名称", "新安风电场", true],
           ["提报日期", "2026/04/01", true], ["物流单号", "WL20260401", true],
-          ["销售合同号", "XSHT-2026-001", true], ["销售合同编号", "SC-001", true],
+          ["销售合同编号", "XSHT-2026-001", true],
           ["指定业务部门", "经营发展中心", true], ["确认人", "张明（经营发展中心）", true]
         ],
         "货物质量验收审批": [
@@ -951,14 +951,8 @@
       }
       function bindSalesContractRelation() {
         if (!ORDER_HANDLE_TASKS[taskName]) return;
-        var salesInput = document.querySelector('.pph-input[data-field-label="销售合同号"]');
-        var salesCodeInput = document.querySelector('.pph-input[data-field-label="销售合同编号"]');
-        if (!salesInput || !salesCodeInput) return;
-        var salesMap = {
-          "XSHT-2026-001": "SC-001",
-          "XSHT-2026-002": "SC-002",
-          "XSHT-2026-003": "SC-003"
-        };
+        var salesInput = document.querySelector('.pph-input[data-field-label="销售合同编号"]');
+        if (!salesInput) return;
         var sel = document.createElement("select");
         sel.className = "pph-input";
         ["XSHT-2026-001", "XSHT-2026-002", "XSHT-2026-003"].forEach(function (v) {
@@ -969,18 +963,13 @@
         });
         sel.value = salesInput.value || "XSHT-2026-001";
         salesInput.parentNode.replaceChild(sel, salesInput);
-        sel.setAttribute("data-field-label", "销售合同号");
-        function syncCode() {
-          salesCodeInput.value = salesMap[sel.value] || "";
-        }
-        sel.addEventListener("change", syncCode);
-        syncCode();
+        sel.setAttribute("data-field-label", "销售合同编号");
       }
       function applyOrderHandleFieldPermissions() {
         if (!ORDER_HANDLE_TASKS[taskName]) return;
         var editableMap = {
-          "订单需求管理审批": { "销售合同号": 1, "物流单号": 1 },
-          "录入销售合同单号": { "销售合同号": 1 },
+          "订单需求管理审批": { "销售合同编号": 1, "物流单号": 1 },
+          "录入销售合同单号": { "销售合同编号": 1 },
           "录入物流单号": { "物流单号": 1 }
         };
         var editable = editableMap[taskName] || {};
@@ -991,14 +980,12 @@
           "场站名称",
           "提报日期",
           "物流单号",
-          "销售合同号",
           "销售合同编号",
           "指定业务部门",
           "确认人"
         ].forEach(function (label) {
           setReadonlyByLabel(label, !editable[label]);
         });
-        setReadonlyByLabel("销售合同编号", true);
       }
       var runtimeHandoffRecord = null;
       function makeBatchNo() {

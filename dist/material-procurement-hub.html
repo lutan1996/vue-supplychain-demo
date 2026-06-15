@@ -1532,9 +1532,9 @@
                   <button type="button" class="carrier-btn-add js-op" data-op="新增订单">新增订单</button>
                 </div>
               </div>
-              <div class="carrier-table-wrap"><table class="carrier-table"><thead><tr><th>提报人</th><th>部门</th><th>公司</th><th>日期</th><th>场站名称</th><th>设备清单（物资名称、规格型号、数量）</th><th>订单状态</th><th>当前处理人</th><th>物流单号</th><th>销售合同号</th><th>销售合同编号</th><th>操作</th></tr></thead><tbody>
-                <tr data-order-row="ORD2026001"><td>张明</td><td>电控所</td><td>河北龙源</td><td>2026-04-01</td><td>麒麟山风电场</td><td>变流器模块×2、IGBT×5</td><td data-order-status-text>待确认</td><td data-order-owner>业务部门专责</td><td data-order-logistics-no>WL20260401</td><td data-order-sales-no>XSHT-2026-001</td><td data-order-sales-code>SC-001</td><td class="proc-ops-cell" data-order-op></td></tr>
-                <tr data-order-row="ORD2026002"><td>李芳</td><td>机械所</td><td>天津龙源</td><td>2026-04-10</td><td>沙井子风电场</td><td>主控板×3</td><td data-order-status-text>已确认</td><td data-order-owner>业务部门专责</td><td data-order-logistics-no>WL20260410</td><td data-order-sales-no>XSHT-2026-002</td><td data-order-sales-code>SC-002</td><td class="proc-ops-cell" data-order-op></td></tr>
+              <div class="carrier-table-wrap"><table class="carrier-table"><thead><tr><th>提报人</th><th>部门</th><th>公司</th><th>日期</th><th>场站名称</th><th>设备清单（物资名称、规格型号、数量）</th><th>订单状态</th><th>当前处理人</th><th>物流单号</th><th>销售合同编号</th><th>操作</th></tr></thead><tbody>
+                <tr data-order-row="ORD2026001"><td>张明</td><td>电控所</td><td>河北龙源</td><td>2026-04-01</td><td>麒麟山风电场</td><td>变流器模块×2、IGBT×5</td><td data-order-status-text>待确认</td><td data-order-owner>业务部门专责</td><td data-order-logistics-no>WL20260401</td><td data-order-sales-no>XSHT-2026-001</td><td class="proc-ops-cell" data-order-op></td></tr>
+                <tr data-order-row="ORD2026002"><td>李芳</td><td>机械所</td><td>天津龙源</td><td>2026-04-10</td><td>沙井子风电场</td><td>主控板×3</td><td data-order-status-text>已确认</td><td data-order-owner>业务部门专责</td><td data-order-logistics-no>WL20260410</td><td data-order-sales-no>XSHT-2026-002</td><td class="proc-ops-cell" data-order-op></td></tr>
               </tbody></table></div>
             </div>
           </section>
@@ -1943,7 +1943,7 @@
           var tr = document.createElement("tr");
           tr.setAttribute("data-order-row", "ORD2026X" + (100 + i));
           tr.innerHTML =
-            "<td>张明</td><td>经营发展中心</td><td>河北龙源</td><td>2026-04-2" + (i % 9) + "</td><td>示例场站</td><td>示例设备×" + (i + 1) + '</td><td data-order-status-text>' + st + '</td><td data-order-owner>业务部门专责</td><td data-order-logistics-no>WL2026042' + (i % 9) + '</td><td data-order-sales-no>XSHT-2026-00' + ((i % 3) + 1) + '</td><td data-order-sales-code>SC-00' + ((i % 3) + 1) + '</td><td class="proc-ops-cell" data-order-op></td>';
+            "<td>张明</td><td>经营发展中心</td><td>河北龙源</td><td>2026-04-2" + (i % 9) + "</td><td>示例场站</td><td>示例设备×" + (i + 1) + '</td><td data-order-status-text>' + st + '</td><td data-order-owner>业务部门专责</td><td data-order-logistics-no>WL2026042' + (i % 9) + '</td><td data-order-sales-no>XSHT-2026-00' + ((i % 3) + 1) + '</td><td class="proc-ops-cell" data-order-op></td>';
           tbody.appendChild(tr);
           rows = Array.prototype.slice.call(tbody.querySelectorAll("tr"));
           i++;

@@ -1909,12 +1909,6 @@
     var confirmer = o.confirmer || "张敏（经营发展中心）";
     var logisticsNo = o.logisticsNo || "WL20260430001";
     var salesContractNo = o.salesContractNo || "";
-    var salesContractCode = o.salesContractCode || "";
-    var salesContractMap = {
-      "XSHT-2026-001": "SC-001",
-      "XSHT-2026-002": "SC-002",
-      "XSHT-2026-003": "SC-003"
-    };
     var roInput = ro ? " readonly " : "";
     var roSelect = ro ? " disabled " : "";
     var roCheckbox = ro ? " disabled " : "";
@@ -1922,13 +1916,10 @@
     function pickOpt(v, t) {
       return String(v || "") === String(t || "") ? " selected" : "";
     }
-    var salesNoOptions = '<option value="">请选择销售合同号</option>'
+    var salesNoOptions = '<option value="">请选择销售合同编号</option>'
       + '<option value="XSHT-2026-001"'+pickOpt(salesContractNo, "XSHT-2026-001")+'>XSHT-2026-001</option>'
       + '<option value="XSHT-2026-002"'+pickOpt(salesContractNo, "XSHT-2026-002")+'>XSHT-2026-002</option>'
       + '<option value="XSHT-2026-003"'+pickOpt(salesContractNo, "XSHT-2026-003")+'>XSHT-2026-003</option>';
-    if (!salesContractCode && salesContractNo && salesContractMap[salesContractNo]) {
-      salesContractCode = salesContractMap[salesContractNo];
-    }
     return (
       '<div class="field-row"><label>提报人</label><input id="ordApplicant" type="text" value="' + applicant + '" readonly style="background:#f5f5f5" /></div>' +
       '<div class="field-row"><label>部门</label><input id="ordApplicantDept" type="text" value="' + dept + '" readonly style="background:#f5f5f5" /></div>' +
@@ -1938,8 +1929,7 @@
         '<option' + pickOpt(site, "新安风电场") + '>新安风电场</option><option' + pickOpt(site, "滨海场站") + '>滨海场站</option><option' + pickOpt(site, "酒泉场站") + '>酒泉场站</option></select></div>' +
       '<div class="field-row"><label>提报日期</label><input id="ordDate" type="date" value="' + applyDate + '" ' + roInput + ' style="' + roBg + '" /></div>' +
       '<div class="field-row"><label>物流单号</label><input id="ordLogisticsNo" type="text" value="' + logisticsNo + '" ' + roInput + ' style="' + roBg + '" /></div>' +
-      '<div class="field-row"><label>销售合同号</label><select id="ordSalesContractNo" ' + roSelect + ' style="' + roBg + '">' + salesNoOptions + "</select></div>" +
-      '<div class="field-row"><label>销售合同编号</label><input id="ordSalesContractCode" type="text" value="' + salesContractCode + '" readonly style="background:#f5f5f5" /></div>' +
+      '<div class="field-row"><label>销售合同编号</label><select id="ordSalesContractNo" ' + roSelect + ' style="' + roBg + '">' + salesNoOptions + "</select></div>" +
       '<div class="field-row"><label>指定业务部门</label><select id="ordBizDept" ' + roSelect + ' style="' + roBg + '">' +
         '<option' + pickOpt(dept, "经营发展中心") + '>经营发展中心</option><option' + pickOpt(dept, "运维业务一部") + '>运维业务一部</option><option' + pickOpt(dept, "运维业务二部") + '>运维业务二部</option></select></div>' +
       '<div class="field-row"><label>确认人</label><select id="ordConfirmer" ' + roSelect + ' style="' + roBg + '">' +
@@ -1973,8 +1963,7 @@
       status: cleanText(tds[6] ? tds[6].textContent : ""),
       confirmer: cleanText(tds[7] ? tds[7].textContent : "张敏（经营发展中心）"),
       logisticsNo: cleanText(tds[8] ? tds[8].textContent : ""),
-      salesContractNo: cleanText(tds[9] ? tds[9].textContent : ""),
-      salesContractCode: cleanText(tds[10] ? tds[10].textContent : "")
+      salesContractNo: cleanText(tds[9] ? tds[9].textContent : "")
     };
   }
 
@@ -1989,30 +1978,16 @@
   function bindOrderSalesContractRelation(root) {
     if (!root) return;
     var sel = root.querySelector("#ordSalesContractNo");
-    var code = root.querySelector("#ordSalesContractCode");
-    if (!sel || !code) return;
-    var map = {
-      "XSHT-2026-001": "SC-001",
-      "XSHT-2026-002": "SC-002",
-      "XSHT-2026-003": "SC-003"
-    };
-    var syncCode = function () {
-      var v = String(sel.value || "");
-      code.value = map[v] || "";
-    };
-    sel.addEventListener("change", syncCode);
-    syncCode();
+    if (!sel) return;
   }
 
   function openOrderApproveHandleModal(rowData, tr) {
     var salesNo = rowData && rowData.salesContractNo ? rowData.salesContractNo : "";
-    var salesCode = rowData && rowData.salesContractCode ? rowData.salesContractCode : "";
     openProcModal(
       "订单需求管理审批办理",
       '<div class="field-row"><label>订单编号</label><span>' + escHtml((rowData && rowData.orderNo) || "—") + "</span></div>" +
         '<div class="field-row"><label>审批结论</label><select id="ordApproveResult"><option value="pass">同意</option><option value="reject">驳回</option></select></div>' +
-        '<div class="field-row"><label>销售合同号</label><select id="ordSalesContractNo"><option value="">请选择销售合同号</option><option value="XSHT-2026-001"' + (salesNo==="XSHT-2026-001"?" selected":"") + '>XSHT-2026-001</option><option value="XSHT-2026-002"' + (salesNo==="XSHT-2026-002"?" selected":"") + '>XSHT-2026-002</option><option value="XSHT-2026-003"' + (salesNo==="XSHT-2026-003"?" selected":"") + '>XSHT-2026-003</option></select></div>' +
-        '<div class="field-row"><label>销售合同编号</label><input id="ordSalesContractCode" type="text" value="' + escHtml(salesCode) + '" readonly style="background:#f5f5f5" /></div>' +
+        '<div class="field-row"><label>销售合同编号</label><select id="ordSalesContractNo"><option value="">请选择销售合同编号</option><option value="XSHT-2026-001"' + (salesNo==="XSHT-2026-001"?" selected":"") + '>XSHT-2026-001</option><option value="XSHT-2026-002"' + (salesNo==="XSHT-2026-002"?" selected":"") + '>XSHT-2026-002</option><option value="XSHT-2026-003"' + (salesNo==="XSHT-2026-003"?" selected":"") + '>XSHT-2026-003</option></select></div>' +
         '<div class="field-row"><label>审批意见 <span style="color:#cf1322">*</span></label><textarea id="ordApproveOpinion" rows="3" placeholder="请输入审批意见"></textarea></div>',
       '<button type="button" class="proc-btn" id="procModalCancel">取消</button><button type="button" class="proc-btn proc-btn-primary" id="ordApproveOk">确认提交</button>'
     );
@@ -2029,9 +2004,8 @@
       }
       var result = $("ordApproveResult") ? $("ordApproveResult").value : "pass";
       var sn = $("ordSalesContractNo") ? $("ordSalesContractNo").value : "";
-      var sc = $("ordSalesContractCode") ? $("ordSalesContractCode").value : "";
       if (result === "pass" && !sn) {
-        toast("请选择销售合同号");
+        toast("请选择销售合同编号");
         return;
       }
       if (tr) {
@@ -2041,8 +2015,6 @@
         if (ownerCell && result === "pass") ownerCell.textContent = "业务部门专责";
         var salesNoCell = tr.querySelector("[data-order-sales-no]");
         if (salesNoCell) salesNoCell.textContent = sn;
-        var salesCodeCell = tr.querySelector("[data-order-sales-code]");
-        if (salesCodeCell) salesCodeCell.textContent = sc;
       }
       toast(result === "pass" ? "审批通过并已关联销售合同（演示）" : "已驳回（演示）");
       closeProcModal();
@@ -3443,7 +3415,6 @@
             var applyDate = body.querySelector("#ordDate") ? body.querySelector("#ordDate").value : "2026-04-15";
             var logisticsNo = body.querySelector("#ordLogisticsNo") ? body.querySelector("#ordLogisticsNo").value : ("WL" + nowYmdCompact());
             var salesContractNo = body.querySelector("#ordSalesContractNo") ? body.querySelector("#ordSalesContractNo").value : "";
-            var salesContractCode = body.querySelector("#ordSalesContractCode") ? body.querySelector("#ordSalesContractCode").value : "";
             var picked = Array.prototype.slice.call(body.querySelectorAll(".proc-order-pick:checked")).map(function (x) {
               var tr = x.closest("tr");
               if (!tr) return "";
@@ -3472,7 +3443,6 @@
                 "<td>" + confirmer + "</td>" +
                 '<td data-order-logistics-no>' + logisticsNo + "</td>" +
                 '<td data-order-sales-no>' + salesContractNo + "</td>" +
-                '<td data-order-sales-code>' + salesContractCode + "</td>" +
                 '<td class="proc-ops-cell" data-order-op><a href="#" class="js-op" data-op="订单查看详情" data-order="' + newNo + '">查看</a></td>';
               tbody.insertBefore(tr, tbody.firstChild);
             }
@@ -3494,8 +3464,7 @@
           applyDate: rowData.applyDate,
           confirmer: rowData.confirmer,
           logisticsNo: rowData.logisticsNo,
-          salesContractNo: rowData.salesContractNo,
-          salesContractCode: rowData.salesContractCode
+          salesContractNo: rowData.salesContractNo
         }),
         '<button type="button" class="proc-btn" id="procModalCancel">取消</button><button type="button" class="proc-btn proc-btn-primary" id="procSaveOrderEdit">保存</button>'
       );
@@ -3516,7 +3485,6 @@
           var applyDate = body.querySelector("#ordDate") ? body.querySelector("#ordDate").value : rowData.applyDate || "2026-04-15";
           var logisticsNo = body.querySelector("#ordLogisticsNo") ? body.querySelector("#ordLogisticsNo").value : (rowData.logisticsNo || "");
           var salesContractNo = body.querySelector("#ordSalesContractNo") ? body.querySelector("#ordSalesContractNo").value : (rowData.salesContractNo || "");
-          var salesContractCode = body.querySelector("#ordSalesContractCode") ? body.querySelector("#ordSalesContractCode").value : (rowData.salesContractCode || "");
           var c = body.querySelectorAll(".proc-order-pick:checked").length;
           var summary = rowData.summary || ("设备清单共" + c + "项");
           var tds = tr.querySelectorAll("td");
@@ -3528,7 +3496,6 @@
           if (tds[7]) tds[7].textContent = confirmer;
           if (tds[8]) tds[8].textContent = logisticsNo;
           if (tds[9]) tds[9].textContent = salesContractNo;
-          if (tds[10]) tds[10].textContent = salesContractCode;
           toast("订单已保存（演示）");
           closeProcModal();
         });
@@ -3578,7 +3545,6 @@
           confirmer: rowData.confirmer,
           logisticsNo: rowData.logisticsNo,
           salesContractNo: rowData.salesContractNo,
-          salesContractCode: rowData.salesContractCode,
           readonly: true
         }),
         '<button type="button" class="proc-btn" id="procModalClose">取消</button>'
