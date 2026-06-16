@@ -95,10 +95,24 @@
 .sales-qty-box{display:grid;grid-template-columns:1fr 120px;gap:12px;align-items:end}
 .sales-cart-summary{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px;color:#445a76;font-size:13px}
 .sales-cart-total{font-weight:700;color:#1f3551}
-.sales-cart-table{width:100%;min-width:980px;border-collapse:collapse;font-size:12px}
-.sales-cart-table th,.sales-cart-table td{border:1px solid #e7edf5;padding:8px 10px;text-align:center;white-space:nowrap;color:#1f2937}
+.sales-cart-table{width:100%;min-width:1680px;border-collapse:collapse;font-size:12px;table-layout:fixed}
+.sales-cart-table th,.sales-cart-table td{border:1px solid #e7edf5;padding:8px 10px;text-align:center;white-space:normal;word-break:break-word;overflow-wrap:anywhere;vertical-align:middle;line-height:1.45;color:#1f2937}
 .sales-cart-table th{background:#f6f8fb;color:#5b6b7f;font-weight:600}
 .sales-cart-table td:nth-child(2){text-align:left}
+.sales-cart-table th:nth-child(1),.sales-cart-table td:nth-child(1){width:58px;min-width:58px}
+.sales-cart-table th:nth-child(2),.sales-cart-table td:nth-child(2){width:150px;min-width:150px}
+.sales-cart-table th:nth-child(3),.sales-cart-table td:nth-child(3){width:120px;min-width:120px}
+.sales-cart-table th:nth-child(4),.sales-cart-table td:nth-child(4){width:120px;min-width:120px}
+.sales-cart-table th:nth-child(5),.sales-cart-table td:nth-child(5){width:120px;min-width:120px}
+.sales-cart-table th:nth-child(6),.sales-cart-table td:nth-child(6){width:124px;min-width:124px}
+.sales-cart-table th:nth-child(7),.sales-cart-table td:nth-child(7){width:130px;min-width:130px}
+.sales-cart-table th:nth-child(8),.sales-cart-table td:nth-child(8){width:104px;min-width:104px}
+.sales-cart-table th:nth-child(9),.sales-cart-table td:nth-child(9){width:100px;min-width:100px}
+.sales-cart-table th:nth-child(10),.sales-cart-table td:nth-child(10){width:108px;min-width:108px}
+.sales-cart-table th:nth-child(11),.sales-cart-table td:nth-child(11){width:108px;min-width:108px}
+.sales-cart-table th:nth-child(12),.sales-cart-table td:nth-child(12),.sales-cart-table th:nth-child(13),.sales-cart-table td:nth-child(13),.sales-cart-table th:nth-child(14),.sales-cart-table td:nth-child(14),.sales-cart-table th:nth-child(15),.sales-cart-table td:nth-child(15){width:132px;min-width:132px}
+.sales-cart-table th:nth-child(16),.sales-cart-table td:nth-child(16){width:86px;min-width:86px}
+.sales-cart-table tfoot th{white-space:normal}
 .sales-cart-grid{display:grid;grid-template-columns:64px repeat(13,minmax(118px,1fr)) 86px;min-width:1880px;border-top:1px solid #e7edf5;border-left:1px solid #e7edf5;font-size:12px}
 .sales-cart-cell{min-height:34px;padding:8px 10px;border-right:1px solid #e7edf5;border-bottom:1px solid #e7edf5;display:flex;align-items:center;justify-content:center;background:#fff;box-sizing:border-box;white-space:nowrap;color:#1f2937}
 .sales-cart-cell--head{background:#f6f8fb;color:#1f2937;font-weight:600}
@@ -120,13 +134,13 @@
 .sales-flow-tab.is-active{color:#1677ff;text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:8px}
 .sales-flow-pane{display:none;padding-top:14px}
 .sales-flow-pane.is-active{display:block}
-.sales-flow-track{border:1px solid #f0f2f5;border-radius:8px;padding:22px 18px;overflow:visible}
-.sales-flow-row{display:grid;grid-template-columns:repeat(15,1fr);align-items:stretch;gap:6px}
-.sales-flow-node{min-width:0;padding:8px;border-radius:10px;border:1px solid #cfe8cf;background:#edf8ed;color:#315c35;font-size:11.5px;line-height:1.3;text-align:center;white-space:normal;display:flex;align-items:center;justify-content:center;word-break:break-word}
+.sales-flow-track{border:1px solid #f0f2f5;border-radius:8px;padding:22px 18px;overflow:auto}
+.sales-flow-row{display:flex;align-items:stretch;gap:8px;flex-wrap:wrap}
+.sales-flow-node{min-width:150px;max-width:190px;padding:8px;border-radius:10px;border:1px solid #cfe8cf;background:#edf8ed;color:#315c35;font-size:11.5px;line-height:1.35;text-align:center;white-space:normal;display:flex;align-items:center;justify-content:center;word-break:break-word;overflow-wrap:anywhere;flex:0 1 190px}
 .sales-flow-node.end{background:#fff8e6;border-color:#f0dca8;color:#7a5a14}
 .sales-flow-dot{width:10px;height:10px;border-radius:999px;border:1px solid #7bc67b;background:#ddf5dd;flex:none}
 .sales-flow-dot.end{border-color:#e89292;background:#ffe8e8}
-.sales-flow-arrow{color:#8ca0b3;font-size:16px;line-height:1;display:inline-flex;align-items:center;justify-content:center;flex:none;padding:0 2px}
+.sales-flow-arrow{color:#8ca0b3;font-size:16px;line-height:1;display:inline-flex;align-items:center;justify-content:center;flex:none;padding:0 2px;align-self:center}
 .sales-flow-info{font-size:13px;color:#4f647a;line-height:1.9}
 .sales-flow-ft{padding:10px 16px;border-top:1px solid #edf2f8;display:flex;justify-content:flex-end}
 .sales-flow-ft button{height:32px;padding:0 16px;border:1px solid #d9d9d9;border-radius:6px;background:#fff;color:#3a4a5a;cursor:pointer}
@@ -148,10 +162,10 @@
 .sales-detail-head{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-bottom:12px}
 .sales-detail-card{border:1px solid #e5edf7;border-radius:6px;background:#fbfdff;padding:9px 10px}
 .sales-detail-label{font-size:12px;color:#64748b}
-.sales-detail-value{margin-top:4px;font-size:14px;font-weight:600;color:#1f3551;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sales-detail-value{margin-top:4px;font-size:14px;font-weight:600;color:#1f3551;white-space:normal;overflow:visible;text-overflow:clip;word-break:break-word}
 .sales-section-title{margin:12px 0 8px;font-size:13px;font-weight:600;color:#1f3551}
 .sales-detail-table{width:100%;border-collapse:collapse;font-size:12px}
-.sales-detail-table th,.sales-detail-table td{border:1px solid #e7edf5;padding:8px 10px;text-align:left;white-space:nowrap}
+.sales-detail-table th,.sales-detail-table td{border:1px solid #e7edf5;padding:8px 10px;text-align:left;white-space:normal;word-break:break-word;overflow-wrap:anywhere}
 .sales-detail-table th{width:120px;background:#f6f8fb;color:#5b6b7f;font-weight:600}
 .sales-track{border:1px solid #edf1f6;border-radius:6px;background:#fbfdff;padding:12px}
 .sales-track-map{position:relative;height:360px;margin:14px;border:1px solid #dbe6f3;border-radius:10px;background:#eef6ff;overflow:hidden}

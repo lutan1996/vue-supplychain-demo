@@ -25,6 +25,62 @@
     cartItems = [];
   }
 
+  function cartTypeKey(item) {
+    if (!item) return "";
+    return String(
+      item.cartKey ||
+      item.typeCode ||
+      item.a ||
+      item.typeName ||
+      item.productName ||
+      item.id ||
+      item.b ||
+      item.code ||
+      ""
+    );
+  }
+
+  function migrateCartItems(list) {
+    if (!Array.isArray(list) || !list.length) return [];
+    var merged = [];
+    list.forEach(function (raw) {
+      if (!raw) return;
+      var key = cartTypeKey(raw);
+      if (!key) return;
+      var found = merged.find(function (item) {
+        return item.cartKey === key;
+      });
+      if (!found) {
+        found = {
+          cartKey: key,
+          id: raw.id || raw.code || key,
+          productName: raw.productName || raw.typeName || "",
+          mfrName: raw.mfrName || "",
+          model: raw.model || "",
+          category: raw.category || "销售类",
+          typeCode: raw.typeCode || raw.a || "",
+          typeName: raw.typeName || "",
+          code: raw.code || raw.b || "",
+          stockQty: raw.stockQty || "",
+          refPrice: raw.refPrice || "",
+          features: raw.features || {},
+          qty: 0
+        };
+        merged.push(found);
+      }
+      found.qty += Math.max(1, Number(raw.qty || 1));
+      if (!found.typeCode && (raw.typeCode || raw.a)) found.typeCode = raw.typeCode || raw.a;
+      if (!found.typeName && raw.typeName) found.typeName = raw.typeName;
+      if ((!found.productName || found.productName === found.typeName) && raw.productName) found.productName = raw.productName;
+      if (!found.code && (raw.code || raw.b)) found.code = raw.code || raw.b;
+      if (!found.refPrice && raw.refPrice) found.refPrice = raw.refPrice;
+      if (!found.features || !Object.keys(found.features).length) found.features = raw.features || {};
+    });
+    return merged;
+  }
+
+  cartItems = migrateCartItems(cartItems);
+
   function esc(v) {
     return String(v == null ? "" : v).replace(/[&<>"']/g, function (m) {
       return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[m];
@@ -212,7 +268,17 @@
   }
 
   function cartKey(product) {
-    return String(product && (product.id || product.b || product.code || product.productName + "|" + product.mfrName + "|" + product.model) || "");
+    if (!product) return "";
+    return String(
+      product.a ||
+      product.typeCode ||
+      product.typeName ||
+      product.productName ||
+      product.id ||
+      product.b ||
+      product.code ||
+      ""
+    );
   }
 
   function normalizeCartSnapshot(product) {
@@ -252,11 +318,13 @@
   function addToCart(product, qty) {
     var snapshot = normalizeCartSnapshot(product);
     var old = cartItems.find(function (item) {
-      return item.cartKey === snapshot.cartKey || item.id === snapshot.id || item.code === snapshot.code;
+      return item.cartKey === snapshot.cartKey;
     });
     if (old) {
       old.qty = Number(old.qty || 0) + qty;
-      Object.assign(old, snapshot);
+      old.typeCode = snapshot.typeCode;
+      old.typeName = snapshot.typeName;
+      old.category = snapshot.category;
     } else {
       snapshot.qty = qty;
       cartItems.push(snapshot);
@@ -281,10 +349,15 @@
   }
 
   function cartProduct(item) {
-    var product = getProducts().find(function (p) {
-      return (item.id && p.id === item.id) || (item.code && p.b === item.code) || (item.cartKey && cartKey(p) === item.cartKey);
+    var products = getProducts().filter(function (p) {
+      return item.cartKey && cartKey(p) === item.cartKey;
     });
-    if (product) return product;
+    if (products.length) {
+      products.sort(function (a, b) {
+        return toNumber(b.stockQty) - toNumber(a.stockQty);
+      });
+      return products[0];
+    }
     return {
       id: item.id,
       productName: item.productName,
@@ -316,13 +389,13 @@
       var subtotal = unitPrice * qty;
       return {
         seq: idx + 1,
-        id: item.id,
-        productName: product.productName,
+        id: item.cartKey,
+        productName: product.productName || product.typeName || item.productName || item.typeName || "—",
         mfrName: product.mfrName,
         model: product.model,
         code: product.b,
-        typeCode: product.a,
-        typeName: product.typeName,
+        typeCode: product.a || item.typeCode,
+        typeName: product.typeName || item.typeName,
         category: product.category,
         qty: qty,
         price: unitPrice,
@@ -385,7 +458,7 @@
   }
 
   function changeCartQty(id, nextQty) {
-    var item = cartItems.find(function (row) { return row.id === id; });
+    var item = cartItems.find(function (row) { return row.cartKey === id; });
     if (!item) return;
     item.qty = Math.max(1, Number(nextQty || 1));
     saveCart();
@@ -393,7 +466,7 @@
   }
 
   function removeCartItem(id) {
-    cartItems = cartItems.filter(function (item) { return item.id !== id; });
+    cartItems = cartItems.filter(function (item) { return item.cartKey !== id; });
     saveCart();
     refreshCartModal();
   }
@@ -420,6 +493,7 @@
   }
 
   function openCartModal() {
+    saveCart();
     var foot = cartItems.length ?
       '<button class="sales-btn" data-close>取消</button><button class="sales-btn sales-btn-primary" id="salesCartSubmit">提交订单</button>' :
       '<button class="sales-btn" data-close>关闭</button>';
