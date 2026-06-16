@@ -140,10 +140,10 @@
 
   function salesBaseTrackHtml(productName, productCode) {
     return [
-      salesTrackItemHtml("#2563eb", "2026.4.20 入库：" + textOrDash(productName) + "（" + textOrDash(productCode) + "）", "存放山东风电中心仓库001货位"),
-      salesTrackItemHtml("#10b981", "2026.5.10 被电控所领用", "领用单：LY-2026-0510（演示）"),
-      salesTrackItemHtml("#6366f1", "2026.5.12 使用人变更（初始保管人 → 张三）", "变更原因：岗位调整"),
-      salesTrackItemHtml("#f59e0b", "2026.5.18 使用人变更（张三 → 李四）", "变更原因：岗位调动")
+      salesTrackItemHtml("#2563eb", "2026.4.20 入库：" + textOrDash(productName) + "（" + textOrDash(productCode) + "）", "入库时间：2026.4.20 10:18；入库地点：山东风电中心仓库001货位；办理人：仓储管理员王敏"),
+      salesTrackItemHtml("#10b981", "2026.5.10 被电控所领用", "领用时间：2026.5.10 15:08；领用单：LY-2026-0510（演示）；领用部门：电控所；办理人：成明锴"),
+      salesTrackItemHtml("#6366f1", "2026.5.12 使用人变更（初始保管人 → 张三）", "变更时间：2026.5.12 09:20；原保管地点：山东风电中心仓库001货位；变更人：电控所管理员成明锴；接收人：张三；变更原因：岗位调整"),
+      salesTrackItemHtml("#f59e0b", "2026.5.18 使用人变更（张三 → 李四）", "变更时间：2026.5.18 14:36；所在地点：山东风电中心仓库001货位；变更人：电控所管理员成明锴；接收人：李四；变更原因：岗位调动")
     ].join("");
   }
 
@@ -159,79 +159,45 @@
     html += salesTrackItemHtml(
       "#0ea5e9",
       dotDate(order.orderDate) + " 电控所物资专责发起销售下单",
-      "订单编号：" + textOrDash(order.orderNo) + "；下单公司：" + textOrDash(order.company) + "；场站：" + textOrDash(order.station) + "；产品：" + textOrDash(item.productName) + "；购买数量：" + textOrDash(item.qty)
+      "下单时间：" + dotDate(order.orderDate) + " 09:12；下单人：" + textOrDash(order.requester) + "；订单编号：" + textOrDash(order.orderNo) + "；下单公司：" + textOrDash(order.company) + "；场站：" + textOrDash(order.station) + "；产品：" + textOrDash(item.productName) + "；购买数量：" + textOrDash(item.qty)
     );
 
-    html += approvedDone
-      ? salesTrackItemHtml(
-          "#22c55e",
-          shiftDotDate(order.orderDate, 1) + " 电控所负责人审核通过",
-          "审核人：" + textOrDash(order.handler) + "；已核对购买数量、订单金额、收货单位及场站信息，订单进入销售合同环节。"
-        )
-      : salesTrackItemHtml(
-          "#94a3b8",
-          "待电控所负责人审核",
-          "当前订单状态：" + textOrDash(order.status) + "；需核对产品明细、购买数量、订单总金额及场站收货信息。"
-        );
+    if (approvedDone) {
+      html += salesTrackItemHtml(
+        "#22c55e",
+        shiftDotDate(order.orderDate, 1) + " 电控所负责人审核通过",
+        "审核时间：" + shiftDotDate(order.orderDate, 1) + " 10:03；审核人：" + textOrDash(order.handler) + "；审核地点：" + textOrDash(order.company) + "销售管理岗；已核对购买数量、订单金额、收货单位及场站信息。"
+      );
+    }
 
-    html += contractDone
-      ? salesTrackItemHtml(
-          "#8b5cf6",
-          shiftDotDate(order.orderDate, 2) + " 销售合同登记完成",
-          "销售合同编号：" + textOrDash(order.contractNo) + "；订单已与销售合同关联，可继续安排发货。"
-        )
-      : status === "待上传合同"
-        ? salesTrackItemHtml(
-            "#94a3b8",
-            "待上传销售合同",
-            "订单审核已完成；需上传销售合同附件后进入发货环节。"
-          )
-        : salesTrackItemHtml(
-            "#94a3b8",
-            "待进入销售合同登记",
-            "订单审核通过后登记销售合同编号，并补充对应合同附件。"
-          );
+    if (contractDone) {
+      html += salesTrackItemHtml(
+        "#8b5cf6",
+        shiftDotDate(order.orderDate, 2) + " 销售合同登记完成",
+        "登记时间：" + shiftDotDate(order.orderDate, 2) + " 14:26；登记人：王卿明；销售合同编号：" + textOrDash(order.contractNo) + "；办理地点：经营发展中心合同岗。"
+      );
+    }
 
-    html += shipDone
-      ? salesTrackItemHtml(
-          "#f97316",
-          dotDate(order.shipDate || shiftDotDate(order.orderDate, 4)) + " 安排发货",
-          "发货路径：" + textOrDash(order.route) + "；物流单号：" + textOrDash(order.waybillNo) + "；发往场站：" + textOrDash(order.station) + "。"
-        )
-      : contractDone
-        ? salesTrackItemHtml(
-            "#94a3b8",
-            "待安排发货",
-            "销售合同已完成登记；待维护物流单号和发货日期后执行发货。"
-          )
-        : salesTrackItemHtml(
-            "#94a3b8",
-            "待进入发货准备",
-            "需先完成订单审核及销售合同登记，之后才能安排发货。"
-          );
+    if (shipDone) {
+      html += salesTrackItemHtml(
+        "#f97316",
+        dotDate(order.shipDate || shiftDotDate(order.orderDate, 4)) + " 安排发货",
+        "发货时间：" + dotDate(order.shipDate || shiftDotDate(order.orderDate, 4)) + " 11:08；发货人：李哲；发货路径：" + textOrDash(order.route) + "；物流单号：" + textOrDash(order.waybillNo) + "；发往场站：" + textOrDash(order.station) + "。"
+      );
+    }
 
-    html += receiveDone
-      ? salesTrackItemHtml(
-          "#14b8a6",
-          dotDate(order.receiveDate || shiftDotDate(order.shipDate || order.orderDate, 1)) + " 项目公司收货确认",
-          "收货单位：" + textOrDash(order.receiverCompany) + "；场站：" + textOrDash(order.station) + "；已完成收货确认。"
-        )
-      : shipDone
-        ? salesTrackItemHtml(
-            "#94a3b8",
-            "待项目公司收货确认",
-            "物资已发出；收货单位：" + textOrDash(order.receiverCompany) + "；场站：" + textOrDash(order.station) + "。"
-          )
-        : salesTrackItemHtml(
-            "#94a3b8",
-            "待项目公司收货",
-            "待完成发货后，由项目公司在场站侧进行收货确认。"
-          );
+    if (receiveDone) {
+      html += salesTrackItemHtml(
+        "#14b8a6",
+        dotDate(order.receiveDate || shiftDotDate(order.shipDate || order.orderDate, 1)) + " 项目公司收货确认",
+        "收货时间：" + dotDate(order.receiveDate || shiftDotDate(order.shipDate || order.orderDate, 1)) + " 16:20；收货人：" + textOrDash(order.requester) + "；收货单位：" + textOrDash(order.receiverCompany) + "；场站：" + textOrDash(order.station) + "。"
+      );
+    }
 
     html += salesTrackItemHtml(
       currentColor,
       "当前订单状态：" + textOrDash(order.status),
-      "当前处理人：" + textOrDash(order.handler) + "；可继续通过订单编号 " + textOrDash(order.orderNo) + " 关联查看销售合同和购入物资明细。"
+      "状态时间：" + dotDate(order.receiveDate || order.shipDate || shiftDotDate(order.orderDate, approvedDone ? 1 : 0)) + "；当前处理人：" + textOrDash(order.handler) + "；当前场站：" + textOrDash(order.station) + "；可继续通过订单编号 " + textOrDash(order.orderNo) + " 关联查看销售合同和购入物资明细。"
     );
 
     return html;
@@ -255,32 +221,32 @@
       salesTrackItemHtml(
         "#0ea5e9",
         dotDate(orderDate) + " 电控所物资专责发起销售下单",
-        "下单人：" + textOrDash(requester) + "；订单编号：" + textOrDash(row.orderNo) + "；下单公司：" + textOrDash(row.company) + "；场站：" + textOrDash(row.station) + "；购买数量：" + textOrDash(row.qty)
+        "下单时间：" + dotDate(orderDate) + " 09:12；下单人：" + textOrDash(requester) + "；订单编号：" + textOrDash(row.orderNo) + "；下单公司：" + textOrDash(row.company) + "；场站：" + textOrDash(row.station) + "；购买数量：" + textOrDash(row.qty)
       ) +
       salesTrackItemHtml(
         "#22c55e",
         shiftDotDate(orderDate, 1) + " 电控所负责人审核通过",
-        "审核人：" + textOrDash(handler) + "；确认该产品可按销售流程流转，并保留前序领用与使用人变更记录。"
+        "审核时间：" + shiftDotDate(orderDate, 1) + " 10:03；审核人：" + textOrDash(handler) + "；审核地点：" + textOrDash(row.company) + "销售管理岗；确认该产品可按销售流程流转，并保留前序领用与使用人变更记录。"
       ) +
       salesTrackItemHtml(
         "#8b5cf6",
         shiftDotDate(orderDate, 2) + " 销售合同登记完成",
-        "销售合同编号：" + textOrDash(row.contractNo) + "；已与订单 " + textOrDash(row.orderNo) + " 关联，可用于后续发货和收货反查。"
+        "登记时间：" + shiftDotDate(orderDate, 2) + " 14:26；登记人：王卿明；销售合同编号：" + textOrDash(row.contractNo) + "；已与订单 " + textOrDash(row.orderNo) + " 关联，可用于后续发货和收货反查。"
       ) +
       salesTrackItemHtml(
         "#f97316",
         shiftDotDate(orderDate, 3) + " 安排发货",
-        "发货路径：" + textOrDash(route) + "；发往场站：" + textOrDash(row.station) + "；同步维护收货准备信息。"
+        "发货时间：" + shiftDotDate(orderDate, 3) + " 11:08；发货人：李哲；发货路径：" + textOrDash(route) + "；发往场站：" + textOrDash(row.station) + "；同步维护收货准备信息。"
       ) +
       salesTrackItemHtml(
         "#14b8a6",
         dotDate(row.receiveDate) + " 项目公司收货确认",
-        "收货单位：" + textOrDash(receiverCompany) + "；收货地点：" + textOrDash(row.location) + "；已纳入购入物资统计。"
+        "收货时间：" + dotDate(row.receiveDate) + " 16:20；收货人：" + textOrDash(requester) + "；收货单位：" + textOrDash(receiverCompany) + "；收货地点：" + textOrDash(row.location) + "；已纳入购入物资统计。"
       ) +
       salesTrackItemHtml(
         "#06b6d4",
         "当前状态：" + textOrDash(row.usageStatus),
-        currentSub + " 订单编号：" + textOrDash(row.orderNo) + "；物资类型：" + textOrDash(summary.typeName) + "。"
+        "状态时间：" + dotDate(row.receiveDate) + "；当前处理人：" + textOrDash(handler) + "；" + currentSub + " 订单编号：" + textOrDash(row.orderNo) + "；物资类型：" + textOrDash(summary.typeName) + "。"
       );
   }
 
