@@ -169,8 +169,7 @@
   }
   function addToCart(product, qty) {
     var old = cartItems.find(function (x) { return x.id === product.id; });
-    if (old) old.qty += qty;
-    else cartItems.push({
+    var snapshot = {
       id: product.id,
       productName: product.productName,
       mfrName: product.mfrName,
@@ -181,9 +180,15 @@
       code: product.b,
       stockQty: product.stockQty,
       refPrice: product.refPrice,
-      features: product.features || {},
-      qty: qty
-    });
+      features: product.features || {}
+    };
+    if (old) {
+      old.qty += qty;
+      Object.assign(old, snapshot);
+    } else {
+      snapshot.qty = qty;
+      cartItems.push(snapshot);
+    }
     saveCart();
   }
   function openAddCartModal(product) {
@@ -202,7 +207,9 @@
     var total = cartItems.reduce(function (s, x) { return s + Number(x.qty || 0); }, 0);
     var catalogProducts = getProducts();
     function cartProduct(x) {
-      return catalogProducts.find(function (p) { return p.id === x.id; }) || {
+      var product = catalogProducts.find(function (p) { return p.id === x.id; });
+      if (!product && !x.productName && !x.code) return null;
+      return product || {
         id: x.id,
         productName: x.productName,
         mfrName: x.mfrName,
@@ -223,13 +230,21 @@
       return name && val ? name + "：" + val : name || val || "—";
     }
     var rows = [];
+    var validItems = [];
     cartItems.forEach(function (x) {
       var product = cartProduct(x);
+      if (!product) return;
+      validItems.push(x);
       var qty = Math.max(1, Number(x.qty || 1));
       for (var n = 1; n <= qty; n++) {
         rows.push({ item: x, product: product, no: n });
       }
     });
+    if (validItems.length !== cartItems.length) {
+      cartItems = validItems;
+      saveCart();
+    }
+    if (!rows.length) return '<div class="sales-empty">暂无加购物资</div>';
     return '<div class="sales-cart-summary"><span>已加购 ' + cartItems.length + ' 类物资，共 ' + total + ' 件</span></div>' +
       '<table class="sales-cart-table"><thead><tr><th>序号</th><th>产品名称</th><th>制造商名称</th><th>产品型号</th><th>产品编码</th><th>物资类型编码</th><th>物资类型</th><th>物资分类</th><th>库存数量</th><th>参考单价（万元）</th><th>特征值1</th><th>特征值2</th><th>特征值3</th><th>特征值4</th><th>操作</th></tr></thead><tbody>' +
       rows.map(function (row, i) {

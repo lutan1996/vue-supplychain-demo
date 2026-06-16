@@ -1846,6 +1846,7 @@
         if (t === "操作" || t.indexOf("操作") === 0) opIndex = i;
       });
       if (opIndex < 0) return;
+      if (table.classList && table.classList.contains("sales-cart-table")) return;
       var stIndex = getStatusColumnIndex(table);
 
       table.querySelectorAll("tbody tr").forEach(function (tr) {
