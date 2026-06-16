@@ -175,8 +175,13 @@
       productName: product.productName,
       mfrName: product.mfrName,
       model: product.model,
+      category: product.category,
+      typeCode: product.a,
+      typeName: product.typeName,
       code: product.b,
       stockQty: product.stockQty,
+      refPrice: product.refPrice,
+      features: product.features || {},
       qty: qty
     });
     saveCart();
@@ -195,10 +200,42 @@
   function cartHtml() {
     if (!cartItems.length) return '<div class="sales-empty">暂无加购物资</div>';
     var total = cartItems.reduce(function (s, x) { return s + Number(x.qty || 0); }, 0);
+    var catalogProducts = getProducts();
+    function cartProduct(x) {
+      return catalogProducts.find(function (p) { return p.id === x.id; }) || {
+        id: x.id,
+        productName: x.productName,
+        mfrName: x.mfrName,
+        model: x.model,
+        category: x.category || "销售类",
+        a: x.typeCode || "",
+        typeName: x.typeName || "",
+        b: x.code,
+        stockQty: x.stockQty,
+        refPrice: x.refPrice || "",
+        features: x.features || {}
+      };
+    }
+    function featureText(p, idx) {
+      var f = p.features || {};
+      var name = f["f" + idx + "_name"] || "";
+      var val = f["f" + idx] || "";
+      return name && val ? name + "：" + val : name || val || "—";
+    }
+    var rows = [];
+    cartItems.forEach(function (x) {
+      var product = cartProduct(x);
+      var qty = Math.max(1, Number(x.qty || 1));
+      for (var n = 1; n <= qty; n++) {
+        rows.push({ item: x, product: product, no: n });
+      }
+    });
     return '<div class="sales-cart-summary"><span>已加购 ' + cartItems.length + ' 类物资，共 ' + total + ' 件</span></div>' +
-      '<table class="sales-cart-table"><thead><tr><th>序号</th><th>物资名称</th><th>制造商</th><th>规格型号</th><th>产品编码</th><th>库存数量</th><th>加购数量</th><th>操作</th></tr></thead><tbody>' +
-      cartItems.map(function (x, i) {
-        return '<tr data-cart-id="' + esc(x.id) + '"><td>' + (i + 1) + '</td><td>' + esc(x.productName) + '</td><td>' + esc(x.mfrName) + '</td><td>' + esc(x.model) + '</td><td>' + esc(x.code) + '</td><td>' + esc(x.stockQty) + '</td><td><div class="sales-cart-qty"><button type="button" data-cart-minus="' + esc(x.id) + '">-</button><input type="number" min="1" value="' + esc(x.qty) + '" data-cart-qty="' + esc(x.id) + '"><button type="button" data-cart-plus="' + esc(x.id) + '">+</button></div></td><td><button type="button" class="sales-cart-remove" data-cart-remove="' + esc(x.id) + '">删除</button></td></tr>';
+      '<table class="sales-cart-table"><thead><tr><th>序号</th><th>产品名称</th><th>制造商名称</th><th>产品型号</th><th>产品编码</th><th>物资类型编码</th><th>物资类型</th><th>物资分类</th><th>库存数量</th><th>参考单价（万元）</th><th>特征值1</th><th>特征值2</th><th>特征值3</th><th>特征值4</th><th>操作</th></tr></thead><tbody>' +
+      rows.map(function (row, i) {
+        var x = row.item;
+        var p = row.product;
+        return '<tr data-cart-id="' + esc(x.id) + '" data-cart-row="' + row.no + '"><td>' + (i + 1) + '</td><td>' + esc(p.productName) + '</td><td>' + esc(p.mfrName) + '</td><td>' + esc(p.model) + '</td><td>' + esc(p.b) + '</td><td>' + esc(p.a || "—") + '</td><td>' + esc(p.typeName || "—") + '</td><td>' + esc(p.category || "—") + '</td><td>' + esc(p.stockQty) + '</td><td>' + esc(p.refPrice || "—") + '</td><td>' + esc(featureText(p, 1)) + '</td><td>' + esc(featureText(p, 2)) + '</td><td>' + esc(featureText(p, 3)) + '</td><td>' + esc(featureText(p, 4)) + '</td><td><button type="button" class="sales-cart-remove" data-cart-remove-one="' + esc(x.id) + '">删除</button></td></tr>';
       }).join("") + '</tbody></table>' +
       '<div class="sales-section-title">提交信息</div>' +
       '<div class="sales-form-grid"><div class="sales-field"><label>提交部门</label><input readonly value="电控所"></div><div class="sales-field"><label>收货单位</label><input readonly value="山西龙源"></div><div class="sales-field"><label>发货路径</label><select><option>工程技术公司发货</option><option>供应商直发</option></select></div><div class="sales-field"><label>期望发货日期</label><input type="date" value="2026-06-20"></div><div class="sales-field sales-field--full"><label>备注</label><textarea>销售类物资统一加购后提交审核。</textarea></div></div>';
@@ -245,6 +282,15 @@
       });
       body.querySelectorAll("[data-cart-remove]").forEach(function (btn) {
         btn.addEventListener("click", function () { removeCartItem(btn.getAttribute("data-cart-remove")); });
+      });
+      body.querySelectorAll("[data-cart-remove-one]").forEach(function (btn) {
+        btn.addEventListener("click", function () {
+          var id = btn.getAttribute("data-cart-remove-one");
+          var item = cartItems.find(function (x) { return x.id === id; });
+          if (!item) return;
+          if (Number(item.qty || 0) <= 1) removeCartItem(id);
+          else changeCartQty(id, Number(item.qty) - 1);
+        });
       });
     }
     var submit = document.getElementById("salesCartSubmit");
@@ -293,12 +339,12 @@
         return (i === 0 ? '<span class="sales-flow-dot"></span>' : '<span class="sales-flow-arrow">→</span>') + '<span class="sales-flow-node' + (i === nodes.length - 1 ? " end" : "") + '">' + esc(n) + '</span>' + (i === nodes.length - 1 ? '<span class="sales-flow-dot end"></span>' : "");
       }).join("") +
       '</div></div></div><div class="sales-flow-pane" data-pane="info"><div class="sales-flow-info">' +
-      '<p>1. 电控所物资专责刘建国从本部门所属销售类物资中选取物资，填写加购数量并提交销售订单。</p>' +
-      '<p>2. 电控所负责人张磊审核销售物资清单、库存数量和销售用途，审批结论：同意。</p>' +
-      '<p>3. 电控所王立军与山西龙源李志强完成销售合同签订，并登记销售合同编号。</p>' +
-      '<p>4. 电控所发货负责人陈志远依据合同安排发货，更新物流信息。</p>' +
-      '<p>5. 山西龙源收货负责人赵敏完成收货和验收，验收结论：通过。</p>' +
-      '<p>6. 电控所合同管理员孙晓梅在销售结束后上传销售合同，流程归档结束。</p>' +
+      '<p>1. 电控所物资专责成明锴从本部门所属销售类物资中选取物资，填写加购数量并提交销售订单。</p>' +
+      '<p>2. 电控所负责人陈亮审核销售物资清单、库存数量和销售用途，审批结论：同意。</p>' +
+      '<p>3. 电控所张明煜与山西龙源李志强完成销售合同签订，并登记销售合同编号。</p>' +
+      '<p>4. 电控所发货负责人成明锴依据合同安排发货，更新物流信息。</p>' +
+      '<p>5. 山西龙源收货负责人李志强完成收货和验收，验收结论：通过。</p>' +
+      '<p>6. 电控所流程负责人张明煜在销售结束后上传销售合同，流程归档结束。</p>' +
       '</div></div></div><div class="sales-flow-ft"><button type="button" data-sales-flow-close="1">关闭</button></div></div>';
     document.body.appendChild(mask);
     mask.addEventListener("click", function (e) { if (e.target === mask) closeSalesFlowModal(); });
