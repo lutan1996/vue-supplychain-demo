@@ -2075,7 +2075,7 @@
           act === "progress" ||
           act === "progresss";
         if (!isProgress) return;
-        if (t.id === "salesCartFlowBtn") return;
+        if (t.id === "salesCartFlowBtn" || (t.closest && t.closest("#salesModalMask"))) return;
         e.preventDefault();
         e.stopPropagation();
         var mask = ensureUnifiedProgressModal();

@@ -313,12 +313,17 @@
       hd.insertBefore(headBtn, close);
     }
     var flow = document.getElementById("salesCartFlowBtn");
-    if (flow) flow.addEventListener("click", openSalesFlowModal);
+    if (flow) flow.addEventListener("click", function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      if (e.stopImmediatePropagation) e.stopImmediatePropagation();
+      openSalesFlowModal();
+    });
     bindCartModalEvents();
   }
   function ensureSalesFlowModal() {
     var mask = document.getElementById("salesFlowMask");
-    if (mask) return mask;
+    if (mask && mask.parentNode) mask.parentNode.removeChild(mask);
     mask = document.createElement("div");
     mask.id = "salesFlowMask";
     mask.className = "sales-flow-mask";
