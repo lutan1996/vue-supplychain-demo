@@ -99,7 +99,7 @@
         id: "demo-2",
         b: "B00000002",
         a: "A0100100001",
-        productName: "风力发电机组整机",
+        productName: "叶片",
         mfrName: "金风科技",
         model: "GW70-1500",
         category: "生产类",

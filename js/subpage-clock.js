@@ -2456,7 +2456,6 @@
       "procurement-application.html": 1,
       "order-demand-management.html": 1,
       "proc-project-accept.html": 1,
-      "purchase-summary-report.html": 1,
       "proc-acceptance-inbound.html": 1,
       "proc-use-approval.html": 1,
       "proc-sales-contract.html": 1,

@@ -1848,7 +1848,10 @@
         if (t === "操作" || t.indexOf("操作") === 0) opIndex = i;
       });
       if (opIndex < 0) return;
-      if (table.classList && table.classList.contains("sales-cart-table")) return;
+      if (
+        table.classList &&
+        (table.classList.contains("sales-cart-table") || table.classList.contains("sales-modal-table"))
+      ) return;
       var stIndex = getStatusColumnIndex(table);
 
       table.querySelectorAll("tbody tr").forEach(function (tr) {
@@ -2453,7 +2456,6 @@
       "procurement-application.html": 1,
       "order-demand-management.html": 1,
       "proc-project-accept.html": 1,
-      "purchase-summary-report.html": 1,
       "proc-acceptance-inbound.html": 1,
       "proc-use-approval.html": 1,
       "proc-sales-contract.html": 1,

@@ -695,8 +695,35 @@
     }).join("、");
   }
 
+  function normalizeOrderMaterial(item) {
+    item = item || {};
+    var productName = item.productName || item.materialName || item.name || item.typeName || "—";
+    var productCode = item.productCode || item.code || item.b || item.materialCode || "—";
+    var model = item.model || item.spec || item.productModel || "—";
+    var manufacturer = item.manufacturer || item.mfrName || item.supplier || "—";
+    var typeCode = item.typeCode || item.a || item.materialTypeCode || "—";
+    var typeName = item.typeName || item.materialTypeName || item.categoryName || productName || "—";
+    var category = item.category || item.materialCategory || item.className || "—";
+    var qty = item.qty != null ? item.qty : (item.purchaseQty != null ? item.purchaseQty : (item.count != null ? item.count : "—"));
+    var price = item.price != null ? item.price : (item.unitPrice != null ? item.unitPrice : item.refPrice);
+    var subtotal = item.subtotal != null ? item.subtotal : (item.total != null ? item.total : (item.totalAmount != null ? item.totalAmount : (Number(price || 0) * Number(qty || 0))));
+    return {
+      id: item.id || item.itemId || productCode,
+      productName: productName,
+      productCode: productCode,
+      model: model,
+      manufacturer: manufacturer,
+      typeCode: typeCode,
+      typeName: typeName,
+      category: category,
+      qty: qty,
+      price: price,
+      subtotal: subtotal
+    };
+  }
+
   function orderMaterialsTableHtml(order, withTrack) {
-    var materials = Array.isArray(order.materials) ? order.materials : [];
+    var materials = Array.isArray(order.materials) ? order.materials.map(normalizeOrderMaterial) : [];
     return '<div class="sales-table-wrap sales-modal-table-wrap"><table class="sales-table sales-modal-table" style="min-width:1460px"><thead><tr><th>序号</th><th>产品名称</th><th>产品编码</th><th>产品型号</th><th>制造商名称</th><th>物资类型编码</th><th>物资类型</th><th>物资分类</th><th>购买数量</th><th>参考单价（万元）</th><th>小计金额（万元）</th><th>操作</th></tr></thead><tbody>' +
       (materials.length ? materials.map(function (item, idx) {
         return "<tr>" +
