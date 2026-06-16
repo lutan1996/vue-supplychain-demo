@@ -540,7 +540,9 @@
         rowHtml:
           '<button type="button" class="warehouse-secondary-link" data-action="purchase-plan-manage" data-label="采购信息台帐">采购信息台帐</button>' +
           '<span class="warehouse-secondary-pipe" aria-hidden="true">|</span>' +
-          '<button type="button" class="warehouse-secondary-link" data-action="purchase-contract-mgmt" data-label="合同信息管理">合同信息管理</button>'
+          '<button type="button" class="warehouse-secondary-link" data-action="purchase-contract-mgmt" data-label="合同信息管理">合同信息管理</button>' +
+          '<span class="warehouse-secondary-pipe" aria-hidden="true">|</span>' +
+          '<button type="button" class="warehouse-secondary-link" data-action="purchase-summary-report" data-label="采购合同报表管理">采购合同报表管理</button>'
       },
       assetMgmt: {
         text: '资产管理',
@@ -569,7 +571,7 @@
           '<span class="warehouse-secondary-pipe" aria-hidden="true">|</span>' +
           '<button type="button" class="warehouse-secondary-link" data-action="sales-purchase-material" data-label="购入物资">购入物资</button>' +
           '<span class="warehouse-secondary-pipe" aria-hidden="true">|</span>' +
-          '<button type="button" class="warehouse-secondary-link" data-action="sales-contract-report" data-label="合同报表管理">合同报表管理</button>'
+          '<button type="button" class="warehouse-secondary-link" data-action="sales-contract-report" data-label="销售合同报表管理">销售合同报表管理</button>'
       },
       logistics: {
         text: '物流管理',
@@ -1338,11 +1340,11 @@
         if (fileName === "sales-material-list.html") return "物资列表";
         if (fileName === "sales-order-management.html") return "订单管理";
         if (fileName === "sales-purchased-materials.html") return "购入物资";
-        if (fileName === "sales-contract-report.html") return "合同报表管理";
+        if (fileName === "sales-contract-report.html") return "销售合同报表管理";
         if (fileName === "contract-management.html") return "合同信息管理";
         if (fileName === "purchase-material-info-management.html") return "物资采购信息管理";
         if (fileName === "purchase-plan-management.html") return "采购信息台帐";
-        if (fileName === "purchase-summary-report.html") return "报表管理";
+        if (fileName === "purchase-summary-report.html") return "采购合同报表管理";
         if (fileName === "proc-acceptance-inbound.html") return "公司层面入库";
         if (fileName === "proj-company-inbound.html") return "项目公司入库";
         if (fileName === "proc-use-approval.html") return "领用申请";

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>采购汇总表</title>
+  <title>采购合同报表管理</title>
   <link rel="stylesheet" href="css/subpage-base.css" />
   <link rel="stylesheet" href="css/source-navbar-header.css" />
   <style>
@@ -71,12 +71,16 @@
       <aside class="sidebar"><div class="nav-item"><span class="nav-label">采购管理</span></div></aside>
       <main class="main-scroll">
         <div class="subpage-panel">
+          <div style="margin-bottom:10px;padding:10px 12px;background:#fff;border:1px solid #dde3ea;border-radius:6px;">
+            <div style="font-size:16px;font-weight:600;color:#1f3551;">采购合同报表管理</div>
+            <div style="margin-top:4px;font-size:12px;color:#64748b;">按采购合同维度统计执行情况，供物资采购模块查看合同履约与执行进度。</div>
+          </div>
           <div class="ps-toolbar">
             <div class="ps-left">
               <select id="year"><option>2026</option><option>2025</option><option>2024</option></select>
               <select id="supplier"><option>全部供应商</option><option>联合动力</option><option>东风</option></select>
               <select id="cat"><option>全部类别</option><option>风机整机</option><option>齿轮箱</option><option>变流器</option></select>
-              <button class="ps-btn pri" id="btnQuery">筛选</button>
+              <button class="ps-btn pri" id="btnQuery">查询</button>
               <button class="ps-btn" id="btnReset">重置</button>
               <button class="ps-btn" id="btnExport">导出Excel</button>
             </div>
@@ -279,7 +283,7 @@
       alert("已重置筛选条件（演示）");
     });
     document.getElementById("btnExport").addEventListener("click", function () {
-      alert("已导出采购汇总报表 Excel（演示）");
+      alert("已导出采购合同报表 Excel（演示）");
     });
   </script>
 </body>
