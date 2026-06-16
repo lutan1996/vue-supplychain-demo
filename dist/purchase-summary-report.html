@@ -14,9 +14,9 @@
     .ps-btn{height:30px;border:1px solid #d9d9d9;border-radius:4px;background:#fff;padding:0 12px;font-size:12px;cursor:pointer}
     .ps-btn.pri{background:#1890ff;border-color:#1890ff;color:#fff}
     .subpage-table-wrap{border:1px solid #dde3ea;border-radius:4px;overflow:auto;background:#fff}
-    .subpage-table{min-width:1950px;font-size:12px;background:#fff}
+    .subpage-table{min-width:2080px;font-size:12px;background:#fff}
     .subpage-table thead tr{background:#f2f5f9}
-    .subpage-table th,.subpage-table td{border-bottom:1px solid #edf1f6;padding:8px 8px;text-align:center;white-space:nowrap}
+    .subpage-table th,.subpage-table td{border-bottom:1px solid #edf1f6;padding:8px 8px;text-align:center;white-space:normal;word-break:break-word;overflow-wrap:anywhere}
     .subpage-table th{color:#5a6677;font-weight:600}
     .subpage-table a{color:#1677ff;text-decoration:none;font-weight:500}
     .subpage-table a:hover{text-decoration:underline}
@@ -87,7 +87,7 @@
             </div>
           <div class="subpage-table-wrap">
             <table class="subpage-table">
-              <thead><tr><th>计划编号</th><th>采购部门</th><th>剩余执行数量</th><th>已执行数量</th><th>订单编号</th><th>提报单位</th><th>场站名称</th><th>合同编号</th><th>子合同编号</th><th>供应商</th><th>入库状态</th><th>货物编号</th><th>物资名称</th><th>存放状态</th><th>验收编号</th><th>验收状态</th><th>操作</th></tr></thead>
+              <thead><tr><th>订单编号</th><th>框架协议/常规合同编号</th><th>执行合同编号</th><th>合同名称</th><th>供应商</th><th>执行率</th><th>合同金额</th><th>已执行金额</th><th>剩余金额</th><th>签订日期</th><th>合同有效期</th><th>执行状态</th><th>操作</th></tr></thead>
               <tbody id="reportBody"></tbody>
               </table>
             </div>
@@ -106,14 +106,14 @@
               </div>
             </article>
             <article class="ps-chart-card">
-              <h3 class="ps-chart-title">入库状态分布</h3>
+              <h3 class="ps-chart-title">执行状态分布</h3>
               <div class="ps-pie-wrap">
                 <div class="ps-pie" id="inboundPie"></div>
                 <div class="ps-pie-list" id="inboundLegend"></div>
               </div>
             </article>
             <article class="ps-chart-card">
-              <h3 class="ps-chart-title">验收状态分布</h3>
+              <h3 class="ps-chart-title">合同类型分布</h3>
               <div class="ps-pie-wrap">
                 <div class="ps-pie" id="acceptPie"></div>
                 <div class="ps-pie-list" id="acceptLegend"></div>
@@ -132,47 +132,44 @@
 <script src="js/subpage-clock.js"></script>
   <script>
     const reportRows = [
-      ["CGJH-2026-001","经营发展中心",70,50,"ORD2026001","河南能源","新安风电场","HT-2026-301","SUB-2026-001","联合动力","已入库","G-2026-001","齿轮箱总成","在库","QA-2026-201","通过"],
-      ["CGJH-2026-002","经营发展中心",40,20,"ORD2026002","华中电力","嵩县风电场","HT-2026-302","SUB-2026-002","东方电气","部分入库","G-2026-002","发电机组","在途","QA-2026-202","待验收"],
-      ["CGJH-2026-003","设备管理部",88,36,"ORD2026003","山西能源","黎城风电场","HT-2026-303","SUB-2026-003","金风科技","已入库","G-2026-003","塔筒组件","在库","QA-2026-203","通过"],
-      ["CGJH-2026-004","设备管理部",26,14,"ORD2026004","内蒙绿能","苏尼特风场","HT-2026-304","SUB-2026-004","明阳智能","待入库","G-2026-004","主轴总成","待收货","QA-2026-204","待验收"],
-      ["CGJH-2026-005","生产运维部",53,47,"ORD2026005","豫北新能源","林州风电场","HT-2026-305","SUB-2026-005","联合动力","已入库","G-2026-005","液压站","在库","QA-2026-205","通过"],
-      ["CGJH-2026-006","生产运维部",65,30,"ORD2026006","鲁西电力","菏泽风电场","HT-2026-306","SUB-2026-006","远景能源","部分入库","G-2026-006","变流柜","在途","QA-2026-206","部分通过"],
-      ["CGJH-2026-007","经营发展中心",35,35,"ORD2026007","晋东能源","长治风电场","HT-2026-307","SUB-2026-007","运达股份","已入库","G-2026-007","叶片组件","在库","QA-2026-207","通过"],
-      ["CGJH-2026-008","设备管理部",90,10,"ORD2026008","陇东电力","平凉风电场","HT-2026-308","SUB-2026-008","三一重能","待入库","G-2026-008","偏航系统","待收货","QA-2026-208","待验收"],
-      ["CGJH-2026-009","生产运维部",42,18,"ORD2026009","河北绿电","张北风电场","HT-2026-309","SUB-2026-009","海装风电","部分入库","G-2026-009","变桨系统","在途","QA-2026-209","待复验"],
-      ["CGJH-2026-010","经营发展中心",30,28,"ORD2026010","西北电建","酒泉风电场","HT-2026-310","SUB-2026-010","上海电气","已入库","G-2026-010","法兰连接件","在库","QA-2026-210","通过"]
+      { orderNo:"ORD2026001", planNo:"CGJH-2026-001", dept:"经营发展中心", contractNo:"CG-KJ-2026-301", execNo:"CG-ZX-2026-001", contractName:"联合动力齿轮箱年度框架协议", supplier:"联合动力", progress:"41%", totalAmount:380.00, executedAmount:156.00, remainingAmount:224.00, signDate:"2026-01-20", term:"2026-01-20 ~ 2026-12-31", status:"部分执行", contractType:"框架协议" },
+      { orderNo:"ORD2026002", planNo:"CGJH-2026-002", dept:"经营发展中心", contractNo:"CG-KJ-2026-302", execNo:"CG-ZX-2026-002", contractName:"东方电气发电机组采购框架协议", supplier:"东方电气", progress:"33%", totalAmount:260.00, executedAmount:86.00, remainingAmount:174.00, signDate:"2026-02-05", term:"2026-02-05 ~ 2026-11-30", status:"部分执行", contractType:"框架协议" },
+      { orderNo:"ORD2026003", planNo:"CGJH-2026-003", dept:"设备管理部", contractNo:"CG-KJ-2026-303", execNo:"CG-ZX-2026-003", contractName:"金风科技塔筒组件框架协议", supplier:"金风科技", progress:"29%", totalAmount:520.00, executedAmount:152.00, remainingAmount:368.00, signDate:"2026-01-28", term:"2026-01-28 ~ 2026-12-31", status:"部分执行", contractType:"框架协议" },
+      { orderNo:"ORD2026004", planNo:"CGJH-2026-004", dept:"设备管理部", contractNo:"CG-CG-2026-304", execNo:"CG-ZX-2026-004", contractName:"明阳智能主轴总成常规合同", supplier:"明阳智能", progress:"0%", totalAmount:118.00, executedAmount:0, remainingAmount:118.00, signDate:"2026-03-02", term:"2026-03-02 ~ 2026-08-31", status:"未执行", contractType:"常规合同" },
+      { orderNo:"ORD2026005", planNo:"CGJH-2026-005", dept:"生产运维部", contractNo:"CG-CG-2026-305", execNo:"CG-ZX-2026-005", contractName:"联合动力液压站常规合同", supplier:"联合动力", progress:"63%", totalAmount:96.00, executedAmount:60.00, remainingAmount:36.00, signDate:"2026-02-18", term:"2026-02-18 ~ 2026-09-30", status:"部分执行", contractType:"常规合同" },
+      { orderNo:"ORD2026006", planNo:"CGJH-2026-006", dept:"生产运维部", contractNo:"CG-CG-2026-306", execNo:"CG-ZX-2026-006", contractName:"远景能源变流柜采购合同", supplier:"远景能源", progress:"31%", totalAmount:144.00, executedAmount:45.00, remainingAmount:99.00, signDate:"2026-03-12", term:"2026-03-12 ~ 2026-10-31", status:"部分执行", contractType:"常规合同" },
+      { orderNo:"ORD2026007", planNo:"CGJH-2026-007", dept:"经营发展中心", contractNo:"CG-KJ-2026-307", execNo:"CG-ZX-2026-007", contractName:"运达股份叶片组件框架协议", supplier:"运达股份", progress:"100%", totalAmount:72.00, executedAmount:72.00, remainingAmount:0, signDate:"2026-01-15", term:"2026-01-15 ~ 2026-07-31", status:"已执行", contractType:"框架协议" },
+      { orderNo:"ORD2026008", planNo:"CGJH-2026-008", dept:"设备管理部", contractNo:"CG-KJ-2026-308", execNo:"CG-ZX-2026-008", contractName:"三一重能偏航系统框架协议", supplier:"三一重能", progress:"12%", totalAmount:208.00, executedAmount:25.00, remainingAmount:183.00, signDate:"2026-02-22", term:"2026-02-22 ~ 2026-12-15", status:"部分执行", contractType:"框架协议" },
+      { orderNo:"ORD2026009", planNo:"CGJH-2026-009", dept:"生产运维部", contractNo:"CG-CG-2026-309", execNo:"CG-ZX-2026-009", contractName:"海装风电变桨系统采购合同", supplier:"海装风电", progress:"18%", totalAmount:126.00, executedAmount:22.00, remainingAmount:104.00, signDate:"2026-03-08", term:"2026-03-08 ~ 2026-09-15", status:"部分执行", contractType:"常规合同" },
+      { orderNo:"ORD2026010", planNo:"CGJH-2026-010", dept:"经营发展中心", contractNo:"CG-KJ-2026-310", execNo:"CG-ZX-2026-010", contractName:"上海电气法兰连接件框架协议", supplier:"上海电气", progress:"80%", totalAmount:88.00, executedAmount:70.00, remainingAmount:18.00, signDate:"2026-01-30", term:"2026-01-30 ~ 2026-10-31", status:"部分执行", contractType:"框架协议" }
     ];
 
     function renderRows(rows){
       const tbody = document.getElementById("reportBody");
-      function renderAcceptTag(status){
+      function renderStatusTag(status){
         var txt = String(status || "");
         var cls = "ps-acc-tag ps-acc-pending";
-        if (txt === "通过") cls = "ps-acc-tag ps-acc-pass";
-        else if (txt === "部分通过") cls = "ps-acc-tag ps-acc-partial";
-        else if (txt === "待复验") cls = "ps-acc-tag ps-acc-review";
+        if (txt === "已执行") cls = "ps-acc-tag ps-acc-pass";
+        else if (txt === "部分执行") cls = "ps-acc-tag ps-acc-partial";
+        else if (txt === "未执行") cls = "ps-acc-tag ps-acc-pending";
+        else cls = "ps-acc-tag ps-acc-review";
         return '<span class="' + cls + '">' + txt + "</span>";
       }
       tbody.innerHTML = rows.map(function(r){
         return "<tr>"
-          + "<td>"+r[0]+"</td>"
-          + "<td>"+r[1]+"</td>"
-          + "<td>"+r[2]+"</td>"
-          + "<td>"+r[3]+"</td>"
-          + "<td><a href=\"material-procurement-hub.html?tab=m3\">"+r[4]+"</a></td>"
-          + "<td>"+r[5]+"</td>"
-          + "<td>"+r[6]+"</td>"
-          + "<td><a href=\"purchase-ledger.html\">"+r[7]+"</a></td>"
-          + "<td>"+r[8]+"</td>"
-          + "<td>"+r[9]+"</td>"
-          + "<td>"+r[10]+"</td>"
-          + "<td><a href=\"purchase-ledger.html?tab=ledger\">"+r[11]+"</a></td>"
-          + "<td>"+r[12]+"</td>"
-          + "<td>"+r[13]+"</td>"
-          + "<td><a href=\"proc-quality-accept.html\">"+r[14]+"</a></td>"
-          + "<td>"+renderAcceptTag(r[15])+"</td>"
-          + "<td><a href=\"proc-shipment.html\">查看</a></td>"
+          + "<td><a href=\"material-procurement-hub.html?tab=m3\">"+r.orderNo+"</a></td>"
+          + "<td>"+r.contractNo+"</td>"
+          + "<td>"+r.execNo+"</td>"
+          + "<td>"+r.contractName+"</td>"
+          + "<td>"+r.supplier+"</td>"
+          + "<td>"+r.progress+"</td>"
+          + "<td>"+r.totalAmount.toFixed(2)+"</td>"
+          + "<td>"+r.executedAmount.toFixed(2)+"</td>"
+          + "<td>"+r.remainingAmount.toFixed(2)+"</td>"
+          + "<td>"+r.signDate+"</td>"
+          + "<td>"+r.term+"</td>"
+          + "<td>"+renderStatusTag(r.status)+"</td>"
+          + "<td><a href=\"contract-management.html\">查看</a></td>"
           + "</tr>";
       }).join("");
     }
@@ -181,20 +178,20 @@
       var total = rows.length;
       var doneSum = 0;
       var leftSum = 0;
-      var inboundMap = {};
-      var acceptMap = {};
+      var statusMap = {};
+      var typeMap = {};
       var supplierMap = {};
       var deptMap = {};
 
       rows.forEach(function(r){
-        leftSum += Number(r[2]) || 0;
-        doneSum += Number(r[3]) || 0;
-        inboundMap[r[10]] = (inboundMap[r[10]] || 0) + 1;
-        acceptMap[r[15]] = (acceptMap[r[15]] || 0) + 1;
-        supplierMap[r[9]] = (supplierMap[r[9]] || 0) + 1;
-        if (!deptMap[r[1]]) deptMap[r[1]] = { done:0, left:0 };
-        deptMap[r[1]].done += Number(r[3]) || 0;
-        deptMap[r[1]].left += Number(r[2]) || 0;
+        leftSum += Number(r.remainingAmount) || 0;
+        doneSum += Number(r.executedAmount) || 0;
+        statusMap[r.status] = (statusMap[r.status] || 0) + 1;
+        typeMap[r.contractType] = (typeMap[r.contractType] || 0) + 1;
+        supplierMap[r.supplier] = (supplierMap[r.supplier] || 0) + 1;
+        if (!deptMap[r.dept]) deptMap[r.dept] = { done:0, left:0 };
+        deptMap[r.dept].done += Number(r.executedAmount) || 0;
+        deptMap[r.dept].left += Number(r.remainingAmount) || 0;
       });
 
       return {
@@ -202,8 +199,8 @@
         doneSum: doneSum,
         leftSum: leftSum,
         doneRate: (doneSum + leftSum) ? ((doneSum / (doneSum + leftSum)) * 100).toFixed(1) : "0.0",
-        inboundMap: inboundMap,
-        acceptMap: acceptMap,
+        statusMap: statusMap,
+        typeMap: typeMap,
         supplierMap: supplierMap,
         deptMap: deptMap
       };
@@ -231,9 +228,9 @@
     function renderAnalytics(rows){
       var s = calcStats(rows);
       document.getElementById("kpiRow").innerHTML = [
-        {k:"计划条数",v:s.total},
-        {k:"已执行总量",v:s.doneSum},
-        {k:"剩余执行总量",v:s.leftSum},
+        {k:"合同条数",v:s.total},
+        {k:"已执行金额（万元）",v:s.doneSum.toFixed(2)},
+        {k:"剩余金额（万元）",v:s.leftSum.toFixed(2)},
         {k:"整体执行率",v:s.doneRate + "%"}
       ].map(function(x){
         return '<div class="ps-kpi"><div class="ps-kpi-label">'+x.k+'</div><div class="ps-kpi-val">'+x.v+'</div></div>';
@@ -258,8 +255,8 @@
           + '</div>';
       }).join("");
 
-      buildPie(s.inboundMap, "inboundPie", "inboundLegend", ["#1677ff","#52c41a","#faad14","#f5222d","#722ed1"]);
-      buildPie(s.acceptMap, "acceptPie", "acceptLegend", ["#52c41a","#faad14","#1677ff","#f5222d","#13c2c2"]);
+      buildPie(s.statusMap, "inboundPie", "inboundLegend", ["#52c41a","#1677ff","#faad14","#f5222d","#722ed1"]);
+      buildPie(s.typeMap, "acceptPie", "acceptLegend", ["#1677ff","#13c2c2","#faad14","#722ed1"]);
 
       var tops = Object.keys(s.supplierMap).map(function(k){ return {name:k,val:s.supplierMap[k]}; })
         .sort(function(a,b){ return b.val - a.val; })

@@ -102,6 +102,12 @@
     });
   }
 
+  function textOrDash(v) {
+    if (v == null) return "—";
+    var text = String(v).trim();
+    return text ? text : "—";
+  }
+
   function tag(text) {
     var cls = "sales-tag";
     if (/已完成|已收货|已执行|在用|已通过/.test(text)) cls += " sales-tag-green";
@@ -224,11 +230,12 @@
       }).join("") +
       '</div></div></div>' +
       '<div class="sales-flow-pane" data-pane="info"><div class="sales-flow-info">' +
-      '<p>1. 电控所物资专责在物资列表中录入加购数量，系统按产品类型汇总形成订单明细。</p>' +
-      '<p>2. 电控所负责人审核订单明细、购买数量、订单金额以及场站收货信息。</p>' +
-      '<p>3. 审核通过后维护销售合同编号，进入发货准备环节。</p>' +
-      '<p>4. 发货人员维护物流单号、发货日期和发货说明。</p>' +
-      '<p>5. 项目公司收货后确认验收，购入物资自动关联到订单编号并纳入购入物资统计。</p>' +
+      '<div>1、电控所物资专责成明锴在物资列表中录入加购数量并提交订单（2026-06-10 09:12）</div>' +
+      '<div>2、电控所负责人陈亮审批：审核订单明细、购买数量、订单金额以及场站收货信息，同意（2026-06-10 10:03）</div>' +
+      '<div>3、经营发展中心合同专责王卿明登记销售合同编号并补充合同附件（2026-06-11 14:26）</div>' +
+      '<div>4、物流专责李哲维护物流单号、发货日期和发货说明，安排发货（2026-06-14 11:08）</div>' +
+      '<div>5、项目公司收货人张明完成收货确认，购入物资自动关联订单编号并纳入购入物资统计（2026-06-15 16:20）</div>' +
+      '<div>6、流程归档结束（2026-06-15 16:35）</div>' +
       '</div></div></div><div class="sales-flow-ft"><button type="button" data-sales-flow-close="1">关闭</button></div></div>';
     document.body.appendChild(mask);
     mask.addEventListener("click", function (e) {
@@ -249,22 +256,35 @@
   function productDetailHtml(product) {
     var feats = product.features || {};
     var rows = [
-      ["产品名称", product.productName],
-      ["制造商名称", product.mfrName],
-      ["产品型号", product.model],
-      ["产品编码", product.b],
-      ["物资类型编码", product.a],
-      ["库存数量", product.stockQty],
-      ["参考单价（万元）", product.refPrice || "—"]
+      ["产品名称", textOrDash(product.productName)],
+      ["物资类型名称", textOrDash(product.typeName)],
+      ["制造商名称", textOrDash(product.mfrName)],
+      ["产品型号", textOrDash(product.model)],
+      ["产品编码", textOrDash(product.b)],
+      ["物资类型编码", textOrDash(product.a)],
+      ["物资分类", textOrDash(product.category)],
+      ["库存数量", textOrDash(product.stockQty)],
+      ["参考单价（万元）", textOrDash(product.refPrice)],
+      ["类型说明", textOrDash(product.typeDef)]
     ];
+    var featureRows = [];
     for (var i = 1; i <= 8; i++) {
       var name = feats["f" + i + "_name"];
       var val = feats["f" + i];
-      if (name || val) rows.push(["特征值" + i, name && val ? name + "：" + val : name || val]);
+      if (name || val) featureRows.push([
+        name || ("特征值" + i),
+        textOrDash(val || name)
+      ]);
     }
     return '<table class="sales-detail-table"><tbody>' + rows.map(function (row) {
-      return "<tr><th>" + esc(row[0]) + "</th><td>" + esc(row[1] || "—") + "</td></tr>";
-    }).join("") + "</tbody></table>";
+      return "<tr><th>" + esc(row[0]) + "</th><td>" + esc(textOrDash(row[1])) + "</td></tr>";
+    }).join("") + "</tbody></table>" +
+      '<div class="sales-section-title">产品特征明细</div>' +
+      '<div class="sales-table-wrap sales-modal-table-wrap"><table class="sales-table sales-modal-table"><thead><tr><th>特征项</th><th>特征值</th></tr></thead><tbody>' +
+      (featureRows.length ? featureRows.map(function (row) {
+        return "<tr><td>" + esc(textOrDash(row[0])) + "</td><td>" + esc(textOrDash(row[1])) + "</td></tr>";
+      }).join("") : '<tr><td colspan="2" class="sales-empty">暂无产品特征数据</td></tr>') +
+      "</tbody></table></div>";
   }
 
   function cartKey(product) {
@@ -509,24 +529,25 @@
   }
 
   function orderMaterialsTableHtml(order, withTrack) {
-    return '<table class="sales-table" style="min-width:1460px"><thead><tr><th>序号</th><th>产品名称</th><th>产品编码</th><th>产品型号</th><th>制造商名称</th><th>物资类型编码</th><th>物资类型</th><th>物资分类</th><th>购买数量</th><th>参考单价（万元）</th><th>小计金额（万元）</th><th>操作</th></tr></thead><tbody>' +
-      order.materials.map(function (item, idx) {
+    var materials = Array.isArray(order.materials) ? order.materials : [];
+    return '<div class="sales-table-wrap sales-modal-table-wrap"><table class="sales-table sales-modal-table" style="min-width:1460px"><thead><tr><th>序号</th><th>产品名称</th><th>产品编码</th><th>产品型号</th><th>制造商名称</th><th>物资类型编码</th><th>物资类型</th><th>物资分类</th><th>购买数量</th><th>参考单价（万元）</th><th>小计金额（万元）</th><th>操作</th></tr></thead><tbody>' +
+      (materials.length ? materials.map(function (item, idx) {
         return "<tr>" +
           "<td>" + (idx + 1) + "</td>" +
-          "<td>" + esc(item.productName) + "</td>" +
-          "<td>" + esc(item.productCode) + "</td>" +
-          "<td>" + esc(item.model) + "</td>" +
-          "<td>" + esc(item.manufacturer) + "</td>" +
-          "<td>" + esc(item.typeCode) + "</td>" +
-          "<td>" + esc(item.typeName) + "</td>" +
-          "<td>" + esc(item.category) + "</td>" +
-          "<td>" + esc(item.qty) + "</td>" +
+          "<td>" + esc(textOrDash(item.productName)) + "</td>" +
+          "<td>" + esc(textOrDash(item.productCode)) + "</td>" +
+          "<td>" + esc(textOrDash(item.model)) + "</td>" +
+          "<td>" + esc(textOrDash(item.manufacturer)) + "</td>" +
+          "<td>" + esc(textOrDash(item.typeCode)) + "</td>" +
+          "<td>" + esc(textOrDash(item.typeName)) + "</td>" +
+          "<td>" + esc(textOrDash(item.category)) + "</td>" +
+          "<td>" + esc(textOrDash(item.qty)) + "</td>" +
           "<td>" + money(item.price) + "</td>" +
           "<td>" + money(item.subtotal) + "</td>" +
           '<td>' + (withTrack ? '<button type="button" class="sales-inline-link" data-modal-action="order-track" data-order="' + esc(order.orderNo) + '" data-item="' + esc(item.id) + '">物资跟踪</button>' : "—") + "</td>" +
           "</tr>";
-      }).join("") +
-      "</tbody></table>";
+      }).join("") : '<tr><td colspan="12" class="sales-empty">暂无物资明细数据</td></tr>') +
+      "</tbody></table></div>";
   }
 
   function orderDetailHtml(order) {
@@ -542,7 +563,7 @@
       '<tr><th>发货/销售路径</th><td>' + esc(order.route) + '</td><th>当前处理人</th><td>' + esc(order.handler) + '</td></tr>' +
       '<tr><th>销售合同编号</th><td>' + esc(order.contractNo) + '</td><th>物流单号</th><td>' + esc(order.waybillNo) + '</td></tr>' +
       '<tr><th>发货日期</th><td>' + esc(order.shipDate) + '</td><th>收货日期</th><td>' + esc(order.receiveDate) + '</td></tr>' +
-      '<tr><th>备注</th><td colspan="3">' + esc(order.remark) + '</td></tr>' +
+      '<tr><th>备注</th><td colspan="3">' + esc(textOrDash(order.remark)) + '</td></tr>' +
       '</tbody></table><div class="sales-section-title">订单物资明细表</div>' + orderMaterialsTableHtml(order, true);
   }
 
@@ -577,6 +598,7 @@
     var item = order.materials.find(function (row) { return row.id === itemId; });
     if (!item) return;
     openModal("物资跟踪 - " + item.productName, orderTrackHtml(order, item), '<button class="sales-btn" data-close>关闭</button>', "wide");
+    setModalHeadAction("流程进度", openSalesFlowModal);
   }
 
   function openOrderApproval(order) {
@@ -595,6 +617,7 @@
       '<button class="sales-btn" data-close>取消</button><button class="sales-btn sales-btn-primary" data-close>确认提交</button>',
       "wide"
     );
+    setModalHeadAction("流程进度", openSalesFlowModal);
   }
 
   function openUploadContract(order) {
@@ -604,6 +627,7 @@
       '<button class="sales-btn" data-close>取消</button><button class="sales-btn sales-btn-primary" data-close>上传</button>',
       true
     );
+    setModalHeadAction("流程进度", openSalesFlowModal);
   }
 
   function openShipOrder(order) {
@@ -612,6 +636,7 @@
       '<div class="sales-form-grid"><div class="sales-field"><label>订单编号</label><input readonly value="' + esc(order.orderNo) + '"></div><div class="sales-field"><label>物流单号</label><input value="' + esc(order.waybillNo === "—" ? "WL2026061808" : order.waybillNo) + '"></div><div class="sales-field"><label>发货日期</label><input type="date" value="2026-06-18"></div><div class="sales-field"><label>发货人</label><input value="成明锴"></div><div class="sales-field sales-field--full"><label>发货备注</label><textarea>按销售合同要求发货，并同步维护场站物流信息。</textarea></div></div>',
       '<button class="sales-btn" data-close>取消</button><button class="sales-btn sales-btn-primary" data-close>确认发货</button>'
     );
+    setModalHeadAction("流程进度", openSalesFlowModal);
   }
 
   function openReceiveOrder(order) {
@@ -620,6 +645,7 @@
       '<div class="sales-form-grid"><div class="sales-field"><label>订单编号</label><input readonly value="' + esc(order.orderNo) + '"></div><div class="sales-field"><label>收货日期</label><input type="date" value="2026-06-19"></div><div class="sales-field"><label>收货人</label><input value="' + esc(order.requester) + '"></div><div class="sales-field"><label>验收方式</label><input readonly value="线下验收"></div><div class="sales-field sales-field--full"><label>收货说明</label><textarea>项目公司已完成验收，确认收货并同步进入购入物资统计。</textarea></div></div>',
       '<button class="sales-btn" data-close>取消</button><button class="sales-btn sales-btn-primary" data-close>确认收货</button>'
     );
+    setModalHeadAction("流程进度", openSalesFlowModal);
   }
 
   function orderFormHtml(materials) {
@@ -1017,27 +1043,28 @@
   });
 
   function purchasedDetailsTableHtml(summary, withTrack) {
-    return '<table class="sales-table" style="min-width:1560px"><thead><tr><th>序号</th><th>产品名称</th><th>物资编码</th><th>产品编码</th><th>规格型号</th><th>制造商名称</th><th>下单公司</th><th>场站名称</th><th>订单编号</th><th>销售合同编号</th><th>购入数量</th><th>收货日期</th><th>存放地点</th><th>使用状态</th><th>操作</th></tr></thead><tbody>' +
-      summary.details.map(function (row, idx) {
+    var details = Array.isArray(summary.details) ? summary.details : [];
+    return '<div class="sales-table-wrap sales-modal-table-wrap"><table class="sales-table sales-modal-table" style="min-width:1560px"><thead><tr><th>序号</th><th>产品名称</th><th>物资编码</th><th>产品编码</th><th>规格型号</th><th>制造商名称</th><th>下单公司</th><th>场站名称</th><th>订单编号</th><th>销售合同编号</th><th>购入数量</th><th>收货日期</th><th>存放地点</th><th>使用状态</th><th>操作</th></tr></thead><tbody>' +
+      (details.length ? details.map(function (row, idx) {
         return "<tr>" +
           "<td>" + (idx + 1) + "</td>" +
-          "<td>" + esc(row.productName) + "</td>" +
-          "<td>" + esc(row.materialCode) + "</td>" +
-          "<td>" + esc(row.productCode) + "</td>" +
-          "<td>" + esc(row.spec) + "</td>" +
-          "<td>" + esc(row.manufacturer) + "</td>" +
-          "<td>" + esc(row.company) + "</td>" +
-          "<td>" + esc(row.station) + "</td>" +
-          "<td>" + esc(row.orderNo) + "</td>" +
-          "<td>" + esc(row.contractNo) + "</td>" +
-          "<td>" + esc(row.qty) + "</td>" +
-          "<td>" + esc(row.receiveDate) + "</td>" +
-          "<td>" + esc(row.location) + "</td>" +
+          "<td>" + esc(textOrDash(row.productName)) + "</td>" +
+          "<td>" + esc(textOrDash(row.materialCode)) + "</td>" +
+          "<td>" + esc(textOrDash(row.productCode)) + "</td>" +
+          "<td>" + esc(textOrDash(row.spec)) + "</td>" +
+          "<td>" + esc(textOrDash(row.manufacturer)) + "</td>" +
+          "<td>" + esc(textOrDash(row.company)) + "</td>" +
+          "<td>" + esc(textOrDash(row.station)) + "</td>" +
+          "<td>" + esc(textOrDash(row.orderNo)) + "</td>" +
+          "<td>" + esc(textOrDash(row.contractNo)) + "</td>" +
+          "<td>" + esc(textOrDash(row.qty)) + "</td>" +
+          "<td>" + esc(textOrDash(row.receiveDate)) + "</td>" +
+          "<td>" + esc(textOrDash(row.location)) + "</td>" +
           "<td>" + tag(row.usageStatus) + "</td>" +
           "<td>" + (withTrack ? '<button type="button" class="sales-inline-link" data-modal-action="purchased-track" data-type="' + esc(summary.typeCode) + '" data-item="' + esc(row.id) + '">物资跟踪</button>' : "—") + "</td>" +
           "</tr>";
-      }).join("") +
-      "</tbody></table>";
+      }).join("") : '<tr><td colspan="15" class="sales-empty">暂无购入物资明细数据</td></tr>') +
+      "</tbody></table></div>";
   }
 
   function purchasedDetailHtml(summary) {
@@ -1062,13 +1089,18 @@
       '<tr><th>下单公司</th><td>' + esc(row.company) + '</td><th>场站名称</th><td>' + esc(row.station) + '</td></tr>' +
       '<tr><th>购入数量</th><td>' + esc(row.qty) + '</td><th>存放地点</th><td>' + esc(row.location) + '</td></tr>' +
       '<tr><th>物资类型名称</th><td>' + esc(summary.typeName) + '</td><th>收货日期</th><td>' + esc(row.receiveDate) + '</td></tr>' +
-      '</tbody></table><div class="sales-section-title">购入物资明细表</div>' + purchasedDetailsTableHtml(summary, false) +
+      '</tbody></table><div class="sales-section-title">购入物资明细表</div>' + purchasedDetailsTableHtml(summary, true) +
       '<div class="sales-section-title">物资跟踪</div><div class="sales-track">' +
       '<div class="sales-track-item"><span class="sales-track-dot" style="background:#2563eb"></span><div><div class="sales-track-main">2026-06-12 完成下单</div><div class="sales-track-sub">通过订单 ' + esc(row.orderNo) + ' 采购 ' + esc(row.productName) + '。</div></div></div>' +
       '<div class="sales-track-item"><span class="sales-track-dot" style="background:#10b981"></span><div><div class="sales-track-main">2026-06-13 合同与发货联动</div><div class="sales-track-sub">销售合同 ' + esc(row.contractNo) + ' 生效后安排发货。</div></div></div>' +
       '<div class="sales-track-item"><span class="sales-track-dot" style="background:#6366f1"></span><div><div class="sales-track-main">2026-06-15 场站收货</div><div class="sales-track-sub">收货地点：' + esc(row.location) + '，同步进入购入物资统计。</div></div></div>' +
       '<div class="sales-track-item"><span class="sales-track-dot" style="background:#f59e0b"></span><div><div class="sales-track-main">当前状态</div><div class="sales-track-sub">产品当前状态为 ' + esc(row.usageStatus) + '，后续仍可通过订单编号继续追踪来源。</div></div></div>' +
       '</div>';
+  }
+
+  function openPurchasedDetail(summary) {
+    openModal("查看购入物资 - " + summary.typeName, purchasedDetailHtml(summary), '<button class="sales-btn" data-close>关闭</button>', "wide");
+    setModalHeadAction("流程进度", openSalesFlowModal);
   }
 
   function initPurchased() {
@@ -1098,13 +1130,13 @@
       if (!btn) return;
       var summary = purchasedMap[btn.getAttribute("data-id")];
       if (!summary) return;
-      openModal("查看购入物资 - " + summary.typeName, purchasedDetailHtml(summary), '<button class="sales-btn" data-close>关闭</button>', "wide");
+      openPurchasedDetail(summary);
     });
   }
 
   var reportRows = [
     {
-      orderNo: "XSORD-2026-001 等 2 单",
+      orderNo: "XSORD-2026-001、XSORD-2026-005",
       contractNo: "XSHT-2026-001",
       contractName: "河北龙源风机备件销售合同",
       supplier: "联合动力",
@@ -1249,6 +1281,7 @@
       var row = summary.details.find(function (item) { return item.id === btn.getAttribute("data-item"); });
       if (!row) return;
       openModal("物资跟踪 - " + row.productName, purchasedTrackHtml(summary, row), '<button class="sales-btn" data-close>关闭</button>', "wide");
+      setModalHeadAction("流程进度", openSalesFlowModal);
     }
   });
 
