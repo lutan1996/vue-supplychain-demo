@@ -235,6 +235,9 @@
       var val = f["f" + idx] || "";
       return name && val ? name + "：" + val : name || val || "—";
     }
+    function cartCell(v, cls) {
+      return '<div class="sales-cart-cell ' + (cls || "") + '" style="color:#1f2937">' + esc(v == null || v === "" ? "—" : v) + "</div>";
+    }
     var rows = [];
     var validItems = [];
     cartItems.forEach(function (x) {
@@ -253,12 +256,13 @@
     if (!rows.length) return '<div class="sales-empty">暂无加购物资</div>';
     var total = validItems.reduce(function (s, x) { return s + Number(x.qty || 0); }, 0);
     return '<div class="sales-cart-summary"><span>已加购 ' + cartItems.length + ' 类物资，共 ' + total + ' 件</span></div>' +
-      '<table class="sales-cart-table"><thead><tr><th>序号</th><th>产品名称</th><th>制造商名称</th><th>产品型号</th><th>产品编码</th><th>物资类型编码</th><th>物资类型</th><th>物资分类</th><th>库存数量</th><th>参考单价（万元）</th><th>特征值1</th><th>特征值2</th><th>特征值3</th><th>特征值4</th><th>操作</th></tr></thead><tbody>' +
+      '<div class="sales-cart-grid">' +
+      ["序号","产品名称","制造商名称","产品型号","产品编码","物资类型编码","物资类型","物资分类","库存数量","参考单价（万元）","特征值1","特征值2","特征值3","特征值4","操作"].map(function (h) { return cartCell(h, "sales-cart-cell--head"); }).join("") +
       rows.map(function (row, i) {
         var x = row.item;
         var p = row.product;
-        return '<tr data-cart-id="' + esc(x.id) + '" data-cart-row="' + row.no + '"><td>' + (i + 1) + '</td><td>' + esc(p.productName) + '</td><td>' + esc(p.mfrName) + '</td><td>' + esc(p.model) + '</td><td>' + esc(p.b) + '</td><td>' + esc(p.a || "—") + '</td><td>' + esc(p.typeName || "—") + '</td><td>' + esc(p.category || "—") + '</td><td>' + esc(p.stockQty) + '</td><td>' + esc(p.refPrice || "—") + '</td><td>' + esc(featureText(p, 1)) + '</td><td>' + esc(featureText(p, 2)) + '</td><td>' + esc(featureText(p, 3)) + '</td><td>' + esc(featureText(p, 4)) + '</td><td><button type="button" class="sales-cart-remove" data-cart-remove-one="' + esc(x.id) + '">删除</button></td></tr>';
-      }).join("") + '</tbody></table>' +
+        return cartCell(i + 1) + cartCell(p.productName, "sales-cart-cell--name") + cartCell(p.mfrName) + cartCell(p.model) + cartCell(p.b) + cartCell(p.a) + cartCell(p.typeName) + cartCell(p.category) + cartCell(p.stockQty) + cartCell(p.refPrice) + cartCell(featureText(p, 1)) + cartCell(featureText(p, 2)) + cartCell(featureText(p, 3)) + cartCell(featureText(p, 4)) + '<div class="sales-cart-cell"><button type="button" class="sales-cart-remove" data-cart-remove-one="' + esc(x.id) + '">删除</button></div>';
+      }).join("") + '</div>' +
       '<div class="sales-section-title">提交信息</div>' +
       '<div class="sales-form-grid"><div class="sales-field"><label>提交部门</label><input readonly value="电控所"></div><div class="sales-field"><label>收货单位</label><input readonly value="山西龙源"></div><div class="sales-field"><label>发货路径</label><select><option>工程技术公司发货</option><option>供应商直发</option></select></div><div class="sales-field"><label>期望发货日期</label><input type="date" value="2026-06-20"></div><div class="sales-field sales-field--full"><label>备注</label><textarea>销售类物资统一加购后提交审核。</textarea></div></div>';
   }

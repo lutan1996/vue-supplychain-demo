@@ -99,6 +99,10 @@
 .sales-cart-table th,.sales-cart-table td{border:1px solid #e7edf5;padding:8px 10px;text-align:center;white-space:nowrap;color:#1f2937}
 .sales-cart-table th{background:#f6f8fb;color:#5b6b7f;font-weight:600}
 .sales-cart-table td:nth-child(2){text-align:left}
+.sales-cart-grid{display:grid;grid-template-columns:64px repeat(13,minmax(118px,1fr)) 86px;min-width:1880px;border-top:1px solid #e7edf5;border-left:1px solid #e7edf5;font-size:12px}
+.sales-cart-cell{min-height:34px;padding:8px 10px;border-right:1px solid #e7edf5;border-bottom:1px solid #e7edf5;display:flex;align-items:center;justify-content:center;background:#fff;box-sizing:border-box;white-space:nowrap;color:#1f2937}
+.sales-cart-cell--head{background:#f6f8fb;color:#1f2937;font-weight:600}
+.sales-cart-cell--name{justify-content:flex-start}
 .sales-cart-qty{display:inline-flex;align-items:center;justify-content:center;gap:4px}
 .sales-cart-qty button{width:24px;height:24px;border:1px solid #d9e3f0;border-radius:4px;background:#fff;color:#385168;cursor:pointer}
 .sales-cart-qty input{width:54px;height:24px;border:1px solid #d9e3f0;border-radius:4px;text-align:center;font-size:12px;box-sizing:border-box}
