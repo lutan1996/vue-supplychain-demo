@@ -256,17 +256,15 @@
   function openCartModal() {
     var foot = cartItems.length ? '<button class="sales-btn" data-close>取消</button><button class="sales-btn sales-btn-primary" id="salesCartSubmit">确定提交</button>' : '<button class="sales-btn" data-close>关闭</button>';
     openModal("购物车", cartHtml(), foot, "wide");
-    if (cartItems.length) {
-      var hd = document.querySelector("#salesModalMask .sales-modal-hd");
-      var close = document.querySelector("#salesModalMask .sales-modal-close");
-      if (hd && close) {
-        var headBtn = document.createElement("button");
-        headBtn.type = "button";
-        headBtn.className = "sales-flow-link sales-modal-head-action";
-        headBtn.id = "salesCartFlowBtn";
-        headBtn.textContent = "流程进度";
-        hd.insertBefore(headBtn, close);
-      }
+    var hd = document.querySelector("#salesModalMask .sales-modal-hd");
+    var close = document.querySelector("#salesModalMask .sales-modal-close");
+    if (hd && close) {
+      var headBtn = document.createElement("button");
+      headBtn.type = "button";
+      headBtn.className = "sales-flow-link sales-modal-head-action";
+      headBtn.id = "salesCartFlowBtn";
+      headBtn.textContent = "流程进度";
+      hd.insertBefore(headBtn, close);
     }
     var flow = document.getElementById("salesCartFlowBtn");
     if (flow) flow.addEventListener("click", openSalesFlowModal);
@@ -287,8 +285,8 @@
       "销售结束，系统上传销售合同",
       "流程结束"
     ];
-    mask.innerHTML = '<div class="sales-flow-dialog" role="dialog" aria-label="审批记录">' +
-      '<div class="sales-flow-hd"><span>审批记录</span><button type="button" class="sales-flow-close" data-sales-flow-close="1">&times;</button></div>' +
+    mask.innerHTML = '<div class="sales-flow-dialog" role="dialog" aria-label="流程进度">' +
+      '<div class="sales-flow-hd"><span>流程进度</span><button type="button" class="sales-flow-close" data-sales-flow-close="1">&times;</button></div>' +
       '<div class="sales-flow-body"><div class="sales-flow-tabs"><button type="button" class="sales-flow-tab is-active" data-tab="flow">流程图</button><button type="button" class="sales-flow-tab" data-tab="info">审批信息</button></div>' +
       '<div class="sales-flow-pane is-active" data-pane="flow"><div class="sales-flow-track"><div class="sales-flow-row">' +
       nodes.map(function (n, i) {
