@@ -293,12 +293,12 @@
         return (i === 0 ? '<span class="sales-flow-dot"></span>' : '<span class="sales-flow-arrow">→</span>') + '<span class="sales-flow-node' + (i === nodes.length - 1 ? " end" : "") + '">' + esc(n) + '</span>' + (i === nodes.length - 1 ? '<span class="sales-flow-dot end"></span>' : "");
       }).join("") +
       '</div></div></div><div class="sales-flow-pane" data-pane="info"><div class="sales-flow-info">' +
-      '<p>1. 电控所物资专责从本部门所属销售类物资中选取物资，填写加购数量并提交销售订单。</p>' +
-      '<p>2. 电控所负责人审核销售物资清单、库存数量和销售用途，审批结论：同意。</p>' +
-      '<p>3. 经营人员与山西龙源完成销售合同签订，并登记销售合同编号。</p>' +
-      '<p>4. 电控所依据合同安排发货，更新物流信息。</p>' +
-      '<p>5. 山西龙源完成收货和验收，验收结论：通过。</p>' +
-      '<p>6. 销售结束后系统上传销售合同，流程归档结束。</p>' +
+      '<p>1. 电控所物资专责刘建国从本部门所属销售类物资中选取物资，填写加购数量并提交销售订单。</p>' +
+      '<p>2. 电控所负责人张磊审核销售物资清单、库存数量和销售用途，审批结论：同意。</p>' +
+      '<p>3. 电控所王立军与山西龙源李志强完成销售合同签订，并登记销售合同编号。</p>' +
+      '<p>4. 电控所发货负责人陈志远依据合同安排发货，更新物流信息。</p>' +
+      '<p>5. 山西龙源收货负责人赵敏完成收货和验收，验收结论：通过。</p>' +
+      '<p>6. 电控所合同管理员孙晓梅在销售结束后上传销售合同，流程归档结束。</p>' +
       '</div></div></div><div class="sales-flow-ft"><button type="button" data-sales-flow-close="1">关闭</button></div></div>';
     document.body.appendChild(mask);
     mask.addEventListener("click", function (e) { if (e.target === mask) closeSalesFlowModal(); });
