@@ -272,6 +272,166 @@
     return D ? D.flattenAllProducts() : [];
   }
 
+  function uniqueBy(items, pickKey) {
+    var seen = {};
+    return (items || []).filter(function (item) {
+      var key = String(pickKey(item) || "");
+      if (!key || seen[key]) return false;
+      seen[key] = 1;
+      return true;
+    });
+  }
+
+  function productCandidatesByName(name) {
+    var target = String(name || "").trim();
+    if (!target) return [];
+    return getProducts().filter(function (product) {
+      var productName = String(product.productName || "").trim();
+      var typeName = String(product.typeName || "").trim();
+      return productName === target || typeName === target;
+    });
+  }
+
+  function productCandidateByCodes(productCode, typeCode) {
+    var pCode = String(productCode || "").trim();
+    var tCode = String(typeCode || "").trim();
+    var list = getProducts();
+    if (pCode) {
+      var foundByProduct = list.find(function (product) {
+        return String(product.b || "").trim() === pCode;
+      });
+      if (foundByProduct) return foundByProduct;
+    }
+    if (tCode) {
+      var foundByType = list.find(function (product) {
+        return String(product.a || "").trim() === tCode;
+      });
+      if (foundByType) return foundByType;
+    }
+    return null;
+  }
+
+  function productMetaLookup(item) {
+    item = item || {};
+    var matches = [];
+    var direct = productCandidateByCodes(item.productCode || item.code || item.b, item.typeCode || item.a || item.materialCode);
+    if (direct) matches.push(direct);
+    matches = matches.concat(productCandidatesByName(item.productName || item.materialName || item.name || item.typeName || item.materialTypeName));
+    matches = uniqueBy(matches, function (product) {
+      return String(product.id || product.b || product.a || product.productName || "");
+    });
+    var primary = matches[0] || null;
+    return {
+      primary: primary,
+      typeName: primary ? primary.typeName : "",
+      typeDef: primary ? primary.typeDef : "",
+      manufacturer: primary ? primary.mfrName : "",
+      model: primary ? primary.model : "",
+      productCode: primary ? primary.b : "",
+      typeCode: primary ? primary.a : "",
+      category: primary ? primary.category : "",
+      stockQty: primary ? primary.stockQty : "",
+      refPrice: primary ? primary.refPrice : "",
+      products: matches
+    };
+  }
+
+  function patchOrderMaterials(order) {
+    order = order || {};
+    var materials = Array.isArray(order.materials) ? order.materials : [];
+    order.materials = materials.map(function (raw, idx) {
+      var item = raw ? Object.assign({}, raw) : {};
+      var meta = productMetaLookup(item);
+      var primary = meta.primary;
+      if ((!item.productName || item.productName === "—") && primary) item.productName = primary.productName;
+      if ((!item.productCode || item.productCode === "—") && meta.productCode) item.productCode = meta.productCode;
+      if ((!item.model || item.model === "—") && meta.model) item.model = meta.model;
+      if ((!item.manufacturer || item.manufacturer === "—") && meta.manufacturer) item.manufacturer = meta.manufacturer;
+      if ((!item.typeCode || item.typeCode === "—") && meta.typeCode) item.typeCode = meta.typeCode;
+      if ((!item.typeName || item.typeName === "—") && meta.typeName) item.typeName = meta.typeName;
+      if ((!item.category || item.category === "—") && meta.category) item.category = meta.category;
+      if ((item.price == null || item.price === "" || item.price === "—") && meta.refPrice !== "") item.price = toNumber(meta.refPrice);
+      if ((item.subtotal == null || item.subtotal === "" || item.subtotal === "—") && item.price != null && item.qty != null) item.subtotal = toNumber(item.price) * toNumber(item.qty);
+      if (!item.id) item.id = item.itemId || item.productCode || item.typeCode || ("order-item-" + idx);
+      return item;
+    });
+    return order;
+  }
+
+  function patchPurchasedSummary(summary) {
+    summary = summary || {};
+    var details = Array.isArray(summary.details) ? summary.details : [];
+    summary.details = details.map(function (raw, idx) {
+      var row = raw ? Object.assign({}, raw) : {};
+      var meta = productMetaLookup({
+        productName: row.productName,
+        materialName: row.productName,
+        productCode: row.productCode,
+        materialCode: row.materialCode
+      });
+      var primary = meta.primary;
+      if ((!row.productName || row.productName === "—") && primary) row.productName = primary.productName;
+      if ((!row.materialCode || row.materialCode === "—") && meta.typeCode) row.materialCode = meta.typeCode;
+      if ((!row.productCode || row.productCode === "—") && meta.productCode) row.productCode = meta.productCode;
+      if ((!row.spec || row.spec === "—") && meta.model) row.spec = meta.model;
+      if ((!row.manufacturer || row.manufacturer === "—") && meta.manufacturer) row.manufacturer = meta.manufacturer;
+      if (!row.company || row.company === "—") row.company = "河北龙源";
+      if (!row.station || row.station === "—") row.station = summary.mainStation || "麒麟山风电场";
+      if (!row.orderNo || row.orderNo === "—") row.orderNo = "XSORD-2026-001";
+      if (!row.contractNo || row.contractNo === "—") row.contractNo = "XSHT-2026-001";
+      if (row.qty == null || row.qty === "" || row.qty === "—") row.qty = 1;
+      if (!row.receiveDate || row.receiveDate === "—") row.receiveDate = summary.latestReceiveDate || "2026-06-15";
+      if (!row.location || row.location === "—") row.location = (summary.mainStation || "麒麟山风电场") + "库房";
+      if (!row.usageStatus || row.usageStatus === "—") row.usageStatus = "库内待用";
+      if (!row.id) row.id = row.productCode || row.materialCode || ("purchased-item-" + idx);
+      return row;
+    });
+    if ((!summary.typeName || summary.typeName === "—") && summary.details.length) {
+      var meta = productMetaLookup({ materialCode: summary.details[0].materialCode, productName: summary.details[0].productName });
+      if (meta.typeName) summary.typeName = meta.typeName;
+    }
+    if ((!summary.typeCode || summary.typeCode === "—") && summary.details.length) {
+      summary.typeCode = summary.details[0].materialCode || "—";
+    }
+    if (!summary.mainStation || summary.mainStation === "—") {
+      summary.mainStation = summary.details[0] ? summary.details[0].station : "—";
+    }
+    if (!summary.latestReceiveDate || summary.latestReceiveDate === "—") {
+      summary.latestReceiveDate = summary.details[0] ? summary.details[0].receiveDate : "—";
+    }
+    if (summary.productKinds == null || summary.productKinds === "" || summary.productKinds === "—") {
+      summary.productKinds = uniqueBy(summary.details, function (row) { return row.productCode || row.productName; }).length || 0;
+    }
+    if (summary.orderCount == null || summary.orderCount === "" || summary.orderCount === "—") {
+      summary.orderCount = uniqueBy(summary.details, function (row) { return row.orderNo; }).length || 0;
+    }
+    if (summary.totalQty == null || summary.totalQty === "" || summary.totalQty === "—") {
+      summary.totalQty = summary.details.reduce(function (sum, row) { return sum + toNumber(row.qty); }, 0);
+    }
+    return summary;
+  }
+
+  function patchReportRows(rows) {
+    return (rows || []).map(function (raw) {
+      var row = raw ? Object.assign({}, raw) : {};
+      row.lines = Array.isArray(row.lines) ? row.lines.map(function (line) {
+        var next = line ? Object.assign({}, line) : {};
+        if (!next.orderNo || next.orderNo === "—") next.orderNo = "XSORD-2026-001";
+        var linkedOrder = orderMap[next.orderNo] || {};
+        if ((!next.company || next.company === "—") && linkedOrder.company) next.company = linkedOrder.company;
+        if ((!next.station || next.station === "—") && linkedOrder.station) next.station = linkedOrder.station;
+        if ((next.amount == null || next.amount === "" || next.amount === "—") && linkedOrder.totalAmount != null) next.amount = linkedOrder.totalAmount;
+        if (!next.status || next.status === "—") next.status = linkedOrder.status || row.status || "未执行";
+        if (!next.date || next.date === "—") next.date = linkedOrder.orderDate || row.signDate || "2026-06-10";
+        return next;
+      }) : [];
+      if ((!row.orderNo || row.orderNo === "—") && row.lines.length) {
+        row.orderNo = row.lines.map(function (line) { return line.orderNo; }).filter(Boolean).join("、");
+      }
+      return row;
+    });
+  }
+
   function ensureModal() {
     var mask = document.getElementById("salesModalMask");
     if (mask) return mask;
@@ -396,6 +556,17 @@
   }
 
   function productDetailHtml(product) {
+    product = product || {};
+    var meta = productMetaLookup(product);
+    if ((!product.typeName || product.typeName === "—") && meta.typeName) product.typeName = meta.typeName;
+    if ((!product.typeDef || product.typeDef === "—") && meta.typeDef) product.typeDef = meta.typeDef;
+    if ((!product.mfrName || product.mfrName === "—") && meta.manufacturer) product.mfrName = meta.manufacturer;
+    if ((!product.model || product.model === "—") && meta.model) product.model = meta.model;
+    if ((!product.b || product.b === "—") && meta.productCode) product.b = meta.productCode;
+    if ((!product.a || product.a === "—") && meta.typeCode) product.a = meta.typeCode;
+    if ((!product.category || product.category === "—") && meta.category) product.category = meta.category;
+    if ((product.stockQty == null || product.stockQty === "" || product.stockQty === "—") && meta.stockQty !== "") product.stockQty = meta.stockQty;
+    if ((product.refPrice == null || product.refPrice === "" || product.refPrice === "—") && meta.refPrice !== "") product.refPrice = meta.refPrice;
     var feats = product.features || {};
     var rows = [
       ["产品名称", textOrDash(product.productName)],
@@ -720,6 +891,7 @@
   }
 
   function orderDetailHtml(order) {
+    order = patchOrderMaterials(Object.assign({}, order));
     return '<div class="sales-detail-head">' +
       '<div class="sales-detail-card"><div class="sales-detail-label">订单编号</div><div class="sales-detail-value">' + esc(order.orderNo) + "</div></div>" +
       '<div class="sales-detail-card"><div class="sales-detail-label">订单状态</div><div class="sales-detail-value">' + esc(order.status) + "</div></div>" +
@@ -737,6 +909,8 @@
   }
 
   function orderTrackHtml(order, item) {
+    order = patchOrderMaterials(Object.assign({}, order));
+    item = normalizeOrderMaterial(item);
     return '<div class="sales-detail-head">' +
       '<div class="sales-detail-card"><div class="sales-detail-label">订单编号</div><div class="sales-detail-value">' + esc(order.orderNo) + '</div></div>' +
       '<div class="sales-detail-card"><div class="sales-detail-label">产品名称</div><div class="sales-detail-value">' + esc(item.productName) + '</div></div>' +
@@ -751,6 +925,7 @@
   }
 
   function openOrderDetail(order) {
+    order = patchOrderMaterials(Object.assign({}, order));
     openModal("查看订单 - " + order.orderNo, orderDetailHtml(order), '<button class="sales-btn" data-close>关闭</button>', "wide");
     setModalHeadAction("流程进度", openSalesFlowModal);
   }
@@ -758,6 +933,7 @@
   function openOrderTrack(orderNo, itemId) {
     var order = orderMap[orderNo];
     if (!order) return;
+    order = patchOrderMaterials(Object.assign({}, order));
     var item = order.materials.find(function (row) { return row.id === itemId; });
     if (!item) return;
     openModal("物资跟踪 - " + item.productName, orderTrackHtml(order, item), '<button class="sales-btn" data-close>关闭</button>', "wide");
@@ -765,6 +941,7 @@
   }
 
   function openOrderApproval(order) {
+    order = patchOrderMaterials(Object.assign({}, order));
     openModal(
       "订单审核 - " + order.orderNo,
       '<table class="sales-detail-table"><tbody>' +
@@ -939,6 +1116,7 @@
   ];
 
   orders.forEach(function (order) {
+    patchOrderMaterials(order);
     orderMap[order.orderNo] = order;
   });
 
@@ -1202,6 +1380,7 @@
   ];
 
   purchasedSummaries.forEach(function (item) {
+    patchPurchasedSummary(item);
     purchasedMap[item.typeCode] = item;
   });
 
@@ -1231,6 +1410,7 @@
   }
 
   function purchasedDetailHtml(summary) {
+    summary = patchPurchasedSummary(Object.assign({}, summary));
     return '<div class="sales-detail-head">' +
       '<div class="sales-detail-card"><div class="sales-detail-label">物资类型编码</div><div class="sales-detail-value">' + esc(summary.typeCode) + '</div></div>' +
       '<div class="sales-detail-card"><div class="sales-detail-label">物资类型名称</div><div class="sales-detail-value">' + esc(summary.typeName) + '</div></div>' +
@@ -1243,6 +1423,8 @@
   }
 
   function purchasedTrackHtml(summary, row) {
+    summary = patchPurchasedSummary(Object.assign({}, summary));
+    row = patchPurchasedSummary({ details: [Object.assign({}, row)], typeName: summary.typeName, typeCode: summary.typeCode, mainStation: summary.mainStation, latestReceiveDate: summary.latestReceiveDate }).details[0];
     return '<div class="sales-detail-head">' +
       '<div class="sales-detail-card"><div class="sales-detail-label">产品名称</div><div class="sales-detail-value">' + esc(row.productName) + '</div></div>' +
       '<div class="sales-detail-card"><div class="sales-detail-label">订单编号</div><div class="sales-detail-value">' + esc(row.orderNo) + '</div></div>' +
@@ -1257,6 +1439,7 @@
   }
 
   function openPurchasedDetail(summary) {
+    summary = patchPurchasedSummary(Object.assign({}, summary));
     openModal("查看购入物资 - " + summary.typeName, purchasedDetailHtml(summary), '<button class="sales-btn" data-close>关闭</button>', "wide");
     setModalHeadAction("流程进度", openSalesFlowModal);
   }
@@ -1292,7 +1475,7 @@
     });
   }
 
-  var reportRows = [
+  var reportRows = patchReportRows([
     {
       orderNo: "XSORD-2026-001、XSORD-2026-005",
       contractNo: "XSHT-2026-001",
@@ -1342,13 +1525,15 @@
         { orderNo: "XSORD-2026-003", company: "甘肃龙源", station: "酒泉场站", amount: 12.20, status: "已发货", date: "2026-06-15" }
       ]
     }
-  ];
+  ]);
 
   reportRows.forEach(function (row) {
     reportMap[row.contractNo] = row;
   });
 
   function reportDetailHtml(report) {
+    report = report || {};
+    var lines = Array.isArray(report.lines) ? report.lines : [];
     return '<div class="sales-detail-head">' +
       '<div class="sales-detail-card"><div class="sales-detail-label">销售合同编号</div><div class="sales-detail-value">' + esc(report.contractNo) + '</div></div>' +
       '<div class="sales-detail-card"><div class="sales-detail-label">关联订单</div><div class="sales-detail-value">' + esc(report.orderNo) + '</div></div>' +
@@ -1360,7 +1545,7 @@
       '<tr><th>剩余金额</th><td>' + money(report.remainingAmount) + ' 万元</td><th>签订日期</th><td>' + esc(report.signDate) + '</td></tr>' +
       '<tr><th>合同有效期</th><td colspan="3">' + esc(report.term) + '</td></tr>' +
       '</tbody></table><div class="sales-section-title">合同执行明细</div><table class="sales-table" style="min-width:980px"><thead><tr><th>订单编号</th><th>购买公司</th><th>场站名称</th><th>执行金额（万元）</th><th>执行状态</th><th>执行时间</th></tr></thead><tbody>' +
-      report.lines.map(function (line) {
+      lines.map(function (line) {
         return "<tr><td>" + esc(line.orderNo) + "</td><td>" + esc(line.company) + "</td><td>" + esc(line.station) + "</td><td>" + money(line.amount) + "</td><td>" + tag(line.status) + "</td><td>" + esc(line.date) + "</td></tr>";
       }).join("") +
       "</tbody></table>";
