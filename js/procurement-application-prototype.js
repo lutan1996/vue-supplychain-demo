@@ -2,10 +2,10 @@
   var STEPS = ["部门专责提报", "部门主管审核", "主管领导审核", "公司采购主管审核", "公司采购专责备案"];
   var DEPTS = ["经营发展中心", "运维一部", "运维二部", "工程管理部", "数字化中心", "综合管理部"];
   var ROLE = {
-    dept_asset: { name: "李哲", dept: "经营发展中心" },
-    dept_material: { name: "张敏", dept: "经营发展中心" },
-    dept_head: { name: "张主管", dept: "经营发展中心" },
-    leader: { name: "赵领导", depts: ["运维一部", "运维二部", "工程管理部", "数字化中心"] },
+    dept_asset: { name: "宋中波", dept: "经营发展中心" },
+    dept_material: { name: "王卿明", dept: "经营发展中心" },
+    dept_head: { name: "王超", dept: "经营发展中心" },
+    leader: { name: "曾繁礼", depts: ["运维一部", "运维二部", "工程管理部", "数字化中心"] },
     corp_specialist: { name: "王卿明" },
     corp_head: { name: "王超" },
     director: { name: "周董" }
@@ -24,16 +24,16 @@
 
   function initData(){
     CTX.list = [
-      { id:"r1", no:"CG-20260418-1201", projectName:"华北风场备件采购", dept:"经营发展中心", applicant:"李哲", applyTime:"2026-04-18 09:10", needDate:"2026-05-20", annualPlan:"是", status:"草稿", node:"—", nodeIdx:0, budgetYuan:860000, approvedBudgetWan:86, urgent:"普通", materials:[{name:"齿轮箱",spec:"GW-GX-3.2MW",cat:"生产类",qty:2,unit:"台",price:300000,remark:""},{name:"主轴轴承",spec:"BR-120",cat:"生产类",qty:4,unit:"件",price:65000,remark:""}], reason:"季度备件补库" },
-      { id:"r2", no:"CG-20260417-2210", projectName:"办公设备更新项目", dept:"经营发展中心", applicant:"张敏", applyTime:"2026-04-17 14:00", needDate:"2026-05-10", annualPlan:"否", status:"审批中", node:"部门主管审核", nodeIdx:1, budgetYuan:220000, approvedBudgetWan:22, urgent:"紧急", materials:[{name:"办公电脑",spec:"ThinkPad P16",cat:"办公类",qty:4,unit:"台",price:15000,remark:""},{name:"显示器",spec:"27寸",cat:"办公类",qty:4,unit:"台",price:2500,remark:""}], reason:"办公设备更新" },
+      { id:"r1", no:"CG-20260418-1201", projectName:"华北风场备件采购", dept:"经营发展中心", applicant:"王卿明", applyTime:"2026-04-18 09:10", needDate:"2026-05-20", annualPlan:"是", status:"草稿", node:"—", nodeIdx:0, budgetYuan:860000, approvedBudgetWan:86, urgent:"普通", materials:[{name:"齿轮箱",spec:"GW-GX-3.2MW",cat:"生产类",qty:2,unit:"台",price:300000,remark:""},{name:"主轴轴承",spec:"BR-120",cat:"生产类",qty:4,unit:"件",price:65000,remark:""}], reason:"季度备件补库" },
+      { id:"r2", no:"CG-20260417-2210", projectName:"办公设备更新项目", dept:"经营发展中心", applicant:"宋中波", applyTime:"2026-04-17 14:00", needDate:"2026-05-10", annualPlan:"否", status:"审批中", node:"部门主管审核", nodeIdx:1, budgetYuan:220000, approvedBudgetWan:22, urgent:"紧急", materials:[{name:"办公电脑",spec:"ThinkPad P16",cat:"办公类",qty:4,unit:"台",price:15000,remark:""},{name:"显示器",spec:"27寸",cat:"办公类",qty:4,unit:"台",price:2500,remark:""}], reason:"办公设备更新" },
       { id:"r3", no:"CG-20260416-3318", projectName:"场站改造电缆采购", dept:"运维一部", applicant:"王芳", applyTime:"2026-04-16 10:00", needDate:"2026-05-12", annualPlan:"是", status:"审批中", node:"公司采购主管审核", nodeIdx:3, budgetYuan:1450000, approvedBudgetWan:145, urgent:"普通", materials:[{name:"电缆",spec:"YJV-10kV",cat:"生产类",qty:1800,unit:"米",price:620,remark:""},{name:"连接器",spec:"CN-88",cat:"销售类",qty:400,unit:"件",price:200,remark:""}], reason:"场站改造项目" },
       { id:"r4", no:"CG-20260410-9921", projectName:"无人机巡检能力提升", dept:"运维二部", applicant:"周宁", applyTime:"2026-04-10 11:40", needDate:"2026-05-15", annualPlan:"是", status:"已通过", node:"已完成", nodeIdx:5, budgetYuan:380000, approvedBudgetWan:37.5, urgent:"特急", materials:[{name:"无人机电池",spec:"BAT-5000",cat:"生产类",qty:12,unit:"件",price:18000,remark:""},{name:"巡检终端",spec:"DJI-RC",cat:"办公类",qty:4,unit:"台",price:42000,remark:""}], reason:"巡检能力补强" },
       { id:"r5", no:"CG-20260409-7782", projectName:"会议室改造项目", dept:"综合管理部", applicant:"刘静", applyTime:"2026-04-09 15:20", needDate:"2026-05-08", annualPlan:"否", status:"已驳回", node:"已驳回", nodeIdx:1, budgetYuan:95000, approvedBudgetWan:0, urgent:"普通", materials:[{name:"会议系统配件",spec:"MS-2",cat:"办公类",qty:5,unit:"套",price:19000,remark:""}], reason:"会议室改造" },
-      { id:"r6", no:"CG-20260408-6631", projectName:"风机巡检工器具补充", dept:"运维一部", applicant:"李哲", applyTime:"2026-04-08 10:35", needDate:"2026-05-05", annualPlan:"否", status:"已撤回", node:"—", nodeIdx:0, budgetYuan:126000, approvedBudgetWan:0, urgent:"普通", materials:[{name:"绝缘工具包",spec:"INS-01",cat:"生产类",qty:6,unit:"套",price:21000,remark:""}], reason:"工具补充" },
+      { id:"r6", no:"CG-20260408-6631", projectName:"风机巡检工器具补充", dept:"运维一部", applicant:"王卿明", applyTime:"2026-04-08 10:35", needDate:"2026-05-05", annualPlan:"否", status:"已撤回", node:"—", nodeIdx:0, budgetYuan:126000, approvedBudgetWan:0, urgent:"普通", materials:[{name:"绝缘工具包",spec:"INS-01",cat:"生产类",qty:6,unit:"套",price:21000,remark:""}], reason:"工具补充" },
       { id:"r7", no:"CG-20260407-5528", projectName:"数据中心网络设备采购", dept:"数字化中心", applicant:"王芳", applyTime:"2026-04-07 15:10", needDate:"2026-05-18", annualPlan:"是", status:"草稿", node:"—", nodeIdx:0, budgetYuan:460000, approvedBudgetWan:46, urgent:"紧急", materials:[{name:"核心交换机",spec:"SW-9600",cat:"办公类",qty:2,unit:"台",price:180000,remark:""},{name:"万兆模块",spec:"SFP-10G",cat:"办公类",qty:10,unit:"件",price:10000,remark:""}], reason:"网络升级" },
       { id:"r8", no:"CG-20260406-4419", projectName:"场站电气改造采购", dept:"工程管理部", applicant:"周宁", applyTime:"2026-04-06 09:50", needDate:"2026-05-25", annualPlan:"是", status:"审批中", node:"主管领导审核", nodeIdx:2, budgetYuan:780000, approvedBudgetWan:78, urgent:"普通", materials:[{name:"配电柜",spec:"PD-35kV",cat:"生产类",qty:3,unit:"台",price:220000,remark:""}], reason:"电气改造" },
       { id:"r9", no:"CG-20260405-3320", projectName:"后勤办公补给采购", dept:"综合管理部", applicant:"刘静", applyTime:"2026-04-05 13:20", needDate:"2026-05-06", annualPlan:"否", status:"已通过", node:"已完成", nodeIdx:5, budgetYuan:68000, approvedBudgetWan:6.8, urgent:"普通", materials:[{name:"打印耗材",spec:"HP-88A",cat:"办公类",qty:40,unit:"件",price:1200,remark:""}], reason:"办公补给" },
-      { id:"r10", no:"CG-20260404-2217", projectName:"备件仓储优化采购", dept:"经营发展中心", applicant:"张敏", applyTime:"2026-04-04 17:05", needDate:"2026-05-12", annualPlan:"否", status:"已撤回", node:"—", nodeIdx:0, budgetYuan:215000, approvedBudgetWan:0, urgent:"普通", materials:[{name:"货架组件",spec:"RACK-02",cat:"生产类",qty:15,unit:"套",price:12000,remark:""}], reason:"仓储优化" }
+      { id:"r10", no:"CG-20260404-2217", projectName:"备件仓储优化采购", dept:"经营发展中心", applicant:"宋中波", applyTime:"2026-04-04 17:05", needDate:"2026-05-12", annualPlan:"否", status:"已撤回", node:"—", nodeIdx:0, budgetYuan:215000, approvedBudgetWan:0, urgent:"普通", materials:[{name:"货架组件",spec:"RACK-02",cat:"生产类",qty:15,unit:"套",price:12000,remark:""}], reason:"仓储优化" }
     ];
     CTX.list.forEach(recalcRow);
   }
@@ -239,8 +239,8 @@
     }).join('');
     var rows=[
       {n:'部门专责提报',u:r.applicant,t:r.applyTime,res:'提交',op:'—'},
-      {n:'部门主管审核',u:'张主管',t:r.nodeIdx>1?'2026-04-18 11:20':'—',res:r.nodeIdx>1?'通过':'—',op:r.nodeIdx>1?'同意':'—'},
-      {n:'主管领导审核',u:'赵领导',t:r.nodeIdx>2?'2026-04-19 09:00':'—',res:r.nodeIdx>2?'通过':'—',op:r.nodeIdx>2?'同意':'—'}
+      {n:'部门主管审核',u:'王超',t:r.nodeIdx>1?'2026-04-18 11:20':'—',res:r.nodeIdx>1?'通过':'—',op:r.nodeIdx>1?'同意':'—'},
+      {n:'主管领导审核',u:'曾繁礼',t:r.nodeIdx>2?'2026-04-19 09:00':'—',res:r.nodeIdx>2?'通过':'—',op:r.nodeIdx>2?'同意':'—'}
     ];
     document.getElementById('paProgressBody').innerHTML = rows.map(function(x){ return '<tr><td>'+x.n+'</td><td>'+x.u+'</td><td>'+x.t+'</td><td>'+x.res+'</td><td>'+x.op+'</td></tr>'; }).join('');
   }

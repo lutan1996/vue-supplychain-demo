@@ -8,11 +8,11 @@
   var SUPERVISED_DEPTS = ["运维一部", "工程管理部", "运维二部", "数字化中心"];
 
   var ROLE_META = {
-    dept_asset_specialist: { name: "张敏", label: "部门资产专责" },
-    dept_material_specialist: { name: "李哲", label: "部门物资专责" },
+    dept_asset_specialist: { name: "宋中波", label: "部门资产专责" },
+    dept_material_specialist: { name: "宋中波", label: "部门物资专责" },
     corp_purchase_specialist: { name: "王卿明", label: "公司采购专责（王卿明）" },
-    dept_head: { name: "张主管", label: "部门主管（仅本部门：" + DEPT_HEAD_DEPT + "）" },
-    supervisor_leader: { name: "赵领导", label: "主管领导（分管多部门）" },
+    dept_head: { name: "王超", label: "部门主管（仅本部门：" + DEPT_HEAD_DEPT + "）" },
+    supervisor_leader: { name: "曾繁礼", label: "主管领导（曾繁礼）" },
     corp_purchase_head: { name: "王超", label: "公司采购主管（王超）" },
     director: { name: "冯江哲", label: "董事（仅查看）" },
     gm: { name: "曾繁礼", label: "总经理（仅查看）" }
@@ -278,14 +278,14 @@
         method: "招标",
         targetType: "物资",
         bizDept: "经营发展中心",
-        handler: "张敏",
+        handler: "宋中波",
         budget: 520,
         isFrame: "是",
         oaApprove: "2026-01-10",
         committeeNo: "2026-01期",
         flowStatus: "草稿",
         currentNode: "—",
-        submitter: "王卿明",
+        submitter: "宋中波",
         submitTime: "—",
         flowIndex: 0,
         oaMinutes: "2026-01-14",
@@ -319,14 +319,14 @@
         method: "询价",
         targetType: "服务",
         bizDept: "经营发展中心",
-        handler: "李哲",
+        handler: "王卿明",
         budget: 180,
         isFrame: "否",
         oaApprove: "2026-02-02",
         committeeNo: "2026-02期",
         flowStatus: "审批中",
         currentNode: "部门主管审核",
-        submitter: "王卿明",
+        submitter: "宋中波",
         submitTime: "2026-04-18 09:30",
         flowIndex: 1,
         oaMinutes: "2026-02-07",
@@ -367,7 +367,7 @@
         committeeNo: "2026-01期",
         flowStatus: "审批中",
         currentNode: "主管领导审核",
-        submitter: "李哲",
+        submitter: "王卿明",
         submitTime: "2026-04-10 11:00",
         flowIndex: 2,
         oaMinutes: "2026-01-09",
@@ -540,7 +540,7 @@
     var u = currentUserName();
     var role = currentRole();
     if (row.flowStatus !== "审批中") return false;
-    if (role === "dept_head" && row.currentNode === "部门主管审核" && row.bizDept === DEPT_HEAD_DEPT) return u === "张主管";
+    if (role === "dept_head" && row.currentNode === "部门主管审核" && row.bizDept === DEPT_HEAD_DEPT) return u === "王超";
     if (role === "supervisor_leader" && row.currentNode === "主管领导审核" && SUPERVISED_DEPTS.indexOf(row.bizDept) >= 0)
       return true;
     if (role === "corp_purchase_head" && row.currentNode === "公司采购主管审核") return u === "王超";
@@ -1359,7 +1359,7 @@
       method: "招标",
       targetType: "物资",
       bizDept: "经营发展中心",
-      handler: "张敏",
+      handler: "宋中波",
       budget: 0,
       isFrame: "否",
       oaApprove: "",
@@ -1413,8 +1413,10 @@
     if (tb) {
       var records = [
         { node: "部门专责提报", user: row.submitter, time: row.submitTime, res: "提交", opinion: "—" },
-        { node: "部门主管审核", user: "张主管", time: "2026-04-18 10:00", res: "通过", opinion: "同意" },
-        { node: "主管领导审核", user: "赵领导", time: "—", res: "—", opinion: "—" }
+        { node: "部门主管审核", user: "王超", time: "2026-04-18 10:00", res: "通过", opinion: "同意" },
+        { node: "主管领导审核", user: "曾繁礼", time: "—", res: "—", opinion: "—" },
+        { node: "公司采购主管审核", user: "王超", time: "—", res: "—", opinion: "—" },
+        { node: "公司采购专责汇总", user: "王卿明", time: "—", res: "—", opinion: "—" }
       ];
       if (row.flowStatus === "草稿") records = [];
       tb.innerHTML = records

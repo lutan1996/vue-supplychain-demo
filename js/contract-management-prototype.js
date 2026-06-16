@@ -475,8 +475,8 @@
     if (CTX.role === "corp_purchase_specialist") return "王卿明";
     if (CTX.role === "corp_purchase_head") return "王超";
     if (CTX.role === "finance") return "孙睿";
-    if (CTX.role === "dept_buyer") return "李哲";
-    if (CTX.role === "dept_head") return "张主管";
+    if (CTX.role === "dept_buyer") return "王卿明";
+    if (CTX.role === "dept_head") return "王超";
     return "访客";
   }
 

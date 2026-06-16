@@ -18,8 +18,8 @@
     { id: "value_asset_specialist", title: "价值管理资产专责", person: "杨国卿", dept: "价值管理中心", modules: ["asset", "data", "task"], assetScope: "global" },
     { id: "value_material_specialist", title: "价值管理物资专责", person: "杜欣鑫", dept: "价值管理中心", modules: ["warehouse", "retired", "data", "task"], assetScope: "none" },
     { id: "finance_specialist", title: "财务部专责", person: "财务专责", dept: "财务部", modules: ["data", "task", "purchaseMgmt", "warehouse"], assetScope: "global" },
-    { id: "mech_specialist", title: "机械所专责", person: "机械所专责", dept: "机械所", modules: ["purchaseMgmt", "warehouse", "task", "logistics"], assetScope: "dept" },
-    { id: "elec_specialist", title: "电控所专责", person: "电控所专责", dept: "电控所", modules: ["purchaseMgmt", "warehouse", "task", "logistics"], assetScope: "dept" },
+    { id: "mech_specialist", title: "机械研究所物资专责", person: "许学良", dept: "机械研究所", modules: ["purchaseMgmt", "warehouse", "task", "logistics"], assetScope: "dept" },
+    { id: "elec_specialist", title: "电控所物资专责", person: "成明锴", dept: "电控所", modules: ["purchaseMgmt", "warehouse", "task", "logistics"], assetScope: "dept" },
     { id: "scrap_specialist", title: "公司废旧鉴定专责", person: "史秋生", dept: "废旧鉴定中心", modules: ["retired", "warehouse", "task", "data"], assetScope: "none" },
     { id: "scrap_head", title: "公司废旧鉴定主管", person: "任淮辉", dept: "废旧鉴定中心", modules: ["retired", "warehouse", "task", "data"], assetScope: "none" }
   ];
@@ -1911,10 +1911,10 @@
       "    </div>" +
       '    <div class="map-flow-pane" data-pane="info">' +
       '      <div class="map-flow-info">' +
-      "        <div>1、业务部门物资负责人刘建国录入设备清单，提交申请入库（2026-03-20 09:12）（附件：风机采购合同）</div>" +
-      "        <div>2、业务部门负责人张磊审批：已审批，同意入库（2026-03-20 10:03）</div>" +
-      "        <div>3、物资管理部门物资负责人陈志远审核分类：已审核（2026-03-20 10:28）</div>" +
-      "        <div>4、分管领导部门负责人王立军审批：已审批，同意（2026-03-20 10:48）</div>" +
+      "        <div>1、业务部门物资专责成明锴录入设备清单，提交申请入库（2026-03-20 09:12）（附件：风机采购合同）</div>" +
+      "        <div>2、业务部门负责人陈亮审批：已审批，同意入库（2026-03-20 10:03）</div>" +
+      "        <div>3、物资管理部门物资专责宋中波审核分类：已审核（2026-03-20 10:28）</div>" +
+      "        <div>4、物资管理部门负责人王超审批：已审批，同意（2026-03-20 10:48）</div>" +
       "        <div>5、结束（—）</div>" +
       "      </div>" +
       "    </div>" +
@@ -1968,10 +1968,10 @@
       '</div>';
     if (info) {
       info.innerHTML =
-        '<div>1、业务部门物资负责人刘建国录入设备清单，提交申请入库（2026-03-20 09:12）（附件：风机采购合同）</div>' +
-        '<div>2、业务部门负责人张磊审批：同意入库，审核物资符合采购要求（2026-03-20 10:03）</div>' +
-        '<div>3、物资管理部门物资负责人陈志远审核分类：同意入库（2026-03-20 10:28）</div>' +
-        '<div>4、物资管理部门负责人王立军审批：同意（2026-03-20 10:48）</div>' +
+        '<div>1、业务部门物资专责成明锴录入设备清单，提交申请入库（2026-03-20 09:12）（附件：风机采购合同）</div>' +
+        '<div>2、业务部门负责人陈亮审批：同意入库，审核物资符合采购要求（2026-03-20 10:03）</div>' +
+        '<div>3、物资管理部门物资专责宋中波审核分类：同意入库（2026-03-20 10:28）</div>' +
+        '<div>4、物资管理部门负责人王超审批：同意（2026-03-20 10:48）</div>' +
         '<div>5、入公司库结束（2026-03-20 11:05）</div>';
     }
   }
@@ -1988,9 +1988,9 @@
     if (!track) return;
     track.innerHTML =
       '<div class="map-flow-row" style="grid-template-columns:repeat(11,1fr)">' +
-      '<span class="map-flow-node">电控所负责人张军发起领用流程，从公司库中选取物资清单</span>' +
+      '<span class="map-flow-node">电控所物资专责成明锴发起领用流程，从公司库中选取物资清单</span>' +
       '<span class="map-flow-arrow">→</span>' +
-      '<span class="map-flow-node">电控所负责人审批，通过</span>' +
+      '<span class="map-flow-node">电控所负责人陈亮审批，通过</span>' +
       '<span class="map-flow-arrow">→</span>' +
       '<span class="map-flow-node">物资管理部门专责核对清单，无误</span>' +
       '<span class="map-flow-arrow">→</span>' +
@@ -2001,10 +2001,10 @@
       '</div>';
     if (info) {
       info.innerHTML =
-        '<div>1、电控所负责人张军发起领用流程，从公司库中选取物资清单（2026-05-10 09:12）</div>' +
-        '<div>2、电控所负责人张磊审批：通过（2026-05-10 10:03）</div>' +
-        '<div>3、物资管理部门专责陈志远核对清单：无误（2026-05-10 10:28）</div>' +
-        '<div>4、物资管理部门负责人王立军审核：同意（2026-05-10 10:48）</div>' +
+        '<div>1、电控所物资专责成明锴发起领用流程，从公司库中选取物资清单（2026-05-10 09:12）</div>' +
+        '<div>2、电控所负责人陈亮审批：通过（2026-05-10 10:03）</div>' +
+        '<div>3、物资管理部门专责宋中波核对清单：无误（2026-05-10 10:28）</div>' +
+        '<div>4、物资管理部门负责人王超审核：同意（2026-05-10 10:48）</div>' +
         '<div>5、领用结束，物资归入电控所名下（2026-05-10 11:05）</div>';
     }
   }
@@ -2018,13 +2018,13 @@
       '<div class="map-flow-row" style="grid-template-columns:repeat(11,1fr)">' +
       '<span class="map-flow-node">电控所发起申请，将机械所物资转入本部门</span>' +
       '<span class="map-flow-arrow">→</span>' +
-      '<span class="map-flow-node">电控所负责人审批，通过</span>' +
+      '<span class="map-flow-node">电控所负责人陈亮审批，通过</span>' +
       '<span class="map-flow-arrow">→</span>' +
-      '<span class="map-flow-node">机械所物资专责审批，通过</span>' +
+      '<span class="map-flow-node">机械研究所物资专责许学良审批，通过</span>' +
       '<span class="map-flow-arrow">→</span>' +
-      '<span class="map-flow-node">机械所负责人审批，通过</span>' +
+      '<span class="map-flow-node">机械研究所负责人李仁堂审批，通过</span>' +
       '<span class="map-flow-arrow">→</span>' +
-      '<span class="map-flow-node">物资管理部门物资专责确认</span>' +
+      '<span class="map-flow-node">物资管理部门物资专责宋中波确认</span>' +
       '<span class="map-flow-arrow">→</span>' +
       '</div>' +
       '<div class="map-flow-row" style="grid-template-columns:repeat(11,1fr);margin-top:18px">' +
@@ -2034,10 +2034,10 @@
     if (info) {
       info.innerHTML =
         '<div>1、电控所发起申请：电控所流转到机械所（2026-05-10 09:12）</div>' +
-        '<div>2、电控所负责人审批：通过（2026-05-10 10:03）</div>' +
-        '<div>3、机械所物资专责审批：通过（2026-05-10 10:28）</div>' +
-        '<div>4、机械所负责人审批：通过（2026-05-10 10:48）</div>' +
-        '<div>5、物资管理部门物资专责确认：已确认（2026-05-10 11:05）</div>' +
+        '<div>2、电控所负责人陈亮审批：通过（2026-05-10 10:03）</div>' +
+        '<div>3、机械研究所物资专责许学良审批：通过（2026-05-10 10:28）</div>' +
+        '<div>4、机械研究所负责人李仁堂审批：通过（2026-05-10 10:48）</div>' +
+        '<div>5、物资管理部门物资专责宋中波确认：已确认（2026-05-10 11:05）</div>' +
         '<div>6、公司内部流转结束（2026-05-10 11:30）</div>';
     }
   }
