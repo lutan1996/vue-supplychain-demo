@@ -18,12 +18,21 @@
   var orderMap = {};
   var purchasedMap = {};
   var reportMap = {};
+  var SALES_CART_RESET_KEY = "salesCartResetV1";
 
   try {
     cartItems = JSON.parse(localStorage.getItem("salesCartItems") || "[]") || [];
   } catch (eCartStore) {
     cartItems = [];
   }
+
+  try {
+    if (localStorage.getItem(SALES_CART_RESET_KEY) !== "done") {
+      localStorage.removeItem("salesCartItems");
+      localStorage.setItem(SALES_CART_RESET_KEY, "done");
+      cartItems = [];
+    }
+  } catch (eCartReset) {}
 
   function cartTypeKey(item) {
     if (!item) return "";

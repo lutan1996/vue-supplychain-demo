@@ -89,7 +89,7 @@
     "purchase-ledger": "purchase-data-ledger.html",
     "cargo-ledger": "cargo-ledger.html",
     "purchase-summary-report": "purchase-summary-report.html?v=20260616-fix-v3",
-    "sales-material-list": "sales-material-list.html?v=20260616-fix-v3",
+    "sales-material-list": "sales-material-list.html?v=20260616-fix-v4",
     "sales-order-manage": "sales-order-management.html?v=20260616-fix-v3",
     "sales-purchase-material": "sales-purchased-materials.html?v=20260616-fix-v3",
     "sales-contract-report": "sales-contract-report.html",

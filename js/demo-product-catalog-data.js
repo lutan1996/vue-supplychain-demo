@@ -6,6 +6,7 @@
   var STORAGE_BSEQ = "map-demo-pd-bseq-v1";
   var STORAGE_FEATURES = "map-demo-pd-features-v1";
   var STORAGE_CODE_SCHEMA = "map-demo-code-schema-v2";
+  var STORAGE_SALES_MATERIAL_FIX = "map-demo-sales-material-fix-v1";
 
   var CLASS_TREE = [
     {
@@ -230,6 +231,47 @@
     return changed;
   }
 
+  function migrateSalesMaterialDemoRows(allProducts) {
+    if (!allProducts) return false;
+    var changed = false;
+    var key = "A01|01|001";
+    var rows = allProducts[key];
+    if (!Array.isArray(rows) || rows.length < 2) return false;
+    var second = rows[1] || {};
+    var marker = loadJson(STORAGE_SALES_MATERIAL_FIX, "");
+    var shouldFix = marker !== "done";
+    if (!shouldFix) {
+      shouldFix = String(second.productName || "").trim() !== "叶片";
+    }
+    if (!shouldFix) return false;
+    rows[1] = {
+      id: "demo-b1",
+      b: "B00000005",
+      a: "A0100200001",
+      productName: "叶片",
+      mfrName: "中材科技",
+      model: "SW64-2.0",
+      category: "生产类",
+      stockQty: 8,
+      refPrice: "35.00",
+      features: {
+        f1_name: "制造商名称",
+        f1: "中材科技",
+        f2_name: "制造商型号",
+        f2: "SW64-2.0",
+        f3_name: "叶片长度",
+        f3: "64m",
+        f4_name: "材质",
+        f4: "玻璃纤维复合材料"
+      }
+    };
+    try {
+      localStorage.setItem(STORAGE_SALES_MATERIAL_FIX, "done");
+    } catch (eFlag) {}
+    changed = true;
+    return changed;
+  }
+
   function ensureDemoProducts() {
     migrateTreeACodes(CLASS_TREE);
     var allProducts = loadJson(STORAGE_PRODUCTS, {});
@@ -241,6 +283,7 @@
       }
     });
     if (migrateStoredProducts(allProducts)) changed = true;
+    if (migrateSalesMaterialDemoRows(allProducts)) changed = true;
     try {
       if (localStorage.getItem(STORAGE_CODE_SCHEMA) !== "2") {
         localStorage.setItem(STORAGE_CODE_SCHEMA, "2");
