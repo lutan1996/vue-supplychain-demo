@@ -468,13 +468,23 @@
         return;
       }
       tbody.innerHTML = rows.map(function (p) {
-        return '<tr data-id="' + esc(p.id) + '"><td>' + esc(p.productName) + '</td><td>' + esc(p.mfrName) + '</td><td>' + esc(p.model) + '</td><td>' + esc(p.b) + '</td><td>' + esc(p.stockQty) + '</td>' +
+        return '<tr data-id="' + esc(p.id) + '" data-product="' + esc(JSON.stringify(p)) + '"><td>' + esc(p.productName) + '</td><td>' + esc(p.mfrName) + '</td><td>' + esc(p.model) + '</td><td>' + esc(p.b) + '</td><td>' + esc(p.stockQty) + '</td>' +
           cols.map(function (i) { return "<td>" + esc(featText(p, i)) + "</td>"; }).join("") +
           '<td><span class="sales-op-row">' + iconBtn("plus", "加购", "cart", p.id) + iconBtn("order", "直接下单", "direct", p.id) + iconBtn("view", "查看", "view-product", p.id) + "</span></td></tr>";
       }).join("");
     }
     function findProduct(id) {
       return rowsForSelection().find(function (p) { return p.id === id; }) || getProducts().find(function (p) { return p.id === id; });
+    }
+    function productFromButton(btn) {
+      var row = btn && btn.closest ? btn.closest("tr[data-product]") : null;
+      if (row) {
+        try {
+          var product = JSON.parse(row.getAttribute("data-product") || "{}");
+          if (product && (product.productName || product.b)) return product;
+        } catch (eProduct) {}
+      }
+      return findProduct(btn.getAttribute("data-id"));
     }
     treeEl.addEventListener("click", function (e) {
       var toggle = e.target.closest("[data-toggle]");
@@ -520,7 +530,7 @@
     tbody.addEventListener("click", function (e) {
       var btn = e.target.closest("[data-action]");
       if (!btn) return;
-      var p = findProduct(btn.getAttribute("data-id"));
+      var p = productFromButton(btn);
       var act = btn.getAttribute("data-action");
       if (!p) return;
       if (act === "view-product") openModal("查看物资", productDetailHtml(p), '<button class="sales-btn" data-close>关闭</button>');

@@ -96,7 +96,7 @@
 .sales-cart-summary{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px;color:#445a76;font-size:13px}
 .sales-cart-total{font-weight:700;color:#1f3551}
 .sales-cart-table{width:100%;min-width:980px;border-collapse:collapse;font-size:12px}
-.sales-cart-table th,.sales-cart-table td{border:1px solid #e7edf5;padding:8px 10px;text-align:center;white-space:nowrap}
+.sales-cart-table th,.sales-cart-table td{border:1px solid #e7edf5;padding:8px 10px;text-align:center;white-space:nowrap;color:#1f2937}
 .sales-cart-table th{background:#f6f8fb;color:#5b6b7f;font-weight:600}
 .sales-cart-table td:nth-child(2){text-align:left}
 .sales-cart-qty{display:inline-flex;align-items:center;justify-content:center;gap:4px}
