@@ -37,7 +37,18 @@
 
   function installSiteFooter() {
     try {
+      // 若在 iframe 内运行，跳过生成（由壳层父页面负责）
+      if (window && window.self !== window.top) return;
+
       ensureFooterStyles();
+
+      // 清理可能遗留的无标记页脚，防止重复
+      var existing = document.querySelectorAll("footer.app-site-footer:not([" + MARKER + "])");
+      for (var i = 0; i < existing.length; i++) {
+        var parent = existing[i].parentNode;
+        if (parent) parent.removeChild(existing[i]);
+      }
+
       if (document.querySelector("[" + MARKER + "]")) return;
 
       var portal = document.querySelector("footer.portal-footer");

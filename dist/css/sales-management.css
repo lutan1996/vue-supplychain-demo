@@ -21,9 +21,9 @@
 .sales-cart-count{position:absolute;right:-6px;top:-6px;min-width:18px;height:18px;padding:0 5px;border-radius:999px;background:#ff4d4f;color:#fff;font-size:11px;line-height:18px;text-align:center;box-shadow:0 0 0 2px #fff;box-sizing:border-box}
 .sales-table-wrap{border:1px solid #dde3ea;border-radius:4px;overflow:auto;background:#fff;max-width:100%;padding-bottom:2px}
 .sales-table{width:max-content;min-width:1280px;border-collapse:collapse;font-size:12px;background:#fff;table-layout:auto}
-.sales-table th,.sales-table td{border-bottom:1px solid #edf1f6;padding:8px 12px;text-align:center;color:#334155;line-height:1.45;vertical-align:middle;word-break:normal;min-width:96px}
-.sales-table th{background:#f2f5f9;color:#5a6677;font-weight:600;white-space:normal;word-break:keep-all;overflow:visible;text-overflow:clip}
-.sales-table td{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:280px}
+.sales-table th,.sales-table td{border-bottom:1px solid #edf1f6;padding:8px 12px;text-align:center;color:#334155;line-height:1.5;vertical-align:middle;word-break:break-word;min-width:96px}
+.sales-table th{background:#f2f5f9;color:#5a6677;font-weight:600;white-space:normal;overflow:visible;text-overflow:clip}
+.sales-table td{white-space:normal;overflow:visible;text-overflow:clip}
 .sales-table th:last-child,.sales-table td:last-child{min-width:136px;width:136px;max-width:136px;white-space:nowrap;overflow:visible;text-overflow:clip}
 .sales-table td:nth-child(6){min-width:220px;text-align:left}
 .sales-table tr:hover td{background:#fafcff}
