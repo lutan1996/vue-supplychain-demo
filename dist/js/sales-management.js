@@ -117,6 +117,173 @@
     return '<span class="' + cls + '">' + esc(text) + "</span>";
   }
 
+  function dotDate(v) {
+    var text = String(v == null ? "" : v).trim();
+    if (!text || text === "—") return "";
+    var m = text.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
+    if (m) return Number(m[1]) + "." + Number(m[2]) + "." + Number(m[3]);
+    return text.replace(/-/g, ".");
+  }
+
+  function shiftDotDate(v, days) {
+    var text = String(v == null ? "" : v).trim();
+    var m = text.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
+    if (!m) return dotDate(v);
+    var d = new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3]));
+    d.setDate(d.getDate() + Number(days || 0));
+    return d.getFullYear() + "." + (d.getMonth() + 1) + "." + d.getDate();
+  }
+
+  function salesTrackItemHtml(color, main, sub) {
+    return '<div class="sales-track-item"><span class="sales-track-dot" style="background:' + color + '"></span><div><div class="sales-track-main">' + esc(main) + '</div><div class="sales-track-sub">' + esc(sub) + "</div></div></div>";
+  }
+
+  function salesBaseTrackHtml(productName, productCode) {
+    return [
+      salesTrackItemHtml("#2563eb", "2026.4.20 入库：" + textOrDash(productName) + "（" + textOrDash(productCode) + "）", "存放山东风电中心仓库001货位"),
+      salesTrackItemHtml("#10b981", "2026.5.10 被电控所领用", "领用单：LY-2026-0510（演示）"),
+      salesTrackItemHtml("#6366f1", "2026.5.12 使用人变更（初始保管人 → 张三）", "变更原因：岗位调整"),
+      salesTrackItemHtml("#f59e0b", "2026.5.18 使用人变更（张三 → 李四）", "变更原因：岗位调动")
+    ].join("");
+  }
+
+  function orderTrackTimelineHtml(order, item) {
+    var status = String(order.status || "").trim();
+    var approvedDone = ["待上传合同", "已确认", "待发货", "已发货", "已收货", "已完成"].indexOf(status) >= 0;
+    var contractDone = ["已确认", "待发货", "已发货", "已收货", "已完成"].indexOf(status) >= 0;
+    var shipDone = ["已发货", "已收货", "已完成"].indexOf(status) >= 0;
+    var receiveDone = ["已收货", "已完成"].indexOf(status) >= 0;
+    var currentColor = /已完成|已收货|已发货/.test(status) ? "#14b8a6" : /待|未/.test(status) ? "#94a3b8" : "#2563eb";
+    var html = salesBaseTrackHtml(item.productName, item.productCode);
+
+    html += salesTrackItemHtml(
+      "#0ea5e9",
+      dotDate(order.orderDate) + " 电控所物资专责发起销售下单",
+      "订单编号：" + textOrDash(order.orderNo) + "；下单公司：" + textOrDash(order.company) + "；场站：" + textOrDash(order.station) + "；产品：" + textOrDash(item.productName) + "；购买数量：" + textOrDash(item.qty)
+    );
+
+    html += approvedDone
+      ? salesTrackItemHtml(
+          "#22c55e",
+          shiftDotDate(order.orderDate, 1) + " 电控所负责人审核通过",
+          "审核人：" + textOrDash(order.handler) + "；已核对购买数量、订单金额、收货单位及场站信息，订单进入销售合同环节。"
+        )
+      : salesTrackItemHtml(
+          "#94a3b8",
+          "待电控所负责人审核",
+          "当前订单状态：" + textOrDash(order.status) + "；需核对产品明细、购买数量、订单总金额及场站收货信息。"
+        );
+
+    html += contractDone
+      ? salesTrackItemHtml(
+          "#8b5cf6",
+          shiftDotDate(order.orderDate, 2) + " 销售合同登记完成",
+          "销售合同编号：" + textOrDash(order.contractNo) + "；订单已与销售合同关联，可继续安排发货。"
+        )
+      : status === "待上传合同"
+        ? salesTrackItemHtml(
+            "#94a3b8",
+            "待上传销售合同",
+            "订单审核已完成；需上传销售合同附件后进入发货环节。"
+          )
+        : salesTrackItemHtml(
+            "#94a3b8",
+            "待进入销售合同登记",
+            "订单审核通过后登记销售合同编号，并补充对应合同附件。"
+          );
+
+    html += shipDone
+      ? salesTrackItemHtml(
+          "#f97316",
+          dotDate(order.shipDate || shiftDotDate(order.orderDate, 4)) + " 安排发货",
+          "发货路径：" + textOrDash(order.route) + "；物流单号：" + textOrDash(order.waybillNo) + "；发往场站：" + textOrDash(order.station) + "。"
+        )
+      : contractDone
+        ? salesTrackItemHtml(
+            "#94a3b8",
+            "待安排发货",
+            "销售合同已完成登记；待维护物流单号和发货日期后执行发货。"
+          )
+        : salesTrackItemHtml(
+            "#94a3b8",
+            "待进入发货准备",
+            "需先完成订单审核及销售合同登记，之后才能安排发货。"
+          );
+
+    html += receiveDone
+      ? salesTrackItemHtml(
+          "#14b8a6",
+          dotDate(order.receiveDate || shiftDotDate(order.shipDate || order.orderDate, 1)) + " 项目公司收货确认",
+          "收货单位：" + textOrDash(order.receiverCompany) + "；场站：" + textOrDash(order.station) + "；已完成收货确认。"
+        )
+      : shipDone
+        ? salesTrackItemHtml(
+            "#94a3b8",
+            "待项目公司收货确认",
+            "物资已发出；收货单位：" + textOrDash(order.receiverCompany) + "；场站：" + textOrDash(order.station) + "。"
+          )
+        : salesTrackItemHtml(
+            "#94a3b8",
+            "待项目公司收货",
+            "待完成发货后，由项目公司在场站侧进行收货确认。"
+          );
+
+    html += salesTrackItemHtml(
+      currentColor,
+      "当前订单状态：" + textOrDash(order.status),
+      "当前处理人：" + textOrDash(order.handler) + "；可继续通过订单编号 " + textOrDash(order.orderNo) + " 关联查看销售合同和购入物资明细。"
+    );
+
+    return html;
+  }
+
+  function purchasedTrackTimelineHtml(summary, row) {
+    var linkedOrder = orderMap[row.orderNo] || {};
+    var orderDate = linkedOrder.orderDate || "2026-06-10";
+    var route = linkedOrder.route || "供应商直发";
+    var requester = linkedOrder.requester || "成明锴";
+    var handler = linkedOrder.handler || "电控所负责人";
+    var receiverCompany = linkedOrder.receiverCompany || (textOrDash(row.company) + "新能源有限公司");
+    var currentSub =
+      row.usageStatus === "在用"
+        ? "物资已在场站投入使用；当前使用/存放位置：" + textOrDash(row.location) + "。"
+        : row.usageStatus === "库内待用"
+          ? "物资已完成收货入库，暂存于 " + textOrDash(row.location) + "，等待后续使用。"
+          : "当前存放/使用位置：" + textOrDash(row.location) + "；可继续通过订单编号追溯来源。";
+
+    return salesBaseTrackHtml(row.productName, row.productCode) +
+      salesTrackItemHtml(
+        "#0ea5e9",
+        dotDate(orderDate) + " 电控所物资专责发起销售下单",
+        "下单人：" + textOrDash(requester) + "；订单编号：" + textOrDash(row.orderNo) + "；下单公司：" + textOrDash(row.company) + "；场站：" + textOrDash(row.station) + "；购买数量：" + textOrDash(row.qty)
+      ) +
+      salesTrackItemHtml(
+        "#22c55e",
+        shiftDotDate(orderDate, 1) + " 电控所负责人审核通过",
+        "审核人：" + textOrDash(handler) + "；确认该产品可按销售流程流转，并保留前序领用与使用人变更记录。"
+      ) +
+      salesTrackItemHtml(
+        "#8b5cf6",
+        shiftDotDate(orderDate, 2) + " 销售合同登记完成",
+        "销售合同编号：" + textOrDash(row.contractNo) + "；已与订单 " + textOrDash(row.orderNo) + " 关联，可用于后续发货和收货反查。"
+      ) +
+      salesTrackItemHtml(
+        "#f97316",
+        shiftDotDate(orderDate, 3) + " 安排发货",
+        "发货路径：" + textOrDash(route) + "；发往场站：" + textOrDash(row.station) + "；同步维护收货准备信息。"
+      ) +
+      salesTrackItemHtml(
+        "#14b8a6",
+        dotDate(row.receiveDate) + " 项目公司收货确认",
+        "收货单位：" + textOrDash(receiverCompany) + "；收货地点：" + textOrDash(row.location) + "；已纳入购入物资统计。"
+      ) +
+      salesTrackItemHtml(
+        "#06b6d4",
+        "当前状态：" + textOrDash(row.usageStatus),
+        currentSub + " 订单编号：" + textOrDash(row.orderNo) + "；物资类型：" + textOrDash(summary.typeName) + "。"
+      );
+  }
+
   function toast(msg) {
     if (window.mapDemoToast) window.mapDemoToast(msg);
     else alert(msg);
@@ -578,13 +745,7 @@
       '<tr><th>物资所属部门</th><td>' + esc(order.owningDept) + '</td><th>购买数量</th><td>' + esc(item.qty) + '</td></tr>' +
       '<tr><th>发货路径</th><td>' + esc(order.route) + '</td><th>销售合同编号</th><td>' + esc(order.contractNo) + '</td></tr>' +
       '</tbody></table><div class="sales-section-title">订单物资明细表</div>' + orderMaterialsTableHtml(order, false) +
-      '<div class="sales-section-title">物资跟踪</div><div class="sales-track">' +
-      '<div class="sales-track-item"><span class="sales-track-dot" style="background:#2563eb"></span><div><div class="sales-track-main">2026-06-10 项目公司下单</div><div class="sales-track-sub">下单人 ' + esc(order.requester) + ' 提交订单 ' + esc(order.orderNo) + '，产品 ' + esc(item.productName) + ' 数量 ' + esc(item.qty) + '。</div></div></div>' +
-      '<div class="sales-track-item"><span class="sales-track-dot" style="background:#10b981"></span><div><div class="sales-track-main">2026-06-11 订单审核</div><div class="sales-track-sub">电控所负责人完成审核，订单进入合同维护环节。</div></div></div>' +
-      '<div class="sales-track-item"><span class="sales-track-dot" style="background:#6366f1"></span><div><div class="sales-track-main">2026-06-12 销售合同维护</div><div class="sales-track-sub">登记销售合同编号 ' + esc(order.contractNo) + '，进入发货准备。</div></div></div>' +
-      '<div class="sales-track-item"><span class="sales-track-dot" style="background:#f59e0b"></span><div><div class="sales-track-main">2026-06-14 发货</div><div class="sales-track-sub">物流单号 ' + esc(order.waybillNo) + '，按 ' + esc(order.route) + ' 执行发货。</div></div></div>' +
-      '<div class="sales-track-item"><span class="sales-track-dot" style="background:#14b8a6"></span><div><div class="sales-track-main">2026-06-15 收货确认</div><div class="sales-track-sub">项目公司完成收货确认，后续购入物资明细可通过订单编号关联反查。</div></div></div>' +
-      '</div>';
+      '<div class="sales-section-title">物资跟踪</div><div class="sales-track">' + orderTrackTimelineHtml(order, item) + '</div>';
   }
 
   function openOrderDetail(order) {
@@ -1090,12 +1251,7 @@
       '<tr><th>购入数量</th><td>' + esc(row.qty) + '</td><th>存放地点</th><td>' + esc(row.location) + '</td></tr>' +
       '<tr><th>物资类型名称</th><td>' + esc(summary.typeName) + '</td><th>收货日期</th><td>' + esc(row.receiveDate) + '</td></tr>' +
       '</tbody></table><div class="sales-section-title">购入物资明细表</div>' + purchasedDetailsTableHtml(summary, true) +
-      '<div class="sales-section-title">物资跟踪</div><div class="sales-track">' +
-      '<div class="sales-track-item"><span class="sales-track-dot" style="background:#2563eb"></span><div><div class="sales-track-main">2026-06-12 完成下单</div><div class="sales-track-sub">通过订单 ' + esc(row.orderNo) + ' 采购 ' + esc(row.productName) + '。</div></div></div>' +
-      '<div class="sales-track-item"><span class="sales-track-dot" style="background:#10b981"></span><div><div class="sales-track-main">2026-06-13 合同与发货联动</div><div class="sales-track-sub">销售合同 ' + esc(row.contractNo) + ' 生效后安排发货。</div></div></div>' +
-      '<div class="sales-track-item"><span class="sales-track-dot" style="background:#6366f1"></span><div><div class="sales-track-main">2026-06-15 场站收货</div><div class="sales-track-sub">收货地点：' + esc(row.location) + '，同步进入购入物资统计。</div></div></div>' +
-      '<div class="sales-track-item"><span class="sales-track-dot" style="background:#f59e0b"></span><div><div class="sales-track-main">当前状态</div><div class="sales-track-sub">产品当前状态为 ' + esc(row.usageStatus) + '，后续仍可通过订单编号继续追踪来源。</div></div></div>' +
-      '</div>';
+      '<div class="sales-section-title">物资跟踪</div><div class="sales-track">' + purchasedTrackTimelineHtml(summary, row) + '</div>';
   }
 
   function openPurchasedDetail(summary) {
