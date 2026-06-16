@@ -54,7 +54,7 @@
     </div></main></div>
   </div>
   <script src="js/sidebar-actions.js"></script><script src="js/subpage-feature-title.js"></script><script src="js/site-footer.js"></script>
-<script src="js/subpage-clock.js"></script>
+<script src="js/subpage-clock.js?v=20260616-proc-sales-fix-v3"></script>
 <script>
   (function(){
     var quickConfirmHandler = null;
@@ -99,32 +99,34 @@
     }
     function rowDataFromTr(tr){
       if(!tr) return {};
+      var cells = Array.prototype.slice.call(tr.children || []);
+      if(cells[0] && cells[0].querySelector && cells[0].querySelector("input[type='checkbox']")) cells = cells.slice(1);
       return {
-        no: tr.children[0] ? tr.children[0].textContent : "",
-        name: tr.children[1] ? tr.children[1].textContent : "",
-        type: tr.children[2] ? tr.children[2].textContent : "常规合同",
-        customer: tr.children[3] ? tr.children[3].textContent : "",
-        party: tr.children[4] ? tr.children[4].textContent : "",
-        signDate: tr.children[5] ? tr.children[5].textContent : "",
-        amount: tr.children[6] ? tr.children[6].textContent : "",
-        paid: tr.children[7] ? tr.children[7].textContent : "",
-        remain: tr.children[8] ? tr.children[8].textContent : "",
-        payWay: tr.children[9] ? tr.children[9].textContent : "银行转账",
-        payRate: tr.children[10] ? tr.children[10].textContent : "",
-        valid: tr.children[11] ? tr.children[11].textContent : "",
-        warranty: tr.children[12] ? tr.children[12].textContent : "",
-        recvTime: tr.children[13] ? tr.children[13].textContent : "",
-        recvAmt: tr.children[14] ? tr.children[14].textContent : "",
-        recvProgress: tr.children[15] ? tr.children[15].textContent : "",
-        stage: tr.children[16] ? tr.children[16].textContent : "",
-        material: tr.children[17] ? tr.children[17].textContent : "",
-        spec: tr.children[18] ? tr.children[18].textContent : "",
-        qty: tr.children[19] ? tr.children[19].textContent : "",
-        unitPrice: tr.children[20] ? tr.children[20].textContent : "",
-        tax: tr.children[21] ? tr.children[21].textContent : "",
-        total: tr.children[22] ? tr.children[22].textContent : "",
-        orderNo: tr.children[23] ? tr.children[23].textContent : "",
-        remark: tr.children[24] ? tr.children[24].textContent : ""
+        no: cells[0] ? cells[0].textContent : "",
+        name: cells[1] ? cells[1].textContent : "",
+        type: cells[2] ? cells[2].textContent : "常规合同",
+        customer: cells[3] ? cells[3].textContent : "",
+        party: cells[4] ? cells[4].textContent : "",
+        signDate: cells[5] ? cells[5].textContent : "",
+        amount: cells[6] ? cells[6].textContent : "",
+        paid: cells[7] ? cells[7].textContent : "",
+        remain: cells[8] ? cells[8].textContent : "",
+        payWay: cells[9] ? cells[9].textContent : "银行转账",
+        payRate: cells[10] ? cells[10].textContent : "",
+        valid: cells[11] ? cells[11].textContent : "",
+        warranty: cells[12] ? cells[12].textContent : "",
+        recvTime: cells[13] ? cells[13].textContent : "",
+        recvAmt: cells[14] ? cells[14].textContent : "",
+        recvProgress: cells[15] ? cells[15].textContent : "",
+        stage: cells[16] ? cells[16].textContent : "",
+        material: cells[17] ? cells[17].textContent : "",
+        spec: cells[18] ? cells[18].textContent : "",
+        qty: cells[19] ? cells[19].textContent : "",
+        unitPrice: cells[20] ? cells[20].textContent : "",
+        tax: cells[21] ? cells[21].textContent : "",
+        total: cells[22] ? cells[22].textContent : "",
+        orderNo: cells[23] ? cells[23].textContent : "",
+        remark: cells[24] ? cells[24].textContent : ""
       };
     }
     function salesFormHtml(d, readonly){
