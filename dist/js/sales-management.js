@@ -970,6 +970,8 @@
 
   function orderBaseFieldsHtml(order, includeRemark) {
     return '<div class="sales-form-grid sales-form-grid--spaced">' +
+      '<div class="sales-field"><label>购买总数量</label><input readonly value="' + esc(order.totalQty) + '"></div>' +
+      '<div class="sales-field"><label>订单总金额</label><input readonly value="' + moneyYuan(order.totalAmount) + '"></div>' +
       '<div class="sales-field"><label>订单编号</label><input readonly value="' + esc(order.orderNo) + '"></div>' +
       '<div class="sales-field"><label>订单状态</label><input readonly value="' + esc(order.status) + '"></div>' +
       '<div class="sales-field"><label>下单人</label><input readonly value="' + esc(order.requester) + '"></div>' +
@@ -977,8 +979,6 @@
       '<div class="sales-field"><label>收货单位</label><input readonly value="' + esc(order.receiverCompany) + '"></div>' +
       '<div class="sales-field"><label>场站名称</label><input readonly value="' + esc(order.station) + '"></div>' +
       '<div class="sales-field"><label>物资所属部门</label><input readonly value="' + esc(order.owningDept) + '"></div>' +
-      '<div class="sales-field"><label>购买总数量</label><input readonly value="' + esc(order.totalQty) + '"></div>' +
-      '<div class="sales-field"><label>订单总金额</label><input readonly value="' + moneyYuan(order.totalAmount) + '"></div>' +
       '<div class="sales-field"><label>下单日期</label><input readonly value="' + esc(order.orderDate) + '"></div>' +
       '<div class="sales-field"><label>发货/销售路径</label><input readonly value="' + esc(order.route) + '"></div>' +
       '<div class="sales-field"><label>当前处理人</label><input readonly value="' + esc(order.handler) + '"></div>' +
@@ -1109,6 +1109,8 @@
     return '<div class="sales-section-title">订单物资明细表</div>' +
       materialTable +
       '<div class="sales-form-grid sales-form-grid--spaced">' +
+      '<div class="sales-field"><label>购买总数量</label><input readonly value="系统自动生成"></div>' +
+      '<div class="sales-field"><label>订单总金额</label><input readonly value="系统自动生成"></div>' +
       '<div class="sales-field"><label>订单编号</label><input readonly value="系统自动生成"></div>' +
       '<div class="sales-field"><label>订单状态</label><input readonly value="待确认"></div>' +
       '<div class="sales-field"><label>下单人</label><input value="张明"></div>' +
