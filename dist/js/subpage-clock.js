@@ -1827,6 +1827,7 @@
 
   function applyStatusBasedOpButtons(root) {
     var file = (location.pathname || "").split("/").pop();
+    if (/^sales-/.test(file)) return;
     if (file === "purchase-plan-management.html" || file === "contract-management.html") return;
     var host = root && root.querySelectorAll ? root : document;
     var tables = host.querySelectorAll("table");
@@ -3224,6 +3225,8 @@
             inTableArea &&
             !(btn.closest && btn.closest(".modal,.proc-modal-box,.cm-dialog,.ppm-dialog,[role='dialog']"))
           ) {
+            // 销售管理页面使用自身弹窗和下单交互，不走全局兜底弹窗。
+            if (/^sales-/.test(file)) return;
             // 物资采购聚合页保持原生弹窗（避免覆盖你确认过的新增/编辑/查看交互）
             if (file === "material-procurement-hub.html") return;
             // 验收入库页面走原生弹窗，避免全局通用弹窗导致展示不全
