@@ -193,6 +193,10 @@
     return '<span class="' + cls + '">' + esc(text) + "</span>";
   }
 
+  function isSupplierDirectOrder(order) {
+    return String(order && order.route || "").indexOf("供应商直发场站") >= 0;
+  }
+
   function dotDate(v) {
     var text = String(v == null ? "" : v).trim();
     if (!text || text === "—") return "";
@@ -225,6 +229,45 @@
 
   function orderTrackTimelineHtml(order, item) {
     var status = String(order.status || "").trim();
+    var supplierDirect = isSupplierDirectOrder(order);
+    if (supplierDirect) {
+      var directApprovedDone = ["待供应商发货", "供应商已发货", "已到场"].indexOf(status) >= 0;
+      var directShipDone = ["供应商已发货", "已到场"].indexOf(status) >= 0;
+      var directArrivedDone = status === "已到场";
+      var directHtml = salesBaseTrackHtml(item.productName, item.productCode);
+      directHtml += salesTrackItemHtml(
+        "#0ea5e9",
+        dotDate(order.orderDate) + " 山西龙源提交直发订单",
+        "下单时间：" + dotDate(order.orderDate) + " 09:12；下单人：" + textOrDash(order.requester) + "；订单编号：" + textOrDash(order.orderNo) + "；供应商：" + textOrDash(order.supplierName) + "；收货单位：" + textOrDash(order.receiverCompany) + "；场站：" + textOrDash(order.station) + "；产品：" + textOrDash(item.productName) + "；购买数量：" + textOrDash(item.qty)
+      );
+      if (directApprovedDone) {
+        directHtml += salesTrackItemHtml(
+          "#22c55e",
+          shiftDotDate(order.orderDate, 1) + " 订单确认通过",
+          "确认时间：" + shiftDotDate(order.orderDate, 1) + " 10:03；当前处理人：" + textOrDash(order.handler) + "；已确认供应商直发场站路径、收货单位、场站和物资数量。"
+        );
+      }
+      if (directShipDone) {
+        directHtml += salesTrackItemHtml(
+          "#f97316",
+          dotDate(order.shipDate || shiftDotDate(order.orderDate, 2)) + " 供应商直发场站",
+          "供应商：" + textOrDash(order.supplierName) + "；物流单号：" + textOrDash(order.waybillNo) + "；发货日期：" + dotDate(order.shipDate) + "；预计到场日期：" + dotDate(order.expectedArrivalDate) + "；发往：" + textOrDash(order.receiverCompany) + " " + textOrDash(order.station) + "。"
+        );
+        directHtml += salesTrackItemHtml(
+          "#f59e0b",
+          "物流运输中",
+          "该订单不经过机械所实物发货，由供应商直接发往场站；系统按订单、物流单号和场站信息持续追踪。"
+        );
+      }
+      if (directArrivedDone) {
+        directHtml += salesTrackItemHtml(
+          "#14b8a6",
+          dotDate(order.receiveDate || order.arrivalDate) + " 到达场站并生成 C 码",
+          "到场日期：" + dotDate(order.receiveDate || order.arrivalDate) + "；到场数量：" + textOrDash(order.arrivalQty || item.qty) + "；收货单位：" + textOrDash(order.receiverCompany) + "；场站：" + textOrDash(order.station) + "；已纳入购入物资明细和 C 码管理。"
+        );
+      }
+      return directHtml;
+    }
     var approvedDone = ["待签订合同", "待发货", "已发货", "已收货", "已完成"].indexOf(status) >= 0;
     var contractDone = ["待发货", "已发货", "已收货", "已完成"].indexOf(status) >= 0;
     var shipDone = ["已发货", "已收货", "已完成"].indexOf(status) >= 0;
@@ -894,7 +937,7 @@
       '<div class="sales-field"><label>场站名称</label><input id="salesOrderStation" readonly value="忻州风电场"></div>' +
       '<div class="sales-field"><label>物资所属部门</label><input id="salesOrderDept" readonly value="电控所"></div>' +
       '<div class="sales-field"><label>下单日期</label><input id="salesOrderDate" type="date" value="2026-06-17"></div>' +
-      '<div class="sales-field"><label>发货路径</label><select id="salesOrderRoute"><option>工程技术公司发货</option><option>供应商直发</option></select></div>' +
+      '<div class="sales-field"><label>发货路径</label><select id="salesOrderRoute"><option>工程技术公司发货</option><option>供应商直发场站</option></select></div>' +
       '<div class="sales-field"><label>当前处理人</label><input value="电控所负责人"></div>' +
       '<div class="sales-field"><label>销售合同编号</label><input readonly value="—"></div>' +
       '<div class="sales-field"><label>物流单号</label><input readonly value="—"></div>' +
@@ -985,6 +1028,7 @@
   }
 
   function syncPurchasedFromOrder(order) {
+    if (isSupplierDirectOrder(order) && order.status !== "已到场") return;
     var dynamic = readStore(SALES_PURCHASED_STORE_KEY, []);
     var grouped = {};
     orderMaterialRows(order).forEach(function (material, idx) {
@@ -1012,12 +1056,14 @@
         company: order.company,
         station: order.station,
         orderNo: order.orderNo,
-        contractNo: order.contractNo,
+        contractNo: order.contractNo || order.supplierOrderNo,
         qty: material.qty,
         amount: material.subtotal,
         receiveDate: order.receiveDate || order.shipDate,
         location: order.station + "库房",
-        usageStatus: "库存中"
+        usageStatus: "库存中",
+        supplierName: order.supplierName || "",
+        waybillNo: order.waybillNo || ""
       });
     });
     Object.keys(grouped).forEach(function (key) {
@@ -1166,7 +1212,8 @@
   }
 
   function orderBaseFieldsHtml(order, includeRemark) {
-    return '<div class="sales-form-grid sales-form-grid--spaced">' +
+    var supplierDirect = isSupplierDirectOrder(order);
+    var common = '<div class="sales-form-grid sales-form-grid--spaced">' +
       '<div class="sales-field"><label>购买总数量</label><input readonly value="' + esc(order.totalQty) + '"></div>' +
       '<div class="sales-field"><label>订单总金额</label><input readonly value="' + moneyYuan(order.totalAmount) + '"></div>' +
       '<div class="sales-field"><label>订单编号</label><input readonly value="' + esc(order.orderNo) + '"></div>' +
@@ -1178,11 +1225,23 @@
       '<div class="sales-field"><label>物资所属部门</label><input readonly value="' + esc(order.owningDept) + '"></div>' +
       '<div class="sales-field"><label>下单日期</label><input readonly value="' + esc(order.orderDate) + '"></div>' +
       '<div class="sales-field"><label>发货/销售路径</label><input readonly value="' + esc(order.route) + '"></div>' +
-      '<div class="sales-field"><label>当前处理人</label><input readonly value="' + esc(order.handler) + '"></div>' +
-      '<div class="sales-field"><label>销售合同编号</label><input readonly value="' + esc(order.contractNo) + '"></div>' +
-      '<div class="sales-field"><label>物流单号</label><input readonly value="' + esc(order.waybillNo) + '"></div>' +
-      '<div class="sales-field"><label>发货日期</label><input readonly value="' + esc(order.shipDate) + '"></div>' +
-      '<div class="sales-field"><label>收货日期</label><input readonly value="' + esc(order.receiveDate) + '"></div>' +
+      '<div class="sales-field"><label>当前处理人</label><input readonly value="' + esc(order.handler) + '"></div>';
+    if (supplierDirect) {
+      common +=
+        '<div class="sales-field"><label>供应商名称</label><input readonly value="' + esc(textOrDash(order.supplierName)) + '"></div>' +
+        '<div class="sales-field"><label>供应商订单依据</label><input readonly value="' + esc(textOrDash(order.supplierOrderNo)) + '"></div>' +
+        '<div class="sales-field"><label>供应商物流单号</label><input readonly value="' + esc(textOrDash(order.waybillNo)) + '"></div>' +
+        '<div class="sales-field"><label>供应商发货日期</label><input readonly value="' + esc(textOrDash(order.shipDate)) + '"></div>' +
+        '<div class="sales-field"><label>预计到场日期</label><input readonly value="' + esc(textOrDash(order.expectedArrivalDate)) + '"></div>' +
+        '<div class="sales-field"><label>到场日期</label><input readonly value="' + esc(textOrDash(order.receiveDate || order.arrivalDate)) + '"></div>';
+    } else {
+      common +=
+        '<div class="sales-field"><label>销售合同编号</label><input readonly value="' + esc(order.contractNo) + '"></div>' +
+        '<div class="sales-field"><label>物流单号</label><input readonly value="' + esc(order.waybillNo) + '"></div>' +
+        '<div class="sales-field"><label>发货日期</label><input readonly value="' + esc(order.shipDate) + '"></div>' +
+        '<div class="sales-field"><label>收货日期</label><input readonly value="' + esc(order.receiveDate) + '"></div>';
+    }
+    return common +
       (includeRemark ? '<div class="sales-field sales-field--full"><label>备注</label><textarea readonly>' + esc(textOrDash(order.remark)) + '</textarea></div>' : "") +
       '</div>';
   }
@@ -1245,13 +1304,18 @@
     setModalHeadAction("流程进度", openSalesFlowModal);
     var ok = document.getElementById("salesApproveConfirm");
     if (ok) ok.addEventListener("click", function () {
-      order.status = "待签订合同";
-      order.handler = "经营发展中心合同岗";
+      if (isSupplierDirectOrder(order)) {
+        order.status = "待供应商发货";
+        order.handler = order.supplierName || "供应商发货岗";
+      } else {
+        order.status = "待签订合同";
+        order.handler = "经营发展中心合同岗";
+      }
       saveStoredOrder(order);
       refreshOrderMap();
       if (renderOrdersTable) renderOrdersTable();
       closeModal();
-      toast("订单已审核通过，进入合同签订环节");
+      toast(isSupplierDirectOrder(order) ? "订单已确认，等待供应商发货" : "订单已审核通过，进入合同签订环节");
     });
   }
 
@@ -1334,6 +1398,91 @@
     });
   }
 
+  function openSupplierShipOrder(order) {
+    order = patchOrderMaterials(order);
+    openModal(
+      "供应商发货 - " + order.orderNo,
+      '<table class="sales-detail-table"><tbody>' +
+      '<tr><th>供应商名称</th><td>' + esc(textOrDash(order.supplierName)) + '</td><th>收货单位</th><td>' + esc(order.receiverCompany) + '</td></tr>' +
+      '<tr><th>场站名称</th><td>' + esc(order.station) + '</td><th>发货/销售路径</th><td>' + esc(order.route) + '</td></tr>' +
+      '</tbody></table><div class="sales-section-title">供应商直发信息</div>' +
+      '<div class="sales-form-grid">' +
+      '<div class="sales-field"><label>订单编号</label><input readonly value="' + esc(order.orderNo) + '"></div>' +
+      '<div class="sales-field"><label>供应商订单依据</label><input id="salesSupplierOrderNo" value="' + esc(order.supplierOrderNo || "") + '" placeholder="请输入供应商订单依据"></div>' +
+      '<div class="sales-field"><label>本次发货数量</label><input id="salesSupplierShipQty" type="number" min="1" value="' + esc(order.totalQty) + '"></div>' +
+      '<div class="sales-field"><label>供应商物流单号</label><input id="salesSupplierWaybill" value="' + esc(order.waybillNo && order.waybillNo !== "—" ? order.waybillNo : "") + '" placeholder="请输入供应商物流单号"></div>' +
+      '<div class="sales-field"><label>供应商发货日期</label><input id="salesSupplierShipDate" type="date" value="' + esc(order.shipDate && order.shipDate !== "—" ? order.shipDate : todayIso()) + '"></div>' +
+      '<div class="sales-field"><label>预计到场日期</label><input id="salesExpectedArrivalDate" type="date" value="' + esc(order.expectedArrivalDate || "") + '"></div>' +
+      '<div class="sales-field"><label>供应商联系人</label><input id="salesSupplierContact" value="' + esc(order.supplierContact || "") + '" placeholder="请输入供应商联系人"></div>' +
+      '<div class="sales-field"><label>联系电话</label><input id="salesSupplierPhone" value="' + esc(order.supplierPhone || "") + '" placeholder="请输入联系电话"></div>' +
+      '<div class="sales-field sales-field--full"><label>直发备注</label><textarea id="salesSupplierRemark" placeholder="请输入直发备注">' + esc(order.directRemark || "") + '</textarea></div>' +
+      '</div>',
+      '<button class="sales-btn" data-close>取消</button><button class="sales-btn sales-btn-primary" id="salesSupplierShipConfirm">确认发货</button>',
+      "wide"
+    );
+    setModalHeadAction("流程进度", openSalesFlowModal);
+    var ok = document.getElementById("salesSupplierShipConfirm");
+    if (ok) ok.addEventListener("click", function () {
+      var waybillNo = formValue("#salesSupplierWaybill", "");
+      if (!waybillNo) {
+        toast("请填写供应商物流单号");
+        return;
+      }
+      order.supplierOrderNo = formValue("#salesSupplierOrderNo", order.supplierOrderNo || "");
+      order.shipQty = formValue("#salesSupplierShipQty", order.totalQty);
+      order.waybillNo = waybillNo;
+      order.shipDate = formValue("#salesSupplierShipDate", todayIso());
+      order.expectedArrivalDate = formValue("#salesExpectedArrivalDate", "");
+      order.supplierContact = formValue("#salesSupplierContact", "");
+      order.supplierPhone = formValue("#salesSupplierPhone", "");
+      order.directRemark = formValue("#salesSupplierRemark", "");
+      order.status = "供应商已发货";
+      order.handler = "山西龙源收货岗";
+      saveStoredOrder(order);
+      refreshOrderMap();
+      if (renderOrdersTable) renderOrdersTable();
+      closeModal();
+      toast("供应商直发信息已登记");
+    });
+  }
+
+  function openSupplierArrival(order) {
+    order = patchOrderMaterials(order);
+    openModal(
+      "到场登记 - " + order.orderNo,
+      '<table class="sales-detail-table"><tbody>' +
+      '<tr><th>供应商名称</th><td>' + esc(textOrDash(order.supplierName)) + '</td><th>物流单号</th><td>' + esc(textOrDash(order.waybillNo)) + '</td></tr>' +
+      '<tr><th>收货单位</th><td>' + esc(order.receiverCompany) + '</td><th>场站名称</th><td>' + esc(order.station) + '</td></tr>' +
+      '</tbody></table><div class="sales-section-title">场站到场信息</div>' +
+      '<div class="sales-form-grid">' +
+      '<div class="sales-field"><label>订单编号</label><input readonly value="' + esc(order.orderNo) + '"></div>' +
+      '<div class="sales-field"><label>本次到场数量</label><input id="salesArrivalQty" type="number" min="1" value="' + esc(order.totalQty) + '"></div>' +
+      '<div class="sales-field"><label>到场日期</label><input id="salesArrivalDate" type="date" value="' + esc(order.receiveDate && order.receiveDate !== "—" ? order.receiveDate : todayIso()) + '"></div>' +
+      '<div class="sales-field"><label>是否生成C码</label><select id="salesCreateCCode"><option>是</option><option>否</option></select></div>' +
+      '<div class="sales-field sales-field--full"><label>到场备注</label><textarea id="salesArrivalRemark" placeholder="请输入到场备注">' + esc(order.arrivalRemark || "") + '</textarea></div>' +
+      '</div>',
+      '<button class="sales-btn" data-close>取消</button><button class="sales-btn sales-btn-primary" id="salesArrivalConfirm">确认到场</button>',
+      "wide"
+    );
+    setModalHeadAction("流程进度", openSalesFlowModal);
+    var ok = document.getElementById("salesArrivalConfirm");
+    if (ok) ok.addEventListener("click", function () {
+      order.arrivalQty = formValue("#salesArrivalQty", order.totalQty);
+      order.receiveDate = formValue("#salesArrivalDate", todayIso());
+      order.arrivalDate = order.receiveDate;
+      order.createCCode = formValue("#salesCreateCCode", "是");
+      order.arrivalRemark = formValue("#salesArrivalRemark", "");
+      order.status = "已到场";
+      order.handler = "山西龙源收货岗";
+      saveStoredOrder(order);
+      refreshOrderMap();
+      if (order.createCCode === "是") syncPurchasedFromOrder(order);
+      if (renderOrdersTable) renderOrdersTable();
+      closeModal();
+      toast(order.createCCode === "是" ? "已到场，购入物资和C码跟踪已同步" : "已登记到场，未生成C码");
+    });
+  }
+
   function orderFormHtml(materials) {
     var rows = materials && materials.length ? materials : [];
     var materialTable = rows.length ? materialLineTableHtml(orderMaterialRows({ materials: rows.map(function (row, idx) {
@@ -1362,7 +1511,7 @@
       '<div class="sales-field"><label>场站名称</label><input id="salesOrderStation" value="忻州风电场"></div>' +
       '<div class="sales-field"><label>物资所属部门</label><input id="salesOrderDept" value="电控所"></div>' +
       '<div class="sales-field"><label>下单日期</label><input id="salesOrderDate" type="date" value="2026-06-17"></div>' +
-      '<div class="sales-field"><label>发货路径</label><select id="salesOrderRoute"><option>工程技术公司发货</option><option>供应商直发</option></select></div>' +
+      '<div class="sales-field"><label>发货路径</label><select id="salesOrderRoute"><option>工程技术公司发货</option><option>供应商直发场站</option></select></div>' +
       '<div class="sales-field"><label>当前处理人</label><input value="电控所负责人"></div>' +
       '<div class="sales-field"><label>销售合同编号</label><input readonly value="—"></div>' +
       '<div class="sales-field"><label>物流单号</label><input readonly value="—"></div>' +
@@ -1534,6 +1683,33 @@
       remark: "工业级交换机按订单一次性发运至酒泉场站。",
       materials: [
         { id: "ord3-m1", productName: "工业级交换机", productCode: "B00000006", model: "V2.0", manufacturer: "联合动力", typeCode: "A0200100001", typeName: "工业控制与通讯设备", category: "工业通讯", qty: 6, price: 2.03, subtotal: 12.18 }
+      ]
+    },
+    {
+      orderNo: "XSORD-2026-020",
+      requester: "赵磊",
+      company: "山西龙源",
+      receiverCompany: "山西龙源新能源有限公司",
+      station: "忻州风电场",
+      owningDept: "电控所",
+      orderDate: "2026-06-16",
+      route: "供应商直发场站",
+      supplierName: "大华",
+      supplierOrderNo: "DH-ZF-20260616-01",
+      supplierContact: "刘工",
+      supplierPhone: "13800000000",
+      expectedArrivalDate: "2026-06-20",
+      totalQty: 2,
+      totalAmount: 180000.00,
+      status: "待供应商发货",
+      handler: "大华供应商发货岗",
+      contractNo: "—",
+      waybillNo: "—",
+      shipDate: "—",
+      receiveDate: "—",
+      remark: "供应商大华直发叶片至山西龙源忻州风电场。",
+      materials: [
+        { id: "ord20-m1", productName: "叶片", productCode: "B00000005", model: "SW64-2.0", manufacturer: "大华", typeCode: "A010020001", typeName: "叶片", category: "风机叶片", qty: 2, price: 90000.00, subtotal: 180000.00 }
       ]
     }
   ];
@@ -1725,8 +1901,10 @@
       tbody.innerHTML = orders.map(function (order) {
         var ops = iconBtn("view", "查看", "view-order", order.orderNo);
         if (order.status === "待确认") ops += iconBtn("check", "确认/审核", "approve-order", order.orderNo);
-        if (order.status === "待签订合同") ops += iconBtn("upload", "签订合同", "upload-contract", order.orderNo);
-        if (order.status === "待发货") ops += iconBtn("truck", "发货", "ship-order", order.orderNo);
+        if (!isSupplierDirectOrder(order) && order.status === "待签订合同") ops += iconBtn("upload", "签订合同", "upload-contract", order.orderNo);
+        if (!isSupplierDirectOrder(order) && order.status === "待发货") ops += iconBtn("truck", "发货", "ship-order", order.orderNo);
+        if (isSupplierDirectOrder(order) && order.status === "待供应商发货") ops += iconBtn("truck", "供应商发货", "supplier-ship-order", order.orderNo);
+        if (isSupplierDirectOrder(order) && order.status === "供应商已发货") ops += iconBtn("receive", "到场登记", "supplier-arrival", order.orderNo);
         return "<tr>" +
           "<td>" + esc(order.orderNo) + "</td>" +
           "<td>" + esc(order.requester) + "</td>" +
@@ -1770,6 +1948,8 @@
       if (action === "approve-order") openOrderApproval(order);
       if (action === "upload-contract") openUploadContract(order);
       if (action === "ship-order") openShipOrder(order);
+      if (action === "supplier-ship-order") openSupplierShipOrder(order);
+      if (action === "supplier-arrival") openSupplierArrival(order);
       if (action === "track-order") openOrderFirstTrack(order.orderNo);
     });
 
