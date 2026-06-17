@@ -1079,8 +1079,6 @@
 
   function orderFormHtml(materials) {
     var rows = materials && materials.length ? materials : [];
-    var totalQty = rows.reduce(function (sum, row) { return sum + Number(row.qty || 0); }, 0);
-    var totalAmount = rows.reduce(function (sum, row) { return sum + Number(row.subtotal || 0); }, 0);
     var materialTable = rows.length ? materialLineTableHtml(orderMaterialRows({ materials: rows.map(function (row, idx) {
         return {
           id: row.id || ("tmp-" + idx),
@@ -1099,12 +1097,20 @@
     return '<div class="sales-section-title">订单物资明细表</div>' +
       materialTable +
       '<div class="sales-form-grid sales-form-grid--spaced">' +
+      '<div class="sales-field"><label>订单编号</label><input readonly value="系统自动生成"></div>' +
+      '<div class="sales-field"><label>订单状态</label><input readonly value="待确认"></div>' +
+      '<div class="sales-field"><label>下单人</label><input value="张明"></div>' +
       '<div class="sales-field"><label>下单公司</label><select><option>河北龙源</option><option>天津龙源</option><option>甘肃龙源</option></select></div>' +
       '<div class="sales-field"><label>收货单位</label><input value="山西龙源新能源有限公司"></div>' +
       '<div class="sales-field"><label>场站名称</label><input value="忻州风电场"></div>' +
       '<div class="sales-field"><label>物资所属部门</label><input value="电控所"></div>' +
+      '<div class="sales-field"><label>下单日期</label><input type="date" value="2026-06-17"></div>' +
       '<div class="sales-field"><label>发货路径</label><select><option>工程技术公司发货</option><option>供应商直发</option></select></div>' +
+      '<div class="sales-field"><label>当前处理人</label><input value="电控所负责人"></div>' +
+      '<div class="sales-field"><label>销售合同编号</label><input readonly value="—"></div>' +
+      '<div class="sales-field"><label>物流单号</label><input readonly value="—"></div>' +
       '<div class="sales-field"><label>期望发货日期</label><input type="date" value="2026-06-30"></div>' +
+      '<div class="sales-field"><label>收货日期</label><input readonly value="—"></div>' +
       '<div class="sales-field sales-field--full"><label>订单备注</label><textarea placeholder="请输入订单备注"></textarea></div>' +
       '</div>';
   }
