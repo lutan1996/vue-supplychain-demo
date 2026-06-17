@@ -1840,6 +1840,7 @@
   function purchasedDetailHtml(summary) {
     summary = patchPurchasedSummary(Object.assign({}, summary));
     return '<div class="sales-section-title">购入物资明细表</div>' + purchasedDetailsTableHtml(summary, true) +
+      '<div id="salesPurchasedTrackPanel"></div>' +
       '<div class="sales-form-grid sales-form-grid--spaced">' +
       '<div class="sales-field"><label>物资类型编码</label><input readonly value="' + esc(summary.typeCode) + '"></div>' +
       '<div class="sales-field"><label>物资类型名称</label><input readonly value="' + esc(summary.typeName) + '"></div>' +
@@ -1851,20 +1852,11 @@
       '</div>';
   }
 
-  function purchasedTrackHtml(summary, row) {
+  function purchasedInlineTrackHtml(summary, row) {
     summary = patchPurchasedSummary(Object.assign({}, summary));
     row = patchPurchasedSummary({ details: [Object.assign({}, row)], typeName: summary.typeName, typeCode: summary.typeCode, mainStation: summary.mainStation, latestReceiveDate: summary.latestReceiveDate }).details[0];
-    return '<div class="sales-detail-head">' +
-      '<div class="sales-detail-card"><div class="sales-detail-label">产品名称</div><div class="sales-detail-value">' + esc(row.productName) + '</div></div>' +
-      '<div class="sales-detail-card"><div class="sales-detail-label">订单编号</div><div class="sales-detail-value">' + esc(row.orderNo) + '</div></div>' +
-      '<div class="sales-detail-card"><div class="sales-detail-label">销售合同编号</div><div class="sales-detail-value">' + esc(row.contractNo) + '</div></div>' +
-      '<div class="sales-detail-card"><div class="sales-detail-label">使用状态</div><div class="sales-detail-value">' + esc(row.usageStatus) + '</div></div>' +
-      '</div><table class="sales-detail-table"><tbody>' +
-      '<tr><th>下单公司</th><td>' + esc(row.company) + '</td><th>场站名称</th><td>' + esc(row.station) + '</td></tr>' +
-      '<tr><th>购入数量</th><td>' + esc(row.qty) + '</td><th>存放地点</th><td>' + esc(row.location) + '</td></tr>' +
-      '<tr><th>物资类型名称</th><td>' + esc(summary.typeName) + '</td><th>收货日期</th><td>' + esc(row.receiveDate) + '</td></tr>' +
-      '</tbody></table><div class="sales-section-title">购入物资明细表</div>' + purchasedDetailsTableHtml(summary, true) +
-      '<div class="sales-section-title">物资跟踪</div><div class="sales-track">' + purchasedTrackTimelineHtml(summary, row) + '</div>';
+    return '<div class="sales-section-title">物资跟踪 - ' + esc(row.productName) + '</div>' +
+      '<div class="sales-track">' + purchasedTrackTimelineHtml(summary, row) + '</div>';
   }
 
   function openPurchasedDetail(summary) {
@@ -2072,8 +2064,13 @@
       if (!summary) return;
       var row = expandPurchasedDetails(summary).find(function (item) { return item.id === btn.getAttribute("data-item"); });
       if (!row) return;
-      openModal("物资跟踪 - " + row.productName, purchasedTrackHtml(summary, row), '<button class="sales-btn" data-close>关闭</button>', "wide");
-      setModalHeadAction("流程进度", openSalesFlowModal);
+      var panel = document.getElementById("salesPurchasedTrackPanel");
+      if (!panel) {
+        openModal("查看购入物资 - " + summary.typeName, purchasedDetailHtml(summary), '<button class="sales-btn" data-close>关闭</button>', "wide");
+        setModalHeadAction("流程进度", openSalesFlowModal);
+        panel = document.getElementById("salesPurchasedTrackPanel");
+      }
+      if (panel) panel.innerHTML = purchasedInlineTrackHtml(summary, row);
     }
   });
 
