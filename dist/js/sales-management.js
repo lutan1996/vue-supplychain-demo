@@ -1873,45 +1873,22 @@
     setModalHeadAction("流程进度", openSalesFlowModal);
   }
 
-  function purchasedTotalAmount() {
-    return purchasedSummaries.reduce(function (sum, summary) {
-      return sum + toNumber(summary.totalAmount);
-    }, 0);
-  }
-
-  function purchasedTotalQty() {
-    return purchasedSummaries.reduce(function (sum, summary) {
-      return sum + toNumber(summary.totalQty);
-    }, 0);
-  }
-
-  function percentText(value, total) {
-    if (!total) return "0%";
-    return Math.round(toNumber(value) / total * 100) + "%";
-  }
-
   function initPurchased() {
     var tbody = document.getElementById("salesPurchasedBody");
     var filtered = purchasedSummaries.slice();
-    var allAmount = purchasedTotalAmount();
-    var allQty = purchasedTotalQty();
 
     function render() {
       if (!filtered.length) {
-        tbody.innerHTML = '<tr><td colspan="9" class="sales-empty">暂无匹配购入物资数据</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="6" class="sales-empty">暂无匹配购入物资数据</td></tr>';
         return;
       }
       tbody.innerHTML = filtered.map(function (summary, idx) {
-        var avgPrice = toNumber(summary.totalQty) ? toNumber(summary.totalAmount) / toNumber(summary.totalQty) : 0;
         return "<tr>" +
           "<td>" + (idx + 1) + "</td>" +
           "<td>" + esc(summary.typeCode) + "</td>" +
           "<td>" + esc(summary.typeName) + "</td>" +
           "<td>" + money(summary.totalAmount) + "</td>" +
-          "<td>" + money(avgPrice) + "</td>" +
           "<td>" + esc(summary.totalQty) + "</td>" +
-          "<td>" + esc(percentText(summary.totalAmount, allAmount)) + "</td>" +
-          "<td>" + esc(percentText(summary.totalQty, allQty)) + "</td>" +
           '<td><span class="sales-op-row">' + iconBtn("view", "查看", "view-purchased", summary.typeCode) + "</span></td>" +
           "</tr>";
       }).join("");
