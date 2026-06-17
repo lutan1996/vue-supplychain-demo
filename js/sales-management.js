@@ -824,12 +824,20 @@
   function cartHtml() {
     return cartTableHtml() +
       '<div class="sales-form-grid" style="margin-top:12px">' +
+      '<div class="sales-field"><label>订单编号</label><input readonly value="系统自动生成"></div>' +
+      '<div class="sales-field"><label>订单状态</label><input readonly value="待确认"></div>' +
+      '<div class="sales-field"><label>下单人</label><input value="张明"></div>' +
       '<div class="sales-field"><label>下单公司</label><select><option>河北龙源</option><option>天津龙源</option><option>甘肃龙源</option></select></div>' +
       '<div class="sales-field"><label>收货单位</label><input readonly value="山西龙源新能源有限公司"></div>' +
       '<div class="sales-field"><label>场站名称</label><input readonly value="忻州风电场"></div>' +
       '<div class="sales-field"><label>物资所属部门</label><input readonly value="电控所"></div>' +
+      '<div class="sales-field"><label>下单日期</label><input type="date" value="2026-06-17"></div>' +
       '<div class="sales-field"><label>发货路径</label><select id="salesCartPath"><option>工程技术公司发货</option><option>供应商直发</option></select></div>' +
+      '<div class="sales-field"><label>当前处理人</label><input value="电控所负责人"></div>' +
+      '<div class="sales-field"><label>销售合同编号</label><input readonly value="—"></div>' +
+      '<div class="sales-field"><label>物流单号</label><input readonly value="—"></div>' +
       '<div class="sales-field"><label>期望发货日期</label><input type="date" value="2026-06-30"></div>' +
+      '<div class="sales-field"><label>收货日期</label><input readonly value="—"></div>' +
       '<div class="sales-field sales-field--full"><label>订单备注</label><textarea placeholder="请输入订单备注"></textarea></div>' +
       "</div>";
   }
@@ -1100,7 +1108,6 @@
       }) }), { editable: true, qtyAttr: "data-order-qty", stepAttr: "data-order-qty-step" }) : '<div class="sales-empty">暂无物资，请从物资列表中选择产品后下单。</div>';
     return '<div class="sales-section-title">订单物资明细表</div>' +
       materialTable +
-      '<div class="sales-form-grid sales-form-grid--spaced"><div class="sales-field"><label>购买总数量</label><input readonly value="系统自动生成"></div></div>' +
       '<div class="sales-form-grid sales-form-grid--spaced">' +
       '<div class="sales-field"><label>订单编号</label><input readonly value="系统自动生成"></div>' +
       '<div class="sales-field"><label>订单状态</label><input readonly value="待确认"></div>' +
