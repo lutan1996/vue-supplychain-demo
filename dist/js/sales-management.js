@@ -1548,15 +1548,16 @@
 
   function purchasedDetailHtml(summary) {
     summary = patchPurchasedSummary(Object.assign({}, summary));
-    return '<div class="sales-detail-head">' +
-      '<div class="sales-detail-card"><div class="sales-detail-label">物资类型编码</div><div class="sales-detail-value">' + esc(summary.typeCode) + '</div></div>' +
-      '<div class="sales-detail-card"><div class="sales-detail-label">物资类型名称</div><div class="sales-detail-value">' + esc(summary.typeName) + '</div></div>' +
-      '<div class="sales-detail-card"><div class="sales-detail-label">购入总数量</div><div class="sales-detail-value">' + esc(summary.totalQty) + '</div></div>' +
-      '<div class="sales-detail-card"><div class="sales-detail-label">关联订单数</div><div class="sales-detail-value">' + esc(summary.orderCount) + '</div></div>' +
-      '</div><table class="sales-detail-table"><tbody>' +
-      '<tr><th>物资总价</th><td>' + moneyYuan(summary.totalAmount) + '</td><th>最新收货日期</th><td>' + esc(summary.latestReceiveDate) + '</td></tr>' +
-      '<tr><th>主要场站</th><td colspan="3">' + esc(summary.mainStation) + '</td></tr>' +
-      '</tbody></table><div class="sales-section-title">购入物资明细表</div>' + purchasedDetailsTableHtml(summary, true);
+    return '<div class="sales-section-title">购入物资明细表</div>' + purchasedDetailsTableHtml(summary, true) +
+      '<div class="sales-form-grid sales-form-grid--spaced">' +
+      '<div class="sales-field"><label>物资类型编码</label><input readonly value="' + esc(summary.typeCode) + '"></div>' +
+      '<div class="sales-field"><label>物资类型名称</label><input readonly value="' + esc(summary.typeName) + '"></div>' +
+      '<div class="sales-field"><label>购入总数量</label><input readonly value="' + esc(summary.totalQty) + '"></div>' +
+      '<div class="sales-field"><label>关联订单数</label><input readonly value="' + esc(summary.orderCount) + '"></div>' +
+      '<div class="sales-field"><label>物资总价</label><input readonly value="' + moneyYuan(summary.totalAmount) + '"></div>' +
+      '<div class="sales-field"><label>最新收货日期</label><input readonly value="' + esc(summary.latestReceiveDate) + '"></div>' +
+      '<div class="sales-field"><label>主要场站</label><input readonly value="' + esc(summary.mainStation) + '"></div>' +
+      '</div>';
   }
 
   function purchasedTrackHtml(summary, row) {
