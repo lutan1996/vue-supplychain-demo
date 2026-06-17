@@ -1087,6 +1087,7 @@
       addOrder(order);
       cartItems = [];
       saveCart();
+      refreshCartModal();
       closeModal();
       toast("订单已提交，已同步到订单管理");
     });
