@@ -1145,6 +1145,20 @@
         price: toNumber(product.refPrice),
         subtotal: toNumber(product.refPrice)
       });
+    } else if (page === "orders") {
+      materials.push({
+        id: "new-order-m1",
+        productName: "工业级交换机",
+        productCode: "B00000006",
+        model: "V2.0",
+        manufacturer: "联合动力",
+        typeCode: "A0200100001",
+        typeName: "工业控制与通讯设备",
+        category: "工业通讯",
+        qty: 1,
+        price: 2030.00,
+        subtotal: 2030.00
+      });
     }
     orderDraftMaterials = materials;
     openModal("新增订单", orderFormHtml(orderDraftMaterials), '<button class="sales-btn" data-close>取消</button><button class="sales-btn sales-btn-primary" id="salesSubmitOrder">提交订单</button>', "wide");
