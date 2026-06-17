@@ -163,8 +163,8 @@
 
   function orderTrackTimelineHtml(order, item) {
     var status = String(order.status || "").trim();
-    var approvedDone = ["待上传合同", "已确认", "待发货", "已发货", "已收货", "已完成"].indexOf(status) >= 0;
-    var contractDone = ["已确认", "待发货", "已发货", "已收货", "已完成"].indexOf(status) >= 0;
+    var approvedDone = ["待发货", "已发货", "已收货", "已完成"].indexOf(status) >= 0;
+    var contractDone = ["已发货", "已收货", "已完成"].indexOf(status) >= 0;
     var shipDone = ["已发货", "已收货", "已完成"].indexOf(status) >= 0;
     var receiveDone = ["已收货", "已完成"].indexOf(status) >= 0;
     var currentColor = /已完成|已收货|已发货/.test(status) ? "#14b8a6" : /待|未/.test(status) ? "#94a3b8" : "#2563eb";
@@ -1046,7 +1046,7 @@
   }
 
   function openShipOrder(order) {
-    var needsContract = order.status === "待上传合同" || !order.contractNo || order.contractNo === "—";
+    var needsContract = !order.contractNo || order.contractNo === "—";
     var contractTip = needsContract ? '<div class="sales-inline-tip">请先补充销售合同信息，再继续填写发货信息。</div>' : "";
     openModal(
       "安排发货 - " + order.orderNo,
@@ -1211,9 +1211,9 @@
       route: "工程技术公司发货",
       totalQty: 3,
       totalAmount: 92.00,
-      status: "待上传合同",
-      handler: "经营发展中心",
-      contractNo: "XSHT-2026-002",
+      status: "待发货",
+      handler: "机械所发货专责",
+      contractNo: "—",
       waybillNo: "—",
       shipDate: "—",
       receiveDate: "—",
@@ -1432,7 +1432,7 @@
       tbody.innerHTML = orders.map(function (order) {
         var ops = iconBtn("view", "查看", "view-order", order.orderNo);
         if (order.status === "待确认") ops += iconBtn("check", "确认/审核", "approve-order", order.orderNo);
-        if (order.status === "待上传合同" || order.status === "已确认" || order.status === "待发货") ops += iconBtn("truck", "发货", "ship-order", order.orderNo);
+        if (order.status === "待发货") ops += iconBtn("truck", "发货", "ship-order", order.orderNo);
         if (order.status === "已发货") ops += iconBtn("receive", "确认收货", "receive-order", order.orderNo);
         return "<tr>" +
           "<td>" + esc(order.orderNo) + "</td>" +
@@ -1637,7 +1637,7 @@
       term: "2026-05-28 ~ 2026-12-31",
       status: "部分执行",
       lines: [
-        { orderNo: "XSORD-2026-002", company: "天津龙源", station: "沙井子风电场", amount: 92.00, status: "待上传合同", date: "2026-06-12" }
+        { orderNo: "XSORD-2026-002", company: "天津龙源", station: "沙井子风电场", amount: 92.00, status: "待发货", date: "2026-06-12" }
       ]
     },
     {
