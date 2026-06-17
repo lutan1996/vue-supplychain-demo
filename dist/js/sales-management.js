@@ -1015,6 +1015,15 @@
     setModalHeadAction("流程进度", openSalesFlowModal);
   }
 
+  function openOrderFirstTrack(orderNo) {
+    var order = orderMap[orderNo];
+    if (!order) return;
+    order = patchOrderMaterials(Object.assign({}, order));
+    var item = order.materials && order.materials[0];
+    if (!item) return;
+    openOrderTrack(orderNo, item.id);
+  }
+
   function openOrderApproval(order) {
     order = patchOrderMaterials(Object.assign({}, order));
     openModal(
@@ -1067,15 +1076,6 @@
       '<div class="sales-field sales-field--full"><label>发货备注</label><textarea placeholder="请输入发货备注"></textarea></div>' +
       '</div>',
       '<button class="sales-btn" data-close>取消</button><button class="sales-btn sales-btn-primary" data-close>确认发货</button>'
-    );
-    setModalHeadAction("流程进度", openSalesFlowModal);
-  }
-
-  function openReceiveOrder(order) {
-    openModal(
-      "确认收货 - " + order.orderNo,
-      '<div class="sales-form-grid"><div class="sales-field"><label>订单编号</label><input readonly value="' + esc(order.orderNo) + '"></div><div class="sales-field"><label>收货日期</label><input type="date" value="2026-06-19"></div><div class="sales-field"><label>收货人</label><input value="' + esc(order.requester) + '"></div><div class="sales-field"><label>验收方式</label><input readonly value="线下验收"></div><div class="sales-field sales-field--full"><label>收货说明</label><textarea>项目公司已完成验收，确认收货并同步进入购入物资统计。</textarea></div></div>',
-      '<button class="sales-btn" data-close>取消</button><button class="sales-btn sales-btn-primary" data-close>确认收货</button>'
     );
     setModalHeadAction("流程进度", openSalesFlowModal);
   }
@@ -1433,7 +1433,7 @@
         var ops = iconBtn("view", "查看", "view-order", order.orderNo);
         if (order.status === "待确认") ops += iconBtn("check", "确认/审核", "approve-order", order.orderNo);
         if (order.status === "待发货") ops += iconBtn("truck", "发货", "ship-order", order.orderNo);
-        if (order.status === "已发货") ops += iconBtn("receive", "确认收货", "receive-order", order.orderNo);
+        if (order.status === "已发货") ops += iconBtn("track", "物资跟踪", "track-order", order.orderNo);
         return "<tr>" +
           "<td>" + esc(order.orderNo) + "</td>" +
           "<td>" + esc(order.requester) + "</td>" +
@@ -1475,7 +1475,7 @@
       if (action === "approve-order") openOrderApproval(order);
       if (action === "upload-contract") openUploadContract(order);
       if (action === "ship-order") openShipOrder(order);
-      if (action === "receive-order") openReceiveOrder(order);
+      if (action === "track-order") openOrderFirstTrack(order.orderNo);
     });
 
     render();
@@ -1764,7 +1764,7 @@
     if (action === "purchased-track") {
       var summary = purchasedMap[btn.getAttribute("data-type")];
       if (!summary) return;
-      var row = summary.details.find(function (item) { return item.id === btn.getAttribute("data-item"); });
+      var row = expandPurchasedDetails(summary).find(function (item) { return item.id === btn.getAttribute("data-item"); });
       if (!row) return;
       openModal("物资跟踪 - " + row.productName, purchasedTrackHtml(summary, row), '<button class="sales-btn" data-close>关闭</button>', "wide");
       setModalHeadAction("流程进度", openSalesFlowModal);
