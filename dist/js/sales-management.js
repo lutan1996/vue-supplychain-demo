@@ -1190,23 +1190,13 @@
   function orderDetailHtml(order) {
     order = patchOrderMaterials(Object.assign({}, order));
     return '<div class="sales-section-title">订单物资明细表</div>' + orderMaterialsTableHtml(order, true) +
+      '<div id="salesOrderTrackPanel"></div>' +
       orderBaseFieldsHtml(order, true);
   }
 
-  function orderTrackHtml(order, item) {
-    order = patchOrderMaterials(Object.assign({}, order));
-    item = normalizeOrderMaterial(item);
-    return '<div class="sales-detail-head">' +
-      '<div class="sales-detail-card"><div class="sales-detail-label">订单编号</div><div class="sales-detail-value">' + esc(order.orderNo) + '</div></div>' +
-      '<div class="sales-detail-card"><div class="sales-detail-label">产品名称</div><div class="sales-detail-value">' + esc(item.productName) + '</div></div>' +
-      '<div class="sales-detail-card"><div class="sales-detail-label">场站名称</div><div class="sales-detail-value">' + esc(order.station) + '</div></div>' +
-      '<div class="sales-detail-card"><div class="sales-detail-label">当前订单状态</div><div class="sales-detail-value">' + esc(order.status) + '</div></div>' +
-      '</div><table class="sales-detail-table"><tbody>' +
-      '<tr><th>下单公司</th><td>' + esc(order.company) + '</td><th>收货单位</th><td>' + esc(order.receiverCompany) + '</td></tr>' +
-      '<tr><th>物资所属部门</th><td>' + esc(order.owningDept) + '</td><th>购买数量</th><td>' + esc(item.qty) + '</td></tr>' +
-      '<tr><th>发货路径</th><td>' + esc(order.route) + '</td><th>销售合同编号</th><td>' + esc(order.contractNo) + '</td></tr>' +
-      '</tbody></table><div class="sales-section-title">订单物资明细表</div>' + orderMaterialsTableHtml(order, false) +
-      '<div class="sales-section-title">物资跟踪</div><div class="sales-track">' + orderTrackTimelineHtml(order, item) + '</div>';
+  function orderInlineTrackHtml(order, item) {
+    return '<div class="sales-section-title">物资跟踪 - ' + esc(item.productName) + '</div>' +
+      '<div class="sales-track">' + orderTrackTimelineHtml(order, item) + '</div>';
   }
 
   function openOrderDetail(order) {
@@ -1221,8 +1211,13 @@
     order = patchOrderMaterials(Object.assign({}, order));
     var item = order.materials.find(function (row) { return row.id === itemId; });
     if (!item) return;
-    openModal("物资跟踪 - " + item.productName, orderTrackHtml(order, item), '<button class="sales-btn" data-close>关闭</button>', "wide");
-    setModalHeadAction("流程进度", openSalesFlowModal);
+    var panel = document.getElementById("salesOrderTrackPanel");
+    if (!panel) {
+      openModal("查看订单 - " + order.orderNo, orderDetailHtml(order), '<button class="sales-btn" data-close>关闭</button>', "wide");
+      setModalHeadAction("流程进度", openSalesFlowModal);
+      panel = document.getElementById("salesOrderTrackPanel");
+    }
+    if (panel) panel.innerHTML = orderInlineTrackHtml(order, normalizeOrderMaterial(item));
   }
 
   function openOrderFirstTrack(orderNo) {
