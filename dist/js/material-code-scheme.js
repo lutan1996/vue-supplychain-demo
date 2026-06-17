@@ -1,7 +1,7 @@
 /**
  * 物资类型编码（A码）：A + 3位大类 + 3位中类 + 4位小类（共 11 位）
  * 产品编码（B码）：B + 8 位流水（00000001 起递增）
- * 物资唯一码（C码）：C + 11 位流水
+ * C码：C + 11 位流水
  * 仅被：合同信息管理、库存管理、物资领用 等页引用
  */
 (function (global) {
@@ -167,8 +167,8 @@
     var s = cleanRaw(code);
     if (isDeviceCCode(s)) return s;
     if (/^C\d{1,10}$/.test(s)) return "C" + s.slice(1).padStart(11, "0");
-    var m = s.match(/^(C\d{11})/);
-    if (m) return m[1];
+    var m = s.match(/^C(\d{11})/);
+    if (m) return "C" + m[1];
     return deviceUniqueCode(1);
   }
 

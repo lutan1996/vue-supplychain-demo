@@ -2368,7 +2368,7 @@
     "产品名称",
     "产品型号",
     "产品编码",
-    "物资唯一码",
+    "C码",
     "设备出厂唯一码",
     "财务固定资产编码",
     "物资类型名称",
@@ -2578,7 +2578,7 @@
         产品名称: name,
         产品型号: baseSpec,
         产品编码: code,
-        物资唯一码: materialDetailDeviceCode(i),
+        C码: materialDetailDeviceCode(i),
         设备出厂唯一码: factoryDeviceUniqueCode(i),
         财务固定资产编码: financialFixedAssetCode(i),
         物资类型名称: baseName,
@@ -2640,7 +2640,7 @@
           产品名称: displayName,
           产品型号: echoFieldVal(spec),
           产品编码: code,
-          物资唯一码: materialDetailDeviceCode(seq),
+          C码: materialDetailDeviceCode(seq),
           设备出厂唯一码: factoryDeviceUniqueCode(seq),
           财务固定资产编码: financialFixedAssetCode(seq),
           物资类型名称: echoFieldVal(typeName) || displayName,
@@ -2692,7 +2692,7 @@
       "<td>" + materialDetailReadonlyCell(row.产品名称) + "</td>" +
       "<td>" + materialDetailReadonlyCell(row.产品型号) + "</td>" +
       "<td>" + materialDetailReadonlyCell(row.产品编码) + "</td>" +
-      "<td>" + materialDetailReadonlyCell(row.物资唯一码) + "</td>" +
+      "<td>" + materialDetailReadonlyCell(row.C码) + "</td>" +
       "<td>" + factoryCell + "</td>" +
       "<td>" + faCell + "</td>" +
       "<td>" + materialDetailReadonlyCell(row.物资类型名称) + "</td>" +

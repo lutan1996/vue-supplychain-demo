@@ -163,8 +163,8 @@
 
   function orderTrackTimelineHtml(order, item) {
     var status = String(order.status || "").trim();
-    var approvedDone = ["待发货", "已发货", "已收货", "已完成"].indexOf(status) >= 0;
-    var contractDone = ["已发货", "已收货", "已完成"].indexOf(status) >= 0;
+    var approvedDone = ["待签订合同", "待发货", "已发货", "已收货", "已完成"].indexOf(status) >= 0;
+    var contractDone = ["待发货", "已发货", "已收货", "已完成"].indexOf(status) >= 0;
     var shipDone = ["已发货", "已收货", "已完成"].indexOf(status) >= 0;
     var receiveDone = ["已收货", "已完成"].indexOf(status) >= 0;
     var currentColor = /已完成|已收货|已发货/.test(status) ? "#14b8a6" : /待|未/.test(status) ? "#94a3b8" : "#2563eb";
@@ -428,10 +428,9 @@
       var unitAmount = row.unitAmount != null ? toNumber(row.unitAmount) : (qty ? toNumber(row.amount || row.totalAmount) / qty : 0);
       for (var i = 0; i < qty; i++) {
         var seq = expanded.length + 1;
-        var codeSeed = String(row.productCode || row.materialCode || summary.typeCode || "WL").replace(/[^\w-]/g, "");
         expanded.push(Object.assign({}, row, {
           id: row.id + "-unit-" + (i + 1),
-          unitCode: row.unitCode || ("XS-WZ-" + codeSeed + "-" + String(seq).padStart(4, "0")),
+          unitCode: row.unitCode || ("C" + String(seq).padStart(11, "0")),
           qty: 1,
           amount: unitAmount,
           usageStatus: row.usageStatus || "库存中"
@@ -600,12 +599,9 @@
     var feats = product.features || {};
     var rows = [
       ["产品名称", textOrDash(product.productName)],
-      ["物资类型名称", textOrDash(product.typeName)],
       ["制造商名称", textOrDash(product.mfrName)],
       ["产品型号", textOrDash(product.model)],
       ["产品编码", textOrDash(product.b)],
-      ["物资类型编码", textOrDash(product.a)],
-      ["物资分类", textOrDash(product.category)],
       ["库存数量", textOrDash(product.stockQty)],
       ["单价（元）", textOrDash(product.refPrice)],
       ["类型说明", textOrDash(product.typeDef)]
@@ -756,7 +752,7 @@
     var trackOrder = opts.trackOrder || "";
     if (!rows.length) return '<div class="sales-empty">暂无物资明细数据</div>';
     return '<div class="sales-table-wrap sales-modal-table-wrap"><table class="sales-cart-table"><thead><tr>' +
-      ["序号", "产品名称", "制造商名称", "产品型号", "产品编码", "物资类型编码", "物资类型", "物资分类", "购买数量", "单价（元）", "合计金额（元）", "特征值1", "特征值2", "特征值3", "特征值4", "操作"].map(function (head) {
+      ["序号", "产品名称", "制造商名称", "产品型号", "产品编码", "购买数量", "单价（元）", "合计金额（元）", "特征值1", "特征值2", "特征值3", "特征值4", "操作"].map(function (head) {
         return "<th>" + esc(head) + "</th>";
       }).join("") +
       "</tr></thead><tbody>" +
@@ -771,9 +767,6 @@
           "<td>" + esc(textOrDash(row.mfrName || row.manufacturer)) + "</td>" +
           "<td>" + esc(textOrDash(row.model)) + "</td>" +
           "<td>" + esc(textOrDash(row.code || row.productCode)) + "</td>" +
-          "<td>" + esc(textOrDash(row.typeCode)) + "</td>" +
-          "<td>" + esc(textOrDash(row.typeName)) + "</td>" +
-          "<td>" + esc(textOrDash(row.category)) + "</td>" +
           "<td>" + qtyCell + "</td>" +
           "<td>" + money(row.price) + "</td>" +
           "<td>" + money(row.subtotal) + "</td>" +
@@ -963,24 +956,32 @@
     return materialLineTableHtml(rows, { trackOrder: withTrack ? order.orderNo : "" });
   }
 
+  function orderBaseFieldsHtml(order, includeRemark) {
+    return '<div class="sales-form-grid sales-form-grid--spaced">' +
+      '<div class="sales-field"><label>订单编号</label><input readonly value="' + esc(order.orderNo) + '"></div>' +
+      '<div class="sales-field"><label>订单状态</label><input readonly value="' + esc(order.status) + '"></div>' +
+      '<div class="sales-field"><label>下单人</label><input readonly value="' + esc(order.requester) + '"></div>' +
+      '<div class="sales-field"><label>下单公司</label><input readonly value="' + esc(order.company) + '"></div>' +
+      '<div class="sales-field"><label>收货单位</label><input readonly value="' + esc(order.receiverCompany) + '"></div>' +
+      '<div class="sales-field"><label>场站名称</label><input readonly value="' + esc(order.station) + '"></div>' +
+      '<div class="sales-field"><label>物资所属部门</label><input readonly value="' + esc(order.owningDept) + '"></div>' +
+      '<div class="sales-field"><label>购买总数量</label><input readonly value="' + esc(order.totalQty) + '"></div>' +
+      '<div class="sales-field"><label>订单总金额</label><input readonly value="' + moneyYuan(order.totalAmount) + '"></div>' +
+      '<div class="sales-field"><label>下单日期</label><input readonly value="' + esc(order.orderDate) + '"></div>' +
+      '<div class="sales-field"><label>发货/销售路径</label><input readonly value="' + esc(order.route) + '"></div>' +
+      '<div class="sales-field"><label>当前处理人</label><input readonly value="' + esc(order.handler) + '"></div>' +
+      '<div class="sales-field"><label>销售合同编号</label><input readonly value="' + esc(order.contractNo) + '"></div>' +
+      '<div class="sales-field"><label>物流单号</label><input readonly value="' + esc(order.waybillNo) + '"></div>' +
+      '<div class="sales-field"><label>发货日期</label><input readonly value="' + esc(order.shipDate) + '"></div>' +
+      '<div class="sales-field"><label>收货日期</label><input readonly value="' + esc(order.receiveDate) + '"></div>' +
+      (includeRemark ? '<div class="sales-field sales-field--full"><label>备注</label><textarea readonly>' + esc(textOrDash(order.remark)) + '</textarea></div>' : "") +
+      '</div>';
+  }
+
   function orderDetailHtml(order) {
     order = patchOrderMaterials(Object.assign({}, order));
     return '<div class="sales-section-title">订单物资明细表</div>' + orderMaterialsTableHtml(order, true) +
-      summaryTableHtml(order.totalQty, order.totalAmount) +
-      '<div class="sales-detail-head sales-detail-head--spaced">' +
-      '<div class="sales-detail-card"><div class="sales-detail-label">订单编号</div><div class="sales-detail-value">' + esc(order.orderNo) + "</div></div>" +
-      '<div class="sales-detail-card"><div class="sales-detail-label">订单状态</div><div class="sales-detail-value">' + esc(order.status) + "</div></div>" +
-      '<div class="sales-detail-card"><div class="sales-detail-label">购买总数量</div><div class="sales-detail-value">' + esc(order.totalQty) + "</div></div>" +
-      '<div class="sales-detail-card"><div class="sales-detail-label">订单总金额</div><div class="sales-detail-value">' + moneyYuan(order.totalAmount) + '</div></div>' +
-      '</div><table class="sales-detail-table"><tbody>' +
-      '<tr><th>下单人</th><td>' + esc(order.requester) + '</td><th>下单公司</th><td>' + esc(order.company) + '</td></tr>' +
-      '<tr><th>收货单位</th><td>' + esc(order.receiverCompany) + '</td><th>场站名称</th><td>' + esc(order.station) + '</td></tr>' +
-      '<tr><th>物资所属部门</th><td>' + esc(order.owningDept) + '</td><th>下单日期</th><td>' + esc(order.orderDate) + '</td></tr>' +
-      '<tr><th>发货/销售路径</th><td>' + esc(order.route) + '</td><th>当前处理人</th><td>' + esc(order.handler) + '</td></tr>' +
-      '<tr><th>销售合同编号</th><td>' + esc(order.contractNo) + '</td><th>物流单号</th><td>' + esc(order.waybillNo) + '</td></tr>' +
-      '<tr><th>发货日期</th><td>' + esc(order.shipDate) + '</td><th>收货日期</th><td>' + esc(order.receiveDate) + '</td></tr>' +
-      '<tr><th>备注</th><td colspan="3">' + esc(textOrDash(order.remark)) + '</td></tr>' +
-      '</tbody></table>';
+      orderBaseFieldsHtml(order, true);
   }
 
   function orderTrackHtml(order, item) {
@@ -1028,15 +1029,11 @@
     order = patchOrderMaterials(Object.assign({}, order));
     openModal(
       "订单审核 - " + order.orderNo,
-      '<table class="sales-detail-table"><tbody>' +
-      '<tr><th>订单编号</th><td>' + esc(order.orderNo) + '</td><th>下单公司</th><td>' + esc(order.company) + '</td></tr>' +
-      '<tr><th>场站名称</th><td>' + esc(order.station) + '</td><th>订单总金额</th><td>' + moneyYuan(order.totalAmount) + '</td></tr>' +
-      '<tr><th>物资所属部门</th><td>' + esc(order.owningDept) + '</td><th>购买总数量</th><td>' + esc(order.totalQty) + '</td></tr>' +
-      '</tbody></table><div class="sales-section-title">订单物资明细表</div>' + orderMaterialsTableHtml(order, false) +
+      '<div class="sales-section-title">订单物资明细表</div>' + orderMaterialsTableHtml(order, false) +
+      orderBaseFieldsHtml(order, true) +
       '<div class="sales-section-title">审批信息</div><div class="sales-form-grid">' +
       '<div class="sales-field"><label>审批结论</label><select><option>同意</option><option>驳回</option></select></div>' +
-      '<div class="sales-field"><label>销售合同编号</label><input value="' + esc(order.contractNo === "—" ? "XSHT-2026-009" : order.contractNo) + '"></div>' +
-      '<div class="sales-field sales-field--full"><label>审批意见</label><textarea>订单信息完整，物资明细与购买数量一致，同意进入合同上传或发货环节。</textarea></div>' +
+      '<div class="sales-field sales-field--full"><label>审批意见</label><textarea>订单信息完整，物资明细与购买数量一致，同意进入合同签订环节。</textarea></div>' +
       '</div>',
       '<button class="sales-btn" data-close>取消</button><button class="sales-btn sales-btn-primary" data-close>确认提交</button>',
       "wide"
@@ -1046,9 +1043,9 @@
 
   function openUploadContract(order) {
     openModal(
-      "上传销售合同 - " + order.orderNo,
-      '<div class="sales-form-grid"><div class="sales-field"><label>订单编号</label><input readonly value="' + esc(order.orderNo) + '"></div><div class="sales-field"><label>销售合同编号</label><input value="' + esc(order.contractNo) + '"></div><div class="sales-field sales-field--full"><label>合同附件</label><input type="file"></div></div>',
-      '<button class="sales-btn" data-close>取消</button><button class="sales-btn sales-btn-primary" data-close>上传</button>',
+      "签订销售合同 - " + order.orderNo,
+      '<div class="sales-form-grid"><div class="sales-field"><label>订单编号</label><input readonly value="' + esc(order.orderNo) + '"></div><div class="sales-field"><label>销售合同编号</label><input placeholder="请输入销售合同编号"></div><div class="sales-field sales-field--full"><label>合同附件</label><input type="file"></div></div>',
+      '<button class="sales-btn" data-close>取消</button><button class="sales-btn sales-btn-primary" data-close>确认签订</button>',
       true
     );
     setModalHeadAction("流程进度", openSalesFlowModal);
@@ -1101,7 +1098,6 @@
       }) }), { editable: true, qtyAttr: "data-order-qty", stepAttr: "data-order-qty-step" }) : '<div class="sales-empty">暂无物资，请从物资列表中选择产品后下单。</div>';
     return '<div class="sales-section-title">订单物资明细表</div>' +
       materialTable +
-      summaryTableHtml(totalQty, totalAmount) +
       '<div class="sales-form-grid sales-form-grid--spaced">' +
       '<div class="sales-field"><label>下单公司</label><select><option>河北龙源</option><option>天津龙源</option><option>甘肃龙源</option></select></div>' +
       '<div class="sales-field"><label>收货单位</label><input value="山西龙源新能源有限公司"></div>' +
@@ -1211,7 +1207,7 @@
       route: "工程技术公司发货",
       totalQty: 3,
       totalAmount: 92.00,
-      status: "待发货",
+      status: "待签订合同",
       handler: "机械所发货专责",
       contractNo: "—",
       waybillNo: "—",
@@ -1432,8 +1428,8 @@
       tbody.innerHTML = orders.map(function (order) {
         var ops = iconBtn("view", "查看", "view-order", order.orderNo);
         if (order.status === "待确认") ops += iconBtn("check", "确认/审核", "approve-order", order.orderNo);
+        if (order.status === "待签订合同") ops += iconBtn("upload", "签订合同", "upload-contract", order.orderNo);
         if (order.status === "待发货") ops += iconBtn("truck", "发货", "ship-order", order.orderNo);
-        if (order.status === "已发货") ops += iconBtn("track", "物资跟踪", "track-order", order.orderNo);
         return "<tr>" +
           "<td>" + esc(order.orderNo) + "</td>" +
           "<td>" + esc(order.requester) + "</td>" +
@@ -1519,7 +1515,7 @@
 
   function purchasedDetailsTableHtml(summary, withTrack) {
     var details = expandPurchasedDetails(summary);
-    return '<div class="sales-table-wrap sales-modal-table-wrap"><table class="sales-table sales-modal-table" style="min-width:1720px"><thead><tr><th>序号</th><th>物资唯一编码</th><th>产品名称</th><th>物资编码</th><th>产品编码</th><th>规格型号</th><th>制造商名称</th><th>下单公司</th><th>场站名称</th><th>订单编号</th><th>销售合同编号</th><th>收货日期</th><th>存放地点</th><th>使用状态</th><th>操作</th></tr></thead><tbody>' +
+    return '<div class="sales-table-wrap sales-modal-table-wrap"><table class="sales-table sales-modal-table" style="min-width:1720px"><thead><tr><th>序号</th><th>C码</th><th>产品名称</th><th>物资编码</th><th>产品编码</th><th>规格型号</th><th>制造商名称</th><th>下单公司</th><th>场站名称</th><th>订单编号</th><th>销售合同编号</th><th>收货日期</th><th>存放地点</th><th>使用状态</th><th>操作</th></tr></thead><tbody>' +
       (details.length ? details.map(function (row, idx) {
         return "<tr>" +
           "<td>" + (idx + 1) + "</td>" +
