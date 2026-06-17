@@ -1873,39 +1873,45 @@
     setModalHeadAction("流程进度", openSalesFlowModal);
   }
 
-  function purchasedListMeta(summary) {
-    summary = patchPurchasedSummary(Object.assign({}, summary));
-    var details = summary.details || [];
-    var first = details[0] || {};
-    return {
-      productName: first.productName || "—",
-      manufacturer: first.manufacturer || "—",
-      company: uniqueBy(details, function (row) { return row.company; }).map(function (row) { return row.company; }).filter(Boolean).join("、") || "—",
-      usageStatus: uniqueBy(details, function (row) { return row.usageStatus; }).map(function (row) { return row.usageStatus; }).filter(Boolean).join("、") || "—"
-    };
+  function purchasedTotalAmount() {
+    return purchasedSummaries.reduce(function (sum, summary) {
+      return sum + toNumber(summary.totalAmount);
+    }, 0);
+  }
+
+  function purchasedTotalQty() {
+    return purchasedSummaries.reduce(function (sum, summary) {
+      return sum + toNumber(summary.totalQty);
+    }, 0);
+  }
+
+  function percentText(value, total) {
+    if (!total) return "0%";
+    return Math.round(toNumber(value) / total * 100) + "%";
   }
 
   function initPurchased() {
     var tbody = document.getElementById("salesPurchasedBody");
     var filtered = purchasedSummaries.slice();
+    var allAmount = purchasedTotalAmount();
+    var allQty = purchasedTotalQty();
 
     function render() {
       if (!filtered.length) {
-        tbody.innerHTML = '<tr><td colspan="10" class="sales-empty">暂无匹配购入物资数据</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="9" class="sales-empty">暂无匹配购入物资数据</td></tr>';
         return;
       }
       tbody.innerHTML = filtered.map(function (summary, idx) {
-        var meta = purchasedListMeta(summary);
+        var avgPrice = toNumber(summary.totalQty) ? toNumber(summary.totalAmount) / toNumber(summary.totalQty) : 0;
         return "<tr>" +
           "<td>" + (idx + 1) + "</td>" +
           "<td>" + esc(summary.typeCode) + "</td>" +
           "<td>" + esc(summary.typeName) + "</td>" +
-          "<td>" + esc(textOrDash(meta.productName)) + "</td>" +
-          "<td>" + esc(textOrDash(meta.manufacturer)) + "</td>" +
-          "<td>" + esc(textOrDash(meta.company)) + "</td>" +
-          "<td>" + tag(meta.usageStatus) + "</td>" +
           "<td>" + money(summary.totalAmount) + "</td>" +
+          "<td>" + money(avgPrice) + "</td>" +
           "<td>" + esc(summary.totalQty) + "</td>" +
+          "<td>" + esc(percentText(summary.totalAmount, allAmount)) + "</td>" +
+          "<td>" + esc(percentText(summary.totalQty, allQty)) + "</td>" +
           '<td><span class="sales-op-row">' + iconBtn("view", "查看", "view-purchased", summary.typeCode) + "</span></td>" +
           "</tr>";
       }).join("");
@@ -1915,18 +1921,19 @@
 
     document.getElementById("salesPurchasedQuery").addEventListener("click", function () {
       var typeKeyword = String(document.getElementById("salesPurchasedTypeKeyword").value || "").trim().toLowerCase();
-      var productKeyword = String(document.getElementById("salesPurchasedProductKeyword").value || "").trim().toLowerCase();
-      var mfrKeyword = String(document.getElementById("salesPurchasedMfrKeyword").value || "").trim().toLowerCase();
-      var company = document.getElementById("salesPurchasedCompanyFilter").value;
-      var status = document.getElementById("salesPurchasedStatusFilter").value;
+      var amountMin = toNumber(document.getElementById("salesPurchasedAmountMin").value);
+      var amountMaxText = document.getElementById("salesPurchasedAmountMax").value;
+      var amountMax = amountMaxText === "" ? null : toNumber(amountMaxText);
+      var qtyMin = toNumber(document.getElementById("salesPurchasedQtyMin").value);
+      var qtyMaxText = document.getElementById("salesPurchasedQtyMax").value;
+      var qtyMax = qtyMaxText === "" ? null : toNumber(qtyMaxText);
       filtered = purchasedSummaries.filter(function (summary) {
-        var meta = purchasedListMeta(summary);
         var typeText = (summary.typeCode + summary.typeName).toLowerCase();
         if (typeKeyword && typeText.indexOf(typeKeyword) < 0) return false;
-        if (productKeyword && String(meta.productName).toLowerCase().indexOf(productKeyword) < 0) return false;
-        if (mfrKeyword && String(meta.manufacturer).toLowerCase().indexOf(mfrKeyword) < 0) return false;
-        if (company !== "全部公司" && String(meta.company).indexOf(company) < 0) return false;
-        if (status !== "全部使用状态" && String(meta.usageStatus).indexOf(status) < 0) return false;
+        if (amountMin && toNumber(summary.totalAmount) < amountMin) return false;
+        if (amountMax != null && toNumber(summary.totalAmount) > amountMax) return false;
+        if (qtyMin && toNumber(summary.totalQty) < qtyMin) return false;
+        if (qtyMax != null && toNumber(summary.totalQty) > qtyMax) return false;
         return true;
       });
       render();
@@ -1934,10 +1941,10 @@
     });
     document.getElementById("salesPurchasedReset").addEventListener("click", function () {
       document.getElementById("salesPurchasedTypeKeyword").value = "";
-      document.getElementById("salesPurchasedProductKeyword").value = "";
-      document.getElementById("salesPurchasedMfrKeyword").value = "";
-      document.getElementById("salesPurchasedCompanyFilter").value = "全部公司";
-      document.getElementById("salesPurchasedStatusFilter").value = "全部使用状态";
+      document.getElementById("salesPurchasedAmountMin").value = "";
+      document.getElementById("salesPurchasedAmountMax").value = "";
+      document.getElementById("salesPurchasedQtyMin").value = "";
+      document.getElementById("salesPurchasedQtyMax").value = "";
       filtered = purchasedSummaries.slice();
       render();
       toast("已重置筛选条件");
