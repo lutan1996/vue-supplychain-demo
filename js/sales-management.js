@@ -1701,10 +1701,13 @@
 
   function reportAmountChartHtml(title, amount, total, color) {
     var percent = total ? Math.round(toNumber(amount) / total * 100) : 0;
-    var barWidth = Math.max(4, Math.min(100, percent));
+    var barHeight = Math.max(8, Math.min(100, percent));
     return '<article class="sales-amount-chart">' +
       '<div class="sales-amount-chart-top"><span>' + esc(title) + '</span><strong>' + money(amount) + ' 万元</strong></div>' +
-      '<div class="sales-amount-chart-track"><span style="width:' + barWidth + '%;background:' + esc(color) + '"></span></div>' +
+      '<div class="sales-amount-chart-visual">' +
+      '<div class="sales-mini-bars"><span style="height:' + barHeight + '%;background:' + esc(color) + '"></span><i></i><i></i></div>' +
+      '<div class="sales-mini-donut" style="background:conic-gradient(' + esc(color) + ' 0 ' + percent + '%,#edf2f7 ' + percent + '% 100%)"><b>' + percent + '%</b></div>' +
+      '</div>' +
       '<div class="sales-amount-chart-meta">占合同总金额 ' + percent + '%</div>' +
       '</article>';
   }
