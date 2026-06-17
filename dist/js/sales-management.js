@@ -221,7 +221,7 @@
     var currentSub =
       row.usageStatus === "在用"
         ? "物资已在场站投入使用；当前使用/存放位置：" + textOrDash(row.location) + "。"
-        : row.usageStatus === "库内待用"
+        : row.usageStatus === "库存中"
           ? "物资已完成收货入库，暂存于 " + textOrDash(row.location) + "，等待后续使用。"
           : "当前存放/使用位置：" + textOrDash(row.location) + "；可继续通过订单编号追溯来源。";
 
@@ -392,7 +392,7 @@
       if (row.qty == null || row.qty === "" || row.qty === "—") row.qty = 1;
       if (!row.receiveDate || row.receiveDate === "—") row.receiveDate = summary.latestReceiveDate || "2026-06-15";
       if (!row.location || row.location === "—") row.location = (summary.mainStation || "麒麟山风电场") + "库房";
-      if (!row.usageStatus || row.usageStatus === "—") row.usageStatus = "库内待用";
+      if (!row.usageStatus || row.usageStatus === "—") row.usageStatus = "库存中";
       if (!row.id) row.id = row.productCode || row.materialCode || ("purchased-item-" + idx);
       return row;
     });
@@ -434,7 +434,7 @@
           unitCode: row.unitCode || ("XS-WZ-" + codeSeed + "-" + String(seq).padStart(4, "0")),
           qty: 1,
           amount: unitAmount,
-          usageStatus: row.usageStatus || (detailIdx % 2 ? "库内待用" : "在用")
+          usageStatus: row.usageStatus || "库存中"
         }));
       }
     });
@@ -1492,8 +1492,8 @@
       latestReceiveDate: "2026-06-15",
       mainStation: "酒泉场站",
       details: [
-        { id: "pur1-d1", productName: "工业级交换机", materialCode: "A0200100001", productCode: "B00000006", spec: "V2.0", manufacturer: "联合动力", company: "甘肃龙源", station: "酒泉场站", orderNo: "XSORD-2026-003", contractNo: "XSHT-2026-003", qty: 6, amount: 12180.00, receiveDate: "2026-06-15", location: "酒泉场站库房", usageStatus: "库内待用" },
-        { id: "pur1-d2", productName: "通讯管理机", materialCode: "A0200100002", productCode: "B00000016", spec: "CMU-V3", manufacturer: "联合动力", company: "甘肃龙源", station: "酒泉场站", orderNo: "XSORD-2026-008", contractNo: "XSHT-2026-008", qty: 8, amount: 16400.00, receiveDate: "2026-06-13", location: "酒泉场站二级库", usageStatus: "待调拨" }
+        { id: "pur1-d1", productName: "工业级交换机", materialCode: "A0200100001", productCode: "B00000006", spec: "V2.0", manufacturer: "联合动力", company: "甘肃龙源", station: "酒泉场站", orderNo: "XSORD-2026-003", contractNo: "XSHT-2026-003", qty: 6, amount: 12180.00, receiveDate: "2026-06-15", location: "酒泉场站库房", usageStatus: "库存中" },
+        { id: "pur1-d2", productName: "通讯管理机", materialCode: "A0200100002", productCode: "B00000016", spec: "CMU-V3", manufacturer: "联合动力", company: "甘肃龙源", station: "酒泉场站", orderNo: "XSORD-2026-008", contractNo: "XSHT-2026-008", qty: 8, amount: 16400.00, receiveDate: "2026-06-13", location: "酒泉场站二级库", usageStatus: "库存中" }
       ]
     },
     {
@@ -1506,8 +1506,8 @@
       latestReceiveDate: "2026-06-13",
       mainStation: "麒麟山风电场",
       details: [
-        { id: "pur2-d1", productName: "叶片", materialCode: "A0100200001", productCode: "B00000005", spec: "SW64-2.0", manufacturer: "中材科技", company: "河北龙源", station: "麒麟山风电场", orderNo: "XSORD-2026-004", contractNo: "XSHT-2026-004", qty: 3, amount: 270000.00, receiveDate: "2026-06-13", location: "麒麟山风电场露天区", usageStatus: "在用" },
-        { id: "pur2-d2", productName: "备用叶片", materialCode: "A0100200002", productCode: "B00000018", spec: "SW70-3.0", manufacturer: "中材科技", company: "河北龙源", station: "麒麟山风电场", orderNo: "XSORD-2026-006", contractNo: "XSHT-2026-006", qty: 2, amount: 180000.00, receiveDate: "2026-06-11", location: "麒麟山风电场备件区", usageStatus: "库内待用" }
+        { id: "pur2-d1", productName: "叶片", materialCode: "A0100200001", productCode: "B00000005", spec: "SW64-2.0", manufacturer: "中材科技", company: "河北龙源", station: "麒麟山风电场", orderNo: "XSORD-2026-004", contractNo: "XSHT-2026-004", qty: 3, amount: 270000.00, receiveDate: "2026-06-13", location: "麒麟山风电场露天区", usageStatus: "库存中" },
+        { id: "pur2-d2", productName: "备用叶片", materialCode: "A0100200002", productCode: "B00000018", spec: "SW70-3.0", manufacturer: "中材科技", company: "河北龙源", station: "麒麟山风电场", orderNo: "XSORD-2026-006", contractNo: "XSHT-2026-006", qty: 2, amount: 180000.00, receiveDate: "2026-06-11", location: "麒麟山风电场备件区", usageStatus: "库存中" }
       ]
     }
   ];
