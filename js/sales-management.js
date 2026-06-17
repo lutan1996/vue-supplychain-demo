@@ -1687,19 +1687,17 @@
       "</tbody></table>";
   }
 
-  function initReport() {
-    document.querySelectorAll("[data-report-tab]").forEach(function (btn) {
-      btn.addEventListener("click", function () {
-        var key = btn.getAttribute("data-report-tab");
-        document.querySelectorAll("[data-report-tab]").forEach(function (item) {
-          item.classList.toggle("is-active", item === btn);
-        });
-        document.querySelectorAll("[data-report-pane]").forEach(function (pane) {
-          pane.classList.toggle("is-active", pane.getAttribute("data-report-pane") === key);
-        });
-      });
-    });
+  function reportAmountChartHtml(title, amount, total, color) {
+    var percent = total ? Math.round(toNumber(amount) / total * 100) : 0;
+    var barWidth = Math.max(4, Math.min(100, percent));
+    return '<article class="sales-amount-chart">' +
+      '<div class="sales-amount-chart-top"><span>' + esc(title) + '</span><strong>' + money(amount) + ' 万元</strong></div>' +
+      '<div class="sales-amount-chart-track"><span style="width:' + barWidth + '%;background:' + esc(color) + '"></span></div>' +
+      '<div class="sales-amount-chart-meta">占合同总金额 ' + percent + '%</div>' +
+      '</article>';
+  }
 
+  function initReport() {
     document.getElementById("salesReportBody").innerHTML = reportRows.map(function (row) {
       return "<tr>" +
         "<td>" + esc(row.orderNo) + "</td>" +
@@ -1724,31 +1722,14 @@
       toast("已导出销售合同报表（演示）");
     });
 
-    var contractCount = reportRows.length;
-    var relatedOrderCount = reportRows.reduce(function (sum, row) { return sum + row.lines.length; }, 0);
+    var totalAmount = reportRows.reduce(function (sum, row) { return sum + row.totalAmount; }, 0);
     var executedTotal = reportRows.reduce(function (sum, row) { return sum + row.executedAmount; }, 0);
     var remainingTotal = reportRows.reduce(function (sum, row) { return sum + row.remainingAmount; }, 0);
-    document.getElementById("salesKpis").innerHTML = [
-      ["销售合同数", contractCount],
-      ["关联订单数", relatedOrderCount],
-      ["已执行金额（万元）", money(executedTotal)],
-      ["剩余金额（万元）", money(remainingTotal)]
-    ].map(function (item) {
-      return '<div class="sales-kpi"><div class="sales-kpi-label">' + item[0] + '</div><div class="sales-kpi-val">' + item[1] + "</div></div>";
-    }).join("");
-
-    document.getElementById("salesBars").innerHTML = reportRows.map(function (row) {
-      var ratio = Math.max(0.12, toNumber(row.progress) / 100);
-      var height = Math.round(ratio * 130);
-      return '<div class="sales-bar-col"><div class="sales-bar" style="height:' + height + 'px"></div><div class="sales-bar-label">' + esc(row.contractNo.replace("XSHT-2026-", "")) + "</div></div>";
-    }).join("");
-
-    var doneCount = reportRows.filter(function (row) { return row.status === "已执行"; }).length;
-    var partialCount = reportRows.filter(function (row) { return row.status === "部分执行"; }).length;
-    var pendingCount = reportRows.length - doneCount - partialCount;
-    document.getElementById("salesPie").style.background = "conic-gradient(#52c41a 0 " + (doneCount / contractCount * 100) + "%,#faad14 " + (doneCount / contractCount * 100) + "% " + ((doneCount + partialCount) / contractCount * 100) + "%,#1677ff " + ((doneCount + partialCount) / contractCount * 100) + "% 100%)";
-    document.getElementById("salesPieLegend").innerHTML =
-      "<div>已执行：" + doneCount + "</div><div>部分执行：" + partialCount + "</div><div>未执行：" + pendingCount + "</div>";
+    document.getElementById("salesAmountCharts").innerHTML = [
+      reportAmountChartHtml("全部执行金额", totalAmount, totalAmount, "#1677ff"),
+      reportAmountChartHtml("已执行金额", executedTotal, totalAmount, "#16a34a"),
+      reportAmountChartHtml("剩余执行金额", remainingTotal, totalAmount, "#f59e0b")
+    ].join("");
 
     document.getElementById("salesReportBody").addEventListener("click", function (e) {
       var btn = e.target.closest("[data-action]");
