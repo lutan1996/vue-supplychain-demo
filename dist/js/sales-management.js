@@ -1873,24 +1873,74 @@
     setModalHeadAction("流程进度", openSalesFlowModal);
   }
 
+  function purchasedListMeta(summary) {
+    summary = patchPurchasedSummary(Object.assign({}, summary));
+    var details = summary.details || [];
+    var first = details[0] || {};
+    return {
+      productName: first.productName || "—",
+      manufacturer: first.manufacturer || "—",
+      company: uniqueBy(details, function (row) { return row.company; }).map(function (row) { return row.company; }).filter(Boolean).join("、") || "—",
+      usageStatus: uniqueBy(details, function (row) { return row.usageStatus; }).map(function (row) { return row.usageStatus; }).filter(Boolean).join("、") || "—"
+    };
+  }
+
   function initPurchased() {
     var tbody = document.getElementById("salesPurchasedBody");
-    tbody.innerHTML = purchasedSummaries.map(function (summary, idx) {
-      return "<tr>" +
-        "<td>" + (idx + 1) + "</td>" +
-        "<td>" + esc(summary.typeCode) + "</td>" +
-        "<td>" + esc(summary.typeName) + "</td>" +
-        "<td>" + money(summary.totalAmount) + "</td>" +
-        "<td>" + esc(summary.totalQty) + "</td>" +
-        '<td><span class="sales-op-row">' + iconBtn("view", "查看", "view-purchased", summary.typeCode) + "</span></td>" +
-        "</tr>";
-    }).join("");
+    var filtered = purchasedSummaries.slice();
+
+    function render() {
+      if (!filtered.length) {
+        tbody.innerHTML = '<tr><td colspan="10" class="sales-empty">暂无匹配购入物资数据</td></tr>';
+        return;
+      }
+      tbody.innerHTML = filtered.map(function (summary, idx) {
+        var meta = purchasedListMeta(summary);
+        return "<tr>" +
+          "<td>" + (idx + 1) + "</td>" +
+          "<td>" + esc(summary.typeCode) + "</td>" +
+          "<td>" + esc(summary.typeName) + "</td>" +
+          "<td>" + esc(textOrDash(meta.productName)) + "</td>" +
+          "<td>" + esc(textOrDash(meta.manufacturer)) + "</td>" +
+          "<td>" + esc(textOrDash(meta.company)) + "</td>" +
+          "<td>" + tag(meta.usageStatus) + "</td>" +
+          "<td>" + money(summary.totalAmount) + "</td>" +
+          "<td>" + esc(summary.totalQty) + "</td>" +
+          '<td><span class="sales-op-row">' + iconBtn("view", "查看", "view-purchased", summary.typeCode) + "</span></td>" +
+          "</tr>";
+      }).join("");
+    }
+
+    render();
 
     document.getElementById("salesPurchasedQuery").addEventListener("click", function () {
-      toast("已按条件查询购入物资（演示）");
+      var typeKeyword = String(document.getElementById("salesPurchasedTypeKeyword").value || "").trim().toLowerCase();
+      var productKeyword = String(document.getElementById("salesPurchasedProductKeyword").value || "").trim().toLowerCase();
+      var mfrKeyword = String(document.getElementById("salesPurchasedMfrKeyword").value || "").trim().toLowerCase();
+      var company = document.getElementById("salesPurchasedCompanyFilter").value;
+      var status = document.getElementById("salesPurchasedStatusFilter").value;
+      filtered = purchasedSummaries.filter(function (summary) {
+        var meta = purchasedListMeta(summary);
+        var typeText = (summary.typeCode + summary.typeName).toLowerCase();
+        if (typeKeyword && typeText.indexOf(typeKeyword) < 0) return false;
+        if (productKeyword && String(meta.productName).toLowerCase().indexOf(productKeyword) < 0) return false;
+        if (mfrKeyword && String(meta.manufacturer).toLowerCase().indexOf(mfrKeyword) < 0) return false;
+        if (company !== "全部公司" && String(meta.company).indexOf(company) < 0) return false;
+        if (status !== "全部使用状态" && String(meta.usageStatus).indexOf(status) < 0) return false;
+        return true;
+      });
+      render();
+      toast("已按条件查询购入物资");
     });
     document.getElementById("salesPurchasedReset").addEventListener("click", function () {
-      toast("已重置筛选条件（演示）");
+      document.getElementById("salesPurchasedTypeKeyword").value = "";
+      document.getElementById("salesPurchasedProductKeyword").value = "";
+      document.getElementById("salesPurchasedMfrKeyword").value = "";
+      document.getElementById("salesPurchasedCompanyFilter").value = "全部公司";
+      document.getElementById("salesPurchasedStatusFilter").value = "全部使用状态";
+      filtered = purchasedSummaries.slice();
+      render();
+      toast("已重置筛选条件");
     });
 
     tbody.addEventListener("click", function (e) {
