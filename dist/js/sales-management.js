@@ -812,7 +812,7 @@
   }
 
   function summaryTableHtml(totalQty, totalAmount) {
-    return '<div class="sales-mini-title">汇总信息</div><table class="sales-detail-table"><tbody><tr><th>购买总数量</th><td>' + esc(totalQty || "—") + '</td><th>订单总金额</th><td>' + (totalQty ? moneyYuan(totalAmount) : "—") + '</td></tr></tbody></table>';
+    return '<table class="sales-detail-table sales-summary-table"><tbody><tr><th>购买总数量</th><td>' + esc(totalQty || "—") + '</td><th>订单总金额</th><td>' + (totalQty ? moneyYuan(totalAmount) : "—") + '</td></tr></tbody></table>';
   }
 
   function cartTableHtml() {
