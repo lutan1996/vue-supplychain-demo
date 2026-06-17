@@ -1635,8 +1635,8 @@
     document.getElementById("salesPurchasedQuery").addEventListener("click", function () {
       toast("已按条件查询购入物资（演示）");
     });
-    document.getElementById("salesPurchasedExport").addEventListener("click", function () {
-      toast("已导出购入物资统计（演示）");
+    document.getElementById("salesPurchasedReset").addEventListener("click", function () {
+      toast("已重置筛选条件（演示）");
     });
 
     tbody.addEventListener("click", function (e) {
