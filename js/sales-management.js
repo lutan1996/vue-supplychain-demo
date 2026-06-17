@@ -1046,9 +1046,23 @@
   }
 
   function openShipOrder(order) {
+    var needsContract = order.status === "待上传合同" || !order.contractNo || order.contractNo === "—";
+    var contractTip = needsContract ? '<div class="sales-inline-tip">当前订单尚未完成销售合同上传，可先在本弹窗补录合同编号后安排发货。</div>' : "";
     openModal(
-      "发货确认 - " + order.orderNo,
-      '<div class="sales-form-grid"><div class="sales-field"><label>订单编号</label><input readonly value="' + esc(order.orderNo) + '"></div><div class="sales-field"><label>物流单号</label><input value="' + esc(order.waybillNo === "—" ? "WL2026061808" : order.waybillNo) + '"></div><div class="sales-field"><label>发货日期</label><input type="date" value="2026-06-18"></div><div class="sales-field"><label>发货人</label><input value="成明锴"></div><div class="sales-field sales-field--full"><label>发货备注</label><textarea>按销售合同要求发货，并同步维护场站物流信息。</textarea></div></div>',
+      "安排发货 - " + order.orderNo,
+      contractTip + '<table class="sales-detail-table"><tbody>' +
+      '<tr><th>下单公司</th><td>' + esc(order.company) + '</td><th>场站名称</th><td>' + esc(order.station) + '</td></tr>' +
+      '<tr><th>物资所属部门</th><td>' + esc(order.owningDept) + '</td><th>发货路径</th><td>' + esc(order.route) + '</td></tr>' +
+      '</tbody></table><div class="sales-section-title">发货信息</div>' +
+      '<div class="sales-form-grid">' +
+      '<div class="sales-field"><label>订单编号</label><input readonly value="' + esc(order.orderNo) + '"></div>' +
+      '<div class="sales-field"><label>销售合同编号</label><input value="' + esc(order.contractNo === "—" ? "XSHT-2026-009" : order.contractNo) + '"></div>' +
+      '<div class="sales-field"><label>物流单号</label><input value="' + esc(order.waybillNo === "—" ? "WL2026061808" : order.waybillNo) + '"></div>' +
+      '<div class="sales-field"><label>发货日期</label><input type="date" value="2026-06-18"></div>' +
+      '<div class="sales-field"><label>发货部门</label><input value="' + esc(order.owningDept || "机械所") + '"></div>' +
+      '<div class="sales-field"><label>发货人</label><input value="成明锴"></div>' +
+      '<div class="sales-field sales-field--full"><label>发货备注</label><textarea>已按销售订单明细安排发货，物流单号同步用于项目公司收货确认。</textarea></div>' +
+      '</div>',
       '<button class="sales-btn" data-close>取消</button><button class="sales-btn sales-btn-primary" data-close>确认发货</button>'
     );
     setModalHeadAction("流程进度", openSalesFlowModal);
@@ -1416,7 +1430,7 @@
         var ops = iconBtn("view", "查看", "view-order", order.orderNo);
         if (order.status === "待确认") ops += iconBtn("check", "确认/审核", "approve-order", order.orderNo);
         if (order.status === "待上传合同") ops += iconBtn("upload", "上传销售合同", "upload-contract", order.orderNo);
-        if (order.status === "已确认" || order.status === "待发货") ops += iconBtn("truck", "发货", "ship-order", order.orderNo);
+        if (order.status === "待上传合同" || order.status === "已确认" || order.status === "待发货") ops += iconBtn("truck", "发货", "ship-order", order.orderNo);
         if (order.status === "已发货") ops += iconBtn("receive", "确认收货", "receive-order", order.orderNo);
         return "<tr>" +
           "<td>" + esc(order.orderNo) + "</td>" +

@@ -2286,6 +2286,7 @@
     }
 
     function normalizeOpColumn() {
+      if (/^sales-/.test(file)) return;
       var ops = desiredOpButtons();
       Array.prototype.forEach.call(document.querySelectorAll("tbody tr"), function (tr, idx) {
         var tds = tr.querySelectorAll("td");
