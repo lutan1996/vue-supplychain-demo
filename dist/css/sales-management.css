@@ -37,11 +37,11 @@
 .sales-tag-green{color:#389e0d;border-color:#b7eb8f;background:#f6ffed}
 .sales-tag-orange{color:#d48806;border-color:#ffe58f;background:#fffbe6}
 .sales-tag-red{color:#cf1322;border-color:#ffccc7;background:#fff1f0}
-.sales-op-row{display:inline-flex;align-items:center;justify-content:center;gap:6px;flex-wrap:wrap;max-width:100%}
+.sales-op-row{display:inline-flex;align-items:center;justify-content:center;gap:8px;flex-wrap:nowrap;max-width:none;white-space:nowrap;vertical-align:middle}
 .sales-icon-btn{width:26px;height:26px;min-width:26px;border:none;border-radius:4px;background:transparent;color:#4f95cf;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;padding:0}
 .sales-icon-btn:hover{background:#eef4ff;color:#1677ff}
 .sales-icon-btn svg{width:15px;height:15px;display:block;pointer-events:none}
-.sales-action-link{border:none;background:transparent;color:#1677ff;cursor:pointer;font-size:12px;padding:0 2px;line-height:1.6}
+.sales-action-link{border:none;background:transparent;color:#1677ff;cursor:pointer;font-size:12px;padding:0 2px;line-height:20px;display:inline-flex;align-items:center;white-space:nowrap}
 .sales-action-link:hover{text-decoration:underline}
 .sales-grid-page{display:flex;gap:10px;align-items:stretch;min-height:calc(100vh - 154px)}
 .sales-tree-panel{width:300px;flex-shrink:0;border:1px solid #e7ecf3;border-radius:4px;background:#fff;display:flex;flex-direction:column;min-height:0}
@@ -64,8 +64,8 @@
 .sales-page[data-sales-page="orders"] .sales-table th:nth-child(10),.sales-page[data-sales-page="orders"] .sales-table td:nth-child(10){min-width:150px;max-width:190px}
 .sales-page[data-sales-page="orders"] .sales-table th:nth-child(11),.sales-page[data-sales-page="orders"] .sales-table td:nth-child(11){min-width:170px;max-width:210px}
 .sales-page[data-sales-page="orders"] .sales-table th:nth-child(15),.sales-page[data-sales-page="orders"] .sales-table td:nth-child(15){min-width:360px;max-width:440px;text-align:left}
-.sales-page[data-sales-page="orders"] .sales-table th:last-child,.sales-page[data-sales-page="orders"] .sales-table td:last-child{min-width:150px;width:150px;max-width:150px}
-.sales-page[data-sales-page="orders"] .sales-op-row{transform:translateX(8px)}
+.sales-page[data-sales-page="orders"] .sales-table th:last-child,.sales-page[data-sales-page="orders"] .sales-table td:last-child{min-width:190px;width:auto;max-width:none;vertical-align:middle}
+.sales-page[data-sales-page="orders"] .sales-op-row{transform:none}
 .sales-page[data-sales-page="purchased"] .sales-table{min-width:880px}
 .sales-page[data-sales-page="purchased"] .sales-table th:nth-child(1),.sales-page[data-sales-page="purchased"] .sales-table td:nth-child(1){min-width:64px;width:64px;max-width:64px}
 .sales-page[data-sales-page="purchased"] .sales-table th:nth-child(3),.sales-page[data-sales-page="purchased"] .sales-table td:nth-child(3){min-width:220px;max-width:280px;text-align:left}
