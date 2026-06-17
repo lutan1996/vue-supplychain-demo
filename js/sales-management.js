@@ -1994,22 +1994,14 @@
 
   function reportDetailHtml(report) {
     report = report || {};
-    var lines = Array.isArray(report.lines) ? report.lines : [];
-    return '<div class="sales-detail-head">' +
-      '<div class="sales-detail-card"><div class="sales-detail-label">销售合同编号</div><div class="sales-detail-value">' + esc(report.contractNo) + '</div></div>' +
-      '<div class="sales-detail-card"><div class="sales-detail-label">关联订单</div><div class="sales-detail-value">' + esc(report.orderNo) + '</div></div>' +
-      '<div class="sales-detail-card"><div class="sales-detail-label">已执行金额</div><div class="sales-detail-value">' + money(report.executedAmount) + ' 万元</div></div>' +
-      '<div class="sales-detail-card"><div class="sales-detail-label">执行状态</div><div class="sales-detail-value">' + esc(report.status) + '</div></div>' +
-      '</div><table class="sales-detail-table"><tbody>' +
+    return '<table class="sales-detail-table"><tbody>' +
+      '<tr><th>订单编号</th><td>' + esc(report.orderNo) + '</td><th>销售合同编号</th><td>' + esc(report.contractNo) + '</td></tr>' +
       '<tr><th>合同名称</th><td>' + esc(report.contractName) + '</td><th>供应商</th><td>' + esc(report.supplier) + '</td></tr>' +
-      '<tr><th>执行率</th><td>' + esc(report.progress) + '</td><th>合同金额</th><td>' + money(report.totalAmount) + ' 万元</td></tr>' +
-      '<tr><th>剩余金额</th><td>' + money(report.remainingAmount) + ' 万元</td><th>签订日期</th><td>' + esc(report.signDate) + '</td></tr>' +
-      '<tr><th>合同有效期</th><td colspan="3">' + esc(report.term) + '</td></tr>' +
-      '</tbody></table><div class="sales-section-title">合同执行明细</div><table class="sales-table" style="min-width:980px"><thead><tr><th>订单编号</th><th>购买公司</th><th>场站名称</th><th>执行金额（万元）</th><th>执行状态</th><th>执行时间</th></tr></thead><tbody>' +
-      lines.map(function (line) {
-        return "<tr><td>" + esc(line.orderNo) + "</td><td>" + esc(line.company) + "</td><td>" + esc(line.station) + "</td><td>" + money(line.amount) + "</td><td>" + tag(line.status) + "</td><td>" + esc(line.date) + "</td></tr>";
-      }).join("") +
-      "</tbody></table>";
+      '<tr><th>执行率</th><td>' + esc(report.progress) + '</td><th>合同金额</th><td>' + money(report.totalAmount) + '</td></tr>' +
+      '<tr><th>已执行金额</th><td>' + money(report.executedAmount) + '</td><th>剩余金额</th><td>' + money(report.remainingAmount) + '</td></tr>' +
+      '<tr><th>签订日期</th><td>' + esc(report.signDate) + '</td><th>合同有效期</th><td>' + esc(report.term) + '</td></tr>' +
+      '<tr><th>执行状态</th><td colspan="3">' + tag(report.status) + '</td></tr>' +
+      '</tbody></table>';
   }
 
   function reportAmountChartHtml(title, amount, total, color) {
@@ -2039,7 +2031,7 @@
         "<td>" + esc(row.signDate) + "</td>" +
         "<td>" + esc(row.term) + "</td>" +
         "<td>" + tag(row.status) + "</td>" +
-        '<td><span class="sales-op-row">' + iconBtn("view", "查看执行明细", "report-detail", row.contractNo) + "</span></td>" +
+        '<td><span class="sales-op-row">' + iconBtn("view", "查看", "report-detail", row.contractNo) + "</span></td>" +
         "</tr>";
     }).join("");
 
@@ -2064,7 +2056,7 @@
       if (!btn) return;
       var report = reportMap[btn.getAttribute("data-id")];
       if (!report) return;
-      openModal("合同执行明细 - " + report.contractNo, reportDetailHtml(report), '<button class="sales-btn" data-close>关闭</button>', "wide");
+      openModal("查看 - " + report.contractNo, reportDetailHtml(report), '<button class="sales-btn" data-close>关闭</button>', "wide");
     });
   }
 
