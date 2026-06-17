@@ -39,7 +39,12 @@
     .ps-acc-partial{ color:#1677ff; border-color:#91caff; background:#e6f4ff; }
     .ps-acc-review{ color:#722ed1; border-color:#d3adf7; background:#f9f0ff; }
     .table-foot{margin-top:8px;font-size:12px;color:#6c7786}
-    .ps-analytics{margin-top:12px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+    .ps-tabs{display:flex;gap:4px;margin-bottom:10px;border-bottom:1px solid #dde3ea}
+    .ps-tab{height:34px;border:none;background:transparent;padding:0 16px;font-size:13px;color:#64748b;cursor:pointer;border-bottom:2px solid transparent}
+    .ps-tab.is-active{color:#1677ff;border-bottom-color:#1677ff;font-weight:600}
+    .ps-pane{display:none}
+    .ps-pane.is-active{display:block}
+    .ps-analytics{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
     .ps-chart-card{background:#fff;border:1px solid #dde3ea;border-radius:6px;padding:10px 12px}
     .ps-chart-title{font-size:13px;font-weight:600;color:#334155;margin:0 0 10px}
     .ps-kpi-row{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
@@ -75,24 +80,9 @@
             <div style="font-size:16px;font-weight:600;color:#1f3551;">采购合同报表管理</div>
             <div style="margin-top:4px;font-size:12px;color:#64748b;">按采购合同维度统计执行情况，供物资采购模块查看合同履约与执行进度。</div>
           </div>
-          <div class="ps-toolbar">
-            <div class="ps-left">
-              <select id="year"><option>2026</option><option>2025</option><option>2024</option></select>
-              <select id="supplier"><option>全部供应商</option><option>联合动力</option><option>东风</option></select>
-              <select id="cat"><option>全部类别</option><option>风机整机</option><option>齿轮箱</option><option>变流器</option></select>
-              <button class="ps-btn pri" id="btnQuery">查询</button>
-              <button class="ps-btn" id="btnReset">重置</button>
-              <button class="ps-btn" id="btnExport">导出Excel</button>
-            </div>
-            </div>
-          <div class="subpage-table-wrap">
-            <table class="subpage-table">
-              <thead><tr><th>订单编号</th><th>框架协议/常规合同编号</th><th>执行合同编号</th><th>合同名称</th><th>供应商</th><th>执行率</th><th>合同金额</th><th>已执行金额</th><th>剩余金额</th><th>签订日期</th><th>合同有效期</th><th>执行状态</th><th>操作</th></tr></thead>
-              <tbody id="reportBody"></tbody>
-              </table>
-            </div>
-          <div class="table-foot">当前默认展示 10 行数据（可继续扩展分页）。</div>
-          <section class="ps-analytics">
+          <div class="ps-tabs"><button type="button" class="ps-tab is-active" data-ps-tab="charts">统计图</button><button type="button" class="ps-tab" data-ps-tab="list">报表列表</button></div>
+          <section class="ps-pane is-active" data-ps-pane="charts">
+          <div class="ps-analytics">
             <article class="ps-chart-card" style="grid-column:1 / -1">
               <h3 class="ps-chart-title">核心统计</h3>
               <div class="ps-kpi-row" id="kpiRow"></div>
@@ -123,6 +113,26 @@
               <h3 class="ps-chart-title">供应商供货次数 TOP</h3>
               <div class="ps-top-list" id="supplierTop"></div>
             </article>
+          </div>
+          </section>
+          <section class="ps-pane" data-ps-pane="list">
+            <div class="ps-toolbar">
+              <div class="ps-left">
+                <select id="year"><option>2026</option><option>2025</option><option>2024</option></select>
+                <select id="supplier"><option>全部供应商</option><option>联合动力</option><option>东风</option></select>
+                <select id="cat"><option>全部类别</option><option>风机整机</option><option>齿轮箱</option><option>变流器</option></select>
+                <button class="ps-btn pri" id="btnQuery">查询</button>
+                <button class="ps-btn" id="btnReset">重置</button>
+                <button class="ps-btn" id="btnExport">导出Excel</button>
+              </div>
+            </div>
+            <div class="subpage-table-wrap">
+              <table class="subpage-table">
+                <thead><tr><th>订单编号</th><th>框架协议/常规合同编号</th><th>执行合同编号</th><th>合同名称</th><th>供应商</th><th>执行率</th><th>合同金额</th><th>已执行金额</th><th>剩余金额</th><th>签订日期</th><th>合同有效期</th><th>执行状态</th><th>操作</th></tr></thead>
+                <tbody id="reportBody"></tbody>
+              </table>
+            </div>
+            <div class="table-foot">当前默认展示 10 行数据（可继续扩展分页）。</div>
           </section>
         </div>
       </main>
@@ -269,6 +279,18 @@
     }
     renderRows(reportRows);
     renderAnalytics(reportRows);
+
+    document.querySelectorAll("[data-ps-tab]").forEach(function(btn){
+      btn.addEventListener("click", function(){
+        var key = btn.getAttribute("data-ps-tab");
+        document.querySelectorAll("[data-ps-tab]").forEach(function(item){
+          item.classList.toggle("is-active", item === btn);
+        });
+        document.querySelectorAll("[data-ps-pane]").forEach(function(pane){
+          pane.classList.toggle("is-active", pane.getAttribute("data-ps-pane") === key);
+        });
+      });
+    });
 
     document.getElementById("btnQuery").addEventListener("click", function () {
       alert("已按筛选条件更新报表（演示）");

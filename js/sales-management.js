@@ -15,6 +15,7 @@
   };
 
   var cartItems = [];
+  var orderDraftMaterials = [];
   var orderMap = {};
   var purchasedMap = {};
   var reportMap = {};
@@ -109,6 +110,10 @@
       minimumFractionDigits: 2,
       maximumFractionDigits: 2
     });
+  }
+
+  function moneyYuan(v) {
+    return money(v) + " 元";
   }
 
   function textOrDash(v) {
@@ -259,7 +264,18 @@
   }
 
   function iconBtn(icon, title, action, id) {
-    return '<button type="button" class="sales-icon-btn" title="' + esc(title) + '" data-action="' + esc(action) + '" data-id="' + esc(id || "") + '">' + ICONS[icon] + "</button>";
+    return '<button type="button" class="sales-action-link" data-action="' + esc(action) + '" data-id="' + esc(id || "") + '">' + esc(title) + "</button>";
+  }
+
+  function qtyStepperHtml(value, key, attrName, stepAttrName) {
+    var attr = attrName || "data-qty-key";
+    var stepAttr = stepAttrName || "data-qty-step";
+    var qty = Math.max(1, Number(value || 1));
+    return '<span class="sales-qty-stepper">' +
+      '<button type="button" ' + stepAttr + '="' + esc(key) + '" data-step="-1">-</button>' +
+      '<input type="number" min="1" value="' + qty + '" ' + attr + '="' + esc(key) + '">' +
+      '<button type="button" ' + stepAttr + '="' + esc(key) + '" data-step="1">+</button>' +
+      "</span>";
   }
 
   function getProducts() {
@@ -399,10 +415,30 @@
     if (summary.orderCount == null || summary.orderCount === "" || summary.orderCount === "—") {
       summary.orderCount = uniqueBy(summary.details, function (row) { return row.orderNo; }).length || 0;
     }
-    if (summary.totalQty == null || summary.totalQty === "" || summary.totalQty === "—") {
-      summary.totalQty = summary.details.reduce(function (sum, row) { return sum + toNumber(row.qty); }, 0);
-    }
+    if (summary.totalQty == null || summary.totalQty === "" || summary.totalQty === "—") summary.totalQty = summary.details.reduce(function (sum, row) { return sum + toNumber(row.qty); }, 0);
+    if (summary.totalAmount == null || summary.totalAmount === "" || summary.totalAmount === "—") summary.totalAmount = summary.details.reduce(function (sum, row) { return sum + toNumber(row.amount || row.totalAmount); }, 0);
     return summary;
+  }
+
+  function expandPurchasedDetails(summary) {
+    var details = Array.isArray(summary.details) ? summary.details : [];
+    var expanded = [];
+    details.forEach(function (row, detailIdx) {
+      var qty = Math.max(1, Math.round(toNumber(row.qty || 1)));
+      var unitAmount = row.unitAmount != null ? toNumber(row.unitAmount) : (qty ? toNumber(row.amount || row.totalAmount) / qty : 0);
+      for (var i = 0; i < qty; i++) {
+        var seq = expanded.length + 1;
+        var codeSeed = String(row.productCode || row.materialCode || summary.typeCode || "WL").replace(/[^\w-]/g, "");
+        expanded.push(Object.assign({}, row, {
+          id: row.id + "-unit-" + (i + 1),
+          unitCode: row.unitCode || ("XS-WZ-" + codeSeed + "-" + String(seq).padStart(4, "0")),
+          qty: 1,
+          amount: unitAmount,
+          usageStatus: row.usageStatus || (detailIdx % 2 ? "库内待用" : "在用")
+        }));
+      }
+    });
+    return expanded;
   }
 
   function patchReportRows(rows) {
@@ -571,7 +607,7 @@
       ["物资类型编码", textOrDash(product.a)],
       ["物资分类", textOrDash(product.category)],
       ["库存数量", textOrDash(product.stockQty)],
-      ["参考单价（万元）", textOrDash(product.refPrice)],
+      ["单价（元）", textOrDash(product.refPrice)],
       ["类型说明", textOrDash(product.typeDef)]
     ];
     var featureRows = [];
@@ -707,9 +743,52 @@
     return name && value ? name + "：" + value : name || value || "—";
   }
 
-  function cartTableHtml() {
-    if (!cartItems.length) return '<div class="sales-empty">暂无加购物资</div>';
-    var rows = cartItems.map(function (item, idx) {
+  function materialFeatureCells(product) {
+    return [featureText(product, 1), featureText(product, 2), featureText(product, 3), featureText(product, 4)];
+  }
+
+  function materialLineTableHtml(rows, opts) {
+    opts = opts || {};
+    var editable = !!opts.editable;
+    var removable = !!opts.removable;
+    var qtyAttr = opts.qtyAttr || "data-cart-qty";
+    var stepAttr = opts.stepAttr || "data-qty-step";
+    var trackOrder = opts.trackOrder || "";
+    if (!rows.length) return '<div class="sales-empty">暂无物资明细数据</div>';
+    return '<div class="sales-table-wrap sales-modal-table-wrap"><table class="sales-cart-table"><thead><tr>' +
+      ["序号", "产品名称", "制造商名称", "产品型号", "产品编码", "物资类型编码", "物资类型", "物资分类", "购买数量", "单价（元）", "合计金额（元）", "特征值1", "特征值2", "特征值3", "特征值4", "操作"].map(function (head) {
+        return "<th>" + esc(head) + "</th>";
+      }).join("") +
+      "</tr></thead><tbody>" +
+      rows.map(function (row) {
+        var qtyCell = editable ? qtyStepperHtml(row.qty, row.id, qtyAttr, stepAttr) : esc(textOrDash(row.qty));
+        var op = "—";
+        if (removable) op = '<button type="button" class="sales-cart-remove" data-cart-remove="' + esc(row.id) + '">删除</button>';
+        else if (trackOrder) op = '<button type="button" class="sales-inline-link" data-modal-action="order-track" data-order="' + esc(trackOrder) + '" data-item="' + esc(row.id) + '">物资跟踪</button>';
+        return "<tr>" +
+          "<td>" + esc(row.seq) + "</td>" +
+          "<td>" + esc(textOrDash(row.productName)) + "</td>" +
+          "<td>" + esc(textOrDash(row.mfrName || row.manufacturer)) + "</td>" +
+          "<td>" + esc(textOrDash(row.model)) + "</td>" +
+          "<td>" + esc(textOrDash(row.code || row.productCode)) + "</td>" +
+          "<td>" + esc(textOrDash(row.typeCode)) + "</td>" +
+          "<td>" + esc(textOrDash(row.typeName)) + "</td>" +
+          "<td>" + esc(textOrDash(row.category)) + "</td>" +
+          "<td>" + qtyCell + "</td>" +
+          "<td>" + money(row.price) + "</td>" +
+          "<td>" + money(row.subtotal) + "</td>" +
+          "<td>" + esc(textOrDash(row.features[0])) + "</td>" +
+          "<td>" + esc(textOrDash(row.features[1])) + "</td>" +
+          "<td>" + esc(textOrDash(row.features[2])) + "</td>" +
+          "<td>" + esc(textOrDash(row.features[3])) + "</td>" +
+          "<td>" + op + "</td>" +
+          "</tr>";
+      }).join("") +
+      "</tbody></table></div>";
+  }
+
+  function cartRows() {
+    return cartItems.map(function (item, idx) {
       var product = cartProduct(item);
       var unitPrice = toNumber(product.refPrice);
       var qty = Math.max(1, Number(item.qty || 1));
@@ -727,38 +806,23 @@
         qty: qty,
         price: unitPrice,
         subtotal: subtotal,
-        features: [featureText(product, 1), featureText(product, 2), featureText(product, 3), featureText(product, 4)]
+        features: materialFeatureCells(product)
       };
     });
+  }
+
+  function summaryTableHtml(totalQty, totalAmount) {
+    return '<div class="sales-mini-title">汇总信息</div><table class="sales-detail-table"><tbody><tr><th>购买总数量</th><td>' + esc(totalQty || "—") + '</td><th>订单总金额</th><td>' + (totalQty ? moneyYuan(totalAmount) : "—") + '</td></tr></tbody></table>';
+  }
+
+  function cartTableHtml() {
+    if (!cartItems.length) return '<div class="sales-empty">暂无加购物资</div>';
+    var rows = cartRows();
     var totalQty = rows.reduce(function (sum, row) { return sum + row.qty; }, 0);
     var totalAmount = rows.reduce(function (sum, row) { return sum + row.subtotal; }, 0);
-    return '<div class="sales-cart-summary"><span>已加购 ' + rows.length + ' 类物资，共 ' + totalQty + ' 件</span><span class="sales-cart-total">汇总价格：' + money(totalAmount) + ' 万元</span></div>' +
-      '<table class="sales-cart-table"><thead><tr>' +
-      ["序号", "产品名称", "制造商名称", "产品型号", "产品编码", "物资类型编码", "物资类型", "物资分类", "购买数量", "参考单价（万元）", "小计（万元）", "特征值1", "特征值2", "特征值3", "特征值4", "操作"].map(function (head) {
-        return "<th>" + esc(head) + "</th>";
-      }).join("") +
-      "</tr></thead><tbody>" +
-      rows.map(function (row) {
-        return "<tr>" +
-          "<td>" + row.seq + "</td>" +
-          "<td>" + esc(row.productName) + "</td>" +
-          "<td>" + esc(row.mfrName) + "</td>" +
-          "<td>" + esc(row.model) + "</td>" +
-          "<td>" + esc(row.code) + "</td>" +
-          "<td>" + esc(row.typeCode) + "</td>" +
-          "<td>" + esc(row.typeName) + "</td>" +
-          "<td>" + esc(row.category) + "</td>" +
-          '<td><input class="sales-cart-qty-input" data-cart-qty="' + esc(row.id) + '" type="number" min="1" value="' + row.qty + '"></td>' +
-          "<td>" + money(row.price) + "</td>" +
-          "<td>" + money(row.subtotal) + "</td>" +
-          "<td>" + esc(row.features[0]) + "</td>" +
-          "<td>" + esc(row.features[1]) + "</td>" +
-          "<td>" + esc(row.features[2]) + "</td>" +
-          "<td>" + esc(row.features[3]) + "</td>" +
-          '<td><button type="button" class="sales-cart-remove" data-cart-remove="' + esc(row.id) + '">删除</button></td>' +
-          "</tr>";
-      }).join("") +
-      '</tbody><tfoot><tr><th colspan="10">汇总价格</th><th colspan="6">' + money(totalAmount) + ' 万元</th></tr></tfoot></table>';
+    return '<div class="sales-section-title">订单物资明细表</div>' +
+      materialLineTableHtml(rows, { editable: true, removable: true }) +
+      summaryTableHtml(totalQty, totalAmount);
   }
 
   function cartHtml() {
@@ -804,6 +868,14 @@
       body.querySelectorAll("[data-cart-qty]").forEach(function (input) {
         input.addEventListener("change", function () {
           changeCartQty(input.getAttribute("data-cart-qty"), input.value);
+        });
+      });
+      body.querySelectorAll("[data-qty-step]").forEach(function (btn) {
+        btn.addEventListener("click", function () {
+          var id = btn.getAttribute("data-qty-step");
+          var input = body.querySelector('[data-cart-qty="' + CSS.escape(id) + '"]');
+          var next = Math.max(1, Number(input && input.value || 1) + Number(btn.getAttribute("data-step") || 0));
+          changeCartQty(id, next);
         });
       });
       body.querySelectorAll("[data-cart-remove]").forEach(function (btn) {
@@ -858,39 +930,48 @@
       category: category,
       qty: qty,
       price: price,
-      subtotal: subtotal
+      subtotal: subtotal,
+      features: item.features || []
     };
   }
 
-  function orderMaterialsTableHtml(order, withTrack) {
+  function orderMaterialRows(order) {
     var materials = Array.isArray(order.materials) ? order.materials.map(normalizeOrderMaterial) : [];
-    return '<div class="sales-table-wrap sales-modal-table-wrap"><table class="sales-table sales-modal-table" style="min-width:1460px"><thead><tr><th>序号</th><th>产品名称</th><th>产品编码</th><th>产品型号</th><th>制造商名称</th><th>物资类型编码</th><th>物资类型</th><th>物资分类</th><th>购买数量</th><th>参考单价（万元）</th><th>小计金额（万元）</th><th>操作</th></tr></thead><tbody>' +
-      (materials.length ? materials.map(function (item, idx) {
-        return "<tr>" +
-          "<td>" + (idx + 1) + "</td>" +
-          "<td>" + esc(textOrDash(item.productName)) + "</td>" +
-          "<td>" + esc(textOrDash(item.productCode)) + "</td>" +
-          "<td>" + esc(textOrDash(item.model)) + "</td>" +
-          "<td>" + esc(textOrDash(item.manufacturer)) + "</td>" +
-          "<td>" + esc(textOrDash(item.typeCode)) + "</td>" +
-          "<td>" + esc(textOrDash(item.typeName)) + "</td>" +
-          "<td>" + esc(textOrDash(item.category)) + "</td>" +
-          "<td>" + esc(textOrDash(item.qty)) + "</td>" +
-          "<td>" + money(item.price) + "</td>" +
-          "<td>" + money(item.subtotal) + "</td>" +
-          '<td>' + (withTrack ? '<button type="button" class="sales-inline-link" data-modal-action="order-track" data-order="' + esc(order.orderNo) + '" data-item="' + esc(item.id) + '">物资跟踪</button>' : "—") + "</td>" +
-          "</tr>";
-      }).join("") : '<tr><td colspan="12" class="sales-empty">暂无物资明细数据</td></tr>') +
-      "</tbody></table></div>";
+    return materials.map(function (item, idx) {
+      var meta = productMetaLookup(item);
+      var product = meta.primary || {};
+      return {
+        seq: idx + 1,
+        id: item.id,
+        productName: item.productName,
+        code: item.productCode,
+        model: item.model,
+        mfrName: item.manufacturer,
+        typeCode: item.typeCode,
+        typeName: item.typeName,
+        category: item.category,
+        qty: item.qty,
+        price: item.price,
+        subtotal: item.subtotal,
+        features: Array.isArray(item.features) && item.features.length ? item.features : materialFeatureCells(product)
+      };
+    });
+  }
+
+  function orderMaterialsTableHtml(order, withTrack) {
+    var rows = orderMaterialRows(order);
+    return materialLineTableHtml(rows, { trackOrder: withTrack ? order.orderNo : "" });
   }
 
   function orderDetailHtml(order) {
     order = patchOrderMaterials(Object.assign({}, order));
-    return '<div class="sales-detail-head">' +
+    return '<div class="sales-section-title">订单物资明细表</div>' + orderMaterialsTableHtml(order, true) +
+      summaryTableHtml(order.totalQty, order.totalAmount) +
+      '<div class="sales-detail-head sales-detail-head--spaced">' +
       '<div class="sales-detail-card"><div class="sales-detail-label">订单编号</div><div class="sales-detail-value">' + esc(order.orderNo) + "</div></div>" +
       '<div class="sales-detail-card"><div class="sales-detail-label">订单状态</div><div class="sales-detail-value">' + esc(order.status) + "</div></div>" +
       '<div class="sales-detail-card"><div class="sales-detail-label">购买总数量</div><div class="sales-detail-value">' + esc(order.totalQty) + "</div></div>" +
-      '<div class="sales-detail-card"><div class="sales-detail-label">订单总金额</div><div class="sales-detail-value">' + money(order.totalAmount) + ' 万元</div></div>' +
+      '<div class="sales-detail-card"><div class="sales-detail-label">订单总金额</div><div class="sales-detail-value">' + moneyYuan(order.totalAmount) + '</div></div>' +
       '</div><table class="sales-detail-table"><tbody>' +
       '<tr><th>下单人</th><td>' + esc(order.requester) + '</td><th>下单公司</th><td>' + esc(order.company) + '</td></tr>' +
       '<tr><th>收货单位</th><td>' + esc(order.receiverCompany) + '</td><th>场站名称</th><td>' + esc(order.station) + '</td></tr>' +
@@ -899,7 +980,7 @@
       '<tr><th>销售合同编号</th><td>' + esc(order.contractNo) + '</td><th>物流单号</th><td>' + esc(order.waybillNo) + '</td></tr>' +
       '<tr><th>发货日期</th><td>' + esc(order.shipDate) + '</td><th>收货日期</th><td>' + esc(order.receiveDate) + '</td></tr>' +
       '<tr><th>备注</th><td colspan="3">' + esc(textOrDash(order.remark)) + '</td></tr>' +
-      '</tbody></table><div class="sales-section-title">订单物资明细表</div>' + orderMaterialsTableHtml(order, true);
+      '</tbody></table>';
   }
 
   function orderTrackHtml(order, item) {
@@ -940,7 +1021,7 @@
       "订单审核 - " + order.orderNo,
       '<table class="sales-detail-table"><tbody>' +
       '<tr><th>订单编号</th><td>' + esc(order.orderNo) + '</td><th>下单公司</th><td>' + esc(order.company) + '</td></tr>' +
-      '<tr><th>场站名称</th><td>' + esc(order.station) + '</td><th>订单总金额</th><td>' + money(order.totalAmount) + ' 万元</td></tr>' +
+      '<tr><th>场站名称</th><td>' + esc(order.station) + '</td><th>订单总金额</th><td>' + moneyYuan(order.totalAmount) + '</td></tr>' +
       '<tr><th>物资所属部门</th><td>' + esc(order.owningDept) + '</td><th>购买总数量</th><td>' + esc(order.totalQty) + '</td></tr>' +
       '</tbody></table><div class="sales-section-title">订单物资明细表</div>' + orderMaterialsTableHtml(order, false) +
       '<div class="sales-section-title">审批信息</div><div class="sales-form-grid">' +
@@ -986,16 +1067,7 @@
     var rows = materials && materials.length ? materials : [];
     var totalQty = rows.reduce(function (sum, row) { return sum + Number(row.qty || 0); }, 0);
     var totalAmount = rows.reduce(function (sum, row) { return sum + Number(row.subtotal || 0); }, 0);
-    return '<div class="sales-form-grid">' +
-      '<div class="sales-field"><label>下单公司</label><select><option>河北龙源</option><option>天津龙源</option><option>甘肃龙源</option></select></div>' +
-      '<div class="sales-field"><label>收货单位</label><input value="山西龙源新能源有限公司"></div>' +
-      '<div class="sales-field"><label>场站名称</label><input value="忻州风电场"></div>' +
-      '<div class="sales-field"><label>物资所属部门</label><input value="电控所"></div>' +
-      '<div class="sales-field"><label>发货路径</label><select><option>工程技术公司发货</option><option>供应商直发</option></select></div>' +
-      '<div class="sales-field"><label>期望发货日期</label><input type="date" value="2026-06-30"></div>' +
-      '<div class="sales-field sales-field--full"><label>订单备注</label><textarea placeholder="请输入订单备注"></textarea></div>' +
-      '</div><div class="sales-section-title">订单物资明细表</div>' +
-      (rows.length ? orderMaterialsTableHtml({ materials: rows.map(function (row, idx) {
+    var materialTable = rows.length ? materialLineTableHtml(orderMaterialRows({ materials: rows.map(function (row, idx) {
         return {
           id: row.id || ("tmp-" + idx),
           productName: row.productName,
@@ -1009,8 +1081,19 @@
           price: row.price,
           subtotal: row.subtotal
         };
-      }) }, false) : '<div class="sales-empty">暂无物资，请从物资列表中选择产品后下单。</div>') +
-      '<div class="sales-mini-title">汇总信息</div><table class="sales-detail-table"><tbody><tr><th>购买总数量</th><td>' + esc(totalQty || "—") + '</td><th>订单总金额</th><td>' + (rows.length ? money(totalAmount) + ' 万元' : "—") + '</td></tr></tbody></table>';
+      }) }), { editable: true, qtyAttr: "data-order-qty", stepAttr: "data-order-qty-step" }) : '<div class="sales-empty">暂无物资，请从物资列表中选择产品后下单。</div>';
+    return '<div class="sales-section-title">订单物资明细表</div>' +
+      materialTable +
+      summaryTableHtml(totalQty, totalAmount) +
+      '<div class="sales-form-grid sales-form-grid--spaced">' +
+      '<div class="sales-field"><label>下单公司</label><select><option>河北龙源</option><option>天津龙源</option><option>甘肃龙源</option></select></div>' +
+      '<div class="sales-field"><label>收货单位</label><input value="山西龙源新能源有限公司"></div>' +
+      '<div class="sales-field"><label>场站名称</label><input value="忻州风电场"></div>' +
+      '<div class="sales-field"><label>物资所属部门</label><input value="电控所"></div>' +
+      '<div class="sales-field"><label>发货路径</label><select><option>工程技术公司发货</option><option>供应商直发</option></select></div>' +
+      '<div class="sales-field"><label>期望发货日期</label><input type="date" value="2026-06-30"></div>' +
+      '<div class="sales-field sales-field--full"><label>订单备注</label><textarea placeholder="请输入订单备注"></textarea></div>' +
+      '</div>';
   }
 
   function openOrderForm(product) {
@@ -1030,7 +1113,45 @@
         subtotal: toNumber(product.refPrice)
       });
     }
-    openModal("新增订单", orderFormHtml(materials), '<button class="sales-btn" data-close>取消</button><button class="sales-btn sales-btn-primary" id="salesSubmitOrder">提交订单</button>', "wide");
+    orderDraftMaterials = materials;
+    openModal("新增订单", orderFormHtml(orderDraftMaterials), '<button class="sales-btn" data-close>取消</button><button class="sales-btn sales-btn-primary" id="salesSubmitOrder">提交订单</button>', "wide");
+    bindOrderFormEvents();
+  }
+
+  function refreshOrderFormModal() {
+    var body = document.getElementById("salesModalBody");
+    var foot = document.getElementById("salesModalFoot");
+    if (!body || !foot) return;
+    body.innerHTML = orderFormHtml(orderDraftMaterials);
+    foot.innerHTML = '<button class="sales-btn" data-close>取消</button><button class="sales-btn sales-btn-primary" id="salesSubmitOrder">提交订单</button>';
+    bindOrderFormEvents();
+  }
+
+  function changeOrderDraftQty(id, nextQty) {
+    var item = orderDraftMaterials.find(function (row) { return String(row.id) === String(id); });
+    if (!item) return;
+    item.qty = Math.max(1, Number(nextQty || 1));
+    item.subtotal = toNumber(item.price) * item.qty;
+    refreshOrderFormModal();
+  }
+
+  function bindOrderFormEvents() {
+    var body = document.getElementById("salesModalBody");
+    if (body) {
+      body.querySelectorAll("[data-order-qty]").forEach(function (input) {
+        input.addEventListener("change", function () {
+          changeOrderDraftQty(input.getAttribute("data-order-qty"), input.value);
+        });
+      });
+      body.querySelectorAll("[data-order-qty-step]").forEach(function (btn) {
+        btn.addEventListener("click", function () {
+          var id = btn.getAttribute("data-order-qty-step");
+          var input = body.querySelector('[data-order-qty="' + CSS.escape(id) + '"]');
+          var next = Math.max(1, Number(input && input.value || 1) + Number(btn.getAttribute("data-step") || 0));
+          changeOrderDraftQty(id, next);
+        });
+      });
+    }
     var ok = document.getElementById("salesSubmitOrder");
     if (ok) ok.addEventListener("click", function () {
       toast("订单已提交（演示）");
@@ -1350,12 +1471,13 @@
       typeName: "工业控制与通讯设备",
       productKinds: 2,
       totalQty: 14,
+      totalAmount: 28580.00,
       orderCount: 2,
       latestReceiveDate: "2026-06-15",
       mainStation: "酒泉场站",
       details: [
-        { id: "pur1-d1", productName: "工业级交换机", materialCode: "A0200100001", productCode: "B00000006", spec: "V2.0", manufacturer: "联合动力", company: "甘肃龙源", station: "酒泉场站", orderNo: "XSORD-2026-003", contractNo: "XSHT-2026-003", qty: 6, receiveDate: "2026-06-15", location: "酒泉场站库房", usageStatus: "库内待用" },
-        { id: "pur1-d2", productName: "通讯管理机", materialCode: "A0200100002", productCode: "B00000016", spec: "CMU-V3", manufacturer: "联合动力", company: "甘肃龙源", station: "酒泉场站", orderNo: "XSORD-2026-008", contractNo: "XSHT-2026-008", qty: 8, receiveDate: "2026-06-13", location: "酒泉场站二级库", usageStatus: "待调拨" }
+        { id: "pur1-d1", productName: "工业级交换机", materialCode: "A0200100001", productCode: "B00000006", spec: "V2.0", manufacturer: "联合动力", company: "甘肃龙源", station: "酒泉场站", orderNo: "XSORD-2026-003", contractNo: "XSHT-2026-003", qty: 6, amount: 12180.00, receiveDate: "2026-06-15", location: "酒泉场站库房", usageStatus: "库内待用" },
+        { id: "pur1-d2", productName: "通讯管理机", materialCode: "A0200100002", productCode: "B00000016", spec: "CMU-V3", manufacturer: "联合动力", company: "甘肃龙源", station: "酒泉场站", orderNo: "XSORD-2026-008", contractNo: "XSHT-2026-008", qty: 8, amount: 16400.00, receiveDate: "2026-06-13", location: "酒泉场站二级库", usageStatus: "待调拨" }
       ]
     },
     {
@@ -1363,12 +1485,13 @@
       typeName: "风机叶片",
       productKinds: 2,
       totalQty: 5,
+      totalAmount: 450000.00,
       orderCount: 2,
       latestReceiveDate: "2026-06-13",
       mainStation: "麒麟山风电场",
       details: [
-        { id: "pur2-d1", productName: "叶片", materialCode: "A0100200001", productCode: "B00000005", spec: "SW64-2.0", manufacturer: "中材科技", company: "河北龙源", station: "麒麟山风电场", orderNo: "XSORD-2026-004", contractNo: "XSHT-2026-004", qty: 3, receiveDate: "2026-06-13", location: "麒麟山风电场露天区", usageStatus: "在用" },
-        { id: "pur2-d2", productName: "备用叶片", materialCode: "A0100200002", productCode: "B00000018", spec: "SW70-3.0", manufacturer: "中材科技", company: "河北龙源", station: "麒麟山风电场", orderNo: "XSORD-2026-006", contractNo: "XSHT-2026-006", qty: 2, receiveDate: "2026-06-11", location: "麒麟山风电场备件区", usageStatus: "库内待用" }
+        { id: "pur2-d1", productName: "叶片", materialCode: "A0100200001", productCode: "B00000005", spec: "SW64-2.0", manufacturer: "中材科技", company: "河北龙源", station: "麒麟山风电场", orderNo: "XSORD-2026-004", contractNo: "XSHT-2026-004", qty: 3, amount: 270000.00, receiveDate: "2026-06-13", location: "麒麟山风电场露天区", usageStatus: "在用" },
+        { id: "pur2-d2", productName: "备用叶片", materialCode: "A0100200002", productCode: "B00000018", spec: "SW70-3.0", manufacturer: "中材科技", company: "河北龙源", station: "麒麟山风电场", orderNo: "XSORD-2026-006", contractNo: "XSHT-2026-006", qty: 2, amount: 180000.00, receiveDate: "2026-06-11", location: "麒麟山风电场备件区", usageStatus: "库内待用" }
       ]
     }
   ];
@@ -1379,11 +1502,12 @@
   });
 
   function purchasedDetailsTableHtml(summary, withTrack) {
-    var details = Array.isArray(summary.details) ? summary.details : [];
-    return '<div class="sales-table-wrap sales-modal-table-wrap"><table class="sales-table sales-modal-table" style="min-width:1560px"><thead><tr><th>序号</th><th>产品名称</th><th>物资编码</th><th>产品编码</th><th>规格型号</th><th>制造商名称</th><th>下单公司</th><th>场站名称</th><th>订单编号</th><th>销售合同编号</th><th>购入数量</th><th>收货日期</th><th>存放地点</th><th>使用状态</th><th>操作</th></tr></thead><tbody>' +
+    var details = expandPurchasedDetails(summary);
+    return '<div class="sales-table-wrap sales-modal-table-wrap"><table class="sales-table sales-modal-table" style="min-width:1720px"><thead><tr><th>序号</th><th>物资唯一编码</th><th>产品名称</th><th>物资编码</th><th>产品编码</th><th>规格型号</th><th>制造商名称</th><th>下单公司</th><th>场站名称</th><th>订单编号</th><th>销售合同编号</th><th>收货日期</th><th>存放地点</th><th>使用状态</th><th>操作</th></tr></thead><tbody>' +
       (details.length ? details.map(function (row, idx) {
         return "<tr>" +
           "<td>" + (idx + 1) + "</td>" +
+          "<td>" + esc(textOrDash(row.unitCode)) + "</td>" +
           "<td>" + esc(textOrDash(row.productName)) + "</td>" +
           "<td>" + esc(textOrDash(row.materialCode)) + "</td>" +
           "<td>" + esc(textOrDash(row.productCode)) + "</td>" +
@@ -1393,7 +1517,6 @@
           "<td>" + esc(textOrDash(row.station)) + "</td>" +
           "<td>" + esc(textOrDash(row.orderNo)) + "</td>" +
           "<td>" + esc(textOrDash(row.contractNo)) + "</td>" +
-          "<td>" + esc(textOrDash(row.qty)) + "</td>" +
           "<td>" + esc(textOrDash(row.receiveDate)) + "</td>" +
           "<td>" + esc(textOrDash(row.location)) + "</td>" +
           "<td>" + tag(row.usageStatus) + "</td>" +
@@ -1411,7 +1534,7 @@
       '<div class="sales-detail-card"><div class="sales-detail-label">购入总数量</div><div class="sales-detail-value">' + esc(summary.totalQty) + '</div></div>' +
       '<div class="sales-detail-card"><div class="sales-detail-label">关联订单数</div><div class="sales-detail-value">' + esc(summary.orderCount) + '</div></div>' +
       '</div><table class="sales-detail-table"><tbody>' +
-      '<tr><th>产品种类数</th><td>' + esc(summary.productKinds) + '</td><th>最新收货日期</th><td>' + esc(summary.latestReceiveDate) + '</td></tr>' +
+      '<tr><th>物资总价</th><td>' + moneyYuan(summary.totalAmount) + '</td><th>最新收货日期</th><td>' + esc(summary.latestReceiveDate) + '</td></tr>' +
       '<tr><th>主要场站</th><td colspan="3">' + esc(summary.mainStation) + '</td></tr>' +
       '</tbody></table><div class="sales-section-title">购入物资明细表</div>' + purchasedDetailsTableHtml(summary, true);
   }
@@ -1440,15 +1563,13 @@
 
   function initPurchased() {
     var tbody = document.getElementById("salesPurchasedBody");
-    tbody.innerHTML = purchasedSummaries.map(function (summary) {
+    tbody.innerHTML = purchasedSummaries.map(function (summary, idx) {
       return "<tr>" +
+        "<td>" + (idx + 1) + "</td>" +
         "<td>" + esc(summary.typeCode) + "</td>" +
         "<td>" + esc(summary.typeName) + "</td>" +
-        "<td>" + esc(summary.productKinds) + "</td>" +
+        "<td>" + money(summary.totalAmount) + "</td>" +
         "<td>" + esc(summary.totalQty) + "</td>" +
-        "<td>" + esc(summary.orderCount) + "</td>" +
-        "<td>" + esc(summary.latestReceiveDate) + "</td>" +
-        "<td>" + esc(summary.mainStation) + "</td>" +
         '<td><span class="sales-op-row">' + iconBtn("view", "查看", "view-purchased", summary.typeCode) + "</span></td>" +
         "</tr>";
     }).join("");
@@ -1546,6 +1667,18 @@
   }
 
   function initReport() {
+    document.querySelectorAll("[data-report-tab]").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        var key = btn.getAttribute("data-report-tab");
+        document.querySelectorAll("[data-report-tab]").forEach(function (item) {
+          item.classList.toggle("is-active", item === btn);
+        });
+        document.querySelectorAll("[data-report-pane]").forEach(function (pane) {
+          pane.classList.toggle("is-active", pane.getAttribute("data-report-pane") === key);
+        });
+      });
+    });
+
     document.getElementById("salesReportBody").innerHTML = reportRows.map(function (row) {
       return "<tr>" +
         "<td>" + esc(row.orderNo) + "</td>" +
