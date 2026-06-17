@@ -19,7 +19,10 @@
   var orderMap = {};
   var purchasedMap = {};
   var reportMap = {};
+  var renderOrdersTable = null;
   var SALES_CART_RESET_KEY = "salesCartResetV1";
+  var SALES_ORDER_STORE_KEY = "salesSubmittedOrdersV1";
+  var SALES_PURCHASED_STORE_KEY = "salesDynamicPurchasedV1";
 
   try {
     cartItems = JSON.parse(localStorage.getItem("salesCartItems") || "[]") || [];
@@ -120,6 +123,65 @@
     if (v == null) return "—";
     var text = String(v).trim();
     return text ? text : "—";
+  }
+
+  function todayIso() {
+    var d = new Date();
+    var m = String(d.getMonth() + 1).padStart(2, "0");
+    var day = String(d.getDate()).padStart(2, "0");
+    return d.getFullYear() + "-" + m + "-" + day;
+  }
+
+  function readStore(key, fallback) {
+    try {
+      var parsed = JSON.parse(localStorage.getItem(key) || "null");
+      return parsed == null ? fallback : parsed;
+    } catch (eStoreRead) {
+      return fallback;
+    }
+  }
+
+  function writeStore(key, value) {
+    try {
+      localStorage.setItem(key, JSON.stringify(value));
+    } catch (eStoreWrite) {}
+  }
+
+  function refreshOrderMap() {
+    orderMap = {};
+    orders.forEach(function (order) {
+      patchOrderMaterials(order);
+      orderMap[order.orderNo] = order;
+    });
+  }
+
+  function storedOrders() {
+    return readStore(SALES_ORDER_STORE_KEY, []);
+  }
+
+  function saveStoredOrder(order) {
+    var list = storedOrders();
+    var idx = list.findIndex(function (row) { return row.orderNo === order.orderNo; });
+    if (idx >= 0) list[idx] = order;
+    else list.push(order);
+    writeStore(SALES_ORDER_STORE_KEY, list);
+  }
+
+  function nextOrderNo() {
+    var max = 0;
+    orders.concat(storedOrders()).forEach(function (order) {
+      var m = String(order && order.orderNo || "").match(/XSORD-2026-(\d+)/);
+      if (m) max = Math.max(max, Number(m[1]));
+    });
+    return "XSORD-2026-" + String(max + 1).padStart(3, "0");
+  }
+
+  function rebuildPurchasedMap() {
+    purchasedMap = {};
+    purchasedSummaries.forEach(function (item) {
+      patchPurchasedSummary(item);
+      purchasedMap[item.typeCode] = item;
+    });
   }
 
   function tag(text) {
@@ -824,22 +886,147 @@
   function cartHtml() {
     return cartTableHtml() +
       '<div class="sales-form-grid" style="margin-top:12px">' +
-      '<div class="sales-field"><label>订单编号</label><input readonly value="XSORD-2026-009"></div>' +
+      '<div class="sales-field"><label>订单编号</label><input readonly value="' + esc(nextOrderNo()) + '"></div>' +
       '<div class="sales-field"><label>订单状态</label><input readonly value="待确认"></div>' +
-      '<div class="sales-field"><label>下单人</label><input value="张明"></div>' +
-      '<div class="sales-field"><label>下单公司</label><select><option>河北龙源</option><option>天津龙源</option><option>甘肃龙源</option></select></div>' +
-      '<div class="sales-field"><label>收货单位</label><input readonly value="山西龙源新能源有限公司"></div>' +
-      '<div class="sales-field"><label>场站名称</label><input readonly value="忻州风电场"></div>' +
-      '<div class="sales-field"><label>物资所属部门</label><input readonly value="电控所"></div>' +
-      '<div class="sales-field"><label>下单日期</label><input type="date" value="2026-06-17"></div>' +
-      '<div class="sales-field"><label>发货路径</label><select id="salesCartPath"><option>工程技术公司发货</option><option>供应商直发</option></select></div>' +
+      '<div class="sales-field"><label>下单人</label><input id="salesOrderRequester" value="张明"></div>' +
+      '<div class="sales-field"><label>下单公司</label><select id="salesOrderCompany"><option>河北龙源</option><option>天津龙源</option><option>甘肃龙源</option></select></div>' +
+      '<div class="sales-field"><label>收货单位</label><input id="salesOrderReceiver" readonly value="山西龙源新能源有限公司"></div>' +
+      '<div class="sales-field"><label>场站名称</label><input id="salesOrderStation" readonly value="忻州风电场"></div>' +
+      '<div class="sales-field"><label>物资所属部门</label><input id="salesOrderDept" readonly value="电控所"></div>' +
+      '<div class="sales-field"><label>下单日期</label><input id="salesOrderDate" type="date" value="2026-06-17"></div>' +
+      '<div class="sales-field"><label>发货路径</label><select id="salesOrderRoute"><option>工程技术公司发货</option><option>供应商直发</option></select></div>' +
       '<div class="sales-field"><label>当前处理人</label><input value="电控所负责人"></div>' +
       '<div class="sales-field"><label>销售合同编号</label><input readonly value="—"></div>' +
       '<div class="sales-field"><label>物流单号</label><input readonly value="—"></div>' +
       '<div class="sales-field"><label>期望发货日期</label><input type="date" value="2026-06-30"></div>' +
       '<div class="sales-field"><label>收货日期</label><input readonly value="—"></div>' +
-      '<div class="sales-field sales-field--full"><label>订单备注</label><textarea placeholder="请输入订单备注"></textarea></div>' +
+      '<div class="sales-field sales-field--full"><label>订单备注</label><textarea id="salesOrderRemark" placeholder="请输入订单备注"></textarea></div>' +
       "</div>";
+  }
+
+  function formValue(selector, fallback) {
+    var el = document.querySelector(selector);
+    if (!el) return fallback;
+    return String(el.value || "").trim() || fallback;
+  }
+
+  function buildOrderFromRows(rows, source) {
+    var totalQty = rows.reduce(function (sum, row) { return sum + toNumber(row.qty); }, 0);
+    var totalAmount = rows.reduce(function (sum, row) { return sum + toNumber(row.subtotal); }, 0);
+    var orderNo = nextOrderNo();
+    return patchOrderMaterials({
+      orderNo: orderNo,
+      requester: formValue("#salesOrderRequester", "张明"),
+      company: formValue("#salesOrderCompany", "河北龙源"),
+      receiverCompany: formValue("#salesOrderReceiver", "山西龙源新能源有限公司"),
+      station: formValue("#salesOrderStation", "忻州风电场"),
+      owningDept: formValue("#salesOrderDept", "电控所"),
+      orderDate: formValue("#salesOrderDate", todayIso()),
+      route: formValue("#salesOrderRoute", "工程技术公司发货"),
+      totalQty: totalQty,
+      totalAmount: totalAmount,
+      status: "待确认",
+      handler: "电控所负责人",
+      contractNo: "—",
+      waybillNo: "—",
+      shipDate: "—",
+      receiveDate: "—",
+      remark: formValue("#salesOrderRemark", ""),
+      materials: rows.map(function (row, idx) {
+        return {
+          id: orderNo + "-m" + (idx + 1),
+          productName: row.productName,
+          productCode: row.code || row.productCode,
+          model: row.model,
+          manufacturer: row.mfrName || row.manufacturer,
+          typeCode: row.typeCode,
+          typeName: row.typeName,
+          category: row.category,
+          qty: toNumber(row.qty),
+          price: toNumber(row.price),
+          subtotal: toNumber(row.subtotal),
+          features: row.features || []
+        };
+      })
+    });
+  }
+
+  function addOrder(order) {
+    orders.unshift(order);
+    saveStoredOrder(order);
+    refreshOrderMap();
+    if (renderOrdersTable) renderOrdersTable();
+  }
+
+  function purchasedSummaryKey(material) {
+    var code = String(material.typeCode || material.materialCode || "").trim();
+    return code.length > 10 ? code.slice(0, 10) : code || "UNKNOWN";
+  }
+
+  function mergePurchasedSummary(list, summary) {
+    var idx = list.findIndex(function (row) { return row.typeCode === summary.typeCode; });
+    if (idx < 0) {
+      list.push(summary);
+      return;
+    }
+    var old = list[idx];
+    var details = Array.isArray(old.details) ? old.details : [];
+    (summary.details || []).forEach(function (detail) {
+      var exists = details.some(function (row) { return row.id === detail.id; });
+      if (!exists) details.push(detail);
+    });
+    old.details = details;
+    old.totalQty = details.reduce(function (sum, row) { return sum + toNumber(row.qty); }, 0);
+    old.totalAmount = details.reduce(function (sum, row) { return sum + toNumber(row.amount); }, 0);
+    old.orderCount = uniqueBy(details, function (row) { return row.orderNo; }).length;
+    old.productKinds = uniqueBy(details, function (row) { return row.productCode || row.productName; }).length;
+    old.latestReceiveDate = details.map(function (row) { return row.receiveDate; }).sort().slice(-1)[0] || old.latestReceiveDate;
+    old.mainStation = details[0] ? details[0].station : old.mainStation;
+  }
+
+  function syncPurchasedFromOrder(order) {
+    var dynamic = readStore(SALES_PURCHASED_STORE_KEY, []);
+    var grouped = {};
+    orderMaterialRows(order).forEach(function (material, idx) {
+      var key = purchasedSummaryKey(material);
+      if (!grouped[key]) {
+        grouped[key] = {
+          typeCode: key,
+          typeName: material.typeName,
+          productKinds: 0,
+          totalQty: 0,
+          totalAmount: 0,
+          orderCount: 1,
+          latestReceiveDate: order.receiveDate || order.shipDate,
+          mainStation: order.station,
+          details: []
+        };
+      }
+      grouped[key].details.push({
+        id: order.orderNo + "-" + material.id + "-p" + (idx + 1),
+        productName: material.productName,
+        materialCode: material.typeCode,
+        productCode: material.code,
+        spec: material.model,
+        manufacturer: material.mfrName,
+        company: order.company,
+        station: order.station,
+        orderNo: order.orderNo,
+        contractNo: order.contractNo,
+        qty: material.qty,
+        amount: material.subtotal,
+        receiveDate: order.receiveDate || order.shipDate,
+        location: order.station + "库房",
+        usageStatus: "库存中"
+      });
+    });
+    Object.keys(grouped).forEach(function (key) {
+      var summary = patchPurchasedSummary(grouped[key]);
+      mergePurchasedSummary(dynamic, summary);
+      if (typeof purchasedSummaries !== "undefined") mergePurchasedSummary(purchasedSummaries, summary);
+    });
+    writeStore(SALES_PURCHASED_STORE_KEY, dynamic);
+    if (typeof purchasedSummaries !== "undefined") rebuildPurchasedMap();
   }
 
   function refreshCartModal() {
@@ -891,8 +1078,17 @@
     }
     var submit = document.getElementById("salesCartSubmit");
     if (submit) submit.addEventListener("click", function () {
-      toast("订单已提交（演示）");
+      var rows = cartRows();
+      if (!rows.length) {
+        toast("请先添加购物车物资");
+        return;
+      }
+      var order = buildOrderFromRows(rows, "cart");
+      addOrder(order);
+      cartItems = [];
+      saveCart();
       closeModal();
+      toast("订单已提交，已同步到订单管理");
     });
   }
 
@@ -1038,7 +1234,7 @@
   }
 
   function openOrderApproval(order) {
-    order = patchOrderMaterials(Object.assign({}, order));
+    order = patchOrderMaterials(order);
     openModal(
       "订单审核 - " + order.orderNo,
       '<div class="sales-section-title">订单物资明细表</div>' + orderMaterialsTableHtml(order, false) +
@@ -1047,23 +1243,51 @@
       '<div class="sales-field"><label>审批结论</label><select><option>同意</option><option>驳回</option></select></div>' +
       '<div class="sales-field sales-field--full"><label>审批意见</label><textarea>订单信息完整，物资明细与购买数量一致，同意进入合同签订环节。</textarea></div>' +
       '</div>',
-      '<button class="sales-btn" data-close>取消</button><button class="sales-btn sales-btn-primary" data-close>确认提交</button>',
+      '<button class="sales-btn" data-close>取消</button><button class="sales-btn sales-btn-primary" id="salesApproveConfirm">确认提交</button>',
       "wide"
     );
     setModalHeadAction("流程进度", openSalesFlowModal);
+    var ok = document.getElementById("salesApproveConfirm");
+    if (ok) ok.addEventListener("click", function () {
+      order.status = "待签订合同";
+      order.handler = "经营发展中心合同岗";
+      saveStoredOrder(order);
+      refreshOrderMap();
+      if (renderOrdersTable) renderOrdersTable();
+      closeModal();
+      toast("订单已审核通过，进入合同签订环节");
+    });
   }
 
   function openUploadContract(order) {
+    order = patchOrderMaterials(order);
     openModal(
       "签订销售合同 - " + order.orderNo,
-      '<div class="sales-form-grid"><div class="sales-field"><label>订单编号</label><input readonly value="' + esc(order.orderNo) + '"></div><div class="sales-field"><label>销售合同编号</label><input placeholder="请输入销售合同编号"></div><div class="sales-field sales-field--full"><label>合同附件</label><input type="file"></div></div>',
-      '<button class="sales-btn" data-close>取消</button><button class="sales-btn sales-btn-primary" data-close>确认签订</button>',
+      '<div class="sales-form-grid"><div class="sales-field"><label>订单编号</label><input readonly value="' + esc(order.orderNo) + '"></div><div class="sales-field"><label>销售合同编号</label><input id="salesContractNo" value="' + esc(order.contractNo && order.contractNo !== "—" ? order.contractNo : "") + '" placeholder="请输入销售合同编号"></div><div class="sales-field sales-field--full"><label>合同附件</label><input type="file"></div></div>',
+      '<button class="sales-btn" data-close>取消</button><button class="sales-btn sales-btn-primary" id="salesContractConfirm">确认签订</button>',
       true
     );
     setModalHeadAction("流程进度", openSalesFlowModal);
+    var ok = document.getElementById("salesContractConfirm");
+    if (ok) ok.addEventListener("click", function () {
+      var contractNo = formValue("#salesContractNo", "");
+      if (!contractNo) {
+        toast("请填写销售合同编号");
+        return;
+      }
+      order.contractNo = contractNo;
+      order.status = "待发货";
+      order.handler = "机械所发货专责";
+      saveStoredOrder(order);
+      refreshOrderMap();
+      if (renderOrdersTable) renderOrdersTable();
+      closeModal();
+      toast("销售合同已签订，可安排发货");
+    });
   }
 
   function openShipOrder(order) {
+    order = patchOrderMaterials(order);
     var needsContract = !order.contractNo || order.contractNo === "—";
     var contractTip = needsContract ? '<div class="sales-inline-tip">请先补充销售合同信息，再继续填写发货信息。</div>' : "";
     openModal(
@@ -1074,19 +1298,44 @@
       '</tbody></table><div class="sales-section-title">销售合同信息</div>' +
       '<div class="sales-form-grid">' +
       '<div class="sales-field"><label>订单编号</label><input readonly value="' + esc(order.orderNo) + '"></div>' +
-      '<div class="sales-field"><label>销售合同编号</label><input placeholder="请输入销售合同编号"></div>' +
+      '<div class="sales-field"><label>销售合同编号</label><input id="salesShipContractNo" value="' + esc(order.contractNo && order.contractNo !== "—" ? order.contractNo : "") + '" placeholder="请输入销售合同编号"></div>' +
       '<div class="sales-field sales-field--full"><label>销售合同附件</label><input type="file"></div>' +
       '</div><div class="sales-section-title">发货信息</div>' +
       '<div class="sales-form-grid">' +
-      '<div class="sales-field"><label>物流单号</label><input placeholder="请输入物流单号"></div>' +
-      '<div class="sales-field"><label>发货日期</label><input type="date"></div>' +
-      '<div class="sales-field"><label>发货部门</label><input placeholder="请输入发货部门"></div>' +
-      '<div class="sales-field"><label>发货人</label><input placeholder="请输入发货人"></div>' +
-      '<div class="sales-field sales-field--full"><label>发货备注</label><textarea placeholder="请输入发货备注"></textarea></div>' +
+      '<div class="sales-field"><label>物流单号</label><input id="salesShipWaybill" value="' + esc(order.waybillNo && order.waybillNo !== "—" ? order.waybillNo : "") + '" placeholder="请输入物流单号"></div>' +
+      '<div class="sales-field"><label>发货日期</label><input id="salesShipDate" type="date" value="' + esc(order.shipDate && order.shipDate !== "—" ? order.shipDate : todayIso()) + '"></div>' +
+      '<div class="sales-field"><label>发货部门</label><input id="salesShipDept" placeholder="请输入发货部门"></div>' +
+      '<div class="sales-field"><label>发货人</label><input id="salesShipPerson" placeholder="请输入发货人"></div>' +
+      '<div class="sales-field sales-field--full"><label>发货备注</label><textarea id="salesShipRemark" placeholder="请输入发货备注"></textarea></div>' +
       '</div>',
-      '<button class="sales-btn" data-close>取消</button><button class="sales-btn sales-btn-primary" data-close>确认发货</button>'
+      '<button class="sales-btn" data-close>取消</button><button class="sales-btn sales-btn-primary" id="salesShipConfirm">确认发货</button>'
     );
     setModalHeadAction("流程进度", openSalesFlowModal);
+    var ok = document.getElementById("salesShipConfirm");
+    if (ok) ok.addEventListener("click", function () {
+      var contractNo = formValue("#salesShipContractNo", "");
+      var waybillNo = formValue("#salesShipWaybill", "");
+      if (!contractNo) {
+        toast("请填写销售合同编号");
+        return;
+      }
+      if (!waybillNo) {
+        toast("请填写物流单号");
+        return;
+      }
+      order.contractNo = contractNo;
+      order.waybillNo = waybillNo;
+      order.shipDate = formValue("#salesShipDate", todayIso());
+      order.status = "已发货";
+      order.handler = formValue("#salesShipPerson", order.handler || "机械所发货专责");
+      order.receiveDate = order.receiveDate && order.receiveDate !== "—" ? order.receiveDate : order.shipDate;
+      saveStoredOrder(order);
+      refreshOrderMap();
+      syncPurchasedFromOrder(order);
+      if (renderOrdersTable) renderOrdersTable();
+      closeModal();
+      toast("订单已发货，购入物资和物资跟踪已同步");
+    });
   }
 
   function orderFormHtml(materials) {
@@ -1109,21 +1358,21 @@
     return '<div class="sales-section-title">订单物资明细表</div>' +
       materialTable +
       '<div class="sales-form-grid sales-form-grid--spaced">' +
-      '<div class="sales-field"><label>订单编号</label><input readonly value="XSORD-2026-009"></div>' +
+      '<div class="sales-field"><label>订单编号</label><input readonly value="' + esc(nextOrderNo()) + '"></div>' +
       '<div class="sales-field"><label>订单状态</label><input readonly value="待确认"></div>' +
-      '<div class="sales-field"><label>下单人</label><input value="张明"></div>' +
-      '<div class="sales-field"><label>下单公司</label><select><option>河北龙源</option><option>天津龙源</option><option>甘肃龙源</option></select></div>' +
-      '<div class="sales-field"><label>收货单位</label><input value="山西龙源新能源有限公司"></div>' +
-      '<div class="sales-field"><label>场站名称</label><input value="忻州风电场"></div>' +
-      '<div class="sales-field"><label>物资所属部门</label><input value="电控所"></div>' +
-      '<div class="sales-field"><label>下单日期</label><input type="date" value="2026-06-17"></div>' +
-      '<div class="sales-field"><label>发货路径</label><select><option>工程技术公司发货</option><option>供应商直发</option></select></div>' +
+      '<div class="sales-field"><label>下单人</label><input id="salesOrderRequester" value="张明"></div>' +
+      '<div class="sales-field"><label>下单公司</label><select id="salesOrderCompany"><option>河北龙源</option><option>天津龙源</option><option>甘肃龙源</option></select></div>' +
+      '<div class="sales-field"><label>收货单位</label><input id="salesOrderReceiver" value="山西龙源新能源有限公司"></div>' +
+      '<div class="sales-field"><label>场站名称</label><input id="salesOrderStation" value="忻州风电场"></div>' +
+      '<div class="sales-field"><label>物资所属部门</label><input id="salesOrderDept" value="电控所"></div>' +
+      '<div class="sales-field"><label>下单日期</label><input id="salesOrderDate" type="date" value="2026-06-17"></div>' +
+      '<div class="sales-field"><label>发货路径</label><select id="salesOrderRoute"><option>工程技术公司发货</option><option>供应商直发</option></select></div>' +
       '<div class="sales-field"><label>当前处理人</label><input value="电控所负责人"></div>' +
       '<div class="sales-field"><label>销售合同编号</label><input readonly value="—"></div>' +
       '<div class="sales-field"><label>物流单号</label><input readonly value="—"></div>' +
       '<div class="sales-field"><label>期望发货日期</label><input type="date" value="2026-06-30"></div>' +
       '<div class="sales-field"><label>收货日期</label><input readonly value="—"></div>' +
-      '<div class="sales-field sales-field--full"><label>订单备注</label><textarea placeholder="请输入订单备注"></textarea></div>' +
+      '<div class="sales-field sales-field--full"><label>订单备注</label><textarea id="salesOrderRemark" placeholder="请输入订单备注"></textarea></div>' +
       '</div>';
   }
 
@@ -1211,8 +1460,14 @@
     }
     var ok = document.getElementById("salesSubmitOrder");
     if (ok) ok.addEventListener("click", function () {
-      toast("订单已提交（演示）");
+      var rows = orderMaterialRows({ materials: orderDraftMaterials });
+      if (!rows.length) {
+        toast("请先选择下单物资");
+        return;
+      }
+      addOrder(buildOrderFromRows(rows, "direct"));
       closeModal();
+      toast("订单已提交，已同步到订单管理");
     });
   }
 
@@ -1287,10 +1542,12 @@
     }
   ];
 
-  orders.forEach(function (order) {
-    patchOrderMaterials(order);
-    orderMap[order.orderNo] = order;
+  storedOrders().forEach(function (stored) {
+    var idx = orders.findIndex(function (order) { return order.orderNo === stored.orderNo; });
+    if (idx >= 0) orders[idx] = stored;
+    else orders.unshift(stored);
   });
+  refreshOrderMap();
 
   function initMaterialList() {
     if (!D) return;
@@ -1494,6 +1751,7 @@
           "</tr>";
       }).join("");
     }
+    renderOrdersTable = render;
 
     var orderAdd = document.getElementById("salesOrderAdd");
     if (orderAdd) orderAdd.addEventListener("click", function () {
@@ -1553,10 +1811,10 @@
     }
   ];
 
-  purchasedSummaries.forEach(function (item) {
-    patchPurchasedSummary(item);
-    purchasedMap[item.typeCode] = item;
+  readStore(SALES_PURCHASED_STORE_KEY, []).forEach(function (summary) {
+    mergePurchasedSummary(purchasedSummaries, summary);
   });
+  rebuildPurchasedMap();
 
   function purchasedDetailsTableHtml(summary, withTrack) {
     var details = expandPurchasedDetails(summary);
