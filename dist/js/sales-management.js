@@ -1840,7 +1840,6 @@
   function purchasedDetailHtml(summary) {
     summary = patchPurchasedSummary(Object.assign({}, summary));
     return '<div class="sales-section-title">购入物资明细表</div>' + purchasedDetailsTableHtml(summary, true) +
-      '<div id="salesPurchasedTrackPanel"></div>' +
       '<div class="sales-form-grid sales-form-grid--spaced">' +
       '<div class="sales-field"><label>物资类型编码</label><input readonly value="' + esc(summary.typeCode) + '"></div>' +
       '<div class="sales-field"><label>物资类型名称</label><input readonly value="' + esc(summary.typeName) + '"></div>' +
@@ -1849,7 +1848,8 @@
       '<div class="sales-field"><label>物资总价</label><input readonly value="' + moneyYuan(summary.totalAmount) + '"></div>' +
       '<div class="sales-field"><label>最新收货日期</label><input readonly value="' + esc(summary.latestReceiveDate) + '"></div>' +
       '<div class="sales-field"><label>主要场站</label><input readonly value="' + esc(summary.mainStation) + '"></div>' +
-      '</div>';
+      '</div>' +
+      '<div id="salesPurchasedTrackPanel"></div>';
   }
 
   function purchasedInlineTrackHtml(summary, row) {
@@ -2060,6 +2060,8 @@
       openOrderTrack(btn.getAttribute("data-order"), btn.getAttribute("data-item"));
     }
     if (action === "purchased-track") {
+      e.preventDefault();
+      e.stopPropagation();
       var summary = purchasedMap[btn.getAttribute("data-type")];
       if (!summary) return;
       var row = expandPurchasedDetails(summary).find(function (item) { return item.id === btn.getAttribute("data-item"); });
