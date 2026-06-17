@@ -1091,6 +1091,8 @@
 
   function orderFormHtml(materials) {
     var rows = materials && materials.length ? materials : [];
+    var totalQty = rows.reduce(function (sum, row) { return sum + toNumber(row.qty); }, 0);
+    var totalAmount = rows.reduce(function (sum, row) { return sum + toNumber(row.subtotal); }, 0);
     var materialTable = rows.length ? materialLineTableHtml(orderMaterialRows({ materials: rows.map(function (row, idx) {
         return {
           id: row.id || ("tmp-" + idx),
@@ -1109,8 +1111,8 @@
     return '<div class="sales-section-title">订单物资明细表</div>' +
       materialTable +
       '<div class="sales-form-grid sales-form-grid--spaced">' +
-      '<div class="sales-field"><label>购买总数量</label><input readonly value="系统自动生成"></div>' +
-      '<div class="sales-field"><label>订单总金额</label><input readonly value="系统自动生成"></div>' +
+      '<div class="sales-field"><label>购买总数量</label><input readonly value="' + esc(totalQty || "—") + '"></div>' +
+      '<div class="sales-field"><label>订单总金额</label><input readonly value="' + (totalQty ? moneyYuan(totalAmount) : "—") + '"></div>' +
       '<div class="sales-field"><label>订单编号</label><input readonly value="系统自动生成"></div>' +
       '<div class="sales-field"><label>订单状态</label><input readonly value="待确认"></div>' +
       '<div class="sales-field"><label>下单人</label><input value="张明"></div>' +
