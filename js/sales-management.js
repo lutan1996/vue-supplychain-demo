@@ -203,12 +203,6 @@
       );
     }
 
-    html += salesTrackItemHtml(
-      currentColor,
-      "当前订单状态：" + textOrDash(order.status),
-      "状态时间：" + dotDate(order.receiveDate || order.shipDate || shiftDotDate(order.orderDate, approvedDone ? 1 : 0)) + "；当前处理人：" + textOrDash(order.handler) + "；当前场站：" + textOrDash(order.station) + "；可继续通过订单编号 " + textOrDash(order.orderNo) + " 关联查看销售合同和购入物资明细。"
-    );
-
     return html;
   }
 
