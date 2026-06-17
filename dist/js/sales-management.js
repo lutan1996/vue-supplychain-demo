@@ -1097,6 +1097,7 @@
       }) }), { editable: true, qtyAttr: "data-order-qty", stepAttr: "data-order-qty-step" }) : '<div class="sales-empty">暂无物资，请从物资列表中选择产品后下单。</div>';
     return '<div class="sales-section-title">订单物资明细表</div>' +
       materialTable +
+      '<div class="sales-form-grid sales-form-grid--spaced"><div class="sales-field"><label>购买总数量</label><input readonly value="系统自动生成"></div></div>' +
       '<div class="sales-form-grid sales-form-grid--spaced">' +
       '<div class="sales-field"><label>订单编号</label><input readonly value="系统自动生成"></div>' +
       '<div class="sales-field"><label>订单状态</label><input readonly value="待确认"></div>' +
