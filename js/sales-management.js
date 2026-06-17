@@ -821,12 +821,13 @@
   function cartHtml() {
     return cartTableHtml() +
       '<div class="sales-form-grid" style="margin-top:12px">' +
-      '<div class="sales-field"><label>物资所属部门</label><input readonly value="电控所"></div>' +
+      '<div class="sales-field"><label>下单公司</label><select><option>河北龙源</option><option>天津龙源</option><option>甘肃龙源</option></select></div>' +
       '<div class="sales-field"><label>收货单位</label><input readonly value="山西龙源新能源有限公司"></div>' +
       '<div class="sales-field"><label>场站名称</label><input readonly value="忻州风电场"></div>' +
+      '<div class="sales-field"><label>物资所属部门</label><input readonly value="电控所"></div>' +
       '<div class="sales-field"><label>发货路径</label><select id="salesCartPath"><option>工程技术公司发货</option><option>供应商直发</option></select></div>' +
-      '<div class="sales-field"><label>期望发货日期</label><input type="date" value="2026-06-20"></div>' +
-      '<div class="sales-field sales-field--full"><label>备注</label><textarea>销售类物资统一汇总后提交订单。</textarea></div>' +
+      '<div class="sales-field"><label>期望发货日期</label><input type="date" value="2026-06-30"></div>' +
+      '<div class="sales-field sales-field--full"><label>订单备注</label><textarea placeholder="请输入订单备注"></textarea></div>' +
       "</div>";
   }
 
