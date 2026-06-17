@@ -1499,7 +1499,8 @@
       }).join("");
     }
 
-    document.getElementById("salesOrderAdd").addEventListener("click", function () {
+    var orderAdd = document.getElementById("salesOrderAdd");
+    if (orderAdd) orderAdd.addEventListener("click", function () {
       openOrderForm(null);
     });
     document.getElementById("salesOrderQuery").addEventListener("click", function () {
