@@ -824,7 +824,7 @@
   function cartHtml() {
     return cartTableHtml() +
       '<div class="sales-form-grid" style="margin-top:12px">' +
-      '<div class="sales-field"><label>订单编号</label><input readonly value="系统自动生成"></div>' +
+      '<div class="sales-field"><label>订单编号</label><input readonly value="XSORD-2026-009"></div>' +
       '<div class="sales-field"><label>订单状态</label><input readonly value="待确认"></div>' +
       '<div class="sales-field"><label>下单人</label><input value="张明"></div>' +
       '<div class="sales-field"><label>下单公司</label><select><option>河北龙源</option><option>天津龙源</option><option>甘肃龙源</option></select></div>' +
@@ -1113,7 +1113,7 @@
       '<div class="sales-form-grid sales-form-grid--spaced">' +
       '<div class="sales-field"><label>购买总数量</label><input readonly value="' + esc(totalQty || "—") + '"></div>' +
       '<div class="sales-field"><label>订单总金额</label><input readonly value="' + (totalQty ? moneyYuan(totalAmount) : "—") + '"></div>' +
-      '<div class="sales-field"><label>订单编号</label><input readonly value="系统自动生成"></div>' +
+      '<div class="sales-field"><label>订单编号</label><input readonly value="XSORD-2026-009"></div>' +
       '<div class="sales-field"><label>订单状态</label><input readonly value="待确认"></div>' +
       '<div class="sales-field"><label>下单人</label><input value="张明"></div>' +
       '<div class="sales-field"><label>下单公司</label><select><option>河北龙源</option><option>天津龙源</option><option>甘肃龙源</option></select></div>' +
@@ -1160,6 +1160,18 @@
         qty: 1,
         price: 2030.00,
         subtotal: 2030.00
+      }, {
+        id: "new-order-m2",
+        productName: "通讯管理机",
+        productCode: "B00000016",
+        model: "CMU-V3",
+        manufacturer: "联合动力",
+        typeCode: "A0200100002",
+        typeName: "工业控制与通讯设备",
+        category: "工业通讯",
+        qty: 2,
+        price: 2050.00,
+        subtotal: 4100.00
       });
     }
     orderDraftMaterials = materials;
