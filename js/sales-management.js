@@ -2072,7 +2072,14 @@
         setModalHeadAction("流程进度", openSalesFlowModal);
         panel = document.getElementById("salesPurchasedTrackPanel");
       }
-      if (panel) panel.innerHTML = purchasedInlineTrackHtml(summary, row);
+      if (panel) {
+        var modalBody = document.getElementById("salesModalBody");
+        var detailTable = modalBody && modalBody.querySelector(".sales-modal-table-wrap");
+        if (detailTable && detailTable.nextSibling !== panel) {
+          detailTable.parentNode.insertBefore(panel, detailTable.nextSibling);
+        }
+        panel.innerHTML = purchasedInlineTrackHtml(summary, row);
+      }
     }
   });
 
