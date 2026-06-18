@@ -2594,7 +2594,7 @@
         是否在库: inStockFlag,
         是否开票: i % 4 === 0 ? "已开票" : "未开票",
         物资跟踪:
-          '<a href="#" class="js-op" data-op="物资跟踪查看" data-track-code="' +
+          '<a href="#" class="m10-material-track-link" data-track-action="material-track" data-track-code="' +
           escHtml(code) +
           '" data-track-name="' +
           escHtml(name) +
@@ -2656,7 +2656,7 @@
           是否在库: "否",
           是否开票: seq % 4 === 0 ? "已开票" : "未开票",
           物资跟踪:
-            '<a href="#" class="js-op" data-op="物资跟踪查看" data-track-code="' +
+            '<a href="#" class="m10-material-track-link" data-track-action="material-track" data-track-code="' +
             escHtml(code) +
             '" data-track-name="' +
             escHtml(displayName) +
@@ -2819,7 +2819,7 @@
       '<div id="procInlineTrackWrap" style="margin-top:14px">' +
       '<div style="font-weight:600;margin:0 0 8px;color:#1f3551;">物资跟踪</div>' +
       '<div id="procInlineTrackBox" style="display:none;border:1px solid #e6edf5;border-radius:8px;padding:12px;background:#fff"></div>' +
-      '<div id="procInlineTrackHint" style="font-size:12px;color:#8a94a6;margin-top:6px">点击上方“查看”在当前弹窗内展开节点轨迹。</div>' +
+      '<div id="procInlineTrackHint" style="font-size:12px;color:#8a94a6;margin-top:6px">点击上方“物资跟踪”在当前弹窗内展开节点轨迹。</div>' +
       "</div>" +
       "</div>"
     );
@@ -4029,11 +4029,6 @@
       );
       $("procModalClose").addEventListener("click", closeProcModal, { once: true });
     },
-    物资跟踪查看: function (el) {
-      renderInlineTrackTimeline(el);
-      var hint = document.getElementById("procInlineTrackHint");
-      if (hint) hint.textContent = "已展开该物资轨迹，可继续点其它“物资跟踪”切换。";
-    },
     验收录入: function () {
       openProcModal(
         "录入验收结果",
@@ -4141,6 +4136,14 @@
           if (!row) return;
           var open = row.classList.toggle("is-open");
           toggleBtn.setAttribute("aria-expanded", open ? "true" : "false");
+          return;
+        }
+        var trackBtn = e.target.closest("[data-track-action='material-track']");
+        if (trackBtn) {
+          e.preventDefault();
+          renderInlineTrackTimeline(trackBtn);
+          var trackHint = document.getElementById("procInlineTrackHint");
+          if (trackHint) trackHint.textContent = "已展开该物资轨迹，可继续点其它“物资跟踪”切换。";
           return;
         }
         var t = e.target.closest(".js-op");
