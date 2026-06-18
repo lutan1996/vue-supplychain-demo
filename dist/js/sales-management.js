@@ -2072,17 +2072,58 @@
       '</tbody></table>';
   }
 
-  function reportAmountChartHtml(title, amount, total, color) {
-    var percent = total ? Math.round(toNumber(amount) / total * 100) : 0;
-    var barHeight = Math.max(8, Math.min(100, percent));
-    return '<article class="sales-amount-chart">' +
-      '<div class="sales-amount-chart-top"><span>' + esc(title) + '</span><strong>' + money(amount) + ' 万元</strong></div>' +
-      '<div class="sales-amount-chart-visual">' +
-      '<div class="sales-mini-bars"><span style="height:' + barHeight + '%;background:' + esc(color) + '"></span><i></i><i></i></div>' +
-      '<div class="sales-mini-donut" style="background:conic-gradient(' + esc(color) + ' 0 ' + percent + '%,#edf2f7 ' + percent + '% 100%)"><b>' + percent + '%</b></div>' +
-      '</div>' +
-      '<div class="sales-amount-chart-meta">占合同总金额 ' + percent + '%</div>' +
-      '</article>';
+  function groupReportRows(key, valueKey) {
+    var map = {};
+    reportRows.forEach(function (row) {
+      var name = row[key] || "未分类";
+      if (!map[name]) map[name] = 0;
+      map[name] += toNumber(row[valueKey]);
+    });
+    return Object.keys(map).map(function (name) {
+      return { name: name, value: map[name] };
+    });
+  }
+
+  function reportMergedPieHtml(executedTotal, remainingTotal, totalAmount) {
+    var executedPercent = totalAmount ? Math.round(executedTotal / totalAmount * 100) : 0;
+    var remainingPercent = Math.max(0, 100 - executedPercent);
+    return '<article class="sales-report-pie-panel">' +
+      '<div class="sales-report-panel-title">合同金额执行结构</div>' +
+      '<div class="sales-report-pie-main">' +
+      '<div class="sales-report-donut" style="background:conic-gradient(#16a34a 0 ' + executedPercent + '%,#f59e0b ' + executedPercent + '% 100%)"><b>' + executedPercent + '%</b><span>已执行</span></div>' +
+      '<div class="sales-report-pie-legend">' +
+      '<div><i style="background:#16a34a"></i><span>已执行金额</span><strong>' + money(executedTotal) + ' 万元</strong><em>' + executedPercent + '%</em></div>' +
+      '<div><i style="background:#f59e0b"></i><span>剩余金额</span><strong>' + money(remainingTotal) + ' 万元</strong><em>' + remainingPercent + '%</em></div>' +
+      '<div><i style="background:#1677ff"></i><span>合同总金额</span><strong>' + money(totalAmount) + ' 万元</strong><em>100%</em></div>' +
+      '</div></div></article>';
+  }
+
+  function reportSupplierBarsHtml() {
+    var groups = groupReportRows("supplier", "totalAmount");
+    var max = groups.reduce(function (m, row) { return Math.max(m, row.value); }, 1);
+    return '<article class="sales-report-chart-panel"><div class="sales-report-panel-title">供应商合同金额分布</div>' +
+      '<div class="sales-report-column-chart">' + groups.map(function (row) {
+        var h = Math.max(12, Math.round(row.value / max * 100));
+        return '<div class="sales-report-column"><div class="sales-report-column-value">' + money(row.value) + '</div><span style="height:' + h + '%"></span><em>' + esc(row.name) + '</em></div>';
+      }).join("") + '</div></article>';
+  }
+
+  function reportStatusBarsHtml() {
+    var groups = {};
+    reportRows.forEach(function (row) {
+      if (!groups[row.status]) groups[row.status] = { count: 0, amount: 0 };
+      groups[row.status].count += 1;
+      groups[row.status].amount += toNumber(row.totalAmount);
+    });
+    var list = Object.keys(groups).map(function (name) {
+      return { name: name, count: groups[name].count, amount: groups[name].amount };
+    });
+    var max = list.reduce(function (m, row) { return Math.max(m, row.amount); }, 1);
+    return '<article class="sales-report-chart-panel"><div class="sales-report-panel-title">执行状态金额条形图</div>' +
+      '<div class="sales-report-bar-chart">' + list.map(function (row) {
+        var w = Math.max(8, Math.round(row.amount / max * 100));
+        return '<div class="sales-report-bar-row"><label>' + esc(row.name) + '</label><div><span style="width:' + w + '%"></span></div><strong>' + money(row.amount) + ' 万元</strong><em>' + row.count + '单</em></div>';
+      }).join("") + '</div></article>';
   }
 
   function initReport() {
@@ -2113,11 +2154,12 @@
     var totalAmount = reportRows.reduce(function (sum, row) { return sum + row.totalAmount; }, 0);
     var executedTotal = reportRows.reduce(function (sum, row) { return sum + row.executedAmount; }, 0);
     var remainingTotal = reportRows.reduce(function (sum, row) { return sum + row.remainingAmount; }, 0);
-    document.getElementById("salesAmountCharts").innerHTML = [
-      reportAmountChartHtml("全部执行金额", totalAmount, totalAmount, "#1677ff"),
-      reportAmountChartHtml("已执行金额", executedTotal, totalAmount, "#16a34a"),
-      reportAmountChartHtml("剩余执行金额", remainingTotal, totalAmount, "#f59e0b")
-    ].join("");
+    document.getElementById("salesAmountCharts").innerHTML =
+      reportMergedPieHtml(executedTotal, remainingTotal, totalAmount) +
+      '<div class="sales-report-chart-stack">' +
+      reportSupplierBarsHtml() +
+      reportStatusBarsHtml() +
+      '</div>';
 
     document.getElementById("salesReportBody").addEventListener("click", function (e) {
       var btn = e.target.closest("[data-action]");
