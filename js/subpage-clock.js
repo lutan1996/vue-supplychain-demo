@@ -1877,6 +1877,10 @@
         }
 
         tds[opIndex].querySelectorAll("button, a").forEach(function (btn) {
+          if (btn.getAttribute && btn.getAttribute("data-track-action") === "material-track") {
+            btn.style.display = "";
+            return;
+          }
           var txt = (btn.textContent || "").replace(/\s+/g, "");
           if (!txt) return;
           var keep = false;
