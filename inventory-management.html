@@ -501,6 +501,7 @@
           refs.tableBody.innerHTML =
             '<tr><td colspan="11" style="text-align:center;color:#8ca0b8;padding:26px;">暂无数据</td></tr>';
           refs.totalText.textContent = "共 0 条";
+          removeStockCheckboxColumn();
           return;
         }
         rows.forEach(function (item) {
@@ -525,7 +526,41 @@
             "</div></td>";
           refs.tableBody.appendChild(tr);
         });
+        removeStockCheckboxColumn();
         refs.totalText.textContent = "共 " + rows.length + " 条";
+      }
+
+      function removeStockCheckboxColumn() {
+        Array.prototype.forEach.call(document.querySelectorAll(".carrier-main-inner table"), function (table) {
+          var headRow = table.querySelector("thead tr");
+          var firstTh = headRow && headRow.children ? headRow.children[0] : null;
+          if (firstTh && firstTh.querySelector && firstTh.querySelector("input[type='checkbox']")) {
+            firstTh.parentNode.removeChild(firstTh);
+          }
+          Array.prototype.forEach.call(table.querySelectorAll("tbody tr"), function (tr) {
+            var firstTd = tr.children && tr.children[0];
+            if (firstTd && firstTd.querySelector && firstTd.querySelector("input[type='checkbox']")) {
+              firstTd.parentNode.removeChild(firstTd);
+            }
+          });
+        });
+      }
+
+      function watchStockCheckboxColumn() {
+        removeStockCheckboxColumn();
+        setTimeout(removeStockCheckboxColumn, 150);
+        var table = document.querySelector(".carrier-main-inner");
+        if (!table || typeof MutationObserver !== "function") return;
+        var pending = false;
+        var observer = new MutationObserver(function () {
+          if (pending) return;
+          pending = true;
+          setTimeout(function () {
+            pending = false;
+            removeStockCheckboxColumn();
+          }, 30);
+        });
+        observer.observe(table, { childList: true, subtree: true });
       }
 
       function refreshCards(sourceRows) {
@@ -667,6 +702,7 @@
       refs.filterKeyword.addEventListener("input", applyFilters);
 
       applyFilters();
+      watchStockCheckboxColumn();
     })();
   </script>
 </body>
