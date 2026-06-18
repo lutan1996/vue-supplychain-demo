@@ -2217,7 +2217,6 @@
     var file = (location.pathname || "").split("/").pop();
     var targets = {
       "purchase-plan-table.html": 1,
-      "receipt-inbound.html": 1,
       "logistics-payment.html": 1
     };
     if (!targets[file]) return;
