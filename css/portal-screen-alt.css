@@ -35,7 +35,7 @@ body.page-screen-alt .main-scroll {
   flex: 1 1 auto;
   min-height: 0;
   display: grid;
-  grid-template-rows: minmax(0, 1fr) auto;
+  grid-template-rows: auto auto;
   gap: 8px;
   padding: 6px 8px 4px;
   box-sizing: border-box;
@@ -49,7 +49,7 @@ body.page-screen-alt .main-scroll {
   display: grid;
   grid-template-columns: minmax(0, 1.95fr) minmax(0, 1fr);
   gap: 8px;
-  align-items: stretch;
+  align-items: start;
   margin-bottom: 2px;
 }
 .row-top > .stack-col {
@@ -101,8 +101,8 @@ body.page-screen-alt .main-scroll {
   overflow: visible;
 }
 .stack-col--main > .module-hub {
-  flex: 1 1 auto;
-  min-height: 0;
+  flex: 0 0 auto;
+  min-height: min-content;
 }
 
 /* 通用面板 */
