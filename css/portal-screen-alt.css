@@ -424,6 +424,15 @@ button.biz-process-link:hover {
   font-size: 11px;
   text-decoration: none;
 }
+.biz-process-link--handle {
+  display: inline-block;
+  min-width: 24px;
+  color: #1677ff !important;
+  font-weight: 600;
+  line-height: 1.2;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
 .biz-process-link:hover,
 .biz-op-link:hover {
   text-decoration: underline;
