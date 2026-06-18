@@ -2408,6 +2408,21 @@
         );
       }
 
+      function buildDetailTrackTd(d) {
+        var name = String((d && (d.productName || d.name)) || "");
+        var code = String((d && (d.productCode || d.code || d.assetNo)) || "");
+        return (
+          '<td style="padding:8px;border-bottom:1px solid #f0f2f5;text-align:center;white-space:nowrap">' +
+          '<span class="req-op-wrap">' +
+          '<a href="#" class="req-track-link" data-track-name="' +
+          esc(name) +
+          '" data-track-code="' +
+          esc(code) +
+          '" style="color:#1677ff;text-decoration:none">物资跟踪</a>' +
+          "</span></td>"
+        );
+      }
+
       function buildTransferDetailRowsHtml(lines) {
         var tdStyle = "padding:8px;border-bottom:1px solid #f0f2f5";
         var list = lines || [];
@@ -2532,7 +2547,9 @@
           bodyRows = list
             .map(function (d, idx) {
               var seq = idx + 1;
-              var opTd = buildEditDetailDeleteTd(idx, "req-detail-remove");
+              var opTd = opts.detailAction === "track"
+                ? buildDetailTrackTd(d)
+                : buildEditDetailDeleteTd(idx, "req-detail-remove");
               return (
                 "<tr>" +
                 '<td style="' +
@@ -2703,7 +2720,8 @@
           });
           var flowDetailTable = buildReqMatDetailBlockFromLines(flowDetailLines, "流转物资明细表", {
             showUserCol: true,
-            defaultUserName: row.receiver || row.toKeeper || ""
+            defaultUserName: row.receiver || row.toKeeper || "",
+            detailAction: "track"
           });
           body.innerHTML = flowHead + flowDetailTable;
           document.getElementById("detailTitle").textContent = "流转记录 - " + (row.flowNo || "");
@@ -2815,7 +2833,8 @@
             "</div>" +
             buildReqMatDetailBlockFromLines(detailLines, "领用物资明细表", {
               showUserCol: true,
-              defaultUserName: row.applicant || sourceRow.keeper || ""
+              defaultUserName: row.applicant || sourceRow.keeper || "",
+              detailAction: "track"
             });
           document.getElementById("detailTitle").textContent = "领用记录 - " + (row.reqNo || "");
           document.getElementById("detailMask").classList.add("show");
