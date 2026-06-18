@@ -56,8 +56,20 @@
       .replace(/"/g, "&quot;");
   }
 
-  /** 入库记录表：验收状态所在列（0 起算，含勾选） */
-  var M10_INBOUND_STATUS_TD = 7;
+  /** 入库记录表列索引（0 起算，不含勾选列） */
+  var M10_INBOUND_COL = {
+    acceptNo: 0,
+    contractNo: 1,
+    executionNo: 2,
+    supplier: 3,
+    productName: 4,
+    inboundType: 5,
+    status: 6,
+    inboundTime: 7,
+    inboundBy: 8,
+    remark: 9
+  };
+  var M10_INBOUND_STATUS_TD = M10_INBOUND_COL.status;
   var M10_INBOUND_DETAIL_OMIT = {
     物资名称: 1,
     产品名称: 1,
@@ -2270,7 +2282,6 @@
     ths.forEach(function (th, idx) {
       var label = headerLabel(th);
       if (!label || label === "操作") return;
-      if (table.id === "proc-m10-inbound-table" && idx === 0) return;
       if (table.id === "proc-m10-inbound-table" && M10_INBOUND_DETAIL_OMIT[label]) return;
       var value = extractM10CellDisplayText(tds[idx]);
       if (label === "备注" && (value === "—" || !cleanText(value))) {
@@ -2303,7 +2314,6 @@
     ths.forEach(function (th, idx) {
       var label = headerLabel(th);
       if (!label || label === "操作") return;
-      if (table.id === "proc-m10-inbound-table" && idx === 0) return;
       map[label] = extractM10CellDisplayText(tds[idx]);
     });
     return map;
@@ -2422,8 +2432,8 @@
       var td = tr.children[i];
       return td ? cleanText(td.textContent || "") : "";
     }
-    var fw = cell(2);
-    var ex = cell(3);
+    var fw = cell(M10_INBOUND_COL.contractNo);
+    var ex = cell(M10_INBOUND_COL.executionNo);
     var k;
     for (k in QA_ACCEPT_BY_CONTRACT) {
       if (!Object.prototype.hasOwnProperty.call(QA_ACCEPT_BY_CONTRACT, k)) continue;
@@ -2463,26 +2473,27 @@
         var el = $(id);
         if (el) el.value = v == null ? "" : String(v);
       }
-      set("qaFldFrameworkNo", cell(2));
-      set("qaFldExecutionReadonly", cell(3));
-      set("qaAutoSupplier", cell(4));
+      set("qaFldFrameworkNo", cell(M10_INBOUND_COL.contractNo));
+      set("qaFldExecutionReadonly", cell(M10_INBOUND_COL.executionNo));
+      set("qaAutoSupplier", cell(M10_INBOUND_COL.supplier));
       qaClearMaterialLines();
     }
     var inboundBy = $("qaFldInbound");
-    if (inboundBy) inboundBy.value = cell(9) || "宋波";
+    if (inboundBy) inboundBy.value = cell(M10_INBOUND_COL.inboundBy) || "宋波";
     var inboundType = $("qaFldInboundType");
     var inboundTypeBtn = $("qaInboundTypeDdBtn");
-    var typeLabel = cell(6) || "采购入库";
+    var typeLabel = cell(M10_INBOUND_COL.inboundType) || "采购入库";
     if (inboundType) inboundType.value = typeLabel;
     if (inboundTypeBtn) inboundTypeBtn.textContent = typeLabel;
     var remark = $("qaFldRemark");
-    if (remark) remark.value = cell(10) || "各级审批已完成，发起人补录入库（演示）";
+    if (remark) remark.value = cell(M10_INBOUND_COL.remark) || "各级审批已完成，发起人补录入库（演示）";
     var d = m10InboundLineDataFromTr(tr);
     var primary =
       m10InboundTrAttr(tr, "data-m10-primary-name", "") ||
-      String(cell(5))
+      String(cell(M10_INBOUND_COL.productName))
         .split(/[.．·]/)[0]
         .trim() ||
+      cell(M10_INBOUND_COL.productName) ||
       "IGBT驱动板";
     if (ck) {
       qaClearMaterialLines();
@@ -3020,29 +3031,29 @@
         var td = tr.children[i];
         return td ? cleanText(td.textContent || "") : "";
       }
-      var mergedMain = cell(2);
-      var executionZx = cell(3);
-      var supplier = cell(4);
+      var mergedMain = cell(M10_INBOUND_COL.contractNo);
+      var executionZx = cell(M10_INBOUND_COL.executionNo);
+      var supplier = cell(M10_INBOUND_COL.supplier);
       var name =
         m10InboundTrAttr(tr, "data-m10-primary-name", "") ||
-        String(cell(5))
+        String(cell(M10_INBOUND_COL.productName))
           .split(/[.．·]/)[0]
           .trim() ||
-        cell(5);
+        cell(M10_INBOUND_COL.productName);
       var spec = m10InboundTrAttr(tr, "data-m10-spec", "");
       if (!mergedMain && !name) return;
       var key = [mergedMain, executionZx, supplier, name, spec].join("\u0001");
       var st = cell(M10_INBOUND_STATUS_TD);
       var shipQty = Number(m10InboundTrAttr(tr, "data-m10-ship-qty", "0")) || 0;
       var recvQty = Number(m10InboundTrAttr(tr, "data-m10-recv-qty", "0")) || 0;
-      var inboundType = cell(6);
-      var timeIn = cell(8);
+      var inboundType = cell(M10_INBOUND_COL.inboundType);
+      var timeIn = cell(M10_INBOUND_COL.inboundTime);
       var wh = m10InboundTrAttr(tr, "data-m10-warehouse", "");
       var keeper = m10InboundTrAttr(tr, "data-m10-keeper", "");
       var receiver = m10InboundTrAttr(tr, "data-m10-receiver", "");
-      var inboundBy = cell(9);
+      var inboundBy = cell(M10_INBOUND_COL.inboundBy);
       var mtype = normalizeMaterialCategory(m10InboundTrAttr(tr, "data-m10-mat-type", ""), key);
-      var rk = cell(1);
+      var rk = cell(M10_INBOUND_COL.acceptNo);
       if (!groups[key]) {
         groups[key] = {
           mergedMain: mergedMain,
@@ -3156,16 +3167,16 @@
         return td ? cleanText(td.textContent || "") : "";
       }
       out.push({
-        acceptNo: cell(1),
-        contractNo: cell(2),
-        executionNo: cell(3),
-        supplier: cell(4),
+        acceptNo: cell(M10_INBOUND_COL.acceptNo),
+        contractNo: cell(M10_INBOUND_COL.contractNo),
+        executionNo: cell(M10_INBOUND_COL.executionNo),
+        supplier: cell(M10_INBOUND_COL.supplier),
         name:
           m10InboundTrAttr(tr, "data-m10-primary-name", "") ||
-          String(cell(5))
+          String(cell(M10_INBOUND_COL.productName))
             .split(/[.．·]/)[0]
             .trim() ||
-          cell(5),
+          cell(M10_INBOUND_COL.productName),
         spec: m10InboundTrAttr(tr, "data-m10-spec", ""),
         qty: m10InboundTrAttr(tr, "data-m10-recv-qty", "") || m10InboundTrAttr(tr, "data-m10-ship-qty", ""),
         warehouse: m10InboundTrAttr(tr, "data-m10-warehouse", ""),
