@@ -2072,18 +2072,6 @@
       '</tbody></table>';
   }
 
-  function groupReportRows(key, valueKey) {
-    var map = {};
-    reportRows.forEach(function (row) {
-      var name = row[key] || "未分类";
-      if (!map[name]) map[name] = 0;
-      map[name] += toNumber(row[valueKey]);
-    });
-    return Object.keys(map).map(function (name) {
-      return { name: name, value: map[name] };
-    });
-  }
-
   function reportMergedPieHtml(executedTotal, remainingTotal, totalAmount) {
     var executedPercent = totalAmount ? Math.round(executedTotal / totalAmount * 100) : 0;
     var remainingPercent = Math.max(0, 100 - executedPercent);
@@ -2098,31 +2086,50 @@
       '</div></div></article>';
   }
 
-  function reportSupplierBarsHtml() {
-    var groups = groupReportRows("supplier", "totalAmount");
-    var max = groups.reduce(function (m, row) { return Math.max(m, row.value); }, 1);
-    return '<article class="sales-report-chart-panel"><div class="sales-report-panel-title">供应商合同金额分布</div>' +
-      '<div class="sales-report-column-chart">' + groups.map(function (row) {
-        var h = Math.max(12, Math.round(row.value / max * 100));
-        return '<div class="sales-report-column"><div class="sales-report-column-value">' + money(row.value) + '</div><span style="height:' + h + '%"></span><em>' + esc(row.name) + '</em></div>';
+  function reportSupplierShareHtml() {
+    var groups = {};
+    reportRows.forEach(function (row) {
+      var name = row.supplier || "未填写";
+      if (!groups[name]) groups[name] = 0;
+      groups[name] += toNumber(row.totalAmount);
+    });
+    var list = Object.keys(groups).map(function (name) {
+      return { name: name, value: groups[name] };
+    }).sort(function (a, b) { return b.value - a.value; });
+    var total = list.reduce(function (sum, row) { return sum + row.value; }, 0) || 1;
+    return '<article class="sales-report-chart-panel"><div class="sales-report-panel-title">供应商合同金额占比</div>' +
+      '<div class="sales-report-share-list">' + list.map(function (row) {
+        var pct = Math.round(row.value / total * 100);
+        return '<div class="sales-report-share-item"><div><strong>' + esc(row.name) + '</strong><span>' + money(row.value) + ' 万元</span></div><b>' + pct + '%</b><i style="width:' + pct + '%"></i></div>';
       }).join("") + '</div></article>';
   }
 
-  function reportStatusBarsHtml() {
-    var groups = {};
-    reportRows.forEach(function (row) {
-      if (!groups[row.status]) groups[row.status] = { count: 0, amount: 0 };
-      groups[row.status].count += 1;
-      groups[row.status].amount += toNumber(row.totalAmount);
+  function reportTermTimelineHtml() {
+    function timeValue(dateText) {
+      var t = new Date(String(dateText || "").replace(/\./g, "-")).getTime();
+      return isNaN(t) ? 0 : t;
+    }
+    var terms = reportRows.map(function (row) {
+      var parts = String(row.term || "").split("~");
+      var start = (parts[0] || row.signDate || "").trim();
+      var end = (parts[1] || row.signDate || "").trim();
+      return {
+        no: row.contractNo,
+        name: row.contractName,
+        start: start,
+        end: end,
+        startAt: timeValue(start),
+        endAt: timeValue(end)
+      };
     });
-    var list = Object.keys(groups).map(function (name) {
-      return { name: name, count: groups[name].count, amount: groups[name].amount };
-    });
-    var max = list.reduce(function (m, row) { return Math.max(m, row.amount); }, 1);
-    return '<article class="sales-report-chart-panel"><div class="sales-report-panel-title">执行状态金额条形图</div>' +
-      '<div class="sales-report-bar-chart">' + list.map(function (row) {
-        var w = Math.max(8, Math.round(row.amount / max * 100));
-        return '<div class="sales-report-bar-row"><label>' + esc(row.name) + '</label><div><span style="width:' + w + '%"></span></div><strong>' + money(row.amount) + ' 万元</strong><em>' + row.count + '单</em></div>';
+    var min = terms.reduce(function (m, row) { return row.startAt && row.startAt < m ? row.startAt : m; }, terms[0] ? terms[0].startAt : 0);
+    var max = terms.reduce(function (m, row) { return row.endAt && row.endAt > m ? row.endAt : m; }, terms[0] ? terms[0].endAt : 1);
+    var span = Math.max(1, max - min);
+    return '<article class="sales-report-chart-panel"><div class="sales-report-panel-title">合同有效期时间轴</div>' +
+      '<div class="sales-report-term-chart">' + terms.map(function (row) {
+        var left = Math.max(0, Math.min(92, Math.round((row.startAt - min) / span * 88)));
+        var width = Math.max(8, Math.min(100 - left, Math.round((row.endAt - row.startAt) / span * 88)));
+        return '<div class="sales-report-term-row"><label>' + esc(row.no) + '</label><div><span style="left:' + left + '%;width:' + width + '%"></span></div><em>' + esc(row.start) + ' 至 ' + esc(row.end) + '</em></div>';
       }).join("") + '</div></article>';
   }
 
@@ -2157,8 +2164,8 @@
     document.getElementById("salesAmountCharts").innerHTML =
       reportMergedPieHtml(executedTotal, remainingTotal, totalAmount) +
       '<div class="sales-report-chart-stack">' +
-      reportSupplierBarsHtml() +
-      reportStatusBarsHtml() +
+      reportSupplierShareHtml() +
+      reportTermTimelineHtml() +
       '</div>';
 
     document.getElementById("salesReportBody").addEventListener("click", function (e) {
