@@ -133,6 +133,21 @@
     </div>
   </div>
 
+  <div class="wh-modal-mask modal-mask" id="slotViewMask" aria-hidden="true">
+    <div class="wh-modal-box wh-modal-box--md" role="dialog" aria-modal="true" aria-labelledby="slotViewTitle">
+      <div class="wh-modal-head">
+        <h3 class="wh-modal-title" id="slotViewTitle">查看货位</h3>
+        <button type="button" class="wh-modal-close" id="slotViewCloseX" aria-label="关闭">×</button>
+      </div>
+      <div class="wh-modal-body">
+        <div class="wh-detail-grid" id="slotViewGrid"></div>
+      </div>
+      <div class="wh-modal-foot">
+        <button type="button" class="wh-btn wh-btn--ghost" id="slotViewOk">关闭</button>
+      </div>
+    </div>
+  </div>
+
   <div class="wh-modal-mask modal-mask" id="slotEditMask" aria-hidden="true">
     <div class="wh-modal-box" role="dialog" aria-modal="true" aria-labelledby="slotEditTitle">
       <div class="wh-modal-head">
@@ -176,6 +191,7 @@
       ];
       var tb = document.getElementById("slotTableBody");
       var addMask = document.getElementById("slotAddMask");
+      var viewMask = document.getElementById("slotViewMask");
       var editMask = document.getElementById("slotEditMask");
       var editIndex = -1;
 
@@ -189,7 +205,7 @@
       }
 
       function setBodyScroll() {
-        var any = addMask.classList.contains("show") || editMask.classList.contains("show");
+        var any = addMask.classList.contains("show") || viewMask.classList.contains("show") || editMask.classList.contains("show");
         document.body.style.overflow = any ? "hidden" : "";
       }
 
@@ -204,13 +220,33 @@
         editIndex = -1;
         setBodyScroll();
       }
+      function closeView() {
+        viewMask.classList.remove("show");
+        viewMask.setAttribute("aria-hidden", "true");
+        setBodyScroll();
+      }
+      function openView(s) {
+        document.getElementById("slotViewGrid").innerHTML = [
+          ["货位编码", s.code],
+          ["货位名称", s.name],
+          ["所属仓库", s.wh],
+          ["货位状态", s.st],
+          ["二维码", s.qr],
+          ["当前存放物资", s.mat]
+        ].map(function (pair) {
+          return '<div class="wh-detail-item"><div class="wh-detail-label">' + pair[0] + '</div><div class="wh-detail-value">' + pair[1] + '</div></div>';
+        }).join("");
+        viewMask.classList.add("show");
+        viewMask.setAttribute("aria-hidden", "false");
+        setBodyScroll();
+      }
 
       function render() {
         tb.innerHTML = slots.map(function (s, i) {
           var stTag = s.st === "空闲"
             ? '<span class="tag-status" style="background:#f6ffed;color:#389e0d;">空闲</span>'
             : '<span class="tag-status" style="background:#e6f4ff;color:#1677ff;">占用</span>';
-          return "<tr data-i='" + i + "'><td>" + s.code + "</td><td>" + s.name + "</td><td>" + s.wh + "</td><td>" + stTag + "</td><td>" + s.qr + "</td><td>" + s.mat + "</td><td><a href='#' class='slot-op' data-o='edit'>编辑</a> · <a href='#' class='slot-op' data-o='print'>打印标签</a></td></tr>";
+          return "<tr data-i='" + i + "'><td>" + s.code + "</td><td>" + s.name + "</td><td>" + s.wh + "</td><td>" + stTag + "</td><td>" + s.qr + "</td><td>" + s.mat + "</td><td><div class='wh-ops'><a href='#' class='slot-op' data-o='view'>查看</a><a href='#' class='slot-op' data-o='edit'>修改</a><a href='#' class='slot-op' data-o='delete'>删除</a></div></td></tr>";
         }).join("");
       }
       render();
@@ -244,6 +280,9 @@
       document.getElementById("slotEditCancel").addEventListener("click", closeEdit);
       document.getElementById("slotEditCloseX").addEventListener("click", closeEdit);
       editMask.addEventListener("click", function (e) { if (e.target === editMask) closeEdit(); });
+      document.getElementById("slotViewOk").addEventListener("click", closeView);
+      document.getElementById("slotViewCloseX").addEventListener("click", closeView);
+      viewMask.addEventListener("click", function (e) { if (e.target === viewMask) closeView(); });
       document.getElementById("slotEditOk").addEventListener("click", function () {
         if (editIndex < 0) return;
         var s = slots[editIndex];
@@ -267,8 +306,16 @@
         var o = a.getAttribute("data-o");
         var tr = a.closest("tr");
         var i = tr ? parseInt(tr.getAttribute("data-i"), 10) : -1;
-        if (o === "print") {
-          showToast("已打开打印二维码标签（演示）");
+        if (o === "view" && i >= 0) {
+          openView(slots[i]);
+          return;
+        }
+        if (o === "delete" && i >= 0) {
+          showActionConfirm("删除货位", "确认删除货位 " + slots[i].code + "？", function () {
+            slots.splice(i, 1);
+            render();
+            showToast("已删除货位");
+          });
           return;
         }
         if (o === "edit" && i >= 0) {
@@ -286,6 +333,7 @@
       document.addEventListener("keydown", function (e) {
         if (e.key !== "Escape") return;
         if (addMask.classList.contains("show")) closeAdd();
+        if (viewMask.classList.contains("show")) closeView();
         if (editMask.classList.contains("show")) closeEdit();
       });
     })();

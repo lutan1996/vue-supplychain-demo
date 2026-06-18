@@ -205,6 +205,21 @@
     </div>
   </div>
 
+  <div class="wh-modal-mask modal-mask" id="idleDetailMask" aria-hidden="true">
+    <div class="wh-modal-box wh-modal-box--md" role="dialog" aria-modal="true" aria-labelledby="idleDetailTitle">
+      <div class="wh-modal-head">
+        <h3 class="wh-modal-title" id="idleDetailTitle">闲置物资详情</h3>
+        <button type="button" class="wh-modal-close" id="idleDetailCloseX" aria-label="关闭">×</button>
+      </div>
+      <div class="wh-modal-body">
+        <div class="wh-detail-grid" id="idleDetailGrid"></div>
+      </div>
+      <div class="wh-modal-foot">
+        <button type="button" class="wh-btn wh-btn--ghost" id="idleDetailOk">关闭</button>
+      </div>
+    </div>
+  </div>
+
   <script src="js/sidebar-actions.js"></script>
   <script src="js/subpage-feature-title.js"></script>
   <script src="js/warehouse-submenu.js"></script>
@@ -271,6 +286,7 @@
       var today = new Date("2026-03-23"); // 演示基准日期
       var xferTargetCode = null;
       var xferMask = document.getElementById("idleTransferMask");
+      var detailMask = document.getElementById("idleDetailMask");
 
       var refs = {
         tbody: document.getElementById("idleTableBody"),
@@ -385,12 +401,7 @@
         if (!item) return;
 
         if (action === "view") {
-          alert(
-            "物资编码：" + item.materialCode + "\n" +
-            "库存数量：" + item.qty + "\n" +
-            "最后出库时间：" + item.lastOutboundDate + "\n" +
-            "闲置时长：" + daysBetween(item.lastOutboundDate, today) + " 天"
-          );
+          openDetail(item);
           return;
         }
 
@@ -421,13 +432,41 @@
         xferMask.setAttribute("aria-hidden", "false");
         document.body.style.overflow = "hidden";
       }
+      function closeDetail() {
+        detailMask.classList.remove("show");
+        detailMask.setAttribute("aria-hidden", "true");
+        document.body.style.overflow = "";
+      }
+      function openDetail(item) {
+        document.getElementById("idleDetailGrid").innerHTML = [
+          ["物资编码", item.materialCode],
+          ["物资名称", item.materialName],
+          ["规格型号", item.spec],
+          ["入库日期", item.inboundDate],
+          ["最后出库日期", item.lastOutboundDate],
+          ["闲置天数", daysBetween(item.lastOutboundDate, today) + " 天"],
+          ["闲置认定标准", "第58条第（三）项：入库满3年未使用"],
+          ["当前状态", statusMeta(item.status).text.replace("已调拨", "调剂中").replace("待处理", "待调剂").replace("已报废", "已处置")]
+        ].map(function (pair) {
+          return '<div class="wh-detail-item"><div class="wh-detail-label">' + pair[0] + '</div><div class="wh-detail-value">' + pair[1] + '</div></div>';
+        }).join("");
+        detailMask.classList.add("show");
+        detailMask.setAttribute("aria-hidden", "false");
+        document.body.style.overflow = "hidden";
+      }
       document.getElementById("btnIdleXferClose").addEventListener("click", closeXfer);
       document.getElementById("btnIdleXferCancel").addEventListener("click", closeXfer);
+      document.getElementById("idleDetailCloseX").addEventListener("click", closeDetail);
+      document.getElementById("idleDetailOk").addEventListener("click", closeDetail);
       xferMask.addEventListener("click", function (e) {
         if (e.target === xferMask) closeXfer();
       });
+      detailMask.addEventListener("click", function (e) {
+        if (e.target === detailMask) closeDetail();
+      });
       document.addEventListener("keydown", function (e) {
         if (e.key === "Escape" && xferMask.classList.contains("show")) closeXfer();
+        if (e.key === "Escape" && detailMask.classList.contains("show")) closeDetail();
       });
       document.getElementById("btnIdleXferOk").addEventListener("click", function () {
         if (!xferTargetCode) return;

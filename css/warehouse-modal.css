@@ -146,6 +146,52 @@
   background: #40a9ff;
   border-color: #40a9ff;
 }
+.wh-ops {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  white-space: nowrap;
+}
+.wh-ops a {
+  color: #1677ff;
+  text-decoration: none;
+  font-size: 13px;
+}
+.wh-ops a:hover {
+  opacity: 0.85;
+}
+.wh-ops a[data-action="delete"],
+.wh-ops a[data-action="del"] {
+  color: #ff4d4f;
+}
+.wh-detail-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px 12px;
+}
+.wh-detail-item {
+  min-width: 0;
+  padding: 10px 12px;
+  border: 1px solid #edf1f6;
+  border-radius: 8px;
+  background: #fafcff;
+}
+.wh-detail-label {
+  margin-bottom: 5px;
+  color: #7b8fa7;
+  font-size: 12px;
+}
+.wh-detail-value {
+  color: #24364a;
+  font-size: 13px;
+  line-height: 1.5;
+  word-break: break-all;
+}
+@media (max-width: 640px) {
+  .wh-detail-grid {
+    grid-template-columns: 1fr;
+  }
+}
 
 /* 弹窗内表格与库存流水等复用 carrier-table */
 .wh-modal-body .carrier-table {

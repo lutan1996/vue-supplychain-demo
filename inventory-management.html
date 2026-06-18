@@ -258,6 +258,21 @@
     </div>
   </div>
 
+  <div class="wh-modal-mask modal-mask" id="stockDetailMask" aria-hidden="true">
+    <div class="wh-modal-box wh-modal-box--md" role="dialog" aria-modal="true" aria-labelledby="stockDetailHeading">
+      <div class="wh-modal-head">
+        <h3 class="wh-modal-title" id="stockDetailHeading">库存详情</h3>
+        <button type="button" class="wh-modal-close" id="btnCloseStockDetail" aria-label="关闭">×</button>
+      </div>
+      <div class="wh-modal-body">
+        <div class="wh-detail-grid" id="stockDetailGrid"></div>
+      </div>
+      <div class="wh-modal-foot">
+        <button type="button" class="wh-btn wh-btn--ghost" id="btnOkStockDetail">关闭</button>
+      </div>
+    </div>
+  </div>
+
   <div class="wh-modal-mask modal-mask" id="transferMask" aria-hidden="true">
     <div class="wh-modal-box" role="dialog" aria-modal="true" aria-labelledby="transferHeading">
       <div class="wh-modal-head">
@@ -425,10 +440,11 @@
       var transferMask = document.getElementById("transferMask");
       var warnMask = document.getElementById("warnMask");
       var stockFlowMask = document.getElementById("stockFlowMask");
+      var stockDetailMask = document.getElementById("stockDetailMask");
       var warnEditingCode = null;
 
       function anyModalOpen() {
-        return [transferMask, warnMask, stockFlowMask].some(function (m) {
+        return [transferMask, warnMask, stockFlowMask, stockDetailMask].some(function (m) {
           return m && m.classList.contains("show");
         });
       }
@@ -482,6 +498,25 @@
         document.getElementById("warnMin").value = item.minQty;
         openMask(warnMask);
       }
+      function openStockDetail(code) {
+        var item = ledger.find(function (x) { return x.materialCode === code; });
+        if (!item) return;
+        document.getElementById("stockDetailGrid").innerHTML = [
+          ["物资编码", item.materialCode],
+          ["物资名称", item.materialName],
+          ["规格型号", item.spec],
+          ["仓库", item.warehouse],
+          ["货位", item.slot],
+          ["当前库存数量", item.currentQty],
+          ["单位", item.unit],
+          ["库存上限", item.maxQty],
+          ["库存下限", item.minQty],
+          ["上次盘点时间", item.lastCheckAt]
+        ].map(function (pair) {
+          return '<div class="wh-detail-item"><div class="wh-detail-label">' + pair[0] + '</div><div class="wh-detail-value">' + pair[1] + '</div></div>';
+        }).join("");
+        openMask(stockDetailMask);
+      }
 
       function openFlowModal(code) {
         var item = ledger.find(function (x) { return x.materialCode === code; });
@@ -520,6 +555,7 @@
             '<td class="cell-num">' + item.minQty + "</td>" +
             "<td>" + item.lastCheckAt + "</td>" +
             '<td><div class="wh-ops">' +
+            '<a href="#" data-action="view">查看</a>' +
             '<a href="#" data-action="flow">库存流水</a>' +
             '<a href="#" data-action="transfer">发起调拨</a>' +
             '<a href="#" data-action="warn">设置预警值</a>' +
@@ -620,6 +656,9 @@
       document.getElementById("btnCloseStockFlow").addEventListener("click", function () { closeMask(stockFlowMask); });
       document.getElementById("btnOkStockFlow").addEventListener("click", function () { closeMask(stockFlowMask); });
       stockFlowMask.addEventListener("click", function (e) { if (e.target === stockFlowMask) closeMask(stockFlowMask); });
+      document.getElementById("btnCloseStockDetail").addEventListener("click", function () { closeMask(stockDetailMask); });
+      document.getElementById("btnOkStockDetail").addEventListener("click", function () { closeMask(stockDetailMask); });
+      stockDetailMask.addEventListener("click", function (e) { if (e.target === stockDetailMask) closeMask(stockDetailMask); });
 
       document.getElementById("btnCloseTransfer").addEventListener("click", function () { closeMask(transferMask); });
       document.getElementById("btnCancelTransfer").addEventListener("click", function () { closeMask(transferMask); });
@@ -667,7 +706,8 @@
 
       document.addEventListener("keydown", function (e) {
         if (e.key !== "Escape") return;
-        if (stockFlowMask.classList.contains("show")) closeMask(stockFlowMask);
+        if (stockDetailMask.classList.contains("show")) closeMask(stockDetailMask);
+        else if (stockFlowMask.classList.contains("show")) closeMask(stockFlowMask);
         else if (transferMask.classList.contains("show")) closeMask(transferMask);
         else if (warnMask.classList.contains("show")) closeMask(warnMask);
       });
@@ -683,6 +723,10 @@
         var item = ledger.find(function (x) { return x.materialCode === code; });
         if (!item) return;
 
+        if (action === "view") {
+          openStockDetail(code);
+          return;
+        }
         if (action === "flow") {
           openFlowModal(code);
           return;

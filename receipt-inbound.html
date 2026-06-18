@@ -223,6 +223,21 @@
     </div>
   </div>
 
+  <div class="wh-modal-mask modal-mask" id="inboundDetailModal" aria-hidden="true">
+    <div class="wh-modal-box wh-modal-box--md" role="dialog" aria-modal="true" aria-labelledby="inboundDetailTitle">
+      <div class="wh-modal-head">
+        <h3 class="wh-modal-title" id="inboundDetailTitle">入库详情</h3>
+        <button type="button" class="wh-modal-close" id="btnCloseInboundDetail" aria-label="关闭">×</button>
+      </div>
+      <div class="wh-modal-body">
+        <div class="wh-detail-grid" id="inboundDetailGrid"></div>
+      </div>
+      <div class="wh-modal-foot">
+        <button type="button" class="wh-btn wh-btn--ghost" id="btnOkInboundDetail">关闭</button>
+      </div>
+    </div>
+  </div>
+
   <script src="js/sidebar-actions.js"></script>
   <script src="js/subpage-feature-title.js"></script>
   <script src="js/warehouse-submenu.js"></script>
@@ -236,6 +251,7 @@
       var filter = document.getElementById("inboundStatusFilter");
       var btnCreate = document.getElementById("btnCreateInbound");
       var syncLog = document.getElementById("syncLog");
+      var detailMask = document.getElementById("inboundDetailModal");
 
       var rows = [
         { inboundNo: "RK20260401001", poNo: "CG-2026-001", supplier: "远景能源", arriveDate: "2026-04-01", qcStatus: "待验收", inboundStatus: "待入库", dept: "北京中心库", source: "扫码收货" },
@@ -285,6 +301,28 @@
         });
         totalEl.textContent = "共 " + list.length + " 条";
       }
+      function openDetail(item) {
+        document.getElementById("inboundDetailGrid").innerHTML = [
+          ["入库单号", item.inboundNo],
+          ["采购订单号", item.poNo],
+          ["供应商", item.supplier],
+          ["到货日期", item.arriveDate],
+          ["验收状态", item.qcStatus],
+          ["入库状态", item.inboundStatus],
+          ["关联部门", item.dept],
+          ["录入方式", item.source]
+        ].map(function (pair) {
+          return '<div class="wh-detail-item"><div class="wh-detail-label">' + pair[0] + '</div><div class="wh-detail-value">' + pair[1] + '</div></div>';
+        }).join("");
+        detailMask.classList.add("show");
+        detailMask.setAttribute("aria-hidden", "false");
+        document.body.style.overflow = "hidden";
+      }
+      function closeDetail() {
+        detailMask.classList.remove("show");
+        detailMask.setAttribute("aria-hidden", "true");
+        document.body.style.overflow = "";
+      }
 
       btnCreate.addEventListener("click", function () {
         showActionPrompt("扫码收货/手工录入", "请输入采购订单号：", "PO20260309999", function (poNo) {
@@ -316,7 +354,7 @@
         if (!item) return;
         var action = a.getAttribute("data-action");
         if (action === "view") {
-          alert("入库单号：" + item.inboundNo + "\n采购订单号：" + item.poNo + "\n验收状态：" + item.qcStatus + "\n入库状态：" + item.inboundStatus + "\n关联部门：" + item.dept);
+          openDetail(item);
           return;
         }
         if (action === "qc") {
@@ -347,6 +385,9 @@
       search.addEventListener("input", render);
       filter.addEventListener("change", render);
       render();
+      document.getElementById("btnCloseInboundDetail").addEventListener("click", closeDetail);
+      document.getElementById("btnOkInboundDetail").addEventListener("click", closeDetail);
+      detailMask.addEventListener("click", function (e) { if (e.target === detailMask) closeDetail(); });
 
       var flowMask = document.getElementById("inboundFlowModal");
       var btnFlow = document.getElementById("btnInboundFlowDemo");
@@ -371,6 +412,9 @@
           if (e.key === "Escape" && flowMask.classList.contains("show")) closeFlow();
         });
       }
+      document.addEventListener("keydown", function (e) {
+        if (e.key === "Escape" && detailMask.classList.contains("show")) closeDetail();
+      });
     })();
   </script>
 </body>

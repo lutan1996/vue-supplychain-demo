@@ -132,7 +132,7 @@
                   <td>王雷</td>
                   <td>+2 / -1</td>
                   <td><span class="tag-status" style="background:#fff7e6;color:#d46b08;">待审核</span></td>
-                  <td><a href="#" class="pd-op" data-action="detail" style="color:#1677ff;font-size:13px;">明细</a> · <a href="#" class="pd-op" data-action="post" style="color:#1677ff;font-size:13px;">过账</a> · <button type="button" class="carrier-btn-add pd-export-btn" style="height:26px;padding:0 8px;font-size:12px;">导出明细</button></td>
+                  <td><div class="wh-ops"><a href="#" class="pd-op" data-action="view">查看</a><a href="#" class="pd-op" data-action="edit">修改</a><a href="#" class="pd-op" data-action="delete">删除</a></div></td>
                 </tr>
                 <tr>
                   <td>PD-2026-Q1-002</td>
@@ -142,7 +142,7 @@
                   <td>李凯</td>
                   <td>0 / 0</td>
                   <td><span class="tag-status" style="background:#f6ffed;color:#389e0d;">已结存</span></td>
-                  <td><a href="#" class="pd-op" data-action="detail" style="color:#1677ff;font-size:13px;">明细</a> · <button type="button" class="carrier-btn-add pd-export-btn" style="height:26px;padding:0 8px;font-size:12px;">导出明细</button></td>
+                  <td><div class="wh-ops"><a href="#" class="pd-op" data-action="view">查看</a><a href="#" class="pd-op" data-action="edit">修改</a><a href="#" class="pd-op" data-action="delete">删除</a></div></td>
                 </tr>
               </tbody>
             </table>
@@ -243,6 +243,22 @@
     </div>
   </div>
 
+  <div class="wh-modal-mask modal-mask" id="pdDetailMask" aria-hidden="true">
+    <div class="wh-modal-box wh-modal-box--md" role="dialog" aria-modal="true" aria-labelledby="pdDetailTitle">
+      <div class="wh-modal-head">
+        <h3 class="wh-modal-title" id="pdDetailTitle">盘点任务详情</h3>
+        <button type="button" class="wh-modal-close" id="pdDetailCloseX" aria-label="关闭">×</button>
+      </div>
+      <div class="wh-modal-body">
+        <div class="wh-detail-grid" id="pdDetailGrid"></div>
+      </div>
+      <div class="wh-modal-foot">
+        <button type="button" class="wh-btn wh-btn--ghost" id="pdDetailCancel">关闭</button>
+        <button type="button" class="wh-btn wh-btn--primary" id="pdDetailOk">确定</button>
+      </div>
+    </div>
+  </div>
+
   <script src="js/sidebar-actions.js"></script>
   <script src="js/subpage-feature-title.js"></script>
   <script src="js/warehouse-submenu.js"></script>
@@ -270,6 +286,30 @@
       setTimeout(function () { t.remove(); }, 2400);
     }
     var pdMask = document.getElementById("pdNewPlanMask");
+    var pdDetailMask = document.getElementById("pdDetailMask");
+    var pdDetailMode = "view";
+    function getPdRowData(tr) {
+      return [
+        ["盘点单号", tr.cells[0].textContent.trim()],
+        ["仓库", tr.cells[1].textContent.trim()],
+        ["盘点类型", tr.cells[2].textContent.trim()],
+        ["计划日期", tr.cells[3].textContent.trim()],
+        ["负责人", tr.cells[4].textContent.trim()],
+        ["盘盈/盘亏", tr.cells[5].textContent.trim()],
+        ["状态", tr.cells[6].textContent.trim()]
+      ];
+    }
+    function renderPdDetail(data, mode) {
+      pdDetailMode = mode;
+      document.getElementById("pdDetailTitle").textContent = mode === "edit" ? "修改盘点任务" : "查看盘点任务";
+      document.getElementById("pdDetailGrid").innerHTML = data.map(function (pair) {
+        return '<div class="wh-detail-item"><div class="wh-detail-label">' + pair[0] + '</div><div class="wh-detail-value">' + pair[1] + '</div></div>';
+      }).join("");
+      document.getElementById("pdDetailOk").textContent = mode === "edit" ? "保存" : "确定";
+      pdDetailMask.classList.add("show");
+      pdDetailMask.setAttribute("aria-hidden", "false");
+      document.body.style.overflow = "hidden";
+    }
     function pdOpen() {
       document.getElementById("pdNewDate").value = new Date().toISOString().slice(0, 10);
       pdMask.classList.add("show");
@@ -279,6 +319,11 @@
     function pdClose() {
       pdMask.classList.remove("show");
       pdMask.setAttribute("aria-hidden", "true");
+      document.body.style.overflow = "";
+    }
+    function pdDetailClose() {
+      pdDetailMask.classList.remove("show");
+      pdDetailMask.setAttribute("aria-hidden", "true");
       document.body.style.overflow = "";
     }
     document.getElementById("btnNewInventoryPlan").addEventListener("click", pdOpen);
@@ -291,8 +336,16 @@
       pdClose();
       pdToast("已创建盘点计划（演示）：" + wh + " · " + ty);
     });
+    document.getElementById("pdDetailCloseX").addEventListener("click", pdDetailClose);
+    document.getElementById("pdDetailCancel").addEventListener("click", pdDetailClose);
+    document.getElementById("pdDetailOk").addEventListener("click", function () {
+      if (pdDetailMode === "edit") pdToast("已保存盘点任务（演示）");
+      pdDetailClose();
+    });
+    pdDetailMask.addEventListener("click", function (e) { if (e.target === pdDetailMask) pdDetailClose(); });
     document.addEventListener("keydown", function (e) {
       if (e.key === "Escape" && pdMask.classList.contains("show")) pdClose();
+      if (e.key === "Escape" && pdDetailMask.classList.contains("show")) pdDetailClose();
     });
     document.getElementById("btnExportPd").addEventListener("click", function () {
       pdToast("正在导出盘点明细表（演示）…");
@@ -304,8 +357,12 @@
         var act = a.getAttribute("data-action");
         var tr = a.closest("tr");
         var no = tr && tr.cells[0] ? tr.cells[0].textContent.trim() : "";
-        if (act === "detail") pdToast("打开盘点明细：" + no);
-        if (act === "post") pdToast("过账提交（演示）：" + no);
+        if (act === "view") renderPdDetail(getPdRowData(tr), "view");
+        if (act === "edit") renderPdDetail(getPdRowData(tr), "edit");
+        if (act === "delete") showActionConfirm("删除盘点任务", "确认删除盘点单 " + no + "？", function () {
+          tr.remove();
+          pdToast("已删除盘点任务（演示）：" + no);
+        });
         return;
       }
       if (e.target.closest(".pd-export-btn")) {

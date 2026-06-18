@@ -10,6 +10,7 @@
   <!-- 子菜单业务页统一布局与样式（与仓库管理一致） -->
   <link rel="stylesheet" href="css/subpage-base.css" />
 <link rel="stylesheet" href="css/source-navbar-header.css" />
+  <link rel="stylesheet" href="css/warehouse-modal.css" />
 </head>
 <body class="page-source-navbar page-subpage page-warehouse">
   <div class="page-bg" aria-hidden="true"></div>
@@ -121,8 +122,6 @@
             <button type="button" class="warehouse-secondary-link" data-action="idle" data-label="闲置物资">闲置物资</button>
             <span class="warehouse-secondary-pipe" aria-hidden="true">|</span>
             <button type="button" class="warehouse-secondary-link" data-action="warehouse" data-label="仓库管理">仓库管理</button>
-            <span class="warehouse-secondary-pipe" aria-hidden="true">|</span>
-            <button type="button" class="warehouse-secondary-link" data-action="warehouse-stock-ledger" data-label="库存台账">库存台账</button>
           </div>
         </div>
       </aside>
@@ -206,6 +205,21 @@
     </div>
   </div>
 
+  <div class="wh-modal-mask modal-mask" id="warehouseDetailMask" aria-hidden="true">
+    <div class="wh-modal-box wh-modal-box--md" role="dialog" aria-modal="true" aria-labelledby="warehouseDetailTitle">
+      <div class="wh-modal-head">
+        <h3 class="wh-modal-title" id="warehouseDetailTitle">仓库详情</h3>
+        <button type="button" class="wh-modal-close" id="warehouseDetailCloseX" aria-label="关闭">×</button>
+      </div>
+      <div class="wh-modal-body">
+        <div class="wh-detail-grid" id="warehouseDetailGrid"></div>
+      </div>
+      <div class="wh-modal-foot">
+        <button type="button" class="wh-btn wh-btn--ghost" id="warehouseDetailOk">关闭</button>
+      </div>
+    </div>
+  </div>
+
   <script src="js/sidebar-actions.js"></script>
   <script src="js/subpage-feature-title.js"></script>
   <script src="js/site-footer.js"></script>
@@ -241,6 +255,7 @@
         fRegion: document.getElementById("f-region"),
         fAddress: document.getElementById("f-address")
       };
+      var detailMask = document.getElementById("warehouseDetailMask");
 
       function render() {
         var name = (refs.fName.value || "").trim();
@@ -276,6 +291,29 @@
       function genCode() {
         return "CK" + String(Math.floor(Math.random() * 90000 + 10000));
       }
+      function openDetail(item) {
+        document.getElementById("warehouseDetailGrid").innerHTML = [
+          ["仓库编码", item.code],
+          ["仓库名称", item.name],
+          ["仓库类型", item.type],
+          ["所属区域", item.region],
+          ["详细地址", item.address],
+          ["库管员", item.manager],
+          ["联系电话", item.phone],
+          ["状态", item.status],
+          ["上级仓库", item.parent]
+        ].map(function (pair) {
+          return '<div class="wh-detail-item"><div class="wh-detail-label">' + pair[0] + '</div><div class="wh-detail-value">' + pair[1] + '</div></div>';
+        }).join("");
+        detailMask.classList.add("show");
+        detailMask.setAttribute("aria-hidden", "false");
+        document.body.style.overflow = "hidden";
+      }
+      function closeDetail() {
+        detailMask.classList.remove("show");
+        detailMask.setAttribute("aria-hidden", "true");
+        document.body.style.overflow = "";
+      }
 
       document.querySelector(".btn-toolbar--primary").addEventListener("click", function () {
         showActionPrompt("新增仓库", "仓库名称：", "", function (name) {
@@ -307,7 +345,7 @@
         if (!item) return;
         var action = a.getAttribute("data-action");
         if (action === "view") {
-          alert("仓库编码：" + item.code + "\n仓库名称：" + item.name + "\n类型：" + item.type + "\n上级仓库：" + item.parent);
+          openDetail(item);
           return;
         }
         if (action === "edit") {
@@ -359,6 +397,12 @@
       var iconBtns = document.querySelectorAll(".wh-toolbar-icons button");
       if (iconBtns[0]) iconBtns[0].addEventListener("click", function () { whToast("在结果中搜索（演示）"); });
       if (iconBtns[1]) iconBtns[1].addEventListener("click", function () { render(); whToast("列表已刷新"); });
+      document.getElementById("warehouseDetailCloseX").addEventListener("click", closeDetail);
+      document.getElementById("warehouseDetailOk").addEventListener("click", closeDetail);
+      detailMask.addEventListener("click", function (e) { if (e.target === detailMask) closeDetail(); });
+      document.addEventListener("keydown", function (e) {
+        if (e.key === "Escape" && detailMask.classList.contains("show")) closeDetail();
+      });
 
       render();
     })();
