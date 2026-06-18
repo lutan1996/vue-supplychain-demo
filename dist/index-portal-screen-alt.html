@@ -1104,6 +1104,33 @@
         });
       }
 
+      function requestedAssetSubtab() {
+        var key = "";
+        try {
+          key = new URLSearchParams(location.search || "").get("asset") || "";
+        } catch (eAssetSearch) {}
+        if (!key && typeof window.__DEMO_ASSET_TAB__ === "string") key = window.__DEMO_ASSET_TAB__;
+        if (!key && window.name) {
+          try {
+            key = new URLSearchParams(String(window.name || "")).get("asset") || "";
+          } catch (eAssetName) {}
+        }
+        key = String(key || "").trim();
+        if (key === "dept") key = "department";
+        if (key === "corp") key = "company";
+        return /^(personal|department|company)$/.test(key) ? key : "";
+      }
+
+      function showAssetsPaneWithSubtab(assetKey) {
+        tabs.forEach(function (t) {
+          var active = t.getAttribute("data-biz-tab") === "assets";
+          t.classList.toggle("is-active", active);
+          t.setAttribute("aria-selected", active ? "true" : "false");
+        });
+        showAssetsPane();
+        switchAssetSubtab(assetKey || "personal");
+      }
+
       function syncBizTasksFromHash() {
         var key = null;
         var m = /^#bizTasks=(initiated|todo|done|cc)$/.exec(location.hash);
@@ -1233,6 +1260,8 @@
 
       window.addEventListener("hashchange", syncBizTasksFromHash);
       syncBizTasksFromHash();
+      var initialAssetSubtab = requestedAssetSubtab();
+      if (initialAssetSubtab) showAssetsPaneWithSubtab(initialAssetSubtab);
     })();
   </script>
 </body>

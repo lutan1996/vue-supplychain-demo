@@ -14,9 +14,9 @@
 
   var SIDEBAR_ACTION_HREF = {
     // 我的资产
-    "asset-personal": "assets-personal.html",
-    "asset-dept": "assets-department.html",
-    "asset-company": "assets-company.html",
+    "asset-personal": "index-portal-screen-alt.html?asset=personal",
+    "asset-dept": "index-portal-screen-alt.html?asset=department",
+    "asset-company": "index-portal-screen-alt.html?asset=company",
     "asset-transfer-manage": "asset-transfer-management.html",
     "asset-nature-change-manage": "asset-nature-change-management.html",
     "asset-inventory-manage": "asset-inventory-management.html",

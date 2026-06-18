@@ -456,6 +456,12 @@ body.map-demo-hide-shell-topbar .shell .main > .topbar{display:none !important;}
     actionToFile["sales-order-manage"] = "sales-order-management.html";
     actionToFile["sales-purchase-material"] = "sales-purchased-materials.html";
     actionToFile["sales-contract-report"] = "sales-contract-report.html";
+    actionToFile["asset-personal"] = "index-portal-screen-alt.html?asset=personal";
+    actionToFile["asset-dept"] = "index-portal-screen-alt.html?asset=department";
+    actionToFile["asset-company"] = "index-portal-screen-alt.html?asset=company";
+    labelToFile["个人资产"] = "index-portal-screen-alt.html?asset=personal";
+    labelToFile["部门资产"] = "index-portal-screen-alt.html?asset=department";
+    labelToFile["公司资产"] = "index-portal-screen-alt.html?asset=company";
     labelToFile["采购合同报表管理"] = "purchase-summary-report.html";
     labelToFile["销售合同报表管理"] = "sales-contract-report.html";
     labelToFile["物资列表"] = "sales-material-list.html";
@@ -921,6 +927,27 @@ body.map-demo-hide-shell-topbar .shell .main > .topbar{display:none !important;}
                 html = html.slice(0, hip + 6) + injBt + html.slice(hip + 6);
               } else {
                 html = injBt + html;
+              }
+            }
+            var assetTab = "";
+            try {
+              var rawHref = String(optFullHref || "").split("#")[0];
+              var qx = rawHref.indexOf("?");
+              if (qx >= 0) {
+                var asp = new URLSearchParams(rawHref.slice(qx + 1));
+                assetTab = (asp.get("asset") || "").trim();
+              }
+            } catch (eAssetTab) {}
+            if (/^(personal|department|company)$/.test(assetTab)) {
+              var injAsset =
+                "<script>window.__DEMO_ASSET_TAB__=" +
+                JSON.stringify(assetTab) +
+                ";<\/script>";
+              var hia = html.indexOf("<head>");
+              if (hia >= 0) {
+                html = html.slice(0, hia + 6) + injAsset + html.slice(hia + 6);
+              } else {
+                html = injAsset + html;
               }
             }
           }
