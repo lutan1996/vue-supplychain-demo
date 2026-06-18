@@ -149,9 +149,9 @@
   </div>
 
   <div class="wh-modal-mask modal-mask" id="slotEditMask" aria-hidden="true">
-    <div class="wh-modal-box" role="dialog" aria-modal="true" aria-labelledby="slotEditTitle">
+    <div class="wh-modal-box wh-modal-box--md" role="dialog" aria-modal="true" aria-labelledby="slotEditTitle">
       <div class="wh-modal-head">
-        <h3 class="wh-modal-title" id="slotEditTitle">编辑货位</h3>
+        <h3 class="wh-modal-title" id="slotEditTitle">修改货位</h3>
         <button type="button" class="wh-modal-close" id="slotEditCloseX" aria-label="关闭">×</button>
       </div>
       <div class="wh-modal-body">
@@ -169,6 +169,21 @@
             <option>华北主仓</option>
             <option>华东备件仓</option>
           </select>
+        </div>
+        <div class="wh-field">
+          <label class="wh-label" for="slotEditStatus">货位状态</label>
+          <select id="slotEditStatus" class="wh-input">
+            <option>空闲</option>
+            <option>占用</option>
+          </select>
+        </div>
+        <div class="wh-field">
+          <label class="wh-label" for="slotEditQr">二维码</label>
+          <input id="slotEditQr" class="wh-input" type="text" placeholder="二维码编号" />
+        </div>
+        <div class="wh-field">
+          <label class="wh-label" for="slotEditMat">当前存放物资</label>
+          <input id="slotEditMat" class="wh-input" type="text" placeholder="当前存放物资" />
         </div>
       </div>
       <div class="wh-modal-foot">
@@ -288,12 +303,18 @@
         var s = slots[editIndex];
         var name = (document.getElementById("slotEditName").value || "").trim();
         var wh = document.getElementById("slotEditWh").value;
+        var st = document.getElementById("slotEditStatus").value;
+        var qr = (document.getElementById("slotEditQr").value || "").trim();
+        var mat = (document.getElementById("slotEditMat").value || "").trim();
         if (!name) {
           showToast("请输入货位名称");
           return;
         }
         s.name = name;
         s.wh = wh;
+        s.st = st;
+        s.qr = qr || "QR-" + s.code.replace(/-/g, "");
+        s.mat = mat || "—";
         closeEdit();
         render();
         showToast("已保存货位 " + s.code);
@@ -324,6 +345,9 @@
           document.getElementById("slotEditCode").value = s.code;
           document.getElementById("slotEditName").value = s.name;
           document.getElementById("slotEditWh").value = s.wh;
+          document.getElementById("slotEditStatus").value = s.st;
+          document.getElementById("slotEditQr").value = s.qr;
+          document.getElementById("slotEditMat").value = s.mat;
           editMask.classList.add("show");
           editMask.setAttribute("aria-hidden", "false");
           setBodyScroll();

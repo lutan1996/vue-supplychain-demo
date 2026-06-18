@@ -1826,6 +1826,15 @@
   function applyStatusBasedOpButtons(root) {
     var file = (location.pathname || "").split("/").pop();
     if (/^sales-/.test(file)) return;
+    var keepWarehouseOps = {
+      "slot-management.html": 1,
+      "inventory-check.html": 1,
+      "inventory-management.html": 1,
+      "receipt-inbound.html": 1,
+      "idle-materials.html": 1,
+      "warehouse.html": 1
+    };
+    if (keepWarehouseOps[file]) return;
     if (file === "purchase-plan-management.html" || file === "contract-management.html") return;
     var host = root && root.querySelectorAll ? root : document;
     var tables = host.querySelectorAll("table");
