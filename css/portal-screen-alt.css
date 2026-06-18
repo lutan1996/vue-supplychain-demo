@@ -361,6 +361,49 @@ button.biz-process-link:hover {
   text-align: center;
   white-space: nowrap;
 }
+.biz-pane--tasks thead .biz-col-action {
+  width: 64px;
+  min-width: 64px;
+  padding-right: 16px;
+}
+.biz-pane--tasks tbody td.biz-col-action {
+  position: relative;
+  width: 64px;
+  min-width: 64px;
+  padding: 0 16px 0 8px;
+  text-align: center;
+  cursor: pointer;
+}
+.biz-pane--tasks tbody td.biz-col-action::after {
+  content: "办理";
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 32px;
+  height: 22px;
+  color: #1677ff;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1;
+  pointer-events: none;
+  text-decoration: none;
+}
+.biz-pane--tasks tbody td.biz-col-action:hover::after {
+  text-decoration: underline;
+}
+.biz-pane--tasks tbody td.biz-col-action .biz-process-link--handle {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  min-width: 100%;
+  overflow: hidden;
+  color: transparent !important;
+  font-size: 0 !important;
+  text-decoration: none !important;
+}
 .biz-col-summary {
   white-space: normal;
   word-break: break-word;
