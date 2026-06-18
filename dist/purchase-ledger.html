@@ -2395,6 +2395,19 @@
         return Array.isArray(all) ? all.slice() : [];
       }
 
+      function buildEditDetailDeleteTd(idx, extraClass) {
+        return (
+          '<td style="padding:8px;border-bottom:1px solid #f0f2f5;text-align:center;white-space:nowrap">' +
+          '<span class="req-op-wrap">' +
+          '<a href="#" class="' +
+          esc(extraClass || "req-detail-remove") +
+          '" data-req-remove-index="' +
+          esc(idx) +
+          '" style="color:#1677ff;text-decoration:none">删除</a>' +
+          "</span></td>"
+        );
+      }
+
       function buildTransferDetailRowsHtml(lines) {
         var tdStyle = "padding:8px;border-bottom:1px solid #f0f2f5";
         var list = lines || [];
@@ -2409,14 +2422,7 @@
         return list
           .map(function (d, idx) {
             var seq = idx + 1;
-            var trackTd =
-              '<td style="' +
-              tdStyle +
-              ';text-align:center;white-space:nowrap"><span class="req-op-wrap"><a href="#" class="req-track-link trf-track-link" data-track-name="' +
-              esc(d.productName || d.name || "") +
-              '" data-track-code="' +
-              esc(d.productCode || "") +
-              '" style="color:#1677ff;text-decoration:none">物资跟踪</a></span></td>';
+            var opTd = buildEditDetailDeleteTd(idx, "trf-detail-remove");
             return (
               "<tr>" +
               '<td style="' +
@@ -2504,7 +2510,7 @@
               '">' +
               esc(d.invoiceStatus || "—") +
               "</td>" +
-              trackTd +
+              opTd +
               "</tr>"
             );
           })
@@ -2526,17 +2532,7 @@
           bodyRows = list
             .map(function (d, idx) {
               var seq = idx + 1;
-              var trackTd =
-                '<td style="' +
-                thStyle +
-                ';text-align:center;white-space:nowrap">' +
-                '<span class="req-op-wrap">' +
-                '<a href="#" class="req-track-link" data-track-name="' +
-                esc(d.productName || d.name || "") +
-                '" data-track-code="' +
-                esc(d.productCode || "") +
-                '" style="color:#1677ff;text-decoration:none">物资跟踪</a>' +
-                "</span></td>";
+              var opTd = buildEditDetailDeleteTd(idx, "req-detail-remove");
               return (
                 "<tr>" +
                 '<td style="' +
@@ -2624,7 +2620,7 @@
                 '">' +
                 esc(d.invoiceStatus || "—") +
                 "</td>" +
-                trackTd +
+                opTd +
                 "</tr>"
               );
             })
@@ -3022,6 +3018,18 @@
                 });
               });
             }
+            var reqWrap = document.getElementById("reqMatDetailBlockWrap");
+            if (reqWrap) {
+              reqWrap.addEventListener("click", function (ev) {
+                var remove = ev.target && ev.target.closest ? ev.target.closest(".req-detail-remove") : null;
+                if (!remove) return;
+                ev.preventDefault();
+                var idx = Number(remove.getAttribute("data-req-remove-index"));
+                if (!isFinite(idx) || idx < 0) return;
+                reqSelectedRows.splice(idx, 1);
+                syncReqForm();
+              });
+            }
             syncReqForm();
             Array.prototype.forEach.call(document.querySelectorAll("#actionBody .detail-grid .k"), function (lab) {
               if ((lab.textContent || "").replace(/\s+/g, "") === "当前状态") {
@@ -3141,6 +3149,18 @@
                   },
                   { variant: "transfer" }
                 );
+              });
+            }
+            var trfBody = document.getElementById("trfDetailTbody");
+            if (trfBody) {
+              trfBody.addEventListener("click", function (ev) {
+                var remove = ev.target && ev.target.closest ? ev.target.closest(".trf-detail-remove") : null;
+                if (!remove) return;
+                ev.preventDefault();
+                var idx = Number(remove.getAttribute("data-req-remove-index"));
+                if (!isFinite(idx) || idx < 0) return;
+                trfSelectedRows.splice(idx, 1);
+                syncTrfForm();
               });
             }
             syncTrfForm();
