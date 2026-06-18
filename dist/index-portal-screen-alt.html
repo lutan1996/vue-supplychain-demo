@@ -175,9 +175,9 @@
                   </div>
                     <div class="biz-pane biz-pane--assets is-active" id="bizPaneAssets" role="tabpanel">
                       <div class="asset-subtabs" role="tablist" aria-label="我的资产分类">
-                        <button type="button" class="asset-subtab is-active" role="tab" aria-selected="true" data-asset-tab="personal">个人资产</button>
-                        <button type="button" class="asset-subtab" role="tab" aria-selected="false" data-asset-tab="department">部门资产</button>
-                        <button type="button" class="asset-subtab" role="tab" aria-selected="false" data-asset-tab="company">公司资产</button>
+                        <button type="button" class="asset-subtab is-active" role="tab" aria-selected="true" data-asset-tab="personal" data-home-asset-tab>个人资产</button>
+                        <button type="button" class="asset-subtab" role="tab" aria-selected="false" data-asset-tab="department" data-home-asset-tab>部门资产</button>
+                        <button type="button" class="asset-subtab" role="tab" aria-selected="false" data-asset-tab="company" data-home-asset-tab>公司资产</button>
                   </div>
 
                       <div class="asset-subpanel is-active" data-asset-panel="personal" role="tabpanel">
@@ -1012,6 +1012,36 @@
     </div>
   </div>
 
+  <script>
+    (function () {
+      function switchHomeAssetTab(tab) {
+        var key = tab && tab.getAttribute("data-asset-tab");
+        var pane = tab && tab.closest && tab.closest(".biz-pane--assets");
+        if (!key || !pane) return;
+        pane.querySelectorAll("[data-asset-tab]").forEach(function (item) {
+          var active = item.getAttribute("data-asset-tab") === key;
+          item.classList.toggle("is-active", active);
+          item.setAttribute("aria-selected", active ? "true" : "false");
+        });
+        pane.querySelectorAll("[data-asset-panel]").forEach(function (panel) {
+          panel.classList.toggle("is-active", panel.getAttribute("data-asset-panel") === key);
+        });
+      }
+
+      document.addEventListener(
+        "click",
+        function (e) {
+          var tab = e.target && e.target.closest ? e.target.closest("[data-home-asset-tab]") : null;
+          if (!tab) return;
+          e.preventDefault();
+          e.stopPropagation();
+          if (e.stopImmediatePropagation) e.stopImmediatePropagation();
+          switchHomeAssetTab(tab);
+        },
+        true
+      );
+    })();
+  </script>
   <script src="js/sidebar-actions.js"></script>
   <script src="js/subpage-feature-title.js"></script>
   <script src="js/site-footer.js"></script>
