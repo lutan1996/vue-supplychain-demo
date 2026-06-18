@@ -964,8 +964,6 @@
   function cartHtml() {
     return cartTableHtml() +
       '<div class="sales-form-grid" style="margin-top:12px">' +
-      '<div class="sales-field"><label>订单编号</label><input readonly value="' + esc(nextOrderNo()) + '"></div>' +
-      '<div class="sales-field"><label>订单状态</label><input readonly value="待确认"></div>' +
       '<div class="sales-field"><label>下单人</label><input id="salesOrderRequester" value="张明"></div>' +
       '<div class="sales-field"><label>下单公司</label><select id="salesOrderCompany"><option>河北龙源</option><option>天津龙源</option><option>甘肃龙源</option></select></div>' +
       '<div class="sales-field"><label>收货单位</label><input id="salesOrderReceiver" readonly value="山西龙源新能源有限公司"></div>' +
@@ -977,7 +975,6 @@
       '<div class="sales-field"><label>销售合同编号</label><input readonly value="—"></div>' +
       '<div class="sales-field"><label>物流单号</label><input readonly value="—"></div>' +
       '<div class="sales-field"><label>期望发货日期</label><input type="date" value="2026-06-30"></div>' +
-      '<div class="sales-field"><label>收货日期</label><input readonly value="—"></div>' +
       '<div class="sales-field sales-field--full"><label>订单备注</label><textarea id="salesOrderRemark" placeholder="请输入订单备注"></textarea></div>' +
       "</div>";
   }
@@ -1435,8 +1432,6 @@
     return '<div class="sales-section-title">订单物资明细表</div>' +
       materialTable +
       '<div class="sales-form-grid sales-form-grid--spaced">' +
-      '<div class="sales-field"><label>订单编号</label><input readonly value="' + esc(nextOrderNo()) + '"></div>' +
-      '<div class="sales-field"><label>订单状态</label><input readonly value="待确认"></div>' +
       '<div class="sales-field"><label>下单人</label><input id="salesOrderRequester" value="张明"></div>' +
       '<div class="sales-field"><label>下单公司</label><select id="salesOrderCompany"><option>河北龙源</option><option>天津龙源</option><option>甘肃龙源</option></select></div>' +
       '<div class="sales-field"><label>收货单位</label><input id="salesOrderReceiver" value="山西龙源新能源有限公司"></div>' +
@@ -1448,7 +1443,6 @@
       '<div class="sales-field"><label>销售合同编号</label><input readonly value="—"></div>' +
       '<div class="sales-field"><label>物流单号</label><input readonly value="—"></div>' +
       '<div class="sales-field"><label>期望发货日期</label><input type="date" value="2026-06-30"></div>' +
-      '<div class="sales-field"><label>收货日期</label><input readonly value="—"></div>' +
       '<div class="sales-field sales-field--full"><label>订单备注</label><textarea id="salesOrderRemark" placeholder="请输入订单备注"></textarea></div>' +
       '</div>';
   }
