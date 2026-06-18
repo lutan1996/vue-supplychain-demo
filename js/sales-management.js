@@ -1890,7 +1890,7 @@
 
   function purchasedDetailsTableHtml(summary, withTrack) {
     var details = expandPurchasedDetails(summary);
-    return '<div class="sales-table-wrap sales-modal-table-wrap"><table class="sales-table sales-modal-table" style="min-width:1720px"><thead><tr><th>序号</th><th>C码</th><th>产品名称</th><th>物资编码</th><th>产品编码</th><th>规格型号</th><th>制造商名称</th><th>下单公司</th><th>场站名称</th><th>订单编号</th><th>销售合同编号</th><th>收货日期</th><th>存放地点</th><th>使用状态</th><th>操作</th></tr></thead><tbody>' +
+    return '<div class="sales-table-wrap sales-modal-table-wrap"><table class="sales-table sales-modal-table" style="min-width:1720px"><thead><tr><th>序号</th><th>物资唯一码</th><th>产品名称</th><th>物资编码</th><th>产品编码</th><th>规格型号</th><th>制造商名称</th><th>下单公司</th><th>场站名称</th><th>订单编号</th><th>销售合同编号</th><th>收货日期</th><th>存放地点</th><th>使用状态</th><th>操作</th></tr></thead><tbody>' +
       (details.length ? details.map(function (row, idx) {
         return "<tr>" +
           "<td>" + (idx + 1) + "</td>" +
