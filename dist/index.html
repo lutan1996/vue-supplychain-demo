@@ -736,6 +736,8 @@ body.map-demo-hide-shell-topbar .shell .main > .topbar{display:none !important;}
             el.matches("[data-task-panel]") ||
             el.matches("[data-biz-tab]") ||
             el.matches("[data-biz-filter]") ||
+            el.matches("[data-asset-tab]") ||
+            el.matches("[data-home-asset-tab]") ||
             el.matches("[data-notice-tab]") ||
             el.matches("[data-pub]") ||
             el.matches("[data-pub-panel]") ||
@@ -745,6 +747,7 @@ body.map-demo-hide-shell-topbar .shell .main > .topbar{display:none !important;}
           (el.closest && (
             el.closest(".tabs") ||
             el.closest(".sub-tabs") ||
+            el.closest(".asset-subtabs") ||
             el.closest(".notice-tabs") ||
             el.closest("#bizFilterRow") ||
             el.closest(".biz-filter-row")
