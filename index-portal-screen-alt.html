@@ -163,7 +163,7 @@
                     </div>
                   <div class="panel-body biz-panel-body">
                     <div class="biz-tablist" role="tablist" aria-label="业务动态分类">
-                      <button type="button" class="biz-tab is-active" role="tab" aria-selected="true" data-biz-tab="assets">我的资产</button>
+                      <button type="button" class="biz-tab is-active" role="tab" aria-selected="true" data-biz-tab="assets">资产管理</button>
                       <button type="button" class="biz-tab" role="tab" aria-selected="false" data-biz-tab="tasks">我的任务</button>
                       <button type="button" class="biz-tab" role="tab" aria-selected="false" data-biz-tab="notice">公示信息</button>
                   </div>
@@ -1272,6 +1272,41 @@
           true
         );
       }
+
+      root.addEventListener(
+        "click",
+        function (e) {
+          var t = e.target;
+          if (t && t.nodeType !== 1) t = t.parentElement;
+          if (!t || !t.closest) return;
+          var btn = t.closest(".biz-process-link");
+          if (!btn || !root.contains(btn)) return;
+          var panel = btn.closest("[data-biz-task-panel]");
+          var scene = panel ? panel.getAttribute("data-biz-task-panel") : "todo";
+          if (!/^(initiated|todo|done|cc)$/.test(scene)) scene = "todo";
+          e.preventDefault();
+          e.stopPropagation();
+          if (e.stopImmediatePropagation) e.stopImmediatePropagation();
+          var href = "my-tasks-prototype-list.html?scene=" + encodeURIComponent(scene);
+          if (typeof window.navigateBySidebarAction === "function") {
+            var actionMap = {
+              initiated: "task-initiated",
+              todo: "task-todo",
+              done: "task-done",
+              cc: "task-cc"
+            };
+            if (window.navigateBySidebarAction(actionMap[scene], { label: btn.textContent || "办理" })) return;
+          }
+          try {
+            if (window.parent && window.parent !== window && window.parent.postMessage) {
+              window.parent.postMessage({ type: "map-demo-nav", href: href }, "*");
+              return;
+            }
+          } catch (ePost) {}
+          window.location.href = href;
+        },
+        true
+      );
 
       window.addEventListener("hashchange", syncBizTasksFromHash);
       syncBizTasksFromHash();
