@@ -2383,7 +2383,7 @@
     "仓库名称",
     "是否在库",
     "是否开票",
-    "物资跟踪"
+    "操作"
   ];
 
   var QA_INBOUND_RETURN_INITIATOR_KEY = "map_m10_inbound_flow_return_initiator_v1";
@@ -2598,7 +2598,7 @@
           escHtml(code) +
           '" data-track-name="' +
           escHtml(name) +
-          '">查看</a>'
+          '">物资跟踪</a>'
       });
     }
     return rows;
@@ -2660,7 +2660,7 @@
             escHtml(code) +
             '" data-track-name="' +
             escHtml(displayName) +
-            '">查看</a>'
+            '">物资跟踪</a>'
         });
       }
     });
@@ -2707,7 +2707,7 @@
       "<td>" + materialDetailReadonlyCell(row.仓库名称) + "</td>" +
       "<td>" + materialDetailReadonlyCell(row.是否在库) + "</td>" +
       "<td>" + materialDetailReadonlyCell(row.是否开票) + "</td>" +
-      "<td>" + (editableHandfill ? materialDetailReadonlyCell("查看") : row.物资跟踪) + "</td>" +
+      "<td>" + (editableHandfill ? materialDetailReadonlyCell("物资跟踪") : row.物资跟踪) + "</td>" +
       "</tr>"
     );
   }
@@ -4032,7 +4032,7 @@
     物资跟踪查看: function (el) {
       renderInlineTrackTimeline(el);
       var hint = document.getElementById("procInlineTrackHint");
-      if (hint) hint.textContent = "已展开该物资轨迹，可继续点其它“查看”切换。";
+      if (hint) hint.textContent = "已展开该物资轨迹，可继续点其它“物资跟踪”切换。";
     },
     验收录入: function () {
       openProcModal(
