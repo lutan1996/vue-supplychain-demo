@@ -227,7 +227,7 @@
         <h3 class="wh-modal-title">领用单详情</h3>
         <button type="button" class="wh-modal-close" id="closeDetail" aria-label="关闭">×</button>
       </div>
-      <div class="wh-modal-body" id="detailBody" style="font-size:13px;line-height:1.8;color:#31475f;max-height:70vh;overflow:auto;"></div>
+      <div class="wh-modal-body" id="detailBody" style="max-height:70vh;overflow:auto;"></div>
       <div class="wh-modal-foot">
         <button type="button" class="wh-btn wh-btn--ghost" id="btnDetailOk">关闭</button>
       </div>
@@ -468,15 +468,22 @@
         var i = parseInt(a.getAttribute("data-i"), 10);
         var r = issues[i];
         if (a.getAttribute("data-a") === "d") {
-          document.getElementById("detailBody").innerHTML =
-            "<p><strong>领用单号</strong>：" + r.issue_no + "</p>" +
-            "<p><strong>领用人/部门</strong>：" + r.recipient + " / " + r.dept + "</p>" +
-            "<p><strong>领用日期/紧急程度</strong>：" + r.issue_date + " / " + (r.urgent || "") + "</p>" +
-            "<p><strong>物资名称/规格/数量/单位</strong>：" + r.material_name + " / " + r.spec + " / " + r.quantity + "</p>" +
-            "<p><strong>用途</strong>：" + r.purpose + "</p>" +
-            "<p><strong>电子签名</strong>：" + (r.signature || "—") + "</p>" +
-            "<p><strong>出库确认人/时间</strong>：" + (r.approver || "—") + " / " + (r.approve_time || "—") + "</p>" +
-            (r.reject_reason ? "<p><strong>驳回原因</strong>：" + r.reject_reason + "</p>" : "");
+          document.getElementById("detailBody").innerHTML = '<div class="wh-detail-grid">' + [
+            ["领用单号", r.issue_no],
+            ["领用人", r.recipient],
+            ["领用部门", r.dept],
+            ["领用日期", r.issue_date],
+            ["紧急程度", r.urgent || "—"],
+            ["物资名称", r.material_name],
+            ["规格型号", r.spec],
+            ["数量", r.quantity],
+            ["用途", r.purpose],
+            ["电子签名", r.signature || "—"],
+            ["出库确认人", r.approver || "—"],
+            ["确认时间", r.approve_time || "—"]
+          ].concat(r.reject_reason ? [["驳回原因", r.reject_reason]] : []).map(function (pair) {
+            return '<div class="wh-detail-item"><div class="wh-detail-label">' + pair[0] + '</div><div class="wh-detail-value">' + pair[1] + '</div></div>';
+          }).join("") + "</div>";
           show("maskDetail", true);
         } else {
           showActionModal("撤回", "确定撤回该领用单？", function () {

@@ -63,6 +63,24 @@
     }, 2400);
   }
 
+  function detailGrid(rows) {
+    return (
+      '<div class="wm-detail-grid">' +
+      rows
+        .map(function (pair) {
+          return (
+            '<div class="wm-detail-item"><div class="wm-detail-label">' +
+            pair[0] +
+            '</div><div class="wm-detail-value">' +
+            pair[1] +
+            "</div></div>"
+          );
+        })
+        .join("") +
+      "</div>"
+    );
+  }
+
   function renderInvTable() {
     var tb = document.getElementById("wmTblInvBody");
     if (!tb) return;
@@ -142,24 +160,16 @@
     if (!row) return;
     document.getElementById("wmInvDetailTitle").textContent = "物料详情 - " + row.name;
     document.getElementById("wmInvDetailBody").innerHTML =
-      "<p><strong>编码</strong> " +
-      row.code +
-      " &nbsp; <strong>名称</strong> " +
-      row.name +
-      " &nbsp; <strong>型号</strong> " +
-      row.spec +
-      "</p>" +
-      "<p><strong>分类</strong> " +
-      row.cat +
-      " &nbsp; <strong>存放</strong> " +
-      row.loc +
-      " &nbsp; <strong>单价</strong> " +
-      row.price +
-      " &nbsp; <strong>库存</strong> " +
-      row.qty +
-      " &nbsp; <strong>低库存阈值</strong> " +
-      row.th +
-      "</p>" +
+      detailGrid([
+        ["编码", row.code],
+        ["名称", row.name],
+        ["型号", row.spec],
+        ["分类", row.cat],
+        ["存放", row.loc],
+        ["单价", row.price],
+        ["库存", row.qty],
+        ["低库存阈值", row.th]
+      ]) +
       "<div style=\"margin-top:12px;font-weight:600;margin-bottom:6px\">出入库流水（最近10条）</div>" +
       "<div class=\"carrier-table-wrap\"><table class=\"carrier-table\"><thead><tr><th>时间</th><th>业务类型</th><th>数量</th><th>经手人</th></tr></thead><tbody>" +
       Array.from({ length: 10 })
@@ -304,6 +314,15 @@
               : "<tr><td colspan=\"3\" style=\"text-align:center;color:#8c8c8c\">暂无领用记录</td></tr>";
           document.getElementById("wmHistTitle").textContent = "领用记录 - " + name;
           document.getElementById("wmHistBody").innerHTML =
+            detailGrid([
+              ["物料名称", SMALL_DATA[ix].name],
+              ["规格型号", SMALL_DATA[ix].spec],
+              ["分类", SMALL_DATA[ix].cat],
+              ["管理方式", SMALL_DATA[ix].mode],
+              ["当前库存", SMALL_DATA[ix].qty + SMALL_DATA[ix].unit],
+              ["存放位置", SMALL_DATA[ix].loc]
+            ]) +
+            "<div style=\"margin-top:12px;font-weight:600;margin-bottom:6px\">领用历史</div>" +
             "<table class=\"carrier-table\"><thead><tr><th>时间</th><th>数量</th><th>领用人</th></tr></thead><tbody>" +
             rows +
             "</tbody></table>";

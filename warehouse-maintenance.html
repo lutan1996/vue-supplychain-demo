@@ -73,6 +73,11 @@
     .wm-dialog-hd { padding: 12px 16px; border-bottom: 1px solid #edf2f8; font-weight: 600; display: flex; justify-content: space-between; align-items: center; }
     .wm-dialog-bd { padding: 14px 16px; overflow-y: auto; font-size: 13px; }
     .wm-dialog-ft { padding: 10px 16px; border-top: 1px solid #edf2f8; display: flex; justify-content: flex-end; gap: 8px; flex-wrap: wrap; }
+    .wm-detail-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px 28px; }
+    .wm-detail-item { display: grid; grid-template-columns: 96px minmax(0, 1fr); align-items: center; column-gap: 10px; min-width: 0; }
+    .wm-detail-label { color: #60728b; font-size: 15px; font-weight: 600; }
+    .wm-detail-value { min-height: 34px; padding: 4px 8px; border: 1px solid #6f6f6f; border-top-color: #222; border-left-color: #222; background: #f8f8f8; color: #111; font-size: 15px; line-height: 24px; word-break: break-all; box-sizing: border-box; }
+    @media (max-width: 640px) { .wm-detail-grid { grid-template-columns: 1fr; } .wm-detail-item { grid-template-columns: 90px minmax(0, 1fr); } }
     .wm-field { margin-bottom: 10px; }
     .wm-field label { display: block; font-size: 12px; color: #62788f; margin-bottom: 4px; }
     .wm-field input, .wm-field select, .wm-field textarea {

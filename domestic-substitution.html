@@ -60,6 +60,10 @@
     .modal-hd{display:flex;justify-content:space-between;align-items:center;padding:12px 14px;border-bottom:1px solid var(--border);font-weight:700}
     .modal-bd{padding:12px 14px}
     .modal-ft{padding:10px 14px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:8px}
+    .detail-form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px 28px}
+    .detail-field{display:grid;grid-template-columns:96px minmax(0,1fr);align-items:center;column-gap:10px;min-width:0}
+    .detail-label{color:#60728b;font-size:15px;font-weight:600}
+    .detail-value{min-height:34px;padding:4px 8px;border:1px solid #6f6f6f;border-top-color:#222;border-left-color:#222;background:#f8f8f8;color:#111;font-size:15px;line-height:24px;word-break:break-all;box-sizing:border-box}
     .x{border:none;background:transparent;font-size:18px;cursor:pointer;color:#64748b}
     .x:hover{color:#111827}
     @media (max-width:1200px){.ds-layout{grid-template-columns:1fr}.kpis{grid-template-columns:repeat(2,minmax(0,1fr));}}
@@ -187,6 +191,7 @@
       var applyCols = [["id","领用单号"],["date","领用日期"],["code","产品编码"],["name","产品名称"],["spec","规格型号"],["qty","领用数量"],["unit","单位"],["use","领用用途"],["user","领用人"],["produced","关联生产成品"],["contract","关联合同"],["status","审批状态"]];
       var saleCols = [["id","销售单号"],["date","销售日期"],["code","产品编码"],["name","产品名称"],["spec","规格型号"],["qty","销售数量"],["unit","单位"],["customer","客户单位"],["station","场站名称"],["contract","合同编号"],["amount","合同金额(元)"],["ship","发货状态"],["status","审批状态"]];
       function esc(v){ return String(v==null?"":v).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;"); }
+      function detailForm(rows){ return '<div class="detail-form">'+rows.map(function(p){return '<div class="detail-field"><div class="detail-label">'+esc(p[0])+'</div><div class="detail-value">'+esc(p[1])+'</div></div>';}).join("")+"</div>"; }
       function fmtStatus(v){ if(v==="已通过") return '<span class="status-pass">已通过</span>'; if(v==="审批中") return '<span class="status-pending">审批中</span>'; return '<span class="status-reject">'+esc(v)+'</span>'; }
       function showModal(t,b,f){ document.getElementById("modalTitle").textContent=t; document.getElementById("modalBody").innerHTML=b||""; document.getElementById("modalFoot").innerHTML=f||'<button class="btn" data-action="close">关闭</button>'; document.getElementById("modal").classList.add("show"); }
       function closeModal(){ document.getElementById("modal").classList.remove("show"); }
@@ -213,10 +218,10 @@
         if(e.target.id==="aAdd"){ showModal("新增领用申请","已按提示词实现完整表单逻辑。",'<button class="btn" data-action="close">取消</button><button class="btn primary" data-action="close">提交</button>'); return; }
         if(e.target.id==="sAdd"){ showModal("新增销售","已按提示词实现完整表单逻辑。",'<button class="btn" data-action="close">取消</button><button class="btn primary" data-action="close">提交</button>'); return; }
         var op=e.target.getAttribute("data-op"), id=e.target.getAttribute("data-id");
-        if(op==="a-detail"){ var r=rowById(applyRows,id); showModal("领用申请详情","<p><b>"+esc(r.id)+"</b> / "+esc(r.name)+" / "+esc(r.qty)+esc(r.unit)+"</p><p>审批记录："+esc(r.approver)+" / "+esc(r.opinion)+" / "+esc(r.approveTime)+"</p>",'<button class="btn" data-action="close">关闭</button>'); return; }
+        if(op==="a-detail"){ var r=rowById(applyRows,id); showModal("领用申请详情",detailForm([["申请单号",r.id],["物资名称",r.name],["申请数量",r.qty+r.unit],["审批人",r.approver],["审批意见",r.opinion],["审批时间",r.approveTime]]),'<button class="btn" data-action="close">关闭</button>'); return; }
         if(op==="a-withdraw"){ alert("撤回成功"); return; }
         if(op==="a-approve"){ showModal("领用申请审批","<p>审批流程：部门主管 → 公司物资专责</p><div class='field'><label>审批结论</label><select><option>同意</option><option>驳回</option></select></div><div class='field'><label>审批意见</label><textarea></textarea></div>",'<button class="btn" data-action="close">取消</button><button class="btn primary" data-action="close">提交</button>'); return; }
-        if(op==="s-detail"){ var rs=rowById(saleRows,id); showModal("销售详情","<p><b>"+esc(rs.id)+"</b> / "+esc(rs.name)+" / "+esc(rs.contract)+"</p><p>合同附件：demo-"+esc(rs.contract)+".pdf</p>",'<button class="btn" data-action="close">关闭</button>'); return; }
+        if(op==="s-detail"){ var rs=rowById(saleRows,id); showModal("销售详情",detailForm([["销售单号",rs.id],["物资名称",rs.name],["合同编号",rs.contract],["合同附件","demo-"+rs.contract+".pdf"]]),'<button class="btn" data-action="close">关闭</button>'); return; }
         if(op==="s-withdraw"){ alert("撤回成功"); return; }
         if(op==="s-approve"){ showModal("销售审批","<p>审批流程：部门主管 → 采购专责 → 物资主管</p><div class='field'><label>审批结论</label><select><option>同意</option><option>驳回</option></select></div><div class='field'><label>审批意见</label><textarea></textarea></div>",'<button class="btn" data-action="close">取消</button><button class="btn primary" data-action="close">提交</button>'); return; }
         if(op==="s-ship"){ showModal("确认发货","<div class='field'><label>物流单号</label><input></div><div class='field'><label>承运商</label><input></div><div class='field'><label>发货日期</label><input type='date'></div>",'<button class="btn" data-action="close">取消</button><button class="btn primary" data-action="close">确认发货</button>'); return; }

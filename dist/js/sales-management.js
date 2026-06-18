@@ -552,6 +552,39 @@
     mask.setAttribute("aria-hidden", "false");
   }
 
+  function ensureProductViewModal() {
+    var mask = document.getElementById("salesProductViewMask");
+    if (mask) return mask;
+    mask = document.createElement("div");
+    mask.id = "salesProductViewMask";
+    mask.className = "sales-product-view-mask";
+    mask.innerHTML = '<div class="sales-product-view-dialog" role="dialog" aria-modal="true" aria-labelledby="salesProductViewTitle">' +
+      '<div class="sales-product-view-hd"><span id="salesProductViewTitle">查看物资</span><button type="button" class="sales-product-view-close" data-product-view-close aria-label="关闭">×</button></div>' +
+      '<div class="sales-product-view-bd" id="salesProductViewBody"></div>' +
+      '<div class="sales-product-view-ft"><button type="button" class="sales-btn" data-product-view-close>关闭</button></div>' +
+      '</div>';
+    document.body.appendChild(mask);
+    mask.addEventListener("click", function (e) {
+      if (e.target === mask || (e.target.closest && e.target.closest("[data-product-view-close]"))) closeProductViewModal();
+    });
+    return mask;
+  }
+
+  function openProductViewModal(product) {
+    var mask = ensureProductViewModal();
+    document.getElementById("salesProductViewTitle").textContent = "查看物资";
+    document.getElementById("salesProductViewBody").innerHTML = productDetailHtml(product);
+    mask.classList.add("show");
+    mask.setAttribute("aria-hidden", "false");
+  }
+
+  function closeProductViewModal() {
+    var mask = document.getElementById("salesProductViewMask");
+    if (!mask) return;
+    mask.classList.remove("show");
+    mask.setAttribute("aria-hidden", "true");
+  }
+
   function closeModal() {
     var mask = document.getElementById("salesModalMask");
     if (!mask) return;
@@ -688,6 +721,51 @@
       "</tbody></table></div>";
   }
 
+  function productDetailFromLine(row) {
+    row = row || {};
+    var meta = productMetaLookup({
+      id: row.id,
+      productName: row.productName,
+      productCode: row.code || row.productCode,
+      materialCode: row.typeCode,
+      typeCode: row.typeCode,
+      typeName: row.typeName
+    });
+    var product = meta.primary ? Object.assign({}, meta.primary) : {};
+    product.productName = row.productName || product.productName;
+    product.mfrName = row.mfrName || row.manufacturer || product.mfrName || meta.manufacturer;
+    product.model = row.model || product.model || meta.model;
+    product.b = row.code || row.productCode || product.b || meta.productCode;
+    product.a = row.typeCode || product.a || meta.typeCode;
+    product.typeName = row.typeName || product.typeName || meta.typeName;
+    product.category = row.category || product.category || meta.category;
+    product.stockQty = row.stockQty != null && row.stockQty !== "" ? row.stockQty : (product.stockQty != null ? product.stockQty : meta.stockQty);
+    product.refPrice = row.price != null && row.price !== "" ? row.price : (product.refPrice != null ? product.refPrice : meta.refPrice);
+    product.typeDef = row.typeDef || product.typeDef || meta.typeDef;
+    if (!product.features || !Object.keys(product.features).length) {
+      product.features = {};
+      (row.features || []).forEach(function (text, idx) {
+        if (!text || text === "—") return;
+        var parts = String(text).split("：");
+        product.features["f" + (idx + 1) + "_name"] = parts.length > 1 ? parts[0] : ("特征值" + (idx + 1));
+        product.features["f" + (idx + 1)] = parts.length > 1 ? parts.slice(1).join("：") : text;
+      });
+    }
+    return product;
+  }
+
+  function bindMaterialViewButtons(root, rows) {
+    if (!root) return;
+    rows = rows || [];
+    root.querySelectorAll("[data-material-view]").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        var id = btn.getAttribute("data-material-view");
+        var row = rows.find(function (item) { return String(item.id) === String(id); });
+        if (row) openProductViewModal(productDetailFromLine(row));
+      });
+    });
+  }
+
   function cartKey(product) {
     if (!product) return "";
     return String(
@@ -820,9 +898,9 @@
       "</tr></thead><tbody>" +
       rows.map(function (row) {
         var qtyCell = editable ? qtyStepperHtml(row.qty, row.id, qtyAttr, stepAttr) : esc(textOrDash(row.qty));
-        var op = "—";
-        if (removable) op = '<button type="button" class="sales-cart-remove" data-cart-remove="' + esc(row.id) + '">删除</button>';
-        else if (trackOrder) op = '<button type="button" class="sales-inline-link" data-modal-action="order-track" data-order="' + esc(trackOrder) + '" data-item="' + esc(row.id) + '">物资跟踪</button>';
+        var op = '<button type="button" class="sales-inline-link" data-material-view="' + esc(row.id) + '">查看</button>';
+        if (removable) op += '<button type="button" class="sales-cart-remove" data-cart-remove="' + esc(row.id) + '">删除</button>';
+        else if (trackOrder) op += '<button type="button" class="sales-inline-link" data-modal-action="order-track" data-order="' + esc(trackOrder) + '" data-item="' + esc(row.id) + '">物资跟踪</button>';
         return "<tr>" +
           "<td>" + esc(row.seq) + "</td>" +
           "<td>" + esc(textOrDash(row.productName)) + "</td>" +
@@ -1075,6 +1153,7 @@
           removeCartItem(btn.getAttribute("data-cart-remove"));
         });
       });
+      bindMaterialViewButtons(body, cartRows());
     }
     var submit = document.getElementById("salesCartSubmit");
     if (submit) submit.addEventListener("click", function () {
@@ -1203,6 +1282,7 @@
     order = patchOrderMaterials(Object.assign({}, order));
     openModal("查看订单 - " + order.orderNo, orderDetailHtml(order), '<button class="sales-btn" data-close>关闭</button>', "wide");
     setModalHeadAction("流程进度", openSalesFlowModal);
+    bindMaterialViewButtons(document.getElementById("salesModalBody"), orderMaterialRows(order));
   }
 
   function openOrderTrack(orderNo, itemId) {
@@ -1215,6 +1295,7 @@
     if (!panel) {
       openModal("查看订单 - " + order.orderNo, orderDetailHtml(order), '<button class="sales-btn" data-close>关闭</button>', "wide");
       setModalHeadAction("流程进度", openSalesFlowModal);
+      bindMaterialViewButtons(document.getElementById("salesModalBody"), orderMaterialRows(order));
       panel = document.getElementById("salesOrderTrackPanel");
     }
     if (panel) panel.innerHTML = orderInlineTrackHtml(order, normalizeOrderMaterial(item));
@@ -1453,6 +1534,7 @@
           changeOrderDraftQty(id, next);
         });
       });
+      bindMaterialViewButtons(body, orderMaterialRows({ materials: orderDraftMaterials }));
     }
     var ok = document.getElementById("salesSubmitOrder");
     if (ok) ok.addEventListener("click", function () {
