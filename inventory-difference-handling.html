@@ -42,6 +42,9 @@
     .diff-tag.done { background: #f6ffed; border-color: #b7eb8f; color: #389e0d; }
     .diff-modal-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px 18px; }
     .diff-modal-grid .wh-field { margin-bottom: 0; }
+    .diff-modal-head-actions { display: inline-flex; align-items: center; gap: 8px; }
+    .diff-head-action { height: 28px; border: 1px solid #91caff; border-radius: 4px; background: #e6f4ff; color: #1677ff; padding: 0 10px; font-size: 12px; cursor: pointer; font-family: inherit; }
+    .diff-head-action:hover { background: #bae0ff; border-color: #69b1ff; }
     .diff-detail-table { width: 100%; min-width: 1180px; border-collapse: collapse; table-layout: fixed; font-size: 12px; }
     .diff-detail-table th, .diff-detail-table td { border: 1px solid #e8e8e8; padding: 8px; color: #262626; text-align: left; }
     .diff-detail-table th { background: #f5f7fa; color: #334155; white-space: nowrap; }
@@ -147,7 +150,13 @@
 
   <div class="wh-modal-mask" id="detailMask" aria-hidden="true">
     <div class="wh-modal-box wh-modal-box--lg" role="dialog" aria-modal="true" aria-labelledby="detailTitle">
-      <div class="wh-modal-head"><h3 class="wh-modal-title" id="detailTitle">差异详情</h3><button type="button" class="wh-modal-close" data-close aria-label="关闭">×</button></div>
+      <div class="wh-modal-head">
+        <h3 class="wh-modal-title" id="detailTitle">差异详情</h3>
+        <div class="diff-modal-head-actions">
+          <button type="button" class="diff-head-action" id="btnFlowProgress">流程进度</button>
+          <button type="button" class="wh-modal-close" data-close aria-label="关闭">×</button>
+        </div>
+      </div>
       <div class="wh-modal-body">
         <div class="wh-detail-grid" id="detailGrid"></div>
         <div style="margin-top:14px;overflow:auto">
@@ -156,6 +165,15 @@
             <tbody id="detailLines"></tbody>
           </table>
         </div>
+      </div>
+      <div class="wh-modal-foot"><button type="button" class="wh-btn wh-btn--ghost" data-close>关闭</button></div>
+    </div>
+  </div>
+
+  <div class="wh-modal-mask" id="flowMask" aria-hidden="true">
+    <div class="wh-modal-box wh-modal-box--lg" role="dialog" aria-modal="true" aria-labelledby="flowTitle">
+      <div class="wh-modal-head"><h3 class="wh-modal-title" id="flowTitle">流程进度</h3><button type="button" class="wh-modal-close" data-close aria-label="关闭">×</button></div>
+      <div class="wh-modal-body">
         <div class="diff-flow">
           <div class="diff-step done">生成差异</div>
           <div class="diff-step active">部门复核</div>
@@ -321,6 +339,7 @@
           rows.forEach(function (x) { if (x.status !== "已处理") x.status = "处理中"; });
           renderTable();
         }
+        if (e.target.id === "btnFlowProgress") open(document.getElementById("flowMask"));
         if (e.target.id === "btnExport") alert("正在导出盘点差异明细（演示）");
         if (e.target.id === "btnLedgerRefresh") { renderLedger(); alert("盘点台帐已刷新（演示）"); }
         if (e.target.id === "btnLedgerExport") alert("正在导出盘点台帐（演示）");
