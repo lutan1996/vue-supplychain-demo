@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>盘点任务管理 - 新能源物资供应链管理系统</title>
+  <link rel="stylesheet" href="css/vendor/fa-all.min.css" />
+  <link rel="stylesheet" href="css/subpage-base.css" />
+  <link rel="stylesheet" href="css/carrier-management.css" />
+  <link rel="stylesheet" href="css/source-navbar-header.css" />
+  <link rel="stylesheet" href="css/warehouse-modal.css?v=20260618-detail-input-v3" />
+  <style>
+    body.page-inventory-task .main-scroll { background: #f5f7fa; }
+    .inv-wrap { padding: 12px 16px 20px; }
+    .inv-kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin-bottom: 10px; }
+    .inv-kpi { background: #fff; border: 1px solid #e8e8e8; border-radius: 8px; padding: 12px 14px; }
+    .inv-kpi b { display: block; font-size: 12px; color: #60728b; font-weight: 600; }
+    .inv-kpi span { display: block; margin-top: 6px; font-size: 22px; font-weight: 700; color: #1677ff; }
+    .inv-panel { background: #fff; border: 1px solid #e8e8e8; border-radius: 8px; overflow: hidden; }
+    .inv-filters { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; padding: 12px 16px 8px; }
+    .inv-actions { display: flex; gap: 8px; padding: 0 16px 12px; border-bottom: 1px solid #f0f0f0; }
+    .inv-btn { height: 32px; border-radius: 4px; border: 1px solid #d9d9d9; background: #fff; padding: 0 14px; font-size: 13px; cursor: pointer; font-family: inherit; }
+    .inv-btn.primary { background: #1677ff; border-color: #1677ff; color: #fff; }
+    .inv-btn.soft { color: #1677ff; border-color: #91caff; background: #e6f4ff; }
+    .inv-table-wrap { overflow: auto; padding: 0 16px 12px; }
+    .inv-table { width: 100%; min-width: 1280px; border-collapse: collapse; table-layout: fixed; font-size: 12px; }
+    .inv-table th, .inv-table td { border: 1px solid #e8e8e8; padding: 8px; text-align: left; color: #262626; }
+    .inv-table th { background: #f5f5f5; color: #334155; white-space: nowrap; }
+    .inv-op { display: inline-flex; gap: 8px; white-space: nowrap; }
+    .inv-op button { border: none; background: transparent; color: #1677ff; cursor: pointer; font-size: 12px; padding: 0; font-family: inherit; }
+    .inv-tag { display: inline-flex; align-items: center; height: 22px; padding: 0 8px; border-radius: 4px; border: 1px solid transparent; font-size: 11px; }
+    .inv-tag.wait { background: #fff7e6; border-color: #ffd591; color: #d46b08; }
+    .inv-tag.run { background: #e6f4ff; border-color: #91caff; color: #0958d9; }
+    .inv-tag.done { background: #f6ffed; border-color: #b7eb8f; color: #389e0d; }
+    .inv-detail-table { width: 100%; min-width: 960px; border-collapse: collapse; table-layout: fixed; font-size: 12px; }
+    .inv-detail-table th, .inv-detail-table td { border: 1px solid #e8e8e8; padding: 8px; color: #262626; text-align: left; }
+    .inv-detail-table th { background: #f5f7fa; color: #334155; }
+    .inv-modal-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px 18px; }
+    .inv-modal-grid .wh-field { margin-bottom: 0; }
+    @media (max-width: 1100px) {
+      .inv-kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .inv-filters { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+  </style>
+</head>
+<body class="page-source-navbar page-subpage page-inventory-task">
+  <div class="page-bg" aria-hidden="true"></div>
+  <div class="app">
+    <header class="header">
+      <div class="header-left">
+        <button type="button" class="header-hamburger" aria-label="菜单" title="菜单"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+        <a class="header-logo" href="#" aria-label="国家能源集团"><img src="assets/logo-chenergy.png" alt="国家能源集团 CHN ENERGY" width="220" height="40" /></a>
+        <div class="header-source-brand"><p>新能源供应链管理系统</p></div>
+      </div>
+      <div class="header-right"><span class="clock" id="clock"></span><div class="user-avatar" title="用户">用</div></div>
+    </header>
+    <div class="layout">
+      <aside class="sidebar" aria-label="主导航">
+        <div class="nav-item" title="我的资产"><span class="nav-label">我的资产</span></div>
+        <div class="nav-item" title="我的任务"><span class="nav-label">我的任务</span></div>
+        <a class="nav-item" href="index-portal-screen-alt.html" title="首页"><span class="nav-label">首页</span></a>
+        <div class="nav-item" title="物资采购"><span class="nav-label">物资采购</span></div>
+        <div class="nav-item" title="实物管理"><span class="nav-label">实物管理</span></div>
+        <div class="nav-item" title="销售管理"><span class="nav-label">销售管理</span></div>
+        <div class="nav-item nav-item--module-active" title="盘点管理"><span class="nav-label">盘点管理</span></div>
+        <div class="nav-item" title="资产管理"><span class="nav-label">资产管理</span></div>
+        <div class="nav-item" title="物流管理"><span class="nav-label">物流管理</span></div>
+        <div class="nav-item" title="仓储管理"><span class="nav-label">仓储管理</span></div>
+        <div class="nav-item" title="物资出库与处置"><span class="nav-label">物资出库与处置</span></div>
+        <div class="nav-item" title="综合业务管理"><span class="nav-label">综合业务管理</span></div>
+        <div class="nav-item" title="基础数据管理"><span class="nav-label">基础数据管理</span></div>
+      </aside>
+      <main class="main-scroll">
+        <h1 class="carrier-page-title">盘点任务管理</h1>
+        <div class="inv-wrap">
+          <div class="inv-kpis" id="kpis"></div>
+          <section class="inv-panel">
+            <div class="inv-filters">
+              <div class="wh-field"><label for="fNo">盘点单号</label><input id="fNo" type="text" placeholder="请输入盘点单号"></div>
+              <div class="wh-field"><label for="fDept">盘点部门</label><select id="fDept"><option value="">全部部门</option><option>机械研究所</option><option>电控所</option><option>经营发展中心</option><option>华北运维部</option></select></div>
+              <div class="wh-field"><label for="fType">盘点类型</label><select id="fType"><option value="">全部类型</option><option>部门自盘</option><option>公司抽盘</option><option>专项盘点</option></select></div>
+              <div class="wh-field"><label for="fStatus">任务状态</label><select id="fStatus"><option value="">全部状态</option><option>待开始</option><option>进行中</option><option>待差异处理</option><option>已完成</option></select></div>
+              <div class="wh-field"><label for="fKeeper">负责人</label><input id="fKeeper" type="text" placeholder="请输入负责人"></div>
+            </div>
+            <div class="inv-actions">
+              <button class="inv-btn primary" id="btnSearch">搜索</button>
+              <button class="inv-btn" id="btnReset">重置</button>
+              <button class="inv-btn soft" id="btnCreate">新建盘点任务</button>
+              <button class="inv-btn" id="btnExport">导出盘点任务</button>
+            </div>
+            <div class="inv-table-wrap">
+              <table class="inv-table">
+                <thead>
+                  <tr>
+                    <th>序号</th><th>盘点单号</th><th>盘点名称</th><th>盘点类型</th><th>盘点部门</th><th>盘点范围</th><th>计划日期</th><th>负责人</th><th>应盘数量</th><th>已盘数量</th><th>差异数量</th><th>任务状态</th><th>操作</th>
+                  </tr>
+                </thead>
+                <tbody id="tbody"></tbody>
+              </table>
+            </div>
+          </section>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <div class="wh-modal-mask" id="createMask" aria-hidden="true">
+    <div class="wh-modal-box wh-modal-box--lg" role="dialog" aria-modal="true" aria-labelledby="createTitle">
+      <div class="wh-modal-head"><h3 class="wh-modal-title" id="createTitle">新建盘点任务</h3><button type="button" class="wh-modal-close" data-close aria-label="关闭">×</button></div>
+      <div class="wh-modal-body">
+        <div class="inv-modal-grid">
+          <div class="wh-field"><label class="wh-label">盘点名称</label><input class="wh-input" id="newName" value="2026年部门物资盘点"></div>
+          <div class="wh-field"><label class="wh-label">盘点类型</label><select class="wh-input" id="newType"><option>部门自盘</option><option>公司抽盘</option><option>专项盘点</option></select></div>
+          <div class="wh-field"><label class="wh-label">盘点部门</label><select class="wh-input" id="newDept"><option>机械研究所</option><option>电控所</option><option>经营发展中心</option><option>华北运维部</option></select></div>
+          <div class="wh-field"><label class="wh-label">盘点范围</label><select class="wh-input" id="newScope"><option>本部门在库及已领用物资</option><option>仓库在库物资</option><option>已销售待核销物资</option><option>闲置物资</option></select></div>
+          <div class="wh-field"><label class="wh-label">计划开始日期</label><input class="wh-input" id="newStart" type="date" value="2026-06-25"></div>
+          <div class="wh-field"><label class="wh-label">计划完成日期</label><input class="wh-input" id="newEnd" type="date" value="2026-06-30"></div>
+          <div class="wh-field"><label class="wh-label">负责人</label><input class="wh-input" id="newOwner" value="宋中波"></div>
+          <div class="wh-field"><label class="wh-label">数据来源</label><input class="wh-input" readonly value="产品目录、采购合同、收货入库、库存台账、扫码领用、销售发货"></div>
+        </div>
+        <p class="wh-hint">系统按物资唯一码汇总应盘清单，并带入物资类型编码、产品编码、合同编号、入库记录、当前所在部门/仓库。</p>
+      </div>
+      <div class="wh-modal-foot"><button type="button" class="wh-btn wh-btn--ghost" data-close>取消</button><button type="button" class="wh-btn wh-btn--primary" id="btnCreateOk">确定</button></div>
+    </div>
+  </div>
+
+  <div class="wh-modal-mask" id="detailMask" aria-hidden="true">
+    <div class="wh-modal-box wh-modal-box--lg" role="dialog" aria-modal="true" aria-labelledby="detailTitle">
+      <div class="wh-modal-head"><h3 class="wh-modal-title" id="detailTitle">盘点任务详情</h3><button type="button" class="wh-modal-close" data-close aria-label="关闭">×</button></div>
+      <div class="wh-modal-body">
+        <div class="wh-detail-grid" id="detailGrid"></div>
+        <div style="margin-top:14px;overflow:auto">
+          <table class="inv-detail-table">
+            <thead><tr><th>物资唯一码</th><th>物资类型编码</th><th>产品编码</th><th>物资名称</th><th>规格型号</th><th>账面位置</th><th>账面数量</th><th>实盘数量</th><th>盘点结果</th></tr></thead>
+            <tbody id="detailLines"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="wh-modal-foot"><button type="button" class="wh-btn wh-btn--ghost" data-close>关闭</button><button type="button" class="wh-btn wh-btn--primary" id="btnDetailOk">确定</button></div>
+    </div>
+  </div>
+
+  <script src="js/sidebar-actions.js"></script>
+  <script src="js/subpage-feature-title.js"></script>
+  <script src="js/site-footer.js"></script>
+  <script src="js/subpage-clock.js?v=20260621-inventory-task-v1"></script>
+  <script>
+    (function () {
+      var rows = [
+        { id: 1, no: "PD-2026-001", name: "机械研究所二季度盘点", type: "部门自盘", dept: "机械研究所", scope: "本部门在库及已领用物资", start: "2026-06-25", end: "2026-06-30", owner: "宋中波", should: 126, done: 92, diff: 3, status: "进行中" },
+        { id: 2, no: "PD-2026-002", name: "电控所已领用物资抽盘", type: "公司抽盘", dept: "电控所", scope: "已领用物资", start: "2026-06-28", end: "2026-07-03", owner: "成明锴", should: 84, done: 84, diff: 2, status: "待差异处理" },
+        { id: 3, no: "PD-2026-003", name: "中心仓闲置物资专项盘点", type: "专项盘点", dept: "经营发展中心", scope: "闲置物资", start: "2026-07-01", end: "2026-07-05", owner: "杜欣鑫", should: 57, done: 0, diff: 0, status: "待开始" },
+        { id: 4, no: "PD-2026-004", name: "华北运维部月度盘点", type: "部门自盘", dept: "华北运维部", scope: "仓库在库物资", start: "2026-06-10", end: "2026-06-15", owner: "许学良", should: 98, done: 98, diff: 0, status: "已完成" }
+      ];
+      var lines = [
+        { code: "C20260000001", type: "A0010020001", product: "B00001234", name: "变桨轴承", spec: "BP-2.0MW", loc: "机械研究所/华北主仓A-01", book: 1, real: 1, result: "账实相符" },
+        { code: "C20260000002", type: "A0010020002", product: "B00001235", name: "齿轮箱滤芯", spec: "GX-LX-90", loc: "机械研究所/华北主仓A-03", book: 12, real: 10, result: "盘亏" },
+        { code: "C20260000003", type: "A0020010006", product: "B00001888", name: "变频器模块", spec: "VF-800", loc: "电控所/已领用", book: 2, real: 3, result: "盘盈" }
+      ];
+      var state = { filters: {} };
+      function tag(status) {
+        if (status === "待开始") return '<span class="inv-tag wait">待开始</span>';
+        if (status === "进行中") return '<span class="inv-tag run">进行中</span>';
+        if (status === "已完成") return '<span class="inv-tag done">已完成</span>';
+        return '<span class="inv-tag wait">待差异处理</span>';
+      }
+      function getRows() {
+        return rows.filter(function (x) {
+          if (state.filters.no && x.no.indexOf(state.filters.no) < 0) return false;
+          if (state.filters.dept && x.dept !== state.filters.dept) return false;
+          if (state.filters.type && x.type !== state.filters.type) return false;
+          if (state.filters.status && x.status !== state.filters.status) return false;
+          if (state.filters.owner && x.owner.indexOf(state.filters.owner) < 0) return false;
+          return true;
+        });
+      }
+      function renderKpis(list) {
+        document.getElementById("kpis").innerHTML = [
+          ["盘点任务总数", rows.length],
+          ["进行中任务", rows.filter(function (x) { return x.status === "进行中"; }).length],
+          ["待处理差异", rows.reduce(function (s, x) { return s + x.diff; }, 0)],
+          ["已完成任务", rows.filter(function (x) { return x.status === "已完成"; }).length]
+        ].map(function (x) { return '<div class="inv-kpi"><b>' + x[0] + '</b><span>' + x[1] + '</span></div>'; }).join("");
+      }
+      function renderTable() {
+        var list = getRows();
+        renderKpis(list);
+        document.getElementById("tbody").innerHTML = list.map(function (x, i) {
+          return '<tr><td>' + (i + 1) + '</td><td>' + x.no + '</td><td>' + x.name + '</td><td>' + x.type + '</td><td>' + x.dept + '</td><td>' + x.scope + '</td><td>' + x.start + ' 至 ' + x.end + '</td><td>' + x.owner + '</td><td>' + x.should + '</td><td>' + x.done + '</td><td>' + x.diff + '</td><td>' + tag(x.status) + '</td><td><span class="inv-op"><button data-act="view" data-id="' + x.id + '">查看</button><button data-act="start" data-id="' + x.id + '">执行盘点</button><button data-act="close" data-id="' + x.id + '">生成差异</button></span></td></tr>';
+        }).join("");
+      }
+      function open(mask) {
+        mask.classList.add("is-open");
+        mask.setAttribute("aria-hidden", "false");
+      }
+      function close(mask) {
+        mask.classList.remove("is-open");
+        mask.setAttribute("aria-hidden", "true");
+      }
+      function openDetail(row) {
+        document.getElementById("detailGrid").innerHTML = [
+          ["盘点单号", row.no], ["盘点名称", row.name], ["盘点类型", row.type], ["盘点部门", row.dept],
+          ["盘点范围", row.scope], ["计划日期", row.start + " 至 " + row.end], ["负责人", row.owner], ["任务状态", row.status]
+        ].map(function (x) { return '<div class="wh-detail-item"><span class="wh-detail-label">' + x[0] + '</span><span class="wh-detail-value">' + x[1] + '</span></div>'; }).join("");
+        document.getElementById("detailLines").innerHTML = lines.map(function (x) {
+          return '<tr><td>' + x.code + '</td><td>' + x.type + '</td><td>' + x.product + '</td><td>' + x.name + '</td><td>' + x.spec + '</td><td>' + x.loc + '</td><td>' + x.book + '</td><td>' + x.real + '</td><td>' + x.result + '</td></tr>';
+        }).join("");
+        open(document.getElementById("detailMask"));
+      }
+      document.addEventListener("click", function (e) {
+        var closeBtn = e.target.closest("[data-close]");
+        if (closeBtn) {
+          close(closeBtn.closest(".wh-modal-mask"));
+          return;
+        }
+        if (e.target.id === "btnCreate") open(document.getElementById("createMask"));
+        if (e.target.id === "btnCreateOk") {
+          rows.unshift({ id: Date.now(), no: "PD-2026-005", name: document.getElementById("newName").value || "新建盘点任务", type: document.getElementById("newType").value, dept: document.getElementById("newDept").value, scope: document.getElementById("newScope").value, start: document.getElementById("newStart").value, end: document.getElementById("newEnd").value, owner: document.getElementById("newOwner").value || "当前用户", should: 0, done: 0, diff: 0, status: "待开始" });
+          close(document.getElementById("createMask"));
+          renderTable();
+        }
+        if (e.target.id === "btnSearch") {
+          state.filters = { no: fNo.value.trim(), dept: fDept.value, type: fType.value, status: fStatus.value, owner: fKeeper.value.trim() };
+          renderTable();
+        }
+        if (e.target.id === "btnReset") {
+          ["fNo", "fKeeper"].forEach(function (id) { document.getElementById(id).value = ""; });
+          ["fDept", "fType", "fStatus"].forEach(function (id) { document.getElementById(id).value = ""; });
+          state.filters = {};
+          renderTable();
+        }
+        if (e.target.id === "btnExport") alert("正在导出盘点任务列表（演示）");
+        var op = e.target.closest("[data-act]");
+        if (op) {
+          var row = rows.find(function (x) { return String(x.id) === op.getAttribute("data-id"); });
+          if (!row) return;
+          if (op.getAttribute("data-act") === "view") openDetail(row);
+          if (op.getAttribute("data-act") === "start") { row.status = "进行中"; row.done = Math.max(row.done, Math.floor(row.should * 0.35)); renderTable(); }
+          if (op.getAttribute("data-act") === "close") { row.status = row.diff ? "待差异处理" : "已完成"; renderTable(); }
+        }
+      });
+      renderTable();
+    })();
+  </script>
+</body>
+</html>

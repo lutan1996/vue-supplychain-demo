@@ -93,6 +93,8 @@
     "sales-order-manage": "sales-order-management.html?v=20260616-fix-v6",
     "sales-purchase-material": "sales-purchased-materials.html?v=20260616-fix-v6",
     "sales-contract-report": "sales-contract-report.html?v=20260616-fix-v6",
+    "inventory-task-manage": "inventory-task-management.html",
+    "inventory-difference-handle": "inventory-difference-handling.html",
     // 物流
     "logistics-carrier": "carrier-management.html",
     "logistics-contract": "logistics-contract.html",

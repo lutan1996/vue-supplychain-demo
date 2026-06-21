@@ -95,6 +95,11 @@
     if (allowed.indexOf("cockpit") === -1) allowed.push("cockpit");
     if (moduleKey === "physicalMgmt" && allowed.indexOf("purchaseMgmt") >= 0) return true;
     if (moduleKey === "salesMgmt" && allowed.indexOf("purchaseMgmt") >= 0) return true;
+    if (
+      moduleKey === "inventoryMgmt" &&
+      (allowed.indexOf("warehouse") >= 0 || allowed.indexOf("asset") >= 0 || allowed.indexOf("purchaseMgmt") >= 0)
+    )
+      return true;
     return allowed.indexOf(moduleKey) >= 0;
   }
 
@@ -110,6 +115,7 @@
     }
     if (action === "cargo-ledger") return "purchaseMgmt";
     if (/^(asset-)/.test(action)) return "asset";
+    if (/^(inventory-task|inventory-difference)/.test(action)) return "inventoryMgmt";
     if (/^(logistics-)/.test(action)) return "logistics";
     if (/^(sales-)/.test(action)) return "salesMgmt";
     if (/^(purchase-|cargo-|proc-|material-|purchaseMgmt)/.test(action)) return "purchaseMgmt";
@@ -596,6 +602,15 @@
           '<span class="warehouse-secondary-pipe" aria-hidden="true">|</span>' +
           '<button type="button" class="warehouse-secondary-link" data-action="sales-contract-report" data-label="销售合同报表管理">销售合同报表管理</button>'
       },
+      inventoryMgmt: {
+        text: '盘点管理',
+        panel: secondaryPanel,
+        aclModuleKey: 'inventoryMgmt',
+        rowHtml:
+          '<button type="button" class="warehouse-secondary-link" data-action="inventory-task-manage" data-label="盘点任务管理">盘点任务管理</button>' +
+          '<span class="warehouse-secondary-pipe" aria-hidden="true">|</span>' +
+          '<button type="button" class="warehouse-secondary-link" data-action="inventory-difference-handle" data-label="盘点差异处理">盘点差异处理</button>'
+      },
       logistics: {
         text: '物流管理',
         panel: secondaryPanel,
@@ -784,6 +799,7 @@
       purchaseMgmt: "purchaseMgmt",
       physicalMgmt: "physicalMgmt",
       salesMgmt: "salesMgmt",
+      inventoryMgmt: "inventoryMgmt",
       logistics: "logistics",
       warehouse: "warehouse",
       retired: "retired",
@@ -1062,6 +1078,8 @@
       'sales-order-management.html': 'salesMgmt',
       'sales-purchased-materials.html': 'salesMgmt',
       'sales-contract-report.html': 'salesMgmt',
+      'inventory-task-management.html': 'inventoryMgmt',
+      'inventory-difference-handling.html': 'inventoryMgmt',
       'purchase-prototype-list.html': 'purchaseMgmt',
       'purchase-pm-nonbid.html': 'purchaseMgmt',
       'purchase-pm-plan.html': 'purchaseMgmt',
@@ -1254,6 +1272,7 @@
     }
     if (f.indexOf("scrap-identification") >= 0 || f.indexOf("retire") === 0 || f.indexOf("retired-") === 0 || f === "big-small-reuse.html" || f === "goods-transfer-out.html")
       return "物资出库与处置";
+    if (f === "inventory-task-management.html" || f === "inventory-difference-handling.html") return "盘点管理";
     if (f.indexOf("assets-") === 0 || f.indexOf("asset-") === 0 || f === "equipment-evaluation.html") return "我的资产";
     if (f.indexOf("carrier-") === 0 || f.indexOf("logistics-") === 0) return "物流管理";
     if (
