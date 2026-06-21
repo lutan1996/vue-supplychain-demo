@@ -42,6 +42,7 @@
     .diff-modal-head-actions { display: inline-flex; align-items: center; gap: 8px; }
     .diff-head-action { height: 28px; border: 1px solid #91caff; border-radius: 4px; background: #e6f4ff; color: #1677ff; padding: 0 10px; font-size: 12px; cursor: pointer; font-family: inherit; }
     .diff-head-action:hover { background: #bae0ff; border-color: #69b1ff; }
+    .diff-table-title { margin: 14px 0 8px; color: #334155; font-size: 13px; font-weight: 600; }
     .diff-detail-table { width: 100%; min-width: 1380px; border-collapse: collapse; table-layout: fixed; font-size: 12px; }
     .diff-detail-table th, .diff-detail-table td { border: 1px solid #e8e8e8; padding: 8px; color: #262626; text-align: left; }
     .diff-detail-table th { background: #f5f7fa; color: #334155; white-space: nowrap; }
@@ -134,7 +135,8 @@
       </div>
       <div class="wh-modal-body">
         <div class="wh-detail-grid" id="detailGrid"></div>
-        <div style="margin-top:14px;overflow:auto">
+        <div class="diff-table-title">盘点差异明细表</div>
+        <div style="overflow:auto">
           <table class="diff-detail-table">
             <thead><tr><th>物资唯一码</th><th>物资类型编码</th><th>产品编码</th><th>物资名称</th><th>规格型号</th><th>账面位置</th><th>实盘位置</th><th>账面数量</th><th>实盘数量</th><th>差异类型</th><th>差异金额</th><th>处理级别</th><th>操作</th></tr></thead>
             <tbody id="detailLines"></tbody>
@@ -224,10 +226,12 @@
       function rowActions(row) {
         var buttons = [
           '<button data-act="view" data-id="' + row.id + '">查看</button>',
+          '<button data-act="track" data-id="' + row.id + '">物资跟踪</button>',
           '<button data-act="handle" data-id="' + row.id + '">处理</button>',
           '<button data-act="flow" data-id="' + row.id + '">流程进度</button>'
         ];
         if (isHigh(row)) buttons.push('<button data-act="approve" data-id="' + row.id + '">大额审批</button>');
+        if (row.status !== "已处理") buttons.push('<button data-act="adjust" data-id="' + row.id + '">生成调整</button>');
         if (row.status !== "已处理") buttons.push('<button data-act="return" data-id="' + row.id + '">退回复盘</button>');
         return '<span class="diff-op">' + buttons.join("") + '</span>';
       }
@@ -235,9 +239,11 @@
         var buttons = [
           '<button data-line-act="track" data-code="' + row.code + '">物资跟踪</button>',
           '<button data-line-act="handle" data-code="' + row.code + '">差异处理</button>',
-          '<button data-line-act="flow" data-code="' + row.code + '">流程进度</button>'
+          '<button data-line-act="flow" data-code="' + row.code + '">流程进度</button>',
+          '<button data-line-act="adjust" data-code="' + row.code + '">生成调整</button>'
         ];
         if (isHigh(row)) buttons.push('<button data-line-act="approve" data-code="' + row.code + '">大额审批</button>');
+        if (row.status !== "已处理") buttons.push('<button data-line-act="return" data-code="' + row.code + '">退回复盘</button>');
         return '<span class="diff-op">' + buttons.join("") + '</span>';
       }
       function getRows() {
@@ -331,6 +337,18 @@
           if (lineOp.getAttribute("data-line-act") === "flow") openFlow(line);
           if (lineOp.getAttribute("data-line-act") === "handle") { fillHandle(line); close(document.getElementById("detailMask")); open(document.getElementById("handleMask")); }
           if (lineOp.getAttribute("data-line-act") === "approve") { fillHandle(line); close(document.getElementById("detailMask")); open(document.getElementById("handleMask")); }
+          if (lineOp.getAttribute("data-line-act") === "adjust") {
+            line.status = "处理中";
+            line.adjustNo = line.adjustNo === "待生成" ? "TZ-2026-0010" : line.adjustNo;
+            close(document.getElementById("detailMask"));
+            renderTable();
+          }
+          if (lineOp.getAttribute("data-line-act") === "return") {
+            line.status = "待复核";
+            line.reason = "已退回复盘，请重新确认实物位置与数量";
+            close(document.getElementById("detailMask"));
+            renderTable();
+          }
           return;
         }
         if (e.target.id === "btnSearch") {
@@ -361,6 +379,9 @@
           var row = rows.find(function (x) { return String(x.id) === op.getAttribute("data-id"); });
           if (!row) return;
           if (op.getAttribute("data-act") === "view") showDetail(row);
+          if (op.getAttribute("data-act") === "track") {
+            openTrack(row);
+          }
           if (op.getAttribute("data-act") === "handle") {
             fillHandle(row);
             open(document.getElementById("handleMask"));
@@ -371,6 +392,11 @@
           if (op.getAttribute("data-act") === "approve") {
             fillHandle(row);
             open(document.getElementById("handleMask"));
+          }
+          if (op.getAttribute("data-act") === "adjust") {
+            row.status = "处理中";
+            row.adjustNo = row.adjustNo === "待生成" ? "TZ-2026-0010" : row.adjustNo;
+            renderTable();
           }
           if (op.getAttribute("data-act") === "return") {
             row.status = "待复核";

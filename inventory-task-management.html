@@ -28,17 +28,18 @@
     .inv-tab-panel[hidden] { display: none !important; }
     .inv-ledger-note { padding: 10px 16px; border-bottom: 1px solid #f0f0f0; color: #60728b; font-size: 12px; background: #fbfdff; }
     .inv-table-wrap { overflow: auto; padding: 0 16px 12px; }
-    .inv-table { width: 100%; min-width: 1280px; border-collapse: collapse; table-layout: fixed; font-size: 12px; }
-    .inv-table--ledger { min-width: 1480px; }
+    .inv-table { width: 100%; min-width: 1460px; border-collapse: collapse; table-layout: fixed; font-size: 12px; }
+    .inv-table--ledger { min-width: 1600px; }
     .inv-table th, .inv-table td { border: 1px solid #e8e8e8; padding: 8px; text-align: left; color: #262626; }
     .inv-table th { background: #f5f5f5; color: #334155; white-space: nowrap; }
-    .inv-op { display: inline-flex; gap: 8px; white-space: nowrap; }
+    .inv-op { display: inline-flex; flex-wrap: wrap; gap: 8px; white-space: nowrap; }
     .inv-op button { border: none; background: transparent; color: #1677ff; cursor: pointer; font-size: 12px; padding: 0; font-family: inherit; }
     .inv-tag { display: inline-flex; align-items: center; height: 22px; padding: 0 8px; border-radius: 4px; border: 1px solid transparent; font-size: 11px; }
     .inv-tag.wait { background: #fff7e6; border-color: #ffd591; color: #d46b08; }
     .inv-tag.run { background: #e6f4ff; border-color: #91caff; color: #0958d9; }
     .inv-tag.done { background: #f6ffed; border-color: #b7eb8f; color: #389e0d; }
-    .inv-detail-table { width: 100%; min-width: 1120px; border-collapse: collapse; table-layout: fixed; font-size: 12px; }
+    .inv-table-title { margin: 14px 0 8px; color: #334155; font-size: 13px; font-weight: 600; }
+    .inv-detail-table { width: 100%; min-width: 1320px; border-collapse: collapse; table-layout: fixed; font-size: 12px; }
     .inv-detail-table th, .inv-detail-table td { border: 1px solid #e8e8e8; padding: 8px; color: #262626; text-align: left; }
     .inv-detail-table th { background: #f5f7fa; color: #334155; }
     .inv-modal-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px 18px; }
@@ -46,6 +47,11 @@
     .inv-track-flow { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; margin-top: 14px; }
     .inv-track-step { border: 1px solid #d9e8ff; background: #f7fbff; border-radius: 6px; padding: 8px 6px; text-align: center; color: #516a87; font-size: 12px; line-height: 1.5; }
     .inv-track-step.is-done { border-color: #91caff; background: #e6f4ff; color: #0958d9; }
+    .inv-flow { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 8px; margin-top: 14px; }
+    .inv-step { text-align: center; border: 1px dashed #d9d9d9; border-radius: 6px; padding: 8px 6px; font-size: 12px; color: #8c8c8c; }
+    .inv-step.done { border-style: solid; border-color: #52c41a; color: #389e0d; background: #f6ffed; }
+    .inv-step.active { border-style: solid; border-color: #1677ff; color: #0958d9; background: #e6f4ff; }
+    .inv-flow-note { margin-top: 10px; color: #60728b; font-size: 12px; line-height: 1.6; }
     @media (max-width: 1100px) {
       .inv-kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .inv-filters { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -164,7 +170,8 @@
       <div class="wh-modal-head"><h3 class="wh-modal-title" id="detailTitle">盘点任务详情</h3><button type="button" class="wh-modal-close" data-close aria-label="关闭">×</button></div>
       <div class="wh-modal-body">
         <div class="wh-detail-grid" id="detailGrid"></div>
-        <div style="margin-top:14px;overflow:auto">
+        <div class="inv-table-title">盘点物资明细表</div>
+        <div style="overflow:auto">
           <table class="inv-detail-table">
             <thead><tr><th>物资唯一码</th><th>物资类型编码</th><th>产品编码</th><th>物资名称</th><th>规格型号</th><th>账面位置</th><th>账面数量</th><th>实盘数量</th><th>盘点结果</th><th>操作</th></tr></thead>
             <tbody id="detailLines"></tbody>
@@ -172,6 +179,17 @@
         </div>
       </div>
       <div class="wh-modal-foot"><button type="button" class="wh-btn wh-btn--ghost" data-close>关闭</button><button type="button" class="wh-btn wh-btn--primary" id="btnDetailOk">确定</button></div>
+    </div>
+  </div>
+
+  <div class="wh-modal-mask" id="flowMask" aria-hidden="true">
+    <div class="wh-modal-box wh-modal-box--lg" role="dialog" aria-modal="true" aria-labelledby="flowTitle">
+      <div class="wh-modal-head"><h3 class="wh-modal-title" id="flowTitle">流程进度</h3><button type="button" class="wh-modal-close" data-close aria-label="关闭">×</button></div>
+      <div class="wh-modal-body">
+        <div class="inv-flow" id="flowSteps"></div>
+        <div class="inv-flow-note" id="flowNote"></div>
+      </div>
+      <div class="wh-modal-foot"><button type="button" class="wh-btn wh-btn--ghost" data-close>关闭</button></div>
     </div>
   </div>
 
@@ -210,6 +228,28 @@
         if (status === "已完成") return '<span class="inv-tag done">已完成</span>';
         return '<span class="inv-tag wait">待差异处理</span>';
       }
+      function taskActions(row) {
+        var buttons = [
+          '<button data-act="view" data-id="' + row.id + '">查看</button>',
+          '<button data-act="start" data-id="' + row.id + '">执行盘点</button>',
+          '<button data-act="flow" data-id="' + row.id + '">流程进度</button>',
+          '<button data-act="export-detail" data-id="' + row.id + '">导出明细</button>'
+        ];
+        if (row.diff > 0) buttons.push('<button data-act="close" data-id="' + row.id + '">生成差异</button>');
+        return '<span class="inv-op">' + buttons.join("") + '</span>';
+      }
+      function lineActions(line) {
+        var buttons = [
+          '<button data-line-act="track" data-code="' + line.code + '">物资跟踪</button>',
+          '<button data-line-act="record" data-code="' + line.code + '">盘点记录</button>',
+          '<button data-line-act="ledger" data-code="' + line.code + '">台帐详情</button>'
+        ];
+        if (line.result !== "账实相符") {
+          buttons.push('<button data-line-act="diff" data-code="' + line.code + '">生成差异</button>');
+          buttons.push('<button data-line-act="handle" data-code="' + line.code + '">差异处理</button>');
+        }
+        return '<span class="inv-op">' + buttons.join("") + '</span>';
+      }
       function getRows() {
         return rows.filter(function (x) {
           if (state.filters.no && x.no.indexOf(state.filters.no) < 0) return false;
@@ -232,12 +272,12 @@
         var list = getRows();
         renderKpis(list);
         document.getElementById("tbody").innerHTML = list.map(function (x, i) {
-          return '<tr><td>' + (i + 1) + '</td><td>' + x.no + '</td><td>' + x.name + '</td><td>' + x.type + '</td><td>' + x.dept + '</td><td>' + x.scope + '</td><td>' + x.start + ' 至 ' + x.end + '</td><td>' + x.owner + '</td><td>' + x.should + '</td><td>' + x.done + '</td><td>' + x.diff + '</td><td>' + tag(x.status) + '</td><td><span class="inv-op"><button data-act="view" data-id="' + x.id + '">查看</button><button data-act="start" data-id="' + x.id + '">执行盘点</button><button data-act="close" data-id="' + x.id + '">生成差异</button></span></td></tr>';
+          return '<tr><td>' + (i + 1) + '</td><td>' + x.no + '</td><td>' + x.name + '</td><td>' + x.type + '</td><td>' + x.dept + '</td><td>' + x.scope + '</td><td>' + x.start + ' 至 ' + x.end + '</td><td>' + x.owner + '</td><td>' + x.should + '</td><td>' + x.done + '</td><td>' + x.diff + '</td><td>' + tag(x.status) + '</td><td>' + taskActions(x) + '</td></tr>';
         }).join("");
       }
       function renderLedger() {
         document.getElementById("ledgerBody").innerHTML = lines.map(function (x, i) {
-          return '<tr><td>' + (i + 1) + '</td><td>' + x.code + '</td><td>' + x.type + '</td><td>' + x.product + '</td><td>' + x.name + '</td><td>' + x.spec + '</td><td>' + x.dept + '</td><td>' + x.loc + '</td><td>' + x.state + '</td><td>' + x.lastNo + '</td><td>' + x.lastDate + '</td><td>' + x.book + '</td><td>' + x.real + '</td><td>' + x.result + '</td><td><span class="inv-op"><button data-line-act="track" data-code="' + x.code + '">物资跟踪</button><button data-line-act="ledger" data-code="' + x.code + '">台帐详情</button></span></td></tr>';
+          return '<tr><td>' + (i + 1) + '</td><td>' + x.code + '</td><td>' + x.type + '</td><td>' + x.product + '</td><td>' + x.name + '</td><td>' + x.spec + '</td><td>' + x.dept + '</td><td>' + x.loc + '</td><td>' + x.state + '</td><td>' + x.lastNo + '</td><td>' + x.lastDate + '</td><td>' + x.book + '</td><td>' + x.real + '</td><td>' + x.result + '</td><td>' + lineActions(x) + '</td></tr>';
         }).join("");
       }
       function open(mask) {
@@ -270,13 +310,23 @@
         ].map(function (x) { return '<div class="inv-track-step is-done">' + x + '</div>'; }).join("");
         open(document.getElementById("trackMask"));
       }
+      function openFlow(row) {
+        var steps = ["创建任务", "生成应盘清单", "执行盘点", "复核确认", "生成差异/归档"];
+        var activeIndex = row.status === "待开始" ? 0 : (row.status === "进行中" ? 2 : (row.status === "待差异处理" ? 3 : 4));
+        document.getElementById("flowSteps").innerHTML = steps.map(function (step, i) {
+          var cls = i < activeIndex ? " done" : (i === activeIndex ? " active" : "");
+          return '<div class="inv-step' + cls + '">' + step + '</div>';
+        }).join("");
+        document.getElementById("flowNote").textContent = row.no + "，当前状态：" + row.status + "；差异数量：" + row.diff + "。";
+        open(document.getElementById("flowMask"));
+      }
       function openDetail(row) {
         document.getElementById("detailGrid").innerHTML = [
           ["盘点单号", row.no], ["盘点名称", row.name], ["盘点类型", row.type], ["盘点部门", row.dept],
           ["盘点范围", row.scope], ["计划日期", row.start + " 至 " + row.end], ["负责人", row.owner], ["任务状态", row.status]
         ].map(function (x) { return '<div class="wh-detail-item"><span class="wh-detail-label">' + x[0] + '</span><span class="wh-detail-value">' + x[1] + '</span></div>'; }).join("");
         document.getElementById("detailLines").innerHTML = lines.map(function (x) {
-          return '<tr><td>' + x.code + '</td><td>' + x.type + '</td><td>' + x.product + '</td><td>' + x.name + '</td><td>' + x.spec + '</td><td>' + x.loc + '</td><td>' + x.book + '</td><td>' + x.real + '</td><td>' + x.result + '</td><td><span class="inv-op"><button data-line-act="track" data-code="' + x.code + '">物资跟踪</button><button data-line-act="ledger" data-code="' + x.code + '">台帐详情</button></span></td></tr>';
+          return '<tr><td>' + x.code + '</td><td>' + x.type + '</td><td>' + x.product + '</td><td>' + x.name + '</td><td>' + x.spec + '</td><td>' + x.loc + '</td><td>' + x.book + '</td><td>' + x.real + '</td><td>' + x.result + '</td><td>' + lineActions(x) + '</td></tr>';
         }).join("");
         open(document.getElementById("detailMask"));
       }
@@ -292,7 +342,10 @@
         if (lineOp) {
           var line = findLine(lineOp.getAttribute("data-code"));
           if (lineOp.getAttribute("data-line-act") === "track") openTrack(line);
+          if (lineOp.getAttribute("data-line-act") === "record") alert(line.code + " 的盘点记录已打开（演示）");
           if (lineOp.getAttribute("data-line-act") === "ledger") { close(document.getElementById("detailMask")); switchTab("ledger"); }
+          if (lineOp.getAttribute("data-line-act") === "diff") alert(line.code + " 已生成盘点差异记录（演示）");
+          if (lineOp.getAttribute("data-line-act") === "handle") { window.location.href = "inventory-difference-handling.html"; }
           return;
         }
         if (e.target.id === "btnCreate") open(document.getElementById("createMask"));
@@ -320,6 +373,8 @@
           if (!row) return;
           if (op.getAttribute("data-act") === "view") openDetail(row);
           if (op.getAttribute("data-act") === "start") { row.status = "进行中"; row.done = Math.max(row.done, Math.floor(row.should * 0.35)); renderTable(); }
+          if (op.getAttribute("data-act") === "flow") openFlow(row);
+          if (op.getAttribute("data-act") === "export-detail") alert(row.no + " 的盘点明细正在导出（演示）");
           if (op.getAttribute("data-act") === "close") { row.status = row.diff ? "待差异处理" : "已完成"; renderTable(); }
         }
       });
