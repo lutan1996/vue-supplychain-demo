@@ -22,8 +22,14 @@
     .inv-btn { height: 32px; border-radius: 4px; border: 1px solid #d9d9d9; background: #fff; padding: 0 14px; font-size: 13px; cursor: pointer; font-family: inherit; }
     .inv-btn.primary { background: #1677ff; border-color: #1677ff; color: #fff; }
     .inv-btn.soft { color: #1677ff; border-color: #91caff; background: #e6f4ff; }
+    .inv-tabs { display: flex; align-items: center; gap: 8px; margin: 0 0 10px; }
+    .inv-tab { height: 34px; padding: 0 18px; border: 1px solid #d9d9d9; border-radius: 4px; background: #fff; color: #334155; font-size: 13px; cursor: pointer; font-family: inherit; }
+    .inv-tab.is-active { background: #1677ff; border-color: #1677ff; color: #fff; }
+    .inv-tab-panel[hidden] { display: none !important; }
+    .inv-ledger-note { padding: 10px 16px; border-bottom: 1px solid #f0f0f0; color: #60728b; font-size: 12px; background: #fbfdff; }
     .inv-table-wrap { overflow: auto; padding: 0 16px 12px; }
     .inv-table { width: 100%; min-width: 1280px; border-collapse: collapse; table-layout: fixed; font-size: 12px; }
+    .inv-table--ledger { min-width: 1480px; }
     .inv-table th, .inv-table td { border: 1px solid #e8e8e8; padding: 8px; text-align: left; color: #262626; }
     .inv-table th { background: #f5f5f5; color: #334155; white-space: nowrap; }
     .inv-op { display: inline-flex; gap: 8px; white-space: nowrap; }
@@ -32,14 +38,18 @@
     .inv-tag.wait { background: #fff7e6; border-color: #ffd591; color: #d46b08; }
     .inv-tag.run { background: #e6f4ff; border-color: #91caff; color: #0958d9; }
     .inv-tag.done { background: #f6ffed; border-color: #b7eb8f; color: #389e0d; }
-    .inv-detail-table { width: 100%; min-width: 960px; border-collapse: collapse; table-layout: fixed; font-size: 12px; }
+    .inv-detail-table { width: 100%; min-width: 1120px; border-collapse: collapse; table-layout: fixed; font-size: 12px; }
     .inv-detail-table th, .inv-detail-table td { border: 1px solid #e8e8e8; padding: 8px; color: #262626; text-align: left; }
     .inv-detail-table th { background: #f5f7fa; color: #334155; }
     .inv-modal-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px 18px; }
     .inv-modal-grid .wh-field { margin-bottom: 0; }
+    .inv-track-flow { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; margin-top: 14px; }
+    .inv-track-step { border: 1px solid #d9e8ff; background: #f7fbff; border-radius: 6px; padding: 8px 6px; text-align: center; color: #516a87; font-size: 12px; line-height: 1.5; }
+    .inv-track-step.is-done { border-color: #91caff; background: #e6f4ff; color: #0958d9; }
     @media (max-width: 1100px) {
       .inv-kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .inv-filters { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .inv-track-flow { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     }
   </style>
 </head>
@@ -74,31 +84,56 @@
         <h1 class="carrier-page-title">盘点任务管理</h1>
         <div class="inv-wrap">
           <div class="inv-kpis" id="kpis"></div>
-          <section class="inv-panel">
-            <div class="inv-filters">
-              <div class="wh-field"><label for="fNo">盘点单号</label><input id="fNo" type="text" placeholder="请输入盘点单号"></div>
-              <div class="wh-field"><label for="fDept">盘点部门</label><select id="fDept"><option value="">全部部门</option><option>机械研究所</option><option>电控所</option><option>经营发展中心</option><option>华北运维部</option></select></div>
-              <div class="wh-field"><label for="fType">盘点类型</label><select id="fType"><option value="">全部类型</option><option>部门自盘</option><option>公司抽盘</option><option>专项盘点</option></select></div>
-              <div class="wh-field"><label for="fStatus">任务状态</label><select id="fStatus"><option value="">全部状态</option><option>待开始</option><option>进行中</option><option>待差异处理</option><option>已完成</option></select></div>
-              <div class="wh-field"><label for="fKeeper">负责人</label><input id="fKeeper" type="text" placeholder="请输入负责人"></div>
-            </div>
-            <div class="inv-actions">
-              <button class="inv-btn primary" id="btnSearch">搜索</button>
-              <button class="inv-btn" id="btnReset">重置</button>
-              <button class="inv-btn soft" id="btnCreate">新建盘点任务</button>
-              <button class="inv-btn" id="btnExport">导出盘点任务</button>
-            </div>
-            <div class="inv-table-wrap">
-              <table class="inv-table">
-                <thead>
-                  <tr>
-                    <th>序号</th><th>盘点单号</th><th>盘点名称</th><th>盘点类型</th><th>盘点部门</th><th>盘点范围</th><th>计划日期</th><th>负责人</th><th>应盘数量</th><th>已盘数量</th><th>差异数量</th><th>任务状态</th><th>操作</th>
-                  </tr>
-                </thead>
-                <tbody id="tbody"></tbody>
-              </table>
-            </div>
-          </section>
+          <div class="inv-tabs" role="tablist" aria-label="盘点任务页签">
+            <button type="button" class="inv-tab is-active" data-inv-tab="task" role="tab" aria-selected="true">盘点任务</button>
+            <button type="button" class="inv-tab" data-inv-tab="ledger" role="tab" aria-selected="false">盘点台帐</button>
+          </div>
+          <div class="inv-tab-panel" id="taskPanel">
+            <section class="inv-panel">
+              <div class="inv-filters">
+                <div class="wh-field"><label for="fNo">盘点单号</label><input id="fNo" type="text" placeholder="请输入盘点单号"></div>
+                <div class="wh-field"><label for="fDept">盘点部门</label><select id="fDept"><option value="">全部部门</option><option>机械研究所</option><option>电控所</option><option>经营发展中心</option><option>华北运维部</option></select></div>
+                <div class="wh-field"><label for="fType">盘点类型</label><select id="fType"><option value="">全部类型</option><option>部门自盘</option><option>公司抽盘</option><option>专项盘点</option></select></div>
+                <div class="wh-field"><label for="fStatus">任务状态</label><select id="fStatus"><option value="">全部状态</option><option>待开始</option><option>进行中</option><option>待差异处理</option><option>已完成</option></select></div>
+                <div class="wh-field"><label for="fKeeper">负责人</label><input id="fKeeper" type="text" placeholder="请输入负责人"></div>
+              </div>
+              <div class="inv-actions">
+                <button class="inv-btn primary" id="btnSearch">搜索</button>
+                <button class="inv-btn" id="btnReset">重置</button>
+                <button class="inv-btn soft" id="btnCreate">新建盘点任务</button>
+                <button class="inv-btn" id="btnExport">导出盘点任务</button>
+              </div>
+              <div class="inv-table-wrap">
+                <table class="inv-table">
+                  <thead>
+                    <tr>
+                      <th>序号</th><th>盘点单号</th><th>盘点名称</th><th>盘点类型</th><th>盘点部门</th><th>盘点范围</th><th>计划日期</th><th>负责人</th><th>应盘数量</th><th>已盘数量</th><th>差异数量</th><th>任务状态</th><th>操作</th>
+                    </tr>
+                  </thead>
+                  <tbody id="tbody"></tbody>
+                </table>
+              </div>
+            </section>
+          </div>
+          <div class="inv-tab-panel" id="ledgerPanel" hidden>
+            <section class="inv-panel">
+              <div class="inv-ledger-note">盘点台帐按物资唯一码归集，承接产品目录、收货入库、库存台账、扫码领用、部门流转和销售发货数据。</div>
+              <div class="inv-actions">
+                <button class="inv-btn primary" id="btnLedgerRefresh">刷新台帐</button>
+                <button class="inv-btn" id="btnLedgerExport">导出台帐</button>
+              </div>
+              <div class="inv-table-wrap">
+                <table class="inv-table inv-table--ledger">
+                  <thead>
+                    <tr>
+                      <th>序号</th><th>物资唯一码</th><th>物资类型编码</th><th>产品编码</th><th>物资名称</th><th>规格型号</th><th>所属部门</th><th>当前位置</th><th>在库/领用状态</th><th>最近盘点单号</th><th>最近盘点日期</th><th>账面数量</th><th>实盘数量</th><th>差异状态</th><th>操作</th>
+                    </tr>
+                  </thead>
+                  <tbody id="ledgerBody"></tbody>
+                </table>
+              </div>
+            </section>
+          </div>
         </div>
       </main>
     </div>
@@ -131,12 +166,23 @@
         <div class="wh-detail-grid" id="detailGrid"></div>
         <div style="margin-top:14px;overflow:auto">
           <table class="inv-detail-table">
-            <thead><tr><th>物资唯一码</th><th>物资类型编码</th><th>产品编码</th><th>物资名称</th><th>规格型号</th><th>账面位置</th><th>账面数量</th><th>实盘数量</th><th>盘点结果</th></tr></thead>
+            <thead><tr><th>物资唯一码</th><th>物资类型编码</th><th>产品编码</th><th>物资名称</th><th>规格型号</th><th>账面位置</th><th>账面数量</th><th>实盘数量</th><th>盘点结果</th><th>操作</th></tr></thead>
             <tbody id="detailLines"></tbody>
           </table>
         </div>
       </div>
       <div class="wh-modal-foot"><button type="button" class="wh-btn wh-btn--ghost" data-close>关闭</button><button type="button" class="wh-btn wh-btn--primary" id="btnDetailOk">确定</button></div>
+    </div>
+  </div>
+
+  <div class="wh-modal-mask" id="trackMask" aria-hidden="true">
+    <div class="wh-modal-box wh-modal-box--lg" role="dialog" aria-modal="true" aria-labelledby="trackTitle">
+      <div class="wh-modal-head"><h3 class="wh-modal-title" id="trackTitle">物资跟踪</h3><button type="button" class="wh-modal-close" data-close aria-label="关闭">×</button></div>
+      <div class="wh-modal-body">
+        <div class="wh-detail-grid" id="trackGrid"></div>
+        <div class="inv-track-flow" id="trackFlow"></div>
+      </div>
+      <div class="wh-modal-foot"><button type="button" class="wh-btn wh-btn--ghost" data-close>关闭</button></div>
     </div>
   </div>
 
@@ -153,9 +199,9 @@
         { id: 4, no: "PD-2026-004", name: "华北运维部月度盘点", type: "部门自盘", dept: "华北运维部", scope: "仓库在库物资", start: "2026-06-10", end: "2026-06-15", owner: "许学良", should: 98, done: 98, diff: 0, status: "已完成" }
       ];
       var lines = [
-        { code: "C20260000001", type: "A0010020001", product: "B00001234", name: "变桨轴承", spec: "BP-2.0MW", loc: "机械研究所/华北主仓A-01", book: 1, real: 1, result: "账实相符" },
-        { code: "C20260000002", type: "A0010020002", product: "B00001235", name: "齿轮箱滤芯", spec: "GX-LX-90", loc: "机械研究所/华北主仓A-03", book: 12, real: 10, result: "盘亏" },
-        { code: "C20260000003", type: "A0020010006", product: "B00001888", name: "变频器模块", spec: "VF-800", loc: "电控所/已领用", book: 2, real: 3, result: "盘盈" }
+        { code: "C20260000001", type: "A0010020001", product: "B00001234", name: "变桨轴承", spec: "BP-2.0MW", loc: "机械研究所/华北主仓A-01", dept: "机械研究所", state: "在库", lastNo: "PD-2026-001", lastDate: "2026-06-25", book: 1, real: 1, result: "账实相符" },
+        { code: "C20260000002", type: "A0010020002", product: "B00001235", name: "齿轮箱滤芯", spec: "GX-LX-90", loc: "机械研究所/华北主仓A-03", dept: "机械研究所", state: "在库", lastNo: "PD-2026-001", lastDate: "2026-06-25", book: 12, real: 10, result: "盘亏" },
+        { code: "C20260000003", type: "A0020010006", product: "B00001888", name: "变频器模块", spec: "VF-800", loc: "电控所/已领用", dept: "电控所", state: "已领用", lastNo: "PD-2026-002", lastDate: "2026-06-28", book: 2, real: 3, result: "盘盈" }
       ];
       var state = { filters: {} };
       function tag(status) {
@@ -189,6 +235,11 @@
           return '<tr><td>' + (i + 1) + '</td><td>' + x.no + '</td><td>' + x.name + '</td><td>' + x.type + '</td><td>' + x.dept + '</td><td>' + x.scope + '</td><td>' + x.start + ' 至 ' + x.end + '</td><td>' + x.owner + '</td><td>' + x.should + '</td><td>' + x.done + '</td><td>' + x.diff + '</td><td>' + tag(x.status) + '</td><td><span class="inv-op"><button data-act="view" data-id="' + x.id + '">查看</button><button data-act="start" data-id="' + x.id + '">执行盘点</button><button data-act="close" data-id="' + x.id + '">生成差异</button></span></td></tr>';
         }).join("");
       }
+      function renderLedger() {
+        document.getElementById("ledgerBody").innerHTML = lines.map(function (x, i) {
+          return '<tr><td>' + (i + 1) + '</td><td>' + x.code + '</td><td>' + x.type + '</td><td>' + x.product + '</td><td>' + x.name + '</td><td>' + x.spec + '</td><td>' + x.dept + '</td><td>' + x.loc + '</td><td>' + x.state + '</td><td>' + x.lastNo + '</td><td>' + x.lastDate + '</td><td>' + x.book + '</td><td>' + x.real + '</td><td>' + x.result + '</td><td><span class="inv-op"><button data-line-act="track" data-code="' + x.code + '">物资跟踪</button><button data-line-act="ledger" data-code="' + x.code + '">台帐详情</button></span></td></tr>';
+        }).join("");
+      }
       function open(mask) {
         mask.classList.add("is-open");
         mask.setAttribute("aria-hidden", "false");
@@ -197,13 +248,35 @@
         mask.classList.remove("is-open");
         mask.setAttribute("aria-hidden", "true");
       }
+      function switchTab(key) {
+        document.querySelectorAll("[data-inv-tab]").forEach(function (btn) {
+          var on = btn.getAttribute("data-inv-tab") === key;
+          btn.classList.toggle("is-active", on);
+          btn.setAttribute("aria-selected", on ? "true" : "false");
+        });
+        document.getElementById("taskPanel").hidden = key !== "task";
+        document.getElementById("ledgerPanel").hidden = key !== "ledger";
+      }
+      function findLine(code) {
+        return lines.find(function (x) { return x.code === code; }) || lines[0];
+      }
+      function openTrack(line) {
+        document.getElementById("trackGrid").innerHTML = [
+          ["物资唯一码", line.code], ["物资类型编码", line.type], ["产品编码", line.product], ["物资名称", line.name],
+          ["规格型号", line.spec], ["所属部门", line.dept], ["当前位置", line.loc], ["盘点结果", line.result]
+        ].map(function (x) { return '<div class="wh-detail-item"><span class="wh-detail-label">' + x[0] + '</span><span class="wh-detail-value">' + x[1] + '</span></div>'; }).join("");
+        document.getElementById("trackFlow").innerHTML = [
+          "产品目录建档", "合同关联", "收货入库", "部门领用/流转", "盘点复核"
+        ].map(function (x) { return '<div class="inv-track-step is-done">' + x + '</div>'; }).join("");
+        open(document.getElementById("trackMask"));
+      }
       function openDetail(row) {
         document.getElementById("detailGrid").innerHTML = [
           ["盘点单号", row.no], ["盘点名称", row.name], ["盘点类型", row.type], ["盘点部门", row.dept],
           ["盘点范围", row.scope], ["计划日期", row.start + " 至 " + row.end], ["负责人", row.owner], ["任务状态", row.status]
         ].map(function (x) { return '<div class="wh-detail-item"><span class="wh-detail-label">' + x[0] + '</span><span class="wh-detail-value">' + x[1] + '</span></div>'; }).join("");
         document.getElementById("detailLines").innerHTML = lines.map(function (x) {
-          return '<tr><td>' + x.code + '</td><td>' + x.type + '</td><td>' + x.product + '</td><td>' + x.name + '</td><td>' + x.spec + '</td><td>' + x.loc + '</td><td>' + x.book + '</td><td>' + x.real + '</td><td>' + x.result + '</td></tr>';
+          return '<tr><td>' + x.code + '</td><td>' + x.type + '</td><td>' + x.product + '</td><td>' + x.name + '</td><td>' + x.spec + '</td><td>' + x.loc + '</td><td>' + x.book + '</td><td>' + x.real + '</td><td>' + x.result + '</td><td><span class="inv-op"><button data-line-act="track" data-code="' + x.code + '">物资跟踪</button><button data-line-act="ledger" data-code="' + x.code + '">台帐详情</button></span></td></tr>';
         }).join("");
         open(document.getElementById("detailMask"));
       }
@@ -211,6 +284,15 @@
         var closeBtn = e.target.closest("[data-close]");
         if (closeBtn) {
           close(closeBtn.closest(".wh-modal-mask"));
+          return;
+        }
+        var tabBtn = e.target.closest("[data-inv-tab]");
+        if (tabBtn) { switchTab(tabBtn.getAttribute("data-inv-tab")); return; }
+        var lineOp = e.target.closest("[data-line-act]");
+        if (lineOp) {
+          var line = findLine(lineOp.getAttribute("data-code"));
+          if (lineOp.getAttribute("data-line-act") === "track") openTrack(line);
+          if (lineOp.getAttribute("data-line-act") === "ledger") { close(document.getElementById("detailMask")); switchTab("ledger"); }
           return;
         }
         if (e.target.id === "btnCreate") open(document.getElementById("createMask"));
@@ -230,6 +312,8 @@
           renderTable();
         }
         if (e.target.id === "btnExport") alert("正在导出盘点任务列表（演示）");
+        if (e.target.id === "btnLedgerRefresh") { renderLedger(); alert("盘点台帐已刷新（演示）"); }
+        if (e.target.id === "btnLedgerExport") alert("正在导出盘点台帐（演示）");
         var op = e.target.closest("[data-act]");
         if (op) {
           var row = rows.find(function (x) { return String(x.id) === op.getAttribute("data-id"); });
@@ -240,6 +324,7 @@
         }
       });
       renderTable();
+      renderLedger();
     })();
   </script>
 </body>

@@ -22,8 +22,14 @@
     .diff-btn { height: 32px; border-radius: 4px; border: 1px solid #d9d9d9; background: #fff; padding: 0 14px; font-size: 13px; cursor: pointer; font-family: inherit; }
     .diff-btn.primary { background: #1677ff; border-color: #1677ff; color: #fff; }
     .diff-btn.warn { background: #fff7e6; border-color: #ffd591; color: #d46b08; }
+    .diff-tabs { display: flex; align-items: center; gap: 8px; margin: 0 0 10px; }
+    .diff-tab { height: 34px; padding: 0 18px; border: 1px solid #d9d9d9; border-radius: 4px; background: #fff; color: #334155; font-size: 13px; cursor: pointer; font-family: inherit; }
+    .diff-tab.is-active { background: #1677ff; border-color: #1677ff; color: #fff; }
+    .diff-tab-panel[hidden] { display: none !important; }
+    .diff-ledger-note { padding: 10px 16px; border-bottom: 1px solid #f0f0f0; color: #60728b; font-size: 12px; background: #fbfdff; }
     .diff-table-wrap { overflow: auto; padding: 0 16px 12px; }
     .diff-table { width: 100%; min-width: 1360px; border-collapse: collapse; table-layout: fixed; font-size: 12px; }
+    .diff-table--ledger { min-width: 1540px; }
     .diff-table th, .diff-table td { border: 1px solid #e8e8e8; padding: 8px; color: #262626; text-align: left; }
     .diff-table th { background: #f5f5f5; color: #334155; white-space: nowrap; }
     .diff-op { display: inline-flex; gap: 8px; white-space: nowrap; }
@@ -36,13 +42,20 @@
     .diff-tag.done { background: #f6ffed; border-color: #b7eb8f; color: #389e0d; }
     .diff-modal-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px 18px; }
     .diff-modal-grid .wh-field { margin-bottom: 0; }
+    .diff-detail-table { width: 100%; min-width: 1180px; border-collapse: collapse; table-layout: fixed; font-size: 12px; }
+    .diff-detail-table th, .diff-detail-table td { border: 1px solid #e8e8e8; padding: 8px; color: #262626; text-align: left; }
+    .diff-detail-table th { background: #f5f7fa; color: #334155; white-space: nowrap; }
     .diff-flow { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; margin-top: 14px; }
     .diff-step { text-align: center; border: 1px dashed #d9d9d9; border-radius: 6px; padding: 8px 6px; font-size: 12px; color: #8c8c8c; }
     .diff-step.done { border-style: solid; border-color: #52c41a; color: #389e0d; background: #f6ffed; }
     .diff-step.active { border-style: solid; border-color: #fa8c16; color: #d46b08; background: #fff7e6; }
+    .diff-track-flow { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 8px; margin-top: 14px; }
+    .diff-track-step { border: 1px solid #d9e8ff; background: #f7fbff; border-radius: 6px; padding: 8px 6px; text-align: center; color: #516a87; font-size: 12px; line-height: 1.5; }
+    .diff-track-step.is-done { border-color: #91caff; background: #e6f4ff; color: #0958d9; }
     @media (max-width: 1100px) {
       .diff-kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .diff-filters { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .diff-track-flow { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     }
   </style>
 </head>
@@ -77,31 +90,56 @@
         <h1 class="carrier-page-title">盘点差异处理</h1>
         <div class="diff-wrap">
           <div class="diff-kpis" id="kpis"></div>
-          <section class="diff-panel">
-            <div class="diff-filters">
-              <div class="wh-field"><label for="fTask">盘点单号</label><input id="fTask" type="text" placeholder="请输入盘点单号"></div>
-              <div class="wh-field"><label for="fCode">物资唯一码</label><input id="fCode" type="text" placeholder="请输入物资唯一码"></div>
-              <div class="wh-field"><label for="fType">差异类型</label><select id="fType"><option value="">全部类型</option><option>盘亏</option><option>盘盈</option><option>位置不符</option><option>部门不符</option></select></div>
-              <div class="wh-field"><label for="fDept">责任部门</label><select id="fDept"><option value="">全部部门</option><option>机械研究所</option><option>电控所</option><option>经营发展中心</option><option>华北运维部</option></select></div>
-              <div class="wh-field"><label for="fStatus">处理状态</label><select id="fStatus"><option value="">全部状态</option><option>待复核</option><option>处理中</option><option>已处理</option></select></div>
-            </div>
-            <div class="diff-actions">
-              <button class="diff-btn primary" id="btnSearch">搜索</button>
-              <button class="diff-btn" id="btnReset">重置</button>
-              <button class="diff-btn warn" id="btnBatch">批量生成调整记录</button>
-              <button class="diff-btn" id="btnExport">导出差异明细</button>
-            </div>
-            <div class="diff-table-wrap">
-              <table class="diff-table">
-                <thead>
-                  <tr>
-                    <th>序号</th><th>盘点单号</th><th>物资唯一码</th><th>物资类型编码</th><th>产品编码</th><th>物资名称</th><th>账面位置</th><th>实盘位置</th><th>账面数量</th><th>实盘数量</th><th>差异类型</th><th>责任部门</th><th>处理状态</th><th>操作</th>
-                  </tr>
-                </thead>
-                <tbody id="tbody"></tbody>
-              </table>
-            </div>
-          </section>
+          <div class="diff-tabs" role="tablist" aria-label="盘点差异页签">
+            <button type="button" class="diff-tab is-active" data-diff-tab="diff" role="tab" aria-selected="true">差异处理</button>
+            <button type="button" class="diff-tab" data-diff-tab="ledger" role="tab" aria-selected="false">盘点台帐</button>
+          </div>
+          <div class="diff-tab-panel" id="diffPanel">
+            <section class="diff-panel">
+              <div class="diff-filters">
+                <div class="wh-field"><label for="fTask">盘点单号</label><input id="fTask" type="text" placeholder="请输入盘点单号"></div>
+                <div class="wh-field"><label for="fCode">物资唯一码</label><input id="fCode" type="text" placeholder="请输入物资唯一码"></div>
+                <div class="wh-field"><label for="fType">差异类型</label><select id="fType"><option value="">全部类型</option><option>盘亏</option><option>盘盈</option><option>位置不符</option><option>部门不符</option></select></div>
+                <div class="wh-field"><label for="fDept">责任部门</label><select id="fDept"><option value="">全部部门</option><option>机械研究所</option><option>电控所</option><option>经营发展中心</option><option>华北运维部</option></select></div>
+                <div class="wh-field"><label for="fStatus">处理状态</label><select id="fStatus"><option value="">全部状态</option><option>待复核</option><option>处理中</option><option>已处理</option></select></div>
+              </div>
+              <div class="diff-actions">
+                <button class="diff-btn primary" id="btnSearch">搜索</button>
+                <button class="diff-btn" id="btnReset">重置</button>
+                <button class="diff-btn warn" id="btnBatch">批量生成调整记录</button>
+                <button class="diff-btn" id="btnExport">导出差异明细</button>
+              </div>
+              <div class="diff-table-wrap">
+                <table class="diff-table">
+                  <thead>
+                    <tr>
+                      <th>序号</th><th>盘点单号</th><th>物资唯一码</th><th>物资类型编码</th><th>产品编码</th><th>物资名称</th><th>账面位置</th><th>实盘位置</th><th>账面数量</th><th>实盘数量</th><th>差异类型</th><th>责任部门</th><th>处理状态</th><th>操作</th>
+                    </tr>
+                  </thead>
+                  <tbody id="tbody"></tbody>
+                </table>
+              </div>
+            </section>
+          </div>
+          <div class="diff-tab-panel" id="ledgerPanel" hidden>
+            <section class="diff-panel">
+              <div class="diff-ledger-note">盘点台帐合并展示差异处理所需的物资唯一码、产品编码、盘点差异、责任部门、调整记录和处理状态。</div>
+              <div class="diff-actions">
+                <button class="diff-btn primary" id="btnLedgerRefresh">刷新台帐</button>
+                <button class="diff-btn" id="btnLedgerExport">导出台帐</button>
+              </div>
+              <div class="diff-table-wrap">
+                <table class="diff-table diff-table--ledger">
+                  <thead>
+                    <tr>
+                      <th>序号</th><th>物资唯一码</th><th>物资类型编码</th><th>产品编码</th><th>物资名称</th><th>规格型号</th><th>责任部门</th><th>账面位置</th><th>实盘位置</th><th>账面数量</th><th>实盘数量</th><th>差异类型</th><th>处理状态</th><th>关联盘点单号</th><th>关联调整单号</th><th>操作</th>
+                    </tr>
+                  </thead>
+                  <tbody id="ledgerBody"></tbody>
+                </table>
+              </div>
+            </section>
+          </div>
         </div>
       </main>
     </div>
@@ -112,6 +150,12 @@
       <div class="wh-modal-head"><h3 class="wh-modal-title" id="detailTitle">差异详情</h3><button type="button" class="wh-modal-close" data-close aria-label="关闭">×</button></div>
       <div class="wh-modal-body">
         <div class="wh-detail-grid" id="detailGrid"></div>
+        <div style="margin-top:14px;overflow:auto">
+          <table class="diff-detail-table">
+            <thead><tr><th>物资唯一码</th><th>物资类型编码</th><th>产品编码</th><th>物资名称</th><th>规格型号</th><th>账面位置</th><th>实盘位置</th><th>账面数量</th><th>实盘数量</th><th>差异类型</th><th>操作</th></tr></thead>
+            <tbody id="detailLines"></tbody>
+          </table>
+        </div>
         <div class="diff-flow">
           <div class="diff-step done">生成差异</div>
           <div class="diff-step active">部门复核</div>
@@ -139,6 +183,17 @@
     </div>
   </div>
 
+  <div class="wh-modal-mask" id="trackMask" aria-hidden="true">
+    <div class="wh-modal-box wh-modal-box--lg" role="dialog" aria-modal="true" aria-labelledby="trackTitle">
+      <div class="wh-modal-head"><h3 class="wh-modal-title" id="trackTitle">物资跟踪</h3><button type="button" class="wh-modal-close" data-close aria-label="关闭">×</button></div>
+      <div class="wh-modal-body">
+        <div class="wh-detail-grid" id="trackGrid"></div>
+        <div class="diff-track-flow" id="trackFlow"></div>
+      </div>
+      <div class="wh-modal-foot"><button type="button" class="wh-btn wh-btn--ghost" data-close>关闭</button></div>
+    </div>
+  </div>
+
   <script src="js/sidebar-actions.js"></script>
   <script src="js/subpage-feature-title.js"></script>
   <script src="js/site-footer.js"></script>
@@ -146,10 +201,10 @@
   <script>
     (function () {
       var rows = [
-        { id: 1, task: "PD-2026-001", code: "C20260000002", typeCode: "A0010020002", product: "B00001235", name: "齿轮箱滤芯", bookLoc: "机械研究所/华北主仓A-03", realLoc: "机械研究所/华北主仓A-03", bookQty: 12, realQty: 10, type: "盘亏", dept: "机械研究所", status: "待复核", reason: "账面数量与实盘数量不一致" },
-        { id: 2, task: "PD-2026-002", code: "C20260000003", typeCode: "A0020010006", product: "B00001888", name: "变频器模块", bookLoc: "电控所/已领用", realLoc: "电控所/备用柜", bookQty: 2, realQty: 3, type: "盘盈", dept: "电控所", status: "处理中", reason: "现场多出一件未入账物资" },
-        { id: 3, task: "PD-2026-002", code: "C20260000011", typeCode: "A0030010004", product: "B00002119", name: "偏航电机", bookLoc: "经营发展中心/中心仓B-02", realLoc: "华北运维部/张北场站", bookQty: 1, realQty: 1, type: "位置不符", dept: "华北运维部", status: "待复核", reason: "实物已流转但台账位置未同步" },
-        { id: 4, task: "PD-2026-004", code: "C20260000018", typeCode: "A0040020001", product: "B00003102", name: "液压站密封包", bookLoc: "华北运维部/主仓C-01", realLoc: "华北运维部/主仓C-01", bookQty: 6, realQty: 6, type: "部门不符", dept: "华北运维部", status: "已处理", reason: "领用部门字段未同步" }
+        { id: 1, task: "PD-2026-001", code: "C20260000002", typeCode: "A0010020002", product: "B00001235", name: "齿轮箱滤芯", spec: "GX-LX-90", bookLoc: "机械研究所/华北主仓A-03", realLoc: "机械研究所/华北主仓A-03", bookQty: 12, realQty: 10, type: "盘亏", dept: "机械研究所", status: "待复核", adjustNo: "待生成", reason: "账面数量与实盘数量不一致" },
+        { id: 2, task: "PD-2026-002", code: "C20260000003", typeCode: "A0020010006", product: "B00001888", name: "变频器模块", spec: "VF-800", bookLoc: "电控所/已领用", realLoc: "电控所/备用柜", bookQty: 2, realQty: 3, type: "盘盈", dept: "电控所", status: "处理中", adjustNo: "TZ-2026-0008", reason: "现场多出一件未入账物资" },
+        { id: 3, task: "PD-2026-002", code: "C20260000011", typeCode: "A0030010004", product: "B00002119", name: "偏航电机", spec: "PY-DJ-55", bookLoc: "经营发展中心/中心仓B-02", realLoc: "华北运维部/张北场站", bookQty: 1, realQty: 1, type: "位置不符", dept: "华北运维部", status: "待复核", adjustNo: "待生成", reason: "实物已流转但台账位置未同步" },
+        { id: 4, task: "PD-2026-004", code: "C20260000018", typeCode: "A0040020001", product: "B00003102", name: "液压站密封包", spec: "YY-MFB-6", bookLoc: "华北运维部/主仓C-01", realLoc: "华北运维部/主仓C-01", bookQty: 6, realQty: 6, type: "部门不符", dept: "华北运维部", status: "已处理", adjustNo: "TZ-2026-0006", reason: "领用部门字段未同步" }
       ];
       var state = { filters: {}, current: null };
       function typeTag(t) {
@@ -186,6 +241,12 @@
         document.getElementById("tbody").innerHTML = list.map(function (x, i) {
           return '<tr><td>' + (i + 1) + '</td><td>' + x.task + '</td><td>' + x.code + '</td><td>' + x.typeCode + '</td><td>' + x.product + '</td><td>' + x.name + '</td><td>' + x.bookLoc + '</td><td>' + x.realLoc + '</td><td>' + x.bookQty + '</td><td>' + x.realQty + '</td><td>' + typeTag(x.type) + '</td><td>' + x.dept + '</td><td>' + statusTag(x.status) + '</td><td><span class="diff-op"><button data-act="view" data-id="' + x.id + '">查看</button><button data-act="handle" data-id="' + x.id + '">处理</button><button data-act="return" data-id="' + x.id + '">退回复盘</button></span></td></tr>';
         }).join("");
+        renderLedger();
+      }
+      function renderLedger() {
+        document.getElementById("ledgerBody").innerHTML = rows.map(function (x, i) {
+          return '<tr><td>' + (i + 1) + '</td><td>' + x.code + '</td><td>' + x.typeCode + '</td><td>' + x.product + '</td><td>' + x.name + '</td><td>' + x.spec + '</td><td>' + x.dept + '</td><td>' + x.bookLoc + '</td><td>' + x.realLoc + '</td><td>' + x.bookQty + '</td><td>' + x.realQty + '</td><td>' + typeTag(x.type) + '</td><td>' + statusTag(x.status) + '</td><td>' + x.task + '</td><td>' + x.adjustNo + '</td><td><span class="diff-op"><button data-line-act="track" data-code="' + x.code + '">物资跟踪</button><button data-line-act="ledger" data-code="' + x.code + '">台帐详情</button><button data-line-act="handle" data-code="' + x.code + '">差异处理</button></span></td></tr>';
+        }).join("");
       }
       function open(mask) {
         mask.classList.add("is-open");
@@ -195,6 +256,34 @@
         mask.classList.remove("is-open");
         mask.setAttribute("aria-hidden", "true");
       }
+      function switchTab(key) {
+        document.querySelectorAll("[data-diff-tab]").forEach(function (btn) {
+          var on = btn.getAttribute("data-diff-tab") === key;
+          btn.classList.toggle("is-active", on);
+          btn.setAttribute("aria-selected", on ? "true" : "false");
+        });
+        document.getElementById("diffPanel").hidden = key !== "diff";
+        document.getElementById("ledgerPanel").hidden = key !== "ledger";
+      }
+      function findLine(code) {
+        return rows.find(function (x) { return x.code === code; }) || rows[0];
+      }
+      function fillHandle(row) {
+        state.current = row;
+        document.getElementById("handleDept").value = row.dept;
+        document.getElementById("handleRemark").value = row.reason;
+      }
+      function openTrack(row) {
+        document.getElementById("trackGrid").innerHTML = [
+          ["物资唯一码", row.code], ["物资类型编码", row.typeCode], ["产品编码", row.product], ["物资名称", row.name],
+          ["规格型号", row.spec], ["责任部门", row.dept], ["账面位置", row.bookLoc], ["实盘位置", row.realLoc],
+          ["差异类型", row.type], ["处理状态", row.status], ["关联盘点单号", row.task], ["关联调整单号", row.adjustNo]
+        ].map(function (x) { return '<div class="wh-detail-item"><span class="wh-detail-label">' + x[0] + '</span><span class="wh-detail-value">' + x[1] + '</span></div>'; }).join("");
+        document.getElementById("trackFlow").innerHTML = [
+          "产品目录建档", "合同关联", "收货入库", "部门领用/流转", "盘点生成差异", "差异复核调整"
+        ].map(function (x) { return '<div class="diff-track-step is-done">' + x + '</div>'; }).join("");
+        open(document.getElementById("trackMask"));
+      }
       function showDetail(row) {
         document.getElementById("detailGrid").innerHTML = [
           ["盘点单号", row.task], ["物资唯一码", row.code], ["物资类型编码", row.typeCode], ["产品编码", row.product],
@@ -202,11 +291,22 @@
           ["账面数量", row.bookQty], ["实盘数量", row.realQty], ["责任部门", row.dept], ["处理状态", row.status],
           ["差异原因", row.reason], ["数据来源", "盘点任务、库存台账、扫码领用、部门流转、销售发货"]
         ].map(function (x) { return '<div class="wh-detail-item"><span class="wh-detail-label">' + x[0] + '</span><span class="wh-detail-value">' + x[1] + '</span></div>'; }).join("");
+        document.getElementById("detailLines").innerHTML = '<tr><td>' + row.code + '</td><td>' + row.typeCode + '</td><td>' + row.product + '</td><td>' + row.name + '</td><td>' + row.spec + '</td><td>' + row.bookLoc + '</td><td>' + row.realLoc + '</td><td>' + row.bookQty + '</td><td>' + row.realQty + '</td><td>' + typeTag(row.type) + '</td><td><span class="diff-op"><button data-line-act="track" data-code="' + row.code + '">物资跟踪</button><button data-line-act="ledger" data-code="' + row.code + '">台帐详情</button><button data-line-act="handle" data-code="' + row.code + '">差异处理</button></span></td></tr>';
         open(document.getElementById("detailMask"));
       }
       document.addEventListener("click", function (e) {
         var closeBtn = e.target.closest("[data-close]");
         if (closeBtn) { close(closeBtn.closest(".wh-modal-mask")); return; }
+        var tabBtn = e.target.closest("[data-diff-tab]");
+        if (tabBtn) { switchTab(tabBtn.getAttribute("data-diff-tab")); return; }
+        var lineOp = e.target.closest("[data-line-act]");
+        if (lineOp) {
+          var line = findLine(lineOp.getAttribute("data-code"));
+          if (lineOp.getAttribute("data-line-act") === "track") openTrack(line);
+          if (lineOp.getAttribute("data-line-act") === "ledger") { close(document.getElementById("detailMask")); switchTab("ledger"); }
+          if (lineOp.getAttribute("data-line-act") === "handle") { fillHandle(line); close(document.getElementById("detailMask")); open(document.getElementById("handleMask")); }
+          return;
+        }
         if (e.target.id === "btnSearch") {
           state.filters = { task: fTask.value.trim(), code: fCode.value.trim(), type: fType.value, dept: fDept.value, status: fStatus.value };
           renderTable();
@@ -222,9 +322,12 @@
           renderTable();
         }
         if (e.target.id === "btnExport") alert("正在导出盘点差异明细（演示）");
+        if (e.target.id === "btnLedgerRefresh") { renderLedger(); alert("盘点台帐已刷新（演示）"); }
+        if (e.target.id === "btnLedgerExport") alert("正在导出盘点台帐（演示）");
         if (e.target.id === "btnHandleOk" && state.current) {
           state.current.status = "已处理";
           state.current.reason = document.getElementById("handleRemark").value || state.current.reason;
+          state.current.adjustNo = state.current.adjustNo === "待生成" ? "TZ-2026-0010" : state.current.adjustNo;
           close(document.getElementById("handleMask"));
           renderTable();
         }
@@ -234,9 +337,7 @@
           if (!row) return;
           if (op.getAttribute("data-act") === "view") showDetail(row);
           if (op.getAttribute("data-act") === "handle") {
-            state.current = row;
-            document.getElementById("handleDept").value = row.dept;
-            document.getElementById("handleRemark").value = row.reason;
+            fillHandle(row);
             open(document.getElementById("handleMask"));
           }
           if (op.getAttribute("data-act") === "return") {
