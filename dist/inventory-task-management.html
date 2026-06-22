@@ -45,8 +45,8 @@
     .inv-tag.done { background: #f6ffed; border-color: #b7eb8f; color: #389e0d; }
     .inv-table-title { margin: 14px 0 8px; color: #334155; font-size: 13px; font-weight: 600; }
     .page-inventory-task .wh-modal-box--lg { width: min(97vw, 1760px); max-width: 97vw; }
-    .page-inventory-task #detailMask .wh-modal-box,
-    .page-inventory-task #flowMask .wh-modal-box { width: min(98vw, 1920px); max-width: 98vw; }
+    .page-inventory-task #detailMask .wh-modal-box { width: min(98vw, 1920px); max-width: 98vw; }
+    .page-inventory-task #flowMask .wh-modal-box { width: min(86vw, 1680px); max-width: 92vw; border-radius: 8px; }
     .page-inventory-task .wh-modal-body { max-height: calc(100vh - 170px); overflow: auto; }
     .inv-detail-table { width: 100%; min-width: 8200px; border-collapse: collapse; table-layout: auto; font-size: 12px; }
     .inv-detail-table th, .inv-detail-table td { border: 1px solid #e8e8e8; padding: 8px; color: #262626; text-align: left; white-space: nowrap; vertical-align: top; }
@@ -98,31 +98,34 @@
     .inv-material-cell-textarea { min-height: 54px; padding: 6px 8px; resize: vertical; }
     .inv-modal-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px 18px; }
     .inv-modal-grid .wh-field { margin-bottom: 0; }
+    #detailMask .wh-modal-head,
+    #materialCheckMask .wh-modal-head,
     #taskInfoMask .wh-modal-head { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+    #detailMask .wh-modal-title,
+    #materialCheckMask .wh-modal-title,
     #taskInfoMask .wh-modal-title { color: #111; flex: 1 1 auto; min-width: 0; }
     .inv-modal-title-line { display: inline-flex; align-items: center; justify-content: flex-end; gap: 10px; min-width: 0; flex: 0 0 auto; }
-    .inv-head-action { display: inline-flex; align-items: center; height: 28px; border: 1px solid #91caff; border-radius: 4px; background: #e6f4ff; color: #1677ff; padding: 0 10px; font-size: 12px; cursor: pointer; font-family: inherit; }
-    .inv-head-action:hover { background: #bae0ff; border-color: #69b1ff; }
+    .inv-head-action { display: inline-flex; align-items: center; border: 0 !important; background: transparent !important; color: #1677ff !important; padding: 0 !important; font-size: 13px; font-weight: 600; line-height: 1; cursor: pointer; font-family: inherit; text-decoration: none; box-shadow: none !important; }
+    .inv-head-action:hover { color: #0958d9; text-decoration: none; }
     .inv-track-flow { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; margin-top: 14px; }
     .inv-track-step { border: 1px solid #d9e8ff; background: #f7fbff; border-radius: 6px; padding: 8px 6px; text-align: center; color: #516a87; font-size: 12px; line-height: 1.5; }
     .inv-track-step.is-done { border-color: #91caff; background: #e6f4ff; color: #0958d9; }
-    .inv-approval-tabs { display: flex; align-items: center; gap: 18px; padding: 0 0 8px; border-bottom: 1px solid #eef2f7; }
-    .inv-approval-tab { border: 0; background: transparent; color: #60728b; cursor: pointer; font-size: 14px; font-family: inherit; padding: 0 0 6px; }
+    .inv-approval-tabs { display: flex; align-items: center; gap: 22px; padding: 0 0 8px; border-bottom: 1px solid #e8edf5; }
+    .inv-approval-tab { border: 0; background: transparent; color: #5f7288; cursor: pointer; font-size: 14px; font-family: inherit; padding: 0 0 7px; }
     .inv-approval-tab.is-active { color: #1677ff; border-bottom: 2px solid #1677ff; font-weight: 600; }
     .inv-approval-pane { display: none; }
     .inv-approval-pane.is-active { display: block; }
-    .inv-flow { overflow-x: auto; border: 1px solid #eef2f7; border-radius: 8px; padding: 18px 22px; margin-top: 14px; background: #fff; }
-    .inv-flow-row { display: inline-flex; align-items: center; min-width: 2380px; gap: 14px; }
-    .inv-step { flex: 0 0 220px; width: 220px; min-height: 88px; display: flex; flex-direction: column; justify-content: center; gap: 4px; text-align: center; border: 1px dashed #d9d9d9; border-radius: 8px; padding: 8px 9px; font-size: 12px; color: #8c8c8c; line-height: 1.35; }
-    .inv-step strong { color: inherit; font-size: 12px; }
-    .inv-step span { color: inherit; font-size: 11px; }
-    .inv-step.done { border-style: solid; border-color: #b7eb8f; color: #389e0d; background: #f6ffed; }
-    .inv-step.active { border-style: solid; border-color: #91caff; color: #0958d9; background: #e6f4ff; }
-    .inv-arrow { flex: 0 0 auto; color: #8aa0b8; font-size: 22px; line-height: 1; }
-    .inv-flow-note { margin-top: 10px; color: #60728b; font-size: 12px; line-height: 1.6; }
-    .inv-approval-table { width: 100%; border-collapse: collapse; table-layout: fixed; font-size: 12px; margin-top: 14px; }
-    .inv-approval-table th, .inv-approval-table td { border: 1px solid #e8e8e8; padding: 8px; text-align: left; color: #262626; vertical-align: top; }
-    .inv-approval-table th { background: #f5f7fa; color: #334155; white-space: nowrap; }
+    .inv-flow { overflow-x: auto; border: 1px solid #eef2f7; border-radius: 8px; padding: 30px 24px; margin-top: 20px; background: #fff; }
+    .inv-flow-row { display: inline-flex; align-items: center; min-width: 1180px; gap: 26px; }
+    .inv-step { flex: 0 0 132px; width: 132px; min-height: 112px; display: flex; align-items: center; justify-content: center; text-align: center; border: 1px solid #c8e6ce; border-radius: 10px; padding: 10px 12px; font-size: 13px; font-weight: 600; color: #426b45; line-height: 1.45; background: #f0fbf0; }
+    .inv-step strong { color: inherit; font-size: 13px; font-weight: 600; }
+    .inv-step span { display: none; }
+    .inv-step.done, .inv-step.active { border-color: #c8e6ce; color: #426b45; background: #f0fbf0; }
+    .inv-step.is-end { border-color: #f5d79b; color: #7a4d05; background: #fff8e8; }
+    .inv-arrow { flex: 0 0 auto; color: #8aa0b8; font-size: 24px; line-height: 1; }
+    .inv-flow-note { display: none; }
+    .inv-approval-list { margin-top: 20px; color: #51657d; font-size: 14px; font-weight: 600; line-height: 1.9; }
+    .inv-approval-line { margin: 0 0 4px; }
     @media (max-width: 1100px) {
       .inv-kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .inv-filters { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -221,11 +224,11 @@
   <div class="wh-modal-mask" id="detailMask" aria-hidden="true">
     <div class="wh-modal-box wh-modal-box--lg" role="dialog" aria-modal="true" aria-labelledby="detailTitle">
       <div class="wh-modal-head">
+        <h3 class="wh-modal-title" id="detailTitle">盘点任务详情</h3>
         <div class="inv-modal-title-line">
-          <h3 class="wh-modal-title" id="detailTitle">盘点任务详情</h3>
           <span role="button" tabindex="0" class="inv-head-action" id="btnDetailFlow">流程进度</span>
+          <button type="button" class="wh-modal-close" data-close aria-label="关闭">×</button>
         </div>
-        <button type="button" class="wh-modal-close" data-close aria-label="关闭">×</button>
       </div>
       <div class="wh-modal-body">
         <div class="wh-detail-grid" id="detailGrid"></div>
@@ -270,11 +273,11 @@
   <div class="wh-modal-mask" id="materialCheckMask" aria-hidden="true">
     <div class="wh-modal-box wh-modal-box--lg" role="dialog" aria-modal="true" aria-labelledby="materialCheckTitle">
       <div class="wh-modal-head">
+        <h3 class="wh-modal-title" id="materialCheckTitle">物料盘点明细</h3>
         <div class="inv-modal-title-line">
-          <h3 class="wh-modal-title" id="materialCheckTitle">物料盘点明细</h3>
           <span role="button" tabindex="0" class="inv-head-action" id="btnMaterialFlow">流程进度</span>
+          <button type="button" class="wh-modal-close" data-close aria-label="关闭">×</button>
         </div>
-        <button type="button" class="wh-modal-close" data-close aria-label="关闭">×</button>
       </div>
       <div class="wh-modal-body">
         <div class="inv-material-task-summary" id="materialTaskSummary"></div>
@@ -353,10 +356,7 @@
           <div class="inv-flow-note" id="flowNote"></div>
         </div>
         <div class="inv-approval-pane" data-approval-pane="info">
-          <table class="inv-approval-table">
-            <thead><tr><th>审批节点</th><th>审批人</th><th>审批时间</th><th>审批结果</th><th>审批意见</th></tr></thead>
-            <tbody id="approvalInfoBody"></tbody>
-          </table>
+          <div class="inv-approval-list" id="approvalInfoBody"></div>
         </div>
       </div>
       <div class="wh-modal-foot"><button type="button" class="wh-btn wh-btn--ghost" data-close>关闭</button></div>
@@ -687,11 +687,12 @@
         document.getElementById("flowTitle").textContent = "审批记录 - 部门盘点";
         document.getElementById("flowSteps").innerHTML = steps.map(function (step, i) {
           var cls = i < activeIndex ? " done" : (i === activeIndex ? " active" : "");
+          if (i === steps.length - 1) cls += " is-end";
           var arrow = i < steps.length - 1 ? '<span class="inv-arrow">→</span>' : "";
-          return '<div class="inv-step' + cls + '"><strong>' + step.name + '</strong><span>' + step.person + '</span></div>' + arrow;
+          return '<div class="inv-step' + cls + '"><strong>' + step.text + '</strong><span>' + step.person + '</span></div>' + arrow;
         }).join("");
-        document.getElementById("approvalInfoBody").innerHTML = approvalRowsFor(state.current).map(function (x) {
-          return '<tr><td>' + x.node + '</td><td>' + x.person + '</td><td>' + x.time + '</td><td>' + x.result + '</td><td>' + x.opinion + '</td></tr>';
+        document.getElementById("approvalInfoBody").innerHTML = approvalRowsFor(state.current).map(function (x, i) {
+          return '<p class="inv-approval-line">' + (i + 1) + '、' + x.opinion + '（' + x.time + '）</p>';
         }).join("");
         document.getElementById("flowNote").textContent = state.current.no + "，当前状态：" + state.current.status + "；当前流程严格按部门物资盘点执行。";
         switchApprovalTab("flow");
