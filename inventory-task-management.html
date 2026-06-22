@@ -533,9 +533,11 @@
       }
       function inventoryPhoto(line) {
         if (!line) return "images/demo-inline-1.jpg";
-        if (line.materialTypeName === "无形资产") return "images/demo-pages-embed-1.jpg";
-        if (line.assetName.indexOf("电机") > -1 || line.assetName.indexOf("模块") > -1) return "images/demo-inline-3.jpg";
-        if (line.assetName.indexOf("滤芯") > -1) return "images/demo-inline-5.png";
+        if (line.assetName.indexOf("软件") > -1 || line.assetName.indexOf("授权") > -1) return "https://statics.zwsoft.cn/web/index/img/index_cad.jpg";
+        if (line.assetName.indexOf("轴承") > -1) return "https://a.tydcdn.com/1200/2024/11/67a377a1de8cd46e2a07820598233252cb8a7c75.png?x-oss-process=image%2Fresize%2Cw_400";
+        if (line.assetName.indexOf("滤芯") > -1) return "https://image.made-in-china.com/155f0j00hBZGiVwjrRkl/Hangzhou-Advance-Gearbox-120c-Spare-Parts-Wu63X100-J-Strainer-Element-Oil-Filter.webp";
+        if (line.assetName.indexOf("电机") > -1) return "https://www.wolong-electric.com/Public/Uploads/uploadfile/images/20240422/8.png";
+        if (line.assetName.indexOf("模块") > -1) return "https://www.plc-sensors.com/wp-content/uploads/2021/03/3G3MX2-A2002-V1-3.jpg";
         return "images/demo-inline-1.jpg";
       }
       function statusPillText(line) {
