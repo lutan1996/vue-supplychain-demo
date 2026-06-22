@@ -301,17 +301,10 @@
         </div>
       </div>
       <div class="wh-modal-body">
-        <div class="inv-material-task-summary" id="materialTaskSummary"></div>
         <div class="inv-material-filters">
-          <div class="wh-field"><label class="wh-label">盘点部门</label><select class="wh-input" id="mcDept"><option>机械研究所</option><option>电气控制所</option><option>经营发展中心</option><option>全部业务部门</option></select></div>
-          <div class="wh-field"><label class="wh-label">资产类型</label><select class="wh-input" id="mcAssetType"><option>全部</option><option>固定资产</option><option>存货</option><option>无形资产</option></select></div>
+          <div class="wh-field"><label class="wh-label">盘点类型</label><select class="wh-input" id="mcAssetType"><option>全部</option><option>部门盘点</option><option>公司盘点</option></select></div>
           <div class="wh-field"><label class="wh-label">所属仓库/存放地点</label><input class="wh-input" id="mcLoc" placeholder="请输入仓库或存放地点"></div>
           <div class="wh-field"><label class="wh-label">物资名称</label><input class="wh-input" id="mcName" placeholder="请输入物资名称"></div>
-          <div class="wh-field"><label class="wh-label">物资唯一码</label><input class="wh-input" id="mcCode" placeholder="请输入物资唯一码"></div>
-          <div class="wh-field"><label class="wh-label">产品编码</label><input class="wh-input" id="mcProduct" placeholder="请输入产品编码"></div>
-          <div class="wh-field"><label class="wh-label">物资类型编码</label><input class="wh-input" id="mcTypeCode" placeholder="请输入物资类型编码"></div>
-          <div class="wh-field"><label class="wh-label">使用人/负责人</label><input class="wh-input" id="mcOwner" placeholder="请输入使用人/负责人"></div>
-          <div class="wh-field"><label class="wh-label">状态</label><select class="wh-input" id="mcState"><option>全部</option><option>在库</option><option>已入库</option><option>已领用</option><option>流转中</option><option>未入库</option><option>待核验</option></select></div>
           <div class="wh-field inv-material-query-field"><label class="wh-label">&nbsp;</label><button type="button" class="inv-btn primary" id="btnMaterialQuery">查询</button></div>
         </div>
         <div class="inv-material-toolbar">
@@ -326,7 +319,6 @@
               <col style="width:124px">
               <col style="width:118px">
               <col style="width:124px">
-              <col style="width:126px">
               <col style="width:104px">
               <col style="width:112px">
               <col style="width:148px">
@@ -339,7 +331,7 @@
               <col style="width:118px">
               <col style="width:170px">
             </colgroup>
-            <thead><tr><th>序号</th><th>资产编号</th><th>物资唯一码</th><th>物资类型编码</th><th>产品编码</th><th>物资名称</th><th>规格型号</th><th>物资类型名称</th><th>所属部门</th><th>存储地点/仓库货位</th><th>使用人/负责人</th><th>在库/领用状态</th><th>账面数量</th><th>盘点确认数量</th><th>单位</th><th>状态是否完好</th><th>盘点结果</th><th>差异说明</th></tr></thead>
+            <thead><tr><th>序号</th><th>资产编号</th><th>物资唯一码</th><th>物资类型编码</th><th>产品编码</th><th>物资名称</th><th>物资类型名称</th><th>所属部门</th><th>存储地点/仓库货位</th><th>使用人</th><th>在库/领用状态</th><th>账面数量</th><th>盘点确认数量</th><th>单位</th><th>状态是否完好</th><th>盘点结果</th><th>差异说明</th></tr></thead>
             <tbody id="materialCheckBody"></tbody>
           </table>
           <div class="inv-material-empty" id="materialCheckEmpty" hidden>暂无数据</div>
@@ -639,25 +631,11 @@
         return '<div class="inv-task-location-card"><div class="inv-rack"><div class="inv-rack-name">' + name.replace("货架", "<br>货架") + '</div><div class="inv-rack-stack"><div class="inv-rack-layer' + (activeLevel === 1 ? ' is-active' : '') + '">1层</div><div class="inv-rack-layer' + (activeLevel === 2 ? ' is-active' : '') + '">2层</div><div class="inv-rack-layer' + (activeLevel === 3 ? ' is-active' : '') + '">3层</div></div></div></div>';
       }
       function materialRows() {
-        var dept = document.getElementById("mcDept").value;
-        var assetType = document.getElementById("mcAssetType").value;
         var loc = document.getElementById("mcLoc").value.trim();
         var name = document.getElementById("mcName").value.trim();
-        var code = document.getElementById("mcCode").value.trim();
-        var product = document.getElementById("mcProduct").value.trim();
-        var typeCode = document.getElementById("mcTypeCode").value.trim();
-        var owner = document.getElementById("mcOwner").value.trim();
-        var state = document.getElementById("mcState").value;
         return lines.filter(function (x) {
-          if (dept && dept !== "全部业务部门" && x.dept !== dept) return false;
-          if (assetType && assetType !== "全部" && x.materialTypeName !== assetType) return false;
           if (loc && x.loc.indexOf(loc) < 0) return false;
           if (name && x.assetName.indexOf(name) < 0) return false;
-          if (code && x.code.indexOf(code) < 0) return false;
-          if (product && x.product.indexOf(product) < 0) return false;
-          if (typeCode && x.typeCode.indexOf(typeCode) < 0) return false;
-          if (owner && x.user.indexOf(owner) < 0) return false;
-          if (state && state !== "全部" && x.state !== state) return false;
           return true;
         });
       }
@@ -671,7 +649,6 @@
             '<td>' + cell(x.typeCode) + '</td>' +
             '<td>' + cell(x.product) + '</td>' +
             '<td>' + cell(x.assetName) + '</td>' +
-            '<td>' + cell(x.spec) + '</td>' +
             '<td>' + cell(x.materialTypeName) + '</td>' +
             '<td>' + cell(x.dept) + '</td>' +
             '<td><input class="inv-material-cell-input" value="' + cell(x.loc) + '"></td>' +
@@ -691,29 +668,8 @@
         state.current = row || state.current || getRows()[0] || rows[0];
         var isCompany = normalizeFlowType(state.current) === "company";
         document.getElementById("materialCheckTitle").textContent = isCompany ? "公司物资盘点明细" : "物料盘点明细";
-        var summary = [
-          sideItem("盘点单号", state.current.no),
-          sideItem("盘点任务名称", state.current.name),
-          sideItem("盘点类型", state.current.type),
-          sideItem("盘点范围", state.current.scope),
-          sideItem("资产类型范围", state.current.assetTypeRange || "全部"),
-          sideItem("发起人", state.current.owner),
-          sideItem("负责人", responsiblePerson(state.current)),
-          sideItem("当前状态", state.current.status)
-        ];
-        if (isCompany) {
-          summary = summary.concat([
-            sideItem("物资管理部门负责人", state.current.deptHead || "王超"),
-            sideItem("财务负责人", state.current.financeHead || "孙睿"),
-            sideItem("业务部门负责人", state.current.bizHead || "按所属部门匹配"),
-            sideItem("共同确认人员", "物资：" + (state.current.materialOwner || "宋中波") + "；财务：" + (state.current.financeOwner || "杜欣鑫") + "；业务：" + (state.current.bizOwner || "按所属部门匹配"))
-          ]);
-        }
-        document.getElementById("materialTaskSummary").innerHTML = summary.join("");
-        document.getElementById("mcDept").value = state.current.type === "公司盘点" ? "全部业务部门" : state.current.dept;
-        document.getElementById("mcAssetType").value = "全部";
-        ["mcLoc", "mcName", "mcCode", "mcProduct", "mcTypeCode", "mcOwner"].forEach(function (id) { document.getElementById(id).value = ""; });
-        document.getElementById("mcState").value = "全部";
+        document.getElementById("mcAssetType").value = state.current.type || "全部";
+        ["mcLoc", "mcName"].forEach(function (id) { document.getElementById(id).value = ""; });
         renderMaterialCheck();
         open(document.getElementById("materialCheckMask"));
       }
