@@ -118,7 +118,7 @@
     .inv-approval-pane { display: none; }
     .inv-approval-pane.is-active { display: block; }
     .inv-flow { overflow-x: auto; border: 1px solid #eef2f7; border-radius: 8px; padding: 30px 24px; margin-top: 20px; background: #fff; }
-    .inv-flow-row { display: inline-flex; align-items: center; min-width: 1720px; gap: 26px; }
+    .inv-flow-row { display: inline-flex; align-items: center; min-width: 1980px; gap: 26px; }
     .inv-step { flex: 0 0 132px; width: 132px; min-height: 112px; display: flex; align-items: center; justify-content: center; text-align: center; border: 1px solid #c8e6ce; border-radius: 10px; padding: 10px 12px; font-size: 13px; font-weight: 400; color: #426b45; line-height: 1.45; background: #f0fbf0; }
     .inv-step strong { color: inherit; font-size: 13px; font-weight: 400; }
     .inv-step span { display: none; }
@@ -439,7 +439,7 @@
       }
       function flowIndex(row) {
         var deptMap = { "待开始": 0, "盘点中": 2, "待部门负责人审阅": 3, "待物资管理部门审阅": 4, "已完成": 5, "待差异处理": 4 };
-        var companyMap = { "待开始": 0, "待物资负责人分配": 2, "待业务部门分配": 3, "待三方确认": 4, "待财务负责人审阅": 5, "待物资管理部门审阅": 6, "待阅知": 7, "待差异处理": 7, "已完成": 8 };
+        var companyMap = { "待开始": 0, "待物资负责人分配": 2, "待业务部门分配": 4, "待三方确认": 6, "待财务负责人审阅": 7, "待物资管理部门审阅": 8, "待阅知": 9, "待差异处理": 9, "已完成": 9 };
         var map = normalizeFlowType(row) === "company" ? companyMap : deptMap;
         return map[row.status] == null ? 0 : map[row.status];
       }
@@ -448,9 +448,11 @@
           return [
             { name: "发起公司物资盘点", person: "宋中波", text: "物资管理部门物资专责宋中波发起公司物资盘点" },
             { name: "生成公司物资清单", person: "宋中波", text: "系统根据物资管理部门物资专责宋中波发起的信息生成公司所有已入库、未入库物资清单，存货类同步带入最近盘库日期、盘库账面数量、盘库实盘数量和盘库差异" },
-            { name: "物资部门同意并分配", person: "王超", text: "物资管理部门负责人王超同意，并分配宋中波等本部门盘点人员" },
+            { name: "物资部门负责人同意", person: "王超", text: "物资管理部门负责人王超同意公司物资盘点" },
+            { name: "物资部门分配人员", person: "王超、宋中波", text: "物资管理部门负责人王超分配本部门盘点人员宋中波" },
             { name: "业务部门同意并分配", person: row.bizHead || "李仁堂、陈亮、王贺", text: "所有业务部门负责人" + (row.bizHead || "李仁堂、陈亮、王贺") + "同意，并分配本部门盘点人员" },
-            { name: "三方逐条共同确认", person: "宋中波、杜欣鑫、" + (row.bizOwner || "成明锴、许学良"), text: "所有参与盘点人员宋中波、杜欣鑫、" + (row.bizOwner || "成明锴、许学良") + "收到流程，按清单逐条确认，物资、财务、业务三方共同确认物资型号、编码、存储地点、使用人/负责人等信息是否与系统台帐一致，状态是否完好" },
+            { name: "参与人员收到流程", person: "宋中波、杜欣鑫、" + (row.bizOwner || "成明锴、许学良"), text: "所有参与盘点人员宋中波、杜欣鑫、" + (row.bizOwner || "成明锴、许学良") + "收到公司盘点流程" },
+            { name: "三方逐条共同确认", person: "宋中波、杜欣鑫、" + (row.bizOwner || "成明锴、许学良"), text: "所有参与盘点人员按清单逐条确认，物资、财务、业务三方共同确认物资型号、编码、存储地点、使用人/负责人等信息是否与系统台帐一致，状态是否完好" },
             { name: "财务负责人审阅", person: row.financeHead || "孙睿", text: "盘点完毕，提交财务负责人" + (row.financeHead || "孙睿") + "审阅" },
             { name: "物资管理部门负责人审阅", person: "王超", text: "物资管理部门负责人王超审阅" },
             { name: "物资专责阅知", person: "宋中波", text: "物资管理部门物资专责宋中波阅知" },
