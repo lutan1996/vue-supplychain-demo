@@ -334,8 +334,10 @@
         if (status === "已完成") return '<span class="inv-tag done">已完成</span>';
         return '<span class="inv-tag wait">待差异处理</span>';
       }
-      function taskActions(row) {
-        return '<span class="inv-op"><span role="button" tabindex="0" data-inv-act="view" data-id="' + row.id + '">查看</span></span>';
+      function taskActions(row, index) {
+        var buttons = ['<span role="button" tabindex="0" data-inv-act="view" data-id="' + row.id + '">查看</span>'];
+        if (index === 0) buttons.push('<span role="button" tabindex="0" data-inv-act="start" data-id="' + row.id + '">盘点开始</span>');
+        return '<span class="inv-op">' + buttons.join("") + '</span>';
       }
       function lineActions(line, showTrack) {
         return '<span class="inv-op"><span role="button" tabindex="0" data-line-act="view" data-code="' + line.code + '">查看</span></span>';
@@ -412,7 +414,7 @@
         var list = getRows();
         renderKpis(list);
         document.getElementById("tbody").innerHTML = list.map(function (x, i) {
-          return '<tr><td>' + (i + 1) + '</td><td>' + x.no + '</td><td>' + x.name + '</td><td>' + x.type + '</td><td>' + x.dept + '</td><td>' + x.scope + '</td><td>' + x.start + ' 至 ' + x.end + '</td><td>' + x.owner + '</td><td>' + x.should + '</td><td>' + x.done + '</td><td>' + x.diff + '</td><td>' + tag(x.status) + '</td><td>' + taskActions(x) + '</td></tr>';
+          return '<tr><td>' + (i + 1) + '</td><td>' + x.no + '</td><td>' + x.name + '</td><td>' + x.type + '</td><td>' + x.dept + '</td><td>' + x.scope + '</td><td>' + x.start + ' 至 ' + x.end + '</td><td>' + x.owner + '</td><td>' + x.should + '</td><td>' + x.done + '</td><td>' + x.diff + '</td><td>' + tag(x.status) + '</td><td>' + taskActions(x, i) + '</td></tr>';
         }).join("");
       }
       function renderLedger() {
@@ -645,7 +647,7 @@
         if (!state.workflow) return;
         var row = state.workflow.row;
         var act = state.workflow.act;
-        if (act === "start") row.status = row.type === "公司盘点" ? "待物资负责人分配" : "盘点中";
+        if (act === "start") { row.status = row.type === "公司盘点" ? "待物资负责人分配" : "盘点中"; openDetail(row); }
         if (act === "generate-list") openDetail(row);
         if (act === "assign-material") row.status = "待业务部门分配";
         if (act === "assign-business") row.status = "待三方确认";
