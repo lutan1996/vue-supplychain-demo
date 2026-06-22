@@ -23,7 +23,7 @@
     .diff-btn.primary { background: #1677ff; border-color: #1677ff; color: #fff; }
     .diff-btn.warn { background: #fff7e6; border-color: #ffd591; color: #d46b08; }
     .diff-table-wrap { overflow: auto; padding: 0 16px 12px; }
-    .diff-table { width: 100%; min-width: 2520px; border-collapse: collapse; table-layout: fixed; font-size: 12px; }
+    .diff-table { width: 100%; min-width: 3120px; border-collapse: collapse; table-layout: fixed; font-size: 12px; }
     .diff-table th, .diff-table td { border: 1px solid #e8e8e8; padding: 8px; color: #262626; text-align: left; white-space: normal; word-break: break-all; overflow-wrap: anywhere; vertical-align: top; line-height: 1.45; }
     .diff-table th { background: #f5f5f5; color: #334155; white-space: normal; word-break: keep-all; line-height: 1.35; }
     .diff-op { display: inline-flex; flex-wrap: wrap; gap: 8px; white-space: nowrap; }
@@ -60,7 +60,7 @@
     .page-inventory-diff #detailMask .wh-modal-box { width: min(98vw, 1920px); max-width: 98vw; }
     .page-inventory-diff #flowMask .wh-modal-box { width: min(86vw, 1680px); max-width: 92vw; border-radius: 8px; }
     .page-inventory-diff .wh-modal-body { max-height: calc(100vh - 170px); overflow: auto; }
-    .diff-detail-table { width: 100%; min-width: 2360px; border-collapse: collapse; table-layout: fixed; font-size: 12px; }
+    .diff-detail-table { width: 100%; min-width: 2920px; border-collapse: collapse; table-layout: fixed; font-size: 12px; }
     .diff-detail-table th, .diff-detail-table td { border: 1px solid #e8e8e8; padding: 8px; color: #262626; text-align: left; white-space: normal; word-break: break-all; overflow-wrap: anywhere; vertical-align: top; line-height: 1.45; }
     .diff-detail-table th { background: #f5f7fa; color: #334155; white-space: nowrap; }
     .diff-approval-tabs,
@@ -152,7 +152,7 @@
               <table class="diff-table">
                 <thead>
                   <tr>
-                    <th>序号</th><th>盘点单号</th><th>资产编号</th><th>物资唯一码</th><th>物资类型编码</th><th>产品编码</th><th>物资类型名称</th><th>物资名称</th><th>账面位置</th><th>实盘位置</th><th>账面数量</th><th>实盘数量</th><th>差异类型</th><th>责任部门</th><th>原值</th><th>差异金额</th><th>是否大额盘亏</th><th>处理状态</th><th>操作</th>
+                    <th>序号</th><th>盘点单号</th><th>资产编号</th><th>物资唯一码</th><th>物资类型编码</th><th>产品编码</th><th>物资名称</th><th>物资类型名称</th><th>所属部门</th><th>账面位置</th><th>实盘位置</th><th>账面数量</th><th>盘点确认数量</th><th>单位</th><th>状态是否完好</th><th>盘点结果</th><th>差异类型</th><th>差异说明</th><th>原值</th><th>差异金额</th><th>是否大额盘亏</th><th>处理状态</th><th>操作</th>
                   </tr>
                 </thead>
                 <tbody id="tbody"></tbody>
@@ -178,7 +178,7 @@
         <div class="diff-table-title">盘点差异明细表</div>
         <div style="overflow:auto" data-skip-demo-unify>
           <table class="diff-detail-table">
-            <thead><tr><th>序号</th><th>资产编号</th><th>物资唯一码</th><th>物资类型编码</th><th>产品编码</th><th>物资名称</th><th>物资类型名称</th><th>所属部门</th><th>存储地点/仓库货位</th><th>使用人</th><th>在库/领用状态</th><th>账面数量</th><th>盘点确认数量</th><th>单位</th><th>状态是否完好</th><th>盘点结果</th><th>差异说明</th><th>操作</th></tr></thead>
+            <thead><tr><th>序号</th><th>资产编号</th><th>物资唯一码</th><th>物资类型编码</th><th>产品编码</th><th>物资名称</th><th>物资类型名称</th><th>所属部门</th><th>账面位置</th><th>实盘位置</th><th>使用人</th><th>在库/领用状态</th><th>账面数量</th><th>盘点确认数量</th><th>单位</th><th>状态是否完好</th><th>盘点结果</th><th>差异类型</th><th>差异说明</th><th>原值</th><th>差异金额</th><th>是否大额盘亏</th><th>操作</th></tr></thead>
             <tbody id="detailLines"></tbody>
           </table>
         </div>
@@ -222,6 +222,14 @@
       <div class="wh-modal-head"><h3 class="wh-modal-title" id="handleTitle">处理差异</h3><button type="button" class="wh-modal-close" data-close aria-label="关闭">×</button></div>
       <div class="wh-modal-body">
         <div class="diff-modal-grid">
+          <div class="wh-field"><label class="wh-label">账面位置</label><input class="wh-input" id="handleBookLoc" readonly></div>
+          <div class="wh-field"><label class="wh-label">实盘位置</label><input class="wh-input" id="handleRealLoc" readonly></div>
+          <div class="wh-field"><label class="wh-label">账面数量</label><input class="wh-input" id="handleBookQty" readonly></div>
+          <div class="wh-field"><label class="wh-label">盘点确认数量</label><input class="wh-input" id="handleRealQty" readonly></div>
+          <div class="wh-field"><label class="wh-label">状态是否完好</label><input class="wh-input" id="handleHealth" readonly></div>
+          <div class="wh-field"><label class="wh-label">盘点结果</label><input class="wh-input" id="handleResult" readonly></div>
+          <div class="wh-field"><label class="wh-label">差异类型</label><input class="wh-input" id="handleDiffType" readonly></div>
+          <div class="wh-field"><label class="wh-label">差异金额</label><input class="wh-input" id="handleAmount" readonly></div>
           <div class="wh-field"><label class="wh-label">处理方式</label><select class="wh-input" id="handleWay"><option>登记处理</option><option>确认盘亏，生成出库调整</option><option>确认盘盈，生成入库调整</option><option>更正所在部门/位置</option><option>提交审批</option><option>退回复盘</option></select></div>
           <div class="wh-field"><label class="wh-label">处理人</label><input class="wh-input" id="handleUser" value="当前用户"></div>
           <div class="wh-field"><label class="wh-label">责任部门</label><input class="wh-input" id="handleDept"></div>
@@ -284,6 +292,13 @@
       }
       function levelTag(row) {
         return isHighLoss(row) ? '<span class="diff-tag high">大额盘亏</span>' : '<span class="diff-tag normal">普通差异</span>';
+      }
+      function unitOf(row) {
+        return row.unit || (row.materialTypeName === "固定资产" ? "台" : "件");
+      }
+      function resultOf(row) {
+        if (row.type === "数量差异") return Number(row.realQty || 0) < Number(row.bookQty || 0) ? "盘亏" : "盘盈";
+        return row.type || "有差异";
       }
       function approvalText(row) {
         return isHighLoss(row) ? "系统判断为固定资产盘亏且原值不低于50万元，需提交审批" : "普通差异由责任部门处理差异，后续审批进入我的任务办理";
@@ -370,7 +385,7 @@
         var list = getRows();
         renderKpis();
         document.getElementById("tbody").innerHTML = list.map(function (x, i) {
-          return '<tr class="' + (isHighLoss(x) ? "diff-row-high" : "diff-row-problem") + '"><td>' + (i + 1) + '</td><td>' + x.task + '</td><td>' + x.assetNo + '</td><td>' + x.code + '</td><td>' + x.typeCode + '</td><td>' + x.product + '</td><td>' + x.materialTypeName + '</td><td>' + x.name + '</td><td>' + x.bookLoc + '</td><td>' + x.realLoc + '</td><td>' + x.bookQty + '</td><td>' + x.realQty + '</td><td>' + typeTag(x.type) + '</td><td>' + x.dept + '</td><td>' + money(x.originalValue) + '</td><td>' + money(x.amount) + '</td><td>' + levelTag(x) + '</td><td>' + statusTag(x.status) + '</td><td>' + rowActions(x) + '</td></tr>';
+          return '<tr class="' + (isHighLoss(x) ? "diff-row-high" : "diff-row-problem") + '"><td>' + (i + 1) + '</td><td>' + x.task + '</td><td>' + x.assetNo + '</td><td>' + x.code + '</td><td>' + x.typeCode + '</td><td>' + x.product + '</td><td>' + x.name + '</td><td>' + x.materialTypeName + '</td><td>' + x.dept + '</td><td>' + x.bookLoc + '</td><td>' + x.realLoc + '</td><td>' + x.bookQty + '</td><td>' + x.realQty + '</td><td>' + unitOf(x) + '</td><td>' + x.health + '</td><td>' + resultOf(x) + '</td><td>' + typeTag(x.type) + '</td><td>' + x.reason + '</td><td>' + money(x.originalValue) + '</td><td>' + money(x.amount) + '</td><td>' + levelTag(x) + '</td><td>' + statusTag(x.status) + '</td><td>' + rowActions(x) + '</td></tr>';
         }).join("");
       }
       function open(mask) {
@@ -387,6 +402,14 @@
       function fillHandle(row) {
         state.current = row;
         document.getElementById("handleTitle").textContent = "处理差异";
+        document.getElementById("handleBookLoc").value = row.bookLoc;
+        document.getElementById("handleRealLoc").value = row.realLoc;
+        document.getElementById("handleBookQty").value = row.bookQty + unitOf(row);
+        document.getElementById("handleRealQty").value = row.realQty + unitOf(row);
+        document.getElementById("handleHealth").value = row.health;
+        document.getElementById("handleResult").value = resultOf(row);
+        document.getElementById("handleDiffType").value = row.type;
+        document.getElementById("handleAmount").value = money(row.amount);
         document.getElementById("handleWay").value = isHighLoss(row) ? "提交审批" : (row.status === "待处理" ? "登记处理" : "更正所在部门/位置");
         document.getElementById("handleDept").value = row.dept;
         document.getElementById("handleReason").value = row.reason;
@@ -429,11 +452,11 @@
         document.getElementById("detailGrid").innerHTML = [
           ["盘点单号", row.task], ["资产编号", row.assetNo], ["物资唯一码", row.code], ["物资类型编码", row.typeCode], ["产品编码", row.product],
           ["物资类型名称", row.materialTypeName], ["物资名称", row.name], ["差异类型", row.type], ["账面位置", row.bookLoc], ["实盘位置", row.realLoc],
-          ["使用人/负责人", row.user], ["状态是否完好", row.health], ["账面数量", row.bookQty], ["实盘数量", row.realQty], ["责任部门", row.dept],
+          ["使用人/负责人", row.user], ["状态是否完好", row.health], ["账面数量", row.bookQty], ["盘点确认数量", row.realQty], ["单位", unitOf(row)], ["盘点结果", resultOf(row)], ["责任部门", row.dept],
           ["原值", money(row.originalValue)], ["差异金额", money(row.amount)], ["是否大额差异", levelText(row)], ["处理状态", row.status], ["处理要求", approvalText(row)],
           ["差异原因", row.reason], ["盘点流程类型", row.flowType], ["数据来源", "盘点任务、库存台账、扫码领用、部门流转、销售发货"]
         ].map(function (x) { return '<div class="wh-detail-item"><span class="wh-detail-label">' + x[0] + '</span><span class="wh-detail-value">' + x[1] + '</span></div>'; }).join("");
-        document.getElementById("detailLines").innerHTML = '<tr class="' + (isHighLoss(row) ? "diff-row-high" : "diff-row-problem") + '"><td>1</td><td>' + row.assetNo + '</td><td>' + row.code + '</td><td>' + row.typeCode + '</td><td>' + row.product + '</td><td>' + row.name + '</td><td>' + row.materialTypeName + '</td><td>' + row.dept + '</td><td>' + row.bookLoc + '</td><td>' + row.user + '</td><td>在库</td><td>' + row.bookQty + '</td><td>' + row.realQty + '</td><td>件</td><td>' + row.health + '</td><td>' + row.type + '</td><td>' + row.reason + '</td><td>' + lineActions(row) + '</td></tr>';
+        document.getElementById("detailLines").innerHTML = '<tr class="' + (isHighLoss(row) ? "diff-row-high" : "diff-row-problem") + '"><td>1</td><td>' + row.assetNo + '</td><td>' + row.code + '</td><td>' + row.typeCode + '</td><td>' + row.product + '</td><td>' + row.name + '</td><td>' + row.materialTypeName + '</td><td>' + row.dept + '</td><td>' + row.bookLoc + '</td><td>' + row.realLoc + '</td><td>' + row.user + '</td><td>在库</td><td>' + row.bookQty + '</td><td>' + row.realQty + '</td><td>' + unitOf(row) + '</td><td>' + row.health + '</td><td>' + resultOf(row) + '</td><td>' + row.type + '</td><td>' + row.reason + '</td><td>' + money(row.originalValue) + '</td><td>' + money(row.amount) + '</td><td>' + levelText(row) + '</td><td>' + lineActions(row) + '</td></tr>';
         document.getElementById("detailDiffType").value = row.type;
         document.getElementById("detailReasonField").value = row.reason;
         document.getElementById("detailProofField").value = row.proof || "-";
