@@ -268,30 +268,10 @@
         return isHighLoss(row) ? "系统判断为固定资产盘亏且原值不低于50万元，需价值管理部门主管孙睿复核，并提交主管领导刘静审批" : "普通差异由责任部门负责人" + (row.deptHead || "李仁堂") + "复核处理";
       }
       function rowActions(row) {
-        var buttons = ['<span role="button" tabindex="0" data-diff-act="view" data-id="' + row.id + '">查看</span>'];
-        if (row.status === "待复核") {
-          buttons.push('<span role="button" tabindex="0" data-diff-act="review" data-id="' + row.id + '">复核</span>');
-          buttons.push('<span role="button" tabindex="0" data-diff-act="handle" data-id="' + row.id + '">处理</span>');
-        } else if (row.status === "处理中") {
-          buttons.push('<span role="button" tabindex="0" data-diff-act="handle" data-id="' + row.id + '">处理</span>');
-          if (isHighLoss(row)) buttons.push('<span role="button" tabindex="0" data-diff-act="submit-approval" data-id="' + row.id + '">提交审批</span>');
-          else buttons.push('<span role="button" tabindex="0" data-diff-act="complete" data-id="' + row.id + '">确认完成</span>');
-        } else if (row.status === "待提交审批") {
-          buttons.push('<span role="button" tabindex="0" data-diff-act="submit-approval" data-id="' + row.id + '">提交审批</span>');
-        } else if (row.status === "审批中") {
-          buttons.push('<span role="button" tabindex="0" data-diff-act="progress" data-id="' + row.id + '">审批进度</span>');
-        } else if (row.status === "已处理") {
-          buttons.push('<span role="button" tabindex="0" data-diff-act="track" data-id="' + row.id + '">物资跟踪</span>');
-        }
-        return '<span class="diff-op">' + buttons.join("") + '</span>';
+        return '<span class="diff-op"><span role="button" tabindex="0" data-diff-act="view" data-id="' + row.id + '">查看</span></span>';
       }
       function lineActions(row) {
-        var buttons = ['<span role="button" tabindex="0" data-line-act="track" data-code="' + row.code + '">物资跟踪</span>'];
-        if (row.status !== "已处理") buttons.push('<span role="button" tabindex="0" data-line-act="handle" data-code="' + row.code + '">处理</span>');
-        if (isHighLoss(row) && row.status !== "审批中" && row.status !== "已处理") buttons.push('<span role="button" tabindex="0" data-line-act="submit-approval" data-code="' + row.code + '">提交审批</span>');
-        if (row.status === "审批中") buttons.push('<span role="button" tabindex="0" data-line-act="progress" data-code="' + row.code + '">审批进度</span>');
-        if (row.status !== "已处理" && !isHighLoss(row)) buttons.push('<span role="button" tabindex="0" data-line-act="complete" data-code="' + row.code + '">确认完成</span>');
-        return '<span class="diff-op">' + buttons.join("") + '</span>';
+        return '<span class="diff-op"><span role="button" tabindex="0" data-line-act="view" data-code="' + row.code + '">查看</span></span>';
       }
       function getRows() {
         return rows.filter(function (x) {
@@ -439,6 +419,7 @@
         var lineOp = e.target.closest("[data-line-act]");
         if (lineOp) {
           var line = findLine(lineOp.getAttribute("data-code"));
+          if (lineOp.getAttribute("data-line-act") === "view") showDetail(line);
           if (lineOp.getAttribute("data-line-act") === "track") openTrack(line);
           if (lineOp.getAttribute("data-line-act") === "handle") { fillHandle(line); close(document.getElementById("detailMask")); open(document.getElementById("handleMask")); }
           if (lineOp.getAttribute("data-line-act") === "submit-approval") {
