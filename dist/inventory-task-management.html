@@ -68,7 +68,7 @@
     .inv-task-info-grid .inv-task-field span { display: block; margin-bottom: 6px; color: #516a87; font-weight: 600; }
     .inv-task-info-grid .inv-task-field b { display: flex; align-items: center; min-height: 36px; box-sizing: border-box; border: 1px solid #d9d9d9; border-radius: 4px; background: #fff; color: #262626; padding: 0 12px; font-weight: 400; }
     .inv-task-mini-table-wrap { overflow: auto; margin-top: 8px; }
-    .inv-task-mini-table { width: 100%; min-width: 1660px; border-collapse: collapse; table-layout: fixed; font-size: 12px; }
+    .inv-task-mini-table { width: 100%; min-width: 1760px; border-collapse: collapse; table-layout: fixed; font-size: 12px; }
     .inv-task-mini-table th, .inv-task-mini-table td { border: 1px solid #e8e8e8; padding: 8px 6px; color: #262626; text-align: left; white-space: normal; word-break: break-all; line-height: 1.45; }
     .inv-task-mini-table th { background: #f5f7fa; color: #334155; }
     .inv-task-track-panel { margin-top: 14px; border-top: 1px solid #e8eef7; padding-top: 14px; }
@@ -601,9 +601,9 @@
             taskField("确认口径", isCompany ? "物资、财务、业务三方共同确认" : "部门物资专责逐条确认") +
           '</div>',
           '<div class="inv-table-title">盘点物资明细表</div>',
-          '<div class="inv-task-mini-table-wrap"><table class="inv-task-mini-table"><thead><tr><th>序号</th><th>资产编号</th><th>物资唯一码</th><th>物资类型编码</th><th>产品编码</th><th>物资名称</th><th>规格型号</th><th>物资类型名称</th><th>所属部门</th><th>存储地点/仓库货位</th><th>使用人/负责人</th><th>在库/领用状态</th><th>账面数量</th><th>盘点确认数量</th><th>单位</th><th>盘点结果</th><th>操作</th></tr></thead><tbody>' +
+          '<div class="inv-task-mini-table-wrap"><table class="inv-task-mini-table"><thead><tr><th>序号</th><th>资产编号</th><th>物资唯一码</th><th>物资类型编码</th><th>产品编码</th><th>物资名称</th><th>物资类型名称</th><th>所属部门</th><th>存储地点/仓库货位</th><th>使用人</th><th>在库/领用状态</th><th>账面数量</th><th>盘点确认数量</th><th>单位</th><th>状态是否完好</th><th>盘点结果</th><th>差异说明</th><th>操作</th></tr></thead><tbody>' +
             list.map(function (x, i) {
-              return '<tr><td>' + (i + 1) + '</td><td>' + cell(x.assetNo) + '</td><td>' + cell(x.code) + '</td><td>' + cell(x.typeCode) + '</td><td>' + cell(x.product) + '</td><td>' + cell(x.assetName) + '</td><td>' + cell(x.spec) + '</td><td>' + cell(x.materialTypeName) + '</td><td>' + cell(x.dept) + '</td><td>' + cell(x.loc) + '</td><td>' + cell(x.user) + '</td><td>' + cell(x.state) + '</td><td>' + cell(x.book) + '</td><td>' + cell(x.confirmQty || x.real) + '</td><td>' + cell(x.unit || "件") + '</td><td>' + cell(x.result) + '</td><td><span class="inv-op"><span role="button" tabindex="0" data-task-track="' + x.code + '">物资跟踪</span></span></td></tr>';
+              return '<tr><td>' + (i + 1) + '</td><td>' + cell(x.assetNo) + '</td><td>' + cell(x.code) + '</td><td>' + cell(x.typeCode) + '</td><td>' + cell(x.product) + '</td><td>' + cell(x.assetName) + '</td><td>' + cell(x.materialTypeName) + '</td><td>' + cell(x.dept) + '</td><td>' + cell(x.loc) + '</td><td>' + cell(x.user) + '</td><td>' + cell(x.state) + '</td><td>' + cell(x.book) + '</td><td>' + cell(x.confirmQty || x.real) + '</td><td>' + cell(x.unit || "件") + '</td><td>' + cell(x.health) + '</td><td>' + cell(x.result) + '</td><td>' + cell(x.reason) + '</td><td><span class="inv-op"><span role="button" tabindex="0" data-task-track="' + x.code + '">物资跟踪</span></span></td></tr>';
             }).join("") +
           '</tbody></table></div>',
           '<div class="inv-task-track-panel" id="taskTrackPanel" hidden></div>'
