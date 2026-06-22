@@ -39,8 +39,13 @@
     .inv-tag.run { background: #e6f4ff; border-color: #91caff; color: #0958d9; }
     .inv-tag.done { background: #f6ffed; border-color: #b7eb8f; color: #389e0d; }
     .inv-table-title { margin: 14px 0 8px; color: #334155; font-size: 13px; font-weight: 600; }
-    .inv-detail-table { width: 100%; min-width: 5200px; border-collapse: collapse; table-layout: fixed; font-size: 12px; }
-    .inv-detail-table th, .inv-detail-table td { border: 1px solid #e8e8e8; padding: 8px; color: #262626; text-align: left; }
+    .page-inventory-task .wh-modal-box--lg { width: min(97vw, 1760px); max-width: 97vw; }
+    .page-inventory-task #detailMask .wh-modal-box,
+    .page-inventory-task #workflowMask .wh-modal-box,
+    .page-inventory-task #flowMask .wh-modal-box { width: min(98vw, 1920px); max-width: 98vw; }
+    .page-inventory-task .wh-modal-body { max-height: calc(100vh - 170px); overflow: auto; }
+    .inv-detail-table { width: 100%; min-width: 8200px; border-collapse: collapse; table-layout: auto; font-size: 12px; }
+    .inv-detail-table th, .inv-detail-table td { border: 1px solid #e8e8e8; padding: 8px; color: #262626; text-align: left; white-space: nowrap; vertical-align: top; }
     .inv-detail-table th { background: #f5f7fa; color: #334155; }
     .inv-row-diff td { background: #fff1f0; }
     .inv-text-danger { color: #cf1322; font-weight: 600; }
@@ -48,6 +53,7 @@
     .inv-text-muted { color: #8c8c8c; }
     .inv-reason-box { margin-top: 12px; border: 1px solid #ffa39e; background: #fff1f0; color: #a8071a; border-radius: 6px; padding: 10px 12px; line-height: 1.7; font-size: 12px; }
     .inv-rule-box { margin-top: 10px; border: 1px solid #d9e8ff; background: #f7fbff; border-radius: 6px; color: #516a87; padding: 8px 10px; font-size: 12px; line-height: 1.6; }
+    .inv-workflow-summary { border: 1px solid #d9e8ff; background: #f7fbff; border-radius: 6px; color: #516a87; padding: 10px 12px; font-size: 12px; line-height: 1.7; margin: 12px 0; }
     .inv-modal-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px 18px; }
     .inv-modal-grid .wh-field { margin-bottom: 0; }
     .inv-modal-title-line { display: inline-flex; align-items: center; gap: 10px; min-width: 0; }
@@ -62,13 +68,13 @@
     .inv-approval-pane { display: none; }
     .inv-approval-pane.is-active { display: block; }
     .inv-flow { overflow-x: auto; border: 1px solid #eef2f7; border-radius: 8px; padding: 18px 22px; margin-top: 14px; background: #fff; }
-    .inv-flow-row { display: inline-flex; align-items: center; min-width: 980px; gap: 14px; }
-    .inv-step { width: 148px; min-height: 82px; display: flex; flex-direction: column; justify-content: center; gap: 4px; text-align: center; border: 1px dashed #d9d9d9; border-radius: 8px; padding: 8px 9px; font-size: 12px; color: #8c8c8c; line-height: 1.35; }
+    .inv-flow-row { display: inline-flex; align-items: center; min-width: 2380px; gap: 14px; }
+    .inv-step { flex: 0 0 220px; width: 220px; min-height: 88px; display: flex; flex-direction: column; justify-content: center; gap: 4px; text-align: center; border: 1px dashed #d9d9d9; border-radius: 8px; padding: 8px 9px; font-size: 12px; color: #8c8c8c; line-height: 1.35; }
     .inv-step strong { color: inherit; font-size: 12px; }
     .inv-step span { color: inherit; font-size: 11px; }
     .inv-step.done { border-style: solid; border-color: #b7eb8f; color: #389e0d; background: #f6ffed; }
     .inv-step.active { border-style: solid; border-color: #91caff; color: #0958d9; background: #e6f4ff; }
-    .inv-arrow { color: #8aa0b8; font-size: 22px; line-height: 1; }
+    .inv-arrow { flex: 0 0 auto; color: #8aa0b8; font-size: 22px; line-height: 1; }
     .inv-flow-note { margin-top: 10px; color: #60728b; font-size: 12px; line-height: 1.6; }
     .inv-approval-table { width: 100%; border-collapse: collapse; table-layout: fixed; font-size: 12px; margin-top: 14px; }
     .inv-approval-table th, .inv-approval-table td { border: 1px solid #e8e8e8; padding: 8px; text-align: left; color: #262626; vertical-align: top; }
@@ -236,6 +242,26 @@
     </div>
   </div>
 
+  <div class="wh-modal-mask" id="workflowMask" aria-hidden="true">
+    <div class="wh-modal-box wh-modal-box--lg" role="dialog" aria-modal="true" aria-labelledby="workflowTitle">
+      <div class="wh-modal-head"><h3 class="wh-modal-title" id="workflowTitle">流程办理</h3><button type="button" class="wh-modal-close" data-close aria-label="关闭">×</button></div>
+      <div class="wh-modal-body">
+        <div class="wh-detail-grid" id="workflowGrid"></div>
+        <div class="inv-workflow-summary" id="workflowSummary"></div>
+        <div class="inv-modal-grid">
+          <div class="wh-field"><label class="wh-label">办理动作</label><input class="wh-input" id="workflowAction" readonly></div>
+          <div class="wh-field"><label class="wh-label">办理人</label><input class="wh-input" id="workflowPerson"></div>
+          <div class="wh-field"><label class="wh-label">当前节点</label><input class="wh-input" id="workflowCurrent" readonly></div>
+          <div class="wh-field"><label class="wh-label">下一节点</label><input class="wh-input" id="workflowNext" readonly></div>
+          <div class="wh-field"><label class="wh-label">分配人员</label><input class="wh-input" id="workflowAssignees"></div>
+          <div class="wh-field"><label class="wh-label">清单范围</label><input class="wh-input" id="workflowScope" readonly></div>
+          <div class="wh-field" style="grid-column:1 / -1"><label class="wh-label">办理意见</label><input class="wh-input" id="workflowOpinion"></div>
+        </div>
+      </div>
+      <div class="wh-modal-foot"><button type="button" class="wh-btn wh-btn--ghost" data-close>取消</button><button type="button" class="wh-btn wh-btn--primary" id="btnWorkflowOk">确定</button></div>
+    </div>
+  </div>
+
   <div class="wh-modal-mask" id="flowMask" aria-hidden="true">
     <div class="wh-modal-box wh-modal-box--lg" role="dialog" aria-modal="true" aria-labelledby="flowTitle">
       <div class="wh-modal-head"><h3 class="wh-modal-title" id="flowTitle">审批记录</h3><button type="button" class="wh-modal-close" data-close aria-label="关闭">×</button></div>
@@ -289,7 +315,7 @@
         { task: "PD-2026-002", assetNo: "ZC-2026-0011", code: "C20260000011", typeCode: "A0030010004", product: "B00002119", assetName: "偏航电机", spec: "PY-DJ-55", materialTypeName: "固定资产", dept: "现场服务中心", loc: "现场服务中心/张北场站", user: "喻家敏", state: "已领用", health: "完好", lastNo: "PD-2026-002", lastDate: "2026-06-28", book: 1, real: 1, result: "位置不符", lineStatus: "有差异", diffType: "位置不符", reason: "实物已流转但系统台账位置未同步", keeper: "喻家敏", serviceLife: "10年", originalValue: 520000, qty: 1, unit: "台", checkQty: 1, useStatus: "正常", checkResult: "位置不符", remark1: "固定资产", remark2: "台账位置待更正", remark3: "需业务部门确认" },
         { task: "PD-2026-003", assetNo: "WX-2026-0001", code: "C20260000021", typeCode: "A0060010001", product: "B00004101", assetName: "风机诊断软件授权", spec: "V3.2 企业版", materialTypeName: "无形资产", dept: "经营发展中心", loc: "经营发展中心/系统账号", user: "王超", state: "使用中", health: "完好", lastNo: "PD-2026-003", lastDate: "待盘点", book: 1, real: 0, result: "未盘点", lineStatus: "未盘点", diffType: "无差异", reason: "", authNo: "AUTH-2026-0315", useDept: "经营发展中心", useOwner: "王超", authStart: "2026-03-15", authEnd: "2029-03-14", bookOriginal: 260000, bookNet: 238000, intangibleStatus: "使用中", clearResult: "待清查" }
       ];
-      var state = { filters: {}, current: null, currentLine: null };
+      var state = { filters: {}, current: null, currentLine: null, workflow: null };
       function money(v) {
         if (v === "" || v == null) return "-";
         return "¥" + Number(v || 0).toLocaleString("zh-CN", { maximumFractionDigits: 0 });
@@ -311,13 +337,17 @@
       function taskActions(row) {
         var buttons = ['<span role="button" tabindex="0" data-inv-act="view" data-id="' + row.id + '">查看</span>'];
         if (row.status === "待开始") buttons.push('<span role="button" tabindex="0" data-inv-act="start" data-id="' + row.id + '">' + (row.type === "公司盘点" ? "发起盘点" : "盘点开始") + '</span>');
+        if (row.status === "盘点中" || row.status === "待物资负责人分配" || row.status === "待业务部门分配" || row.status === "待三方确认") buttons.push('<span role="button" tabindex="0" data-inv-act="generate-list" data-id="' + row.id + '">生成清单</span>');
         if (row.type === "公司盘点" && row.status === "待物资负责人分配") buttons.push('<span role="button" tabindex="0" data-inv-act="assign-material" data-id="' + row.id + '">物资部门分配</span>');
         if (row.type === "公司盘点" && row.status === "待业务部门分配") buttons.push('<span role="button" tabindex="0" data-inv-act="assign-business" data-id="' + row.id + '">业务部门分配</span>');
-        if (row.type === "公司盘点" && row.status === "待三方确认") buttons.push('<span role="button" tabindex="0" data-inv-act="company-confirm" data-id="' + row.id + '">逐条确认</span>');
+        if (row.type === "公司盘点" && row.status === "待三方确认") buttons.push('<span role="button" tabindex="0" data-inv-act="company-confirm" data-id="' + row.id + '">三方逐条确认</span>');
         if (row.type !== "公司盘点" && row.status === "盘点中") buttons.push('<span role="button" tabindex="0" data-inv-act="check" data-id="' + row.id + '">逐条确认</span>');
         if ((row.type !== "公司盘点" && row.status === "盘点中") || (row.type === "公司盘点" && row.status === "待三方确认")) buttons.push('<span role="button" tabindex="0" data-inv-act="submit-review" data-id="' + row.id + '">提交审阅</span>');
-        if (row.status === "待部门负责人审阅" || row.status === "待财务负责人审阅" || row.status === "待物资管理部门审阅") buttons.push('<span role="button" tabindex="0" data-inv-act="review" data-id="' + row.id + '">审阅确认</span>');
-        if (row.status === "待阅知") buttons.push('<span role="button" tabindex="0" data-inv-act="review" data-id="' + row.id + '">阅知确认</span>');
+        if (row.status === "待部门负责人审阅") buttons.push('<span role="button" tabindex="0" data-inv-act="dept-review" data-id="' + row.id + '">部门负责人审阅</span>');
+        if (row.status === "待财务负责人审阅") buttons.push('<span role="button" tabindex="0" data-inv-act="finance-review" data-id="' + row.id + '">财务负责人审阅</span>');
+        if (row.status === "待物资管理部门审阅") buttons.push('<span role="button" tabindex="0" data-inv-act="material-review" data-id="' + row.id + '">' + (row.type === "公司盘点" ? "物资部门负责人审阅" : "物资专责审阅") + '</span>');
+        if (row.status === "待阅知") buttons.push('<span role="button" tabindex="0" data-inv-act="read-confirm" data-id="' + row.id + '">物资专责阅知</span>');
+        if (row.status === "已完成") buttons.push('<span role="button" tabindex="0" data-inv-act="finish-view" data-id="' + row.id + '">盘点结束</span>');
         if (row.status === "待差异处理") buttons.push('<span role="button" tabindex="0" data-inv-act="goto-diff" data-id="' + row.id + '">去处理</span>');
         buttons.push('<span role="button" tabindex="0" data-inv-act="export-detail" data-id="' + row.id + '">导出明细</span>');
         return '<span class="inv-op">' + buttons.join("") + '</span>';
@@ -490,6 +520,168 @@
         renderDetailLines();
         open(document.getElementById("detailMask"));
       }
+      function workflowMeta(row, act) {
+        var isCompany = row.type === "公司盘点";
+        var map = {
+          "start": {
+            title: isCompany ? "发起公司物资盘点" : "盘点开始",
+            action: isCompany ? "物资管理部门物资专责发起公司物资盘点" : "部门物资专责点“盘点开始”",
+            person: isCompany ? "宋中波" : (row.owner || "许学良"),
+            current: "待开始",
+            next: isCompany ? "物资管理部门负责人同意并分配人员" : "系统生成部门所属物资清单",
+            assignees: isCompany ? "王超、宋中波" : (row.owner || "许学良"),
+            opinion: isCompany ? "发起公司物资盘点，申请生成公司所有已入库、未入库物资清单。" : "进入部门内物资盘点，申请生成部门所属物资清单。",
+            summary: isCompany ? "公司盘点：物资管理部门物资专责发起公司物资盘点。" : "部门盘点：部门物资专责点“盘点开始”，进入部门内物资盘点。"
+          },
+          "generate-list": {
+            title: "系统生成盘点清单",
+            action: isCompany ? "系统生成公司所有已入库、未入库物资清单" : "系统生成部门所属物资清单",
+            person: "系统自动生成",
+            current: row.status,
+            next: isCompany ? (row.status === "待物资负责人分配" ? "物资管理部门负责人同意并分配人员" : "三方逐条共同确认") : "部门物资专责逐条盘点确认",
+            assignees: isCompany ? "宋中波、杜欣鑫、各业务部门专责" : (row.owner || "许学良"),
+            opinion: "按资产编号、物资唯一码、物资类型编码、产品编码生成清单；存货类同步带入最近盘库数据。",
+            summary: isCompany ? "公司盘点：系统生成公司所有已入库、未入库物资清单。" : "部门盘点：系统生成部门所属物资清单。"
+          },
+          "assign-material": {
+            title: "物资管理部门负责人分配",
+            action: "物资管理部门负责人同意并分配本部门盘点人员",
+            person: "王超",
+            current: "待物资负责人分配",
+            next: "所有业务部门负责人同意并分配人员",
+            assignees: "宋中波",
+            opinion: "同意开展公司盘点，分配物资管理部门盘点人员。",
+            summary: "公司盘点：物资管理部门负责人同意，并分配本部门盘点人员。"
+          },
+          "assign-business": {
+            title: "业务部门负责人分配",
+            action: "所有业务部门负责人同意并分配本部门盘点人员",
+            person: row.bizHead || "陈亮、李仁堂、王贺",
+            current: "待业务部门分配",
+            next: "所有参与盘点人员收到流程并逐条确认",
+            assignees: row.bizOwner || "成明锴、许学良、喻家敏",
+            opinion: "各业务部门同意盘点安排，并分配本部门盘点人员。",
+            summary: "公司盘点：所有业务部门负责人同意，并分配本部门盘点人员。"
+          },
+          "check": {
+            title: "部门逐条盘点确认",
+            action: "部门物资专责逐条盘点物资并确认型号、编码、存储地点、使用人/负责人、状态",
+            person: row.owner || "许学良",
+            current: "盘点中",
+            next: "提交部门负责人审阅",
+            assignees: row.owner || "许学良",
+            opinion: "逐条确认清单，发现不一致进入登记差异。",
+            summary: "部门盘点：部门物资专责逐条盘点物资并确认型号、编码、存储地点、使用人/负责人和状态。"
+          },
+          "company-confirm": {
+            title: "三方逐条共同确认",
+            action: "所有参与盘点人员收到流程并逐条确认，物资、财务、业务三方共同确认",
+            person: "宋中波、杜欣鑫、" + (row.bizOwner || "成明锴、许学良、喻家敏"),
+            current: "待三方确认",
+            next: "提交财务负责人审阅",
+            assignees: "宋中波、杜欣鑫、" + (row.bizOwner || "成明锴、许学良、喻家敏"),
+            opinion: "三方共同确认物资型号、编码、存储地点、使用人/负责人等信息与系统台账一致性和状态完好情况。",
+            summary: "公司盘点：物资、财务、业务三方共同逐条确认。"
+          },
+          "submit-review": {
+            title: isCompany ? "提交财务负责人审阅" : "提交部门负责人审阅",
+            action: isCompany ? "盘点完毕，提交财务负责人审阅" : "盘点完毕，提交部门负责人审阅",
+            person: row.owner || "宋中波",
+            current: row.status,
+            next: isCompany ? "财务负责人审阅" : "部门负责人审阅",
+            assignees: isCompany ? (row.financeHead || "孙睿") : (row.deptHead || "李仁堂"),
+            opinion: isCompany ? "公司盘点逐条确认完毕，提交财务负责人审阅。" : "部门盘点逐条确认完毕，提交部门负责人审阅。",
+            summary: isCompany ? "公司盘点：盘点完毕，提交财务负责人审阅。" : "部门盘点：盘点完毕，提交部门负责人审阅。"
+          },
+          "dept-review": {
+            title: "部门负责人审阅",
+            action: "部门负责人审阅，盘点无误",
+            person: row.deptHead || "李仁堂",
+            current: "待部门负责人审阅",
+            next: "物资管理部门物资专责审阅确认",
+            assignees: row.materialOwner || "宋中波",
+            opinion: "部门盘点结果已审阅，盘点无误，提交物资管理部门物资专责确认。",
+            summary: "部门盘点：部门负责人审阅，确认盘点无误。"
+          },
+          "finance-review": {
+            title: "财务负责人审阅",
+            action: "财务负责人审阅",
+            person: row.financeHead || "孙睿",
+            current: "待财务负责人审阅",
+            next: "物资管理部门负责人审阅",
+            assignees: "王超",
+            opinion: "财务负责人审阅盘点结果和差异金额。",
+            summary: "公司盘点：财务负责人审阅盘点结果。"
+          },
+          "material-review": {
+            title: isCompany ? "物资管理部门负责人审阅" : "物资管理部门物资专责审阅确认",
+            action: isCompany ? "物资管理部门负责人审阅" : "物资管理部门物资专责审阅确认",
+            person: isCompany ? "王超" : (row.materialOwner || "宋中波"),
+            current: "待物资管理部门审阅",
+            next: isCompany ? "物资管理部门物资专责阅知" : "部门盘点结束",
+            assignees: row.materialOwner || "宋中波",
+            opinion: isCompany ? "物资管理部门负责人审阅公司盘点结果。" : "物资管理部门物资专责审阅并确认部门盘点结果。",
+            summary: isCompany ? "公司盘点：物资管理部门负责人审阅。" : "部门盘点：物资管理部门物资专责审阅确认。"
+          },
+          "read-confirm": {
+            title: "物资管理部门物资专责阅知",
+            action: "物资管理部门物资专责阅知",
+            person: row.materialOwner || "宋中波",
+            current: "待阅知",
+            next: "盘点结束",
+            assignees: row.materialOwner || "宋中波",
+            opinion: "已阅知公司盘点审阅结果，确认流程结束。",
+            summary: "公司盘点：物资管理部门物资专责阅知。"
+          },
+          "finish-view": {
+            title: isCompany ? "公司盘点结束" : "部门盘点结束",
+            action: "盘点结束",
+            person: row.materialOwner || "宋中波",
+            current: "已完成",
+            next: "无",
+            assignees: "-",
+            opinion: "盘点流程已结束。",
+            summary: isCompany ? "公司盘点：盘点结束。" : "部门盘点：部门盘点结束。"
+          }
+        };
+        return map[act] || map["generate-list"];
+      }
+      function openWorkflow(row, act) {
+        state.current = row;
+        state.workflow = { row: row, act: act };
+        var meta = workflowMeta(row, act);
+        document.getElementById("workflowTitle").textContent = meta.title;
+        document.getElementById("workflowGrid").innerHTML = [
+          ["盘点单号", row.no], ["盘点类型", row.type], ["盘点部门", row.dept], ["当前状态", row.status],
+          ["应盘数量", row.should], ["已盘数量", row.done], ["差异数量", row.diff], ["负责人", row.owner]
+        ].map(function (x) { return '<div class="wh-detail-item"><span class="wh-detail-label">' + x[0] + '</span><span class="wh-detail-value">' + x[1] + '</span></div>'; }).join("");
+        document.getElementById("workflowSummary").textContent = meta.summary;
+        document.getElementById("workflowAction").value = meta.action;
+        document.getElementById("workflowPerson").value = meta.person;
+        document.getElementById("workflowCurrent").value = meta.current;
+        document.getElementById("workflowNext").value = meta.next;
+        document.getElementById("workflowAssignees").value = meta.assignees;
+        document.getElementById("workflowScope").value = row.type === "公司盘点" ? "公司所有已入库、未入库物资清单" : row.dept + "所属物资清单";
+        document.getElementById("workflowOpinion").value = meta.opinion;
+        open(document.getElementById("workflowMask"));
+      }
+      function completeWorkflow() {
+        if (!state.workflow) return;
+        var row = state.workflow.row;
+        var act = state.workflow.act;
+        if (act === "start") row.status = row.type === "公司盘点" ? "待物资负责人分配" : "盘点中";
+        if (act === "generate-list") openDetail(row);
+        if (act === "assign-material") row.status = "待业务部门分配";
+        if (act === "assign-business") row.status = "待三方确认";
+        if (act === "check" || act === "company-confirm") { row.done = row.should; openDetail(row); }
+        if (act === "submit-review") row.status = row.type === "公司盘点" ? "待财务负责人审阅" : "待部门负责人审阅";
+        if (act === "dept-review") row.status = "待物资管理部门审阅";
+        if (act === "finance-review") row.status = "待物资管理部门审阅";
+        if (act === "material-review") row.status = row.type === "公司盘点" ? "待阅知" : (row.diff ? "待差异处理" : "已完成");
+        if (act === "read-confirm") row.status = row.diff ? "待差异处理" : "已完成";
+        close(document.getElementById("workflowMask"));
+        renderTable();
+      }
       function openConfirm(line, mode) {
         state.currentLine = line;
         document.getElementById("confirmTitle").textContent = mode === "diff" ? "登记盘点差异" : (mode === "view" ? "盘点明细查看" : "逐条盘点确认");
@@ -556,6 +748,10 @@
         if (e.target.id === "btnExport") alert("正在导出盘点任务列表（演示）");
         if (e.target.id === "btnLedgerRefresh") { renderLedger(); alert("盘点台帐已刷新（演示）"); }
         if (e.target.id === "btnLedgerExport") alert("正在导出盘点台帐（演示）");
+        if (e.target.id === "btnWorkflowOk") {
+          completeWorkflow();
+          return;
+        }
         if (e.target.id === "btnConfirmOk" && state.currentLine) {
           var line = state.currentLine;
           var isDiff = document.getElementById("confirmSame").value === "不一致" || document.getElementById("confirmDiffType").value !== "无差异";
@@ -581,23 +777,18 @@
           var row = rows.find(function (x) { return String(x.id) === op.getAttribute("data-id"); });
           if (!row) return;
           if (op.getAttribute("data-inv-act") === "view") openDetail(row);
-          if (op.getAttribute("data-inv-act") === "start") { row.status = row.type === "公司盘点" ? "待物资负责人分配" : "盘点中"; row.done = Math.max(row.done, Math.floor(row.should * 0.2)); renderTable(); }
-          if (op.getAttribute("data-inv-act") === "assign-material") { row.status = "待业务部门分配"; renderTable(); }
-          if (op.getAttribute("data-inv-act") === "assign-business") { row.status = "待三方确认"; renderTable(); }
-          if (op.getAttribute("data-inv-act") === "check") { row.done = row.should; openDetail(row); }
-          if (op.getAttribute("data-inv-act") === "company-confirm") { row.done = row.should; openDetail(row); }
-          if (op.getAttribute("data-inv-act") === "submit-review") { row.status = row.type === "公司盘点" ? "待财务负责人审阅" : "待部门负责人审阅"; renderTable(); }
-          if (op.getAttribute("data-inv-act") === "review") {
-            if (row.type === "公司盘点") {
-              if (row.status === "待财务负责人审阅") row.status = "待物资管理部门审阅";
-              else if (row.status === "待物资管理部门审阅") row.status = "待阅知";
-              else row.status = row.diff ? "待差异处理" : "已完成";
-            } else {
-              if (row.status === "待部门负责人审阅") row.status = "待物资管理部门审阅";
-              else row.status = row.diff ? "待差异处理" : "已完成";
-            }
-            renderTable();
-          }
+          if (op.getAttribute("data-inv-act") === "start") openWorkflow(row, "start");
+          if (op.getAttribute("data-inv-act") === "generate-list") openWorkflow(row, "generate-list");
+          if (op.getAttribute("data-inv-act") === "assign-material") openWorkflow(row, "assign-material");
+          if (op.getAttribute("data-inv-act") === "assign-business") openWorkflow(row, "assign-business");
+          if (op.getAttribute("data-inv-act") === "check") openWorkflow(row, "check");
+          if (op.getAttribute("data-inv-act") === "company-confirm") openWorkflow(row, "company-confirm");
+          if (op.getAttribute("data-inv-act") === "submit-review") openWorkflow(row, "submit-review");
+          if (op.getAttribute("data-inv-act") === "dept-review") openWorkflow(row, "dept-review");
+          if (op.getAttribute("data-inv-act") === "finance-review") openWorkflow(row, "finance-review");
+          if (op.getAttribute("data-inv-act") === "material-review") openWorkflow(row, "material-review");
+          if (op.getAttribute("data-inv-act") === "read-confirm") openWorkflow(row, "read-confirm");
+          if (op.getAttribute("data-inv-act") === "finish-view") openWorkflow(row, "finish-view");
           if (op.getAttribute("data-inv-act") === "export-detail") alert(row.no + " 的盘点明细正在导出（演示）");
           if (op.getAttribute("data-inv-act") === "goto-diff") window.location.href = "inventory-difference-handling.html";
         }
