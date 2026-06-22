@@ -68,18 +68,18 @@
     .inv-task-photo { width: 100%; aspect-ratio: 16 / 9; border: 1px solid #d9e8ff; border-radius: 4px; overflow: hidden; background: #f7f7f7; }
     .inv-task-photo img { width: 100%; height: 100%; object-fit: contain; display: block; }
     .inv-task-photo-note { margin-top: 8px; color: #111; font-size: 12px; line-height: 1.5; }
-    .inv-task-location-panel { margin-top: 16px; border: 2px dashed #0b4ea2; border-radius: 10px; background: #eaf5ff; padding: 18px; }
-    .inv-task-location-title { margin: 0 0 12px; color: #0b3f8a; font-size: 16px; font-weight: 700; }
+    .inv-task-location-panel { margin-top: 16px; border: 2px dashed #0b4ea2 !important; border-radius: 10px; background: #eaf5ff !important; padding: 18px; }
+    .inv-task-location-title { margin: 0 0 12px; color: #0b3f8a !important; font-size: 16px; font-weight: 700; }
     .inv-rack { display: grid; grid-template-columns: 72px 1fr 1fr; gap: 8px; align-items: stretch; margin-top: 8px; }
     .inv-rack-name { display: flex; align-items: center; justify-content: center; background: #1677ff; color: #fff; border-radius: 6px; font-size: 12px; font-weight: 700; }
     .inv-rack-layer { border: 1px solid #91caff; border-radius: 4px; padding: 6px; text-align: center; color: #0958d9; background: #fff; font-size: 12px; }
     .inv-task-location-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }
-    .inv-task-location-card { background: #d7ebff; border: 1px solid #0b4ea2; border-radius: 10px; padding: 14px 16px; min-height: 132px; }
+    .inv-task-location-card { background: #d7ebff !important; border: 1px solid #0b4ea2 !important; border-radius: 10px; padding: 14px 16px; min-height: 132px; }
     .inv-task-location-card .inv-rack { grid-template-columns: 88px 1fr; }
-    .inv-task-location-card .inv-rack-name { min-height: 100%; }
+    .inv-task-location-card .inv-rack-name { min-height: 100%; background: #b9dcff !important; color: #0b3f8a !important; border: 1px solid #0b4ea2 !important; }
     .inv-task-location-card .inv-rack-stack { display: grid; gap: 0; }
-    .inv-task-location-card .inv-rack-layer { border-radius: 0; background: #f7fbff; color: #0b3f8a; border-color: #0b4ea2; }
-    .inv-task-location-card .inv-rack-layer.is-active { background: #8cc9ff; color: #0b3f8a; font-weight: 700; }
+    .inv-task-location-card .inv-rack-layer { border-radius: 0; background: #f7fbff !important; color: #0b3f8a !important; border-color: #0b4ea2 !important; }
+    .inv-task-location-card .inv-rack-layer.is-active { background: #8cc9ff !important; color: #0b3f8a !important; font-weight: 700; }
     .inv-side-item { border: 1px solid #e8eef7; background: #fbfdff; border-radius: 6px; padding: 8px 9px; min-width: 0; }
     .inv-side-item span { display: block; color: #64748b; font-size: 11px; }
     .inv-side-item b { display: block; margin-top: 3px; color: #1f2d3d; font-size: 12px; font-weight: 600; word-break: break-all; }
@@ -98,7 +98,9 @@
     .inv-material-cell-textarea { min-height: 54px; padding: 6px 8px; resize: vertical; }
     .inv-modal-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px 18px; }
     .inv-modal-grid .wh-field { margin-bottom: 0; }
-    .inv-modal-title-line { display: inline-flex; align-items: center; gap: 10px; min-width: 0; }
+    #taskInfoMask .wh-modal-head { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+    #taskInfoMask .wh-modal-title { color: #111; flex: 1 1 auto; min-width: 0; }
+    .inv-modal-title-line { display: inline-flex; align-items: center; justify-content: flex-end; gap: 10px; min-width: 0; flex: 0 0 auto; }
     .inv-head-action { display: inline-flex; align-items: center; height: 28px; border: 1px solid #91caff; border-radius: 4px; background: #e6f4ff; color: #1677ff; padding: 0 10px; font-size: 12px; cursor: pointer; font-family: inherit; }
     .inv-head-action:hover { background: #bae0ff; border-color: #69b1ff; }
     .inv-track-flow { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; margin-top: 14px; }
@@ -327,11 +329,11 @@
   <div class="wh-modal-mask" id="taskInfoMask" aria-hidden="true">
     <div class="wh-modal-box wh-modal-box--lg" role="dialog" aria-modal="true" aria-labelledby="taskInfoTitle">
       <div class="wh-modal-head">
+        <h3 class="wh-modal-title" id="taskInfoTitle">物资信息</h3>
         <div class="inv-modal-title-line">
-          <h3 class="wh-modal-title" id="taskInfoTitle">物资信息</h3>
           <span role="button" tabindex="0" class="inv-head-action" id="btnTaskInfoFlow">流程进度</span>
+          <button type="button" class="wh-modal-close" data-close aria-label="关闭">×</button>
         </div>
-        <button type="button" class="wh-modal-close" data-close aria-label="关闭">×</button>
       </div>
       <div class="wh-modal-body" id="taskInfoBody"></div>
       <div class="wh-modal-foot"><button type="button" class="wh-btn wh-btn--primary" data-close>关闭</button></div>
