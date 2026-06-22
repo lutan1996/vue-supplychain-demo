@@ -80,13 +80,15 @@
     .inv-task-location-card .inv-rack-stack { display: grid; gap: 0; }
     .inv-task-location-card .inv-rack-layer { border-radius: 0; background: #f7fbff !important; color: #0b3f8a !important; border-color: #0b4ea2 !important; }
     .inv-task-location-card .inv-rack-layer.is-active { background: #8cc9ff !important; color: #0b3f8a !important; font-weight: 700; }
-    .inv-side-item { border: 1px solid #e8eef7; background: #fbfdff; border-radius: 6px; padding: 8px 9px; min-width: 0; }
-    .inv-side-item span { display: block; color: #64748b; font-size: 11px; }
-    .inv-side-item b { display: block; margin-top: 3px; color: #1f2d3d; font-size: 12px; font-weight: 600; word-break: break-all; }
-    .inv-material-task-summary { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; margin: 0 0 10px; }
-    .inv-material-task-summary .inv-side-item { background: #f7fbff; }
-    .inv-material-filters { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px 14px; align-items: end; }
+    .inv-side-item { min-width: 0; }
+    .inv-side-item span { display: block; margin-bottom: 6px; color: #516a87; font-size: 13px; font-weight: 600; }
+    .inv-side-item b { display: flex; align-items: center; width: 100%; height: 36px; box-sizing: border-box; border: 1px solid #d9d9d9; border-radius: 4px; background: #fff; color: #262626; padding: 0 12px; font-size: 13px; font-weight: 400; line-height: 1.35; word-break: break-all; overflow: hidden; }
+    .inv-material-task-summary { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px 14px; margin: 0 0 12px; }
+    .inv-material-filters { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px 14px; align-items: end; }
     .inv-material-filters .wh-field { margin-bottom: 0; }
+    .inv-material-filters .wh-input { height: 36px; }
+    .inv-material-query-field { align-self: end; }
+    .inv-material-query-field .inv-btn { width: 100%; height: 36px; }
     .inv-material-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 10px; }
     .inv-material-table-wrap { overflow: auto; margin-top: 8px; }
     .inv-material-table { width: 100%; min-width: 1880px; border-collapse: collapse; table-layout: fixed; font-size: 12px; }
@@ -130,7 +132,8 @@
       .inv-kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .inv-filters { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .inv-track-flow { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-      .inv-material-task-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .inv-material-task-summary,
+      .inv-material-filters { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .inv-task-view-layout { grid-template-columns: 1fr; }
       .inv-task-location-grid { grid-template-columns: 1fr; }
     }
@@ -291,9 +294,8 @@
           <div class="wh-field"><label class="wh-label">物资类型编码</label><input class="wh-input" id="mcTypeCode" placeholder="请输入物资类型编码"></div>
           <div class="wh-field"><label class="wh-label">使用人/负责人</label><input class="wh-input" id="mcOwner" placeholder="请输入使用人/负责人"></div>
           <div class="wh-field"><label class="wh-label">状态</label><select class="wh-input" id="mcState"><option>全部</option><option>在库</option><option>已入库</option><option>已领用</option><option>流转中</option><option>未入库</option><option>待核验</option></select></div>
-          <div class="wh-field"><label class="wh-label">&nbsp;</label><button type="button" class="inv-btn primary" id="btnMaterialQuery">查询</button></div>
+          <div class="wh-field inv-material-query-field"><label class="wh-label">&nbsp;</label><button type="button" class="inv-btn primary" id="btnMaterialQuery">查询</button></div>
         </div>
-        <div class="inv-rule-box">系统按盘点部门、资产类型和物资唯一码生成本次盘点清单，数据来源包括产品目录、采购合同、收货入库、库存管理、扫码领用、部门流转和最近盘库结果。</div>
         <div class="inv-material-toolbar">
           <div class="inv-table-title" style="margin:0">盘点物资明细表</div>
         </div>
