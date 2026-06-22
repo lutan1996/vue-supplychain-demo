@@ -116,7 +116,7 @@
     .inv-approval-pane { display: none; }
     .inv-approval-pane.is-active { display: block; }
     .inv-flow { overflow-x: auto; border: 1px solid #eef2f7; border-radius: 8px; padding: 30px 24px; margin-top: 20px; background: #fff; }
-    .inv-flow-row { display: inline-flex; align-items: center; min-width: 1180px; gap: 26px; }
+    .inv-flow-row { display: inline-flex; align-items: center; min-width: 1720px; gap: 26px; }
     .inv-step { flex: 0 0 132px; width: 132px; min-height: 112px; display: flex; align-items: center; justify-content: center; text-align: center; border: 1px solid #c8e6ce; border-radius: 10px; padding: 10px 12px; font-size: 13px; font-weight: 600; color: #426b45; line-height: 1.45; background: #f0fbf0; }
     .inv-step strong { color: inherit; font-size: 13px; font-weight: 600; }
     .inv-step span { display: none; }
@@ -526,6 +526,10 @@
         if (!row || row.type === "公司盘点") return lines;
         return lines.filter(function (x) { return x.task === row.no || x.dept === row.dept; });
       }
+      function currentTaskForAction() {
+        if (state.current && getRows().some(function (x) { return x.id === state.current.id; })) return state.current;
+        return getRows()[0] || rows[0];
+      }
       function renderDetailLines() {
         var list = linesForTask(state.current);
         document.getElementById("detailLines").innerHTML = list.map(function (x) {
@@ -563,7 +567,8 @@
         state.current = row;
         var list = taskLines(row);
         var first = list[0] || lines[0];
-        document.getElementById("taskInfoTitle").textContent = cell(first.assetName || row.name);
+        var isCompany = normalizeFlowType(row) === "company";
+        document.getElementById("taskInfoTitle").textContent = isCompany ? "公司盘点物资信息" : cell(first.assetName || row.name);
         document.getElementById("taskInfoBody").innerHTML = [
           '<div class="inv-task-view-layout">' +
             '<div class="inv-task-view-fields">' +
@@ -571,9 +576,12 @@
               taskField("库存数量", String(cell(first.real)) + " / " + String(cell(first.book))) +
               taskField("所在库区", first.dept) +
               taskField("任务状态", cell(row.status)) +
+              taskField("盘点类型", cell(row.type)) +
+              taskField("清单范围", isCompany ? "公司所有已入库、未入库物资" : row.dept + "所属物资") +
               taskField("库存状态", '<span class="inv-task-status-pill">' + statusPillText(first) + '</span>', true) +
               taskField("存放位置", first.loc) +
               taskField("制造厂商", first.materialTypeName === "无形资产" ? "系统授权" : "国家能源供应商目录") +
+              taskField("确认口径", isCompany ? "物资、财务、业务三方共同确认" : "部门物资专责逐条确认") +
               taskField("物资唯一码", first.code) +
               taskField("产品编码", first.product) +
             '</div>' +
@@ -650,7 +658,9 @@
       }
       function openMaterialCheck(row) {
         state.current = row || state.current || getRows()[0] || rows[0];
-        document.getElementById("materialTaskSummary").innerHTML = [
+        var isCompany = normalizeFlowType(state.current) === "company";
+        document.getElementById("materialCheckTitle").textContent = isCompany ? "公司物资盘点明细" : "物料盘点明细";
+        var summary = [
           sideItem("盘点单号", state.current.no),
           sideItem("盘点任务名称", state.current.name),
           sideItem("盘点类型", state.current.type),
@@ -659,7 +669,16 @@
           sideItem("发起人", state.current.owner),
           sideItem("负责人", responsiblePerson(state.current)),
           sideItem("当前状态", state.current.status)
-        ].join("");
+        ];
+        if (isCompany) {
+          summary = summary.concat([
+            sideItem("物资管理部门负责人", state.current.deptHead || "王超"),
+            sideItem("财务负责人", state.current.financeHead || "孙睿"),
+            sideItem("业务部门负责人", state.current.bizHead || "按所属部门匹配"),
+            sideItem("共同确认人员", "物资：" + (state.current.materialOwner || "宋中波") + "；财务：" + (state.current.financeOwner || "杜欣鑫") + "；业务：" + (state.current.bizOwner || "按所属部门匹配"))
+          ]);
+        }
+        document.getElementById("materialTaskSummary").innerHTML = summary.join("");
         document.getElementById("mcDept").value = state.current.type === "公司盘点" ? "全部业务部门" : state.current.dept;
         document.getElementById("mcAssetType").value = "全部";
         ["mcLoc", "mcName", "mcCode", "mcProduct", "mcTypeCode", "mcOwner"].forEach(function (id) { document.getElementById(id).value = ""; });
@@ -679,12 +698,10 @@
       }
       function openFlow(row) {
         state.current = row || state.current || rows[0];
-        if (state.current && state.current.type === "公司盘点") {
-          state.current = Object.assign({}, state.current, { type: "部门盘点" });
-        }
         var steps = flowStepsFor(state.current);
         var activeIndex = flowIndex(state.current);
-        document.getElementById("flowTitle").textContent = "审批记录 - 部门盘点";
+        var isCompany = normalizeFlowType(state.current) === "company";
+        document.getElementById("flowTitle").textContent = isCompany ? "审批记录 - 公司盘点" : "审批记录 - 部门盘点";
         document.getElementById("flowSteps").innerHTML = steps.map(function (step, i) {
           var cls = i < activeIndex ? " done" : (i === activeIndex ? " active" : "");
           if (i === steps.length - 1) cls += " is-end";
@@ -694,7 +711,7 @@
         document.getElementById("approvalInfoBody").innerHTML = approvalRowsFor(state.current).map(function (x, i) {
           return '<p class="inv-approval-line">' + (i + 1) + '、' + x.opinion + '（' + x.time + '）</p>';
         }).join("");
-        document.getElementById("flowNote").textContent = state.current.no + "，当前状态：" + state.current.status + "；当前流程严格按部门物资盘点执行。";
+        document.getElementById("flowNote").textContent = state.current.no + "，当前状态：" + state.current.status + "；当前流程严格按" + (isCompany ? "公司物资盘点" : "部门物资盘点") + "执行。";
         switchApprovalTab("flow");
         open(document.getElementById("flowMask"));
       }
@@ -754,7 +771,7 @@
           return;
         }
         if (e.target.closest("#btnStartInventory")) {
-          openMaterialCheck(state.current || getRows()[0] || rows[0]);
+          openMaterialCheck(currentTaskForAction());
           return;
         }
         if (e.target.id === "btnMaterialQuery") {
@@ -764,7 +781,7 @@
         if (e.target.id === "btnMaterialSubmit") {
           var current = state.current || getRows()[0] || rows[0];
           var checked = materialRows();
-          current.status = "盘点中";
+          current.status = current.type === "公司盘点" ? "待财务负责人审阅" : "待部门负责人审阅";
           current.done = checked.length;
           current.diff = checked.filter(function (x) { return x.lineStatus === "有差异"; }).length;
           close(document.getElementById("materialCheckMask"));
@@ -816,7 +833,7 @@
       var startBtn = document.getElementById("btnStartInventory");
       if (startBtn) {
         startBtn.onclick = function () {
-          openMaterialCheck(state.current || getRows()[0] || rows[0]);
+          openMaterialCheck(currentTaskForAction());
         };
       }
       renderTable();
