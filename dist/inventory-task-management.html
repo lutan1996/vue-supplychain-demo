@@ -30,7 +30,7 @@
     .inv-ledger-note { padding: 10px 16px; border-bottom: 1px solid #f0f0f0; color: #60728b; font-size: 12px; background: #fbfdff; }
     .inv-table-wrap { overflow: auto; padding: 0 16px 12px; }
     .inv-table { width: 100%; min-width: 1920px; border-collapse: collapse; table-layout: fixed; font-size: 12px; }
-    .inv-table--ledger { min-width: 1900px; }
+    .inv-table--ledger { min-width: 2380px; }
     .inv-table th, .inv-table td { border: 1px solid #e8e8e8; padding: 8px; text-align: left; color: #262626; }
     .inv-table th { background: #f5f5f5; color: #334155; white-space: nowrap; }
     .inv-op { display: inline-flex; flex-wrap: wrap; gap: 8px; white-space: nowrap; }
@@ -114,10 +114,15 @@
     .inv-material-cell-textarea { min-height: 54px; padding: 6px 8px; resize: vertical; }
     .inv-modal-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px 18px; }
     .inv-modal-grid .wh-field { margin-bottom: 0; }
+    .inv-auto-grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px 14px; margin-bottom: 12px; padding: 12px; border: 1px solid #e8eef7; border-radius: 6px; background: #fbfdff; }
+    .inv-auto-grid .wh-field { margin-bottom: 0; }
+    .inv-auto-grid .wh-input[readonly] { background: #f5f7fa; color: #595959; cursor: default; }
     #detailMask .wh-modal-head,
+    #taskCreateMask .wh-modal-head,
     #materialCheckMask .wh-modal-head,
     #taskInfoMask .wh-modal-head { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
     #detailMask .wh-modal-title,
+    #taskCreateMask .wh-modal-title,
     #materialCheckMask .wh-modal-title,
     #taskInfoMask .wh-modal-title { color: #111; flex: 1 1 auto; min-width: 0; }
     .inv-modal-title-line { display: inline-flex; align-items: center; justify-content: flex-end; gap: 10px; min-width: 0; flex: 0 0 auto; }
@@ -198,6 +203,7 @@
               <div class="inv-actions">
                 <button class="inv-btn primary" id="btnSearch">搜索</button>
                 <button class="inv-btn" id="btnReset">重置</button>
+                <button class="inv-btn" id="btnCreateTask">新增</button>
                 <button class="inv-btn soft" id="btnStartInventory">盘点开始</button>
               </div>
               <div class="inv-table-wrap">
@@ -223,7 +229,7 @@
                 <table class="inv-table inv-table--ledger">
                   <thead>
                     <tr>
-                      <th>序号</th><th>资产编号</th><th>物资唯一码</th><th>物资类型编码</th><th>产品编码</th><th>物资类型名称</th><th>物资名称</th><th>规格型号</th><th>所属部门</th><th>当前位置</th><th>使用人/负责人</th><th>在库/领用状态</th><th>状态是否完好</th><th>最近盘点单号</th><th>最近盘点日期</th><th>账面数量</th><th>实盘数量</th><th>差异状态</th><th>操作</th>
+                      <th>序号</th><th>盘点单号</th><th>资产编号</th><th>物资唯一码</th><th>物资类型编码</th><th>产品编码</th><th>物资名称</th><th>物资类型名称</th><th>所属部门/场站</th><th>所属仓库</th><th>所属库区</th><th>库位/存放地点</th><th>使用人</th><th>在库/领用状态</th><th>账面数量</th><th>实盘数量</th><th>盘点结果</th><th>差异状态</th><th>操作人</th><th>盘点时间</th><th>操作</th>
                     </tr>
                   </thead>
                   <tbody id="ledgerBody"></tbody>
@@ -285,6 +291,34 @@
     </div>
   </div>
 
+  <div class="wh-modal-mask" id="taskCreateMask" aria-hidden="true">
+    <div class="wh-modal-box wh-modal-box--lg" role="dialog" aria-modal="true" aria-labelledby="taskCreateTitle">
+      <div class="wh-modal-head">
+        <h3 class="wh-modal-title" id="taskCreateTitle">新增盘点任务</h3>
+        <button type="button" class="wh-modal-close" data-close aria-label="关闭">×</button>
+      </div>
+      <div class="wh-modal-body">
+        <div class="inv-modal-grid">
+          <div class="wh-field"><label class="wh-label">盘点单号</label><input class="wh-input" id="createNo" readonly></div>
+          <div class="wh-field"><label class="wh-label">盘点任务名称</label><input class="wh-input" id="createName" placeholder="请输入盘点任务名称"></div>
+          <div class="wh-field"><label class="wh-label">盘点类型</label><select class="wh-input" id="createType"><option>部门盘点</option><option>公司盘点</option></select></div>
+          <div class="wh-field"><label class="wh-label">盘点部门</label><select class="wh-input" id="createDept"><option>机械研究所</option><option>电气控制所</option><option>经营发展中心</option><option>全部业务部门</option></select></div>
+          <div class="wh-field"><label class="wh-label">盘点范围</label><input class="wh-input" id="createScope" value="本部门在库及已领用物资"></div>
+          <div class="wh-field"><label class="wh-label">资产类型范围</label><select class="wh-input" id="createAssetRange"><option>固定资产、存货、无形资产</option><option>固定资产</option><option>存货</option><option>无形资产</option><option>全部</option></select></div>
+          <div class="wh-field"><label class="wh-label">计划开始日期</label><input class="wh-input" id="createStart" type="date" value="2026-07-08"></div>
+          <div class="wh-field"><label class="wh-label">计划结束日期</label><input class="wh-input" id="createEnd" type="date" value="2026-07-12"></div>
+          <div class="wh-field"><label class="wh-label">发起人</label><input class="wh-input" id="createOwner" value="宋中波"></div>
+          <div class="wh-field"><label class="wh-label">负责人</label><input class="wh-input" id="createResp" value="王超"></div>
+          <div class="wh-field"><label class="wh-label">应盘数量</label><input class="wh-input" id="createShould" value="0"></div>
+          <div class="wh-field"><label class="wh-label">已盘数量</label><input class="wh-input" id="createDone" readonly value="0"></div>
+          <div class="wh-field"><label class="wh-label">差异数量</label><input class="wh-input" id="createDiff" readonly value="0"></div>
+          <div class="wh-field"><label class="wh-label">任务状态</label><input class="wh-input" id="createStatus" readonly value="待开始"></div>
+        </div>
+      </div>
+      <div class="wh-modal-foot"><button type="button" class="wh-btn wh-btn--ghost" data-close>取消</button><button type="button" class="wh-btn wh-btn--primary" id="btnCreateSave">确定</button></div>
+    </div>
+  </div>
+
   <div class="wh-modal-mask" id="materialCheckMask" aria-hidden="true">
     <div class="wh-modal-box wh-modal-box--lg" role="dialog" aria-modal="true" aria-labelledby="materialCheckTitle">
       <div class="wh-modal-head">
@@ -295,6 +329,13 @@
         </div>
       </div>
       <div class="wh-modal-body">
+        <div class="inv-auto-grid">
+          <div class="wh-field"><label class="wh-label">盘点单号</label><input class="wh-input" id="mcNo" readonly></div>
+          <div class="wh-field"><label class="wh-label">所属仓库</label><input class="wh-input" id="mcWarehouse" readonly></div>
+          <div class="wh-field"><label class="wh-label">所属库区</label><input class="wh-input" id="mcArea" readonly></div>
+          <div class="wh-field"><label class="wh-label">操作人</label><input class="wh-input" id="mcOperator" readonly></div>
+          <div class="wh-field"><label class="wh-label">盘点时间</label><input class="wh-input" id="mcCheckTime" readonly></div>
+        </div>
         <div class="inv-material-filters">
           <div class="wh-field"><label class="wh-label">盘点类型</label><select class="wh-input" id="mcAssetType"><option>全部</option><option>部门盘点</option><option>公司盘点</option></select></div>
           <div class="wh-field"><label class="wh-label">所属仓库/存放地点</label><input class="wh-input" id="mcLoc" placeholder="请输入仓库或存放地点"></div>
@@ -421,6 +462,33 @@
       function taskActions(row) {
         return '<span class="inv-op"><span role="button" tabindex="0" data-inv-act="view" data-id="' + row.id + '">查看</span></span>';
       }
+      function splitLocation(loc) {
+        var text = cell(loc);
+        var parts = text.split("/");
+        var tail = parts[parts.length - 1] || text;
+        var match = tail.match(/^(.+?)([A-Z])-\d+/);
+        return {
+          warehouse: parts.length > 1 ? parts[1] : tail,
+          area: match ? match[1] + match[2] + "区" : (parts.length > 1 ? parts[1] : tail),
+          slot: tail
+        };
+      }
+      function taskWarehouse(row) {
+        var list = linesForTask(row);
+        var loc = list[0] ? list[0].loc : "";
+        return splitLocation(loc).warehouse;
+      }
+      function taskArea(row) {
+        var list = linesForTask(row);
+        var loc = list[0] ? list[0].loc : "";
+        return splitLocation(loc).area;
+      }
+      function taskCheckTime(row) {
+        return row && row.start ? row.start + " 09:00" : "2026-07-08 09:00";
+      }
+      function nextTaskNo() {
+        return "PD-2026-" + String(rows.length + 1).padStart(3, "0");
+      }
       function responsiblePerson(row) {
         if (row.type === "公司盘点") return row.materialOwner || "宋中波";
         return row.deptHead || row.owner || "-";
@@ -498,7 +566,8 @@
       }
       function renderLedger() {
         document.getElementById("ledgerBody").innerHTML = lines.map(function (x, i) {
-          return '<tr class="' + (x.lineStatus === "有差异" ? "inv-row-diff" : "") + '"><td>' + (i + 1) + '</td><td>' + x.assetNo + '</td><td>' + x.code + '</td><td>' + x.typeCode + '</td><td>' + x.product + '</td><td>' + x.materialTypeName + '</td><td>' + x.assetName + '</td><td>' + x.spec + '</td><td>' + x.dept + '</td><td>' + x.loc + '</td><td>' + x.user + '</td><td>' + x.state + '</td><td>' + x.health + '</td><td>' + x.lastNo + '</td><td>' + x.lastDate + '</td><td>' + x.book + '</td><td>' + x.real + '</td><td>' + resultText(x.result) + '</td><td>' + lineActions(x, false) + '</td></tr>';
+          var loc = splitLocation(x.loc);
+          return '<tr class="' + (x.lineStatus === "有差异" ? "inv-row-diff" : "") + '"><td>' + (i + 1) + '</td><td>' + x.lastNo + '</td><td>' + x.assetNo + '</td><td>' + x.code + '</td><td>' + x.typeCode + '</td><td>' + x.product + '</td><td>' + x.assetName + '</td><td>' + x.materialTypeName + '</td><td>' + x.dept + '</td><td>' + loc.warehouse + '</td><td>' + loc.area + '</td><td>' + x.loc + '</td><td>' + x.user + '</td><td>' + x.state + '</td><td>' + x.book + '</td><td>' + x.real + '</td><td>' + resultText(x.result) + '</td><td>' + resultText(x.diffType || x.result) + '</td><td>' + (x.operator || x.user) + '</td><td>' + (x.checkTime || (x.lastDate + " 09:00")) + '</td><td>' + lineActions(x, false) + '</td></tr>';
         }).join("");
       }
       function open(mask) {
@@ -687,10 +756,58 @@
         }).join("");
         document.getElementById("materialCheckEmpty").hidden = list.length > 0;
       }
+      function openCreateTask() {
+        document.getElementById("createNo").value = nextTaskNo();
+        document.getElementById("createName").value = "";
+        document.getElementById("createType").value = "部门盘点";
+        document.getElementById("createDept").value = "机械研究所";
+        document.getElementById("createScope").value = "本部门在库及已领用物资";
+        document.getElementById("createAssetRange").value = "固定资产、存货、无形资产";
+        document.getElementById("createStart").value = "2026-07-08";
+        document.getElementById("createEnd").value = "2026-07-12";
+        document.getElementById("createOwner").value = "宋中波";
+        document.getElementById("createResp").value = "王超";
+        document.getElementById("createShould").value = "0";
+        document.getElementById("createDone").value = "0";
+        document.getElementById("createDiff").value = "0";
+        document.getElementById("createStatus").value = "待开始";
+        open(document.getElementById("taskCreateMask"));
+      }
+      function saveCreateTask() {
+        var type = document.getElementById("createType").value;
+        var dept = document.getElementById("createDept").value;
+        var owner = document.getElementById("createOwner").value || "宋中波";
+        rows.unshift({
+          id: Date.now(),
+          no: document.getElementById("createNo").value,
+          name: document.getElementById("createName").value || (dept + "盘点任务"),
+          type: type,
+          dept: dept,
+          scope: document.getElementById("createScope").value,
+          assetTypeRange: document.getElementById("createAssetRange").value,
+          start: document.getElementById("createStart").value,
+          end: document.getElementById("createEnd").value,
+          owner: owner,
+          deptHead: document.getElementById("createResp").value || "王超",
+          materialOwner: "宋中波",
+          financeHead: type === "公司盘点" ? "孙睿" : "",
+          should: Number(document.getElementById("createShould").value || 0),
+          done: 0,
+          diff: 0,
+          status: "待开始"
+        });
+        close(document.getElementById("taskCreateMask"));
+        renderTable();
+      }
       function openMaterialCheck(row) {
         state.current = row || state.current || getRows()[0] || rows[0];
         var isCompany = normalizeFlowType(state.current) === "company";
         document.getElementById("materialCheckTitle").textContent = isCompany ? "公司物资盘点明细" : "物料盘点明细";
+        document.getElementById("mcNo").value = state.current.no;
+        document.getElementById("mcWarehouse").value = taskWarehouse(state.current);
+        document.getElementById("mcArea").value = taskArea(state.current);
+        document.getElementById("mcOperator").value = state.current.owner || "宋中波";
+        document.getElementById("mcCheckTime").value = taskCheckTime(state.current);
         document.getElementById("mcAssetType").value = state.current.type || "全部";
         ["mcLoc", "mcName"].forEach(function (id) { document.getElementById(id).value = ""; });
         renderMaterialCheck();
@@ -738,6 +855,24 @@
       function openConfirm(line, mode) {
         state.currentLine = line;
         document.getElementById("confirmTitle").textContent = mode === "diff" ? "登记盘点差异" : (mode === "view" ? "盘点明细查看" : "逐条盘点确认");
+        if (mode === "view") {
+          var locInfo = splitLocation(line.loc);
+          document.getElementById("confirmCode").value = line.assetNo + " / " + line.code;
+          document.getElementById("confirmHealth").value = line.health === "待复核" ? "待复核" : "完好";
+          document.getElementById("confirmSame").value = line.lineStatus === "有差异" ? "不一致" : "一致";
+          document.getElementById("confirmLoc").value = line.loc;
+          document.getElementById("confirmUser").value = line.user;
+          document.getElementById("confirmDiffType").value = line.diffType || "无差异";
+          document.getElementById("confirmBookValue").value = "盘点单号：" + line.lastNo + "；所属仓库：" + locInfo.warehouse + "；所属库区：" + locInfo.area;
+          document.getElementById("confirmRealValue").value = "账面数量：" + line.book + "；实盘数量：" + line.real + "；盘点时间：" + (line.checkTime || (line.lastDate + " 09:00"));
+          document.getElementById("confirmDept").value = line.dept;
+          document.getElementById("confirmOwner").value = line.operator || line.user;
+          document.getElementById("confirmReason").value = line.reason || "";
+          document.getElementById("confirmAdvice").value = line.lineStatus === "有差异" ? "进入盘点差异处理" : "台帐归档";
+          document.getElementById("confirmAttachment").value = "盘点照片/库位图已归档";
+          open(document.getElementById("confirmMask"));
+          return;
+        }
         document.getElementById("confirmCode").value = line.assetNo + " / " + line.code;
         document.getElementById("confirmHealth").value = line.health === "待复核" ? "待复核" : "完好";
         document.getElementById("confirmSame").value = line.lineStatus === "有差异" ? "不一致" : "一致";
@@ -782,6 +917,14 @@
         }
         if (e.target.closest("#btnStartInventory")) {
           openMaterialCheck(currentTaskForAction());
+          return;
+        }
+        if (e.target.closest("#btnCreateTask")) {
+          openCreateTask();
+          return;
+        }
+        if (e.target.id === "btnCreateSave") {
+          saveCreateTask();
           return;
         }
         if (e.target.id === "btnMaterialQuery") {
@@ -848,6 +991,15 @@
           var row = rows.find(function (x) { return String(x.id) === op.getAttribute("data-id"); });
           if (!row) return;
           if (op.getAttribute("data-inv-act") === "view") openTaskInfo(row);
+        }
+      });
+      document.addEventListener("change", function (e) {
+        if (e.target.id === "createType") {
+          var isCompanyCreate = e.target.value === "公司盘点";
+          document.getElementById("createDept").value = isCompanyCreate ? "全部业务部门" : "机械研究所";
+          document.getElementById("createScope").value = isCompanyCreate ? "公司所有已入库、未入库物资" : "本部门在库及已领用物资";
+          document.getElementById("createResp").value = isCompanyCreate ? "王超" : "李仁堂";
+          document.getElementById("createOwner").value = isCompanyCreate ? "宋中波" : "许学良";
         }
       });
       var startBtn = document.getElementById("btnStartInventory");
