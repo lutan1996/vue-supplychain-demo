@@ -12,10 +12,6 @@
   <style>
     body.page-inventory-task .main-scroll { background: #f5f7fa; }
     .inv-wrap { padding: 12px 16px 20px; }
-    .inv-kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin-bottom: 10px; }
-    .inv-kpi { background: #fff; border: 1px solid #e8e8e8; border-radius: 8px; padding: 12px 14px; }
-    .inv-kpi b { display: block; font-size: 12px; color: #60728b; font-weight: 600; }
-    .inv-kpi span { display: block; margin-top: 6px; font-size: 22px; font-weight: 700; color: #1677ff; }
     .inv-panel { background: #fff; border: 1px solid #e8e8e8; border-radius: 8px; overflow: hidden; }
     .inv-filters { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; padding: 12px 16px 8px; }
     .inv-filters input,
@@ -147,7 +143,6 @@
     .inv-approval-list { margin-top: 20px; color: #51657d; font-size: 14px; font-weight: 400; line-height: 1.9; }
     .inv-approval-line { margin: 0 0 4px; }
     @media (max-width: 1100px) {
-      .inv-kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .inv-filters { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .inv-track-flow { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .inv-material-task-summary,
@@ -187,7 +182,6 @@
       <main class="main-scroll">
         <h1 class="carrier-page-title">盘点任务管理</h1>
         <div class="inv-wrap">
-          <div class="inv-kpis" id="kpis"></div>
           <div class="inv-tabs" role="tablist" aria-label="盘点任务页签">
             <button type="button" class="inv-tab is-active" data-inv-tab="task" role="tab" aria-selected="true">盘点任务</button>
             <button type="button" class="inv-tab" data-inv-tab="ledger" role="tab" aria-selected="false">盘点台帐</button>
@@ -496,17 +490,8 @@
           pane.classList.toggle("is-active", pane.getAttribute("data-approval-pane") === key);
         });
       }
-      function renderKpis(list) {
-        document.getElementById("kpis").innerHTML = [
-          ["盘点任务总数", rows.length],
-          ["进行中任务", rows.filter(function (x) { return x.status !== "待开始" && x.status !== "已完成"; }).length],
-          ["待处理差异", rows.reduce(function (s, x) { return s + x.diff; }, 0)],
-          ["已完成任务", rows.filter(function (x) { return x.status === "已完成"; }).length]
-        ].map(function (x) { return '<div class="inv-kpi"><b>' + x[0] + '</b><span>' + x[1] + '</span></div>'; }).join("");
-      }
       function renderTable() {
         var list = getRows();
-        renderKpis(list);
         document.getElementById("tbody").innerHTML = list.map(function (x, i) {
           return '<tr><td>' + (i + 1) + '</td><td>' + x.no + '</td><td>' + x.name + '</td><td>' + x.type + '</td><td>' + x.dept + '</td><td>' + x.scope + '</td><td>' + (x.assetTypeRange || "全部") + '</td><td>' + x.start + '</td><td>' + x.end + '</td><td>' + x.owner + '</td><td>' + responsiblePerson(x) + '</td><td>' + x.should + '</td><td>' + x.done + '</td><td>' + x.diff + '</td><td>' + tag(x.status) + '</td><td>' + taskActions(x) + '</td></tr>';
         }).join("");
