@@ -2791,7 +2791,7 @@
 
     function hasVisibleModal() {
       return !!document.querySelector(
-        ".modal-mask.show, .proc-modal-mask.show, .proc-modal-mask.is-open, .cm-modal-mask.show, .ppm-modal-mask.show, .map-flow-mask.show, #map-global-action-fallback.show"
+        ".modal-mask.show, .proc-modal-mask.show, .proc-modal-mask.is-open, .cm-modal-mask.show, .ppm-modal-mask.show, .wh-modal-mask.is-open, .map-flow-mask.show, #map-global-action-fallback.show"
       );
     }
 
@@ -3293,6 +3293,8 @@
             if (file === "return-exchange-management.html") return;
             // 物资领用走页面原生弹窗（新增领用/内部流转/可选物资等）
             if (file === "purchase-ledger.html") return;
+            // 盘点管理两页使用页面原生弹窗，避免全局兜底弹窗覆盖明细表操作列
+            if (file === "inventory-task-management.html" || file === "inventory-difference-handling.html") return;
             // 订单需求管理（m3）走页面原生弹窗（新增同款），不使用全局统一弹窗
             if (
               file === "material-procurement-hub.html" &&
@@ -3329,6 +3331,7 @@
             if (file === "proj-company-inbound.html") return;
             if (file === "contract-management.html") return;
             if (file === "return-exchange-management.html") return;
+            if (file === "inventory-task-management.html" || file === "inventory-difference-handling.html") return;
             var inTableArea = !!(btn.closest && (btn.closest("table") || btn.closest(".carrier-toolbar,.search-row,.filters,.map-ledger-actions,.toolbar,.toolbar-left,.toolbar-right,.actions,.carrier-head,.card")));
             if (!inTableArea) return;
             if (actionLabel === "编辑" && tryOpenEditUsingAddTemplate(btn)) {

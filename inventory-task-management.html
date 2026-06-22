@@ -171,7 +171,7 @@
       <div class="wh-modal-body">
         <div class="wh-detail-grid" id="detailGrid"></div>
         <div class="inv-table-title">盘点物资明细表</div>
-        <div style="overflow:auto">
+        <div style="overflow:auto" data-skip-demo-unify>
           <table class="inv-detail-table">
             <thead><tr><th>物资唯一码</th><th>物资类型编码</th><th>产品编码</th><th>物资名称</th><th>规格型号</th><th>账面位置</th><th>账面数量</th><th>实盘数量</th><th>盘点结果</th><th>操作</th></tr></thead>
             <tbody id="detailLines"></tbody>
@@ -240,13 +240,13 @@
       }
       function lineActions(line) {
         var buttons = [
-          '<button data-line-act="track" data-code="' + line.code + '">物资跟踪</button>',
-          '<button data-line-act="record" data-code="' + line.code + '">盘点记录</button>',
-          '<button data-line-act="ledger" data-code="' + line.code + '">台帐详情</button>'
+          '<button type="button" data-line-act="track" data-code="' + line.code + '">物资跟踪</button>',
+          '<button type="button" data-line-act="record" data-code="' + line.code + '">盘点记录</button>',
+          '<button type="button" data-line-act="ledger" data-code="' + line.code + '">台帐详情</button>'
         ];
         if (line.result !== "账实相符") {
-          buttons.push('<button data-line-act="diff" data-code="' + line.code + '">生成差异</button>');
-          buttons.push('<button data-line-act="handle" data-code="' + line.code + '">差异处理</button>');
+          buttons.push('<button type="button" data-line-act="diff" data-code="' + line.code + '">生成差异</button>');
+          buttons.push('<button type="button" data-line-act="handle" data-code="' + line.code + '">差异处理</button>');
         }
         return '<span class="inv-op">' + buttons.join("") + '</span>';
       }
