@@ -280,7 +280,7 @@
       salesNav.parentNode.insertBefore(el, salesNav.nextSibling);
     }
 
-    // 统一左侧主菜单：首页、我的待办 + 一级业务模块（含实物管理）+ 基础数据管理
+    // 统一左侧主菜单：首页、我的任务 + 一级业务模块（含实物管理）+ 基础数据管理
     (function ensureFullSidebar() {
       if (sidebar.getAttribute("data-demo-sidebar-master-v8") === "1") {
         ensurePhysicalMgmtNavItem();
@@ -290,7 +290,7 @@
       sidebar.setAttribute("data-demo-sidebar-master-v8", "1");
       sidebar.innerHTML =
         '<div class="nav-item" title="首页"><span class="nav-label">首页</span></div>' +
-        '<div class="nav-item" title="我的待办"><span class="nav-label">我的待办</span></div>' +
+        '<div class="nav-item" title="我的任务"><span class="nav-label">我的任务</span></div>' +
         '<div class="nav-item" title="物资采购"><span class="nav-label">物资采购</span></div>' +
         '<div class="nav-item" title="实物管理"><span class="nav-label">实物管理</span></div>' +
         '<div class="nav-item" title="销售管理"><span class="nav-label">销售管理</span></div>' +
@@ -511,7 +511,7 @@
         aclModuleKey: "cockpit"
       },
       taskTodoTop: {
-        text: "我的待办",
+        text: "我的任务",
         panel: secondaryPanel,
         rowHtml:
           '<button type="button" class="warehouse-secondary-link" data-action="task-initiated" data-label="我发起的">我发起的</button>' +
@@ -1154,7 +1154,7 @@
       var navHome = findNavByText("首页");
       if (navHome) navHome.classList.add("nav-item--module-active");
     } else if (isMyTasksPage) {
-      var navTodo = findNavByText("我的待办");
+      var navTodo = findNavByText("我的任务");
       if (navTodo) navTodo.classList.add("nav-item--module-active");
     } else if (currentModule && modules[currentModule]) {
       var effectiveModule = currentModule;
