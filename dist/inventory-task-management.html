@@ -352,7 +352,7 @@
         buttons.push('<span role="button" tabindex="0" data-inv-act="export-detail" data-id="' + row.id + '">导出明细</span>');
         return '<span class="inv-op">' + buttons.join("") + '</span>';
       }
-      function lineActions(line) {
+      function lineActions(line, showTrack) {
         var buttons = ['<span role="button" tabindex="0" data-line-act="view" data-code="' + line.code + '">查看</span>'];
         if (line.lineStatus === "未盘点") {
           buttons.push('<span role="button" tabindex="0" data-line-act="ok" data-code="' + line.code + '">确认一致</span>');
@@ -361,7 +361,7 @@
           buttons.push('<span role="button" tabindex="0" data-line-act="reason" data-code="' + line.code + '">差异原因</span>');
           buttons.push('<span role="button" tabindex="0" data-line-act="handle" data-code="' + line.code + '">去处理</span>');
         }
-        buttons.push('<span role="button" tabindex="0" data-line-act="track" data-code="' + line.code + '">物资跟踪</span>');
+        if (showTrack !== false) buttons.push('<span role="button" tabindex="0" data-line-act="track" data-code="' + line.code + '">物资跟踪</span>');
         return '<span class="inv-op">' + buttons.join("") + '</span>';
       }
       function getRows() {
@@ -441,7 +441,7 @@
       }
       function renderLedger() {
         document.getElementById("ledgerBody").innerHTML = lines.map(function (x, i) {
-          return '<tr class="' + (x.lineStatus === "有差异" ? "inv-row-diff" : "") + '"><td>' + (i + 1) + '</td><td>' + x.assetNo + '</td><td>' + x.code + '</td><td>' + x.typeCode + '</td><td>' + x.product + '</td><td>' + x.materialTypeName + '</td><td>' + x.assetName + '</td><td>' + x.spec + '</td><td>' + x.dept + '</td><td>' + x.loc + '</td><td>' + x.user + '</td><td>' + x.state + '</td><td>' + x.health + '</td><td>' + x.lastNo + '</td><td>' + x.lastDate + '</td><td>' + x.book + '</td><td>' + x.real + '</td><td>' + resultText(x.result) + '</td><td>' + lineActions(x) + '</td></tr>';
+          return '<tr class="' + (x.lineStatus === "有差异" ? "inv-row-diff" : "") + '"><td>' + (i + 1) + '</td><td>' + x.assetNo + '</td><td>' + x.code + '</td><td>' + x.typeCode + '</td><td>' + x.product + '</td><td>' + x.materialTypeName + '</td><td>' + x.assetName + '</td><td>' + x.spec + '</td><td>' + x.dept + '</td><td>' + x.loc + '</td><td>' + x.user + '</td><td>' + x.state + '</td><td>' + x.health + '</td><td>' + x.lastNo + '</td><td>' + x.lastDate + '</td><td>' + x.book + '</td><td>' + x.real + '</td><td>' + resultText(x.result) + '</td><td>' + lineActions(x, false) + '</td></tr>';
         }).join("");
       }
       function open(mask) {
