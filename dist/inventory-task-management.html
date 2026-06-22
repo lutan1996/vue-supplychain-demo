@@ -82,21 +82,15 @@
     .inv-material-task-summary .inv-side-item { background: #f7fbff; }
     .inv-material-filters { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px 14px; align-items: end; }
     .inv-material-filters .wh-field { margin-bottom: 0; }
-    .inv-material-layout { display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: 12px; align-items: stretch; }
-    .inv-material-list { min-width: 0; }
-    .inv-material-table { width: 100%; min-width: 2400px; border-collapse: collapse; table-layout: auto; font-size: 12px; }
-    .inv-material-table th, .inv-material-table td { border: 1px solid #1677ff33; padding: 8px; color: #262626; text-align: left; white-space: nowrap; }
+    .inv-material-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 10px; }
+    .inv-material-table-wrap { overflow: auto; margin-top: 8px; }
+    .inv-material-table { width: 100%; min-width: 1880px; border-collapse: collapse; table-layout: fixed; font-size: 12px; }
+    .inv-material-table th, .inv-material-table td { border: 1px solid #1677ff33; padding: 8px 6px; color: #262626; text-align: left; white-space: normal; word-break: break-all; vertical-align: top; line-height: 1.45; }
     .inv-material-table th { background: #f5f7fa; color: #334155; }
     .inv-material-empty { padding: 46px 0; text-align: center; color: #8c8c8c; border: 1px solid #e8eef7; border-top: 0; }
-    .inv-material-map { border: 1px solid #d9e8ff; border-radius: 8px; background: linear-gradient(180deg, #f7fbff 0%, #fff 100%); padding: 12px; min-height: 360px; }
-    .inv-material-map-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; border-bottom: 1px solid #eef2f7; padding-bottom: 10px; margin-bottom: 12px; }
-    .inv-material-map-head h4 { margin: 0; color: #1f2d3d; font-size: 14px; }
-    .inv-material-map-head p { margin: 4px 0 0; color: #64748b; font-size: 12px; line-height: 1.45; }
-    .inv-material-shelves { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
-    .inv-material-shelf { border: 1px solid #91caff; border-radius: 8px; background: #fff; overflow: hidden; }
-    .inv-material-shelf b { display: block; background: #e6f4ff; color: #0958d9; font-size: 12px; padding: 8px; text-align: center; }
-    .inv-material-shelf span { display: block; height: 38px; border-top: 1px solid #d9e8ff; color: #64748b; font-size: 12px; line-height: 38px; text-align: center; }
-    .inv-material-shelf span.is-active { background: #1677ff; color: #fff; font-weight: 700; }
+    .inv-material-cell-input, .inv-material-cell-select, .inv-material-cell-textarea { width: 100%; min-width: 0; border: 1px solid #d9d9d9; border-radius: 4px; font: inherit; color: #262626; background: #fff; box-sizing: border-box; }
+    .inv-material-cell-input, .inv-material-cell-select { height: 30px; padding: 0 8px; }
+    .inv-material-cell-textarea { min-height: 54px; padding: 6px 8px; resize: vertical; }
     .inv-modal-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px 18px; }
     .inv-modal-grid .wh-field { margin-bottom: 0; }
     .inv-modal-title-line { display: inline-flex; align-items: center; gap: 10px; min-width: 0; }
@@ -126,7 +120,6 @@
       .inv-kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .inv-filters { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .inv-track-flow { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-      .inv-material-layout { grid-template-columns: 1fr; }
       .inv-material-task-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .inv-task-view-layout { grid-template-columns: 1fr; }
       .inv-task-location-grid { grid-template-columns: 1fr; }
@@ -269,7 +262,13 @@
 
   <div class="wh-modal-mask" id="materialCheckMask" aria-hidden="true">
     <div class="wh-modal-box wh-modal-box--lg" role="dialog" aria-modal="true" aria-labelledby="materialCheckTitle">
-      <div class="wh-modal-head"><h3 class="wh-modal-title" id="materialCheckTitle">物料盘点明细</h3><button type="button" class="wh-modal-close" data-close aria-label="关闭">×</button></div>
+      <div class="wh-modal-head">
+        <div class="inv-modal-title-line">
+          <h3 class="wh-modal-title" id="materialCheckTitle">物料盘点明细</h3>
+          <span role="button" tabindex="0" class="inv-head-action" id="btnMaterialFlow">流程进度</span>
+        </div>
+        <button type="button" class="wh-modal-close" data-close aria-label="关闭">×</button>
+      </div>
       <div class="wh-modal-body">
         <div class="inv-material-task-summary" id="materialTaskSummary"></div>
         <div class="inv-material-filters">
@@ -285,31 +284,35 @@
           <div class="wh-field"><label class="wh-label">&nbsp;</label><button type="button" class="inv-btn primary" id="btnMaterialQuery">查询</button></div>
         </div>
         <div class="inv-rule-box">系统按盘点部门、资产类型和物资唯一码生成本次盘点清单，数据来源包括产品目录、采购合同、收货入库、库存管理、扫码领用、部门流转和最近盘库结果。</div>
-        <div class="inv-table-title">盘点物资明细表</div>
-        <div class="inv-material-layout">
-          <div class="inv-material-list">
-            <div style="overflow:auto">
-              <table class="inv-material-table">
-                <thead><tr><th>序号</th><th>资产编号</th><th>物资唯一码</th><th>物资类型编码</th><th>产品编码</th><th>物资名称</th><th>规格型号</th><th>物资类型名称</th><th>所属部门</th><th>存储地点/仓库货位</th><th>使用人/负责人</th><th>在库/领用状态</th><th>账面数量</th><th>盘点确认数量</th><th>单位</th><th>状态是否完好</th><th>盘点结果</th><th>差异说明</th></tr></thead>
-                <tbody id="materialCheckBody"></tbody>
-              </table>
-              <div class="inv-material-empty" id="materialCheckEmpty" hidden>暂无数据</div>
-            </div>
-          </div>
-          <aside class="inv-material-map">
-            <div class="inv-material-map-head">
-              <div>
-                <h4>库位图</h4>
-                <p id="materialMapText">按盘点清单展示当前仓库/存放地点。</p>
-              </div>
-            </div>
-            <div class="inv-material-shelves">
-              <div class="inv-material-shelf"><b>第一货架</b><span class="is-active">1层</span><span>2层</span><span>3层</span></div>
-              <div class="inv-material-shelf"><b>第二货架</b><span>1层</span><span>2层</span><span>3层</span></div>
-              <div class="inv-material-shelf"><b>第三货架</b><span>1层</span><span class="is-active">2层</span><span>3层</span></div>
-              <div class="inv-material-shelf"><b>第四货架</b><span>1层</span><span>2层</span><span>3层</span></div>
-            </div>
-          </aside>
+        <div class="inv-material-toolbar">
+          <div class="inv-table-title" style="margin:0">盘点物资明细表</div>
+        </div>
+        <div class="inv-material-table-wrap">
+          <table class="inv-material-table">
+            <colgroup>
+              <col style="width:72px">
+              <col style="width:118px">
+              <col style="width:132px">
+              <col style="width:124px">
+              <col style="width:118px">
+              <col style="width:124px">
+              <col style="width:126px">
+              <col style="width:104px">
+              <col style="width:112px">
+              <col style="width:148px">
+              <col style="width:128px">
+              <col style="width:110px">
+              <col style="width:90px">
+              <col style="width:116px">
+              <col style="width:78px">
+              <col style="width:124px">
+              <col style="width:118px">
+              <col style="width:170px">
+            </colgroup>
+            <thead><tr><th>序号</th><th>资产编号</th><th>物资唯一码</th><th>物资类型编码</th><th>产品编码</th><th>物资名称</th><th>规格型号</th><th>物资类型名称</th><th>所属部门</th><th>存储地点/仓库货位</th><th>使用人/负责人</th><th>在库/领用状态</th><th>账面数量</th><th>盘点确认数量</th><th>单位</th><th>状态是否完好</th><th>盘点结果</th><th>差异说明</th></tr></thead>
+            <tbody id="materialCheckBody"></tbody>
+          </table>
+          <div class="inv-material-empty" id="materialCheckEmpty" hidden>暂无数据</div>
         </div>
       </div>
       <div class="wh-modal-foot"><button type="button" class="wh-btn wh-btn--ghost" data-close>取消</button><button type="button" class="wh-btn wh-btn--primary" id="btnMaterialSubmit">盘点提交</button></div>
@@ -604,11 +607,28 @@
       function renderMaterialCheck() {
         var list = materialRows();
         document.getElementById("materialCheckBody").innerHTML = list.map(function (x, i) {
-          return '<tr><td>' + (i + 1) + '</td><td>' + cell(x.assetNo) + '</td><td>' + cell(x.code) + '</td><td>' + cell(x.typeCode) + '</td><td>' + cell(x.product) + '</td><td>' + cell(x.assetName) + '</td><td>' + cell(x.spec) + '</td><td>' + cell(x.materialTypeName) + '</td><td>' + cell(x.dept) + '</td><td>' + cell(x.loc) + '</td><td>' + cell(x.user) + '</td><td>' + cell(x.state) + '</td><td>' + cell(x.book) + '</td><td>' + cell(x.confirmQty || x.real) + '</td><td>' + cell(x.unit || "件") + '</td><td>' + cell(x.health) + '</td><td>' + resultText(x.result) + '</td><td>' + cell(x.reason) + '</td></tr>';
+          return '<tr>' +
+            '<td>' + (i + 1) + '</td>' +
+            '<td>' + cell(x.assetNo) + '</td>' +
+            '<td>' + cell(x.code) + '</td>' +
+            '<td>' + cell(x.typeCode) + '</td>' +
+            '<td>' + cell(x.product) + '</td>' +
+            '<td>' + cell(x.assetName) + '</td>' +
+            '<td>' + cell(x.spec) + '</td>' +
+            '<td>' + cell(x.materialTypeName) + '</td>' +
+            '<td>' + cell(x.dept) + '</td>' +
+            '<td><input class="inv-material-cell-input" value="' + cell(x.loc) + '"></td>' +
+            '<td><input class="inv-material-cell-input" value="' + cell(x.user) + '"></td>' +
+            '<td>' + cell(x.state) + '</td>' +
+            '<td>' + cell(x.book) + '</td>' +
+            '<td><input class="inv-material-cell-input" value="' + cell(x.confirmQty || x.real) + '"></td>' +
+            '<td>' + cell(x.unit || "件") + '</td>' +
+            '<td><select class="inv-material-cell-select"><option' + ((x.health === "完好" || !x.health) ? ' selected' : '') + '>完好</option><option' + (x.health === "待复核" ? ' selected' : '') + '>待复核</option><option' + (x.health === "损坏" ? ' selected' : '') + '>损坏</option><option' + (x.health === "缺失" ? ' selected' : '') + '>缺失</option></select></td>' +
+            '<td><select class="inv-material-cell-select"><option' + ((x.result === "账实相符" || x.result === "无差异") ? ' selected' : '') + '>账实相符</option><option' + (x.result === "盘亏" ? ' selected' : '') + '>盘亏</option><option' + (x.result === "盘盈" ? ' selected' : '') + '>盘盈</option><option' + (x.result === "位置不符" ? ' selected' : '') + '>位置不符</option><option' + (x.result === "未盘点" ? ' selected' : '') + '>未盘点</option></select></td>' +
+            '<td><textarea class="inv-material-cell-textarea" placeholder="手动填写差异说明">' + (x.reason || '') + '</textarea></td>' +
+          '</tr>';
         }).join("");
         document.getElementById("materialCheckEmpty").hidden = list.length > 0;
-        var first = list[0] || {};
-        document.getElementById("materialMapText").textContent = first.assetName ? first.assetName + "，当前位置：" + first.loc : "当前筛选条件下暂无物资，调整条件后重新查询。";
       }
       function openMaterialCheck(row) {
         state.current = row || state.current || getRows()[0] || rows[0];
@@ -641,9 +661,12 @@
       }
       function openFlow(row) {
         state.current = row || state.current || rows[0];
+        if (state.current && state.current.type === "公司盘点") {
+          state.current = Object.assign({}, state.current, { type: "部门盘点" });
+        }
         var steps = flowStepsFor(state.current);
         var activeIndex = flowIndex(state.current);
-        document.getElementById("flowTitle").textContent = normalizeFlowType(state.current) === "company" ? "审批记录 - 公司盘点" : "审批记录 - 部门盘点";
+        document.getElementById("flowTitle").textContent = "审批记录 - 部门盘点";
         document.getElementById("flowSteps").innerHTML = steps.map(function (step, i) {
           var cls = i < activeIndex ? " done" : (i === activeIndex ? " active" : "");
           var arrow = i < steps.length - 1 ? '<span class="inv-arrow">→</span>' : "";
@@ -652,7 +675,7 @@
         document.getElementById("approvalInfoBody").innerHTML = approvalRowsFor(state.current).map(function (x) {
           return '<tr><td>' + x.node + '</td><td>' + x.person + '</td><td>' + x.time + '</td><td>' + x.result + '</td><td>' + x.opinion + '</td></tr>';
         }).join("");
-        document.getElementById("flowNote").textContent = state.current.no + "，当前状态：" + state.current.status + "；当前流程严格按" + (normalizeFlowType(state.current) === "company" ? "公司物资盘点" : "部门物资盘点") + "执行。";
+        document.getElementById("flowNote").textContent = state.current.no + "，当前状态：" + state.current.status + "；当前流程严格按部门物资盘点执行。";
         switchApprovalTab("flow");
         open(document.getElementById("flowMask"));
       }
@@ -730,6 +753,7 @@
           return;
         }
         if (e.target.id === "btnDetailFlow") openFlow(state.current || rows[0]);
+        if (e.target.id === "btnMaterialFlow") openFlow(state.current || rows[0]);
         if (e.target.id === "btnSearch") {
           state.filters = { no: fNo.value.trim(), dept: fDept.value, type: fType.value, status: fStatus.value, owner: fKeeper.value.trim() };
           renderTable();
