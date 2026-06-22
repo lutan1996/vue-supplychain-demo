@@ -47,8 +47,12 @@
     .diff-form-grid .wh-input[readonly], .diff-modal-grid .wh-input[readonly] { background: #f5f7fa; color: #595959; cursor: default; }
     .diff-modal-title-line { display: inline-flex; align-items: center; gap: 10px; min-width: 0; flex: 1 1 auto; }
     .diff-modal-head-actions { display: inline-flex; align-items: center; gap: 8px; }
-    .diff-head-action { display: inline-flex; align-items: center; border: 0 !important; background: transparent !important; color: #1677ff !important; padding: 0 !important; font-size: 13px; font-weight: 600; line-height: 1; cursor: pointer; font-family: inherit; text-decoration: none; box-shadow: none !important; }
-    .diff-head-action:hover { color: #0958d9; text-decoration: none; }
+    .diff-head-action,
+    .page-inventory-diff .inv-head-action,
+    .page-inventory-diff #btnFlowProgress { display: inline-flex !important; align-items: center; border: 0 !important; background: transparent !important; color: #1677ff !important; padding: 0 !important; font-size: 13px !important; font-weight: 600 !important; line-height: 1 !important; cursor: pointer; font-family: inherit; text-decoration: none !important; box-shadow: none !important; border-radius: 0 !important; height: auto !important; min-width: 0 !important; }
+    .diff-head-action:hover,
+    .page-inventory-diff .inv-head-action:hover,
+    .page-inventory-diff #btnFlowProgress:hover { color: #0958d9 !important; text-decoration: none !important; background: transparent !important; border-color: transparent !important; }
     .diff-table-title { margin: 14px 0 8px; color: #334155; font-size: 13px; font-weight: 600; }
     .page-inventory-diff .wh-modal-box--lg { width: min(97vw, 1760px); max-width: 97vw; }
     .page-inventory-diff #detailMask .wh-modal-box { width: min(98vw, 1920px); max-width: 98vw; }
@@ -62,14 +66,23 @@
     .diff-approval-tab.is-active { color: #1677ff; border-bottom: 2px solid #1677ff; font-weight: 600; }
     .diff-approval-pane { display: none; }
     .diff-approval-pane.is-active { display: block; }
-    .diff-flow { overflow-x: auto; border: 1px solid #eef2f7; border-radius: 8px; padding: 30px 24px; margin-top: 20px; background: #fff; }
-    .diff-flow-row { display: inline-flex; align-items: center; min-width: 1980px; gap: 26px; }
-    .diff-step { flex: 0 0 132px; width: 132px; min-height: 112px; display: flex; align-items: center; justify-content: center; text-align: center; border: 1px solid #c8e6ce; border-radius: 10px; padding: 10px 12px; font-size: 13px; font-weight: 400; color: #426b45; line-height: 1.45; background: #f0fbf0; }
-    .diff-step strong { color: inherit; font-size: 13px; font-weight: 400; }
-    .diff-step span { display: none; }
-    .diff-step.done, .diff-step.active { border-color: #c8e6ce; color: #426b45; background: #f0fbf0; }
-    .diff-arrow { flex: 0 0 auto; color: #8aa0b8; font-size: 24px; line-height: 1; }
-    .diff-flow-note { display: none; }
+    .diff-flow,
+    .page-inventory-diff .inv-flow { overflow-x: auto; border: 1px solid #eef2f7; border-radius: 8px; padding: 30px 24px; margin-top: 20px; background: #fff; }
+    .diff-flow-row,
+    .page-inventory-diff .inv-flow-row { display: inline-flex; align-items: center; min-width: 1980px; gap: 26px; }
+    .diff-step,
+    .page-inventory-diff .inv-step { flex: 0 0 132px; width: 132px; min-height: 112px; display: flex; align-items: center; justify-content: center; text-align: center; border: 1px solid #c8e6ce; border-radius: 10px; padding: 10px 12px; font-size: 13px; font-weight: 400; color: #426b45; line-height: 1.45; background: #f0fbf0; }
+    .diff-step strong,
+    .page-inventory-diff .inv-step strong { color: inherit; font-size: 13px; font-weight: 400; }
+    .diff-step span,
+    .page-inventory-diff .inv-step span { display: none; }
+    .diff-step.done, .diff-step.active,
+    .page-inventory-diff .inv-step.done,
+    .page-inventory-diff .inv-step.active { border-color: #c8e6ce; color: #426b45; background: #f0fbf0; }
+    .diff-arrow,
+    .page-inventory-diff .inv-arrow { flex: 0 0 auto; color: #8aa0b8; font-size: 24px; line-height: 1; }
+    .diff-flow-note,
+    .page-inventory-diff .inv-flow-note { display: none; }
     .diff-approval-table { width: 100%; border-collapse: collapse; table-layout: fixed; font-size: 12px; margin-top: 14px; }
     .diff-approval-table th, .diff-approval-table td { border: 1px solid #e8e8e8; padding: 8px; text-align: left; color: #262626; vertical-align: top; }
     .diff-approval-table th { background: #f5f7fa; color: #334155; white-space: nowrap; }
@@ -149,7 +162,7 @@
       <div class="wh-modal-head">
         <div class="diff-modal-title-line">
           <h3 class="wh-modal-title" id="detailTitle">差异详情</h3>
-          <span role="button" tabindex="0" class="diff-head-action" id="btnFlowProgress">流程进度</span>
+          <span role="button" tabindex="0" class="inv-head-action" id="btnFlowProgress">流程进度</span>
         </div>
         <div class="diff-modal-head-actions">
           <button type="button" class="wh-modal-close" data-close aria-label="关闭">×</button>
@@ -188,8 +201,8 @@
           <button type="button" class="diff-approval-tab" data-approval-tab="info">审批信息</button>
         </div>
         <div class="diff-approval-pane is-active" data-approval-pane="flow">
-          <div class="diff-flow"><div class="diff-flow-row" id="flowSteps"></div></div>
-          <div class="diff-flow-note" id="flowNote"></div>
+          <div class="inv-flow"><div class="inv-flow-row" id="flowSteps"></div></div>
+          <div class="inv-flow-note" id="flowNote"></div>
         </div>
         <div class="diff-approval-pane" data-approval-pane="info">
           <table class="diff-approval-table">
@@ -400,8 +413,8 @@
         document.getElementById("flowTitle").textContent = normalizeFlowType(state.current) === "company" ? "审批记录 - 公司盘点" : "审批记录 - 部门盘点";
         document.getElementById("flowSteps").innerHTML = steps.map(function (step, i) {
           var cls = i < activeIndex ? " done" : (i === activeIndex ? " active" : "");
-          var arrow = i < steps.length - 1 ? '<span class="diff-arrow">→</span>' : "";
-          return '<div class="diff-step' + cls + '"><strong>' + step.name + '</strong><span>' + step.person + '</span></div>' + arrow;
+          var arrow = i < steps.length - 1 ? '<span class="inv-arrow">→</span>' : "";
+          return '<div class="inv-step' + cls + '"><strong>' + step.name + '</strong><span>' + step.person + '</span></div>' + arrow;
         }).join("");
         document.getElementById("approvalInfoBody").innerHTML = approvalRowsFor(state.current).map(function (x) {
           return '<tr><td>' + x.node + '</td><td>' + x.person + '</td><td>' + x.time + '</td><td>' + x.result + '</td><td>' + x.opinion + '</td></tr>';
