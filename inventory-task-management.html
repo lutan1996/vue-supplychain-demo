@@ -637,11 +637,11 @@
         var panel = document.getElementById("taskTrackPanel");
         if (!panel) return;
         panel.hidden = false;
-        panel.innerHTML = '<h4>物资跟踪</h4><div class="inv-task-track-list">' +
-          '<div class="inv-task-track-item">2026.4.20 入库：' + cell(line.assetName) + '（' + cell(line.product) + '）<span class="inv-task-track-sub">存放' + cell(line.loc) + '</span></div>' +
-          '<div class="inv-task-track-item">2026.5.10 被' + cell(line.dept) + '领用<span class="inv-task-track-sub">领用人/负责人：' + cell(line.user) + '</span></div>' +
-          '<div class="inv-task-track-item">2026.5.12 使用人变更（初始保管人 → ' + cell(line.user) + '）<span class="inv-task-track-sub">变更原因：岗位调整</span></div>' +
-          '<div class="inv-task-track-item">2026.5.18 存放位置复核<span class="inv-task-track-sub">当前位置：' + cell(line.loc) + '；盘点结果：' + cell(line.result) + '</span></div>' +
+        panel.innerHTML = '<h4>物资跟踪 - ' + cell(line.assetName) + '</h4><div class="inv-task-track-list">' +
+          '<div class="inv-task-track-item">2026.4.20 入库：' + cell(line.assetName) + '（' + cell(line.product) + '）<span class="inv-task-track-sub">入库时间：2026.4.20 10:18；入库地点：' + cell(line.loc) + '；入库单号：RK-2026-0420；办理人：宋中波</span></div>' +
+          '<div class="inv-task-track-item">2026.5.10 被' + cell(line.dept) + '领用<span class="inv-task-track-sub">领用时间：2026.5.10 15:08；领用单号：LY-2026-0510；领用部门：' + cell(line.dept) + '；领用人/负责人：' + cell(line.user) + '</span></div>' +
+          '<div class="inv-task-track-item">2026.5.12 使用人变更（初始保管人 → ' + cell(line.user) + '）<span class="inv-task-track-sub">变更时间：2026.5.12 09:20；原存放地点：' + cell(line.loc) + '；变更人：部门物资专责；接收人：' + cell(line.user) + '；变更原因：岗位调整</span></div>' +
+          '<div class="inv-task-track-item">2026.5.18 存放位置复核<span class="inv-task-track-sub">复核时间：2026.5.18 14:36；当前位置：' + cell(line.loc) + '；复核人：' + cell(line.user) + '；盘点结果：' + cell(line.result) + '</span></div>' +
         '</div>';
       }
       function taskField(label, value, isHtml) {
