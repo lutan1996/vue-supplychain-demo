@@ -588,10 +588,48 @@
           '<div class="inv-table-title">盘点物资明细表</div>',
           '<div class="inv-task-mini-table-wrap"><table class="inv-task-mini-table"><thead><tr><th>序号</th><th>资产编号</th><th>物资唯一码</th><th>物资类型编码</th><th>产品编码</th><th>物资名称</th><th>物资类型名称</th><th>所属部门</th><th>存储地点/仓库货位</th><th>使用人</th><th>在库/领用状态</th><th>账面数量</th><th>盘点确认数量</th><th>单位</th><th>状态是否完好</th><th>盘点结果</th><th>差异说明</th><th>操作</th></tr></thead><tbody>' +
             list.map(function (x, i) {
-              return '<tr><td>' + (i + 1) + '</td><td>' + cell(x.assetNo) + '</td><td>' + cell(x.code) + '</td><td>' + cell(x.typeCode) + '</td><td>' + cell(x.product) + '</td><td>' + cell(x.assetName) + '</td><td>' + cell(x.materialTypeName) + '</td><td>' + cell(x.dept) + '</td><td>' + cell(x.loc) + '</td><td>' + cell(x.user) + '</td><td>' + cell(x.state) + '</td><td>' + cell(x.book) + '</td><td>' + cell(x.confirmQty || x.real) + '</td><td>' + cell(x.unit || "件") + '</td><td>' + cell(x.health) + '</td><td>' + cell(x.result) + '</td><td>' + cell(x.reason) + '</td><td><span class="inv-op"><span role="button" tabindex="0" data-task-track="' + x.code + '">物资跟踪</span></span></td></tr>';
+              return '<tr><td>' + (i + 1) + '</td><td>' + cell(x.assetNo) + '</td><td>' + cell(x.code) + '</td><td>' + cell(x.typeCode) + '</td><td>' + cell(x.product) + '</td><td>' + cell(x.assetName) + '</td><td>' + cell(x.materialTypeName) + '</td><td>' + cell(x.dept) + '</td><td>' + cell(x.loc) + '</td><td>' + cell(x.user) + '</td><td>' + cell(x.state) + '</td><td>' + cell(x.book) + '</td><td>' + cell(x.confirmQty || x.real) + '</td><td>' + cell(x.unit || "件") + '</td><td>' + cell(x.health) + '</td><td>' + cell(x.result) + '</td><td>' + cell(x.reason) + '</td><td><span class="inv-op"><span role="button" tabindex="0" data-task-view="' + x.code + '">查看</span><span role="button" tabindex="0" data-task-track="' + x.code + '">物资跟踪</span></span></td></tr>';
             }).join("") +
           '</tbody></table></div>',
           '<div class="inv-task-track-panel" id="taskTrackPanel" hidden></div>'
+        ].join("");
+        open(document.getElementById("taskInfoMask"));
+      }
+      function openMaterialInfo(line) {
+        state.currentLine = line;
+        document.getElementById("taskInfoTitle").textContent = "物资信息";
+        document.getElementById("taskInfoBody").innerHTML = [
+          '<div class="inv-task-view-layout">',
+            '<div class="inv-task-view-fields">',
+              taskField("物资名称", line.assetName),
+              taskField("规格型号", line.spec),
+              taskField("物资类型名称", line.materialTypeName),
+              taskField("物资类型编码", line.typeCode),
+              taskField("产品编码", line.product),
+              taskField("物资唯一码", line.code),
+              taskField("资产编号", line.assetNo),
+              taskField("所属部门", line.dept),
+              taskField("存放地点", line.loc),
+              taskField("使用人", line.user),
+              taskField("库存数量", cell(line.confirmQty || line.real) + cell(line.unit || "件")),
+              taskField("在库/领用状态", statusPillText(line)),
+              taskField("状态是否完好", line.health),
+              taskField("盘点结果", line.result),
+            '</div>',
+            '<div>',
+              '<div class="inv-task-media">',
+                '<img class="inv-task-photo" src="' + inventoryPhoto(line) + '" alt="' + cell(line.assetName) + '">',
+              '</div>',
+              '<div class="inv-task-location-panel">',
+                '<div class="inv-task-location-title">库位图</div>',
+                '<div class="inv-task-location-grid">' +
+                  locationCard("A区货架", 1) +
+                  locationCard("B区货架", 2) +
+                  locationCard("C区货架", 3) +
+                '</div>',
+              '</div>',
+            '</div>',
+          '</div>'
         ].join("");
         open(document.getElementById("taskInfoMask"));
       }
@@ -798,6 +836,11 @@
         var taskTrack = e.target.closest("[data-task-track]");
         if (taskTrack) {
           renderTaskTrack(findLine(taskTrack.getAttribute("data-task-track")));
+          return;
+        }
+        var taskView = e.target.closest("[data-task-view]");
+        if (taskView) {
+          openMaterialInfo(findLine(taskView.getAttribute("data-task-view")));
           return;
         }
         var op = e.target.closest("[data-inv-act]");

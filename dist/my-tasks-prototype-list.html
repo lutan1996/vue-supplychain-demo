@@ -318,6 +318,79 @@
       background: #1890ff;
       color: #fff;
     }
+    #procModalMask .proc-btn-danger {
+      border-color: #ff4d4f;
+      color: #ff4d4f;
+      background: #fff;
+    }
+    #procModalMask.inventory-handle-mode .proc-modal-box {
+      max-width: min(1320px, 98vw);
+      width: 100%;
+      margin: 3vh auto;
+      max-height: 94vh;
+      border-radius: 4px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);
+    }
+    #procModalMask.inventory-handle-mode .proc-modal-head {
+      background: #fff;
+      border-bottom-color: #e8eef5;
+    }
+    #procModalMask.inventory-handle-mode #procModalTitle {
+      font-size: 16px;
+      font-weight: 600;
+      color: #1f3551;
+    }
+    #procModalMask.inventory-handle-mode .proc-modal-flow-btn {
+      display: inline-flex;
+      align-items: center;
+      border: 0;
+      background: transparent;
+      color: #1677ff;
+      padding: 0;
+      font-size: 13px;
+      cursor: pointer;
+      margin-left: auto;
+    }
+    #procModalMask.inventory-handle-mode .inv-todo-flow {
+      padding: 10px 12px;
+      margin-bottom: 12px;
+      border: 1px solid #e8eef5;
+      border-radius: 4px;
+      background: #fff;
+    }
+    #procModalMask.inventory-handle-mode .inv-todo-flow-title {
+      margin: 0 0 10px;
+      color: #1f3551;
+      font-size: 14px;
+      font-weight: 600;
+    }
+    #procModalMask.inventory-handle-mode .inv-todo-flow-row {
+      display: flex;
+      gap: 8px;
+      align-items: stretch;
+      overflow: auto;
+      padding-bottom: 4px;
+    }
+    #procModalMask.inventory-handle-mode .inv-todo-step {
+      min-width: 136px;
+      border: 1px solid #d9e8f5;
+      border-radius: 4px;
+      padding: 8px;
+      color: #3f5366;
+      background: #f8fbff;
+      line-height: 1.45;
+      font-size: 12px;
+    }
+    #procModalMask.inventory-handle-mode .inv-todo-step.is-active {
+      border-color: #1890ff;
+      color: #0958d9;
+      background: #e6f4ff;
+    }
+    #procModalMask.inventory-handle-mode .inv-todo-step span {
+      display: block;
+      margin-top: 4px;
+      color: #6b7280;
+    }
     #procModalMask.qa-accept-mode .qa-accept-wrap {
       padding: 12px 16px 14px;
       background: #f5f7fa;
@@ -677,16 +750,18 @@
           page: "10条/页",
           pageBtns: ["1", "2", "3"],
           rows: [
-            ["", "1", "库存管理审批", "kcglsp", "库存管理审批", "业务部门专责", "待审批", "2024-12-09 11:02:22", "handle"],
-            ["", "2", "库存管理审批", "kcglsp", "库存管理审批", "业务部门专责", "待审批", "2024-12-09 11:06:33", "handle"],
-            ["", "3", "库存管理审批", "kcglsp", "库存管理审批", "业务部门专责", "待审批", "2024-12-09 11:12:30", "handle"],
-            ["", "4", "领用申请审批", "lysqsp", "领用申请审批", "业务部门专责", "待审批", "2024-12-09 11:17:23", "handle"],
-            ["", "5", "库存管理审批", "kcglsp", "库存管理审批", "业务部门专责", "待审批", "2024-12-09 11:20:06", "handle"],
-            ["", "6", "订单需求管理审批", "ddxqglsp", "订单需求管理审批", "业务部门专责", "待审批", "2024-12-09 11:24:38", "handle"],
-            ["", "7", "录入销售合同单号", "xshtsp", "录入销售合同单号", "业务部门专责", "待审批", "2024-12-09 11:28:42", "handle"],
-            ["", "8", "录入物流单号", "fhglsp", "录入物流单号", "业务部门专责", "待审批", "2024-12-09 11:31:36", "handle"],
-            ["", "9", "货物质量验收审批", "hwzlyspsp", "货物质量验收审批", "业务部门专责", "待审批", "2024-12-09 11:35:00", "handle"],
-            ["", "10", "退换货管理审批", "thhglsp", "退换货管理审批", "业务部门专责", "待审批", "2024-12-09 11:42:11", "handle"]
+            ["", "1", "盘点任务审批", "pdtask_dept", "机械研究所部门盘点负责人审阅", "李仁堂", "待审批", "2026-06-25 10:30:00", "handle"],
+            ["", "2", "盘点任务审批", "pdtask_company", "公司二季度物资盘点财务负责人审阅", "孙睿", "待审批", "2026-06-28 15:30:00", "handle"],
+            ["", "3", "库存管理审批", "kcglsp", "库存管理审批", "业务部门专责", "待审批", "2024-12-09 11:02:22", "handle"],
+            ["", "4", "库存管理审批", "kcglsp", "库存管理审批", "业务部门专责", "待审批", "2024-12-09 11:06:33", "handle"],
+            ["", "5", "库存管理审批", "kcglsp", "库存管理审批", "业务部门专责", "待审批", "2024-12-09 11:12:30", "handle"],
+            ["", "6", "领用申请审批", "lysqsp", "领用申请审批", "业务部门专责", "待审批", "2024-12-09 11:17:23", "handle"],
+            ["", "7", "库存管理审批", "kcglsp", "库存管理审批", "业务部门专责", "待审批", "2024-12-09 11:20:06", "handle"],
+            ["", "8", "订单需求管理审批", "ddxqglsp", "订单需求管理审批", "业务部门专责", "待审批", "2024-12-09 11:24:38", "handle"],
+            ["", "9", "录入销售合同单号", "xshtsp", "录入销售合同单号", "业务部门专责", "待审批", "2024-12-09 11:28:42", "handle"],
+            ["", "10", "录入物流单号", "fhglsp", "录入物流单号", "业务部门专责", "待审批", "2024-12-09 11:31:36", "handle"],
+            ["", "11", "货物质量验收审批", "hwzlyspsp", "货物质量验收审批", "业务部门专责", "待审批", "2024-12-09 11:35:00", "handle"],
+            ["", "12", "退换货管理审批", "thhglsp", "退换货管理审批", "业务部门专责", "待审批", "2024-12-09 11:42:11", "handle"]
           ]
         },
         done: {
@@ -1030,6 +1105,163 @@
         var mask = mt$("mtQaAcceptMask");
         if (mask && mask.classList.contains("is-open")) closeMtQaAcceptModal();
       });
+      function mtEsc(v) {
+        return String(v == null || v === "" ? "-" : v)
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;");
+      }
+      var inventoryTodoLines = [
+        { assetNo: "ZC-2026-0001", code: "C20260000001", typeCode: "A0010020001", product: "B00001234", name: "变桨轴承", typeName: "固定资产", dept: "机械研究所", loc: "机械研究所/华北主仓A-01", user: "李仁堂", state: "在库", book: 1, confirm: 1, unit: "台", health: "完好", result: "账实相符", reason: "" },
+        { assetNo: "ZC-2026-0002", code: "C20260000002", typeCode: "A0010020002", product: "B00001235", name: "齿轮箱滤芯", typeName: "存货", dept: "机械研究所", loc: "机械研究所/华北主仓A-03", user: "许学良", state: "在库", book: 12, confirm: 10, unit: "件", health: "完好", result: "盘亏", reason: "账面数量与实盘数量不一致，需进入盘点差异处理" },
+        { assetNo: "ZC-2026-0003", code: "C20260000003", typeCode: "A0020010006", product: "B00001888", name: "变频器模块", typeName: "存货", dept: "电气控制所", loc: "电气控制所/备用柜", user: "成明锴", state: "已入库", book: 2, confirm: 3, unit: "件", health: "待复核", result: "盘盈", reason: "现场多出一件未入账物资，需核对采购合同和入库记录" },
+        { assetNo: "ZC-2026-0011", code: "C20260000011", typeCode: "A0030010004", product: "B00002119", name: "偏航电机", typeName: "固定资产", dept: "现场服务中心", loc: "现场服务中心/张北场站", user: "喻家敏", state: "已领用", book: 1, confirm: 1, unit: "台", health: "完好", result: "位置不符", reason: "实物已流转但系统台账位置未同步" }
+      ];
+      function inventoryTodoFlow(isCompany, map) {
+        if (isCompany) {
+          return [
+            ["发起公司物资盘点", "宋中波", "已通过"],
+            ["生成公司物资清单", "系统", "已通过"],
+            ["物资管理部门负责人同意", "王超", "已通过"],
+            ["物资管理部门分配人员", "王超、宋中波", "已通过"],
+            ["业务部门同意并分配", "陈亮、李仁堂、王贺", "已通过"],
+            ["参与人员收到流程", "宋中波、杜欣鑫、成明锴、许学良、喻家敏", "已通过"],
+            ["三方逐条共同确认", "物资、财务、业务三方", "已通过"],
+            ["财务负责人审阅", map["办理人"] || "孙睿", "处理中"],
+            ["物资管理部门负责人审阅", "王超", "待处理"],
+            ["物资专责阅知并结束", "宋中波", "待处理"]
+          ];
+        }
+        return [
+          ["盘点开始", "许学良", "已通过"],
+          ["生成部门所属物资清单", "系统", "已通过"],
+          ["部门物资专责逐条确认", "许学良", "已通过"],
+          ["部门负责人审阅", map["办理人"] || "李仁堂", "处理中"],
+          ["物资专责审阅确认", "宋中波", "待处理"],
+          ["部门盘点结束", "宋中波", "待处理"]
+        ];
+      }
+      function inventoryTodoTask(isCompany, map) {
+        if (isCompany) {
+          return {
+            no: "PD-2026-002",
+            name: "公司二季度物资全面盘点",
+            type: "公司盘点",
+            dept: "全部业务部门",
+            scope: "公司所有已入库、未入库物资",
+            assetRange: "固定资产、存货、无形资产",
+            start: "2026-06-28",
+            end: "2026-07-03",
+            initiator: "宋中波",
+            owner: "孙睿",
+            node: "财务负责人审阅",
+            next: "物资管理部门负责人审阅",
+            caliber: "物资、财务、业务三方共同确认",
+            status: map["流程状态"] || "待审批"
+          };
+        }
+        return {
+          no: "PD-2026-001",
+          name: "机械研究所二季度部门盘点",
+          type: "部门盘点",
+          dept: "机械研究所",
+          scope: "本部门在库及已领用物资",
+          assetRange: "固定资产、存货、无形资产",
+          start: "2026-06-25",
+          end: "2026-06-30",
+          initiator: "许学良",
+          owner: "李仁堂",
+          node: "部门负责人审阅",
+          next: "物资管理部门物资专责审阅确认",
+          caliber: "部门物资专责逐条确认",
+          status: map["流程状态"] || "待审批"
+        };
+      }
+      function inventoryTodoRows(isCompany) {
+        return inventoryTodoLines.filter(function (x) {
+          return isCompany || x.dept === "机械研究所";
+        });
+      }
+      function inventoryTodoField(label, value) {
+        return '<td class="qa-lab">' + mtEsc(label) + '</td><td class="qa-val"><div class="qa-inp qa-inp--auto">' + mtEsc(value) + '</div></td>';
+      }
+      function inventoryTodoHtml(map) {
+        var isCompany = String(map["流程定义KEY"] || "").indexOf("company") >= 0 || String(map["任务名称"] || "").indexOf("公司") >= 0;
+        var task = inventoryTodoTask(isCompany, map);
+        var lines = inventoryTodoRows(isCompany);
+        var flow = inventoryTodoFlow(isCompany, map);
+        var flowHtml = flow.map(function (x) {
+          return '<div class="inv-todo-step' + (x[2] === "处理中" ? " is-active" : "") + '">' + mtEsc(x[0]) + '<span>' + mtEsc(x[1]) + " / " + mtEsc(x[2]) + '</span></div>';
+        }).join("");
+        var rowsHtml = lines.map(function (x, i) {
+          return '<tr><td>' + (i + 1) + '</td><td>' + mtEsc(x.assetNo) + '</td><td>' + mtEsc(x.code) + '</td><td>' + mtEsc(x.typeCode) + '</td><td>' + mtEsc(x.product) + '</td><td>' + mtEsc(x.name) + '</td><td>' + mtEsc(x.typeName) + '</td><td>' + mtEsc(x.dept) + '</td><td>' + mtEsc(x.loc) + '</td><td>' + mtEsc(x.user) + '</td><td>' + mtEsc(x.state) + '</td><td>' + mtEsc(x.book) + '</td><td>' + mtEsc(x.confirm) + '</td><td>' + mtEsc(x.unit) + '</td><td>' + mtEsc(x.health) + '</td><td>' + mtEsc(x.result) + '</td><td>' + mtEsc(x.reason) + '</td></tr>';
+        }).join("");
+        return '<div class="qa-accept-wrap">' +
+          '<div class="qa-accept-toolbar"><div class="qa-accept-toolbar-title">盘点任务办理</div></div>' +
+          '<div class="inv-todo-flow"><div class="inv-todo-flow-title">' + (isCompany ? "公司物资盘点流程" : "部门物资盘点流程") + '</div><div class="inv-todo-flow-row">' + flowHtml + '</div></div>' +
+          '<div class="qa-accept-form-shell"><table class="qa-accept-grid" role="presentation"><tbody>' +
+          '<tr>' + inventoryTodoField("盘点单号", task.no) + inventoryTodoField("盘点任务名称", task.name) + '</tr>' +
+          '<tr>' + inventoryTodoField("盘点类型", task.type) + inventoryTodoField("盘点部门", task.dept) + '</tr>' +
+          '<tr>' + inventoryTodoField("盘点范围", task.scope) + inventoryTodoField("资产类型范围", task.assetRange) + '</tr>' +
+          '<tr>' + inventoryTodoField("计划开始日期", task.start) + inventoryTodoField("计划结束日期", task.end) + '</tr>' +
+          '<tr>' + inventoryTodoField("发起人", task.initiator) + inventoryTodoField("办理人", map["办理人"] || task.owner) + '</tr>' +
+          '<tr>' + inventoryTodoField("当前节点", task.node) + inventoryTodoField("下一节点", task.next) + '</tr>' +
+          '<tr>' + inventoryTodoField("确认口径", task.caliber) + inventoryTodoField("当前状态", task.status) + '</tr>' +
+          '<tr><td class="qa-lab">办理意见</td><td class="qa-val" colspan="3"><textarea class="qa-ta" id="inventoryTodoOpinion" rows="2" placeholder="请输入办理意见"></textarea></td></tr>' +
+          '</tbody></table></div>' +
+          '<div class="qa-mat-lines-block qa-mat-lines-block--readonly qa-mat-detail-list-block">' +
+          '<div style="font-size:14px;font-weight:600;color:#1f3551;margin-bottom:8px;">盘点物资明细表</div>' +
+          '<div class="qa-mat-lines-table-wrap"><table class="qa-mat-lines-table"><thead><tr><th>序号</th><th>资产编号</th><th>物资唯一码</th><th>物资类型编码</th><th>产品编码</th><th>物资名称</th><th>物资类型名称</th><th>所属部门</th><th>存储地点/仓库货位</th><th>使用人</th><th>在库/领用状态</th><th>账面数量</th><th>盘点确认数量</th><th>单位</th><th>状态是否完好</th><th>盘点结果</th><th>差异说明</th></tr></thead><tbody>' + rowsHtml + '</tbody></table></div>' +
+          '</div></div>';
+      }
+      function closeInventoryTodoModal() {
+        var mask = mt$("procModalMask");
+        if (!mask) return;
+        mask.classList.remove("is-open", "inventory-handle-mode", "qa-accept-mode");
+        mask.setAttribute("aria-hidden", "true");
+        mt$("procModalBody").innerHTML = "";
+        mt$("procModalFoot").innerHTML = '<button type="button" class="proc-btn" id="procModalClose">取消</button>';
+        var flowBtn = mt$("procModalFlow");
+        if (flowBtn) {
+          flowBtn.hidden = true;
+          flowBtn.setAttribute("aria-hidden", "true");
+          flowBtn.onclick = null;
+        }
+        var resetClose = mt$("procModalClose");
+        if (resetClose) resetClose.onclick = closeInventoryTodoModal;
+      }
+      function openInventoryTodoHandleModal(map) {
+        var mask = mt$("procModalMask");
+        if (!mask) return;
+        mt$("procModalTitle").textContent = "办理 · 盘点任务审批";
+        mt$("procModalBody").innerHTML = inventoryTodoHtml(map);
+        mt$("procModalFoot").innerHTML =
+          '<button type="button" class="proc-btn" id="inventoryTodoCancel">取消</button>' +
+          '<button type="button" class="proc-btn proc-btn-danger" id="inventoryTodoReject">驳回</button>' +
+          '<button type="button" class="proc-btn proc-btn-primary" id="inventoryTodoApprove">通过</button>';
+        var flowBtn = mt$("procModalFlow");
+        if (flowBtn) {
+          flowBtn.hidden = false;
+          flowBtn.setAttribute("aria-hidden", "false");
+          flowBtn.onclick = function () {
+            var block = document.querySelector("#procModalMask .inv-todo-flow");
+            if (block) block.scrollIntoView({ behavior: "smooth", block: "start" });
+          };
+        }
+        mask.classList.add("is-open", "inventory-handle-mode");
+        mask.setAttribute("aria-hidden", "false");
+        var cancel = mt$("inventoryTodoCancel");
+        var reject = mt$("inventoryTodoReject");
+        var approve = mt$("inventoryTodoApprove");
+        if (cancel) cancel.onclick = closeInventoryTodoModal;
+        if (reject) reject.onclick = function () { mtQaToast("已驳回（演示）"); closeInventoryTodoModal(); };
+        if (approve) approve.onclick = function () { mtQaToast("已通过（演示）"); closeInventoryTodoModal(); };
+      }
+      var procCloseBtn = mt$("procModalClose");
+      var procXBtn = mt$("procModalX");
+      if (procCloseBtn) procCloseBtn.onclick = closeInventoryTodoModal;
+      if (procXBtn) procXBtn.onclick = closeInventoryTodoModal;
 
       document.getElementById("mtTitle").textContent = cfg.title;
       var s = document.getElementById("mtSearch");
@@ -1265,6 +1497,10 @@
                   "退换货管理审批": 1
                 };
                 var procKey = map["流程定义KEY"] || "";
+                if (procName === "盘点任务审批" || procKey.indexOf("pdtask_") === 0) {
+                  openInventoryTodoHandleModal(map);
+                  return;
+                }
                 if (procKey.indexOf("handoff_") === 0) {
                   var hid = procKey.replace(/^handoff_/, "");
                   var destH =
