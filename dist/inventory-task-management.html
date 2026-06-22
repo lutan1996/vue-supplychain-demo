@@ -743,15 +743,15 @@
             '<td>' + cell(x.assetName) + '</td>' +
             '<td>' + cell(x.materialTypeName) + '</td>' +
             '<td>' + cell(x.dept) + '</td>' +
-            '<td><input class="inv-material-cell-input" value="' + cell(x.loc) + '"></td>' +
-            '<td><input class="inv-material-cell-input" value="' + cell(x.user) + '"></td>' +
+            '<td><input class="inv-material-cell-input" value="" placeholder="手动确认存储地点"></td>' +
+            '<td><input class="inv-material-cell-input" value="" placeholder="手动确认使用人"></td>' +
             '<td>' + cell(x.state) + '</td>' +
             '<td>' + cell(x.book) + '</td>' +
-            '<td><input class="inv-material-cell-input" value="' + cell(x.confirmQty || x.real) + '"></td>' +
+            '<td><input class="inv-material-cell-input" value="" placeholder="手动填写"></td>' +
             '<td>' + cell(x.unit || "件") + '</td>' +
-            '<td><select class="inv-material-cell-select"><option' + ((x.health === "完好" || !x.health) ? ' selected' : '') + '>完好</option><option' + (x.health === "待复核" ? ' selected' : '') + '>待复核</option><option' + (x.health === "损坏" ? ' selected' : '') + '>损坏</option><option' + (x.health === "缺失" ? ' selected' : '') + '>缺失</option></select></td>' +
-            '<td><select class="inv-material-cell-select"><option' + ((x.result === "账实相符" || x.result === "无差异") ? ' selected' : '') + '>账实相符</option><option' + (x.result === "盘亏" ? ' selected' : '') + '>盘亏</option><option' + (x.result === "盘盈" ? ' selected' : '') + '>盘盈</option><option' + (x.result === "位置不符" ? ' selected' : '') + '>位置不符</option><option' + (x.result === "未盘点" ? ' selected' : '') + '>未盘点</option></select></td>' +
-            '<td><textarea class="inv-material-cell-textarea" placeholder="手动填写差异说明">' + (x.reason || '') + '</textarea></td>' +
+            '<td><select class="inv-material-cell-select"><option value="">请选择</option><option>完好</option><option>待复核</option><option>损坏</option><option>缺失</option></select></td>' +
+            '<td><select class="inv-material-cell-select"><option value="">请选择</option><option>账实相符</option><option>盘亏</option><option>盘盈</option><option>位置不符</option><option>未盘点</option></select></td>' +
+            '<td><textarea class="inv-material-cell-textarea" placeholder="手动填写差异说明"></textarea></td>' +
           '</tr>';
         }).join("");
         document.getElementById("materialCheckEmpty").hidden = list.length > 0;
