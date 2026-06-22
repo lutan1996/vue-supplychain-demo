@@ -63,6 +63,14 @@
     .inv-task-field { display: grid; grid-template-columns: 110px minmax(0, 1fr); align-items: center; gap: 10px; color: #111; }
     .inv-task-field span { color: #111; font-size: 13px; line-height: 1.5; }
     .inv-task-field b { color: #111; font-size: 13px; font-weight: 600; line-height: 1.5; word-break: break-all; }
+    .inv-task-info-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px 14px; }
+    .inv-task-info-grid .inv-task-field { display: block; }
+    .inv-task-info-grid .inv-task-field span { display: block; margin-bottom: 6px; color: #516a87; font-weight: 600; }
+    .inv-task-info-grid .inv-task-field b { display: flex; align-items: center; min-height: 36px; box-sizing: border-box; border: 1px solid #d9d9d9; border-radius: 4px; background: #fff; color: #262626; padding: 0 12px; font-weight: 400; }
+    .inv-task-mini-table-wrap { overflow: auto; margin-top: 8px; }
+    .inv-task-mini-table { width: 100%; min-width: 1560px; border-collapse: collapse; table-layout: fixed; font-size: 12px; }
+    .inv-task-mini-table th, .inv-task-mini-table td { border: 1px solid #e8e8e8; padding: 8px 6px; color: #262626; text-align: left; white-space: normal; word-break: break-all; line-height: 1.45; }
+    .inv-task-mini-table th { background: #f5f7fa; color: #334155; }
     .inv-task-status-pill { display: inline-flex; align-items: center; justify-content: center; min-width: 56px; height: 28px; padding: 0 14px; border-radius: 6px; font-size: 13px; font-weight: 600; border: 1px solid #36cfc9; color: #08979c; background: #e6fffb; }
     .inv-task-media { border: 1px solid #d9e8ff; border-radius: 6px; background: #fff; padding: 12px; }
     .inv-task-photo { width: 100%; aspect-ratio: 16 / 9; border: 1px solid #d9e8ff; border-radius: 4px; overflow: hidden; background: #f7f7f7; }
@@ -570,35 +578,32 @@
       function openTaskInfo(row) {
         state.current = row;
         var list = taskLines(row);
-        var first = list[0] || lines[0];
         var isCompany = normalizeFlowType(row) === "company";
-        document.getElementById("taskInfoTitle").textContent = isCompany ? "公司盘点物资信息" : cell(first.assetName || row.name);
+        document.getElementById("taskInfoTitle").textContent = "盘点任务详情";
         document.getElementById("taskInfoBody").innerHTML = [
-          '<div class="inv-task-view-layout">' +
-            '<div class="inv-task-view-fields">' +
-              taskField("规格型号", first.spec) +
-              taskField("库存数量", String(cell(first.real)) + " / " + String(cell(first.book))) +
-              taskField("所在库区", first.dept) +
-              taskField("任务状态", cell(row.status)) +
-              taskField("盘点类型", cell(row.type)) +
-              taskField("清单范围", isCompany ? "公司所有已入库、未入库物资" : row.dept + "所属物资") +
-              taskField("库存状态", '<span class="inv-task-status-pill">' + statusPillText(first) + '</span>', true) +
-              taskField("存放位置", first.loc) +
-              taskField("制造厂商", first.materialTypeName === "无形资产" ? "系统授权" : "国家能源供应商目录") +
-              taskField("确认口径", isCompany ? "物资、财务、业务三方共同确认" : "部门物资专责逐条确认") +
-              taskField("物资唯一码", first.code) +
-              taskField("产品编码", first.product) +
-            '</div>' +
-            '<div class="inv-task-media">' +
-              '<div class="inv-task-photo"><img src="' + inventoryPhoto(first) + '" alt="' + cell(first.assetName) + '"></div>' +
-              '<div class="inv-task-photo-note">物资名称：' + cell(first.assetName) + '　资产编号：' + cell(first.assetNo) + '　物资类型编码：' + cell(first.typeCode) + '</div>' +
-            '</div>' +
+          '<div class="inv-task-info-grid">' +
+            taskField("盘点单号", row.no) +
+            taskField("盘点任务名称", row.name) +
+            taskField("盘点类型", row.type) +
+            taskField("盘点部门", row.dept) +
+            taskField("盘点范围", row.scope) +
+            taskField("资产类型范围", row.assetTypeRange || "全部") +
+            taskField("计划开始日期", row.start) +
+            taskField("计划结束日期", row.end) +
+            taskField("发起人", row.owner) +
+            taskField("负责人", responsiblePerson(row)) +
+            taskField("应盘数量", row.should) +
+            taskField("已盘数量", row.done) +
+            taskField("差异数量", row.diff) +
+            taskField("任务状态", row.status) +
+            taskField("确认口径", isCompany ? "物资、财务、业务三方共同确认" : "部门物资专责逐条确认") +
           '</div>',
-          '<section class="inv-task-location-panel"><h4 class="inv-task-location-title">库位图</h4><div class="inv-task-location-grid">' +
-            locationCard("第一货架", 1) +
-            locationCard("第二货架", 0) +
-            locationCard("第三货架", first.materialTypeName === "存货" ? 2 : 0) +
-          '</div></section>'
+          '<div class="inv-table-title">盘点物资明细表</div>',
+          '<div class="inv-task-mini-table-wrap"><table class="inv-task-mini-table"><thead><tr><th>序号</th><th>资产编号</th><th>物资唯一码</th><th>物资类型编码</th><th>产品编码</th><th>物资名称</th><th>规格型号</th><th>物资类型名称</th><th>所属部门</th><th>存储地点/仓库货位</th><th>使用人/负责人</th><th>在库/领用状态</th><th>账面数量</th><th>盘点确认数量</th><th>单位</th><th>盘点结果</th></tr></thead><tbody>' +
+            list.map(function (x, i) {
+              return '<tr><td>' + (i + 1) + '</td><td>' + cell(x.assetNo) + '</td><td>' + cell(x.code) + '</td><td>' + cell(x.typeCode) + '</td><td>' + cell(x.product) + '</td><td>' + cell(x.assetName) + '</td><td>' + cell(x.spec) + '</td><td>' + cell(x.materialTypeName) + '</td><td>' + cell(x.dept) + '</td><td>' + cell(x.loc) + '</td><td>' + cell(x.user) + '</td><td>' + cell(x.state) + '</td><td>' + cell(x.book) + '</td><td>' + cell(x.confirmQty || x.real) + '</td><td>' + cell(x.unit || "件") + '</td><td>' + cell(x.result) + '</td></tr>';
+            }).join("") +
+          '</tbody></table></div>'
         ].join("");
         open(document.getElementById("taskInfoMask"));
       }
