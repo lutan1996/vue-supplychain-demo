@@ -28,8 +28,8 @@
     .inv-tab-panel[hidden] { display: none !important; }
     .inv-ledger-note { padding: 10px 16px; border-bottom: 1px solid #f0f0f0; color: #60728b; font-size: 12px; background: #fbfdff; }
     .inv-table-wrap { overflow: auto; padding: 0 16px 12px; }
-    .inv-table { width: 100%; min-width: 1460px; border-collapse: collapse; table-layout: fixed; font-size: 12px; }
-    .inv-table--ledger { min-width: 1600px; }
+    .inv-table { width: 100%; min-width: 1580px; border-collapse: collapse; table-layout: fixed; font-size: 12px; }
+    .inv-table--ledger { min-width: 1900px; }
     .inv-table th, .inv-table td { border: 1px solid #e8e8e8; padding: 8px; text-align: left; color: #262626; }
     .inv-table th { background: #f5f5f5; color: #334155; white-space: nowrap; }
     .inv-op { display: inline-flex; flex-wrap: wrap; gap: 8px; white-space: nowrap; }
@@ -39,9 +39,15 @@
     .inv-tag.run { background: #e6f4ff; border-color: #91caff; color: #0958d9; }
     .inv-tag.done { background: #f6ffed; border-color: #b7eb8f; color: #389e0d; }
     .inv-table-title { margin: 14px 0 8px; color: #334155; font-size: 13px; font-weight: 600; }
-    .inv-detail-table { width: 100%; min-width: 1320px; border-collapse: collapse; table-layout: fixed; font-size: 12px; }
+    .inv-detail-table { width: 100%; min-width: 5200px; border-collapse: collapse; table-layout: fixed; font-size: 12px; }
     .inv-detail-table th, .inv-detail-table td { border: 1px solid #e8e8e8; padding: 8px; color: #262626; text-align: left; }
     .inv-detail-table th { background: #f5f7fa; color: #334155; }
+    .inv-row-diff td { background: #fff1f0; }
+    .inv-text-danger { color: #cf1322; font-weight: 600; }
+    .inv-text-ok { color: #389e0d; font-weight: 600; }
+    .inv-text-muted { color: #8c8c8c; }
+    .inv-reason-box { margin-top: 12px; border: 1px solid #ffa39e; background: #fff1f0; color: #a8071a; border-radius: 6px; padding: 10px 12px; line-height: 1.7; font-size: 12px; }
+    .inv-rule-box { margin-top: 10px; border: 1px solid #d9e8ff; background: #f7fbff; border-radius: 6px; color: #516a87; padding: 8px 10px; font-size: 12px; line-height: 1.6; }
     .inv-modal-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px 18px; }
     .inv-modal-grid .wh-field { margin-bottom: 0; }
     .inv-modal-title-line { display: inline-flex; align-items: center; gap: 10px; min-width: 0; }
@@ -115,7 +121,7 @@
                 <div class="wh-field"><label for="fNo">盘点单号</label><input id="fNo" type="text" placeholder="请输入盘点单号"></div>
                 <div class="wh-field"><label for="fDept">盘点部门</label><select id="fDept"><option value="">全部部门</option><option>机械研究所</option><option>电控所</option><option>经营发展中心</option><option>华北运维部</option></select></div>
                 <div class="wh-field"><label for="fType">盘点类型</label><select id="fType"><option value="">全部类型</option><option>部门盘点</option><option>公司盘点</option></select></div>
-                <div class="wh-field"><label for="fStatus">任务状态</label><select id="fStatus"><option value="">全部状态</option><option>待开始</option><option>盘点中</option><option>待物资负责人分配</option><option>待业务部门分配</option><option>待三方确认</option><option>待提交财务审阅</option><option>待逐条确认</option><option>待部门负责人审阅</option><option>待财务负责人审阅</option><option>待物资管理部门审阅</option><option>待阅知</option><option>待差异处理</option><option>已完成</option></select></div>
+                <div class="wh-field"><label for="fStatus">任务状态</label><select id="fStatus"><option value="">全部状态</option><option>待开始</option><option>盘点中</option><option>待物资负责人分配</option><option>待业务部门分配</option><option>待三方确认</option><option>待部门负责人审阅</option><option>待财务负责人审阅</option><option>待物资管理部门审阅</option><option>待阅知</option><option>待差异处理</option><option>已完成</option></select></div>
                 <div class="wh-field"><label for="fKeeper">负责人</label><input id="fKeeper" type="text" placeholder="请输入负责人"></div>
               </div>
               <div class="inv-actions">
@@ -147,7 +153,7 @@
                 <table class="inv-table inv-table--ledger">
                   <thead>
                     <tr>
-                      <th>序号</th><th>物资唯一码</th><th>物资类型编码</th><th>产品编码</th><th>物资名称</th><th>规格型号</th><th>所属部门</th><th>当前位置</th><th>使用人/负责人</th><th>在库/领用状态</th><th>状态是否完好</th><th>最近盘点单号</th><th>最近盘点日期</th><th>账面数量</th><th>实盘数量</th><th>差异状态</th><th>操作</th>
+                      <th>序号</th><th>资产编号</th><th>物资唯一码</th><th>物资类型编码</th><th>产品编码</th><th>物资类型名称</th><th>物资名称</th><th>规格型号</th><th>所属部门</th><th>当前位置</th><th>使用人/负责人</th><th>在库/领用状态</th><th>状态是否完好</th><th>最近盘点单号</th><th>最近盘点日期</th><th>账面数量</th><th>实盘数量</th><th>差异状态</th><th>操作</th>
                     </tr>
                   </thead>
                   <tbody id="ledgerBody"></tbody>
@@ -169,6 +175,7 @@
           <div class="wh-field"><label class="wh-label">盘点类型</label><select class="wh-input" id="newType"><option>部门盘点</option><option>公司盘点</option></select></div>
           <div class="wh-field"><label class="wh-label">盘点部门</label><select class="wh-input" id="newDept"><option>机械研究所</option><option>电控所</option><option>经营发展中心</option><option>华北运维部</option></select></div>
           <div class="wh-field"><label class="wh-label">盘点范围</label><select class="wh-input" id="newScope"><option>本部门在库及已领用物资</option><option>仓库在库物资</option><option>已销售待核销物资</option><option>闲置物资</option></select></div>
+          <div class="wh-field"><label class="wh-label">资产类型范围</label><select class="wh-input" id="newAssetType"><option>全部</option><option>固定资产</option><option>存货</option><option>无形资产</option></select></div>
           <div class="wh-field"><label class="wh-label">计划开始日期</label><input class="wh-input" id="newStart" type="date" value="2026-06-25"></div>
           <div class="wh-field"><label class="wh-label">计划完成日期</label><input class="wh-input" id="newEnd" type="date" value="2026-06-30"></div>
           <div class="wh-field"><label class="wh-label">负责人</label><input class="wh-input" id="newOwner" value="宋中波"></div>
@@ -194,12 +201,38 @@
         <div class="inv-table-title">盘点物资明细表</div>
         <div style="overflow:auto" data-skip-demo-unify>
           <table class="inv-detail-table">
-            <thead><tr><th>物资唯一码</th><th>物资类型编码</th><th>产品编码</th><th>物资名称</th><th>规格型号</th><th>存储地点</th><th>使用人/负责人</th><th>状态是否完好</th><th>账面数量</th><th>实盘数量</th><th>盘点结果</th><th>操作</th></tr></thead>
+            <thead><tr><th>资产编号</th><th>物资唯一码</th><th>物资类型编码</th><th>产品编码</th><th>资产名称</th><th>规格型号</th><th>物资类型名称</th><th>存放地点</th><th>保管人</th><th>使用年限</th><th>原值</th><th>数量</th><th>单位</th><th>盘点数量</th><th>使用状况</th><th>盘点结果</th><th>备注1</th><th>备注2</th><th>备注3</th><th>仓库/货位</th><th>最近盘库单号</th><th>最近盘库日期</th><th>盘库账面数量</th><th>盘库实盘数量</th><th>盘库差异</th><th>盘点确认数量</th><th>库存状态</th><th>差异数量</th><th>权属/授权编号</th><th>使用部门</th><th>使用负责人</th><th>授权开始日期</th><th>授权到期日期</th><th>账面原值</th><th>账面净值</th><th>使用状态</th><th>清查结果</th><th>操作</th></tr></thead>
             <tbody id="detailLines"></tbody>
           </table>
         </div>
+        <div class="inv-reason-box" id="detailReason" hidden></div>
       </div>
       <div class="wh-modal-foot"><button type="button" class="wh-btn wh-btn--ghost" data-close>关闭</button><button type="button" class="wh-btn wh-btn--primary" id="btnDetailOk">确定</button></div>
+    </div>
+  </div>
+
+  <div class="wh-modal-mask" id="confirmMask" aria-hidden="true">
+    <div class="wh-modal-box wh-modal-box--lg" role="dialog" aria-modal="true" aria-labelledby="confirmTitle">
+      <div class="wh-modal-head"><h3 class="wh-modal-title" id="confirmTitle">逐条盘点确认</h3><button type="button" class="wh-modal-close" data-close aria-label="关闭">×</button></div>
+      <div class="wh-modal-body">
+        <div class="inv-modal-grid">
+          <div class="wh-field"><label class="wh-label">资产编号/物资唯一码</label><input class="wh-input" id="confirmCode"></div>
+          <div class="wh-field"><label class="wh-label">实物状态</label><select class="wh-input" id="confirmHealth"><option>完好</option><option>待复核</option><option>损坏</option><option>缺失</option></select></div>
+          <div class="wh-field"><label class="wh-label">是否与系统台账一致</label><select class="wh-input" id="confirmSame"><option>一致</option><option>不一致</option></select></div>
+          <div class="wh-field"><label class="wh-label">实盘存储地点</label><input class="wh-input" id="confirmLoc"></div>
+          <div class="wh-field"><label class="wh-label">实盘使用人/负责人</label><input class="wh-input" id="confirmUser"></div>
+          <div class="wh-field"><label class="wh-label">差异类型</label><select class="wh-input" id="confirmDiffType"><option>无差异</option><option>数量差异</option><option>位置不符</option><option>负责人不符</option><option>状态异常</option><option>编码信息不符</option><option>盘盈</option><option>盘亏</option></select></div>
+          <div class="wh-field"><label class="wh-label">系统台账值</label><input class="wh-input" id="confirmBookValue"></div>
+          <div class="wh-field"><label class="wh-label">实盘确认值</label><input class="wh-input" id="confirmRealValue"></div>
+          <div class="wh-field"><label class="wh-label">责任部门</label><input class="wh-input" id="confirmDept"></div>
+          <div class="wh-field"><label class="wh-label">责任人</label><input class="wh-input" id="confirmOwner"></div>
+          <div class="wh-field" style="grid-column:1 / -1"><label class="wh-label">差异原因</label><input class="wh-input" id="confirmReason" placeholder="不一致时填写差异原因"></div>
+          <div class="wh-field"><label class="wh-label">处理建议</label><input class="wh-input" id="confirmAdvice" value="进入盘点差异处理"></div>
+          <div class="wh-field"><label class="wh-label">附件/照片</label><input class="wh-input" id="confirmAttachment" value="现场照片待上传"></div>
+        </div>
+        <div class="inv-rule-box">保存后，系统按物资唯一码把不一致记录归入盘点差异处理；存货类同时带入最近盘库日期、盘库账面数量、盘库实盘数量和盘库差异。</div>
+      </div>
+      <div class="wh-modal-foot"><button type="button" class="wh-btn wh-btn--ghost" data-close>取消</button><button type="button" class="wh-btn wh-btn--primary" id="btnConfirmOk">保存</button></div>
     </div>
   </div>
 
@@ -217,7 +250,7 @@
         </div>
         <div class="inv-approval-pane" data-approval-pane="info">
           <table class="inv-approval-table">
-            <thead><tr><th>节点名称</th><th>处理人</th><th>处理时间</th><th>处理结果</th><th>处理意见</th></tr></thead>
+            <thead><tr><th>审批节点</th><th>审批人</th><th>审批时间</th><th>审批结果</th><th>审批意见</th></tr></thead>
             <tbody id="approvalInfoBody"></tbody>
           </table>
         </div>
@@ -244,20 +277,34 @@
   <script>
     (function () {
       var rows = [
-        { id: 1, no: "PD-2026-001", name: "机械研究所二季度部门盘点", type: "部门盘点", dept: "机械研究所", scope: "本部门在库及已领用物资", start: "2026-06-25", end: "2026-06-30", owner: "许学良", deptHead: "李仁堂", materialOwner: "宋中波", should: 126, done: 92, diff: 3, status: "盘点中" },
-        { id: 2, no: "PD-2026-002", name: "公司二季度物资全面盘点", type: "公司盘点", dept: "全部业务部门", scope: "公司所有已入库、未入库物资", start: "2026-06-28", end: "2026-07-03", owner: "宋中波", deptHead: "王超", materialOwner: "宋中波", financeHead: "孙睿", financeOwner: "杜欣鑫", bizHead: "陈亮、李仁堂、王贺", bizOwner: "成明锴、许学良、喻家敏", should: 284, done: 188, diff: 6, status: "待物资负责人分配" },
-        { id: 3, no: "PD-2026-003", name: "经营发展中心部门盘点", type: "部门盘点", dept: "经营发展中心", scope: "本部门在库及已领用物资", start: "2026-07-01", end: "2026-07-05", owner: "宋中波", deptHead: "王超", materialOwner: "宋中波", should: 57, done: 0, diff: 0, status: "待开始" },
-        { id: 4, no: "PD-2026-004", name: "电气控制所部门盘点", type: "部门盘点", dept: "电气控制所", scope: "本部门在库及已领用物资", start: "2026-06-10", end: "2026-06-15", owner: "成明锴", deptHead: "陈亮", materialOwner: "宋中波", should: 98, done: 98, diff: 0, status: "已完成" }
+        { id: 1, no: "PD-2026-001", name: "机械研究所二季度部门盘点", type: "部门盘点", dept: "机械研究所", scope: "本部门在库及已领用物资", assetTypeRange: "固定资产、存货、无形资产", start: "2026-06-25", end: "2026-06-30", owner: "许学良", deptHead: "李仁堂", materialOwner: "宋中波", should: 126, done: 92, diff: 3, status: "盘点中" },
+        { id: 2, no: "PD-2026-002", name: "公司二季度物资全面盘点", type: "公司盘点", dept: "全部业务部门", scope: "公司所有已入库、未入库物资", assetTypeRange: "全部", start: "2026-06-28", end: "2026-07-03", owner: "宋中波", deptHead: "王超", materialOwner: "宋中波", financeHead: "孙睿", financeOwner: "杜欣鑫", bizHead: "陈亮、李仁堂、王贺", bizOwner: "成明锴、许学良、喻家敏", should: 284, done: 188, diff: 6, status: "待物资负责人分配" },
+        { id: 3, no: "PD-2026-003", name: "经营发展中心部门盘点", type: "部门盘点", dept: "经营发展中心", scope: "本部门在库及已领用物资", assetTypeRange: "固定资产、无形资产", start: "2026-07-01", end: "2026-07-05", owner: "宋中波", deptHead: "王超", materialOwner: "宋中波", should: 57, done: 0, diff: 0, status: "待开始" },
+        { id: 4, no: "PD-2026-004", name: "电气控制所部门盘点", type: "部门盘点", dept: "电气控制所", scope: "本部门在库及已领用物资", assetTypeRange: "固定资产、存货", start: "2026-06-10", end: "2026-06-15", owner: "成明锴", deptHead: "陈亮", materialOwner: "宋中波", should: 98, done: 98, diff: 0, status: "已完成" }
       ];
       var lines = [
-        { code: "C20260000001", type: "A0010020001", product: "B00001234", name: "变桨轴承", spec: "BP-2.0MW", loc: "机械研究所/华北主仓A-01", user: "李仁堂", dept: "机械研究所", state: "在库", health: "完好", lastNo: "PD-2026-001", lastDate: "2026-06-25", book: 1, real: 1, result: "账实相符" },
-        { code: "C20260000002", type: "A0010020002", product: "B00001235", name: "齿轮箱滤芯", spec: "GX-LX-90", loc: "机械研究所/华北主仓A-03", user: "许学良", dept: "机械研究所", state: "在库", health: "完好", lastNo: "PD-2026-001", lastDate: "2026-06-25", book: 12, real: 10, result: "盘亏" },
-        { code: "C20260000003", type: "A0020010006", product: "B00001888", name: "变频器模块", spec: "VF-800", loc: "电气控制所/备用柜", user: "成明锴", dept: "电气控制所", state: "已入库", health: "待复核", lastNo: "PD-2026-002", lastDate: "2026-06-28", book: 2, real: 3, result: "盘盈" }
+        { task: "PD-2026-001", assetNo: "ZC-2026-0001", code: "C20260000001", typeCode: "A0010020001", product: "B00001234", assetName: "变桨轴承", spec: "BP-2.0MW", materialTypeName: "固定资产", dept: "机械研究所", loc: "机械研究所/华北主仓A-01", user: "李仁堂", state: "在库", health: "完好", lastNo: "PD-2026-001", lastDate: "2026-06-25", book: 1, real: 1, result: "账实相符", lineStatus: "已确认", diffType: "无差异", reason: "", keeper: "李仁堂", serviceLife: "8年", originalValue: 680000, qty: 1, unit: "台", checkQty: 1, useStatus: "正常", checkResult: "账实相符", remark1: "固定资产", remark2: "状态完好", remark3: "无需调整" },
+        { task: "PD-2026-001", assetNo: "ZC-2026-0002", code: "C20260000002", typeCode: "A0010020002", product: "B00001235", assetName: "齿轮箱滤芯", spec: "GX-LX-90", materialTypeName: "存货", dept: "机械研究所", loc: "机械研究所/华北主仓A-03", user: "许学良", state: "在库", health: "完好", lastNo: "PD-2026-001", lastDate: "2026-06-25", book: 12, real: 10, result: "盘亏", lineStatus: "有差异", diffType: "数量差异", reason: "账面数量与实盘数量不一致，需进入盘点差异处理", warehouseLoc: "华北主仓A-03", stockNo: "PK-2026-0412", stockDate: "2026-06-20", stockBook: 12, stockReal: 10, stockDiff: -2, confirmQty: 10, stockStatus: "在库", diffQty: -2, unit: "件", checkResult: "盘亏" },
+        { task: "PD-2026-002", assetNo: "ZC-2026-0003", code: "C20260000003", typeCode: "A0020010006", product: "B00001888", assetName: "变频器模块", spec: "VF-800", materialTypeName: "存货", dept: "电气控制所", loc: "电气控制所/备用柜", user: "成明锴", state: "已入库", health: "待复核", lastNo: "PD-2026-002", lastDate: "2026-06-28", book: 2, real: 3, result: "盘盈", lineStatus: "有差异", diffType: "数量差异", reason: "现场多出一件未入账物资，需核对采购合同和入库记录", warehouseLoc: "备用柜", stockNo: "PK-2026-0415", stockDate: "2026-06-22", stockBook: 2, stockReal: 3, stockDiff: 1, confirmQty: 3, stockStatus: "已入库", diffQty: 1, unit: "件", checkResult: "盘盈" },
+        { task: "PD-2026-002", assetNo: "ZC-2026-0011", code: "C20260000011", typeCode: "A0030010004", product: "B00002119", assetName: "偏航电机", spec: "PY-DJ-55", materialTypeName: "固定资产", dept: "现场服务中心", loc: "现场服务中心/张北场站", user: "喻家敏", state: "已领用", health: "完好", lastNo: "PD-2026-002", lastDate: "2026-06-28", book: 1, real: 1, result: "位置不符", lineStatus: "有差异", diffType: "位置不符", reason: "实物已流转但系统台账位置未同步", keeper: "喻家敏", serviceLife: "10年", originalValue: 520000, qty: 1, unit: "台", checkQty: 1, useStatus: "正常", checkResult: "位置不符", remark1: "固定资产", remark2: "台账位置待更正", remark3: "需业务部门确认" },
+        { task: "PD-2026-003", assetNo: "WX-2026-0001", code: "C20260000021", typeCode: "A0060010001", product: "B00004101", assetName: "风机诊断软件授权", spec: "V3.2 企业版", materialTypeName: "无形资产", dept: "经营发展中心", loc: "经营发展中心/系统账号", user: "王超", state: "使用中", health: "完好", lastNo: "PD-2026-003", lastDate: "待盘点", book: 1, real: 0, result: "未盘点", lineStatus: "未盘点", diffType: "无差异", reason: "", authNo: "AUTH-2026-0315", useDept: "经营发展中心", useOwner: "王超", authStart: "2026-03-15", authEnd: "2029-03-14", bookOriginal: 260000, bookNet: 238000, intangibleStatus: "使用中", clearResult: "待清查" }
       ];
-      var state = { filters: {}, current: null };
+      var state = { filters: {}, current: null, currentLine: null };
+      function money(v) {
+        if (v === "" || v == null) return "-";
+        return "¥" + Number(v || 0).toLocaleString("zh-CN", { maximumFractionDigits: 0 });
+      }
+      function cell(v) {
+        return v === "" || v == null ? "-" : v;
+      }
+      function resultText(v) {
+        if (v && v !== "账实相符" && v !== "无差异" && v !== "未盘点") return '<span class="inv-text-danger">' + v + '</span>';
+        if (v === "账实相符" || v === "无差异") return '<span class="inv-text-ok">' + v + '</span>';
+        return '<span class="inv-text-muted">' + cell(v) + '</span>';
+      }
       function tag(status) {
         if (status === "待开始") return '<span class="inv-tag wait">待开始</span>';
-        if (status === "盘点中" || status === "待物资负责人分配" || status === "待业务部门分配" || status === "待三方确认" || status === "待提交财务审阅" || status === "待逐条确认" || status === "待部门负责人审阅" || status === "待财务负责人审阅" || status === "待物资管理部门审阅" || status === "待阅知") return '<span class="inv-tag run">' + status + '</span>';
+        if (status === "盘点中" || status === "待物资负责人分配" || status === "待业务部门分配" || status === "待三方确认" || status === "待部门负责人审阅" || status === "待财务负责人审阅" || status === "待物资管理部门审阅" || status === "待阅知") return '<span class="inv-tag run">' + status + '</span>';
         if (status === "已完成") return '<span class="inv-tag done">已完成</span>';
         return '<span class="inv-tag wait">待差异处理</span>';
       }
@@ -266,24 +313,25 @@
         if (row.status === "待开始") buttons.push('<span role="button" tabindex="0" data-inv-act="start" data-id="' + row.id + '">' + (row.type === "公司盘点" ? "发起盘点" : "盘点开始") + '</span>');
         if (row.type === "公司盘点" && row.status === "待物资负责人分配") buttons.push('<span role="button" tabindex="0" data-inv-act="assign-material" data-id="' + row.id + '">物资部门分配</span>');
         if (row.type === "公司盘点" && row.status === "待业务部门分配") buttons.push('<span role="button" tabindex="0" data-inv-act="assign-business" data-id="' + row.id + '">业务部门分配</span>');
-        if (row.type === "公司盘点" && row.status === "待三方确认") buttons.push('<span role="button" tabindex="0" data-inv-act="company-confirm" data-id="' + row.id + '">三方逐条确认</span>');
+        if (row.type === "公司盘点" && row.status === "待三方确认") buttons.push('<span role="button" tabindex="0" data-inv-act="company-confirm" data-id="' + row.id + '">逐条确认</span>');
         if (row.type !== "公司盘点" && row.status === "盘点中") buttons.push('<span role="button" tabindex="0" data-inv-act="check" data-id="' + row.id + '">逐条确认</span>');
-        if ((row.type !== "公司盘点" && row.status === "待逐条确认") || (row.type === "公司盘点" && row.status === "待提交财务审阅")) buttons.push('<span role="button" tabindex="0" data-inv-act="submit-review" data-id="' + row.id + '">提交审阅</span>');
-        if ((row.status.indexOf("审阅") >= 0 && row.status !== "待提交财务审阅") || row.status === "待阅知") buttons.push('<span role="button" tabindex="0" data-inv-act="review" data-id="' + row.id + '">审阅确认</span>');
-        if (row.diff > 0 && row.status !== "待开始") buttons.push('<span role="button" tabindex="0" data-inv-act="close" data-id="' + row.id + '">生成差异</span>');
+        if ((row.type !== "公司盘点" && row.status === "盘点中") || (row.type === "公司盘点" && row.status === "待三方确认")) buttons.push('<span role="button" tabindex="0" data-inv-act="submit-review" data-id="' + row.id + '">提交审阅</span>');
+        if (row.status === "待部门负责人审阅" || row.status === "待财务负责人审阅" || row.status === "待物资管理部门审阅") buttons.push('<span role="button" tabindex="0" data-inv-act="review" data-id="' + row.id + '">审阅确认</span>');
+        if (row.status === "待阅知") buttons.push('<span role="button" tabindex="0" data-inv-act="review" data-id="' + row.id + '">阅知确认</span>');
+        if (row.status === "待差异处理") buttons.push('<span role="button" tabindex="0" data-inv-act="goto-diff" data-id="' + row.id + '">去处理</span>');
         buttons.push('<span role="button" tabindex="0" data-inv-act="export-detail" data-id="' + row.id + '">导出明细</span>');
         return '<span class="inv-op">' + buttons.join("") + '</span>';
       }
       function lineActions(line) {
-        var buttons = [
-          '<span role="button" tabindex="0" data-line-act="track" data-code="' + line.code + '">物资跟踪</span>',
-          '<span role="button" tabindex="0" data-line-act="record" data-code="' + line.code + '">盘点记录</span>',
-          '<span role="button" tabindex="0" data-line-act="ledger" data-code="' + line.code + '">台帐详情</span>'
-        ];
-        if (line.result !== "账实相符") {
-          buttons.push('<span role="button" tabindex="0" data-line-act="diff" data-code="' + line.code + '">生成差异</span>');
-          buttons.push('<span role="button" tabindex="0" data-line-act="handle" data-code="' + line.code + '">差异处理</span>');
+        var buttons = ['<span role="button" tabindex="0" data-line-act="view" data-code="' + line.code + '">查看</span>'];
+        if (line.lineStatus === "未盘点") {
+          buttons.push('<span role="button" tabindex="0" data-line-act="ok" data-code="' + line.code + '">确认一致</span>');
+          buttons.push('<span role="button" tabindex="0" data-line-act="diff" data-code="' + line.code + '">登记差异</span>');
+        } else if (line.lineStatus === "有差异") {
+          buttons.push('<span role="button" tabindex="0" data-line-act="reason" data-code="' + line.code + '">差异原因</span>');
+          buttons.push('<span role="button" tabindex="0" data-line-act="handle" data-code="' + line.code + '">去处理</span>');
         }
+        buttons.push('<span role="button" tabindex="0" data-line-act="track" data-code="' + line.code + '">物资跟踪</span>');
         return '<span class="inv-op">' + buttons.join("") + '</span>';
       }
       function getRows() {
@@ -300,8 +348,8 @@
         return row && row.type === "公司盘点" ? "company" : "dept";
       }
       function flowIndex(row) {
-        var deptMap = { "待开始": 0, "盘点中": 2, "待逐条确认": 2, "待部门负责人审阅": 3, "待物资管理部门审阅": 4, "已完成": 5, "待差异处理": 4 };
-        var companyMap = { "待开始": 0, "待物资负责人分配": 2, "待业务部门分配": 3, "待三方确认": 4, "待提交财务审阅": 4, "待财务负责人审阅": 5, "待物资管理部门审阅": 6, "待阅知": 7, "待差异处理": 7, "已完成": 8 };
+        var deptMap = { "待开始": 0, "盘点中": 2, "待部门负责人审阅": 3, "待物资管理部门审阅": 4, "已完成": 5, "待差异处理": 4 };
+        var companyMap = { "待开始": 0, "待物资负责人分配": 2, "待业务部门分配": 3, "待三方确认": 4, "待财务负责人审阅": 5, "待物资管理部门审阅": 6, "待阅知": 7, "待差异处理": 7, "已完成": 8 };
         var map = normalizeFlowType(row) === "company" ? companyMap : deptMap;
         return map[row.status] == null ? 0 : map[row.status];
       }
@@ -309,10 +357,10 @@
         if (normalizeFlowType(row) === "company") {
           return [
             { name: "发起公司物资盘点", person: "宋中波", text: "物资管理部门物资专责宋中波发起公司物资盘点" },
-            { name: "生成公司物资清单", person: "宋中波", text: "系统按宋中波发起的范围生成公司所有已入库、未入库物资清单" },
+            { name: "生成公司物资清单", person: "宋中波", text: "系统根据物资管理部门物资专责宋中波发起的信息生成公司所有已入库、未入库物资清单，存货类同步带入最近盘库日期、盘库账面数量、盘库实盘数量和盘库差异" },
             { name: "物资部门同意并分配", person: "王超", text: "物资管理部门负责人王超同意，并分配宋中波等本部门盘点人员" },
             { name: "业务部门同意并分配", person: row.bizHead || "李仁堂、陈亮、王贺", text: "所有业务部门负责人" + (row.bizHead || "李仁堂、陈亮、王贺") + "同意，并分配本部门盘点人员" },
-            { name: "三方逐条共同确认", person: "宋中波、杜欣鑫、" + (row.bizOwner || "成明锴、许学良"), text: "宋中波、杜欣鑫、" + (row.bizOwner || "成明锴、许学良") + "共同确认物资型号、编码、存储地点、使用人/负责人是否与系统台帐一致，状态是否完好" },
+            { name: "三方逐条共同确认", person: "宋中波、杜欣鑫、" + (row.bizOwner || "成明锴、许学良"), text: "所有参与盘点人员宋中波、杜欣鑫、" + (row.bizOwner || "成明锴、许学良") + "收到流程，按清单逐条确认，物资、财务、业务三方共同确认物资型号、编码、存储地点、使用人/负责人等信息是否与系统台帐一致，状态是否完好" },
             { name: "财务负责人审阅", person: row.financeHead || "孙睿", text: "盘点完毕，提交财务负责人" + (row.financeHead || "孙睿") + "审阅" },
             { name: "物资管理部门负责人审阅", person: "王超", text: "物资管理部门负责人王超审阅" },
             { name: "物资专责阅知", person: "宋中波", text: "物资管理部门物资专责宋中波阅知" },
@@ -320,8 +368,8 @@
           ];
         }
         return [
-          { name: "盘点开始", person: row.owner || "许学良", text: "部门物资专责" + (row.owner || "许学良") + "点击盘点开始，进入部门内物资盘点" },
-          { name: "生成部门物资清单", person: row.owner || "许学良", text: "系统生成" + (row.owner || "许学良") + "负责的" + row.dept + "所属物资清单" },
+          { name: "盘点开始", person: row.owner || "许学良", text: "部门物资专责" + (row.owner || "许学良") + "点“盘点开始”，进入部门内物资盘点" },
+          { name: "生成部门物资清单", person: row.owner || "许学良", text: "系统根据部门物资专责" + (row.owner || "许学良") + "发起的信息生成" + row.dept + "所属物资清单，存货类同步带入最近盘库日期、盘库账面数量、盘库实盘数量和盘库差异" },
           { name: "逐条盘点确认", person: row.owner || "许学良", text: "部门物资专责" + (row.owner || "许学良") + "逐条确认物资型号、编码、存储地点、使用人/负责人是否与系统台帐一致，状态是否完好" },
           { name: "部门负责人审阅", person: row.deptHead || "李仁堂", text: "盘点完毕，提交部门负责人" + (row.deptHead || "李仁堂") + "审阅，盘点无误" },
           { name: "物资专责审阅确认", person: row.materialOwner || "宋中波", text: "物资管理部门物资专责" + (row.materialOwner || "宋中波") + "审阅，确认" },
@@ -363,7 +411,7 @@
       }
       function renderLedger() {
         document.getElementById("ledgerBody").innerHTML = lines.map(function (x, i) {
-          return '<tr><td>' + (i + 1) + '</td><td>' + x.code + '</td><td>' + x.type + '</td><td>' + x.product + '</td><td>' + x.name + '</td><td>' + x.spec + '</td><td>' + x.dept + '</td><td>' + x.loc + '</td><td>' + x.user + '</td><td>' + x.state + '</td><td>' + x.health + '</td><td>' + x.lastNo + '</td><td>' + x.lastDate + '</td><td>' + x.book + '</td><td>' + x.real + '</td><td>' + x.result + '</td><td>' + lineActions(x) + '</td></tr>';
+          return '<tr class="' + (x.lineStatus === "有差异" ? "inv-row-diff" : "") + '"><td>' + (i + 1) + '</td><td>' + x.assetNo + '</td><td>' + x.code + '</td><td>' + x.typeCode + '</td><td>' + x.product + '</td><td>' + x.materialTypeName + '</td><td>' + x.assetName + '</td><td>' + x.spec + '</td><td>' + x.dept + '</td><td>' + x.loc + '</td><td>' + x.user + '</td><td>' + x.state + '</td><td>' + x.health + '</td><td>' + x.lastNo + '</td><td>' + x.lastDate + '</td><td>' + x.book + '</td><td>' + x.real + '</td><td>' + resultText(x.result) + '</td><td>' + lineActions(x) + '</td></tr>';
         }).join("");
       }
       function open(mask) {
@@ -386,9 +434,28 @@
       function findLine(code) {
         return lines.find(function (x) { return x.code === code; }) || lines[0];
       }
+      function linesForTask(row) {
+        if (!row || row.type === "公司盘点") return lines;
+        return lines.filter(function (x) { return x.task === row.no || x.dept === row.dept; });
+      }
+      function renderDetailLines() {
+        var list = linesForTask(state.current);
+        document.getElementById("detailLines").innerHTML = list.map(function (x) {
+          return '<tr class="' + (x.lineStatus === "有差异" ? "inv-row-diff" : "") + '"><td>' + cell(x.assetNo) + '</td><td>' + cell(x.code) + '</td><td>' + cell(x.typeCode) + '</td><td>' + cell(x.product) + '</td><td>' + cell(x.assetName) + '</td><td>' + cell(x.spec) + '</td><td>' + cell(x.materialTypeName) + '</td><td>' + cell(x.loc) + '</td><td>' + cell(x.keeper || x.user) + '</td><td>' + cell(x.serviceLife) + '</td><td>' + money(x.originalValue) + '</td><td>' + cell(x.qty) + '</td><td>' + cell(x.unit) + '</td><td>' + cell(x.checkQty || x.confirmQty || x.real) + '</td><td>' + cell(x.useStatus || x.health) + '</td><td>' + resultText(x.checkResult || x.result) + '</td><td>' + cell(x.remark1) + '</td><td>' + cell(x.remark2) + '</td><td>' + cell(x.remark3) + '</td><td>' + cell(x.warehouseLoc) + '</td><td>' + cell(x.stockNo) + '</td><td>' + cell(x.stockDate) + '</td><td>' + cell(x.stockBook) + '</td><td>' + cell(x.stockReal) + '</td><td>' + resultText(x.stockDiff) + '</td><td>' + cell(x.confirmQty) + '</td><td>' + cell(x.stockStatus) + '</td><td>' + resultText(x.diffQty) + '</td><td>' + cell(x.authNo) + '</td><td>' + cell(x.useDept) + '</td><td>' + cell(x.useOwner) + '</td><td>' + cell(x.authStart) + '</td><td>' + cell(x.authEnd) + '</td><td>' + money(x.bookOriginal) + '</td><td>' + money(x.bookNet) + '</td><td>' + cell(x.intangibleStatus) + '</td><td>' + resultText(x.clearResult) + '</td><td>' + lineActions(x) + '</td></tr>';
+        }).join("");
+        var diffList = list.filter(function (x) { return x.lineStatus === "有差异"; });
+        var reasonBox = document.getElementById("detailReason");
+        if (diffList.length) {
+          reasonBox.hidden = false;
+          reasonBox.innerHTML = diffList.map(function (x) { return x.assetNo + " / " + x.code + "：" + x.diffType + "，" + x.reason; }).join("<br>");
+        } else {
+          reasonBox.hidden = true;
+          reasonBox.innerHTML = "";
+        }
+      }
       function openTrack(line) {
         document.getElementById("trackGrid").innerHTML = [
-          ["物资唯一码", line.code], ["物资类型编码", line.type], ["产品编码", line.product], ["物资名称", line.name],
+          ["资产编号", line.assetNo], ["物资唯一码", line.code], ["物资类型编码", line.typeCode], ["产品编码", line.product], ["物资类型名称", line.materialTypeName], ["物资名称", line.assetName],
           ["规格型号", line.spec], ["所属部门", line.dept], ["当前位置", line.loc], ["盘点结果", line.result]
         ].map(function (x) { return '<div class="wh-detail-item"><span class="wh-detail-label">' + x[0] + '</span><span class="wh-detail-value">' + x[1] + '</span></div>'; }).join("");
         document.getElementById("trackFlow").innerHTML = [
@@ -417,13 +484,27 @@
         state.current = row;
         document.getElementById("detailGrid").innerHTML = [
           ["盘点单号", row.no], ["盘点名称", row.name], ["盘点类型", row.type], ["盘点部门", row.dept],
-          ["盘点范围", row.scope], ["计划日期", row.start + " 至 " + row.end], ["发起/负责人员", row.owner], ["部门负责人", row.deptHead || "按所属部门匹配"],
+          ["盘点范围", row.scope], ["资产类型范围", row.assetTypeRange || "全部"], ["计划日期", row.start + " 至 " + row.end], ["发起/负责人员", row.owner], ["部门负责人", row.deptHead || "按所属部门匹配"],
           ["物资管理部门物资专责", row.materialOwner || "宋中波"], ["财务负责人", row.financeHead || "-"], ["任务状态", row.status], ["数据来源", normalizeFlowType(row) === "company" ? "公司所有已入库、未入库物资清单" : row.dept + "所属物资清单"]
         ].map(function (x) { return '<div class="wh-detail-item"><span class="wh-detail-label">' + x[0] + '</span><span class="wh-detail-value">' + x[1] + '</span></div>'; }).join("");
-        document.getElementById("detailLines").innerHTML = lines.map(function (x) {
-          return '<tr><td>' + x.code + '</td><td>' + x.type + '</td><td>' + x.product + '</td><td>' + x.name + '</td><td>' + x.spec + '</td><td>' + x.loc + '</td><td>' + x.user + '</td><td>' + x.health + '</td><td>' + x.book + '</td><td>' + x.real + '</td><td>' + x.result + '</td><td>' + lineActions(x) + '</td></tr>';
-        }).join("");
+        renderDetailLines();
         open(document.getElementById("detailMask"));
+      }
+      function openConfirm(line, mode) {
+        state.currentLine = line;
+        document.getElementById("confirmTitle").textContent = mode === "diff" ? "登记盘点差异" : (mode === "view" ? "盘点明细查看" : "逐条盘点确认");
+        document.getElementById("confirmCode").value = line.assetNo + " / " + line.code;
+        document.getElementById("confirmHealth").value = line.health === "待复核" ? "待复核" : "完好";
+        document.getElementById("confirmSame").value = line.lineStatus === "有差异" ? "不一致" : "一致";
+        document.getElementById("confirmLoc").value = line.loc;
+        document.getElementById("confirmUser").value = line.user;
+        document.getElementById("confirmDiffType").value = mode === "diff" ? (line.diffType === "无差异" ? "数量差异" : line.diffType) : (line.diffType || "无差异");
+        document.getElementById("confirmBookValue").value = "位置：" + line.loc + "；数量：" + line.book;
+        document.getElementById("confirmRealValue").value = "位置：" + line.loc + "；数量：" + line.real;
+        document.getElementById("confirmDept").value = line.dept;
+        document.getElementById("confirmOwner").value = line.user;
+        document.getElementById("confirmReason").value = line.reason || "";
+        open(document.getElementById("confirmMask"));
       }
       document.addEventListener("click", function (e) {
         var closeBtn = e.target.closest("[data-close]");
@@ -438,10 +519,19 @@
         var lineOp = e.target.closest("[data-line-act]");
         if (lineOp) {
           var line = findLine(lineOp.getAttribute("data-code"));
+          if (lineOp.getAttribute("data-line-act") === "view") openConfirm(line, "view");
           if (lineOp.getAttribute("data-line-act") === "track") openTrack(line);
-          if (lineOp.getAttribute("data-line-act") === "record") alert(line.code + " 的盘点记录已打开（演示）");
-          if (lineOp.getAttribute("data-line-act") === "ledger") { close(document.getElementById("detailMask")); switchTab("ledger"); }
-          if (lineOp.getAttribute("data-line-act") === "diff") alert(line.code + " 已生成盘点差异记录（演示）");
+          if (lineOp.getAttribute("data-line-act") === "ok") {
+            line.lineStatus = "已确认";
+            line.result = "账实相符";
+            line.checkResult = "账实相符";
+            line.diffType = "无差异";
+            line.reason = "";
+            renderDetailLines();
+            renderLedger();
+          }
+          if (lineOp.getAttribute("data-line-act") === "diff") openConfirm(line, "diff");
+          if (lineOp.getAttribute("data-line-act") === "reason") openConfirm(line, "diff");
           if (lineOp.getAttribute("data-line-act") === "handle") { window.location.href = "inventory-difference-handling.html"; }
           return;
         }
@@ -449,7 +539,7 @@
         if (e.target.id === "btnDetailFlow") openFlow(state.current || rows[0]);
         if (e.target.id === "btnCreateOk") {
           var newType = document.getElementById("newType").value;
-          rows.unshift({ id: Date.now(), no: "PD-2026-005", name: document.getElementById("newName").value || "新建盘点任务", type: newType, dept: newType === "公司盘点" ? "全部业务部门" : document.getElementById("newDept").value, scope: newType === "公司盘点" ? "公司所有已入库、未入库物资" : document.getElementById("newScope").value, start: document.getElementById("newStart").value, end: document.getElementById("newEnd").value, owner: document.getElementById("newOwner").value || (newType === "公司盘点" ? "宋中波" : "当前用户"), deptHead: newType === "公司盘点" ? "王超" : "李仁堂", materialOwner: "宋中波", financeHead: newType === "公司盘点" ? "孙睿" : "", financeOwner: newType === "公司盘点" ? "杜欣鑫" : "", bizHead: "李仁堂、陈亮、王贺", bizOwner: "许学良、成明锴、喻家敏", should: 0, done: 0, diff: 0, status: "待开始" });
+          rows.unshift({ id: Date.now(), no: "PD-2026-005", name: document.getElementById("newName").value || "新建盘点任务", type: newType, dept: newType === "公司盘点" ? "全部业务部门" : document.getElementById("newDept").value, scope: newType === "公司盘点" ? "公司所有已入库、未入库物资" : document.getElementById("newScope").value, assetTypeRange: document.getElementById("newAssetType").value, start: document.getElementById("newStart").value, end: document.getElementById("newEnd").value, owner: document.getElementById("newOwner").value || (newType === "公司盘点" ? "宋中波" : "当前用户"), deptHead: newType === "公司盘点" ? "王超" : "李仁堂", materialOwner: "宋中波", financeHead: newType === "公司盘点" ? "孙睿" : "", financeOwner: newType === "公司盘点" ? "杜欣鑫" : "", bizHead: "李仁堂、陈亮、王贺", bizOwner: "许学良、成明锴、喻家敏", should: 0, done: 0, diff: 0, status: "待开始" });
           close(document.getElementById("createMask"));
           renderTable();
         }
@@ -466,6 +556,26 @@
         if (e.target.id === "btnExport") alert("正在导出盘点任务列表（演示）");
         if (e.target.id === "btnLedgerRefresh") { renderLedger(); alert("盘点台帐已刷新（演示）"); }
         if (e.target.id === "btnLedgerExport") alert("正在导出盘点台帐（演示）");
+        if (e.target.id === "btnConfirmOk" && state.currentLine) {
+          var line = state.currentLine;
+          var isDiff = document.getElementById("confirmSame").value === "不一致" || document.getElementById("confirmDiffType").value !== "无差异";
+          line.health = document.getElementById("confirmHealth").value;
+          line.loc = document.getElementById("confirmLoc").value;
+          line.user = document.getElementById("confirmUser").value;
+          line.lineStatus = isDiff ? "有差异" : "已确认";
+          line.diffType = isDiff ? document.getElementById("confirmDiffType").value : "无差异";
+          line.reason = isDiff ? (document.getElementById("confirmReason").value || "盘点确认与系统台账不一致，进入盘点差异处理") : "";
+          line.result = isDiff ? line.diffType : "账实相符";
+          line.checkResult = line.result;
+          if (state.current) {
+            state.current.diff = linesForTask(state.current).filter(function (x) { return x.lineStatus === "有差异"; }).length;
+            state.current.done = Math.max(state.current.done, linesForTask(state.current).filter(function (x) { return x.lineStatus !== "未盘点"; }).length);
+          }
+          close(document.getElementById("confirmMask"));
+          renderDetailLines();
+          renderLedger();
+          renderTable();
+        }
         var op = e.target.closest("[data-inv-act]");
         if (op) {
           var row = rows.find(function (x) { return String(x.id) === op.getAttribute("data-id"); });
@@ -474,8 +584,8 @@
           if (op.getAttribute("data-inv-act") === "start") { row.status = row.type === "公司盘点" ? "待物资负责人分配" : "盘点中"; row.done = Math.max(row.done, Math.floor(row.should * 0.2)); renderTable(); }
           if (op.getAttribute("data-inv-act") === "assign-material") { row.status = "待业务部门分配"; renderTable(); }
           if (op.getAttribute("data-inv-act") === "assign-business") { row.status = "待三方确认"; renderTable(); }
-          if (op.getAttribute("data-inv-act") === "check") { row.status = "待逐条确认"; row.done = row.should; renderTable(); }
-          if (op.getAttribute("data-inv-act") === "company-confirm") { row.status = "待提交财务审阅"; row.done = row.should; renderTable(); }
+          if (op.getAttribute("data-inv-act") === "check") { row.done = row.should; openDetail(row); }
+          if (op.getAttribute("data-inv-act") === "company-confirm") { row.done = row.should; openDetail(row); }
           if (op.getAttribute("data-inv-act") === "submit-review") { row.status = row.type === "公司盘点" ? "待财务负责人审阅" : "待部门负责人审阅"; renderTable(); }
           if (op.getAttribute("data-inv-act") === "review") {
             if (row.type === "公司盘点") {
@@ -489,7 +599,7 @@
             renderTable();
           }
           if (op.getAttribute("data-inv-act") === "export-detail") alert(row.no + " 的盘点明细正在导出（演示）");
-          if (op.getAttribute("data-inv-act") === "close") { row.status = row.diff ? "待差异处理" : "已完成"; renderTable(); }
+          if (op.getAttribute("data-inv-act") === "goto-diff") window.location.href = "inventory-difference-handling.html";
         }
       });
       renderTable();

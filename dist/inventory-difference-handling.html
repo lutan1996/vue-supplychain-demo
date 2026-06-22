@@ -24,7 +24,7 @@
     .diff-btn.warn { background: #fff7e6; border-color: #ffd591; color: #d46b08; }
     .diff-rule-note { margin-bottom: 10px; border: 1px solid #ffd591; background: #fff7e6; border-radius: 6px; color: #ad4e00; padding: 9px 12px; font-size: 12px; line-height: 1.6; }
     .diff-table-wrap { overflow: auto; padding: 0 16px 12px; }
-    .diff-table { width: 100%; min-width: 1580px; border-collapse: collapse; table-layout: fixed; font-size: 12px; }
+    .diff-table { width: 100%; min-width: 2050px; border-collapse: collapse; table-layout: fixed; font-size: 12px; }
     .diff-table th, .diff-table td { border: 1px solid #e8e8e8; padding: 8px; color: #262626; text-align: left; }
     .diff-table th { background: #f5f5f5; color: #334155; white-space: nowrap; }
     .diff-op { display: inline-flex; flex-wrap: wrap; gap: 8px; white-space: nowrap; }
@@ -37,6 +37,11 @@
     .diff-tag.done { background: #f6ffed; border-color: #b7eb8f; color: #389e0d; }
     .diff-tag.high { background: #fff1f0; border-color: #ffa39e; color: #cf1322; }
     .diff-tag.normal { background: #f0f5ff; border-color: #adc6ff; color: #1d39c4; }
+    .diff-row-high td, .diff-row-problem td { background: #fff1f0; }
+    .diff-text-danger { color: #cf1322; font-weight: 600; }
+    .diff-text-ok { color: #389e0d; font-weight: 600; }
+    .diff-reason-box { margin-top: 12px; border: 1px solid #ffa39e; background: #fff1f0; color: #a8071a; border-radius: 6px; padding: 10px 12px; line-height: 1.7; font-size: 12px; }
+    .diff-rule-box { margin-top: 10px; border: 1px solid #ffd591; background: #fff7e6; color: #ad4e00; border-radius: 6px; padding: 9px 12px; line-height: 1.7; font-size: 12px; }
     .diff-modal-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px 18px; }
     .diff-modal-grid .wh-field { margin-bottom: 0; }
     .diff-modal-title-line { display: inline-flex; align-items: center; gap: 10px; min-width: 0; }
@@ -44,7 +49,7 @@
     .diff-head-action { display: inline-flex; align-items: center; height: 28px; border: 1px solid #91caff; border-radius: 4px; background: #e6f4ff; color: #1677ff; padding: 0 10px; font-size: 12px; cursor: pointer; font-family: inherit; }
     .diff-head-action:hover { background: #bae0ff; border-color: #69b1ff; }
     .diff-table-title { margin: 14px 0 8px; color: #334155; font-size: 13px; font-weight: 600; }
-    .diff-detail-table { width: 100%; min-width: 1380px; border-collapse: collapse; table-layout: fixed; font-size: 12px; }
+    .diff-detail-table { width: 100%; min-width: 2100px; border-collapse: collapse; table-layout: fixed; font-size: 12px; }
     .diff-detail-table th, .diff-detail-table td { border: 1px solid #e8e8e8; padding: 8px; color: #262626; text-align: left; }
     .diff-detail-table th { background: #f5f7fa; color: #334155; white-space: nowrap; }
     .diff-approval-tabs { display: flex; align-items: center; gap: 18px; padding: 0 0 8px; border-bottom: 1px solid #eef2f7; }
@@ -105,27 +110,27 @@
         <h1 class="carrier-page-title">盘点差异处理</h1>
         <div class="diff-wrap">
           <div class="diff-kpis" id="kpis"></div>
-          <div class="diff-rule-note">处理规则：差异金额大于50万元的记录按大额差异处理，需价值管理部门主管孙睿复核，并提交主管领导刘静审批；50万元及以下由责任部门负责人复核后生成调整记录。</div>
+          <div class="diff-rule-note">处理规则：系统自动判断“物资类型名称=固定资产、差异类型=盘亏、原值不低于50万元”的记录为大额盘亏，操作列展示“提交审批”；普通差异由责任部门复核处理，不走大额审批。</div>
           <section class="diff-panel">
             <div class="diff-filters">
               <div class="wh-field"><label for="fTask">盘点单号</label><input id="fTask" type="text" placeholder="请输入盘点单号"></div>
               <div class="wh-field"><label for="fCode">物资唯一码</label><input id="fCode" type="text" placeholder="请输入物资唯一码"></div>
-              <div class="wh-field"><label for="fType">差异类型</label><select id="fType"><option value="">全部类型</option><option>盘亏</option><option>盘盈</option><option>位置不符</option><option>部门不符</option></select></div>
+              <div class="wh-field"><label for="fType">差异类型</label><select id="fType"><option value="">全部类型</option><option>数量差异</option><option>位置不符</option><option>负责人不符</option><option>状态异常</option><option>编码信息不符</option><option>盘盈</option><option>盘亏</option><option>价值差异</option></select></div>
               <div class="wh-field"><label for="fDept">责任部门</label><select id="fDept"><option value="">全部部门</option><option>机械研究所</option><option>电控所</option><option>经营发展中心</option><option>华北运维部</option></select></div>
-              <div class="wh-field"><label for="fLevel">处理级别</label><select id="fLevel"><option value="">全部级别</option><option>普通差异</option><option>大额差异</option></select></div>
-              <div class="wh-field"><label for="fStatus">处理状态</label><select id="fStatus"><option value="">全部状态</option><option>待复核</option><option>处理中</option><option>已处理</option></select></div>
+              <div class="wh-field"><label for="fLevel">处理级别</label><select id="fLevel"><option value="">全部级别</option><option>普通差异</option><option>大额盘亏</option></select></div>
+              <div class="wh-field"><label for="fStatus">处理状态</label><select id="fStatus"><option value="">全部状态</option><option>待复核</option><option>处理中</option><option>待提交审批</option><option>审批中</option><option>已处理</option></select></div>
             </div>
             <div class="diff-actions">
               <button class="diff-btn primary" id="btnSearch">搜索</button>
               <button class="diff-btn" id="btnReset">重置</button>
-              <button class="diff-btn warn" id="btnBatch">批量生成调整记录</button>
+              <button class="diff-btn warn" id="btnBatch">批量复核处理</button>
               <button class="diff-btn" id="btnExport">导出差异明细</button>
             </div>
             <div class="diff-table-wrap">
               <table class="diff-table">
                 <thead>
                   <tr>
-                    <th>序号</th><th>盘点单号</th><th>物资唯一码</th><th>物资类型编码</th><th>产品编码</th><th>物资名称</th><th>账面位置</th><th>实盘位置</th><th>账面数量</th><th>实盘数量</th><th>差异类型</th><th>责任部门</th><th>差异金额</th><th>处理级别</th><th>处理状态</th><th>操作</th>
+                    <th>序号</th><th>盘点单号</th><th>资产编号</th><th>物资唯一码</th><th>物资类型编码</th><th>产品编码</th><th>物资类型名称</th><th>物资名称</th><th>账面位置</th><th>实盘位置</th><th>账面数量</th><th>实盘数量</th><th>差异类型</th><th>责任部门</th><th>原值</th><th>差异金额</th><th>是否大额盘亏</th><th>处理状态</th><th>操作</th>
                   </tr>
                 </thead>
                 <tbody id="tbody"></tbody>
@@ -153,10 +158,12 @@
         <div class="diff-table-title">盘点差异明细表</div>
         <div style="overflow:auto" data-skip-demo-unify>
           <table class="diff-detail-table">
-            <thead><tr><th>物资唯一码</th><th>物资类型编码</th><th>产品编码</th><th>物资名称</th><th>规格型号</th><th>账面位置</th><th>实盘位置</th><th>使用人/负责人</th><th>状态是否完好</th><th>账面数量</th><th>实盘数量</th><th>差异类型</th><th>差异金额</th><th>处理级别</th><th>操作</th></tr></thead>
+            <thead><tr><th>资产编号</th><th>物资唯一码</th><th>物资类型编码</th><th>产品编码</th><th>物资类型名称</th><th>物资名称</th><th>规格型号</th><th>账面位置</th><th>实盘位置</th><th>使用人/负责人</th><th>状态是否完好</th><th>账面数量</th><th>实盘数量</th><th>差异类型</th><th>原值</th><th>差异金额</th><th>是否大额盘亏</th><th>操作</th></tr></thead>
             <tbody id="detailLines"></tbody>
           </table>
         </div>
+        <div class="diff-reason-box" id="detailReason"></div>
+        <div class="diff-rule-box" id="detailRule"></div>
       </div>
       <div class="wh-modal-foot"><button type="button" class="wh-btn wh-btn--ghost" data-close>关闭</button></div>
     </div>
@@ -176,7 +183,7 @@
         </div>
         <div class="diff-approval-pane" data-approval-pane="info">
           <table class="diff-approval-table">
-            <thead><tr><th>节点名称</th><th>处理人</th><th>处理时间</th><th>处理结果</th><th>处理意见</th></tr></thead>
+            <thead><tr><th>审批节点</th><th>审批人</th><th>审批时间</th><th>审批结果</th><th>审批意见</th></tr></thead>
             <tbody id="approvalInfoBody"></tbody>
           </table>
         </div>
@@ -190,11 +197,14 @@
       <div class="wh-modal-head"><h3 class="wh-modal-title" id="handleTitle">处理差异</h3><button type="button" class="wh-modal-close" data-close aria-label="关闭">×</button></div>
       <div class="wh-modal-body">
         <div class="diff-modal-grid">
-          <div class="wh-field"><label class="wh-label">处理方式</label><select class="wh-input" id="handleWay"><option>确认盘亏，生成出库调整</option><option>确认盘盈，生成入库调整</option><option>更正所在部门/位置</option><option>提交大额差异审批</option><option>退回复盘</option></select></div>
+          <div class="wh-field"><label class="wh-label">处理方式</label><select class="wh-input" id="handleWay"><option>复核差异属实</option><option>确认盘亏，生成出库调整</option><option>确认盘盈，生成入库调整</option><option>更正所在部门/位置</option><option>提交大额盘亏审批</option><option>退回复盘</option></select></div>
           <div class="wh-field"><label class="wh-label">处理人</label><input class="wh-input" id="handleUser" value="当前用户"></div>
           <div class="wh-field"><label class="wh-label">责任部门</label><input class="wh-input" id="handleDept"></div>
           <div class="wh-field"><label class="wh-label">关联调整单号</label><input class="wh-input" id="handleNo" readonly value="系统保存后生成"></div>
-          <div class="wh-field" style="grid-column:1 / -1"><label class="wh-label">处理说明</label><input class="wh-input" id="handleRemark" placeholder="请输入差异原因、复核依据或调整说明"></div>
+          <div class="wh-field"><label class="wh-label">差异原因</label><input class="wh-input" id="handleReason"></div>
+          <div class="wh-field"><label class="wh-label">复核依据</label><input class="wh-input" id="handleProof"></div>
+          <div class="wh-field"><label class="wh-label">下一步审批人</label><input class="wh-input" id="handleNext"></div>
+          <div class="wh-field" style="grid-column:1 / -1"><label class="wh-label">处理意见</label><input class="wh-input" id="handleRemark" placeholder="请输入处理意见"></div>
         </div>
       </div>
       <div class="wh-modal-foot"><button type="button" class="wh-btn wh-btn--ghost" data-close>取消</button><button type="button" class="wh-btn wh-btn--primary" id="btnHandleOk">确定</button></div>
@@ -219,56 +229,64 @@
   <script>
     (function () {
       var rows = [
-        { id: 1, task: "PD-2026-001", flowType: "部门盘点", code: "C20260000002", typeCode: "A0010020002", product: "B00001235", name: "齿轮箱滤芯", spec: "GX-LX-90", bookLoc: "机械研究所/华北主仓A-03", realLoc: "机械研究所/华北主仓A-03", user: "许学良", health: "完好", bookQty: 12, realQty: 10, amount: 186000, type: "盘亏", dept: "机械研究所", owner: "许学良", deptHead: "李仁堂", materialOwner: "宋中波", status: "待复核", adjustNo: "待生成", reason: "账面数量与实盘数量不一致" },
-        { id: 2, task: "PD-2026-002", flowType: "公司盘点", code: "C20260000003", typeCode: "A0020010006", product: "B00001888", name: "变频器模块", spec: "VF-800", bookLoc: "电气控制所/已入库", realLoc: "电气控制所/备用柜", user: "成明锴", health: "待复核", bookQty: 2, realQty: 3, amount: 735000, type: "盘盈", dept: "电气控制所", owner: "宋中波", deptHead: "王超", materialOwner: "宋中波", financeHead: "孙睿", financeOwner: "杜欣鑫", bizHead: "陈亮、李仁堂、王贺", bizOwner: "成明锴、许学良、喻家敏", status: "处理中", adjustNo: "TZ-2026-0008", reason: "现场多出一件未入账物资" },
-        { id: 3, task: "PD-2026-002", flowType: "公司盘点", code: "C20260000011", typeCode: "A0030010004", product: "B00002119", name: "偏航电机", spec: "PY-DJ-55", bookLoc: "经营发展中心/中心仓B-02", realLoc: "现场服务中心/张北场站", user: "喻家敏", health: "完好", bookQty: 1, realQty: 1, amount: 520000, type: "位置不符", dept: "现场服务中心", owner: "宋中波", deptHead: "王超", materialOwner: "宋中波", financeHead: "孙睿", financeOwner: "杜欣鑫", bizHead: "王贺", bizOwner: "喻家敏", status: "待复核", adjustNo: "待生成", reason: "实物已流转但台账位置未同步" },
-        { id: 4, task: "PD-2026-004", flowType: "部门盘点", code: "C20260000018", typeCode: "A0040020001", product: "B00003102", name: "液压站密封包", spec: "YY-MFB-6", bookLoc: "电气控制所/主仓C-01", realLoc: "电气控制所/主仓C-01", user: "成明锴", health: "完好", bookQty: 6, realQty: 6, amount: 48000, type: "部门不符", dept: "电气控制所", owner: "成明锴", deptHead: "陈亮", materialOwner: "宋中波", status: "已处理", adjustNo: "TZ-2026-0006", reason: "领用部门字段未同步" }
+        { id: 1, task: "PD-2026-001", flowType: "部门盘点", assetNo: "ZC-2026-0002", code: "C20260000002", typeCode: "A0010020002", product: "B00001235", materialTypeName: "存货", name: "齿轮箱滤芯", spec: "GX-LX-90", bookLoc: "机械研究所/华北主仓A-03", realLoc: "机械研究所/华北主仓A-03", user: "许学良", health: "完好", bookQty: 12, realQty: 10, originalValue: 186000, amount: 186000, type: "数量差异", dept: "机械研究所", owner: "许学良", deptHead: "李仁堂", materialOwner: "宋中波", status: "待复核", adjustNo: "待生成", reason: "账面数量与实盘数量不一致", proof: "盘库单PK-2026-0412、现场照片", nextUser: "李仁堂" },
+        { id: 2, task: "PD-2026-002", flowType: "公司盘点", assetNo: "ZC-2026-0003", code: "C20260000003", typeCode: "A0020010006", product: "B00001888", materialTypeName: "存货", name: "变频器模块", spec: "VF-800", bookLoc: "电气控制所/已入库", realLoc: "电气控制所/备用柜", user: "成明锴", health: "待复核", bookQty: 2, realQty: 3, originalValue: 245000, amount: 245000, type: "盘盈", dept: "电气控制所", owner: "宋中波", deptHead: "王超", materialOwner: "宋中波", financeHead: "孙睿", financeOwner: "杜欣鑫", bizHead: "陈亮、李仁堂、王贺", bizOwner: "成明锴、许学良、喻家敏", status: "处理中", adjustNo: "TZ-2026-0008", reason: "现场多出一件未入账物资", proof: "采购合同、入库单、现场盘点照片", nextUser: "陈亮" },
+        { id: 3, task: "PD-2026-002", flowType: "公司盘点", assetNo: "ZC-2026-0011", code: "C20260000011", typeCode: "A0030010004", product: "B00002119", materialTypeName: "固定资产", name: "偏航电机", spec: "PY-DJ-55", bookLoc: "经营发展中心/中心仓B-02", realLoc: "现场服务中心/张北场站", user: "喻家敏", health: "完好", bookQty: 1, realQty: 1, originalValue: 520000, amount: 0, type: "位置不符", dept: "现场服务中心", owner: "宋中波", deptHead: "王超", materialOwner: "宋中波", financeHead: "孙睿", financeOwner: "杜欣鑫", bizHead: "王贺", bizOwner: "喻家敏", status: "待复核", adjustNo: "待生成", reason: "实物已流转但台账位置未同步", proof: "流转记录、领用记录、现场照片", nextUser: "王贺" },
+        { id: 4, task: "PD-2026-004", flowType: "部门盘点", assetNo: "ZC-2026-0018", code: "C20260000018", typeCode: "A0040020001", product: "B00003102", materialTypeName: "存货", name: "液压站密封包", spec: "YY-MFB-6", bookLoc: "电气控制所/主仓C-01", realLoc: "电气控制所/主仓C-01", user: "成明锴", health: "完好", bookQty: 6, realQty: 6, originalValue: 48000, amount: 0, type: "负责人不符", dept: "电气控制所", owner: "成明锴", deptHead: "陈亮", materialOwner: "宋中波", status: "已处理", adjustNo: "TZ-2026-0006", reason: "领用负责人字段未同步", proof: "扫码领用记录", nextUser: "-" },
+        { id: 5, task: "PD-2026-002", flowType: "公司盘点", assetNo: "ZC-2026-0022", code: "C20260000022", typeCode: "A0050010003", product: "B00005210", materialTypeName: "固定资产", name: "主控柜测试平台", spec: "ZK-TP-500", bookLoc: "经营发展中心/设备间", realLoc: "未发现实物", user: "王超", health: "缺失", bookQty: 1, realQty: 0, originalValue: 760000, amount: 760000, type: "盘亏", dept: "经营发展中心", owner: "宋中波", deptHead: "王超", materialOwner: "宋中波", financeHead: "孙睿", financeOwner: "杜欣鑫", bizHead: "王超", bizOwner: "王超", status: "待提交审批", adjustNo: "待生成", reason: "固定资产实物缺失，原值不低于50万元，系统自动标记为大额盘亏", proof: "固定资产台账、现场盘点照片、责任部门说明", nextUser: "孙睿、刘静" },
+        { id: 6, task: "PD-2026-003", flowType: "部门盘点", assetNo: "WX-2026-0001", code: "C20260000021", typeCode: "A0060010001", product: "B00004101", materialTypeName: "无形资产", name: "风机诊断软件授权", spec: "V3.2 企业版", bookLoc: "经营发展中心/系统账号", realLoc: "授权账号待核验", user: "王超", health: "待复核", bookQty: 1, realQty: 1, originalValue: 260000, amount: 22000, type: "状态异常", dept: "经营发展中心", owner: "宋中波", deptHead: "王超", materialOwner: "宋中波", status: "待复核", adjustNo: "待生成", reason: "授权账号使用状态待核验", proof: "授权清单、登录记录", nextUser: "王超" }
       ];
       var state = { filters: {}, current: null };
       function typeTag(t) {
         if (t === "盘亏") return '<span class="diff-tag loss">盘亏</span>';
         if (t === "盘盈") return '<span class="diff-tag gain">盘盈</span>';
-        if (t === "位置不符") return '<span class="diff-tag place">位置不符</span>';
-        return '<span class="diff-tag place">部门不符</span>';
+        if (t === "数量差异" || t === "价值差异") return '<span class="diff-tag loss">' + t + '</span>';
+        return '<span class="diff-tag place">' + t + '</span>';
       }
       function statusTag(s) {
         if (s === "已处理") return '<span class="diff-tag done">已处理</span>';
+        if (s === "审批中" || s === "待提交审批") return '<span class="diff-tag high">' + s + '</span>';
         return '<span class="diff-tag wait">' + s + '</span>';
       }
       function money(v) {
         return "¥" + Number(v || 0).toLocaleString("zh-CN", { maximumFractionDigits: 0 });
       }
-      function isHigh(row) {
-        return Number(row.amount || 0) > 500000;
+      function isHighLoss(row) {
+        return row.materialTypeName === "固定资产" && row.type === "盘亏" && Number(row.originalValue || 0) >= 500000;
       }
       function levelText(row) {
-        return isHigh(row) ? "大额差异" : "普通差异";
+        return isHighLoss(row) ? "大额盘亏" : "普通差异";
       }
       function levelTag(row) {
-        return isHigh(row) ? '<span class="diff-tag high">大额差异</span>' : '<span class="diff-tag normal">普通差异</span>';
+        return isHighLoss(row) ? '<span class="diff-tag high">大额盘亏</span>' : '<span class="diff-tag normal">普通差异</span>';
       }
       function approvalText(row) {
-        return isHigh(row) ? "差异金额大于50万元，需价值管理部门主管孙睿复核，并提交主管领导刘静审批" : "差异金额50万元及以下，由责任部门负责人" + (row.deptHead || "李仁堂") + "复核处理";
+        return isHighLoss(row) ? "系统判断为固定资产盘亏且原值不低于50万元，需价值管理部门主管孙睿复核，并提交主管领导刘静审批" : "普通差异由责任部门负责人" + (row.deptHead || "李仁堂") + "复核处理";
       }
       function rowActions(row) {
-        var buttons = [
-          '<span role="button" tabindex="0" data-diff-act="view" data-id="' + row.id + '">查看</span>',
-          '<span role="button" tabindex="0" data-diff-act="track" data-id="' + row.id + '">物资跟踪</span>'
-        ];
-        if (row.status !== "已处理") buttons.push('<span role="button" tabindex="0" data-diff-act="handle" data-id="' + row.id + '">处理</span>');
-        if (isHigh(row)) buttons.push('<span role="button" tabindex="0" data-diff-act="approve" data-id="' + row.id + '">大额审批</span>');
-        if (row.status !== "已处理") buttons.push('<span role="button" tabindex="0" data-diff-act="adjust" data-id="' + row.id + '">生成调整</span>');
-        if (row.status !== "已处理") buttons.push('<span role="button" tabindex="0" data-diff-act="return" data-id="' + row.id + '">退回复盘</span>');
+        var buttons = ['<span role="button" tabindex="0" data-diff-act="view" data-id="' + row.id + '">查看</span>'];
+        if (row.status === "待复核") {
+          buttons.push('<span role="button" tabindex="0" data-diff-act="review" data-id="' + row.id + '">复核</span>');
+          buttons.push('<span role="button" tabindex="0" data-diff-act="handle" data-id="' + row.id + '">处理</span>');
+        } else if (row.status === "处理中") {
+          buttons.push('<span role="button" tabindex="0" data-diff-act="handle" data-id="' + row.id + '">处理</span>');
+          if (isHighLoss(row)) buttons.push('<span role="button" tabindex="0" data-diff-act="submit-approval" data-id="' + row.id + '">提交审批</span>');
+          else buttons.push('<span role="button" tabindex="0" data-diff-act="complete" data-id="' + row.id + '">确认完成</span>');
+        } else if (row.status === "待提交审批") {
+          buttons.push('<span role="button" tabindex="0" data-diff-act="submit-approval" data-id="' + row.id + '">提交审批</span>');
+        } else if (row.status === "审批中") {
+          buttons.push('<span role="button" tabindex="0" data-diff-act="progress" data-id="' + row.id + '">审批进度</span>');
+        } else if (row.status === "已处理") {
+          buttons.push('<span role="button" tabindex="0" data-diff-act="track" data-id="' + row.id + '">物资跟踪</span>');
+        }
         return '<span class="diff-op">' + buttons.join("") + '</span>';
       }
       function lineActions(row) {
-        var buttons = [
-          '<span role="button" tabindex="0" data-line-act="track" data-code="' + row.code + '">物资跟踪</span>',
-          '<span role="button" tabindex="0" data-line-act="handle" data-code="' + row.code + '">差异处理</span>',
-          '<span role="button" tabindex="0" data-line-act="adjust" data-code="' + row.code + '">生成调整</span>'
-        ];
-        if (isHigh(row)) buttons.push('<span role="button" tabindex="0" data-line-act="approve" data-code="' + row.code + '">大额审批</span>');
-        if (row.status !== "已处理") buttons.push('<span role="button" tabindex="0" data-line-act="return" data-code="' + row.code + '">退回复盘</span>');
+        var buttons = ['<span role="button" tabindex="0" data-line-act="track" data-code="' + row.code + '">物资跟踪</span>'];
+        if (row.status !== "已处理") buttons.push('<span role="button" tabindex="0" data-line-act="handle" data-code="' + row.code + '">处理</span>');
+        if (isHighLoss(row) && row.status !== "审批中" && row.status !== "已处理") buttons.push('<span role="button" tabindex="0" data-line-act="submit-approval" data-code="' + row.code + '">提交审批</span>');
+        if (row.status === "审批中") buttons.push('<span role="button" tabindex="0" data-line-act="progress" data-code="' + row.code + '">审批进度</span>');
+        if (row.status !== "已处理" && !isHighLoss(row)) buttons.push('<span role="button" tabindex="0" data-line-act="complete" data-code="' + row.code + '">确认完成</span>');
         return '<span class="diff-op">' + buttons.join("") + '</span>';
       }
       function getRows() {
@@ -293,10 +311,10 @@
         if (normalizeFlowType(row) === "company") {
           return [
             { name: "发起公司物资盘点", person: "宋中波", text: "物资管理部门物资专责宋中波发起公司物资盘点" },
-            { name: "生成公司物资清单", person: "宋中波", text: "系统按宋中波发起的范围生成公司所有已入库、未入库物资清单" },
+            { name: "生成公司物资清单", person: "宋中波", text: "系统根据物资管理部门物资专责宋中波发起的信息生成公司所有已入库、未入库物资清单，存货类同步带入最近盘库日期、盘库账面数量、盘库实盘数量和盘库差异" },
             { name: "物资部门同意并分配", person: "王超", text: "物资管理部门负责人王超同意，并分配宋中波等本部门盘点人员" },
             { name: "业务部门同意并分配", person: row.bizHead || "陈亮、李仁堂、王贺", text: "所有业务部门负责人" + (row.bizHead || "陈亮、李仁堂、王贺") + "同意，并分配本部门盘点人员" },
-            { name: "三方逐条共同确认", person: "宋中波、杜欣鑫、" + (row.bizOwner || "成明锴、许学良"), text: "宋中波、杜欣鑫、" + (row.bizOwner || "成明锴、许学良") + "共同确认物资型号、编码、存储地点、使用人/负责人是否与系统台帐一致，状态是否完好" },
+            { name: "三方逐条共同确认", person: "宋中波、杜欣鑫、" + (row.bizOwner || "成明锴、许学良"), text: "所有参与盘点人员宋中波、杜欣鑫、" + (row.bizOwner || "成明锴、许学良") + "收到流程，按清单逐条确认，物资、财务、业务三方共同确认物资型号、编码、存储地点、使用人/负责人等信息是否与系统台帐一致，状态是否完好" },
             { name: "财务负责人审阅", person: row.financeHead || "孙睿", text: "盘点完毕，提交财务负责人" + (row.financeHead || "孙睿") + "审阅" },
             { name: "物资管理部门负责人审阅", person: "王超", text: "物资管理部门负责人王超审阅" },
             { name: "物资专责阅知", person: "宋中波", text: "物资管理部门物资专责宋中波阅知" },
@@ -305,7 +323,7 @@
         }
         return [
           { name: "盘点开始", person: row.owner || "许学良", text: "部门物资专责" + (row.owner || "许学良") + "点击盘点开始，进入部门内物资盘点" },
-          { name: "生成部门物资清单", person: row.owner || "许学良", text: "系统生成" + (row.owner || "许学良") + "负责的" + row.dept + "所属物资清单" },
+          { name: "生成部门物资清单", person: row.owner || "许学良", text: "系统根据部门物资专责" + (row.owner || "许学良") + "发起的信息生成" + row.dept + "所属物资清单，存货类同步带入最近盘库日期、盘库账面数量、盘库实盘数量和盘库差异" },
           { name: "逐条盘点确认", person: row.owner || "许学良", text: "部门物资专责" + (row.owner || "许学良") + "逐条确认物资型号、编码、存储地点、使用人/负责人是否与系统台帐一致，状态是否完好" },
           { name: "部门负责人审阅", person: row.deptHead || "李仁堂", text: "盘点完毕，提交部门负责人" + (row.deptHead || "李仁堂") + "审阅，盘点无误" },
           { name: "物资专责审阅确认", person: row.materialOwner || "宋中波", text: "物资管理部门物资专责" + (row.materialOwner || "宋中波") + "审阅，确认" },
@@ -334,7 +352,7 @@
         document.getElementById("kpis").innerHTML = [
           ["差异总数", rows.length],
           ["待复核", rows.filter(function (x) { return x.status === "待复核"; }).length],
-          ["大额差异", rows.filter(function (x) { return isHigh(x); }).length],
+          ["大额盘亏", rows.filter(function (x) { return isHighLoss(x); }).length],
           ["已处理", rows.filter(function (x) { return x.status === "已处理"; }).length]
         ].map(function (x) { return '<div class="diff-kpi"><b>' + x[0] + '</b><span>' + x[1] + '</span></div>'; }).join("");
       }
@@ -342,7 +360,7 @@
         var list = getRows();
         renderKpis();
         document.getElementById("tbody").innerHTML = list.map(function (x, i) {
-          return '<tr><td>' + (i + 1) + '</td><td>' + x.task + '</td><td>' + x.code + '</td><td>' + x.typeCode + '</td><td>' + x.product + '</td><td>' + x.name + '</td><td>' + x.bookLoc + '</td><td>' + x.realLoc + '</td><td>' + x.bookQty + '</td><td>' + x.realQty + '</td><td>' + typeTag(x.type) + '</td><td>' + x.dept + '</td><td>' + money(x.amount) + '</td><td>' + levelTag(x) + '</td><td>' + statusTag(x.status) + '</td><td>' + rowActions(x) + '</td></tr>';
+          return '<tr class="' + (isHighLoss(x) ? "diff-row-high" : "diff-row-problem") + '"><td>' + (i + 1) + '</td><td>' + x.task + '</td><td>' + x.assetNo + '</td><td>' + x.code + '</td><td>' + x.typeCode + '</td><td>' + x.product + '</td><td>' + x.materialTypeName + '</td><td>' + x.name + '</td><td>' + x.bookLoc + '</td><td>' + x.realLoc + '</td><td>' + x.bookQty + '</td><td>' + x.realQty + '</td><td>' + typeTag(x.type) + '</td><td>' + x.dept + '</td><td>' + money(x.originalValue) + '</td><td>' + money(x.amount) + '</td><td>' + levelTag(x) + '</td><td>' + statusTag(x.status) + '</td><td>' + rowActions(x) + '</td></tr>';
         }).join("");
       }
       function open(mask) {
@@ -358,14 +376,17 @@
       }
       function fillHandle(row) {
         state.current = row;
-        document.getElementById("handleTitle").textContent = isHigh(row) ? "大额差异审批" : "处理差异";
-        document.getElementById("handleWay").value = isHigh(row) ? "提交大额差异审批" : "确认盘亏，生成出库调整";
+        document.getElementById("handleTitle").textContent = isHighLoss(row) ? "大额盘亏审批" : "处理差异";
+        document.getElementById("handleWay").value = isHighLoss(row) ? "提交大额盘亏审批" : (row.status === "待复核" ? "复核差异属实" : "更正所在部门/位置");
         document.getElementById("handleDept").value = row.dept;
-        document.getElementById("handleRemark").value = isHigh(row) ? approvalText(row) + "；" + row.reason : row.reason;
+        document.getElementById("handleReason").value = row.reason;
+        document.getElementById("handleProof").value = row.proof || "";
+        document.getElementById("handleNext").value = isHighLoss(row) ? "孙睿复核，刘静审批" : (row.nextUser || row.deptHead || "李仁堂");
+        document.getElementById("handleRemark").value = isHighLoss(row) ? approvalText(row) + "；" + row.reason : row.reason;
       }
       function openTrack(row) {
         document.getElementById("trackGrid").innerHTML = [
-          ["物资唯一码", row.code], ["物资类型编码", row.typeCode], ["产品编码", row.product], ["物资名称", row.name],
+          ["资产编号", row.assetNo], ["物资唯一码", row.code], ["物资类型编码", row.typeCode], ["产品编码", row.product], ["物资类型名称", row.materialTypeName], ["物资名称", row.name],
           ["规格型号", row.spec], ["责任部门", row.dept], ["账面位置", row.bookLoc], ["实盘位置", row.realLoc],
           ["差异类型", row.type], ["差异金额", money(row.amount)], ["处理级别", levelText(row)], ["处理状态", row.status],
           ["关联盘点单号", row.task], ["关联调整单号", row.adjustNo]
@@ -395,13 +416,15 @@
       function showDetail(row) {
         state.current = row;
         document.getElementById("detailGrid").innerHTML = [
-          ["盘点单号", row.task], ["物资唯一码", row.code], ["物资类型编码", row.typeCode], ["产品编码", row.product],
-          ["物资名称", row.name], ["差异类型", row.type], ["账面位置", row.bookLoc], ["实盘位置", row.realLoc],
-          ["使用人/负责人", row.user], ["状态是否完好", row.health], ["账面数量", row.bookQty], ["实盘数量", row.realQty], ["责任部门", row.dept], ["差异金额", money(row.amount)],
-          ["处理级别", levelText(row)], ["处理状态", row.status], ["审批要求", approvalText(row)],
+          ["盘点单号", row.task], ["资产编号", row.assetNo], ["物资唯一码", row.code], ["物资类型编码", row.typeCode], ["产品编码", row.product],
+          ["物资类型名称", row.materialTypeName], ["物资名称", row.name], ["差异类型", row.type], ["账面位置", row.bookLoc], ["实盘位置", row.realLoc],
+          ["使用人/负责人", row.user], ["状态是否完好", row.health], ["账面数量", row.bookQty], ["实盘数量", row.realQty], ["责任部门", row.dept],
+          ["原值", money(row.originalValue)], ["差异金额", money(row.amount)], ["是否大额盘亏", levelText(row)], ["处理状态", row.status], ["审批要求", approvalText(row)],
           ["差异原因", row.reason], ["盘点流程类型", row.flowType], ["数据来源", "盘点任务、库存台账、扫码领用、部门流转、销售发货"]
         ].map(function (x) { return '<div class="wh-detail-item"><span class="wh-detail-label">' + x[0] + '</span><span class="wh-detail-value">' + x[1] + '</span></div>'; }).join("");
-        document.getElementById("detailLines").innerHTML = '<tr><td>' + row.code + '</td><td>' + row.typeCode + '</td><td>' + row.product + '</td><td>' + row.name + '</td><td>' + row.spec + '</td><td>' + row.bookLoc + '</td><td>' + row.realLoc + '</td><td>' + row.user + '</td><td>' + row.health + '</td><td>' + row.bookQty + '</td><td>' + row.realQty + '</td><td>' + typeTag(row.type) + '</td><td>' + money(row.amount) + '</td><td>' + levelTag(row) + '</td><td>' + lineActions(row) + '</td></tr>';
+        document.getElementById("detailLines").innerHTML = '<tr class="' + (isHighLoss(row) ? "diff-row-high" : "diff-row-problem") + '"><td>' + row.assetNo + '</td><td>' + row.code + '</td><td>' + row.typeCode + '</td><td>' + row.product + '</td><td>' + row.materialTypeName + '</td><td>' + row.name + '</td><td>' + row.spec + '</td><td>' + row.bookLoc + '</td><td>' + row.realLoc + '</td><td>' + row.user + '</td><td>' + row.health + '</td><td>' + row.bookQty + '</td><td>' + row.realQty + '</td><td>' + typeTag(row.type) + '</td><td>' + money(row.originalValue) + '</td><td>' + money(row.amount) + '</td><td>' + levelTag(row) + '</td><td>' + lineActions(row) + '</td></tr>';
+        document.getElementById("detailReason").innerHTML = '<strong>差异原因：</strong>' + row.reason + '<br><strong>复核依据：</strong>' + (row.proof || "-");
+        document.getElementById("detailRule").innerHTML = '<strong>系统规则：</strong>' + (isHighLoss(row) ? "该记录满足“固定资产 + 盘亏 + 原值不低于50万元”，系统自动标记为大额盘亏，操作列展示提交审批。" : "该记录不满足大额盘亏条件，按普通差异由责任部门复核处理。");
         open(document.getElementById("detailMask"));
       }
       document.addEventListener("click", function (e) {
@@ -414,10 +437,20 @@
           var line = findLine(lineOp.getAttribute("data-code"));
           if (lineOp.getAttribute("data-line-act") === "track") openTrack(line);
           if (lineOp.getAttribute("data-line-act") === "handle") { fillHandle(line); close(document.getElementById("detailMask")); open(document.getElementById("handleMask")); }
-          if (lineOp.getAttribute("data-line-act") === "approve") { fillHandle(line); close(document.getElementById("detailMask")); open(document.getElementById("handleMask")); }
-          if (lineOp.getAttribute("data-line-act") === "adjust") {
+          if (lineOp.getAttribute("data-line-act") === "submit-approval") {
+            line.status = "审批中";
+            close(document.getElementById("detailMask"));
+            renderTable();
+          }
+          if (lineOp.getAttribute("data-line-act") === "progress") {
+            state.current = line;
+            close(document.getElementById("detailMask"));
+            openFlow(line);
+          }
+          if (lineOp.getAttribute("data-line-act") === "complete") {
             line.status = "处理中";
             line.adjustNo = line.adjustNo === "待生成" ? "TZ-2026-0010" : line.adjustNo;
+            line.status = "已处理";
             close(document.getElementById("detailMask"));
             renderTable();
           }
@@ -440,13 +473,16 @@
           renderTable();
         }
         if (e.target.id === "btnBatch") {
-          rows.forEach(function (x) { if (x.status !== "已处理") x.status = "处理中"; });
+          rows.forEach(function (x) {
+            if (x.status === "已处理") return;
+            x.status = isHighLoss(x) ? "待提交审批" : "处理中";
+          });
           renderTable();
         }
         if (e.target.id === "btnFlowProgress") openFlow(state.current);
         if (e.target.id === "btnExport") alert("正在导出盘点差异明细（演示）");
         if (e.target.id === "btnHandleOk" && state.current) {
-          state.current.status = "已处理";
+          state.current.status = isHighLoss(state.current) ? "审批中" : "已处理";
           state.current.reason = document.getElementById("handleRemark").value || state.current.reason;
           state.current.adjustNo = state.current.adjustNo === "待生成" ? "TZ-2026-0010" : state.current.adjustNo;
           close(document.getElementById("handleMask"));
@@ -460,16 +496,24 @@
           if (op.getAttribute("data-diff-act") === "track") {
             openTrack(row);
           }
+          if (op.getAttribute("data-diff-act") === "review") {
+            row.status = "处理中";
+            renderTable();
+          }
           if (op.getAttribute("data-diff-act") === "handle") {
             fillHandle(row);
             open(document.getElementById("handleMask"));
           }
-          if (op.getAttribute("data-diff-act") === "approve") {
-            fillHandle(row);
-            open(document.getElementById("handleMask"));
+          if (op.getAttribute("data-diff-act") === "submit-approval") {
+            row.status = "审批中";
+            renderTable();
           }
-          if (op.getAttribute("data-diff-act") === "adjust") {
-            row.status = "处理中";
+          if (op.getAttribute("data-diff-act") === "progress") {
+            state.current = row;
+            openFlow(row);
+          }
+          if (op.getAttribute("data-diff-act") === "complete") {
+            row.status = "已处理";
             row.adjustNo = row.adjustNo === "待生成" ? "TZ-2026-0010" : row.adjustNo;
             renderTable();
           }
