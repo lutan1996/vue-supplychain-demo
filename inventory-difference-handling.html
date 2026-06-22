@@ -28,7 +28,7 @@
     .diff-table th, .diff-table td { border: 1px solid #e8e8e8; padding: 8px; color: #262626; text-align: left; }
     .diff-table th { background: #f5f5f5; color: #334155; white-space: nowrap; }
     .diff-op { display: inline-flex; flex-wrap: wrap; gap: 8px; white-space: nowrap; }
-    .diff-op button { border: none; background: transparent; color: #1677ff; cursor: pointer; font-size: 12px; padding: 0; font-family: inherit; }
+    .diff-op button, .diff-op [role="button"] { border: none; background: transparent; color: #1677ff; cursor: pointer; font-size: 12px; padding: 0; font-family: inherit; }
     .diff-tag { display: inline-flex; align-items: center; height: 22px; padding: 0 8px; border-radius: 4px; border: 1px solid transparent; font-size: 11px; }
     .diff-tag.loss { background: #fff1f0; border-color: #ffa39e; color: #cf1322; }
     .diff-tag.gain { background: #f6ffed; border-color: #b7eb8f; color: #389e0d; }
@@ -225,25 +225,25 @@
       }
       function rowActions(row) {
         var buttons = [
-          '<button data-act="view" data-id="' + row.id + '">查看</button>',
-          '<button data-act="track" data-id="' + row.id + '">物资跟踪</button>',
-          '<button data-act="handle" data-id="' + row.id + '">处理</button>',
-          '<button data-act="flow" data-id="' + row.id + '">流程进度</button>'
+          '<span role="button" tabindex="0" data-diff-act="view" data-id="' + row.id + '">查看</span>',
+          '<span role="button" tabindex="0" data-diff-act="track" data-id="' + row.id + '">物资跟踪</span>',
+          '<span role="button" tabindex="0" data-diff-act="handle" data-id="' + row.id + '">处理</span>',
+          '<span role="button" tabindex="0" data-diff-act="flow" data-id="' + row.id + '">流程进度</span>'
         ];
-        if (isHigh(row)) buttons.push('<button data-act="approve" data-id="' + row.id + '">大额审批</button>');
-        if (row.status !== "已处理") buttons.push('<button data-act="adjust" data-id="' + row.id + '">生成调整</button>');
-        if (row.status !== "已处理") buttons.push('<button data-act="return" data-id="' + row.id + '">退回复盘</button>');
+        if (isHigh(row)) buttons.push('<span role="button" tabindex="0" data-diff-act="approve" data-id="' + row.id + '">大额审批</span>');
+        if (row.status !== "已处理") buttons.push('<span role="button" tabindex="0" data-diff-act="adjust" data-id="' + row.id + '">生成调整</span>');
+        if (row.status !== "已处理") buttons.push('<span role="button" tabindex="0" data-diff-act="return" data-id="' + row.id + '">退回复盘</span>');
         return '<span class="diff-op">' + buttons.join("") + '</span>';
       }
       function lineActions(row) {
         var buttons = [
-          '<button type="button" data-line-act="track" data-code="' + row.code + '">物资跟踪</button>',
-          '<button type="button" data-line-act="handle" data-code="' + row.code + '">差异处理</button>',
-          '<button type="button" data-line-act="flow" data-code="' + row.code + '">流程进度</button>',
-          '<button type="button" data-line-act="adjust" data-code="' + row.code + '">生成调整</button>'
+          '<span role="button" tabindex="0" data-line-act="track" data-code="' + row.code + '">物资跟踪</span>',
+          '<span role="button" tabindex="0" data-line-act="handle" data-code="' + row.code + '">差异处理</span>',
+          '<span role="button" tabindex="0" data-line-act="flow" data-code="' + row.code + '">流程进度</span>',
+          '<span role="button" tabindex="0" data-line-act="adjust" data-code="' + row.code + '">生成调整</span>'
         ];
-        if (isHigh(row)) buttons.push('<button type="button" data-line-act="approve" data-code="' + row.code + '">大额审批</button>');
-        if (row.status !== "已处理") buttons.push('<button type="button" data-line-act="return" data-code="' + row.code + '">退回复盘</button>');
+        if (isHigh(row)) buttons.push('<span role="button" tabindex="0" data-line-act="approve" data-code="' + row.code + '">大额审批</span>');
+        if (row.status !== "已处理") buttons.push('<span role="button" tabindex="0" data-line-act="return" data-code="' + row.code + '">退回复盘</span>');
         return '<span class="diff-op">' + buttons.join("") + '</span>';
       }
       function getRows() {
@@ -374,31 +374,31 @@
           close(document.getElementById("handleMask"));
           renderTable();
         }
-        var op = e.target.closest("[data-act]");
+        var op = e.target.closest("[data-diff-act]");
         if (op) {
           var row = rows.find(function (x) { return String(x.id) === op.getAttribute("data-id"); });
           if (!row) return;
-          if (op.getAttribute("data-act") === "view") showDetail(row);
-          if (op.getAttribute("data-act") === "track") {
+          if (op.getAttribute("data-diff-act") === "view") showDetail(row);
+          if (op.getAttribute("data-diff-act") === "track") {
             openTrack(row);
           }
-          if (op.getAttribute("data-act") === "handle") {
+          if (op.getAttribute("data-diff-act") === "handle") {
             fillHandle(row);
             open(document.getElementById("handleMask"));
           }
-          if (op.getAttribute("data-act") === "flow") {
+          if (op.getAttribute("data-diff-act") === "flow") {
             openFlow(row);
           }
-          if (op.getAttribute("data-act") === "approve") {
+          if (op.getAttribute("data-diff-act") === "approve") {
             fillHandle(row);
             open(document.getElementById("handleMask"));
           }
-          if (op.getAttribute("data-act") === "adjust") {
+          if (op.getAttribute("data-diff-act") === "adjust") {
             row.status = "处理中";
             row.adjustNo = row.adjustNo === "待生成" ? "TZ-2026-0010" : row.adjustNo;
             renderTable();
           }
-          if (op.getAttribute("data-act") === "return") {
+          if (op.getAttribute("data-diff-act") === "return") {
             row.status = "待复核";
             row.reason = "已退回复盘，请重新确认实物位置与数量";
             renderTable();

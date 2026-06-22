@@ -33,7 +33,7 @@
     .inv-table th, .inv-table td { border: 1px solid #e8e8e8; padding: 8px; text-align: left; color: #262626; }
     .inv-table th { background: #f5f5f5; color: #334155; white-space: nowrap; }
     .inv-op { display: inline-flex; flex-wrap: wrap; gap: 8px; white-space: nowrap; }
-    .inv-op button { border: none; background: transparent; color: #1677ff; cursor: pointer; font-size: 12px; padding: 0; font-family: inherit; }
+    .inv-op button, .inv-op [role="button"] { border: none; background: transparent; color: #1677ff; cursor: pointer; font-size: 12px; padding: 0; font-family: inherit; }
     .inv-tag { display: inline-flex; align-items: center; height: 22px; padding: 0 8px; border-radius: 4px; border: 1px solid transparent; font-size: 11px; }
     .inv-tag.wait { background: #fff7e6; border-color: #ffd591; color: #d46b08; }
     .inv-tag.run { background: #e6f4ff; border-color: #91caff; color: #0958d9; }
@@ -230,23 +230,23 @@
       }
       function taskActions(row) {
         var buttons = [
-          '<button data-act="view" data-id="' + row.id + '">查看</button>',
-          '<button data-act="start" data-id="' + row.id + '">执行盘点</button>',
-          '<button data-act="flow" data-id="' + row.id + '">流程进度</button>',
-          '<button data-act="export-detail" data-id="' + row.id + '">导出明细</button>'
+          '<span role="button" tabindex="0" data-inv-act="view" data-id="' + row.id + '">查看</span>',
+          '<span role="button" tabindex="0" data-inv-act="start" data-id="' + row.id + '">执行盘点</span>',
+          '<span role="button" tabindex="0" data-inv-act="flow" data-id="' + row.id + '">流程进度</span>',
+          '<span role="button" tabindex="0" data-inv-act="export-detail" data-id="' + row.id + '">导出明细</span>'
         ];
-        if (row.diff > 0) buttons.push('<button data-act="close" data-id="' + row.id + '">生成差异</button>');
+        if (row.diff > 0) buttons.push('<span role="button" tabindex="0" data-inv-act="close" data-id="' + row.id + '">生成差异</span>');
         return '<span class="inv-op">' + buttons.join("") + '</span>';
       }
       function lineActions(line) {
         var buttons = [
-          '<button type="button" data-line-act="track" data-code="' + line.code + '">物资跟踪</button>',
-          '<button type="button" data-line-act="record" data-code="' + line.code + '">盘点记录</button>',
-          '<button type="button" data-line-act="ledger" data-code="' + line.code + '">台帐详情</button>'
+          '<span role="button" tabindex="0" data-line-act="track" data-code="' + line.code + '">物资跟踪</span>',
+          '<span role="button" tabindex="0" data-line-act="record" data-code="' + line.code + '">盘点记录</span>',
+          '<span role="button" tabindex="0" data-line-act="ledger" data-code="' + line.code + '">台帐详情</span>'
         ];
         if (line.result !== "账实相符") {
-          buttons.push('<button type="button" data-line-act="diff" data-code="' + line.code + '">生成差异</button>');
-          buttons.push('<button type="button" data-line-act="handle" data-code="' + line.code + '">差异处理</button>');
+          buttons.push('<span role="button" tabindex="0" data-line-act="diff" data-code="' + line.code + '">生成差异</span>');
+          buttons.push('<span role="button" tabindex="0" data-line-act="handle" data-code="' + line.code + '">差异处理</span>');
         }
         return '<span class="inv-op">' + buttons.join("") + '</span>';
       }
@@ -367,15 +367,15 @@
         if (e.target.id === "btnExport") alert("正在导出盘点任务列表（演示）");
         if (e.target.id === "btnLedgerRefresh") { renderLedger(); alert("盘点台帐已刷新（演示）"); }
         if (e.target.id === "btnLedgerExport") alert("正在导出盘点台帐（演示）");
-        var op = e.target.closest("[data-act]");
+        var op = e.target.closest("[data-inv-act]");
         if (op) {
           var row = rows.find(function (x) { return String(x.id) === op.getAttribute("data-id"); });
           if (!row) return;
-          if (op.getAttribute("data-act") === "view") openDetail(row);
-          if (op.getAttribute("data-act") === "start") { row.status = "进行中"; row.done = Math.max(row.done, Math.floor(row.should * 0.35)); renderTable(); }
-          if (op.getAttribute("data-act") === "flow") openFlow(row);
-          if (op.getAttribute("data-act") === "export-detail") alert(row.no + " 的盘点明细正在导出（演示）");
-          if (op.getAttribute("data-act") === "close") { row.status = row.diff ? "待差异处理" : "已完成"; renderTable(); }
+          if (op.getAttribute("data-inv-act") === "view") openDetail(row);
+          if (op.getAttribute("data-inv-act") === "start") { row.status = "进行中"; row.done = Math.max(row.done, Math.floor(row.should * 0.35)); renderTable(); }
+          if (op.getAttribute("data-inv-act") === "flow") openFlow(row);
+          if (op.getAttribute("data-inv-act") === "export-detail") alert(row.no + " 的盘点明细正在导出（演示）");
+          if (op.getAttribute("data-inv-act") === "close") { row.status = row.diff ? "待差异处理" : "已完成"; renderTable(); }
         }
       });
       renderTable();
