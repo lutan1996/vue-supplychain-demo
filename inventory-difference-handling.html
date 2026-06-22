@@ -45,7 +45,9 @@
     .diff-form-grid .wh-field { margin-bottom: 0; }
     .diff-form-grid .wh-field--wide { grid-column: span 2; }
     .diff-form-grid .wh-input[readonly], .diff-modal-grid .wh-input[readonly] { background: #f5f7fa; color: #595959; cursor: default; }
-    .diff-modal-title-line { display: inline-flex; align-items: center; gap: 10px; min-width: 0; flex: 1 1 auto; }
+    .page-inventory-diff #detailMask .wh-modal-head { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+    .page-inventory-diff #detailMask .wh-modal-title { color: #111; flex: 1 1 auto; min-width: 0; }
+    .diff-modal-title-line { display: inline-flex; align-items: center; justify-content: flex-end; gap: 10px; min-width: 0; flex: 0 0 auto; }
     .diff-modal-head-actions { display: inline-flex; align-items: center; gap: 8px; }
     .diff-head-action,
     .page-inventory-diff .inv-head-action,
@@ -61,11 +63,16 @@
     .diff-detail-table { width: 100%; min-width: 2360px; border-collapse: collapse; table-layout: fixed; font-size: 12px; }
     .diff-detail-table th, .diff-detail-table td { border: 1px solid #e8e8e8; padding: 8px; color: #262626; text-align: left; white-space: normal; word-break: break-all; overflow-wrap: anywhere; vertical-align: top; line-height: 1.45; }
     .diff-detail-table th { background: #f5f7fa; color: #334155; white-space: nowrap; }
-    .diff-approval-tabs { display: flex; align-items: center; gap: 18px; padding: 0 0 8px; border-bottom: 1px solid #eef2f7; }
-    .diff-approval-tab { border: 0; background: transparent; color: #60728b; cursor: pointer; font-size: 14px; font-family: inherit; padding: 0 0 6px; }
-    .diff-approval-tab.is-active { color: #1677ff; border-bottom: 2px solid #1677ff; font-weight: 600; }
-    .diff-approval-pane { display: none; }
-    .diff-approval-pane.is-active { display: block; }
+    .diff-approval-tabs,
+    .page-inventory-diff .inv-approval-tabs { display: flex; align-items: center; gap: 22px; padding: 0 0 8px; border-bottom: 1px solid #e8edf5; }
+    .diff-approval-tab,
+    .page-inventory-diff .inv-approval-tab { border: 0; background: transparent; color: #5f7288; cursor: pointer; font-size: 14px; font-family: inherit; padding: 0 0 7px; }
+    .diff-approval-tab.is-active,
+    .page-inventory-diff .inv-approval-tab.is-active { color: #1677ff; border-bottom: 2px solid #1677ff; font-weight: 600; }
+    .diff-approval-pane,
+    .page-inventory-diff .inv-approval-pane { display: none; }
+    .diff-approval-pane.is-active,
+    .page-inventory-diff .inv-approval-pane.is-active { display: block; }
     .diff-flow,
     .page-inventory-diff .inv-flow { overflow-x: auto; border: 1px solid #eef2f7; border-radius: 8px; padding: 30px 24px; margin-top: 20px; background: #fff; }
     .diff-flow-row,
@@ -83,9 +90,10 @@
     .page-inventory-diff .inv-arrow { flex: 0 0 auto; color: #8aa0b8; font-size: 24px; line-height: 1; }
     .diff-flow-note,
     .page-inventory-diff .inv-flow-note { display: none; }
-    .diff-approval-table { width: 100%; border-collapse: collapse; table-layout: fixed; font-size: 12px; margin-top: 14px; }
-    .diff-approval-table th, .diff-approval-table td { border: 1px solid #e8e8e8; padding: 8px; text-align: left; color: #262626; vertical-align: top; }
-    .diff-approval-table th { background: #f5f7fa; color: #334155; white-space: nowrap; }
+    .diff-approval-list,
+    .page-inventory-diff .inv-approval-list { margin-top: 20px; color: #51657d; font-size: 14px; font-weight: 400; line-height: 1.9; }
+    .diff-approval-line,
+    .page-inventory-diff .inv-approval-line { margin: 0 0 4px; }
     .diff-track-flow { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 8px; margin-top: 14px; }
     .diff-track-step { border: 1px solid #d9e8ff; background: #f7fbff; border-radius: 6px; padding: 8px 6px; text-align: center; color: #516a87; font-size: 12px; line-height: 1.5; }
     .diff-track-step.is-done { border-color: #91caff; background: #e6f4ff; color: #0958d9; }
@@ -159,11 +167,9 @@
   <div class="wh-modal-mask" id="detailMask" aria-hidden="true">
     <div class="wh-modal-box wh-modal-box--lg" role="dialog" aria-modal="true" aria-labelledby="detailTitle">
       <div class="wh-modal-head">
+        <h3 class="wh-modal-title" id="detailTitle">差异详情</h3>
         <div class="diff-modal-title-line">
-          <h3 class="wh-modal-title" id="detailTitle">差异详情</h3>
           <span role="button" tabindex="0" class="inv-head-action" id="btnFlowProgress">流程进度</span>
-        </div>
-        <div class="diff-modal-head-actions">
           <button type="button" class="wh-modal-close" data-close aria-label="关闭">×</button>
         </div>
       </div>
@@ -195,19 +201,16 @@
     <div class="wh-modal-box wh-modal-box--lg" role="dialog" aria-modal="true" aria-labelledby="flowTitle">
       <div class="wh-modal-head"><h3 class="wh-modal-title" id="flowTitle">审批记录</h3><button type="button" class="wh-modal-close" data-close aria-label="关闭">×</button></div>
       <div class="wh-modal-body">
-        <div class="diff-approval-tabs">
-          <button type="button" class="diff-approval-tab is-active" data-approval-tab="flow">流程图</button>
-          <button type="button" class="diff-approval-tab" data-approval-tab="info">审批信息</button>
+        <div class="inv-approval-tabs">
+          <button type="button" class="inv-approval-tab is-active" data-approval-tab="flow">流程图</button>
+          <button type="button" class="inv-approval-tab" data-approval-tab="info">审批信息</button>
         </div>
-        <div class="diff-approval-pane is-active" data-approval-pane="flow">
+        <div class="inv-approval-pane is-active" data-approval-pane="flow">
           <div class="inv-flow"><div class="inv-flow-row" id="flowSteps"></div></div>
           <div class="inv-flow-note" id="flowNote"></div>
         </div>
-        <div class="diff-approval-pane" data-approval-pane="info">
-          <table class="diff-approval-table">
-            <thead><tr><th>审批节点</th><th>审批人</th><th>审批时间</th><th>审批结果</th><th>审批意见</th></tr></thead>
-            <tbody id="approvalInfoBody"></tbody>
-          </table>
+        <div class="inv-approval-pane" data-approval-pane="info">
+          <div class="inv-approval-list" id="approvalInfoBody"></div>
         </div>
       </div>
       <div class="wh-modal-foot"><button type="button" class="wh-btn wh-btn--ghost" data-close>关闭</button></div>
@@ -415,8 +418,8 @@
           var arrow = i < steps.length - 1 ? '<span class="inv-arrow">→</span>' : "";
           return '<div class="inv-step' + cls + '"><strong>' + step.name + '</strong><span>' + step.person + '</span></div>' + arrow;
         }).join("");
-        document.getElementById("approvalInfoBody").innerHTML = approvalRowsFor(state.current).map(function (x) {
-          return '<tr><td>' + x.node + '</td><td>' + x.person + '</td><td>' + x.time + '</td><td>' + x.result + '</td><td>' + x.opinion + '</td></tr>';
+        document.getElementById("approvalInfoBody").innerHTML = approvalRowsFor(state.current).map(function (x, i) {
+          return '<p class="inv-approval-line">' + (i + 1) + '、' + x.person + x.result + '：' + x.opinion + '（' + x.time + '）</p>';
         }).join("");
         document.getElementById("flowNote").textContent = state.current.task + "，差异来自" + state.current.flowType + "；" + approvalText(state.current);
         switchApprovalTab("flow");
