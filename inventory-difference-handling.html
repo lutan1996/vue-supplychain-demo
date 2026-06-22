@@ -39,18 +39,31 @@
     .diff-tag.normal { background: #f0f5ff; border-color: #adc6ff; color: #1d39c4; }
     .diff-modal-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px 18px; }
     .diff-modal-grid .wh-field { margin-bottom: 0; }
+    .diff-modal-title-line { display: inline-flex; align-items: center; gap: 10px; min-width: 0; }
     .diff-modal-head-actions { display: inline-flex; align-items: center; gap: 8px; }
-    .diff-head-action { height: 28px; border: 1px solid #91caff; border-radius: 4px; background: #e6f4ff; color: #1677ff; padding: 0 10px; font-size: 12px; cursor: pointer; font-family: inherit; }
+    .diff-head-action { display: inline-flex; align-items: center; height: 28px; border: 1px solid #91caff; border-radius: 4px; background: #e6f4ff; color: #1677ff; padding: 0 10px; font-size: 12px; cursor: pointer; font-family: inherit; }
     .diff-head-action:hover { background: #bae0ff; border-color: #69b1ff; }
     .diff-table-title { margin: 14px 0 8px; color: #334155; font-size: 13px; font-weight: 600; }
     .diff-detail-table { width: 100%; min-width: 1380px; border-collapse: collapse; table-layout: fixed; font-size: 12px; }
     .diff-detail-table th, .diff-detail-table td { border: 1px solid #e8e8e8; padding: 8px; color: #262626; text-align: left; }
     .diff-detail-table th { background: #f5f7fa; color: #334155; white-space: nowrap; }
-    .diff-flow { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 8px; margin-top: 14px; }
-    .diff-step { text-align: center; border: 1px dashed #d9d9d9; border-radius: 6px; padding: 8px 6px; font-size: 12px; color: #8c8c8c; }
-    .diff-step.done { border-style: solid; border-color: #52c41a; color: #389e0d; background: #f6ffed; }
-    .diff-step.active { border-style: solid; border-color: #fa8c16; color: #d46b08; background: #fff7e6; }
+    .diff-approval-tabs { display: flex; align-items: center; gap: 18px; padding: 0 0 8px; border-bottom: 1px solid #eef2f7; }
+    .diff-approval-tab { border: 0; background: transparent; color: #60728b; cursor: pointer; font-size: 14px; font-family: inherit; padding: 0 0 6px; }
+    .diff-approval-tab.is-active { color: #1677ff; border-bottom: 2px solid #1677ff; font-weight: 600; }
+    .diff-approval-pane { display: none; }
+    .diff-approval-pane.is-active { display: block; }
+    .diff-flow { overflow-x: auto; border: 1px solid #eef2f7; border-radius: 8px; padding: 18px 22px; margin-top: 14px; background: #fff; }
+    .diff-flow-row { display: inline-flex; align-items: center; min-width: 980px; gap: 14px; }
+    .diff-step { width: 148px; min-height: 82px; display: flex; flex-direction: column; justify-content: center; gap: 4px; text-align: center; border: 1px dashed #d9d9d9; border-radius: 8px; padding: 8px 9px; font-size: 12px; color: #8c8c8c; line-height: 1.35; }
+    .diff-step strong { color: inherit; font-size: 12px; }
+    .diff-step span { color: inherit; font-size: 11px; }
+    .diff-step.done { border-style: solid; border-color: #b7eb8f; color: #389e0d; background: #f6ffed; }
+    .diff-step.active { border-style: solid; border-color: #91caff; color: #0958d9; background: #e6f4ff; }
+    .diff-arrow { color: #8aa0b8; font-size: 22px; line-height: 1; }
     .diff-flow-note { margin-top: 10px; color: #60728b; font-size: 12px; line-height: 1.6; }
+    .diff-approval-table { width: 100%; border-collapse: collapse; table-layout: fixed; font-size: 12px; margin-top: 14px; }
+    .diff-approval-table th, .diff-approval-table td { border: 1px solid #e8e8e8; padding: 8px; text-align: left; color: #262626; vertical-align: top; }
+    .diff-approval-table th { background: #f5f7fa; color: #334155; white-space: nowrap; }
     .diff-track-flow { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 8px; margin-top: 14px; }
     .diff-track-step { border: 1px solid #d9e8ff; background: #f7fbff; border-radius: 6px; padding: 8px 6px; text-align: center; color: #516a87; font-size: 12px; line-height: 1.5; }
     .diff-track-step.is-done { border-color: #91caff; background: #e6f4ff; color: #0958d9; }
@@ -92,7 +105,7 @@
         <h1 class="carrier-page-title">盘点差异处理</h1>
         <div class="diff-wrap">
           <div class="diff-kpis" id="kpis"></div>
-          <div class="diff-rule-note">处理规则：差异金额大于50万元的记录按大额差异处理，需经营发展中心复核并提交分管领导审批；50万元及以下由责任部门复核后生成调整记录。</div>
+          <div class="diff-rule-note">处理规则：差异金额大于50万元的记录按大额差异处理，需价值管理部门主管孙睿复核，并提交主管领导刘静审批；50万元及以下由责任部门负责人复核后生成调整记录。</div>
           <section class="diff-panel">
             <div class="diff-filters">
               <div class="wh-field"><label for="fTask">盘点单号</label><input id="fTask" type="text" placeholder="请输入盘点单号"></div>
@@ -127,9 +140,11 @@
   <div class="wh-modal-mask" id="detailMask" aria-hidden="true">
     <div class="wh-modal-box wh-modal-box--lg" role="dialog" aria-modal="true" aria-labelledby="detailTitle">
       <div class="wh-modal-head">
-        <h3 class="wh-modal-title" id="detailTitle">差异详情</h3>
+        <div class="diff-modal-title-line">
+          <h3 class="wh-modal-title" id="detailTitle">差异详情</h3>
+          <span role="button" tabindex="0" class="diff-head-action" id="btnFlowProgress">流程进度</span>
+        </div>
         <div class="diff-modal-head-actions">
-          <button type="button" class="diff-head-action" id="btnFlowProgress">流程进度</button>
           <button type="button" class="wh-modal-close" data-close aria-label="关闭">×</button>
         </div>
       </div>
@@ -138,7 +153,7 @@
         <div class="diff-table-title">盘点差异明细表</div>
         <div style="overflow:auto" data-skip-demo-unify>
           <table class="diff-detail-table">
-            <thead><tr><th>物资唯一码</th><th>物资类型编码</th><th>产品编码</th><th>物资名称</th><th>规格型号</th><th>账面位置</th><th>实盘位置</th><th>账面数量</th><th>实盘数量</th><th>差异类型</th><th>差异金额</th><th>处理级别</th><th>操作</th></tr></thead>
+            <thead><tr><th>物资唯一码</th><th>物资类型编码</th><th>产品编码</th><th>物资名称</th><th>规格型号</th><th>账面位置</th><th>实盘位置</th><th>使用人/负责人</th><th>状态是否完好</th><th>账面数量</th><th>实盘数量</th><th>差异类型</th><th>差异金额</th><th>处理级别</th><th>操作</th></tr></thead>
             <tbody id="detailLines"></tbody>
           </table>
         </div>
@@ -149,10 +164,22 @@
 
   <div class="wh-modal-mask" id="flowMask" aria-hidden="true">
     <div class="wh-modal-box wh-modal-box--lg" role="dialog" aria-modal="true" aria-labelledby="flowTitle">
-      <div class="wh-modal-head"><h3 class="wh-modal-title" id="flowTitle">流程进度</h3><button type="button" class="wh-modal-close" data-close aria-label="关闭">×</button></div>
+      <div class="wh-modal-head"><h3 class="wh-modal-title" id="flowTitle">审批记录</h3><button type="button" class="wh-modal-close" data-close aria-label="关闭">×</button></div>
       <div class="wh-modal-body">
-        <div class="diff-flow" id="flowSteps"></div>
-        <div class="diff-flow-note" id="flowNote"></div>
+        <div class="diff-approval-tabs">
+          <button type="button" class="diff-approval-tab is-active" data-approval-tab="flow">流程图</button>
+          <button type="button" class="diff-approval-tab" data-approval-tab="info">审批信息</button>
+        </div>
+        <div class="diff-approval-pane is-active" data-approval-pane="flow">
+          <div class="diff-flow"><div class="diff-flow-row" id="flowSteps"></div></div>
+          <div class="diff-flow-note" id="flowNote"></div>
+        </div>
+        <div class="diff-approval-pane" data-approval-pane="info">
+          <table class="diff-approval-table">
+            <thead><tr><th>节点名称</th><th>处理人</th><th>处理时间</th><th>处理结果</th><th>处理意见</th></tr></thead>
+            <tbody id="approvalInfoBody"></tbody>
+          </table>
+        </div>
       </div>
       <div class="wh-modal-foot"><button type="button" class="wh-btn wh-btn--ghost" data-close>关闭</button></div>
     </div>
@@ -192,10 +219,10 @@
   <script>
     (function () {
       var rows = [
-        { id: 1, task: "PD-2026-001", code: "C20260000002", typeCode: "A0010020002", product: "B00001235", name: "齿轮箱滤芯", spec: "GX-LX-90", bookLoc: "机械研究所/华北主仓A-03", realLoc: "机械研究所/华北主仓A-03", bookQty: 12, realQty: 10, amount: 186000, type: "盘亏", dept: "机械研究所", status: "待复核", adjustNo: "待生成", reason: "账面数量与实盘数量不一致" },
-        { id: 2, task: "PD-2026-002", code: "C20260000003", typeCode: "A0020010006", product: "B00001888", name: "变频器模块", spec: "VF-800", bookLoc: "电控所/已领用", realLoc: "电控所/备用柜", bookQty: 2, realQty: 3, amount: 735000, type: "盘盈", dept: "电控所", status: "处理中", adjustNo: "TZ-2026-0008", reason: "现场多出一件未入账物资" },
-        { id: 3, task: "PD-2026-002", code: "C20260000011", typeCode: "A0030010004", product: "B00002119", name: "偏航电机", spec: "PY-DJ-55", bookLoc: "经营发展中心/中心仓B-02", realLoc: "华北运维部/张北场站", bookQty: 1, realQty: 1, amount: 520000, type: "位置不符", dept: "华北运维部", status: "待复核", adjustNo: "待生成", reason: "实物已流转但台账位置未同步" },
-        { id: 4, task: "PD-2026-004", code: "C20260000018", typeCode: "A0040020001", product: "B00003102", name: "液压站密封包", spec: "YY-MFB-6", bookLoc: "华北运维部/主仓C-01", realLoc: "华北运维部/主仓C-01", bookQty: 6, realQty: 6, amount: 48000, type: "部门不符", dept: "华北运维部", status: "已处理", adjustNo: "TZ-2026-0006", reason: "领用部门字段未同步" }
+        { id: 1, task: "PD-2026-001", flowType: "部门盘点", code: "C20260000002", typeCode: "A0010020002", product: "B00001235", name: "齿轮箱滤芯", spec: "GX-LX-90", bookLoc: "机械研究所/华北主仓A-03", realLoc: "机械研究所/华北主仓A-03", user: "许学良", health: "完好", bookQty: 12, realQty: 10, amount: 186000, type: "盘亏", dept: "机械研究所", owner: "许学良", deptHead: "李仁堂", materialOwner: "宋中波", status: "待复核", adjustNo: "待生成", reason: "账面数量与实盘数量不一致" },
+        { id: 2, task: "PD-2026-002", flowType: "公司盘点", code: "C20260000003", typeCode: "A0020010006", product: "B00001888", name: "变频器模块", spec: "VF-800", bookLoc: "电气控制所/已入库", realLoc: "电气控制所/备用柜", user: "成明锴", health: "待复核", bookQty: 2, realQty: 3, amount: 735000, type: "盘盈", dept: "电气控制所", owner: "宋中波", deptHead: "王超", materialOwner: "宋中波", financeHead: "孙睿", financeOwner: "杜欣鑫", bizHead: "陈亮、李仁堂、王贺", bizOwner: "成明锴、许学良、喻家敏", status: "处理中", adjustNo: "TZ-2026-0008", reason: "现场多出一件未入账物资" },
+        { id: 3, task: "PD-2026-002", flowType: "公司盘点", code: "C20260000011", typeCode: "A0030010004", product: "B00002119", name: "偏航电机", spec: "PY-DJ-55", bookLoc: "经营发展中心/中心仓B-02", realLoc: "现场服务中心/张北场站", user: "喻家敏", health: "完好", bookQty: 1, realQty: 1, amount: 520000, type: "位置不符", dept: "现场服务中心", owner: "宋中波", deptHead: "王超", materialOwner: "宋中波", financeHead: "孙睿", financeOwner: "杜欣鑫", bizHead: "王贺", bizOwner: "喻家敏", status: "待复核", adjustNo: "待生成", reason: "实物已流转但台账位置未同步" },
+        { id: 4, task: "PD-2026-004", flowType: "部门盘点", code: "C20260000018", typeCode: "A0040020001", product: "B00003102", name: "液压站密封包", spec: "YY-MFB-6", bookLoc: "电气控制所/主仓C-01", realLoc: "电气控制所/主仓C-01", user: "成明锴", health: "完好", bookQty: 6, realQty: 6, amount: 48000, type: "部门不符", dept: "电气控制所", owner: "成明锴", deptHead: "陈亮", materialOwner: "宋中波", status: "已处理", adjustNo: "TZ-2026-0006", reason: "领用部门字段未同步" }
       ];
       var state = { filters: {}, current: null };
       function typeTag(t) {
@@ -221,15 +248,14 @@
         return isHigh(row) ? '<span class="diff-tag high">大额差异</span>' : '<span class="diff-tag normal">普通差异</span>';
       }
       function approvalText(row) {
-        return isHigh(row) ? "差异金额大于50万元，需经营发展中心复核并提交分管领导审批" : "差异金额50万元及以下，由责任部门复核处理";
+        return isHigh(row) ? "差异金额大于50万元，需价值管理部门主管孙睿复核，并提交主管领导刘静审批" : "差异金额50万元及以下，由责任部门负责人" + (row.deptHead || "李仁堂") + "复核处理";
       }
       function rowActions(row) {
         var buttons = [
           '<span role="button" tabindex="0" data-diff-act="view" data-id="' + row.id + '">查看</span>',
-          '<span role="button" tabindex="0" data-diff-act="track" data-id="' + row.id + '">物资跟踪</span>',
-          '<span role="button" tabindex="0" data-diff-act="handle" data-id="' + row.id + '">处理</span>',
-          '<span role="button" tabindex="0" data-diff-act="flow" data-id="' + row.id + '">流程进度</span>'
+          '<span role="button" tabindex="0" data-diff-act="track" data-id="' + row.id + '">物资跟踪</span>'
         ];
+        if (row.status !== "已处理") buttons.push('<span role="button" tabindex="0" data-diff-act="handle" data-id="' + row.id + '">处理</span>');
         if (isHigh(row)) buttons.push('<span role="button" tabindex="0" data-diff-act="approve" data-id="' + row.id + '">大额审批</span>');
         if (row.status !== "已处理") buttons.push('<span role="button" tabindex="0" data-diff-act="adjust" data-id="' + row.id + '">生成调整</span>');
         if (row.status !== "已处理") buttons.push('<span role="button" tabindex="0" data-diff-act="return" data-id="' + row.id + '">退回复盘</span>');
@@ -239,7 +265,6 @@
         var buttons = [
           '<span role="button" tabindex="0" data-line-act="track" data-code="' + row.code + '">物资跟踪</span>',
           '<span role="button" tabindex="0" data-line-act="handle" data-code="' + row.code + '">差异处理</span>',
-          '<span role="button" tabindex="0" data-line-act="flow" data-code="' + row.code + '">流程进度</span>',
           '<span role="button" tabindex="0" data-line-act="adjust" data-code="' + row.code + '">生成调整</span>'
         ];
         if (isHigh(row)) buttons.push('<span role="button" tabindex="0" data-line-act="approve" data-code="' + row.code + '">大额审批</span>');
@@ -255,6 +280,54 @@
           if (state.filters.level && levelText(x) !== state.filters.level) return false;
           if (state.filters.status && x.status !== state.filters.status) return false;
           return true;
+        });
+      }
+      function normalizeFlowType(row) {
+        return row && row.flowType === "公司盘点" ? "company" : "dept";
+      }
+      function flowIndex(row) {
+        if (normalizeFlowType(row) === "company") return row.status === "已处理" ? 8 : 7;
+        return row.status === "已处理" ? 5 : 4;
+      }
+      function flowStepsFor(row) {
+        if (normalizeFlowType(row) === "company") {
+          return [
+            { name: "发起公司物资盘点", person: "宋中波", text: "物资管理部门物资专责宋中波发起公司物资盘点" },
+            { name: "生成公司物资清单", person: "宋中波", text: "系统按宋中波发起的范围生成公司所有已入库、未入库物资清单" },
+            { name: "物资部门同意并分配", person: "王超", text: "物资管理部门负责人王超同意，并分配宋中波等本部门盘点人员" },
+            { name: "业务部门同意并分配", person: row.bizHead || "陈亮、李仁堂、王贺", text: "所有业务部门负责人" + (row.bizHead || "陈亮、李仁堂、王贺") + "同意，并分配本部门盘点人员" },
+            { name: "三方逐条共同确认", person: "宋中波、杜欣鑫、" + (row.bizOwner || "成明锴、许学良"), text: "宋中波、杜欣鑫、" + (row.bizOwner || "成明锴、许学良") + "共同确认物资型号、编码、存储地点、使用人/负责人是否与系统台帐一致，状态是否完好" },
+            { name: "财务负责人审阅", person: row.financeHead || "孙睿", text: "盘点完毕，提交财务负责人" + (row.financeHead || "孙睿") + "审阅" },
+            { name: "物资管理部门负责人审阅", person: "王超", text: "物资管理部门负责人王超审阅" },
+            { name: "物资专责阅知", person: "宋中波", text: "物资管理部门物资专责宋中波阅知" },
+            { name: "盘点结束", person: "宋中波", text: "物资管理部门物资专责宋中波阅知后确认公司盘点结束" }
+          ];
+        }
+        return [
+          { name: "盘点开始", person: row.owner || "许学良", text: "部门物资专责" + (row.owner || "许学良") + "点击盘点开始，进入部门内物资盘点" },
+          { name: "生成部门物资清单", person: row.owner || "许学良", text: "系统生成" + (row.owner || "许学良") + "负责的" + row.dept + "所属物资清单" },
+          { name: "逐条盘点确认", person: row.owner || "许学良", text: "部门物资专责" + (row.owner || "许学良") + "逐条确认物资型号、编码、存储地点、使用人/负责人是否与系统台帐一致，状态是否完好" },
+          { name: "部门负责人审阅", person: row.deptHead || "李仁堂", text: "盘点完毕，提交部门负责人" + (row.deptHead || "李仁堂") + "审阅，盘点无误" },
+          { name: "物资专责审阅确认", person: row.materialOwner || "宋中波", text: "物资管理部门物资专责" + (row.materialOwner || "宋中波") + "审阅，确认" },
+          { name: "部门盘点结束", person: row.materialOwner || "宋中波", text: "物资管理部门物资专责" + (row.materialOwner || "宋中波") + "确认部门盘点结束" }
+        ];
+      }
+      function approvalRowsFor(row) {
+        var steps = flowStepsFor(row);
+        var active = flowIndex(row);
+        return steps.map(function (step, i) {
+          var result = i < active ? "已通过" : (i === active ? "处理中" : "待处理");
+          if (i === steps.length - 1 && row.status === "已处理") result = "已完成";
+          var time = i <= active ? "2026-06-" + String(24 + Math.min(i, 6)).padStart(2, "0") + " 10:" + String(12 + i * 4).padStart(2, "0") : "-";
+          return { node: step.name, person: step.person, time: time, result: result, opinion: step.text };
+        });
+      }
+      function switchApprovalTab(key) {
+        document.querySelectorAll("[data-approval-tab]").forEach(function (btn) {
+          btn.classList.toggle("is-active", btn.getAttribute("data-approval-tab") === key);
+        });
+        document.querySelectorAll("[data-approval-pane]").forEach(function (pane) {
+          pane.classList.toggle("is-active", pane.getAttribute("data-approval-pane") === key);
         });
       }
       function renderKpis() {
@@ -304,15 +377,19 @@
       }
       function openFlow(row) {
         state.current = row || state.current || rows[0];
-        var steps = isHigh(state.current)
-          ? ["生成差异", "责任部门复核", "经营发展中心复核", "分管领导审批", "库存调整", "归档完成"]
-          : ["生成差异", "责任部门复核", "库存调整", "归档完成"];
-        var activeIndex = state.current.status === "已处理" ? steps.length - 1 : (state.current.status === "处理中" ? Math.min(2, steps.length - 2) : 1);
+        var steps = flowStepsFor(state.current);
+        var activeIndex = flowIndex(state.current);
+        document.getElementById("flowTitle").textContent = normalizeFlowType(state.current) === "company" ? "审批记录 - 公司盘点" : "审批记录 - 部门盘点";
         document.getElementById("flowSteps").innerHTML = steps.map(function (step, i) {
           var cls = i < activeIndex ? " done" : (i === activeIndex ? " active" : "");
-          return '<div class="diff-step' + cls + '">' + step + '</div>';
+          var arrow = i < steps.length - 1 ? '<span class="diff-arrow">→</span>' : "";
+          return '<div class="diff-step' + cls + '"><strong>' + step.name + '</strong><span>' + step.person + '</span></div>' + arrow;
         }).join("");
-        document.getElementById("flowNote").textContent = approvalText(state.current);
+        document.getElementById("approvalInfoBody").innerHTML = approvalRowsFor(state.current).map(function (x) {
+          return '<tr><td>' + x.node + '</td><td>' + x.person + '</td><td>' + x.time + '</td><td>' + x.result + '</td><td>' + x.opinion + '</td></tr>';
+        }).join("");
+        document.getElementById("flowNote").textContent = state.current.task + "，差异来自" + state.current.flowType + "；" + approvalText(state.current);
+        switchApprovalTab("flow");
         open(document.getElementById("flowMask"));
       }
       function showDetail(row) {
@@ -320,21 +397,22 @@
         document.getElementById("detailGrid").innerHTML = [
           ["盘点单号", row.task], ["物资唯一码", row.code], ["物资类型编码", row.typeCode], ["产品编码", row.product],
           ["物资名称", row.name], ["差异类型", row.type], ["账面位置", row.bookLoc], ["实盘位置", row.realLoc],
-          ["账面数量", row.bookQty], ["实盘数量", row.realQty], ["责任部门", row.dept], ["差异金额", money(row.amount)],
+          ["使用人/负责人", row.user], ["状态是否完好", row.health], ["账面数量", row.bookQty], ["实盘数量", row.realQty], ["责任部门", row.dept], ["差异金额", money(row.amount)],
           ["处理级别", levelText(row)], ["处理状态", row.status], ["审批要求", approvalText(row)],
-          ["差异原因", row.reason], ["数据来源", "盘点任务、库存台账、扫码领用、部门流转、销售发货"]
+          ["差异原因", row.reason], ["盘点流程类型", row.flowType], ["数据来源", "盘点任务、库存台账、扫码领用、部门流转、销售发货"]
         ].map(function (x) { return '<div class="wh-detail-item"><span class="wh-detail-label">' + x[0] + '</span><span class="wh-detail-value">' + x[1] + '</span></div>'; }).join("");
-        document.getElementById("detailLines").innerHTML = '<tr><td>' + row.code + '</td><td>' + row.typeCode + '</td><td>' + row.product + '</td><td>' + row.name + '</td><td>' + row.spec + '</td><td>' + row.bookLoc + '</td><td>' + row.realLoc + '</td><td>' + row.bookQty + '</td><td>' + row.realQty + '</td><td>' + typeTag(row.type) + '</td><td>' + money(row.amount) + '</td><td>' + levelTag(row) + '</td><td>' + lineActions(row) + '</td></tr>';
+        document.getElementById("detailLines").innerHTML = '<tr><td>' + row.code + '</td><td>' + row.typeCode + '</td><td>' + row.product + '</td><td>' + row.name + '</td><td>' + row.spec + '</td><td>' + row.bookLoc + '</td><td>' + row.realLoc + '</td><td>' + row.user + '</td><td>' + row.health + '</td><td>' + row.bookQty + '</td><td>' + row.realQty + '</td><td>' + typeTag(row.type) + '</td><td>' + money(row.amount) + '</td><td>' + levelTag(row) + '</td><td>' + lineActions(row) + '</td></tr>';
         open(document.getElementById("detailMask"));
       }
       document.addEventListener("click", function (e) {
         var closeBtn = e.target.closest("[data-close]");
         if (closeBtn) { close(closeBtn.closest(".wh-modal-mask")); return; }
+        var approvalTab = e.target.closest("[data-approval-tab]");
+        if (approvalTab) { switchApprovalTab(approvalTab.getAttribute("data-approval-tab")); return; }
         var lineOp = e.target.closest("[data-line-act]");
         if (lineOp) {
           var line = findLine(lineOp.getAttribute("data-code"));
           if (lineOp.getAttribute("data-line-act") === "track") openTrack(line);
-          if (lineOp.getAttribute("data-line-act") === "flow") openFlow(line);
           if (lineOp.getAttribute("data-line-act") === "handle") { fillHandle(line); close(document.getElementById("detailMask")); open(document.getElementById("handleMask")); }
           if (lineOp.getAttribute("data-line-act") === "approve") { fillHandle(line); close(document.getElementById("detailMask")); open(document.getElementById("handleMask")); }
           if (lineOp.getAttribute("data-line-act") === "adjust") {
@@ -385,9 +463,6 @@
           if (op.getAttribute("data-diff-act") === "handle") {
             fillHandle(row);
             open(document.getElementById("handleMask"));
-          }
-          if (op.getAttribute("data-diff-act") === "flow") {
-            openFlow(row);
           }
           if (op.getAttribute("data-diff-act") === "approve") {
             fillHandle(row);
