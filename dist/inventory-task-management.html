@@ -68,9 +68,19 @@
     .inv-task-info-grid .inv-task-field span { display: block; margin-bottom: 6px; color: #516a87; font-weight: 600; }
     .inv-task-info-grid .inv-task-field b { display: flex; align-items: center; min-height: 36px; box-sizing: border-box; border: 1px solid #d9d9d9; border-radius: 4px; background: #fff; color: #262626; padding: 0 12px; font-weight: 400; }
     .inv-task-mini-table-wrap { overflow: auto; margin-top: 8px; }
-    .inv-task-mini-table { width: 100%; min-width: 1560px; border-collapse: collapse; table-layout: fixed; font-size: 12px; }
+    .inv-task-mini-table { width: 100%; min-width: 1660px; border-collapse: collapse; table-layout: fixed; font-size: 12px; }
     .inv-task-mini-table th, .inv-task-mini-table td { border: 1px solid #e8e8e8; padding: 8px 6px; color: #262626; text-align: left; white-space: normal; word-break: break-all; line-height: 1.45; }
     .inv-task-mini-table th { background: #f5f7fa; color: #334155; }
+    .inv-task-track-panel { margin-top: 14px; border-top: 1px solid #e8eef7; padding-top: 14px; }
+    .inv-task-track-panel[hidden] { display: none !important; }
+    .inv-task-track-panel h4 { margin: 0 0 12px; color: #1f2d3d; font-size: 14px; font-weight: 600; }
+    .inv-task-track-list { display: grid; gap: 12px; }
+    .inv-task-track-item { position: relative; padding-left: 24px; color: #111827; font-size: 14px; line-height: 1.55; }
+    .inv-task-track-item::before { content: ""; position: absolute; left: 0; top: 6px; width: 10px; height: 10px; border-radius: 50%; background: #1677ff; }
+    .inv-task-track-item:nth-child(2)::before { background: #10b981; }
+    .inv-task-track-item:nth-child(3)::before { background: #6366f1; }
+    .inv-task-track-item:nth-child(4)::before { background: #f59e0b; }
+    .inv-task-track-sub { display: block; color: #6b7280; font-size: 13px; margin-top: 2px; }
     .inv-task-status-pill { display: inline-flex; align-items: center; justify-content: center; min-width: 56px; height: 28px; padding: 0 14px; border-radius: 6px; font-size: 13px; font-weight: 600; border: 1px solid #36cfc9; color: #08979c; background: #e6fffb; }
     .inv-task-media { border: 1px solid #d9e8ff; border-radius: 6px; background: #fff; padding: 12px; }
     .inv-task-photo { width: 100%; aspect-ratio: 16 / 9; border: 1px solid #d9e8ff; border-radius: 4px; overflow: hidden; background: #f7f7f7; }
@@ -599,13 +609,25 @@
             taskField("确认口径", isCompany ? "物资、财务、业务三方共同确认" : "部门物资专责逐条确认") +
           '</div>',
           '<div class="inv-table-title">盘点物资明细表</div>',
-          '<div class="inv-task-mini-table-wrap"><table class="inv-task-mini-table"><thead><tr><th>序号</th><th>资产编号</th><th>物资唯一码</th><th>物资类型编码</th><th>产品编码</th><th>物资名称</th><th>规格型号</th><th>物资类型名称</th><th>所属部门</th><th>存储地点/仓库货位</th><th>使用人/负责人</th><th>在库/领用状态</th><th>账面数量</th><th>盘点确认数量</th><th>单位</th><th>盘点结果</th></tr></thead><tbody>' +
+          '<div class="inv-task-mini-table-wrap"><table class="inv-task-mini-table"><thead><tr><th>序号</th><th>资产编号</th><th>物资唯一码</th><th>物资类型编码</th><th>产品编码</th><th>物资名称</th><th>规格型号</th><th>物资类型名称</th><th>所属部门</th><th>存储地点/仓库货位</th><th>使用人/负责人</th><th>在库/领用状态</th><th>账面数量</th><th>盘点确认数量</th><th>单位</th><th>盘点结果</th><th>操作</th></tr></thead><tbody>' +
             list.map(function (x, i) {
-              return '<tr><td>' + (i + 1) + '</td><td>' + cell(x.assetNo) + '</td><td>' + cell(x.code) + '</td><td>' + cell(x.typeCode) + '</td><td>' + cell(x.product) + '</td><td>' + cell(x.assetName) + '</td><td>' + cell(x.spec) + '</td><td>' + cell(x.materialTypeName) + '</td><td>' + cell(x.dept) + '</td><td>' + cell(x.loc) + '</td><td>' + cell(x.user) + '</td><td>' + cell(x.state) + '</td><td>' + cell(x.book) + '</td><td>' + cell(x.confirmQty || x.real) + '</td><td>' + cell(x.unit || "件") + '</td><td>' + cell(x.result) + '</td></tr>';
+              return '<tr><td>' + (i + 1) + '</td><td>' + cell(x.assetNo) + '</td><td>' + cell(x.code) + '</td><td>' + cell(x.typeCode) + '</td><td>' + cell(x.product) + '</td><td>' + cell(x.assetName) + '</td><td>' + cell(x.spec) + '</td><td>' + cell(x.materialTypeName) + '</td><td>' + cell(x.dept) + '</td><td>' + cell(x.loc) + '</td><td>' + cell(x.user) + '</td><td>' + cell(x.state) + '</td><td>' + cell(x.book) + '</td><td>' + cell(x.confirmQty || x.real) + '</td><td>' + cell(x.unit || "件") + '</td><td>' + cell(x.result) + '</td><td><span class="inv-op"><span role="button" tabindex="0" data-task-track="' + x.code + '">物资跟踪</span></span></td></tr>';
             }).join("") +
-          '</tbody></table></div>'
+          '</tbody></table></div>',
+          '<div class="inv-task-track-panel" id="taskTrackPanel" hidden></div>'
         ].join("");
         open(document.getElementById("taskInfoMask"));
+      }
+      function renderTaskTrack(line) {
+        var panel = document.getElementById("taskTrackPanel");
+        if (!panel) return;
+        panel.hidden = false;
+        panel.innerHTML = '<h4>物资跟踪</h4><div class="inv-task-track-list">' +
+          '<div class="inv-task-track-item">2026.4.20 入库：' + cell(line.assetName) + '（' + cell(line.product) + '）<span class="inv-task-track-sub">存放' + cell(line.loc) + '</span></div>' +
+          '<div class="inv-task-track-item">2026.5.10 被' + cell(line.dept) + '领用<span class="inv-task-track-sub">领用人/负责人：' + cell(line.user) + '</span></div>' +
+          '<div class="inv-task-track-item">2026.5.12 使用人变更（初始保管人 → ' + cell(line.user) + '）<span class="inv-task-track-sub">变更原因：岗位调整</span></div>' +
+          '<div class="inv-task-track-item">2026.5.18 存放位置复核<span class="inv-task-track-sub">当前位置：' + cell(line.loc) + '；盘点结果：' + cell(line.result) + '</span></div>' +
+        '</div>';
       }
       function taskField(label, value, isHtml) {
         return '<div class="inv-task-field"><span>' + label + '</span><b>' + (isHtml ? value : cell(value)) + '</b></div>';
@@ -831,6 +853,11 @@
           renderDetailLines();
           renderLedger();
           renderTable();
+        }
+        var taskTrack = e.target.closest("[data-task-track]");
+        if (taskTrack) {
+          renderTaskTrack(findLine(taskTrack.getAttribute("data-task-track")));
+          return;
         }
         var op = e.target.closest("[data-inv-act]");
         if (op) {
