@@ -402,7 +402,7 @@
       function approvalText(row) {
         if (isHighLoss(row)) return "系统判断为固定资产盘亏且原值不低于50万元，需提交公司审批";
         if (row.materialTypeName === "存货") return "查明原因后由责任部门确认，按库存差异处理";
-        if (row.materialTypeName === "无形资产") return "登记差异原因，由责任部门确认并按价值管理规则处理";
+        if (row.materialTypeName === "无形资产") return "登记差异原因，由责任部门确认并分类处理";
         return "查明原因后由责任部门确认，按台账差异处理";
       }
       function canHandle(row) {
