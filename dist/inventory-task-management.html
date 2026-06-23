@@ -1034,7 +1034,7 @@
           var cls = i < activeIndex ? " done" : (i === activeIndex ? " active" : "");
           if (i === steps.length - 1) cls += " is-end";
           var arrow = i < steps.length - 1 ? '<span class="inv-arrow">→</span>' : "";
-          return '<div class="inv-step' + cls + '"><strong>' + step.text + '</strong><span>' + step.person + '</span></div>' + arrow;
+          return '<div class="inv-step' + cls + '"><strong>' + step.name + '</strong><span>' + step.person + '</span></div>' + arrow;
         }).join("");
         document.getElementById("approvalInfoBody").innerHTML = approvalRowsFor(state.current).map(function (x, i) {
           return '<p class="inv-approval-line">' + (i + 1) + '、' + x.opinion + '（' + x.time + '）</p>';
