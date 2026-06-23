@@ -259,7 +259,7 @@
                 <table class="inv-table">
                   <thead>
                     <tr>
-                      <th>序号</th><th>盘点单号</th><th>盘点任务名称</th><th>盘点类型</th><th>盘点部门</th><th>资产类型范围</th><th>计划开始日期</th><th>计划结束日期</th><th>发起人</th><th>负责人</th><th>应盘数量</th><th>已盘数量</th><th>差异数量</th><th>任务状态</th><th>操作</th>
+                      <th>序号</th><th>盘点单号</th><th>盘点任务名称</th><th>盘点类型</th><th>盘点部门</th><th>计划开始日期</th><th>计划结束日期</th><th>发起人</th><th>负责人</th><th>应盘数量</th><th>已盘数量</th><th>差异数量</th><th>任务状态</th><th>操作</th>
                     </tr>
                   </thead>
                   <tbody id="tbody"></tbody>
@@ -355,7 +355,6 @@
           <div class="wh-field"><label class="wh-label">盘点任务名称</label><input class="wh-input" id="createName" placeholder="请输入盘点任务名称"></div>
           <div class="wh-field"><label class="wh-label">盘点类型</label><select class="wh-input" id="createType"><option>部门盘点</option><option>公司盘点</option></select></div>
           <div class="wh-field"><label class="wh-label">盘点部门</label><select class="wh-input" id="createDept"><option>机械研究所</option><option>电气控制所</option><option>经营发展中心</option><option>全部业务部门</option></select></div>
-          <div class="wh-field"><label class="wh-label">资产类型范围</label><select class="wh-input" id="createAssetRange"><option>固定资产、存货、无形资产</option><option>固定资产</option><option>存货</option><option>无形资产</option><option>全部</option></select></div>
           <div class="wh-field"><label class="wh-label">计划开始日期</label><input class="wh-input" id="createStart" type="date" value="2026-07-08"></div>
           <div class="wh-field"><label class="wh-label">计划结束日期</label><input class="wh-input" id="createEnd" type="date" value="2026-07-12"></div>
           <div class="wh-field"><label class="wh-label">发起人</label><input class="wh-input" id="createOwner" value="宋中波"></div>
@@ -660,7 +659,7 @@
       function renderTable() {
         var list = getRows();
         document.getElementById("tbody").innerHTML = list.map(function (x, i) {
-          return '<tr><td>' + (i + 1) + '</td><td>' + x.no + '</td><td>' + x.name + '</td><td>' + x.type + '</td><td>' + x.dept + '</td><td>' + x.scope + '</td><td>' + (x.assetTypeRange || "全部") + '</td><td>' + x.start + '</td><td>' + x.end + '</td><td>' + x.owner + '</td><td>' + responsiblePerson(x) + '</td><td>' + x.should + '</td><td>' + x.done + '</td><td>' + x.diff + '</td><td>' + tag(x.status) + '</td><td>' + taskActions(x) + '</td></tr>';
+          return '<tr><td>' + (i + 1) + '</td><td>' + x.no + '</td><td>' + x.name + '</td><td>' + x.type + '</td><td>' + x.dept + '</td><td>' + x.start + '</td><td>' + x.end + '</td><td>' + x.owner + '</td><td>' + responsiblePerson(x) + '</td><td>' + x.should + '</td><td>' + x.done + '</td><td>' + x.diff + '</td><td>' + tag(x.status) + '</td><td>' + taskActions(x) + '</td></tr>';
         }).join("");
       }
       function renderLedger() {
@@ -741,7 +740,6 @@
             taskField("盘点任务名称", row.name) +
             taskField("盘点类型", row.type) +
             taskField("盘点部门", row.dept) +
-            taskField("资产类型范围", row.assetTypeRange || "全部") +
             taskField("计划开始日期", row.start) +
             taskField("计划结束日期", row.end) +
             taskField("发起人", row.owner) +
@@ -883,7 +881,6 @@
         document.getElementById("createName").value = "";
         document.getElementById("createType").value = "部门盘点";
         document.getElementById("createDept").value = "机械研究所";
-        document.getElementById("createAssetRange").value = "固定资产、存货、无形资产";
         document.getElementById("createStart").value = "2026-07-08";
         document.getElementById("createEnd").value = "2026-07-12";
         document.getElementById("createOwner").value = "宋中波";
@@ -905,7 +902,6 @@
           type: type,
           dept: dept,
           scope: type === "公司盘点" ? "公司所有已入库未出库物资" : "本部门在库及已领用物资",
-          assetTypeRange: document.getElementById("createAssetRange").value,
           start: document.getElementById("createStart").value,
           end: document.getElementById("createEnd").value,
           owner: owner,
@@ -962,7 +958,7 @@
         state.current = row;
         document.getElementById("detailGrid").innerHTML = [
           ["盘点单号", row.no], ["盘点名称", row.name], ["盘点类型", row.type], ["盘点部门", row.dept],
-          ["资产类型范围", row.assetTypeRange || "全部"], ["计划日期", row.start + " 至 " + row.end], ["发起/负责人员", row.owner], ["部门负责人", row.deptHead || "按所属部门匹配"],
+          ["计划日期", row.start + " 至 " + row.end], ["发起/负责人员", row.owner], ["部门负责人", row.deptHead || "按所属部门匹配"],
           ["物资管理部门物资专责", row.materialOwner || "宋中波"], ["财务负责人", row.financeHead || "-"], ["任务状态", row.status], ["数据来源", normalizeFlowType(row) === "company" ? "公司所有已入库未出库物资清单" : row.dept + "所属物资清单"]
         ].map(function (x) { return '<div class="wh-detail-item"><span class="wh-detail-label">' + x[0] + '</span><span class="wh-detail-value">' + x[1] + '</span></div>'; }).join("");
         renderDetailLines();
