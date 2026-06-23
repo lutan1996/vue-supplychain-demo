@@ -136,7 +136,6 @@
       <main class="main-scroll">
         <h1 class="carrier-page-title">盘点差异处理</h1>
         <div class="diff-wrap">
-          <div class="diff-kpis" id="kpis"></div>
           <section class="diff-panel">
             <div class="diff-filters">
               <div class="wh-field"><label for="fTask">盘点单号</label><input id="fTask" type="text" placeholder="请输入盘点单号"></div>
@@ -451,17 +450,8 @@
           pane.classList.toggle("is-active", pane.getAttribute("data-approval-pane") === key);
         });
       }
-      function renderKpis() {
-        document.getElementById("kpis").innerHTML = [
-          ["差异总数", allRows().length],
-          ["待处理", allRows().filter(function (x) { return x.status === "待处理"; }).length],
-          ["大额盘亏", allRows().filter(function (x) { return isHighLoss(x); }).length],
-          ["已处理", allRows().filter(function (x) { return x.status === "已处理"; }).length]
-        ].map(function (x) { return '<div class="diff-kpi"><b>' + x[0] + '</b><span>' + x[1] + '</span></div>'; }).join("");
-      }
       function renderTable() {
         var list = getRows();
-        renderKpis();
         document.getElementById("tbody").innerHTML = list.map(function (x, i) {
           return '<tr class="' + (isHighLoss(x) ? "diff-row-high" : "diff-row-problem") + '"><td>' + (i + 1) + '</td><td>' + x.task + '</td><td>' + x.assetNo + '</td><td>' + x.code + '</td><td>' + x.typeCode + '</td><td>' + x.product + '</td><td>' + x.name + '</td><td>' + x.materialTypeName + '</td><td>' + x.dept + '</td><td>' + x.bookLoc + '</td><td>' + x.realLoc + '</td><td>' + x.bookQty + '</td><td>' + x.realQty + '</td><td>' + unitOf(x) + '</td><td>' + x.health + '</td><td>' + resultOf(x) + '</td><td>' + typeTag(x.type) + '</td><td>' + x.reason + '</td><td>' + money(x.originalValue) + '</td><td>' + money(x.amount) + '</td><td>' + levelTag(x) + '</td><td>' + statusTag(x.status) + '</td><td>' + rowActions(x) + '</td></tr>';
         }).join("");
