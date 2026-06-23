@@ -144,7 +144,6 @@
             <div class="diff-filters">
               <div class="wh-field"><label for="fTask">盘点单号</label><input id="fTask" type="text" placeholder="请输入盘点单号"></div>
               <div class="wh-field"><label for="fCode">物资唯一码</label><input id="fCode" type="text" placeholder="请输入物资唯一码"></div>
-              <div class="wh-field"><label for="fType">差异类型</label><select id="fType"><option value="">全部类型</option><option>数量差异</option><option>位置不符</option><option>负责人不符</option><option>状态异常</option><option>编码信息不符</option><option>盘盈</option><option>盘亏</option><option>价值差异</option></select></div>
               <div class="wh-field"><label for="fDept">责任部门</label><select id="fDept"><option value="">全部部门</option><option>机械研究所</option><option>电控所</option><option>经营发展中心</option><option>华北运维部</option></select></div>
               <div class="wh-field"><label for="fLevel">处理级别</label><select id="fLevel"><option value="">全部级别</option><option>普通差异</option><option>大额盘亏</option></select></div>
               <div class="wh-field"><label for="fStatus">处理状态</label><select id="fStatus"><option value="">全部状态</option><option>待处理</option><option>处理中</option><option>待提交审批</option><option>审批中</option><option>已处理</option></select></div>
@@ -158,7 +157,7 @@
               <table class="diff-table">
                 <thead>
                   <tr>
-                    <th>序号</th><th>盘点单号</th><th>资产编号</th><th>物资唯一码</th><th>物资类型编码</th><th>产品编码</th><th>物资名称</th><th>物资类型名称</th><th>所属部门</th><th>账面位置</th><th>实盘位置</th><th>账面数量</th><th>盘点确认数量</th><th>单位</th><th>状态是否完好</th><th>盘点结果</th><th>差异类型</th><th>差异说明</th><th>原值</th><th>差异金额</th><th>是否大额盘亏</th><th>处理状态</th><th>操作</th>
+                    <th>序号</th><th>盘点单号</th><th>资产编号</th><th>物资唯一码</th><th>物资类型编码</th><th>产品编码</th><th>产品名称</th><th>物资类型名称</th><th>所属部门</th><th>账面位置</th><th>实盘位置</th><th>账面数量</th><th>盘点确认数量</th><th>单位</th><th>状态是否完好</th><th>盘点结果</th><th>差异类型</th><th>差异说明</th><th>原值</th><th>差异金额</th><th>是否大额盘亏</th><th>处理状态</th><th>操作</th>
                   </tr>
                 </thead>
                 <tbody id="tbody"></tbody>
@@ -187,12 +186,11 @@
             <colgroup>
               <col style="width:64px"><col style="width:120px"><col style="width:128px"><col style="width:128px"><col style="width:120px"><col style="width:128px"><col style="width:120px"><col style="width:120px"><col style="width:164px"><col style="width:164px"><col style="width:92px"><col style="width:112px"><col style="width:92px"><col style="width:112px"><col style="width:72px"><col style="width:120px"><col style="width:104px"><col style="width:104px"><col style="width:140px"><col style="width:120px"><col style="width:120px"><col style="width:124px"><col style="width:132px">
             </colgroup>
-            <thead><tr><th>序号</th><th>资产编号</th><th>物资唯一码</th><th>物资类型编码</th><th>产品编码</th><th>物资名称</th><th>物资类型名称</th><th>所属部门</th><th>账面位置</th><th>实盘位置</th><th>使用人</th><th>在库/领用状态</th><th>账面数量</th><th>盘点确认数量</th><th>单位</th><th>状态是否完好</th><th>盘点结果</th><th>差异类型</th><th>差异说明</th><th>原值</th><th>差异金额</th><th>是否大额盘亏</th><th>操作</th></tr></thead>
+            <thead><tr><th>序号</th><th>资产编号</th><th>物资唯一码</th><th>物资类型编码</th><th>产品编码</th><th>产品名称</th><th>物资类型名称</th><th>所属部门</th><th>账面位置</th><th>实盘位置</th><th>使用人</th><th>在库/领用状态</th><th>账面数量</th><th>盘点确认数量</th><th>单位</th><th>状态是否完好</th><th>盘点结果</th><th>差异类型</th><th>差异说明</th><th>原值</th><th>差异金额</th><th>是否大额盘亏</th><th>操作</th></tr></thead>
             <tbody id="detailLines"></tbody>
           </table>
         </div>
         <div class="diff-form-grid">
-          <div class="wh-field"><label class="wh-label">差异类型</label><input class="wh-input" id="detailDiffType" readonly></div>
           <div class="wh-field"><label class="wh-label">差异原因</label><input class="wh-input" id="detailReasonField" readonly></div>
           <div class="wh-field"><label class="wh-label">处理依据</label><input class="wh-input" id="detailProofField" readonly></div>
           <div class="wh-field"><label class="wh-label">原值</label><input class="wh-input" id="detailOriginalField" readonly></div>
@@ -237,7 +235,6 @@
           <div class="wh-field"><label class="wh-label">盘点确认数量</label><input class="wh-input" id="handleRealQty" readonly></div>
           <div class="wh-field"><label class="wh-label">状态是否完好</label><input class="wh-input" id="handleHealth" readonly></div>
           <div class="wh-field"><label class="wh-label">盘点结果</label><input class="wh-input" id="handleResult" readonly></div>
-          <div class="wh-field"><label class="wh-label">差异类型</label><input class="wh-input" id="handleDiffType" readonly></div>
           <div class="wh-field"><label class="wh-label">差异金额</label><input class="wh-input" id="handleAmount" readonly></div>
           <div class="wh-field"><label class="wh-label">附件/照片</label><input class="wh-input" id="handleAttachment" readonly></div>
           <div class="wh-field"><label class="wh-label">处理方式</label><select class="wh-input" id="handleWay"><option>登记处理</option><option>确认盘亏，生成出库调整</option><option>确认盘盈，生成入库调整</option><option>更正所在部门/位置</option><option>提交审批</option><option>退回复盘</option></select></div>
@@ -420,7 +417,7 @@
         if (normalizeFlowType(row) === "company") {
           return [
             { name: "发起公司物资盘点", person: "宋中波", text: "物资管理部门物资专责宋中波发起公司物资盘点" },
-            { name: "生成公司物资清单", person: "宋中波", text: "系统根据物资管理部门物资专责宋中波发起的信息生成公司所有已入库、未入库物资清单，存货类同步带入最近盘库日期、盘库账面数量、盘库实盘数量和盘库差异" },
+            { name: "生成公司物资清单", person: "宋中波", text: "系统根据物资管理部门物资专责宋中波发起的信息生成公司所有已入库未出库物资清单，存货类同步带入最近盘库日期、盘库账面数量、盘库实盘数量和盘库差异" },
             { name: "物资部门同意并分配", person: "王超", text: "物资管理部门负责人王超同意，并分配宋中波等本部门盘点人员" },
             { name: "业务部门同意并分配", person: row.bizHead || "陈亮、李仁堂、王贺", text: "所有业务部门负责人" + (row.bizHead || "陈亮、李仁堂、王贺") + "同意，并分配本部门盘点人员" },
             { name: "三方逐条共同确认", person: "宋中波、杜欣鑫、" + (row.bizOwner || "成明锴、许学良"), text: "所有参与盘点人员宋中波、杜欣鑫、" + (row.bizOwner || "成明锴、许学良") + "收到流程，按清单逐条确认，物资、财务、业务三方共同确认物资型号、编码、存储地点、使用人/负责人等信息是否与系统台帐一致，状态是否完好" },
@@ -483,8 +480,7 @@
         document.getElementById("handleRealQty").value = row.realQty + unitOf(row);
         document.getElementById("handleHealth").value = row.health;
         document.getElementById("handleResult").value = resultOf(row);
-        document.getElementById("handleDiffType").value = row.type;
-        document.getElementById("handleAmount").value = money(row.amount);
+                document.getElementById("handleAmount").value = money(row.amount);
         document.getElementById("handleWay").value = isHighLoss(row) ? "提交审批" : (row.status === "待处理" ? "登记处理" : "更正所在部门/位置");
         document.getElementById("handleDept").value = row.dept;
         document.getElementById("handleReason").value = row.reason;
@@ -496,7 +492,7 @@
       }
       function openTrack(row) {
         document.getElementById("trackGrid").innerHTML = [
-          ["资产编号", row.assetNo], ["物资唯一码", row.code], ["物资类型编码", row.typeCode], ["产品编码", row.product], ["物资类型名称", row.materialTypeName], ["物资名称", row.name],
+          ["资产编号", row.assetNo], ["物资唯一码", row.code], ["物资类型编码", row.typeCode], ["产品编码", row.product], ["物资类型名称", row.materialTypeName], ["产品名称", row.name],
           ["规格型号", row.spec], ["责任部门", row.dept], ["账面位置", row.bookLoc], ["实盘位置", row.realLoc],
           ["差异类型", row.type], ["差异金额", money(row.amount)], ["处理级别", levelText(row)], ["处理状态", row.status],
           ["关联盘点单号", row.task], ["关联调整单号", row.adjustNo]
@@ -527,14 +523,13 @@
         state.current = row;
         document.getElementById("detailGrid").innerHTML = [
           ["盘点单号", row.task], ["资产编号", row.assetNo], ["物资唯一码", row.code], ["物资类型编码", row.typeCode], ["产品编码", row.product],
-          ["物资类型名称", row.materialTypeName], ["物资名称", row.name], ["差异类型", row.type], ["账面位置", row.bookLoc], ["实盘位置", row.realLoc],
+          ["物资类型名称", row.materialTypeName], ["产品名称", row.name], ["差异类型", row.type], ["账面位置", row.bookLoc], ["实盘位置", row.realLoc],
           ["使用人/负责人", row.user], ["状态是否完好", row.health], ["账面数量", row.bookQty], ["盘点确认数量", row.realQty], ["单位", unitOf(row)], ["盘点结果", resultOf(row)], ["责任部门", row.dept],
           ["原值", money(row.originalValue)], ["差异金额", money(row.amount)], ["是否大额差异", levelText(row)], ["处理状态", row.status], ["处理要求", approvalText(row)],
           ["差异原因", row.reason], ["盘点流程类型", row.flowType], ["数据来源", "盘点任务、库存台账、扫码领用、部门流转、销售发货"]
         ].map(function (x) { return '<div class="wh-detail-item"><span class="wh-detail-label">' + x[0] + '</span><span class="wh-detail-value">' + x[1] + '</span></div>'; }).join("");
         document.getElementById("detailLines").innerHTML = '<tr class="' + (isHighLoss(row) ? "diff-row-high" : "diff-row-problem") + '"><td>1</td><td>' + row.assetNo + '</td><td>' + row.code + '</td><td>' + row.typeCode + '</td><td>' + row.product + '</td><td>' + row.name + '</td><td>' + row.materialTypeName + '</td><td>' + row.dept + '</td><td>' + row.bookLoc + '</td><td>' + row.realLoc + '</td><td>' + row.user + '</td><td>在库</td><td>' + row.bookQty + '</td><td>' + row.realQty + '</td><td>' + unitOf(row) + '</td><td>' + row.health + '</td><td>' + resultOf(row) + '</td><td>' + row.type + '</td><td>' + row.reason + '</td><td>' + money(row.originalValue) + '</td><td>' + money(row.amount) + '</td><td>' + levelText(row) + '</td><td>' + lineActions(row) + '</td></tr>';
-        document.getElementById("detailDiffType").value = row.type;
-        document.getElementById("detailReasonField").value = row.reason;
+                document.getElementById("detailReasonField").value = row.reason;
         document.getElementById("detailProofField").value = row.proof || "-";
         document.getElementById("detailOriginalField").value = money(row.originalValue);
         document.getElementById("detailAmountField").value = money(row.amount);
@@ -577,12 +572,12 @@
           return;
         }
         if (e.target.id === "btnSearch") {
-          state.filters = { task: fTask.value.trim(), code: fCode.value.trim(), type: fType.value, dept: fDept.value, level: fLevel.value, status: fStatus.value };
+          state.filters = { task: fTask.value.trim(), code: fCode.value.trim(), dept: fDept.value, level: fLevel.value, status: fStatus.value };
           renderTable();
         }
         if (e.target.id === "btnReset") {
           ["fTask", "fCode"].forEach(function (id) { document.getElementById(id).value = ""; });
-          ["fType", "fDept", "fLevel", "fStatus"].forEach(function (id) { document.getElementById(id).value = ""; });
+          ["fDept", "fLevel", "fStatus"].forEach(function (id) { document.getElementById(id).value = ""; });
           state.filters = {};
           renderTable();
         }
