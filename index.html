@@ -802,6 +802,19 @@ body.map-demo-hide-shell-topbar .shell .main > .topbar{display:none !important;}
     /* 必须为 true：Blob URL 的 iframe 与 file:// 父页不同源，子页无法可靠调用 parent.__demoOpenPage / postMessage，蓝框子功能会全部失效。srcdoc 与父页同源，侧栏跳转才能工作。 */
     var demoUseSrcdocOnly = true;
     var demoLoadingSafetyTimer = null;
+    var demoPageVersion = "20260623-inventory-task-clean";
+
+    function demoAppendVersionBeforeHash(href) {
+      if (!href) return href;
+      var s = String(href);
+      if (/^about:|^data:|^blob:/i.test(s)) return href;
+      if (/[?&]v=/.test(s.split("#")[0])) return href;
+      var hashIndex = s.indexOf("#");
+      var head = hashIndex >= 0 ? s.slice(0, hashIndex) : s;
+      var tail = hashIndex >= 0 ? s.slice(hashIndex) : "";
+      head += (head.indexOf("?") >= 0 ? "&" : "?") + "v=" + demoPageVersion;
+      return head + tail;
+    }
 
     function switchTo(index, optFullHref) {
       if (index < 0 || index >= pagesList.length) return;
@@ -848,7 +861,7 @@ body.map-demo-hide-shell-topbar .shell .main > .topbar{display:none !important;}
           finishDemoShellUi(item, index, extSrc);
         });
         try {
-          frame.src = extSrc;
+          frame.src = demoAppendVersionBeforeHash(extSrc);
         } catch (eSrc) {}
         return;
       }
