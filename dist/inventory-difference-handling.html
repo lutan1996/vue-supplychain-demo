@@ -92,6 +92,8 @@
     .diff-step.done, .diff-step.active,
     .page-inventory-diff .inv-step.done,
     .page-inventory-diff .inv-step.active { border-color: #c8e6ce; color: #426b45; background: #f0fbf0; }
+    .diff-step.is-end,
+    .page-inventory-diff .inv-step.is-end { border-color: #f5d79b; color: #7a4d05; background: #fff8e8; font-weight: 600; }
     .diff-arrow,
     .page-inventory-diff .inv-arrow { flex: 0 0 auto; color: #8aa0b8; font-size: 24px; line-height: 1; }
     .diff-flow-note,
@@ -423,24 +425,27 @@
       function flowStepsFor(row) {
         if (normalizeFlowType(row) === "company") {
           return [
-            { name: "发起公司物资盘点", person: "宋中波", text: "物资管理部门物资专责宋中波发起公司物资盘点" },
-            { name: "生成公司物资清单", person: "宋中波", text: "系统根据物资管理部门物资专责宋中波发起的信息生成公司所有已入库未出库物资清单，存货类同步带入最近盘库日期、盘库账面数量、盘库实盘数量和盘库差异" },
-            { name: "物资部门同意并分配", person: "王超", text: "物资管理部门负责人王超同意，并分配宋中波等本部门盘点人员" },
-            { name: "业务部门同意并分配", person: row.bizHead || "陈亮、李仁堂、王贺", text: "所有业务部门负责人" + (row.bizHead || "陈亮、李仁堂、王贺") + "同意，并分配本部门盘点人员" },
-            { name: "三方逐条共同确认", person: "宋中波、杜欣鑫、" + (row.bizOwner || "成明锴、许学良"), text: "所有参与盘点人员宋中波、杜欣鑫、" + (row.bizOwner || "成明锴、许学良") + "收到流程，按清单逐条确认，物资、财务、业务三方共同确认物资型号、编码、存储地点、使用人/负责人等信息是否与系统台帐一致，状态是否完好" },
-            { name: "财务负责人审阅", person: row.financeHead || "孙睿", text: "盘点完毕，提交财务负责人" + (row.financeHead || "孙睿") + "审阅" },
+            { name: "物资管理部门物资专责发起公司物资盘点", person: "宋中波", text: "物资管理部门物资专责宋中波发起公司物资盘点" },
+            { name: "系统根据物资管理部门物资专责发起的信息生成公司所有已入库未出库物资清单，存货类同步带入最近盘库日期、盘库账面数量、盘库实盘数量和盘库差异", person: "宋中波", text: "系统根据物资管理部门物资专责宋中波发起的信息生成公司所有已入库未出库物资清单，存货类同步带入最近盘库日期、盘库账面数量、盘库实盘数量和盘库差异" },
+            { name: "物资管理部门负责人同意公司物资盘点", person: "王超", text: "物资管理部门负责人王超同意公司物资盘点" },
+            { name: "物资管理部门负责人分配本部门盘点人员", person: "王超、宋中波", text: "物资管理部门负责人王超分配本部门盘点人员宋中波" },
+            { name: "所有业务部门负责人同意，并分配本部门盘点人员", person: row.bizHead || "陈亮、李仁堂、王贺", text: "所有业务部门负责人" + (row.bizHead || "陈亮、李仁堂、王贺") + "同意，并分配本部门盘点人员" },
+            { name: "所有参与盘点人员收到公司盘点流程", person: "宋中波、杜欣鑫、" + (row.bizOwner || "成明锴、许学良"), text: "所有参与盘点人员宋中波、杜欣鑫、" + (row.bizOwner || "成明锴、许学良") + "收到公司盘点流程" },
+            { name: "所有参与盘点人员按清单逐条确认，物资、财务、业务三方共同确认物资型号、编码、存储地点、使用人/负责人等信息是否与系统台帐一致，状态是否完好", person: "宋中波、杜欣鑫、" + (row.bizOwner || "成明锴、许学良"), text: "所有参与盘点人员宋中波、杜欣鑫、" + (row.bizOwner || "成明锴、许学良") + "按清单逐条确认，物资、财务、业务三方共同确认物资型号、编码、存储地点、使用人/负责人等信息是否与系统台帐一致，状态是否完好" },
+            { name: "盘点完毕，提交财务负责人审阅", person: row.financeHead || "孙睿", text: "盘点完毕，提交财务负责人" + (row.financeHead || "孙睿") + "审阅" },
+            { name: "财务负责人审阅", person: row.financeHead || "孙睿", text: "财务负责人" + (row.financeHead || "孙睿") + "审阅" },
             { name: "物资管理部门负责人审阅", person: "王超", text: "物资管理部门负责人王超审阅" },
-            { name: "物资专责阅知", person: "宋中波", text: "物资管理部门物资专责宋中波阅知" },
-            { name: "盘点结束", person: "宋中波", text: "物资管理部门物资专责宋中波阅知后确认公司盘点结束" }
+            { name: "物资管理部门物资专责阅知", person: "宋中波", text: "物资管理部门物资专责宋中波阅知" },
+            { name: "物资管理部门阅知后确认公司盘点结束", person: "宋中波", text: "物资管理部门物资专责宋中波阅知后确认公司盘点结束" }
           ];
         }
         return [
-          { name: "盘点开始", person: row.owner || "许学良", text: "部门物资专责" + (row.owner || "许学良") + "点击盘点开始，进入部门内物资盘点" },
-          { name: "生成部门物资清单", person: row.owner || "许学良", text: "系统根据部门物资专责" + (row.owner || "许学良") + "发起的信息生成" + row.dept + "所属物资清单，存货类同步带入最近盘库日期、盘库账面数量、盘库实盘数量和盘库差异" },
-          { name: "逐条盘点确认", person: row.owner || "许学良", text: "部门物资专责" + (row.owner || "许学良") + "逐条确认物资型号、编码、存储地点、使用人/负责人是否与系统台帐一致，状态是否完好" },
-          { name: "部门负责人审阅", person: row.deptHead || "李仁堂", text: "盘点完毕，提交部门负责人" + (row.deptHead || "李仁堂") + "审阅，盘点无误" },
-          { name: "物资专责审阅确认", person: row.materialOwner || "宋中波", text: "物资管理部门物资专责" + (row.materialOwner || "宋中波") + "审阅，确认" },
-          { name: "部门盘点结束", person: row.materialOwner || "宋中波", text: "物资管理部门物资专责" + (row.materialOwner || "宋中波") + "确认部门盘点结束" }
+          { name: "部门物资专责点“盘点开始”，进入部门内物资盘点", person: row.owner || "许学良", text: "部门物资专责" + (row.owner || "许学良") + "点击盘点开始，进入部门内物资盘点" },
+          { name: "系统根据部门物资专责发起的信息生成" + row.dept + "所属物资清单，存货类同步带入最近盘库日期、盘库账面数量、盘库实盘数量和盘库差异", person: row.owner || "许学良", text: "系统根据部门物资专责" + (row.owner || "许学良") + "发起的信息生成" + row.dept + "所属物资清单，存货类同步带入最近盘库日期、盘库账面数量、盘库实盘数量和盘库差异" },
+          { name: "部门物资专责逐条确认物资型号、编码、存储地点、使用人/负责人是否与系统台帐一致，状态是否完好", person: row.owner || "许学良", text: "部门物资专责" + (row.owner || "许学良") + "逐条确认物资型号、编码、存储地点、使用人/负责人是否与系统台帐一致，状态是否完好" },
+          { name: "盘点完毕，提交部门负责人审阅，盘点无误", person: row.deptHead || "李仁堂", text: "盘点完毕，提交部门负责人" + (row.deptHead || "李仁堂") + "审阅，盘点无误" },
+          { name: "物资管理部门物资专责审阅，确认", person: row.materialOwner || "宋中波", text: "物资管理部门物资专责" + (row.materialOwner || "宋中波") + "审阅，确认" },
+          { name: "物资管理部门物资专责确认部门盘点结束", person: row.materialOwner || "宋中波", text: "物资管理部门物资专责" + (row.materialOwner || "宋中波") + "确认部门盘点结束" }
         ];
       }
       function approvalRowsFor(row) {
@@ -516,6 +521,7 @@
         document.getElementById("flowTitle").textContent = normalizeFlowType(state.current) === "company" ? "审批记录 - 公司盘点" : "审批记录 - 部门盘点";
         document.getElementById("flowSteps").innerHTML = steps.map(function (step, i) {
           var cls = i < activeIndex ? " done" : (i === activeIndex ? " active" : "");
+          if (i === steps.length - 1) cls += " is-end";
           var arrow = i < steps.length - 1 ? '<span class="inv-arrow">→</span>' : "";
           return '<div class="inv-step' + cls + '"><strong>' + step.name + '</strong><span>' + step.person + '</span></div>' + arrow;
         }).join("");
