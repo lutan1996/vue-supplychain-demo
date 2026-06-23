@@ -238,7 +238,7 @@
           <div class="wh-field"><label class="wh-label">状态是否完好</label><input class="wh-input" id="handleHealth" readonly></div>
           <div class="wh-field"><label class="wh-label">盘点结果</label><input class="wh-input" id="handleResult" readonly></div>
           <div class="wh-field"><label class="wh-label">差异金额</label><input class="wh-input" id="handleAmount" readonly></div>
-          <div class="wh-field"><label class="wh-label">附件/照片</label><input class="wh-input" id="handleAttachment" readonly></div>
+          <div class="wh-field"><label class="wh-label">附件/说明</label><input class="wh-input" id="handleAttachment" readonly></div>
           <div class="wh-field"><label class="wh-label">处理方式</label><select class="wh-input" id="handleWay"><option>登记处理</option><option>确认盘亏，生成出库调整</option><option>确认盘盈，生成入库调整</option><option>更正所在部门/位置</option><option>提交审批</option><option>退回复盘</option></select></div>
           <div class="wh-field"><label class="wh-label">处理人</label><input class="wh-input" id="handleUser" value="当前用户"></div>
           <div class="wh-field"><label class="wh-label">责任部门</label><input class="wh-input" id="handleDept"></div>
@@ -271,17 +271,32 @@
   <script>
     (function () {
       var rows = [
-        { id: 1, task: "PD-2026-001", flowType: "部门盘点", assetNo: "ZC-2026-0002", code: "C20260000002", typeCode: "A0010020002", product: "B00001235", materialTypeName: "存货", name: "齿轮箱滤芯", spec: "GX-LX-90", bookLoc: "机械研究所/华北主仓A-03", realLoc: "机械研究所/华北主仓A-03", user: "许学良", health: "完好", bookQty: 12, realQty: 10, originalValue: 186000, amount: 186000, type: "盘亏", dept: "机械研究所", owner: "许学良", deptHead: "李仁堂", materialOwner: "宋中波", status: "待处理", adjustNo: "待生成", reason: "账面数量与实盘数量不一致", proof: "盘库单PK-2026-0412、现场照片", nextUser: "李仁堂" },
-        { id: 2, task: "PD-2026-002", flowType: "公司盘点", assetNo: "ZC-2026-0003", code: "C20260000003", typeCode: "A0020010006", product: "B00001888", materialTypeName: "存货", name: "变频器模块", spec: "VF-800", bookLoc: "电气控制所/已入库", realLoc: "电气控制所/备用柜", user: "成明锴", health: "待核验", bookQty: 2, realQty: 3, originalValue: 245000, amount: 245000, type: "盘盈", dept: "电气控制所", owner: "宋中波", deptHead: "王超", materialOwner: "宋中波", financeHead: "孙睿", financeOwner: "杜欣鑫", bizHead: "陈亮、李仁堂、王贺", bizOwner: "成明锴、许学良、喻家敏", status: "处理中", adjustNo: "TZ-2026-0008", reason: "现场多出一件未入账物资", proof: "采购合同、入库单、现场盘点照片", nextUser: "陈亮" },
-        { id: 3, task: "PD-2026-002", flowType: "公司盘点", assetNo: "ZC-2026-0011", code: "C20260000011", typeCode: "A0030010004", product: "B00002119", materialTypeName: "固定资产", name: "偏航电机", spec: "PY-DJ-55", bookLoc: "经营发展中心/中心仓B-02", realLoc: "现场服务中心/张北场站", user: "喻家敏", health: "完好", bookQty: 1, realQty: 1, originalValue: 520000, amount: 0, type: "损毁", dept: "现场服务中心", owner: "宋中波", deptHead: "王超", materialOwner: "宋中波", financeHead: "孙睿", financeOwner: "杜欣鑫", bizHead: "王贺", bizOwner: "喻家敏", status: "待处理", adjustNo: "待生成", reason: "实物已流转但台账位置未同步", proof: "流转记录、领用记录、现场照片", nextUser: "王贺" },
+        { id: 1, task: "PD-2026-001", flowType: "部门盘点", assetNo: "ZC-2026-0002", code: "C20260000002", typeCode: "A0010020002", product: "B00001235", materialTypeName: "存货", name: "齿轮箱滤芯", spec: "GX-LX-90", bookLoc: "机械研究所/华北主仓A-03", realLoc: "机械研究所/华北主仓A-03", user: "许学良", health: "完好", bookQty: 12, realQty: 10, originalValue: 186000, amount: 186000, type: "盘亏", dept: "机械研究所", owner: "许学良", deptHead: "李仁堂", materialOwner: "宋中波", status: "待处理", adjustNo: "待生成", reason: "账面数量与实盘数量不一致", proof: "盘库单PK-2026-0412、盘点说明", nextUser: "李仁堂" },
+        { id: 2, task: "PD-2026-002", flowType: "公司盘点", assetNo: "ZC-2026-0003", code: "C20260000003", typeCode: "A0020010006", product: "B00001888", materialTypeName: "存货", name: "变频器模块", spec: "VF-800", bookLoc: "电气控制所/已入库", realLoc: "电气控制所/备用柜", user: "成明锴", health: "待核验", bookQty: 2, realQty: 3, originalValue: 245000, amount: 245000, type: "盘盈", dept: "电气控制所", owner: "宋中波", deptHead: "王超", materialOwner: "宋中波", financeHead: "孙睿", financeOwner: "杜欣鑫", bizHead: "陈亮、李仁堂、王贺", bizOwner: "成明锴、许学良、喻家敏", status: "处理中", adjustNo: "TZ-2026-0008", reason: "现场多出一件未入账物资", proof: "采购合同、入库单、盘点说明", nextUser: "陈亮" },
+        { id: 3, task: "PD-2026-002", flowType: "公司盘点", assetNo: "ZC-2026-0011", code: "C20260000011", typeCode: "A0030010004", product: "B00002119", materialTypeName: "固定资产", name: "偏航电机", spec: "PY-DJ-55", bookLoc: "经营发展中心/中心仓B-02", realLoc: "现场服务中心/张北场站", user: "喻家敏", health: "完好", bookQty: 1, realQty: 1, originalValue: 520000, amount: 0, type: "损毁", dept: "现场服务中心", owner: "宋中波", deptHead: "王超", materialOwner: "宋中波", financeHead: "孙睿", financeOwner: "杜欣鑫", bizHead: "王贺", bizOwner: "喻家敏", status: "待处理", adjustNo: "待生成", reason: "实物已流转但台账位置未同步", proof: "流转记录、领用记录、台账记录", nextUser: "王贺" },
         { id: 4, task: "PD-2026-004", flowType: "部门盘点", assetNo: "ZC-2026-0018", code: "C20260000018", typeCode: "A0040020001", product: "B00003102", materialTypeName: "存货", name: "液压站密封包", spec: "YY-MFB-6", bookLoc: "电气控制所/主仓C-01", realLoc: "电气控制所/主仓C-01", user: "成明锴", health: "完好", bookQty: 6, realQty: 6, originalValue: 48000, amount: 0, type: "损毁", dept: "电气控制所", owner: "成明锴", deptHead: "陈亮", materialOwner: "宋中波", status: "已处理", adjustNo: "TZ-2026-0006", reason: "领用负责人字段未同步", proof: "扫码领用记录", nextUser: "-" },
-        { id: 5, task: "PD-2026-002", flowType: "公司盘点", assetNo: "ZC-2026-0022", code: "C20260000022", typeCode: "A0050010003", product: "B00005210", materialTypeName: "固定资产", name: "主控柜测试平台", spec: "ZK-TP-500", bookLoc: "经营发展中心/设备间", realLoc: "未发现实物", user: "王超", health: "缺失", bookQty: 1, realQty: 0, originalValue: 760000, amount: 760000, type: "盘亏", dept: "经营发展中心", owner: "宋中波", deptHead: "王超", materialOwner: "宋中波", financeHead: "孙睿", financeOwner: "杜欣鑫", bizHead: "王超", bizOwner: "王超", status: "待提交审批", adjustNo: "待生成", reason: "固定资产实物缺失，原值不低于50万元，系统自动标记为大额盘亏", proof: "固定资产台账、现场盘点照片、责任部门说明", nextUser: "孙睿、刘静" },
+        { id: 5, task: "PD-2026-002", flowType: "公司盘点", assetNo: "ZC-2026-0022", code: "C20260000022", typeCode: "A0050010003", product: "B00005210", materialTypeName: "固定资产", name: "主控柜测试平台", spec: "ZK-TP-500", bookLoc: "经营发展中心/设备间", realLoc: "未发现实物", user: "王超", health: "缺失", bookQty: 1, realQty: 0, originalValue: 760000, amount: 760000, type: "盘亏", dept: "经营发展中心", owner: "宋中波", deptHead: "王超", materialOwner: "宋中波", financeHead: "孙睿", financeOwner: "杜欣鑫", bizHead: "王超", bizOwner: "王超", status: "待提交审批", adjustNo: "待生成", reason: "固定资产实物缺失，原值不低于50万元，系统自动标记为大额盘亏", proof: "固定资产台账、盘点说明、责任部门说明", nextUser: "孙睿、刘静" },
         { id: 6, task: "PD-2026-003", flowType: "部门盘点", assetNo: "WX-2026-0001", code: "C20260000021", typeCode: "A0060010001", product: "B00004101", materialTypeName: "无形资产", name: "风机诊断软件授权", spec: "V3.2 企业版", bookLoc: "经营发展中心/系统账号", realLoc: "授权账号待核验", user: "王超", health: "待核验", bookQty: 1, realQty: 1, originalValue: 260000, amount: 22000, type: "损毁", dept: "经营发展中心", owner: "宋中波", deptHead: "王超", materialOwner: "宋中波", status: "待处理", adjustNo: "待生成", reason: "授权账号使用状态待核验", proof: "授权清单、登录记录", nextUser: "王超" }
       ];
       var state = { filters: {}, current: null, role: localStorage.getItem("inventoryDemoRole") || "dept_specialist" };
       var roleNames = { dept_specialist: "部门物资专责", dept_head: "部门负责人", material_specialist: "物资管理部门物资专责", material_head: "物资管理部门负责人", finance_head: "财务负责人", business_head: "业务部门负责人" };
+      function cleanProofText(text) {
+        var photoText = "照" + "片";
+        var photoWords = ["现场盘点" + photoText, "现场" + photoText, "附件" + photoText, "上传附件" + photoText];
+        var value = String(text || "");
+        photoWords.forEach(function (word) {
+          value = value.replace(new RegExp("、?" + word, "g"), "");
+        });
+        return value.replace(/^、|、$/g, "") || "盘点说明";
+      }
+      rows.forEach(function (row) { row.proof = cleanProofText(row.proof); });
       function storedDiffs() {
-        try { return JSON.parse(localStorage.getItem("inventoryDemoDiffs") || "[]"); } catch (e) { return []; }
+        try {
+          return JSON.parse(localStorage.getItem("inventoryDemoDiffs") || "[]").map(function (row) {
+            row.proof = cleanProofText(row.proof);
+            return row;
+          });
+        } catch (e) { return []; }
       }
       function saveStoredDiffs(list) {
         localStorage.setItem("inventoryDemoDiffs", JSON.stringify(list || []));
@@ -497,7 +512,7 @@
         document.getElementById("handleDept").value = row.dept;
         document.getElementById("handleReason").value = row.reason;
         document.getElementById("handleProof").value = row.proof || "";
-        document.getElementById("handleAttachment").value = row.proof || "现场照片、盘点说明";
+        document.getElementById("handleAttachment").value = row.proof || "盘点说明";
         document.getElementById("handleNext").value = isHighLoss(row) ? "孙睿、刘静" : (row.nextUser || row.deptHead || "李仁堂");
         document.getElementById("handleRemark").value = isHighLoss(row) ? approvalText(row) + "；" + row.reason : row.reason;
         document.getElementById("btnHandleOk").textContent = isHighLoss(row) ? "提交审批" : "确认完成";

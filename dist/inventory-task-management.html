@@ -355,7 +355,7 @@
           <div class="wh-field"><label class="wh-label">责任人</label><input class="wh-input" id="confirmOwner"></div>
           <div class="wh-field" style="grid-column:1 / -1"><label class="wh-label">差异原因</label><input class="wh-input" id="confirmReason" placeholder="不一致时填写差异原因"></div>
           <div class="wh-field"><label class="wh-label">处理建议</label><input class="wh-input" id="confirmAdvice" value="进入盘点差异处理"></div>
-          <div class="wh-field"><label class="wh-label">附件/照片</label><input class="wh-input" id="confirmAttachment" value="现场照片待上传"></div>
+          <div class="wh-field"><label class="wh-label">附件/说明</label><input class="wh-input" id="confirmAttachment" value="盘点说明待上传"></div>
         </div>
         <div class="inv-rule-box">保存后，系统按物资唯一码把不一致记录归入盘点差异处理；存货类同时带入最近盘库日期、盘库账面数量、盘库实盘数量和盘库差异。</div>
       </div>
@@ -560,7 +560,7 @@
             owner: task.owner, deptHead: task.deptHead, materialOwner: task.materialOwner || "宋中波",
             financeHead: task.financeHead || "孙睿", status: line.materialTypeName === "固定资产" && diffType === "盘亏" && originalAmount(line) >= 500000 ? "待提交审批" : "待处理",
             adjustNo: "待生成", reason: line.reason || "盘点确认与系统台账不一致",
-            proof: line.materialTypeName === "存货" ? ((line.stockNo || "盘库单") + "、现场照片、盘点说明") : "现场照片、台账记录、责任部门说明",
+            proof: line.materialTypeName === "存货" ? ((line.stockNo || "盘库单") + "、盘点说明") : "台账记录、责任部门说明",
             nextUser: task.deptHead || "李仁堂"
           });
         });
@@ -779,7 +779,7 @@
               '<tr><td>正常</td><td>' + typeCount("正常") + '</td><td>账、卡、物一致，纳入台账归档</td></tr>' +
               '<tr><td>盘盈</td><td>' + typeCount("盘盈") + '</td><td>核对采购、入库及领用记录</td></tr>' +
               '<tr><td>盘亏</td><td>' + typeCount("盘亏") + '</td><td>查明原因后提交差异处理</td></tr>' +
-              '<tr><td>损毁</td><td>' + typeCount("损毁") + '</td><td>补充现场说明和照片，进入处置流程</td></tr>' +
+              '<tr><td>损毁</td><td>' + typeCount("损毁") + '</td><td>补充现场说明，进入处置流程</td></tr>' +
             '</tbody></table>' +
           '</div>';
         open(document.getElementById("reportMask"));
@@ -1096,7 +1096,7 @@
           document.getElementById("confirmOwner").value = line.operator || line.user;
           document.getElementById("confirmReason").value = line.reason || "";
           document.getElementById("confirmAdvice").value = line.lineStatus === "有差异" ? "进入盘点差异处理" : "台帐归档";
-          document.getElementById("confirmAttachment").value = "盘点照片/库位图已归档";
+          document.getElementById("confirmAttachment").value = "盘点说明/库位信息已归档";
           open(document.getElementById("confirmMask"));
           return;
         }
