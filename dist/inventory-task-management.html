@@ -72,6 +72,7 @@
     .inv-task-info-grid .inv-task-field b { display: flex; align-items: center; min-height: 36px; box-sizing: border-box; border: 1px solid #d9d9d9; border-radius: 4px; background: #fff; color: #262626; padding: 0 12px; font-weight: 400; }
     .inv-task-select-wrap { position: relative; }
     .inv-task-select-wrap::after { content: "▾"; position: absolute; right: 12px; top: 50%; transform: translateY(-50%); pointer-events: none; color: #8c8c8c; font-size: 12px; }
+    .inv-task-select-wrap.is-open::after { transform: translateY(-50%) rotate(180deg); }
     .inv-task-select-input {
       width: 100%;
       height: 36px;
@@ -86,6 +87,35 @@
       outline: none;
     }
     .inv-task-select-input:focus { border-color: #91caff; box-shadow: 0 0 0 2px rgba(22, 119, 255, .08); }
+    .inv-task-select-menu {
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: calc(100% + 4px);
+      z-index: 20;
+      display: none;
+      max-height: 190px;
+      overflow: auto;
+      border: 1px solid #d9d9d9;
+      border-radius: 4px;
+      background: #fff;
+      box-shadow: 0 6px 18px rgba(15, 35, 60, .14);
+      padding: 4px 0;
+    }
+    .inv-task-select-wrap.is-open .inv-task-select-menu { display: block; }
+    .inv-task-select-option {
+      height: 32px;
+      display: flex;
+      align-items: center;
+      padding: 0 12px;
+      color: #262626;
+      font-size: 13px;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .inv-task-select-option:hover,
+    .inv-task-select-option.is-active { background: #e6f4ff; color: #1677ff; }
+    .inv-task-select-empty { padding: 8px 12px; color: #8c8c8c; font-size: 13px; }
     .inv-task-mini-table-wrap { overflow: auto; margin-top: 8px; }
     .inv-task-mini-table { width: 100%; min-width: 1760px; border-collapse: collapse; table-layout: fixed; font-size: 12px; }
     .inv-task-mini-table th, .inv-task-mini-table td { border: 1px solid #e8e8e8; padding: 8px 6px; color: #262626; text-align: left; white-space: normal; word-break: break-all; line-height: 1.45; }
@@ -352,7 +382,7 @@
       <div class="wh-modal-body">
         <div class="inv-material-filters">
           <div class="wh-field"><label class="wh-label">盘点类型</label><select class="wh-input" id="mcAssetType"><option>全部</option><option>部门盘点</option><option>公司盘点</option></select></div>
-          <div class="wh-field"><label class="wh-label">所属仓库</label><div class="inv-task-select-wrap"><input class="inv-task-select-input" id="mcLoc" list="mcLocList" autocomplete="off" placeholder="请选择或搜索所属仓库"><datalist id="mcLocList"><option value="华北主仓A-01"></option><option value="华北主仓A-03"></option><option value="备用柜"></option><option value="现场服务中心/张北场站"></option><option value="机械研究所/华北主仓A-01"></option><option value="机械研究所/华北主仓A-03"></option><option value="电气控制所/备用柜"></option><option value="现场服务中心/张北场站"></option></datalist></div></div>
+          <div class="wh-field"><label class="wh-label">所属仓库</label><div class="inv-task-select-wrap" id="mcLocWrap"><input class="inv-task-select-input" id="mcLoc" autocomplete="off" placeholder="请选择或搜索所属仓库"><div class="inv-task-select-menu" id="mcLocMenu" role="listbox"></div></div></div>
           <div class="wh-field"><label class="wh-label">产品名称</label><input class="wh-input" id="mcName" placeholder="请输入产品名称"></div>
           <div class="wh-field inv-material-query-field"><label class="wh-label">&nbsp;</label><button type="button" class="inv-btn primary" id="btnMaterialQuery">查询</button></div>
         </div>
@@ -799,6 +829,27 @@
           return true;
         });
       }
+      var mcLocOptions = ["华北主仓A-01", "华北主仓A-03", "备用柜", "现场服务中心/张北场站", "机械研究所/华北主仓A-01", "机械研究所/华北主仓A-03", "电气控制所/备用柜"];
+      function renderMcLocMenu(keyword) {
+        var menu = document.getElementById("mcLocMenu");
+        if (!menu) return;
+        var kw = (keyword || "").trim();
+        var options = mcLocOptions.filter(function (x) { return !kw || x.indexOf(kw) >= 0; });
+        menu.innerHTML = options.length ? options.map(function (x) {
+          return '<div class="inv-task-select-option" role="option" data-mc-loc="' + cell(x) + '">' + cell(x) + '</div>';
+        }).join("") : '<div class="inv-task-select-empty">暂无匹配</div>';
+      }
+      function openMcLocMenu() {
+        var wrap = document.getElementById("mcLocWrap");
+        var input = document.getElementById("mcLoc");
+        if (!wrap || !input) return;
+        renderMcLocMenu(input.value);
+        wrap.classList.add("is-open");
+      }
+      function closeMcLocMenu() {
+        var wrap = document.getElementById("mcLocWrap");
+        if (wrap) wrap.classList.remove("is-open");
+      }
       function renderMaterialCheck() {
         var list = materialRows();
         document.getElementById("materialCheckBody").innerHTML = list.map(function (x, i) {
@@ -995,6 +1046,17 @@
           renderMaterialCheck();
           return;
         }
+        if (e.target.id === "mcLoc") {
+          openMcLocMenu();
+          return;
+        }
+        var mcLocOption = e.target.closest("[data-mc-loc]");
+        if (mcLocOption) {
+          document.getElementById("mcLoc").value = mcLocOption.getAttribute("data-mc-loc") || "";
+          closeMcLocMenu();
+          renderMaterialCheck();
+          return;
+        }
         if (e.target.id === "btnMaterialSubmit") {
           var current = state.current || getRows()[0] || rows[0];
           var checked = materialRows();
@@ -1075,6 +1137,12 @@
           document.getElementById("createResp").value = isCompanyCreate ? "王超" : "李仁堂";
           document.getElementById("createOwner").value = isCompanyCreate ? "宋中波" : "许学良";
         }
+      });
+      document.addEventListener("input", function (e) {
+        if (e.target.id === "mcLoc") openMcLocMenu();
+      });
+      document.addEventListener("click", function (e) {
+        if (!e.target.closest("#mcLocWrap")) closeMcLocMenu();
       });
       var startBtn = document.getElementById("btnStartInventory");
       if (startBtn) {
