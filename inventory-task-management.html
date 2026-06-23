@@ -13,6 +13,11 @@
     body.page-inventory-task .main-scroll { background: #f5f7fa; }
     .inv-wrap { padding: 12px 16px 20px; }
     .inv-panel { background: #fff; border: 1px solid #e8e8e8; border-radius: 8px; overflow: hidden; }
+    .inv-role-select { height: 30px; border: 1px solid rgba(255,255,255,.45); border-radius: 4px; background: rgba(255,255,255,.12); color: #fff; padding: 0 8px; font-size: 12px; font-family: inherit; outline: none; }
+    .inv-role-select option { color: #262626; background: #fff; }
+    .inv-rule-summary { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin: 0 0 10px; }
+    .inv-rule-card { border: 1px solid #d9e8ff; border-radius: 6px; background: #fbfdff; padding: 10px 12px; color: #516a87; font-size: 12px; line-height: 1.65; }
+    .inv-rule-card b { display: block; margin-bottom: 4px; color: #1f3551; font-size: 13px; }
     .inv-filters { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; padding: 12px 16px 8px; }
     .inv-filters input,
     .inv-filters select { width: 100%; height: 36px; box-sizing: border-box; border: 1px solid #d9d9d9; border-radius: 4px; background: #fff; color: #262626; padding: 0 12px; font-size: 13px; font-family: inherit; outline: none; }
@@ -166,7 +171,7 @@
         <a class="header-logo" href="#" aria-label="国家能源集团"><img src="assets/logo-chenergy.png" alt="国家能源集团 CHN ENERGY" width="220" height="40" /></a>
         <div class="header-source-brand"><p>新能源供应链管理系统</p></div>
       </div>
-      <div class="header-right"><span class="clock" id="clock"></span><div class="user-avatar" title="用户">用</div></div>
+      <div class="header-right"><select class="inv-role-select" id="inventoryRoleSelect" title="切换角色"><option value="dept_specialist">部门物资专责</option><option value="dept_head">部门负责人</option><option value="material_specialist">物资管理部门物资专责</option><option value="material_head">物资管理部门负责人</option><option value="finance_head">财务负责人</option><option value="business_head">业务部门负责人</option></select><span class="clock" id="clock"></span><div class="user-avatar" title="用户">用</div></div>
     </header>
     <div class="layout">
       <aside class="sidebar" aria-label="主导航">
@@ -187,6 +192,11 @@
       <main class="main-scroll">
         <h1 class="carrier-page-title">盘点任务管理</h1>
         <div class="inv-wrap">
+          <div class="inv-rule-summary">
+            <div class="inv-rule-card"><b>自动生成差异</b>盘点提交时，系统按物资唯一码读取手填确认结果，数量、位置、使用人、状态不一致的记录自动归入盘点差异处理。</div>
+            <div class="inv-rule-card"><b>盘库数据源</b>存货类物资带入最近盘库单号、盘库日期、盘库账面数量、盘库实盘数量和盘库差异，作为盘点确认依据。</div>
+            <div class="inv-rule-card"><b>审批与归档</b>普通差异处理后归档台帐；固定资产盘亏且原值不低于50万元，系统标记大额盘亏并进入我的任务审批。</div>
+          </div>
           <div class="inv-tabs" role="tablist" aria-label="盘点任务页签">
             <button type="button" class="inv-tab is-active" data-inv-tab="task" role="tab" aria-selected="true">盘点任务</button>
             <button type="button" class="inv-tab" data-inv-tab="ledger" role="tab" aria-selected="false">盘点台帐</button>
@@ -224,6 +234,7 @@
               <div class="inv-actions">
                 <button class="inv-btn primary" id="btnLedgerRefresh">刷新台帐</button>
                 <button class="inv-btn" id="btnLedgerExport">导出台帐</button>
+                <button class="inv-btn" id="btnLedgerPrint">打印盘点表</button>
               </div>
               <div class="inv-table-wrap">
                 <table class="inv-table inv-table--ledger">
@@ -443,7 +454,49 @@
         { task: "PD-2026-002", assetNo: "ZC-2026-0011", code: "C20260000011", typeCode: "A0030010004", product: "B00002119", assetName: "偏航电机", spec: "PY-DJ-55", materialTypeName: "固定资产", dept: "现场服务中心", loc: "现场服务中心/张北场站", user: "喻家敏", state: "已领用", health: "完好", lastNo: "PD-2026-002", lastDate: "2026-06-28", book: 1, real: 1, result: "位置不符", lineStatus: "有差异", diffType: "位置不符", reason: "实物已流转但系统台账位置未同步", keeper: "喻家敏", serviceLife: "10年", originalValue: 520000, qty: 1, unit: "台", checkQty: 1, useStatus: "正常", checkResult: "位置不符", remark1: "固定资产", remark2: "台账位置待更正", remark3: "需业务部门确认" },
         { task: "PD-2026-003", assetNo: "WX-2026-0001", code: "C20260000021", typeCode: "A0060010001", product: "B00004101", assetName: "风机诊断软件授权", spec: "V3.2 企业版", materialTypeName: "无形资产", dept: "经营发展中心", loc: "经营发展中心/系统账号", user: "王超", state: "使用中", health: "完好", lastNo: "PD-2026-003", lastDate: "待盘点", book: 1, real: 0, result: "未盘点", lineStatus: "未盘点", diffType: "无差异", reason: "", authNo: "AUTH-2026-0315", useDept: "经营发展中心", useOwner: "王超", authStart: "2026-03-15", authEnd: "2029-03-14", bookOriginal: 260000, bookNet: 238000, intangibleStatus: "使用中", clearResult: "待清查" }
       ];
-      var state = { filters: {}, current: null, currentLine: null };
+      var state = { filters: {}, current: null, currentLine: null, role: localStorage.getItem("inventoryDemoRole") || "dept_specialist" };
+      var roleNames = { dept_specialist: "部门物资专责", dept_head: "部门负责人", material_specialist: "物资管理部门物资专责", material_head: "物资管理部门负责人", finance_head: "财务负责人", business_head: "业务部门负责人" };
+      function storedDiffs() {
+        try { return JSON.parse(localStorage.getItem("inventoryDemoDiffs") || "[]"); } catch (e) { return []; }
+      }
+      function saveStoredDiffs(list) {
+        localStorage.setItem("inventoryDemoDiffs", JSON.stringify(list || []));
+      }
+      function originalAmount(line) {
+        return Number(line.originalValue || line.bookOriginal || 0);
+      }
+      function unitPrice(line) {
+        var qty = Number(line.book || line.qty || 1) || 1;
+        return originalAmount(line) ? originalAmount(line) / qty : 0;
+      }
+      function inferDiffType(line) {
+        if (line.diffType && line.diffType !== "无差异") return line.diffType;
+        if (Number(line.real) !== Number(line.book)) return Number(line.real) > Number(line.book) ? "盘盈" : "数量差异";
+        if (line.health && line.health !== "完好") return "状态异常";
+        if (line.result && line.result !== "账实相符" && line.result !== "无差异") return line.result;
+        return "无差异";
+      }
+      function syncDiffRecords(task) {
+        var list = storedDiffs().filter(function (x) { return x.task !== task.no; });
+        linesForTask(task).filter(function (line) { return line.lineStatus === "有差异"; }).forEach(function (line) {
+          var diffType = inferDiffType(line);
+          var amount = (diffType === "盘亏" || diffType === "数量差异" || diffType === "盘盈") ? Math.abs(Number(line.book || 0) - Number(line.real || line.confirmQty || 0)) * unitPrice(line) : 0;
+          list.push({
+            id: Date.now() + Math.floor(Math.random() * 1000), task: task.no, flowType: task.type,
+            assetNo: line.assetNo, code: line.code, typeCode: line.typeCode, product: line.product,
+            materialTypeName: line.materialTypeName, name: line.assetName, spec: line.spec,
+            bookLoc: line.loc, realLoc: line.loc, user: line.user, health: line.health,
+            bookQty: line.book, realQty: line.real || line.confirmQty || 0, unit: line.unit || "件",
+            originalValue: originalAmount(line), amount: amount, type: diffType, dept: line.dept,
+            owner: task.owner, deptHead: task.deptHead, materialOwner: task.materialOwner || "宋中波",
+            financeHead: task.financeHead || "孙睿", status: line.materialTypeName === "固定资产" && diffType === "盘亏" && originalAmount(line) >= 500000 ? "待提交审批" : "待处理",
+            adjustNo: "待生成", reason: line.reason || "盘点确认与系统台账不一致",
+            proof: line.materialTypeName === "存货" ? ((line.stockNo || "盘库单") + "、现场照片、盘点说明") : "现场照片、台账记录、责任部门说明",
+            nextUser: task.deptHead || "李仁堂"
+          });
+        });
+        saveStoredDiffs(list);
+      }
       function money(v) {
         if (v === "" || v == null) return "-";
         return "¥" + Number(v || 0).toLocaleString("zh-CN", { maximumFractionDigits: 0 });
@@ -462,8 +515,19 @@
         if (status === "已完成") return '<span class="inv-tag done">已完成</span>';
         return '<span class="inv-tag wait">待差异处理</span>';
       }
+      function canStartInventory(row) {
+        if (row.status !== "待开始" && row.status !== "盘点中") return false;
+        if (row.type === "公司盘点") return state.role === "material_specialist" || state.role === "material_head";
+        return state.role === "dept_specialist" || state.role === "material_specialist";
+      }
+      function canCreateTask() {
+        return state.role === "dept_specialist" || state.role === "material_specialist";
+      }
       function taskActions(row) {
-        return '<span class="inv-op"><span role="button" tabindex="0" data-inv-act="view" data-id="' + row.id + '">查看</span></span>';
+        var btns = [];
+        if (canStartInventory(row)) btns.push('<span role="button" tabindex="0" data-inv-act="start" data-id="' + row.id + '">盘点开始</span>');
+        btns.push('<span role="button" tabindex="0" data-inv-act="view" data-id="' + row.id + '">查看</span>');
+        return '<span class="inv-op">' + btns.join("") + '</span>';
       }
       function splitLocation(loc) {
         var text = cell(loc);
@@ -926,6 +990,7 @@
           return;
         }
         if (e.target.closest("#btnCreateTask")) {
+          if (!canCreateTask()) { alert("当前角色不可新增盘点任务，请切换为部门物资专责或物资管理部门物资专责。"); return; }
           openCreateTask();
           return;
         }
@@ -943,6 +1008,8 @@
           current.status = current.type === "公司盘点" ? "待财务负责人审阅" : "待部门负责人审阅";
           current.done = checked.length;
           current.diff = checked.filter(function (x) { return x.lineStatus === "有差异"; }).length;
+          syncDiffRecords(current);
+          if (current.diff > 0) alert("已根据盘点确认结果自动生成 " + current.diff + " 条盘点差异记录，可到盘点差异处理页面查看。");
           close(document.getElementById("materialCheckMask"));
           renderTable();
           return;
@@ -962,6 +1029,7 @@
         }
         if (e.target.id === "btnLedgerRefresh") { renderLedger(); alert("盘点台帐已刷新（演示）"); }
         if (e.target.id === "btnLedgerExport") alert("正在导出盘点台帐（演示）");
+        if (e.target.id === "btnLedgerPrint") alert("正在生成盘点表打印预览（演示）");
         if (e.target.id === "btnConfirmOk" && state.currentLine) {
           var line = state.currentLine;
           var isDiff = document.getElementById("confirmSame").value === "不一致" || document.getElementById("confirmDiffType").value !== "无差异";
@@ -976,6 +1044,7 @@
           if (state.current) {
             state.current.diff = linesForTask(state.current).filter(function (x) { return x.lineStatus === "有差异"; }).length;
             state.current.done = Math.max(state.current.done, linesForTask(state.current).filter(function (x) { return x.lineStatus !== "未盘点"; }).length);
+            syncDiffRecords(state.current);
           }
           close(document.getElementById("confirmMask"));
           renderDetailLines();
@@ -997,9 +1066,16 @@
           var row = rows.find(function (x) { return String(x.id) === op.getAttribute("data-id"); });
           if (!row) return;
           if (op.getAttribute("data-inv-act") === "view") openTaskInfo(row);
+          if (op.getAttribute("data-inv-act") === "start") openMaterialCheck(row);
         }
       });
       document.addEventListener("change", function (e) {
+        if (e.target.id === "inventoryRoleSelect") {
+          state.role = e.target.value;
+          localStorage.setItem("inventoryDemoRole", state.role);
+          renderTable();
+          return;
+        }
         if (e.target.id === "createType") {
           var isCompanyCreate = e.target.value === "公司盘点";
           document.getElementById("createDept").value = isCompanyCreate ? "全部业务部门" : "机械研究所";
@@ -1014,6 +1090,8 @@
           openMaterialCheck(currentTaskForAction());
         };
       }
+      var roleSel = document.getElementById("inventoryRoleSelect");
+      if (roleSel) roleSel.value = state.role;
       renderTable();
       renderLedger();
     })();

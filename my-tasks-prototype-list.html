@@ -16,6 +16,7 @@
     .mt-item { display: grid; grid-template-columns: 80px minmax(220px, 1fr); align-items: center; gap: 6px; }
     .mt-item label { font-size: 12px; color: #4d6480; }
     .mt-item input { height: 26px; border: 1px solid #dbe6f3; border-radius: 2px; padding: 0 6px; font-size: 12px; }
+    .inv-role-select { height: 28px; min-width: 150px; border: 1px solid #d9e8ff; border-radius: 4px; padding: 0 8px; background: #fff; color: #1f3551; font-size: 12px; outline: none; }
     .mt-tools { display: flex; align-items: center; gap: 6px; margin-bottom: 8px; }
     .mt-btn { border: 1px solid #dbe6f3; background: #fff; border-radius: 2px; color: #4d6480; font-size: 12px; padding: 4px 9px; cursor: pointer; }
     .mt-btn.primary { background: #1890ff; border-color: #1890ff; color: #fff; }
@@ -597,7 +598,7 @@
         <a class="header-logo" href="#"><img src="assets/logo-chenergy.png" alt="" width="220" height="40" /></a>
         <div class="header-source-brand"><p>新能源供应链管理系统</p></div>
       </div>
-      <div class="header-right"><span class="clock" id="clock"></span><div class="user-avatar" title="用户">用</div></div>
+      <div class="header-right"><select class="inv-role-select" id="inventoryRoleSelect" title="切换角色"><option value="dept_specialist">部门物资专责</option><option value="dept_head">部门负责人</option><option value="material_specialist">物资管理部门物资专责</option><option value="material_head">物资管理部门负责人</option><option value="finance_head">财务负责人</option><option value="business_head">业务部门负责人</option></select><span class="clock" id="clock"></span><div class="user-avatar" title="用户">用</div></div>
     </header>
     <div class="layout">
       <aside class="sidebar" aria-label="主导航">
@@ -1118,6 +1119,29 @@
         { assetNo: "ZC-2026-0003", code: "C20260000003", typeCode: "A0020010006", product: "B00001888", name: "变频器模块", typeName: "存货", dept: "电气控制所", loc: "电气控制所/备用柜", user: "成明锴", state: "已入库", book: 2, confirm: 3, unit: "件", health: "待复核", result: "盘盈", reason: "现场多出一件未入账物资，需核对采购合同和入库记录" },
         { assetNo: "ZC-2026-0011", code: "C20260000011", typeCode: "A0030010004", product: "B00002119", name: "偏航电机", typeName: "固定资产", dept: "现场服务中心", loc: "现场服务中心/张北场站", user: "喻家敏", state: "已领用", book: 1, confirm: 1, unit: "台", health: "完好", result: "位置不符", reason: "实物已流转但系统台账位置未同步" }
       ];
+      function inventoryStoredTodos() {
+        try { return JSON.parse(localStorage.getItem("inventoryDemoTodos") || "[]"); } catch (e) { return []; }
+      }
+      function inventoryTodoFromMap(map) {
+        return {
+          assetNo: map["资产编号"] || map.assetNo || "ZC-2026-0022",
+          code: map["物资唯一码"] || map.code || "C20260000022",
+          typeCode: map["物资类型编码"] || map.typeCode || "A0050010003",
+          product: map["产品编码"] || map.product || "B00005210",
+          name: map["物资名称"] || map.name || "主控柜测试平台",
+          typeName: map["物资类型名称"] || map.materialTypeName || "固定资产",
+          dept: map["所属部门"] || map.dept || "经营发展中心",
+          loc: map.realLoc || map.bookLoc || "未发现实物",
+          user: map.user || "王超",
+          state: "待审批",
+          book: map.bookQty || 1,
+          confirm: map.realQty || 0,
+          unit: map.unit || "台",
+          health: map.health || "缺失",
+          result: map.result || "盘亏",
+          reason: map.reason || "固定资产大额盘亏，需领导审批"
+        };
+      }
       function inventoryTodoFlow(isCompany, map) {
         if (isCompany) {
           return [
@@ -1143,6 +1167,25 @@
         ];
       }
       function inventoryTodoTask(isCompany, map) {
+        var isDiff = String(map["流程定义KEY"] || "").indexOf("pddiff_") === 0 || map["流程定义名称"] === "盘点差异审批";
+        if (isDiff) {
+          return {
+            no: map["盘点单号"] || map.taskNo || "PD-2026-002",
+            name: map["任务名称"] || "盘点差异审批",
+            type: map.flowType || (isCompany ? "公司盘点" : "部门盘点"),
+            dept: map.dept || "经营发展中心",
+            scope: "盘点差异处理结果提交审批",
+            assetRange: map.materialTypeName || "固定资产",
+            start: "2026-06-29",
+            end: "2026-06-30",
+            initiator: "宋中波",
+            owner: map["办理人"] || map.handler || "孙睿",
+            node: "差异处理审批",
+            next: "物资管理部门负责人审阅",
+            caliber: "按盘点差异处理结果、附件照片和大额盘亏规则审批",
+            status: map["流程状态"] || "待审批"
+          };
+        }
         if (isCompany) {
           return {
             no: "PD-2026-002",
@@ -1179,6 +1222,10 @@
         };
       }
       function inventoryTodoRows(isCompany) {
+        var activeMap = inventoryTodoRows._map || {};
+        if (String(activeMap["流程定义KEY"] || "").indexOf("pddiff_") === 0 || activeMap["流程定义名称"] === "盘点差异审批") {
+          return [inventoryTodoFromMap(activeMap)];
+        }
         return inventoryTodoLines.filter(function (x) {
           return isCompany || x.dept === "机械研究所";
         });
@@ -1188,6 +1235,7 @@
       }
       function inventoryTodoHtml(map) {
         var isCompany = String(map["流程定义KEY"] || "").indexOf("company") >= 0 || String(map["任务名称"] || "").indexOf("公司") >= 0;
+        inventoryTodoRows._map = map;
         var task = inventoryTodoTask(isCompany, map);
         var lines = inventoryTodoRows(isCompany);
         var flow = inventoryTodoFlow(isCompany, map);
@@ -1198,7 +1246,7 @@
           return '<tr><td>' + (i + 1) + '</td><td>' + mtEsc(x.assetNo) + '</td><td>' + mtEsc(x.code) + '</td><td>' + mtEsc(x.typeCode) + '</td><td>' + mtEsc(x.product) + '</td><td>' + mtEsc(x.name) + '</td><td>' + mtEsc(x.typeName) + '</td><td>' + mtEsc(x.dept) + '</td><td>' + mtEsc(x.loc) + '</td><td>' + mtEsc(x.user) + '</td><td>' + mtEsc(x.state) + '</td><td>' + mtEsc(x.book) + '</td><td>' + mtEsc(x.confirm) + '</td><td>' + mtEsc(x.unit) + '</td><td>' + mtEsc(x.health) + '</td><td>' + mtEsc(x.result) + '</td><td>' + mtEsc(x.reason) + '</td></tr>';
         }).join("");
         return '<div class="qa-accept-wrap">' +
-          '<div class="qa-accept-toolbar"><div class="qa-accept-toolbar-title">盘点任务办理</div></div>' +
+          '<div class="qa-accept-toolbar"><div class="qa-accept-toolbar-title">' + mtEsc(map["流程定义名称"] === "盘点差异审批" ? "盘点差异办理" : "盘点任务办理") + '</div></div>' +
           '<div class="inv-todo-flow"><div class="inv-todo-flow-title">' + (isCompany ? "公司物资盘点流程" : "部门物资盘点流程") + '</div><div class="inv-todo-flow-row">' + flowHtml + '</div></div>' +
           '<div class="qa-accept-form-shell"><table class="qa-accept-grid" role="presentation"><tbody>' +
           '<tr>' + inventoryTodoField("盘点单号", task.no) + inventoryTodoField("盘点任务名称", task.name) + '</tr>' +
@@ -1234,7 +1282,7 @@
       function openInventoryTodoHandleModal(map) {
         var mask = mt$("procModalMask");
         if (!mask) return;
-        mt$("procModalTitle").textContent = "办理 · 盘点任务审批";
+        mt$("procModalTitle").textContent = "办理 · " + (map["流程定义名称"] || "盘点任务审批");
         mt$("procModalBody").innerHTML = inventoryTodoHtml(map);
         mt$("procModalFoot").innerHTML =
           '<button type="button" class="proc-btn" id="inventoryTodoCancel">取消</button>' +
@@ -1262,6 +1310,13 @@
       var procXBtn = mt$("procModalX");
       if (procCloseBtn) procCloseBtn.onclick = closeInventoryTodoModal;
       if (procXBtn) procXBtn.onclick = closeInventoryTodoModal;
+      var invRoleSelect = mt$("inventoryRoleSelect");
+      if (invRoleSelect) {
+        invRoleSelect.value = localStorage.getItem("inventoryDemoRole") || "dept_specialist";
+        invRoleSelect.onchange = function () {
+          localStorage.setItem("inventoryDemoRole", invRoleSelect.value);
+        };
+      }
 
       document.getElementById("mtTitle").textContent = cfg.title;
       var s = document.getElementById("mtSearch");
@@ -1339,6 +1394,24 @@
             ]);
           }
         } catch (eNew) {}
+
+        // 3) 盘点差异处理提交的大额审批，进入“我的任务”办理。
+        try {
+          var invTodos = inventoryStoredTodos();
+          invTodos.forEach(function (t, idx) {
+            extraRows.push([
+              "",
+              "PD" + (idx + 1),
+              t.procName || "盘点差异审批",
+              t.key || "pddiff_" + (idx + 1),
+              t.taskName || "盘点差异审批",
+              t.handler || "孙睿",
+              t.status || "待审批",
+              t.createdAt || "2026-06-29 10:30:00",
+              "handle"
+            ]);
+          });
+        } catch (eInvTodo) {}
 
         return extraRows.concat(base);
       }
@@ -1497,7 +1570,32 @@
                   "退换货管理审批": 1
                 };
                 var procKey = map["流程定义KEY"] || "";
-                if (procName === "盘点任务审批" || procKey.indexOf("pdtask_") === 0) {
+                if (procName === "盘点任务审批" || procName === "盘点差异审批" || procKey.indexOf("pdtask_") === 0 || procKey.indexOf("pddiff_") === 0) {
+                  try {
+                    if (procKey.indexOf("pddiff_") === 0) {
+                      var invTodo = inventoryStoredTodos().filter(function (x) { return x.key === procKey; })[0];
+                      if (invTodo) {
+                        map.taskNo = invTodo.taskNo;
+                        map.flowType = invTodo.flowType;
+                        map.assetNo = invTodo.assetNo;
+                        map.code = invTodo.code;
+                        map.typeCode = invTodo.typeCode;
+                        map.product = invTodo.product;
+                        map.name = invTodo.name;
+                        map.materialTypeName = invTodo.materialTypeName;
+                        map.dept = invTodo.dept;
+                        map.bookLoc = invTodo.bookLoc;
+                        map.realLoc = invTodo.realLoc;
+                        map.user = invTodo.user;
+                        map.bookQty = invTodo.bookQty;
+                        map.realQty = invTodo.realQty;
+                        map.unit = invTodo.unit;
+                        map.health = invTodo.health;
+                        map.result = invTodo.result;
+                        map.reason = invTodo.reason;
+                      }
+                    }
+                  } catch (eInvMap) {}
                   openInventoryTodoHandleModal(map);
                   return;
                 }
