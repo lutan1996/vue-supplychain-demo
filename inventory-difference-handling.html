@@ -68,7 +68,7 @@
     .page-inventory-diff .wh-modal-body { max-height: calc(100vh - 170px); overflow: auto; }
     .diff-detail-table { width: 100%; min-width: 2920px; border-collapse: collapse; table-layout: fixed; font-size: 12px; }
     .diff-detail-table th, .diff-detail-table td { border: 1px solid #e8e8e8; padding: 8px; color: #262626; text-align: left; white-space: normal; word-break: break-all; overflow-wrap: anywhere; vertical-align: top; line-height: 1.45; }
-    .diff-detail-table th { background: #f5f7fa; color: #334155; white-space: nowrap; }
+    .diff-detail-table th { background: #f5f7fa; color: #334155; white-space: normal; word-break: keep-all; overflow-wrap: anywhere; }
     .diff-approval-tabs,
     .page-inventory-diff .inv-approval-tabs { display: flex; align-items: center; gap: 22px; padding: 0 0 8px; border-bottom: 1px solid #e8edf5; }
     .diff-approval-tab,
@@ -184,6 +184,9 @@
         <div class="diff-table-title">盘点差异明细表</div>
         <div style="overflow:auto" data-skip-demo-unify>
           <table class="diff-detail-table">
+            <colgroup>
+              <col style="width:64px"><col style="width:120px"><col style="width:128px"><col style="width:128px"><col style="width:120px"><col style="width:128px"><col style="width:120px"><col style="width:120px"><col style="width:164px"><col style="width:164px"><col style="width:92px"><col style="width:112px"><col style="width:92px"><col style="width:112px"><col style="width:72px"><col style="width:120px"><col style="width:104px"><col style="width:104px"><col style="width:140px"><col style="width:120px"><col style="width:120px"><col style="width:124px"><col style="width:132px">
+            </colgroup>
             <thead><tr><th>序号</th><th>资产编号</th><th>物资唯一码</th><th>物资类型编码</th><th>产品编码</th><th>物资名称</th><th>物资类型名称</th><th>所属部门</th><th>账面位置</th><th>实盘位置</th><th>使用人</th><th>在库/领用状态</th><th>账面数量</th><th>盘点确认数量</th><th>单位</th><th>状态是否完好</th><th>盘点结果</th><th>差异类型</th><th>差异说明</th><th>原值</th><th>差异金额</th><th>是否大额盘亏</th><th>操作</th></tr></thead>
             <tbody id="detailLines"></tbody>
           </table>
