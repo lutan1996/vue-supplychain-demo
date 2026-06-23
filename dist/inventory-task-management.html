@@ -202,7 +202,7 @@
                 <div class="wh-field"><label for="fNo">盘点单号</label><input id="fNo" type="text" placeholder="请输入盘点单号"></div>
                 <div class="wh-field"><label for="fDept">盘点部门</label><select id="fDept"><option value="">全部部门</option><option>机械研究所</option><option>电控所</option><option>经营发展中心</option><option>华北运维部</option></select></div>
                 <div class="wh-field"><label for="fType">盘点类型</label><select id="fType"><option value="">全部类型</option><option>部门盘点</option><option>公司盘点</option></select></div>
-                <div class="wh-field"><label for="fStatus">任务状态</label><select id="fStatus"><option value="">全部状态</option><option>待开始</option><option>盘点中</option><option>待物资负责人分配</option><option>待业务部门分配</option><option>待三方确认</option><option>待部门负责人审阅</option><option>待财务负责人审阅</option><option>待物资管理部门审阅</option><option>待阅知</option><option>待差异处理</option><option>已完成</option></select></div>
+                <div class="wh-field"><label for="fStatus">任务状态</label><select id="fStatus"><option value="">全部状态</option><option>待开始</option><option>盘点中</option><option>待分配</option><option>待业务部门分配</option><option>待三方确认</option><option>待部门负责人审阅</option><option>待财务负责人审阅</option><option>待物资管理部门审阅</option><option>待阅知</option><option>待差异处理</option><option>已完成</option></select></div>
                 <div class="wh-field"><label for="fKeeper">负责人</label><input id="fKeeper" type="text" placeholder="请输入负责人"></div>
               </div>
               <div class="inv-actions">
@@ -438,7 +438,7 @@
     (function () {
       var rows = [
         { id: 1, no: "PD-2026-001", name: "机械研究所二季度部门盘点", type: "部门盘点", dept: "机械研究所", scope: "本部门在库及已领用物资", assetTypeRange: "固定资产、存货、无形资产", start: "2026-06-25", end: "2026-06-30", owner: "许学良", deptHead: "李仁堂", materialOwner: "宋中波", should: 126, done: 92, diff: 3, status: "盘点中" },
-        { id: 2, no: "PD-2026-002", name: "公司二季度物资全面盘点", type: "公司盘点", dept: "全部业务部门", scope: "公司所有已入库、未入库物资", assetTypeRange: "全部", start: "2026-06-28", end: "2026-07-03", owner: "宋中波", deptHead: "王超", materialOwner: "宋中波", financeHead: "孙睿", financeOwner: "杜欣鑫", bizHead: "陈亮、李仁堂、王贺", bizOwner: "成明锴、许学良、喻家敏", should: 284, done: 188, diff: 6, status: "待物资负责人分配" },
+        { id: 2, no: "PD-2026-002", name: "公司二季度物资全面盘点", type: "公司盘点", dept: "全部业务部门", scope: "公司所有已入库、未入库物资", assetTypeRange: "全部", start: "2026-06-28", end: "2026-07-03", owner: "宋中波", deptHead: "王超", materialOwner: "宋中波", financeHead: "孙睿", financeOwner: "杜欣鑫", bizHead: "陈亮、李仁堂、王贺", bizOwner: "成明锴、许学良、喻家敏", should: 284, done: 188, diff: 6, status: "待分配" },
         { id: 3, no: "PD-2026-003", name: "经营发展中心部门盘点", type: "部门盘点", dept: "经营发展中心", scope: "本部门在库及已领用物资", assetTypeRange: "固定资产、无形资产", start: "2026-07-01", end: "2026-07-05", owner: "宋中波", deptHead: "王超", materialOwner: "宋中波", should: 57, done: 0, diff: 0, status: "待开始" },
         { id: 4, no: "PD-2026-004", name: "电气控制所部门盘点", type: "部门盘点", dept: "电气控制所", scope: "本部门在库及已领用物资", assetTypeRange: "固定资产、存货", start: "2026-06-10", end: "2026-06-15", owner: "成明锴", deptHead: "陈亮", materialOwner: "宋中波", should: 98, done: 98, diff: 0, status: "已完成" }
       ];
@@ -506,7 +506,7 @@
       }
       function tag(status) {
         if (status === "待开始") return '<span class="inv-tag wait">待开始</span>';
-        if (status === "盘点中" || status === "待物资负责人分配" || status === "待业务部门分配" || status === "待三方确认" || status === "待部门负责人审阅" || status === "待财务负责人审阅" || status === "待物资管理部门审阅" || status === "待阅知") return '<span class="inv-tag run">' + status + '</span>';
+        if (status === "盘点中" || status === "待分配" || status === "待业务部门分配" || status === "待三方确认" || status === "待部门负责人审阅" || status === "待财务负责人审阅" || status === "待物资管理部门审阅" || status === "待阅知") return '<span class="inv-tag run">' + status + '</span>';
         if (status === "已完成") return '<span class="inv-tag done">已完成</span>';
         return '<span class="inv-tag wait">待差异处理</span>';
       }
@@ -572,7 +572,7 @@
       }
       function flowIndex(row) {
         var deptMap = { "待开始": 0, "盘点中": 2, "待部门负责人审阅": 3, "待物资管理部门审阅": 4, "已完成": 5, "待差异处理": 4 };
-        var companyMap = { "待开始": 0, "待物资负责人分配": 2, "待业务部门分配": 4, "待三方确认": 6, "待财务负责人审阅": 7, "待物资管理部门审阅": 8, "待阅知": 9, "待差异处理": 9, "已完成": 9 };
+        var companyMap = { "待开始": 0, "待分配": 2, "待业务部门分配": 4, "待三方确认": 6, "待财务负责人审阅": 7, "待物资管理部门审阅": 8, "待阅知": 9, "待差异处理": 9, "已完成": 9 };
         var map = normalizeFlowType(row) === "company" ? companyMap : deptMap;
         return map[row.status] == null ? 0 : map[row.status];
       }
