@@ -685,6 +685,33 @@
           return { node: step.name, person: step.person, time: time, result: result, opinion: step.text };
         });
       }
+      function flowChartText(step) {
+        var names = (step.person || "").split("、").filter(Boolean);
+        var text = step.text || step.name;
+        names.forEach(function (name) {
+          text = text.split(name).join("");
+        });
+        return text.replace(/、+/g, "、")
+          .replace(/，+/g, "，")
+          .replace(/负责人、同意/g, "负责人同意")
+          .replace(/负责人、分配/g, "负责人分配")
+          .replace(/负责人、审阅/g, "负责人审阅")
+          .replace(/专责、发起/g, "专责发起")
+          .replace(/专责、点/g, "专责点")
+          .replace(/专责、逐条/g, "专责逐条")
+          .replace(/专责、审阅/g, "专责审阅")
+          .replace(/专责、确认/g, "专责确认")
+          .replace(/专责、阅知/g, "专责阅知")
+          .replace(/人员、收到/g, "人员收到")
+          .replace(/人员、按/g, "人员按")
+          .replace(/、同意/g, "同意")
+          .replace(/、收到/g, "收到")
+          .replace(/、审阅/g, "审阅")
+          .replace(/、阅知/g, "阅知")
+          .replace(/、确认/g, "确认")
+          .replace(/、$/g, "")
+          .trim();
+      }
       function switchApprovalTab(key) {
         document.querySelectorAll("[data-approval-tab]").forEach(function (btn) {
           btn.classList.toggle("is-active", btn.getAttribute("data-approval-tab") === key);
@@ -1034,7 +1061,7 @@
           var cls = i < activeIndex ? " done" : (i === activeIndex ? " active" : "");
           if (i === steps.length - 1) cls += " is-end";
           var arrow = i < steps.length - 1 ? '<span class="inv-arrow">→</span>' : "";
-          return '<div class="inv-step' + cls + '"><strong>' + step.name + '</strong><span>' + step.person + '</span></div>' + arrow;
+          return '<div class="inv-step' + cls + '"><strong>' + flowChartText(step) + '</strong><span>' + step.person + '</span></div>' + arrow;
         }).join("");
         document.getElementById("approvalInfoBody").innerHTML = approvalRowsFor(state.current).map(function (x, i) {
           return '<p class="inv-approval-line">' + (i + 1) + '、' + x.opinion + '（' + x.time + '）</p>';
