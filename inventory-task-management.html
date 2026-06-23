@@ -480,11 +480,11 @@
         { id: 4, no: "PD-2026-004", name: "电气控制所部门盘点", type: "部门盘点", dept: "电气控制所", scope: "本部门在库及已领用物资", assetTypeRange: "固定资产、存货", start: "2026-06-10", end: "2026-06-15", owner: "成明锴", deptHead: "陈亮", materialOwner: "宋中波", should: 98, done: 98, diff: 0, status: "已完成" }
       ];
       var lines = [
-        { task: "PD-2026-001", assetNo: "ZC-2026-0001", code: "C20260000001", typeCode: "A0010020001", product: "B00001234", assetName: "变桨轴承", spec: "BP-2.0MW", materialTypeName: "固定资产", dept: "机械研究所", loc: "机械研究所/华北主仓A-01", user: "李仁堂", state: "在库", health: "完好", lastNo: "PD-2026-001", lastDate: "2026-06-25", book: 1, real: 1, result: "账实相符", lineStatus: "已确认", diffType: "无差异", reason: "", keeper: "李仁堂", serviceLife: "8年", originalValue: 680000, qty: 1, unit: "台", checkQty: 1, useStatus: "正常", checkResult: "账实相符", remark1: "固定资产", remark2: "状态完好", remark3: "无需调整" },
-        { task: "PD-2026-001", assetNo: "ZC-2026-0002", code: "C20260000002", typeCode: "A0010020002", product: "B00001235", assetName: "齿轮箱滤芯", spec: "GX-LX-90", materialTypeName: "存货", dept: "机械研究所", loc: "机械研究所/华北主仓A-03", user: "许学良", state: "在库", health: "完好", lastNo: "PD-2026-001", lastDate: "2026-06-25", book: 12, real: 10, result: "盘亏", lineStatus: "有差异", diffType: "数量差异", reason: "账面数量与实盘数量不一致，需进入盘点差异处理", warehouseLoc: "华北主仓A-03", stockNo: "PK-2026-0412", stockDate: "2026-06-20", stockBook: 12, stockReal: 10, stockDiff: -2, confirmQty: 10, stockStatus: "在库", diffQty: -2, unit: "件", checkResult: "盘亏" },
-        { task: "PD-2026-002", assetNo: "ZC-2026-0003", code: "C20260000003", typeCode: "A0020010006", product: "B00001888", assetName: "变频器模块", spec: "VF-800", materialTypeName: "存货", dept: "电气控制所", loc: "电气控制所/备用柜", user: "成明锴", state: "已入库", health: "待核验", lastNo: "PD-2026-002", lastDate: "2026-06-28", book: 2, real: 3, result: "盘盈", lineStatus: "有差异", diffType: "数量差异", reason: "现场多出一件未入账物资，需核对采购合同和入库记录", warehouseLoc: "备用柜", stockNo: "PK-2026-0415", stockDate: "2026-06-22", stockBook: 2, stockReal: 3, stockDiff: 1, confirmQty: 3, stockStatus: "已入库", diffQty: 1, unit: "件", checkResult: "盘盈" },
-        { task: "PD-2026-002", assetNo: "ZC-2026-0011", code: "C20260000011", typeCode: "A0030010004", product: "B00002119", assetName: "偏航电机", spec: "PY-DJ-55", materialTypeName: "固定资产", dept: "现场服务中心", loc: "现场服务中心/张北场站", user: "喻家敏", state: "已领用", health: "完好", lastNo: "PD-2026-002", lastDate: "2026-06-28", book: 1, real: 1, result: "位置不符", lineStatus: "有差异", diffType: "位置不符", reason: "实物已流转但系统台账位置未同步", keeper: "喻家敏", serviceLife: "10年", originalValue: 520000, qty: 1, unit: "台", checkQty: 1, useStatus: "正常", checkResult: "位置不符", remark1: "固定资产", remark2: "台账位置待更正", remark3: "需业务部门确认" },
-        { task: "PD-2026-003", assetNo: "WX-2026-0001", code: "C20260000021", typeCode: "A0060010001", product: "B00004101", assetName: "风机诊断软件授权", spec: "V3.2 企业版", materialTypeName: "无形资产", dept: "经营发展中心", loc: "经营发展中心/系统账号", user: "王超", state: "使用中", health: "完好", lastNo: "PD-2026-003", lastDate: "待盘点", book: 1, real: 0, result: "未盘点", lineStatus: "未盘点", diffType: "无差异", reason: "", authNo: "AUTH-2026-0315", useDept: "经营发展中心", useOwner: "王超", authStart: "2026-03-15", authEnd: "2029-03-14", bookOriginal: 260000, bookNet: 238000, intangibleStatus: "使用中", clearResult: "待清查" }
+        { task: "PD-2026-001", assetNo: "ZC-2026-0001", code: "C20260000001", typeCode: "A0010020001", product: "B00001234", assetName: "变桨轴承", spec: "BP-2.0MW", materialTypeName: "固定资产", dept: "机械研究所", loc: "机械研究所/华北主仓A-01", user: "李仁堂", state: "在库", health: "完好", lastNo: "PD-2026-001", lastDate: "2026-06-25", book: 1, real: 1, result: "正常", lineStatus: "已确认", diffType: "正常", reason: "", keeper: "李仁堂", serviceLife: "8年", originalValue: 680000, qty: 1, unit: "台", checkQty: 1, useStatus: "正常", checkResult: "正常", remark1: "固定资产", remark2: "状态完好", remark3: "无需调整" },
+        { task: "PD-2026-001", assetNo: "ZC-2026-0002", code: "C20260000002", typeCode: "A0010020002", product: "B00001235", assetName: "齿轮箱滤芯", spec: "GX-LX-90", materialTypeName: "存货", dept: "机械研究所", loc: "机械研究所/华北主仓A-03", user: "许学良", state: "在库", health: "完好", lastNo: "PD-2026-001", lastDate: "2026-06-25", book: 12, real: 10, result: "盘亏", lineStatus: "有差异", diffType: "盘亏", reason: "账面数量与实盘数量不一致，需进入盘点差异处理", warehouseLoc: "华北主仓A-03", stockNo: "PK-2026-0412", stockDate: "2026-06-20", stockBook: 12, stockReal: 10, stockDiff: -2, confirmQty: 10, stockStatus: "在库", diffQty: -2, unit: "件", checkResult: "盘亏" },
+        { task: "PD-2026-002", assetNo: "ZC-2026-0003", code: "C20260000003", typeCode: "A0020010006", product: "B00001888", assetName: "变频器模块", spec: "VF-800", materialTypeName: "存货", dept: "电气控制所", loc: "电气控制所/备用柜", user: "成明锴", state: "已入库", health: "待核验", lastNo: "PD-2026-002", lastDate: "2026-06-28", book: 2, real: 3, result: "盘盈", lineStatus: "有差异", diffType: "盘盈", reason: "现场多出一件未入账物资，需核对采购合同和入库记录", warehouseLoc: "备用柜", stockNo: "PK-2026-0415", stockDate: "2026-06-22", stockBook: 2, stockReal: 3, stockDiff: 1, confirmQty: 3, stockStatus: "已入库", diffQty: 1, unit: "件", checkResult: "盘盈" },
+        { task: "PD-2026-002", assetNo: "ZC-2026-0011", code: "C20260000011", typeCode: "A0030010004", product: "B00002119", assetName: "偏航电机", spec: "PY-DJ-55", materialTypeName: "固定资产", dept: "现场服务中心", loc: "现场服务中心/张北场站", user: "喻家敏", state: "已领用", health: "完好", lastNo: "PD-2026-002", lastDate: "2026-06-28", book: 1, real: 1, result: "损毁", lineStatus: "有差异", diffType: "损毁", reason: "实物已流转但系统台账位置未同步", keeper: "喻家敏", serviceLife: "10年", originalValue: 520000, qty: 1, unit: "台", checkQty: 1, useStatus: "正常", checkResult: "损毁", remark1: "固定资产", remark2: "台账位置待更正", remark3: "需业务部门确认" },
+        { task: "PD-2026-003", assetNo: "WX-2026-0001", code: "C20260000021", typeCode: "A0060010001", product: "B00004101", assetName: "风机诊断软件授权", spec: "V3.2 企业版", materialTypeName: "无形资产", dept: "经营发展中心", loc: "经营发展中心/系统账号", user: "王超", state: "使用中", health: "完好", lastNo: "PD-2026-003", lastDate: "待盘点", book: 1, real: 0, result: "未盘点", lineStatus: "未盘点", diffType: "正常", reason: "", authNo: "AUTH-2026-0315", useDept: "经营发展中心", useOwner: "王超", authStart: "2026-03-15", authEnd: "2029-03-14", bookOriginal: 260000, bookNet: 238000, intangibleStatus: "使用中", clearResult: "待清查" }
       ];
       var state = { filters: {}, current: null, currentLine: null, role: localStorage.getItem("inventoryDemoRole") || "dept_specialist" };
       var roleNames = { dept_specialist: "部门物资专责", dept_head: "部门负责人", material_specialist: "物资管理部门物资专责", material_head: "物资管理部门负责人", finance_head: "财务负责人", business_head: "业务部门负责人" };
@@ -501,18 +501,27 @@
         var qty = Number(line.book || line.qty || 1) || 1;
         return originalAmount(line) ? originalAmount(line) / qty : 0;
       }
+      function normalizeDiffType(type, line) {
+        if (type === "盘盈" || type === "盘亏" || type === "损毁" || type === "正常") return type;
+        if (type === "无差异" || type === "账实相符") return "正常";
+        if (type === "数量差异") {
+          return Number((line && (line.real || line.realQty || line.confirmQty)) || 0) > Number((line && (line.book || line.bookQty)) || 0) ? "盘盈" : "盘亏";
+        }
+        if (type === "位置不符" || type === "负责人不符" || type === "状态异常" || type === "价值差异") return "损毁";
+        return "正常";
+      }
       function inferDiffType(line) {
-        if (line.diffType && line.diffType !== "无差异") return line.diffType;
-        if (Number(line.real) !== Number(line.book)) return Number(line.real) > Number(line.book) ? "盘盈" : "数量差异";
-        if (line.health && line.health !== "完好") return "状态异常";
-        if (line.result && line.result !== "账实相符" && line.result !== "无差异") return line.result;
-        return "无差异";
+        if (line.diffType && line.diffType !== "正常") return normalizeDiffType(line.diffType, line);
+        if (Number(line.real) !== Number(line.book)) return Number(line.real) > Number(line.book) ? "盘盈" : "盘亏";
+        if (line.health && line.health !== "完好") return "损毁";
+        if (line.result && line.result !== "正常") return normalizeDiffType(line.result, line);
+        return "正常";
       }
       function syncDiffRecords(task) {
         var list = storedDiffs().filter(function (x) { return x.task !== task.no; });
         linesForTask(task).filter(function (line) { return line.lineStatus === "有差异"; }).forEach(function (line) {
           var diffType = inferDiffType(line);
-          var amount = (diffType === "盘亏" || diffType === "数量差异" || diffType === "盘盈") ? Math.abs(Number(line.book || 0) - Number(line.real || line.confirmQty || 0)) * unitPrice(line) : 0;
+          var amount = (diffType === "盘亏" || diffType === "盘盈") ? Math.abs(Number(line.book || 0) - Number(line.real || line.confirmQty || 0)) * unitPrice(line) : 0;
           list.push({
             id: Date.now() + Math.floor(Math.random() * 1000), task: task.no, flowType: task.type,
             assetNo: line.assetNo, code: line.code, typeCode: line.typeCode, product: line.product,
@@ -537,8 +546,8 @@
         return v === "" || v == null ? "-" : v;
       }
       function resultText(v) {
-        if (v && v !== "账实相符" && v !== "无差异" && v !== "未盘点") return '<span class="inv-text-danger">' + v + '</span>';
-        if (v === "账实相符" || v === "无差异") return '<span class="inv-text-ok">' + v + '</span>';
+        if (v && v !== "正常" && v !== "未盘点") return '<span class="inv-text-danger">' + v + '</span>';
+        if (v === "正常") return '<span class="inv-text-ok">' + v + '</span>';
         return '<span class="inv-text-muted">' + cell(v) + '</span>';
       }
       function tag(status) {
@@ -753,7 +762,7 @@
           '<div class="inv-table-title">盘点物资明细表</div>',
           '<div class="inv-task-mini-table-wrap"><table class="inv-task-mini-table"><thead><tr><th>序号</th><th>资产编号</th><th>物资唯一码</th><th>物资类型编码</th><th>产品编码</th><th>产品名称</th><th>物资类型名称</th><th>所属部门</th><th>存储地点/仓库货位</th><th>使用人</th><th>在库/领用状态</th><th>账面数量</th><th>盘点确认数量</th><th>单位</th><th>状态是否完好</th><th>盘点结果</th><th>差异类型</th><th>原值</th><th>差异金额</th><th>差异说明</th><th>操作</th></tr></thead><tbody>' +
             list.map(function (x, i) {
-              return '<tr><td>' + (i + 1) + '</td><td>' + cell(x.assetNo) + '</td><td>' + cell(x.code) + '</td><td>' + cell(x.typeCode) + '</td><td>' + cell(x.product) + '</td><td>' + cell(x.assetName) + '</td><td>' + cell(x.materialTypeName) + '</td><td>' + cell(x.dept) + '</td><td>' + cell(x.loc) + '</td><td>' + cell(x.user) + '</td><td>' + cell(x.state) + '</td><td>' + cell(x.book) + '</td><td>' + cell(x.confirmQty || x.real) + '</td><td>' + cell(x.unit || "件") + '</td><td>' + cell(x.health) + '</td><td>' + cell(x.result) + '</td><td>' + cell(x.diffType || "无差异") + '</td><td>' + money(x.originalValue || x.bookOriginal || 0) + '</td><td>' + money(Math.abs(Number(x.diffQty || 0)) * (Number(x.originalValue || x.bookOriginal || 0) || 0)) + '</td><td>' + cell(x.reason) + '</td><td><span class="inv-op"><span role="button" tabindex="0" data-task-view="' + x.code + '">查看</span><span role="button" tabindex="0" data-task-track="' + x.code + '">物资跟踪</span></span></td></tr>';
+              return '<tr><td>' + (i + 1) + '</td><td>' + cell(x.assetNo) + '</td><td>' + cell(x.code) + '</td><td>' + cell(x.typeCode) + '</td><td>' + cell(x.product) + '</td><td>' + cell(x.assetName) + '</td><td>' + cell(x.materialTypeName) + '</td><td>' + cell(x.dept) + '</td><td>' + cell(x.loc) + '</td><td>' + cell(x.user) + '</td><td>' + cell(x.state) + '</td><td>' + cell(x.book) + '</td><td>' + cell(x.confirmQty || x.real) + '</td><td>' + cell(x.unit || "件") + '</td><td>' + cell(x.health) + '</td><td>' + cell(x.result) + '</td><td>' + cell(normalizeDiffType(x.diffType || "正常", x)) + '</td><td>' + money(x.originalValue || x.bookOriginal || 0) + '</td><td>' + money(Math.abs(Number(x.diffQty || 0)) * (Number(x.originalValue || x.bookOriginal || 0) || 0)) + '</td><td>' + cell(x.reason) + '</td><td><span class="inv-op"><span role="button" tabindex="0" data-task-view="' + x.code + '">查看</span><span role="button" tabindex="0" data-task-track="' + x.code + '">物资跟踪</span></span></td></tr>';
             }).join("") +
           '</tbody></table></div>',
           '<div class="inv-task-track-panel" id="taskTrackPanel" hidden></div>'
@@ -868,7 +877,7 @@
             '<td>' + cell(x.unit || "件") + '</td>' +
             '<td><select class="inv-material-cell-select"><option value="">请选择</option><option>完好</option><option>待核验</option><option>损坏</option><option>缺失</option></select></td>' +
             '<td><select class="inv-material-cell-select"><option value="">请选择</option><option>账实相符</option><option>盘亏</option><option>盘盈</option><option>位置不符</option><option>未盘点</option></select></td>' +
-            '<td><select class="inv-material-cell-select"><option value="">请选择</option><option>无差异</option><option>数量差异</option><option>位置不符</option><option>负责人不符</option><option>状态异常</option><option>盘盈</option><option>盘亏</option><option>价值差异</option></select></td>' +
+            '<td><select class="inv-material-cell-select"><option value="">请选择</option><option>正常</option><option>盘盈</option><option>盘亏</option><option>损毁</option></select></td>' +
             '<td>' + money(x.originalValue || x.bookOriginal || 0) + '</td>' +
             '<td><input class="inv-material-cell-input" value="" placeholder="系统判断/手动确认"></td>' +
             '<td><textarea class="inv-material-cell-textarea" placeholder="手动填写差异说明"></textarea></td>' +
@@ -1013,9 +1022,9 @@
           if (lineOp.getAttribute("data-line-act") === "track") openTrack(line);
           if (lineOp.getAttribute("data-line-act") === "ok") {
             line.lineStatus = "已确认";
-            line.result = "账实相符";
-            line.checkResult = "账实相符";
-            line.diffType = "无差异";
+            line.result = "正常";
+            line.checkResult = "正常";
+            line.diffType = "正常";
             line.reason = "";
             renderDetailLines();
             renderLedger();
@@ -1088,9 +1097,9 @@
           line.loc = document.getElementById("confirmLoc").value;
           line.user = document.getElementById("confirmUser").value;
           line.lineStatus = isDiff ? "有差异" : "已确认";
-          line.diffType = isDiff ? (line.diffType || "数量差异") : "无差异";
+          line.diffType = isDiff ? (line.diffType || "盘亏") : "正常";
           line.reason = isDiff ? (document.getElementById("confirmReason").value || "盘点确认与系统台账不一致，进入盘点差异处理") : "";
-          line.result = isDiff ? line.diffType : "账实相符";
+          line.result = isDiff ? line.diffType : "正常";
           line.checkResult = line.result;
           if (state.current) {
             state.current.diff = linesForTask(state.current).filter(function (x) { return x.lineStatus === "有差异"; }).length;

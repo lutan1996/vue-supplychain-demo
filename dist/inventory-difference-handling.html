@@ -269,12 +269,12 @@
   <script>
     (function () {
       var rows = [
-        { id: 1, task: "PD-2026-001", flowType: "部门盘点", assetNo: "ZC-2026-0002", code: "C20260000002", typeCode: "A0010020002", product: "B00001235", materialTypeName: "存货", name: "齿轮箱滤芯", spec: "GX-LX-90", bookLoc: "机械研究所/华北主仓A-03", realLoc: "机械研究所/华北主仓A-03", user: "许学良", health: "完好", bookQty: 12, realQty: 10, originalValue: 186000, amount: 186000, type: "数量差异", dept: "机械研究所", owner: "许学良", deptHead: "李仁堂", materialOwner: "宋中波", status: "待处理", adjustNo: "待生成", reason: "账面数量与实盘数量不一致", proof: "盘库单PK-2026-0412、现场照片", nextUser: "李仁堂" },
+        { id: 1, task: "PD-2026-001", flowType: "部门盘点", assetNo: "ZC-2026-0002", code: "C20260000002", typeCode: "A0010020002", product: "B00001235", materialTypeName: "存货", name: "齿轮箱滤芯", spec: "GX-LX-90", bookLoc: "机械研究所/华北主仓A-03", realLoc: "机械研究所/华北主仓A-03", user: "许学良", health: "完好", bookQty: 12, realQty: 10, originalValue: 186000, amount: 186000, type: "盘亏", dept: "机械研究所", owner: "许学良", deptHead: "李仁堂", materialOwner: "宋中波", status: "待处理", adjustNo: "待生成", reason: "账面数量与实盘数量不一致", proof: "盘库单PK-2026-0412、现场照片", nextUser: "李仁堂" },
         { id: 2, task: "PD-2026-002", flowType: "公司盘点", assetNo: "ZC-2026-0003", code: "C20260000003", typeCode: "A0020010006", product: "B00001888", materialTypeName: "存货", name: "变频器模块", spec: "VF-800", bookLoc: "电气控制所/已入库", realLoc: "电气控制所/备用柜", user: "成明锴", health: "待核验", bookQty: 2, realQty: 3, originalValue: 245000, amount: 245000, type: "盘盈", dept: "电气控制所", owner: "宋中波", deptHead: "王超", materialOwner: "宋中波", financeHead: "孙睿", financeOwner: "杜欣鑫", bizHead: "陈亮、李仁堂、王贺", bizOwner: "成明锴、许学良、喻家敏", status: "处理中", adjustNo: "TZ-2026-0008", reason: "现场多出一件未入账物资", proof: "采购合同、入库单、现场盘点照片", nextUser: "陈亮" },
-        { id: 3, task: "PD-2026-002", flowType: "公司盘点", assetNo: "ZC-2026-0011", code: "C20260000011", typeCode: "A0030010004", product: "B00002119", materialTypeName: "固定资产", name: "偏航电机", spec: "PY-DJ-55", bookLoc: "经营发展中心/中心仓B-02", realLoc: "现场服务中心/张北场站", user: "喻家敏", health: "完好", bookQty: 1, realQty: 1, originalValue: 520000, amount: 0, type: "位置不符", dept: "现场服务中心", owner: "宋中波", deptHead: "王超", materialOwner: "宋中波", financeHead: "孙睿", financeOwner: "杜欣鑫", bizHead: "王贺", bizOwner: "喻家敏", status: "待处理", adjustNo: "待生成", reason: "实物已流转但台账位置未同步", proof: "流转记录、领用记录、现场照片", nextUser: "王贺" },
-        { id: 4, task: "PD-2026-004", flowType: "部门盘点", assetNo: "ZC-2026-0018", code: "C20260000018", typeCode: "A0040020001", product: "B00003102", materialTypeName: "存货", name: "液压站密封包", spec: "YY-MFB-6", bookLoc: "电气控制所/主仓C-01", realLoc: "电气控制所/主仓C-01", user: "成明锴", health: "完好", bookQty: 6, realQty: 6, originalValue: 48000, amount: 0, type: "负责人不符", dept: "电气控制所", owner: "成明锴", deptHead: "陈亮", materialOwner: "宋中波", status: "已处理", adjustNo: "TZ-2026-0006", reason: "领用负责人字段未同步", proof: "扫码领用记录", nextUser: "-" },
+        { id: 3, task: "PD-2026-002", flowType: "公司盘点", assetNo: "ZC-2026-0011", code: "C20260000011", typeCode: "A0030010004", product: "B00002119", materialTypeName: "固定资产", name: "偏航电机", spec: "PY-DJ-55", bookLoc: "经营发展中心/中心仓B-02", realLoc: "现场服务中心/张北场站", user: "喻家敏", health: "完好", bookQty: 1, realQty: 1, originalValue: 520000, amount: 0, type: "损毁", dept: "现场服务中心", owner: "宋中波", deptHead: "王超", materialOwner: "宋中波", financeHead: "孙睿", financeOwner: "杜欣鑫", bizHead: "王贺", bizOwner: "喻家敏", status: "待处理", adjustNo: "待生成", reason: "实物已流转但台账位置未同步", proof: "流转记录、领用记录、现场照片", nextUser: "王贺" },
+        { id: 4, task: "PD-2026-004", flowType: "部门盘点", assetNo: "ZC-2026-0018", code: "C20260000018", typeCode: "A0040020001", product: "B00003102", materialTypeName: "存货", name: "液压站密封包", spec: "YY-MFB-6", bookLoc: "电气控制所/主仓C-01", realLoc: "电气控制所/主仓C-01", user: "成明锴", health: "完好", bookQty: 6, realQty: 6, originalValue: 48000, amount: 0, type: "损毁", dept: "电气控制所", owner: "成明锴", deptHead: "陈亮", materialOwner: "宋中波", status: "已处理", adjustNo: "TZ-2026-0006", reason: "领用负责人字段未同步", proof: "扫码领用记录", nextUser: "-" },
         { id: 5, task: "PD-2026-002", flowType: "公司盘点", assetNo: "ZC-2026-0022", code: "C20260000022", typeCode: "A0050010003", product: "B00005210", materialTypeName: "固定资产", name: "主控柜测试平台", spec: "ZK-TP-500", bookLoc: "经营发展中心/设备间", realLoc: "未发现实物", user: "王超", health: "缺失", bookQty: 1, realQty: 0, originalValue: 760000, amount: 760000, type: "盘亏", dept: "经营发展中心", owner: "宋中波", deptHead: "王超", materialOwner: "宋中波", financeHead: "孙睿", financeOwner: "杜欣鑫", bizHead: "王超", bizOwner: "王超", status: "待提交审批", adjustNo: "待生成", reason: "固定资产实物缺失，原值不低于50万元，系统自动标记为大额盘亏", proof: "固定资产台账、现场盘点照片、责任部门说明", nextUser: "孙睿、刘静" },
-        { id: 6, task: "PD-2026-003", flowType: "部门盘点", assetNo: "WX-2026-0001", code: "C20260000021", typeCode: "A0060010001", product: "B00004101", materialTypeName: "无形资产", name: "风机诊断软件授权", spec: "V3.2 企业版", bookLoc: "经营发展中心/系统账号", realLoc: "授权账号待核验", user: "王超", health: "待核验", bookQty: 1, realQty: 1, originalValue: 260000, amount: 22000, type: "状态异常", dept: "经营发展中心", owner: "宋中波", deptHead: "王超", materialOwner: "宋中波", status: "待处理", adjustNo: "待生成", reason: "授权账号使用状态待核验", proof: "授权清单、登录记录", nextUser: "王超" }
+        { id: 6, task: "PD-2026-003", flowType: "部门盘点", assetNo: "WX-2026-0001", code: "C20260000021", typeCode: "A0060010001", product: "B00004101", materialTypeName: "无形资产", name: "风机诊断软件授权", spec: "V3.2 企业版", bookLoc: "经营发展中心/系统账号", realLoc: "授权账号待核验", user: "王超", health: "待核验", bookQty: 1, realQty: 1, originalValue: 260000, amount: 22000, type: "损毁", dept: "经营发展中心", owner: "宋中波", deptHead: "王超", materialOwner: "宋中波", status: "待处理", adjustNo: "待生成", reason: "授权账号使用状态待核验", proof: "授权清单、登录记录", nextUser: "王超" }
       ];
       var state = { filters: {}, current: null, role: localStorage.getItem("inventoryDemoRole") || "dept_specialist" };
       var roleNames = { dept_specialist: "部门物资专责", dept_head: "部门负责人", material_specialist: "物资管理部门物资专责", material_head: "物资管理部门负责人", finance_head: "财务负责人", business_head: "业务部门负责人" };
@@ -346,10 +346,18 @@
         saveApprovalTodos(list);
       }
       function typeTag(t) {
+        t = normalizeDiffType(t);
         if (t === "盘亏") return '<span class="diff-tag loss">盘亏</span>';
         if (t === "盘盈") return '<span class="diff-tag gain">盘盈</span>';
-        if (t === "数量差异" || t === "价值差异") return '<span class="diff-tag loss">' + t + '</span>';
+        if (t === "损毁") return '<span class="diff-tag loss">损毁</span>';
         return '<span class="diff-tag place">' + t + '</span>';
+      }
+      function normalizeDiffType(type, row) {
+        if (type === "盘盈" || type === "盘亏" || type === "损毁" || type === "正常") return type;
+        if (type === "无差异" || type === "账实相符") return "正常";
+        if (type === "数量差异") return Number((row && row.realQty) || 0) > Number((row && row.bookQty) || 0) ? "盘盈" : "盘亏";
+        if (type === "位置不符" || type === "负责人不符" || type === "状态异常" || type === "价值差异") return "损毁";
+        return "正常";
       }
       function statusTag(s) {
         if (s === "已处理") return '<span class="diff-tag done">已处理</span>';
@@ -360,7 +368,7 @@
         return "¥" + Number(v || 0).toLocaleString("zh-CN", { maximumFractionDigits: 0 });
       }
       function isHighLoss(row) {
-        return row.materialTypeName === "固定资产" && row.type === "盘亏" && Number(row.originalValue || 0) >= 500000;
+        return row.materialTypeName === "固定资产" && normalizeDiffType(row.type, row) === "盘亏" && Number(row.originalValue || 0) >= 500000;
       }
       function levelText(row) {
         return isHighLoss(row) ? "大额盘亏" : "普通差异";
@@ -372,8 +380,7 @@
         return row.unit || (row.materialTypeName === "固定资产" ? "台" : "件");
       }
       function resultOf(row) {
-        if (row.type === "数量差异") return Number(row.realQty || 0) < Number(row.bookQty || 0) ? "盘亏" : "盘盈";
-        return row.type || "有差异";
+        return normalizeDiffType(row.type, row);
       }
       function approvalText(row) {
         return isHighLoss(row) ? "系统判断为固定资产盘亏且原值不低于50万元，需提交审批" : "普通差异由责任部门处理差异，后续审批进入我的任务办理";
@@ -494,7 +501,7 @@
         document.getElementById("trackGrid").innerHTML = [
           ["资产编号", row.assetNo], ["物资唯一码", row.code], ["物资类型编码", row.typeCode], ["产品编码", row.product], ["物资类型名称", row.materialTypeName], ["产品名称", row.name],
           ["规格型号", row.spec], ["责任部门", row.dept], ["账面位置", row.bookLoc], ["实盘位置", row.realLoc],
-          ["差异类型", row.type], ["差异金额", money(row.amount)], ["处理级别", levelText(row)], ["处理状态", row.status],
+          ["差异类型", normalizeDiffType(row.type, row)], ["差异金额", money(row.amount)], ["处理级别", levelText(row)], ["处理状态", row.status],
           ["关联盘点单号", row.task], ["关联调整单号", row.adjustNo]
         ].map(function (x) { return '<div class="wh-detail-item"><span class="wh-detail-label">' + x[0] + '</span><span class="wh-detail-value">' + x[1] + '</span></div>'; }).join("");
         document.getElementById("trackFlow").innerHTML = [
@@ -523,12 +530,12 @@
         state.current = row;
         document.getElementById("detailGrid").innerHTML = [
           ["盘点单号", row.task], ["资产编号", row.assetNo], ["物资唯一码", row.code], ["物资类型编码", row.typeCode], ["产品编码", row.product],
-          ["物资类型名称", row.materialTypeName], ["产品名称", row.name], ["差异类型", row.type], ["账面位置", row.bookLoc], ["实盘位置", row.realLoc],
+          ["物资类型名称", row.materialTypeName], ["产品名称", row.name], ["差异类型", normalizeDiffType(row.type, row)], ["账面位置", row.bookLoc], ["实盘位置", row.realLoc],
           ["使用人/负责人", row.user], ["状态是否完好", row.health], ["账面数量", row.bookQty], ["盘点确认数量", row.realQty], ["单位", unitOf(row)], ["盘点结果", resultOf(row)], ["责任部门", row.dept],
           ["原值", money(row.originalValue)], ["差异金额", money(row.amount)], ["是否大额差异", levelText(row)], ["处理状态", row.status], ["处理要求", approvalText(row)],
           ["差异原因", row.reason], ["盘点流程类型", row.flowType], ["数据来源", "盘点任务、库存台账、扫码领用、部门流转、销售发货"]
         ].map(function (x) { return '<div class="wh-detail-item"><span class="wh-detail-label">' + x[0] + '</span><span class="wh-detail-value">' + x[1] + '</span></div>'; }).join("");
-        document.getElementById("detailLines").innerHTML = '<tr class="' + (isHighLoss(row) ? "diff-row-high" : "diff-row-problem") + '"><td>1</td><td>' + row.assetNo + '</td><td>' + row.code + '</td><td>' + row.typeCode + '</td><td>' + row.product + '</td><td>' + row.name + '</td><td>' + row.materialTypeName + '</td><td>' + row.dept + '</td><td>' + row.bookLoc + '</td><td>' + row.realLoc + '</td><td>' + row.user + '</td><td>在库</td><td>' + row.bookQty + '</td><td>' + row.realQty + '</td><td>' + unitOf(row) + '</td><td>' + row.health + '</td><td>' + resultOf(row) + '</td><td>' + row.type + '</td><td>' + row.reason + '</td><td>' + money(row.originalValue) + '</td><td>' + money(row.amount) + '</td><td>' + levelText(row) + '</td><td>' + lineActions(row) + '</td></tr>';
+        document.getElementById("detailLines").innerHTML = '<tr class="' + (isHighLoss(row) ? "diff-row-high" : "diff-row-problem") + '"><td>1</td><td>' + row.assetNo + '</td><td>' + row.code + '</td><td>' + row.typeCode + '</td><td>' + row.product + '</td><td>' + row.name + '</td><td>' + row.materialTypeName + '</td><td>' + row.dept + '</td><td>' + row.bookLoc + '</td><td>' + row.realLoc + '</td><td>' + row.user + '</td><td>在库</td><td>' + row.bookQty + '</td><td>' + row.realQty + '</td><td>' + unitOf(row) + '</td><td>' + row.health + '</td><td>' + resultOf(row) + '</td><td>' + normalizeDiffType(row.type, row) + '</td><td>' + row.reason + '</td><td>' + money(row.originalValue) + '</td><td>' + money(row.amount) + '</td><td>' + levelText(row) + '</td><td>' + lineActions(row) + '</td></tr>';
                 document.getElementById("detailReasonField").value = row.reason;
         document.getElementById("detailProofField").value = row.proof || "-";
         document.getElementById("detailOriginalField").value = money(row.originalValue);
