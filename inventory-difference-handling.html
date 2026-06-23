@@ -276,7 +276,7 @@
         { id: 3, task: "PD-2026-002", flowType: "公司盘点", assetNo: "ZC-2026-0011", code: "C20260000011", typeCode: "A0030010004", product: "B00002119", materialTypeName: "固定资产", name: "偏航电机", spec: "PY-DJ-55", bookLoc: "经营发展中心/中心仓B-02", realLoc: "现场服务中心/张北场站", user: "喻家敏", health: "完好", bookQty: 1, realQty: 1, originalValue: 520000, amount: 0, type: "损毁", dept: "现场服务中心", owner: "宋中波", deptHead: "王超", materialOwner: "宋中波", financeHead: "孙睿", financeOwner: "杜欣鑫", bizHead: "王贺", bizOwner: "喻家敏", status: "待处理", adjustNo: "待生成", reason: "实物已流转但台账位置未同步", proof: "流转记录、领用记录、台账记录", nextUser: "王贺" },
         { id: 4, task: "PD-2026-004", flowType: "部门盘点", assetNo: "ZC-2026-0018", code: "C20260000018", typeCode: "A0040020001", product: "B00003102", materialTypeName: "存货", name: "液压站密封包", spec: "YY-MFB-6", bookLoc: "电气控制所/主仓C-01", realLoc: "电气控制所/主仓C-01", user: "成明锴", health: "完好", bookQty: 6, realQty: 6, originalValue: 48000, amount: 0, type: "损毁", dept: "电气控制所", owner: "成明锴", deptHead: "陈亮", materialOwner: "宋中波", status: "已处理", adjustNo: "TZ-2026-0006", reason: "领用负责人字段未同步", proof: "扫码领用记录", nextUser: "-" },
         { id: 5, task: "PD-2026-002", flowType: "公司盘点", assetNo: "ZC-2026-0022", code: "C20260000022", typeCode: "A0050010003", product: "B00005210", materialTypeName: "固定资产", name: "主控柜测试平台", spec: "ZK-TP-500", bookLoc: "经营发展中心/设备间", realLoc: "未发现实物", user: "王超", health: "缺失", bookQty: 1, realQty: 0, originalValue: 760000, amount: 760000, type: "盘亏", dept: "经营发展中心", owner: "宋中波", deptHead: "王超", materialOwner: "宋中波", financeHead: "孙睿", financeOwner: "杜欣鑫", bizHead: "王超", bizOwner: "王超", status: "待提交审批", adjustNo: "待生成", reason: "固定资产实物缺失，原值不低于50万元，系统自动标记为大额盘亏", proof: "固定资产台账、盘点说明、责任部门说明", nextUser: "孙睿、刘静" },
-        { id: 6, task: "PD-2026-003", flowType: "部门盘点", assetNo: "WX-2026-0001", code: "C20260000021", typeCode: "A0060010001", product: "B00004101", materialTypeName: "无形资产", name: "风机诊断软件授权", spec: "V3.2 企业版", bookLoc: "经营发展中心/系统账号", realLoc: "授权账号待核验", user: "王超", health: "待核验", bookQty: 1, realQty: 1, originalValue: 260000, amount: 22000, type: "损毁", dept: "经营发展中心", owner: "宋中波", deptHead: "王超", materialOwner: "宋中波", status: "待处理", adjustNo: "待生成", reason: "授权账号使用状态待核验", proof: "授权清单、登录记录", nextUser: "王超" }
+        { id: 6, task: "PD-2026-003", flowType: "部门盘点", assetNo: "WX-2026-0001", code: "C20260000021", typeCode: "A0060010001", product: "B00004101", materialTypeName: "无形资产", name: "风机诊断软件授权", spec: "V3.2 企业版", bookLoc: "经营发展中心/系统台账", realLoc: "使用状态待核验", user: "王超", health: "待核验", bookQty: 1, realQty: 1, originalValue: 260000, amount: 22000, type: "损毁", dept: "经营发展中心", owner: "宋中波", deptHead: "王超", materialOwner: "宋中波", status: "待处理", adjustNo: "待生成", reason: "无形资产台账信息与当前使用状态待核验", proof: "台账记录、使用说明", nextUser: "王超" }
       ];
       var state = { filters: {}, current: null, role: localStorage.getItem("inventoryDemoRole") || "dept_specialist" };
       var roleNames = { dept_specialist: "部门物资专责", dept_head: "部门负责人", material_specialist: "物资管理部门物资专责", material_head: "物资管理部门负责人", finance_head: "财务负责人", business_head: "业务部门负责人" };
@@ -400,7 +400,10 @@
         return normalizeDiffType(row.type, row);
       }
       function approvalText(row) {
-        return isHighLoss(row) ? "系统判断为固定资产盘亏且原值不低于50万元，需提交审批" : "普通差异由责任部门处理差异，后续审批进入我的任务办理";
+        if (isHighLoss(row)) return "系统判断为固定资产盘亏且原值不低于50万元，需提交公司审批";
+        if (row.materialTypeName === "存货") return "查明原因后由责任部门确认，按库存差异处理";
+        if (row.materialTypeName === "无形资产") return "登记差异原因，由责任部门确认并按价值管理规则处理";
+        return "查明原因后由责任部门确认，按台账差异处理";
       }
       function canHandle(row) {
         if (row.status === "已处理" || row.status === "审批中") return false;
@@ -562,7 +565,7 @@
         document.getElementById("detailOriginalField").value = money(row.originalValue);
         document.getElementById("detailAmountField").value = money(row.amount);
         document.getElementById("detailLevelField").value = levelText(row);
-        document.getElementById("detailRuleField").value = isHighLoss(row) ? "固定资产、盘亏、原值不低于50万元，系统自动要求提交审批" : "未触发大额差异审批条件";
+        document.getElementById("detailRuleField").value = isHighLoss(row) ? "固定资产、盘亏、原值不低于50万元，系统自动要求提交公司审批" : "未触发固定资产大额盘亏公司审批条件";
         document.getElementById("detailRequireField").value = approvalText(row);
         open(document.getElementById("detailMask"));
       }
