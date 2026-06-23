@@ -38,6 +38,8 @@
     .inv-table--ledger { min-width: 2380px; }
     .inv-table th, .inv-table td { border: 1px solid #e8e8e8; padding: 8px; text-align: left; color: #262626; }
     .inv-table th { background: #f5f5f5; color: #334155; white-space: nowrap; }
+    .inv-table--ledger th,
+    .inv-table--ledger td { white-space: normal; word-break: break-word; overflow-wrap: anywhere; line-height: 1.45; vertical-align: middle; }
     .inv-op { display: inline-flex; flex-wrap: wrap; gap: 8px; white-space: nowrap; }
     .inv-op button, .inv-op [role="button"] { border: none; background: transparent; color: #1677ff; cursor: pointer; font-size: 12px; padding: 0; font-family: inherit; }
     .inv-tag { display: inline-flex; align-items: center; height: 22px; padding: 0 8px; border-radius: 4px; border: 1px solid transparent; font-size: 11px; }
@@ -233,6 +235,9 @@
               </div>
               <div class="inv-table-wrap">
                 <table class="inv-table inv-table--ledger">
+                  <colgroup>
+                    <col style="width:64px"><col style="width:96px"><col style="width:104px"><col style="width:148px"><col style="width:132px"><col style="width:128px"><col style="width:116px"><col style="width:120px"><col style="width:120px"><col style="width:112px"><col style="width:112px"><col style="width:160px"><col style="width:92px"><col style="width:108px"><col style="width:92px"><col style="width:92px"><col style="width:104px"><col style="width:104px"><col style="width:92px"><col style="width:120px"><col style="width:72px">
+                  </colgroup>
                   <thead>
                     <tr>
                       <th>序号</th><th>盘点单号</th><th>资产编号</th><th>物资唯一码</th><th>物资类型编码</th><th>产品编码</th><th>物资名称</th><th>物资类型名称</th><th>所属部门/场站</th><th>所属仓库</th><th>所属库区</th><th>库位/存放地点</th><th>使用人</th><th>在库/领用状态</th><th>账面数量</th><th>实盘数量</th><th>盘点结果</th><th>差异状态</th><th>操作人</th><th>盘点时间</th><th>操作</th>
