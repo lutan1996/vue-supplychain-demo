@@ -33,6 +33,21 @@
     .inv-tab.is-active { background: #1677ff; border-color: #1677ff; color: #fff; }
     .inv-tab-panel[hidden] { display: none !important; }
     .inv-ledger-note { padding: 10px 16px; border-bottom: 1px solid #f0f0f0; color: #60728b; font-size: 12px; background: #fbfdff; }
+    .inv-report-summary { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; margin-bottom: 14px; }
+    .inv-report-card { border: 1px solid #d9e8ff; border-radius: 6px; background: #fbfdff; padding: 12px; min-height: 76px; box-sizing: border-box; }
+    .inv-report-card span { display: block; color: #60728b; font-size: 12px; line-height: 1.4; }
+    .inv-report-card b { display: block; margin-top: 8px; color: #1f3551; font-size: 24px; line-height: 1; }
+    .inv-report-card.is-rate { background: #e6f4ff; border-color: #91caff; }
+    .inv-report-card.is-rate b { color: #0958d9; }
+    .inv-report-section { border: 1px solid #e8eef7; border-radius: 6px; overflow: hidden; margin-top: 12px; }
+    .inv-report-section h4 { margin: 0; padding: 10px 12px; background: #f5f7fa; color: #334155; font-size: 13px; }
+    .inv-report-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0; }
+    .inv-report-field { display: grid; grid-template-columns: 132px minmax(0, 1fr); gap: 10px; padding: 10px 12px; border-top: 1px solid #eef2f7; color: #262626; font-size: 13px; }
+    .inv-report-field:nth-child(-n+2) { border-top: 0; }
+    .inv-report-field span { color: #60728b; }
+    .inv-report-table { width: 100%; border-collapse: collapse; table-layout: fixed; font-size: 12px; }
+    .inv-report-table th, .inv-report-table td { border-top: 1px solid #eef2f7; padding: 9px 12px; color: #262626; text-align: left; }
+    .inv-report-table th { background: #fbfdff; color: #334155; }
     .inv-table-wrap { overflow: auto; padding: 0 16px 12px; }
     .inv-table { width: 100%; min-width: 1920px; border-collapse: collapse; table-layout: fixed; font-size: 12px; }
     .inv-table--ledger { min-width: 2380px; }
@@ -50,6 +65,7 @@
     .page-inventory-task .wh-modal-box--lg { width: min(97vw, 1760px); max-width: 97vw; }
     .page-inventory-task #detailMask .wh-modal-box { width: min(98vw, 1920px); max-width: 98vw; }
     .page-inventory-task #flowMask .wh-modal-box { width: min(86vw, 1680px); max-width: 92vw; border-radius: 8px; }
+    .page-inventory-task #reportMask .wh-modal-box { width: min(92vw, 1080px); max-width: 92vw; }
     .page-inventory-task .wh-modal-body { max-height: calc(100vh - 170px); overflow: auto; }
     .inv-detail-table { width: 100%; min-width: 8200px; border-collapse: collapse; table-layout: auto; font-size: 12px; }
     .inv-detail-table th, .inv-detail-table td { border: 1px solid #e8e8e8; padding: 8px; color: #262626; text-align: left; white-space: nowrap; vertical-align: top; }
@@ -204,6 +220,10 @@
       .inv-material-filters { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .inv-task-view-layout { grid-template-columns: 1fr; }
       .inv-task-location-grid { grid-template-columns: 1fr; }
+      .inv-report-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .inv-report-grid { grid-template-columns: 1fr; }
+      .inv-report-field:nth-child(-n+2) { border-top: 1px solid #eef2f7; }
+      .inv-report-field:first-child { border-top: 0; }
     }
   </style>
 </head>
@@ -273,7 +293,7 @@
               <div class="inv-actions">
                 <button class="inv-btn primary" id="btnLedgerRefresh">刷新台帐</button>
                 <button class="inv-btn" id="btnLedgerExport">导出台帐</button>
-                <button class="inv-btn" id="btnLedgerPrint">打印盘点表</button>
+                <button class="inv-btn" id="btnLedgerReport">生成报告</button>
               </div>
               <div class="inv-table-wrap">
                 <table class="inv-table inv-table--ledger">
@@ -453,6 +473,14 @@
         </div>
       </div>
       <div class="wh-modal-foot"><button type="button" class="wh-btn wh-btn--ghost" data-close>关闭</button></div>
+    </div>
+  </div>
+
+  <div class="wh-modal-mask" id="reportMask" aria-hidden="true">
+    <div class="wh-modal-box" role="dialog" aria-modal="true" aria-labelledby="reportTitle">
+      <div class="wh-modal-head"><h3 class="wh-modal-title" id="reportTitle">盘点报告</h3><button type="button" class="wh-modal-close" data-close aria-label="关闭">×</button></div>
+      <div class="wh-modal-body" id="reportBody"></div>
+      <div class="wh-modal-foot"><button type="button" class="wh-btn wh-btn--ghost" data-close>关闭</button><button type="button" class="wh-btn wh-btn--primary" id="btnReportExport">导出报告</button></div>
     </div>
   </div>
 
@@ -676,6 +704,58 @@
           var loc = splitLocation(x.loc);
           return '<tr class="' + (x.lineStatus === "有差异" ? "inv-row-diff" : "") + '"><td>' + (i + 1) + '</td><td>' + x.lastNo + '</td><td>' + x.assetNo + '</td><td>' + x.code + '</td><td>' + x.typeCode + '</td><td>' + x.product + '</td><td>' + x.assetName + '</td><td>' + x.materialTypeName + '</td><td>' + x.dept + '</td><td>' + loc.warehouse + '</td><td>' + loc.area + '</td><td>' + x.loc + '</td><td>' + x.user + '</td><td>' + x.state + '</td><td>' + x.book + '</td><td>' + x.real + '</td><td>' + resultText(x.result) + '</td><td>' + resultText(x.diffType || x.result) + '</td><td>' + (x.operator || x.user) + '</td><td>' + (x.checkTime || (x.lastDate + " 09:00")) + '</td><td>' + lineActions(x, false) + '</td></tr>';
         }).join("");
+      }
+      function reportStats() {
+        var total = lines.length;
+        var checked = lines.filter(function (x) { return x.result !== "未盘点" && x.lineStatus !== "未盘点"; }).length;
+        var normal = lines.filter(function (x) { return normalizeDiffType(x.diffType || x.result, x) === "正常" && x.result !== "未盘点"; }).length;
+        var diff = lines.filter(function (x) { return normalizeDiffType(x.diffType || x.result, x) !== "正常" && x.result !== "未盘点"; }).length;
+        var pending = total - checked;
+        return {
+          total: total,
+          checked: checked,
+          normal: normal,
+          diff: diff,
+          pending: pending,
+          rate: checked ? Math.round((normal / checked) * 1000) / 10 : 0
+        };
+      }
+      function typeCount(type) {
+        return lines.filter(function (x) { return normalizeDiffType(x.diffType || x.result, x) === type && x.result !== "未盘点"; }).length;
+      }
+      function openReport() {
+        var stats = reportStats();
+        var today = new Date();
+        var reportNo = "BG-" + today.getFullYear() + String(today.getMonth() + 1).padStart(2, "0") + String(today.getDate()).padStart(2, "0") + "-001";
+        document.getElementById("reportBody").innerHTML =
+          '<div class="inv-report-summary">' +
+            '<div class="inv-report-card"><span>台账总数</span><b>' + stats.total + '</b></div>' +
+            '<div class="inv-report-card"><span>已盘数量</span><b>' + stats.checked + '</b></div>' +
+            '<div class="inv-report-card"><span>正常数量</span><b>' + stats.normal + '</b></div>' +
+            '<div class="inv-report-card"><span>差异数量</span><b>' + stats.diff + '</b></div>' +
+            '<div class="inv-report-card is-rate"><span>账卡物相符率</span><b>' + stats.rate + '%</b></div>' +
+          '</div>' +
+          '<div class="inv-report-section">' +
+            '<h4>报告信息</h4>' +
+            '<div class="inv-report-grid">' +
+              '<div class="inv-report-field"><span>报告编号</span><b>' + reportNo + '</b></div>' +
+              '<div class="inv-report-field"><span>报告名称</span><b>盘点台账报告</b></div>' +
+              '<div class="inv-report-field"><span>盘点范围</span><b>当前盘点台账全部物资</b></div>' +
+              '<div class="inv-report-field"><span>生成时间</span><b>' + today.toLocaleString("zh-CN", { hour12: false }) + '</b></div>' +
+              '<div class="inv-report-field"><span>生成角色</span><b>' + (roleNames[state.role] || "部门物资专责") + '</b></div>' +
+              '<div class="inv-report-field"><span>报告状态</span><b>待确认</b></div>' +
+            '</div>' +
+          '</div>' +
+          '<div class="inv-report-section">' +
+            '<h4>差异汇总</h4>' +
+            '<table class="inv-report-table"><thead><tr><th>差异类型</th><th>数量</th><th>处理说明</th></tr></thead><tbody>' +
+              '<tr><td>正常</td><td>' + typeCount("正常") + '</td><td>账、卡、物一致，纳入台账归档</td></tr>' +
+              '<tr><td>盘盈</td><td>' + typeCount("盘盈") + '</td><td>核对采购、入库及领用记录</td></tr>' +
+              '<tr><td>盘亏</td><td>' + typeCount("盘亏") + '</td><td>查明原因后提交差异处理</td></tr>' +
+              '<tr><td>损毁</td><td>' + typeCount("损毁") + '</td><td>补充现场说明和照片，进入处置流程</td></tr>' +
+            '</tbody></table>' +
+          '</div>';
+        open(document.getElementById("reportMask"));
       }
       function open(mask) {
         mask.classList.add("is-open");
@@ -1089,7 +1169,8 @@
         }
         if (e.target.id === "btnLedgerRefresh") { renderLedger(); alert("盘点台帐已刷新（演示）"); }
         if (e.target.id === "btnLedgerExport") alert("正在导出盘点台帐（演示）");
-        if (e.target.id === "btnLedgerPrint") alert("正在生成盘点表打印预览（演示）");
+        if (e.target.id === "btnLedgerReport") openReport();
+        if (e.target.id === "btnReportExport") alert("正在导出盘点报告（演示）");
         if (e.target.id === "btnConfirmOk" && state.currentLine) {
           var line = state.currentLine;
           var isDiff = document.getElementById("confirmSame").value === "不一致";
