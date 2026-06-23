@@ -525,7 +525,6 @@
       }
       function taskActions(row) {
         var btns = [];
-        if (canStartInventory(row)) btns.push('<span role="button" tabindex="0" data-inv-act="start" data-id="' + row.id + '">盘点开始</span>');
         btns.push('<span role="button" tabindex="0" data-inv-act="view" data-id="' + row.id + '">查看</span>');
         return '<span class="inv-op">' + btns.join("") + '</span>';
       }
