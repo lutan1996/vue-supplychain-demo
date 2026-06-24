@@ -57,6 +57,11 @@
     .mt-page-btns button.is-current { background: #1890ff; border-color: #1890ff; color: #fff; }
     .mt-goto { display:inline-flex; align-items:center; gap: 6px; }
     .mt-goto input { width: 34px; height: 22px; border: 1px solid #e1e8f2; border-radius: 2px; text-align:center; font-size: 12px; }
+    .inv-assign-list { border: 1px solid #e9ecef; border-radius: 8px; overflow: hidden; background: #fff; }
+    .inv-assign-item { display: flex; align-items: center; gap: 8px; min-height: 34px; padding: 0 10px; border-bottom: 1px solid #f0f2f5; color: #262626; font-size: 13px; cursor: pointer; }
+    .inv-assign-item:last-child { border-bottom: 0; }
+    .inv-assign-note-label { margin-top: 10px; margin-bottom: 4px; color: #64748b; font-size: 12px; }
+    .inv-assign-note { width: 100%; min-height: 72px; border: 1px solid #e9ecef; border-radius: 8px; padding: 8px 10px; box-sizing: border-box; font-family: inherit; font-size: 13px; resize: vertical; }
     /* 我的待办 · 库存管理审批单全屏弹窗（与 material-procurement-hub 审批单一致） */
     #mtQaAcceptMask {
       position: fixed;
@@ -1167,6 +1172,7 @@
         ];
       }
       function inventoryTodoTask(isCompany, map) {
+        var role = localStorage.getItem("inventoryDemoRole") || "dept_specialist";
         var isDiff = String(map["流程定义KEY"] || "").indexOf("pddiff_") === 0 || map["流程定义名称"] === "盘点差异审批";
         if (isDiff) {
           return {
@@ -1187,6 +1193,24 @@
           };
         }
         if (isCompany) {
+          var ownerMap = {
+            material_head: "王超",
+            finance_head: "孙睿",
+            business_head: "李仁堂",
+            material_specialist: "宋中波"
+          };
+          var nodeMap = {
+            material_head: "物资管理部门负责人审阅",
+            finance_head: "财务负责人审阅",
+            business_head: "业务部门负责人审阅",
+            material_specialist: "物资管理部门物资专责阅知"
+          };
+          var nextMap = {
+            material_head: "分配本部门盘点人员",
+            finance_head: "物资管理部门负责人审阅",
+            business_head: "分配本部门盘点人员",
+            material_specialist: "公司盘点结束"
+          };
           return {
             no: "PD-2026-002",
             name: "公司二季度物资全面盘点",
@@ -1197,9 +1221,9 @@
             start: "2026-06-28",
             end: "2026-07-03",
             initiator: "宋中波",
-            owner: "孙睿",
-            node: "财务负责人审阅",
-            next: "物资管理部门负责人审阅",
+            owner: ownerMap[role] || "孙睿",
+            node: nodeMap[role] || "财务负责人审阅",
+            next: nextMap[role] || "物资管理部门负责人审阅",
             caliber: "物资、财务、业务三方共同确认",
             status: map["流程状态"] || "待审批"
           };
@@ -1229,6 +1253,13 @@
         return inventoryTodoLines.filter(function (x) {
           return isCompany || x.dept === "机械研究所";
         });
+      }
+      function inventoryTodoCanAssign(map) {
+        if (!map) return false;
+        var role = localStorage.getItem("inventoryDemoRole") || "dept_specialist";
+        var isCompany = String(map["流程定义KEY"] || "").indexOf("company") >= 0 || String(map["任务名称"] || "").indexOf("公司") >= 0;
+        if (!isCompany) return false;
+        return role === "material_head" || role === "finance_head" || role === "business_head";
       }
       function inventoryTodoField(label, value) {
         return '<td class="qa-lab">' + mtEsc(label) + '</td><td class="qa-val"><div class="qa-inp qa-inp--auto">' + mtEsc(value) + '</div></td>';
@@ -1279,6 +1310,55 @@
         var resetClose = mt$("procModalClose");
         if (resetClose) resetClose.onclick = closeInventoryTodoModal;
       }
+      function openInventoryAssignModal(map) {
+        var oldMask = document.getElementById("inventoryAssignModalMask");
+        if (oldMask && oldMask.parentNode) oldMask.parentNode.removeChild(oldMask);
+        var task = inventoryTodoTask(true, map || {});
+        var role = localStorage.getItem("inventoryDemoRole") || "dept_specialist";
+        var people = role === "business_head" ? ["成明锴", "许学良", "喻家敏"] : ["宋中波", "杜欣鑫", "成明锴", "许学良"];
+        var maskHtml =
+          '<div class="modal-mask show" id="inventoryAssignModalMask" style="z-index:10001">' +
+            '<div class="modal" style="width:min(560px,92vw);max-height:82vh;overflow:auto">' +
+              '<div class="modal-hd"><span>分配本部门盘点人员</span><button type="button" class="x-btn" data-close-assign="1">×</button></div>' +
+              '<div class="modal-bd">' +
+                '<div style="font-size:12px;color:#64748b;margin-bottom:8px">盘点任务：' + mtEsc(task.no + " " + task.name) + '</div>' +
+                '<input class="carrier-search inventory-assign-search" placeholder="输入姓名搜索" autocomplete="off" style="width:100%;height:36px;border:1px solid #e9ecef;border-radius:8px;padding:0 10px;box-sizing:border-box;font-family:inherit;font-size:13px;margin-bottom:8px" />' +
+                '<div class="inv-assign-list inventory-assign-options">' +
+                  people.map(function (name, idx) {
+                    return '<label class="inv-assign-item"><input type="radio" name="inventoryAssignRadio" value="' + mtEsc(name) + '"' + (idx === 0 ? ' checked' : '') + '><span>' + mtEsc(name) + '</span></label>';
+                  }).join("") +
+                '</div>' +
+                '<div class="inv-assign-note-label">备注</div>' +
+                '<textarea class="inv-assign-note" id="inventoryAssignNote" placeholder="请输入备注"></textarea>' +
+              '</div>' +
+              '<div class="modal-ft"><button type="button" class="btn secondary" data-close-assign="1">取消</button><button type="button" class="btn primary" data-ok-assign="1">确定</button></div>' +
+            '</div>' +
+          '</div>';
+        document.body.insertAdjacentHTML("beforeend", maskHtml);
+        var modalMask = document.getElementById("inventoryAssignModalMask");
+        if (!modalMask) return;
+        function closeAssignModal() {
+          var m = document.getElementById("inventoryAssignModalMask");
+          if (m && m.parentNode) m.parentNode.removeChild(m);
+        }
+        modalMask.addEventListener("click", function (e) {
+          if (e.target && (e.target.getAttribute("data-close-assign") === "1" || e.target === modalMask)) closeAssignModal();
+          if (e.target && e.target.getAttribute("data-ok-assign") === "1") {
+            mtQaToast("已分配盘点人员（演示）");
+            closeAssignModal();
+            closeInventoryTodoModal();
+          }
+        });
+        var search = modalMask.querySelector(".inventory-assign-search");
+        if (search) {
+          search.addEventListener("input", function () {
+            var kw = String(search.value || "").trim();
+            Array.prototype.forEach.call(modalMask.querySelectorAll(".inv-assign-item"), function (label) {
+              label.style.display = !kw || String(label.textContent || "").indexOf(kw) >= 0 ? "flex" : "none";
+            });
+          });
+        }
+      }
       function openInventoryTodoHandleModal(map) {
         var mask = mt$("procModalMask");
         if (!mask) return;
@@ -1304,7 +1384,21 @@
         var approve = mt$("inventoryTodoApprove");
         if (cancel) cancel.onclick = closeInventoryTodoModal;
         if (reject) reject.onclick = function () { mtQaToast("已驳回（演示）"); closeInventoryTodoModal(); };
-        if (approve) approve.onclick = function () { mtQaToast("已通过（演示）"); closeInventoryTodoModal(); };
+        if (approve) approve.onclick = function () {
+          if (inventoryTodoCanAssign(map)) {
+            mt$("procModalFoot").innerHTML =
+              '<button type="button" class="proc-btn" id="inventoryTodoCancelAfter">取消</button>' +
+              '<button type="button" class="proc-btn proc-btn-primary" id="inventoryTodoAssign">分配负责人</button>';
+            var cancelAfter = mt$("inventoryTodoCancelAfter");
+            var assignBtn = mt$("inventoryTodoAssign");
+            if (cancelAfter) cancelAfter.onclick = closeInventoryTodoModal;
+            if (assignBtn) assignBtn.onclick = function () { openInventoryAssignModal(map); };
+            mtQaToast("已同意，请继续分配盘点人员（演示）");
+            return;
+          }
+          mtQaToast("已通过（演示）");
+          closeInventoryTodoModal();
+        };
       }
       var procCloseBtn = mt$("procModalClose");
       var procXBtn = mt$("procModalX");
@@ -1315,6 +1409,7 @@
         invRoleSelect.value = localStorage.getItem("inventoryDemoRole") || "dept_specialist";
         invRoleSelect.onchange = function () {
           localStorage.setItem("inventoryDemoRole", invRoleSelect.value);
+          renderMtTable();
         };
       }
 
@@ -1341,6 +1436,13 @@
       function getTableRows() {
         var base = cfg.rows.slice();
         if (scene !== "todo") return base;
+        var invRole = localStorage.getItem("inventoryDemoRole") || "dept_specialist";
+        base = base.filter(function (row) {
+          var procKey = String(row[3] || "");
+          if (procKey === "pdtask_company") return invRole === "material_head" || invRole === "finance_head" || invRole === "business_head";
+          if (procKey === "pdtask_dept") return invRole === "dept_head" || invRole === "material_specialist";
+          return true;
+        });
 
         var extraRows = [];
 

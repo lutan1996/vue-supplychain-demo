@@ -650,6 +650,12 @@
       function normalizeFlowType(row) {
         return row && row.type === "公司盘点" ? "company" : "dept";
       }
+      function materialCheckFlowRow() {
+        var row = Object.assign({}, state.current || getRows()[0] || rows[0] || {});
+        var selected = document.getElementById("mcAssetType");
+        row.type = selected && selected.value === "公司盘点" ? "公司盘点" : "部门盘点";
+        return row;
+      }
       function flowIndex(row) {
         var deptMap = { "待开始": 0, "盘点中": 2, "待部门负责人审阅": 3, "待物资管理部门审阅": 4, "已完成": 5, "待差异处理": 4 };
         var companyMap = { "待开始": 0, "待分配": 2, "待业务部门分配": 4, "待三方确认": 6, "待财务负责人审阅": 7, "待物资管理部门审阅": 8, "待阅知": 9, "待差异处理": 9, "已完成": 9 };
@@ -1193,7 +1199,7 @@
           return;
         }
         if (e.target.id === "btnDetailFlow") openFlow(state.current || rows[0]);
-        if (e.target.id === "btnMaterialFlow") openFlow(state.current || rows[0]);
+        if (e.target.id === "btnMaterialFlow") openFlow(materialCheckFlowRow());
         if (e.target.id === "btnTaskInfoFlow") openFlow(state.current || rows[0]);
         if (e.target.id === "btnSearch") {
           state.filters = { no: fNo.value.trim(), dept: fDept.value, status: fStatus.value, owner: fKeeper.value.trim() };
