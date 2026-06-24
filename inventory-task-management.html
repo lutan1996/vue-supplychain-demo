@@ -537,6 +537,9 @@
       var rows = [
         { id: 1, no: "PD-2026-001", name: "机械研究所二季度部门盘点", type: "部门盘点", dept: "机械研究所", scope: "本部门在库及已领用物资", assetTypeRange: "固定资产、存货、无形资产", start: "2026-06-25", end: "2026-06-30", owner: "许学良", deptHead: "李仁堂", materialOwner: "宋中波", should: 126, done: 92, diff: 3, status: "盘点中" },
         { id: 2, no: "PD-2026-002", name: "公司二季度物资全面盘点", type: "公司盘点", dept: "全部业务部门", scope: "公司所有已入库未出库物资", assetTypeRange: "全部", start: "2026-06-28", end: "2026-07-03", owner: "宋中波", deptHead: "王超", materialOwner: "宋中波", financeHead: "孙睿", financeOwner: "杜欣鑫", bizHead: "陈亮、李仁堂、王贺", bizOwner: "成明锴、许学良、喻家敏", should: 284, done: 188, diff: 6, status: "待分配" },
+        { id: 5, no: "PD-2026-005", name: "公司三季度固定资产专项盘点", type: "公司盘点", dept: "全部业务部门", scope: "公司固定资产及已领用重点物资", assetTypeRange: "固定资产", start: "2026-07-10", end: "2026-07-18", owner: "宋中波", deptHead: "王超", materialOwner: "宋中波", financeHead: "孙睿", financeOwner: "杜欣鑫", bizHead: "陈亮、李仁堂、王贺", bizOwner: "成明锴、许学良、喻家敏", should: 168, done: 0, diff: 0, status: "待开始" },
+        { id: 6, no: "PD-2026-006", name: "公司存货物资专项复盘", type: "公司盘点", dept: "全部业务部门", scope: "公司已入库未出库存货物资", assetTypeRange: "存货", start: "2026-07-20", end: "2026-07-25", owner: "宋中波", deptHead: "王超", materialOwner: "宋中波", financeHead: "孙睿", financeOwner: "杜欣鑫", bizHead: "陈亮、李仁堂、王贺", bizOwner: "成明锴、许学良、喻家敏", should: 132, done: 48, diff: 2, status: "盘点中" },
+        { id: 7, no: "PD-2026-007", name: "公司无形资产使用状态盘点", type: "公司盘点", dept: "全部业务部门", scope: "公司授权类无形资产及使用记录", assetTypeRange: "无形资产", start: "2026-08-01", end: "2026-08-06", owner: "宋中波", deptHead: "王超", materialOwner: "宋中波", financeHead: "孙睿", financeOwner: "杜欣鑫", bizHead: "陈亮、李仁堂、王贺", bizOwner: "成明锴、许学良、喻家敏", should: 46, done: 0, diff: 0, status: "待开始" },
         { id: 3, no: "PD-2026-003", name: "经营发展中心部门盘点", type: "部门盘点", dept: "经营发展中心", scope: "本部门在库及已领用物资", assetTypeRange: "固定资产、无形资产", start: "2026-07-01", end: "2026-07-05", owner: "宋中波", deptHead: "王超", materialOwner: "宋中波", should: 57, done: 0, diff: 0, status: "待开始" },
         { id: 4, no: "PD-2026-004", name: "电气控制所部门盘点", type: "部门盘点", dept: "电气控制所", scope: "本部门在库及已领用物资", assetTypeRange: "固定资产、存货", start: "2026-06-10", end: "2026-06-15", owner: "成明锴", deptHead: "陈亮", materialOwner: "宋中波", should: 98, done: 98, diff: 0, status: "已完成" }
       ];
@@ -1431,14 +1434,24 @@
       }
       var roleSel = document.getElementById("inventoryRoleSelect");
       if (roleSel) roleSel.value = state.role;
-      document.title = pageTitle + " - 新能源物资供应链管理系统";
-      var pageTitleEl = document.getElementById("inventoryPageTitle");
-      if (pageTitleEl) pageTitleEl.textContent = pageTitle;
-      setTimeout(function () {
-        document.querySelectorAll(".subpage-breadcrumb span, .subpage-breadcrumb a, .breadcrumb span, .breadcrumb a").forEach(function (el) {
-          if (el.textContent && el.textContent.indexOf("盘点任务管理") >= 0) el.textContent = pageTitle;
+      function syncInventoryPageTitle() {
+        document.title = pageTitle + " - 新能源物资供应链管理系统";
+        var pageTitleEl = document.getElementById("inventoryPageTitle");
+        if (pageTitleEl) pageTitleEl.textContent = pageTitle;
+        document.querySelectorAll("nav.subpage-breadcrumb, .subpage-breadcrumb, .apm-breadcrumb, .breadcrumb").forEach(function (nav) {
+          var nodes = Array.prototype.slice.call(nav.querySelectorAll("a, span, b"));
+          var textNodes = nodes.filter(function (el) {
+            var text = (el.textContent || "").trim();
+            return text && text !== "/";
+          });
+          var last = textNodes[textNodes.length - 1];
+          if (last) last.textContent = pageTitle;
         });
-      }, 0);
+      }
+      syncInventoryPageTitle();
+      setTimeout(syncInventoryPageTitle, 0);
+      setTimeout(syncInventoryPageTitle, 100);
+      setTimeout(syncInventoryPageTitle, 300);
       renderTable();
       renderLedger();
     })();
