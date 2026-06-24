@@ -418,7 +418,7 @@
     }
     #procModalMask .qa-mat-lines-table {
       width: 100%;
-      min-width: 1560px;
+      min-width: 2480px;
       border-collapse: collapse;
       font-size: 12px;
     }
@@ -618,14 +618,15 @@
       gap: 22px;
       min-width: 100%;
     }
-    .inventory-progress-row.is-company-branch { gap: 20px; min-width: 1680px; }
-    .inventory-progress-branch {
-      flex: 0 0 500px;
-      display: grid;
-      grid-template-columns: repeat(3, 150px);
-      gap: 14px;
-      align-items: stretch;
-    }
+    .inventory-progress-row.is-company-tree { gap: 20px; min-width: 1880px; align-items: flex-start; }
+    .inventory-progress-fork { flex: 0 0 540px; display: grid; grid-template-columns: 1fr; gap: 12px; align-items: center; justify-items: center; }
+    .inventory-progress-fork-head { display: flex; justify-content: center; }
+    .inventory-progress-fork-grid { width: 100%; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; align-items: start; }
+    .inventory-progress-fork-item { display: flex; flex-direction: column; align-items: center; gap: 10px; position: relative; }
+    .inventory-progress-fork-arrow { color: #8aa0b8; font-size: 24px; line-height: 1; }
+    .inventory-progress-fork-item::before { content: ""; position: absolute; top: -12px; left: 50%; width: 1px; height: 12px; background: #bfd0e3; }
+    .inventory-progress-fork-item::after { content: ""; position: absolute; top: -12px; left: 50%; width: calc(100% + 28px); height: 1px; background: #bfd0e3; transform: translateX(-50%); }
+    .inventory-progress-merge { flex: 0 0 auto; display: flex; align-items: center; gap: 18px; }
     .inventory-progress-step {
       flex: 0 0 148px;
       min-height: 74px;
@@ -1351,10 +1352,13 @@
           .replace(/"/g, "&quot;");
       }
       var inventoryTodoLines = [
-        { assetNo: "ZC-2026-0001", code: "C20260000001", typeCode: "A0010020001", product: "B00001234", name: "变桨轴承", typeName: "固定资产", dept: "机械研究所", loc: "机械研究所/华北主仓A-01", user: "李仁堂", state: "在库", book: 1, confirm: 1, unit: "台", health: "完好", result: "正常", reason: "" },
-        { assetNo: "ZC-2026-0002", code: "C20260000002", typeCode: "A0010020002", product: "B00001235", name: "齿轮箱滤芯", typeName: "存货", dept: "机械研究所", loc: "机械研究所/华北主仓A-03", user: "许学良", state: "在库", book: 12, confirm: 10, unit: "件", health: "完好", result: "盘亏", reason: "账面数量与实盘数量不一致，需进入盘点差异处理" },
-        { assetNo: "ZC-2026-0003", code: "C20260000003", typeCode: "A0020010006", product: "B00001888", name: "变频器模块", typeName: "存货", dept: "电气控制所", loc: "电气控制所/备用柜", user: "成明锴", state: "已入库", book: 2, confirm: 3, unit: "件", health: "待复核", result: "盘盈", reason: "现场多出一件未入账物资，需核对采购合同和入库记录" },
-        { assetNo: "ZC-2026-0011", code: "C20260000011", typeCode: "A0030010004", product: "B00002119", name: "偏航电机", typeName: "固定资产", dept: "现场服务中心", loc: "现场服务中心/张北场站", user: "喻家敏", state: "已领用", book: 1, confirm: 1, unit: "台", health: "完好", result: "损毁", reason: "实物已流转但系统台账位置未同步" }
+        { assetNo: "ZC-2026-0001", code: "C20260000001", typeCode: "A0010020001", product: "B00001234", name: "变桨轴承", typeName: "固定资产", dept: "机械研究所", loc: "机械研究所/华北主仓A-01", user: "李仁堂", state: "在库", book: 1, confirm: 1, unit: "台", health: "完好", result: "正常", reason: "", supplier: "中车电气", invoice: "已开票", assetType: "固定资产", price: 680000 },
+        { assetNo: "ZC-2026-0002", code: "C20260000002", typeCode: "A0010020002", product: "B00001235", name: "齿轮箱滤芯", typeName: "存货", dept: "机械研究所", loc: "机械研究所/华北主仓A-03", user: "许学良", state: "在库", book: 12, confirm: 10, unit: "件", health: "完好", result: "盘亏", reason: "账面数量与实盘数量不一致，需进入盘点差异处理", supplier: "中车电气", invoice: "已开票", assetType: "存货", price: 72000 },
+        { assetNo: "ZC-2026-0004", code: "C20260000004", typeCode: "A0010020003", product: "B00001236", name: "塔筒振动传感器", typeName: "固定资产", dept: "机械研究所", loc: "机械研究所/华北主仓A-02", user: "李仁堂", state: "在库", book: 1, confirm: 1, unit: "台", health: "完好", result: "正常", reason: "", supplier: "中车电气", invoice: "已开票", assetType: "固定资产", price: 210000 },
+        { assetNo: "ZC-2026-0005", code: "C20260000005", typeCode: "A0010020004", product: "B00001237", name: "润滑油滤网", typeName: "存货", dept: "机械研究所", loc: "机械研究所/华北主仓A-04", user: "许学良", state: "在库", book: 8, confirm: 8, unit: "件", health: "完好", result: "正常", reason: "", supplier: "中车电气", invoice: "已开票", assetType: "存货", price: 5800 },
+        { assetNo: "ZC-2026-0003", code: "C20260000003", typeCode: "A0020010006", product: "B00001888", name: "变频器模块", typeName: "存货", dept: "电气控制所", loc: "电气控制所/备用柜", user: "成明锴", state: "已入库", book: 2, confirm: 3, unit: "件", health: "待复核", result: "盘盈", reason: "现场多出一件未入账物资，需核对采购合同和入库记录", supplier: "中车电气", invoice: "已开票", assetType: "存货", price: 21944.6 },
+        { assetNo: "ZC-2026-0006", code: "C20260000006", typeCode: "A0020010007", product: "B00001889", name: "控制柜触点组", typeName: "固定资产", dept: "电气控制所", loc: "电气控制所/配电间", user: "陈亮", state: "已领用", book: 1, confirm: 1, unit: "台", health: "完好", result: "正常", reason: "", supplier: "中车电气", invoice: "已开票", assetType: "固定资产", price: 88000 },
+        { assetNo: "ZC-2026-0011", code: "C20260000011", typeCode: "A0030010004", product: "B00002119", name: "偏航电机", typeName: "固定资产", dept: "现场服务中心", loc: "现场服务中心/张北场站", user: "喻家敏", state: "已领用", book: 1, confirm: 1, unit: "台", health: "完好", result: "损毁", reason: "实物已流转但系统台账位置未同步", supplier: "中车电气", invoice: "已开票", assetType: "固定资产", price: 520000 }
       ];
       function inventoryStoredTodos() {
         try { return JSON.parse(localStorage.getItem("inventoryDemoTodos") || "[]"); } catch (e) { return []; }
@@ -1376,7 +1380,11 @@
           unit: map.unit || "台",
           health: map.health || "缺失",
           result: map.result || "盘亏",
-          reason: map.reason || "固定资产大额盘亏，需领导审批"
+          reason: map.reason || "固定资产大额盘亏，需领导审批",
+          supplier: map.supplier || "中车电气",
+          invoice: map.invoice || "已开票",
+          assetType: map.assetType || map.typeName || "固定资产",
+          price: map.price || 0
         };
       }
       function inventoryTodoFlow(isCompany, map) {
@@ -1445,13 +1453,13 @@
             material_specialist: "公司盘点结束",
             inventory_staff: "提交盘点结果"
           };
-          return {
-            no: "PD-2026-002",
-            name: "公司二季度物资全面盘点",
-            type: "公司盘点",
-            dept: "全部业务部门",
-            scope: "公司所有已入库未出库物资",
-            assetRange: "固定资产、存货、无形资产",
+        return {
+          no: "PD-2026-002",
+          name: "公司二季度物资全面盘点",
+          type: "公司盘点",
+          dept: "全部业务部门",
+          scope: "公司所有已入库未出库物资",
+          assetRange: "固定资产、存货、无形资产",
             start: "2026-06-28",
             end: "2026-07-03",
             initiator: "宋中波",
@@ -1507,16 +1515,22 @@
         var isCompany = inventoryTodoIsCompany(map);
         var title = isCompany ? "审批记录 - 公司盘点" : "审批记录 - 部门盘点";
         var steps = inventoryTodoFlow(isCompany, map || {});
-        var rowClass = isCompany ? "inventory-progress-row is-company-branch" : "inventory-progress-row";
+        var rowClass = isCompany ? "inventory-progress-row is-company-tree" : "inventory-progress-row";
         var stepNodes = steps.map(function (step) {
           var cls = step[2] === "处理中" ? " is-current" : "";
           return '<div class="inventory-progress-step' + cls + '">' + mtEsc(step[0]) + '</div>';
         });
         var rowHtml = isCompany
-          ? stepNodes[0] + '<div class="inventory-progress-arrow">→</div>' +
-            '<div class="inventory-progress-branch">' + stepNodes[1] + stepNodes[2] + stepNodes[3] + '</div>' +
-            '<div class="inventory-progress-arrow">→</div>' + stepNodes.slice(4).join('<div class="inventory-progress-arrow">→</div>') +
-            '<div class="inventory-progress-arrow">→</div><div class="inventory-progress-step is-end">结束</div>'
+          ? stepNodes[0] + '<div class="inventory-progress-arrow">→</div>' + stepNodes[1] + '<div class="inventory-progress-arrow">→</div>' + stepNodes[2] +
+            '<div class="inventory-progress-fork">' +
+              '<div class="inventory-progress-fork-head"><div class="inventory-progress-step is-end" style="min-height:72px;width:170px;flex-basis:170px">三方分支</div></div>' +
+              '<div class="inventory-progress-fork-grid">' +
+                '<div class="inventory-progress-fork-item"><div class="inventory-progress-fork-arrow">↙</div>' + stepNodes[3] + '</div>' +
+                '<div class="inventory-progress-fork-item"><div class="inventory-progress-fork-arrow">↓</div>' + stepNodes[4] + '</div>' +
+                '<div class="inventory-progress-fork-item"><div class="inventory-progress-fork-arrow">↘</div>' + stepNodes[5] + '</div>' +
+              '</div>' +
+            '</div>' +
+            '<div class="inventory-progress-merge"><span class="inventory-progress-arrow">→</span>' + stepNodes.slice(6).join('<span class="inventory-progress-arrow">→</span>') + '</div>'
           : stepNodes.map(function (node, idx) {
             return node + (idx < stepNodes.length - 1 ? '<div class="inventory-progress-arrow">→</div>' : "");
           }).join("") + '<div class="inventory-progress-arrow">→</div><div class="inventory-progress-step is-end">结束</div>';
@@ -1564,13 +1578,14 @@
         var task = inventoryTodoTask(isCompany, map);
         if (isCompany) task.type = "公司盘点";
         var lines = inventoryTodoRows(isCompany);
-        var baseHead = '<th>序号</th><th>资产编号</th><th>物资唯一码</th><th>物资类型编码</th><th>产品编码</th><th>产品名称</th><th>产品型号</th><th>物资类型名称</th><th>所属部门</th><th>存储地点/仓库货位</th><th>使用人</th><th>保管人</th><th>使用年限</th><th>产权</th><th>在库/领用状态</th><th>账面数量</th><th>单位</th>';
+        var baseHead = '<th>序号</th><th>产品名称</th><th>产品型号</th><th>产品编码</th><th>物资唯一码</th><th>物资类型名称</th><th>物资类型编码</th><th>采购部门</th><th>供应商</th><th>采购单价（含税）</th><th>是否在本部门</th><th>是否开票</th><th>使用人</th><th>资产类型</th><th>资产编号</th><th>存放地点</th><th>在库/领用状态</th><th>账面数量</th><th>单位</th>';
         var staffHead = '<th>盘点确认数量</th><th>使用状态</th><th>盘点结果</th><th>盘点依据</th><th>差异类型</th><th>备注</th>';
         var rowsHtml = lines.map(function (x, i) {
           var health = x.health || "完好";
           var result = x.result || "正常";
           var diffType = result === "正常" ? "正常" : result;
-          var row = '<tr><td>' + (i + 1) + '</td><td>' + mtEsc(x.assetNo) + '</td><td>' + mtEsc(x.code) + '</td><td>' + mtEsc(x.typeCode) + '</td><td>' + mtEsc(x.product) + '</td><td>' + mtEsc(x.name) + '</td><td>' + mtEsc(x.spec || "标准型") + '</td><td>' + mtEsc(x.typeName) + '</td><td>' + mtEsc(x.dept) + '</td><td>' + mtEsc(x.loc) + '</td><td>' + mtEsc(x.user) + '</td><td>' + mtEsc(x.keeper || x.user) + '</td><td>' + mtEsc(x.serviceLife || "5年") + '</td><td>' + mtEsc(x.property || "固定资产") + '</td><td>' + mtEsc(x.state) + '</td><td>' + mtEsc(x.book) + '</td><td>' + mtEsc(x.unit) + '</td>';
+          var price = x.price != null ? x.price : (x.bookOriginal || x.originalValue || 0);
+          var row = '<tr><td>' + (i + 1) + '</td><td>' + mtEsc(x.name) + '</td><td>' + mtEsc(x.spec || "标准型") + '</td><td>' + mtEsc(x.product) + '</td><td>' + mtEsc(x.code) + '</td><td>' + mtEsc(x.typeName) + '</td><td>' + mtEsc(x.typeCode) + '</td><td>' + mtEsc(x.dept) + '</td><td>' + mtEsc(x.supplier || "中车电气") + '</td><td>' + (price ? Number(price).toLocaleString("zh-CN", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : "-") + '</td><td>' + mtEsc(x.dept === task.dept || task.dept === "全部业务部门" ? "是" : "否") + '</td><td>' + mtEsc(x.invoice || "已开票") + '</td><td>' + mtEsc(x.user) + '</td><td>' + mtEsc(x.assetType || x.typeName) + '</td><td>' + mtEsc(x.assetNo) + '</td><td>' + mtEsc(x.loc) + '</td><td>' + mtEsc(x.state) + '</td><td>' + mtEsc(x.book) + '</td><td>' + mtEsc(x.unit || "件") + '</td>';
           if (!showResultColumns) {
             return row + '</tr>';
           }
@@ -1592,10 +1607,12 @@
           '<div class="qa-accept-form-shell"><table class="qa-accept-grid" role="presentation"><tbody>' +
           '<tr>' + inventoryTodoField("盘点单号", task.no) + inventoryTodoField("盘点任务名称", task.name) + '</tr>' +
           '<tr>' + inventoryTodoField("盘点类型", task.type) + inventoryTodoField("盘点部门", task.dept) + '</tr>' +
+          '<tr>' + inventoryTodoField("盘点范围", task.scope) + inventoryTodoField("资产类型范围", task.assetRange) + '</tr>' +
           '<tr>' + inventoryTodoField("计划开始日期", task.start) + inventoryTodoField("计划结束日期", task.end) + '</tr>' +
           '<tr>' + inventoryTodoField("发起人", task.initiator) + inventoryTodoField("负责人", map["办理人"] || task.owner) + '</tr>' +
           '<tr>' + inventoryTodoField("应盘数量", isCompany ? "284" : "42") + inventoryTodoField("已盘数量", isInventoryStaff ? "188" : "0") + '</tr>' +
           '<tr>' + inventoryTodoField("差异数量", isInventoryStaff ? "6" : "0") + inventoryTodoField("任务状态", task.status) + '</tr>' +
+          '<tr><td class="qa-lab">确认口径</td><td class="qa-val" colspan="3"><div class="qa-inp qa-inp--auto">' + mtEsc(task.caliber) + '</div></td></tr>' +
           '<tr><td class="qa-lab">办理意见</td><td class="qa-val" colspan="3"><textarea class="qa-ta" id="inventoryTodoOpinion" rows="2" placeholder="请输入办理意见"></textarea></td></tr>' +
           '</tbody></table></div>' +
           '<div class="qa-mat-lines-block ' + (canEditInventoryLines ? "" : "qa-mat-lines-block--readonly ") + 'qa-mat-detail-list-block">' +
