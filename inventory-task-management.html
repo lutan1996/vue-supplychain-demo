@@ -432,7 +432,7 @@
               <col style="width:118px">
               <col style="width:170px">
             </colgroup>
-            <thead><tr><th>序号</th><th>资产编号</th><th>物资唯一码</th><th>物资类型编码</th><th>产品编码</th><th>产品名称</th><th>物资类型名称</th><th>所属部门</th><th>存储地点/仓库货位</th><th>使用人</th><th>在库/领用状态</th><th>账面数量</th><th>盘点确认数量</th><th>单位</th><th>状态是否完好</th><th>盘点结果</th><th>差异类型</th><th>原值</th><th>差异金额</th><th>差异说明</th></tr></thead>
+            <thead><tr><th>序号</th><th>资产编号</th><th>物资唯一码</th><th>物资类型编码</th><th>产品编码</th><th>产品名称</th><th>产品型号</th><th>物资类型名称</th><th>所属部门</th><th>存储地点/仓库货位</th><th>使用人</th><th>在库/领用状态</th><th>账面数量</th><th>盘点确认数量</th><th>单位</th><th>状态是否完好</th><th>盘点结果</th><th>差异类型</th><th>原值</th><th>差异金额</th><th>差异说明</th></tr></thead>
             <tbody id="materialCheckBody"></tbody>
           </table>
           <div class="inv-material-empty" id="materialCheckEmpty" hidden>暂无数据</div>
@@ -867,9 +867,9 @@
             taskField("确认口径", isCompany ? "物资、财务、业务三方共同确认" : "部门物资专责逐条确认") +
           '</div>',
           '<div class="inv-table-title">盘点物资明细表</div>',
-          '<div class="inv-task-mini-table-wrap"><table class="inv-task-mini-table"><thead><tr><th>序号</th><th>资产编号</th><th>物资唯一码</th><th>物资类型编码</th><th>产品编码</th><th>产品名称</th><th>物资类型名称</th><th>所属部门</th><th>存储地点/仓库货位</th><th>使用人</th><th>在库/领用状态</th><th>账面数量</th><th>盘点确认数量</th><th>单位</th><th>状态是否完好</th><th>盘点结果</th><th>差异类型</th><th>原值</th><th>差异金额</th><th>差异说明</th><th>操作</th></tr></thead><tbody>' +
+          '<div class="inv-task-mini-table-wrap"><table class="inv-task-mini-table"><thead><tr><th>序号</th><th>资产编号</th><th>物资唯一码</th><th>物资类型编码</th><th>产品编码</th><th>产品名称</th><th>产品型号</th><th>物资类型名称</th><th>所属部门</th><th>存储地点/仓库货位</th><th>使用人</th><th>在库/领用状态</th><th>账面数量</th><th>盘点确认数量</th><th>单位</th><th>状态是否完好</th><th>盘点结果</th><th>差异类型</th><th>原值</th><th>差异金额</th><th>差异说明</th><th>操作</th></tr></thead><tbody>' +
             list.map(function (x, i) {
-              return '<tr><td>' + (i + 1) + '</td><td>' + cell(x.assetNo) + '</td><td>' + cell(x.code) + '</td><td>' + cell(x.typeCode) + '</td><td>' + cell(x.product) + '</td><td>' + cell(x.assetName) + '</td><td>' + cell(x.materialTypeName) + '</td><td>' + cell(x.dept) + '</td><td>' + cell(x.loc) + '</td><td>' + cell(x.user) + '</td><td>' + cell(x.state) + '</td><td>' + cell(x.book) + '</td><td>' + cell(x.confirmQty || x.real) + '</td><td>' + cell(x.unit || "件") + '</td><td>' + cell(x.health) + '</td><td>' + cell(x.result) + '</td><td>' + cell(normalizeDiffType(x.diffType || "正常", x)) + '</td><td>' + money(x.originalValue || x.bookOriginal || 0) + '</td><td>' + money(Math.abs(Number(x.diffQty || 0)) * (Number(x.originalValue || x.bookOriginal || 0) || 0)) + '</td><td>' + cell(x.reason) + '</td><td><span class="inv-op"><span role="button" tabindex="0" data-task-view="' + x.code + '">查看</span><span role="button" tabindex="0" data-task-track="' + x.code + '">物资跟踪</span></span></td></tr>';
+              return '<tr><td>' + (i + 1) + '</td><td>' + cell(x.assetNo) + '</td><td>' + cell(x.code) + '</td><td>' + cell(x.typeCode) + '</td><td>' + cell(x.product) + '</td><td>' + cell(x.assetName) + '</td><td>' + cell(x.spec) + '</td><td>' + cell(x.materialTypeName) + '</td><td>' + cell(x.dept) + '</td><td>' + cell(x.loc) + '</td><td>' + cell(x.user) + '</td><td>' + cell(x.state) + '</td><td>' + cell(x.book) + '</td><td>' + cell(x.confirmQty || x.real) + '</td><td>' + cell(x.unit || "件") + '</td><td>' + cell(x.health) + '</td><td>' + cell(x.result) + '</td><td>' + cell(normalizeDiffType(x.diffType || "正常", x)) + '</td><td>' + money(x.originalValue || x.bookOriginal || 0) + '</td><td>' + money(Math.abs(Number(x.diffQty || 0)) * (Number(x.originalValue || x.bookOriginal || 0) || 0)) + '</td><td>' + cell(x.reason) + '</td><td><span class="inv-op"><span role="button" tabindex="0" data-task-view="' + x.code + '">查看</span><span role="button" tabindex="0" data-task-track="' + x.code + '">物资跟踪</span></span></td></tr>';
             }).join("") +
           '</tbody></table></div>',
           '<div class="inv-task-track-panel" id="taskTrackPanel" hidden></div>'
@@ -974,6 +974,7 @@
             '<td>' + cell(x.typeCode) + '</td>' +
             '<td>' + cell(x.product) + '</td>' +
             '<td>' + cell(x.assetName) + '</td>' +
+            '<td>' + cell(x.spec) + '</td>' +
             '<td>' + cell(x.materialTypeName) + '</td>' +
             '<td>' + cell(x.dept) + '</td>' +
             '<td>' + cell(x.loc) + '</td>' +
