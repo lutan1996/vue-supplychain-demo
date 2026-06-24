@@ -1353,11 +1353,10 @@
           '<div class="qa-accept-form-shell"><table class="qa-accept-grid" role="presentation"><tbody>' +
           '<tr>' + inventoryTodoField("盘点单号", task.no) + inventoryTodoField("盘点任务名称", task.name) + '</tr>' +
           '<tr>' + inventoryTodoField("盘点类型", task.type) + inventoryTodoField("盘点部门", task.dept) + '</tr>' +
-          '<tr>' + inventoryTodoField("盘点范围", task.scope) + inventoryTodoField("资产类型范围", task.assetRange) + '</tr>' +
           '<tr>' + inventoryTodoField("计划开始日期", task.start) + inventoryTodoField("计划结束日期", task.end) + '</tr>' +
-          '<tr>' + inventoryTodoField("发起人", task.initiator) + inventoryTodoField("办理人", map["办理人"] || task.owner) + '</tr>' +
-          '<tr>' + inventoryTodoField("当前节点", task.node) + inventoryTodoField("下一节点", task.next) + '</tr>' +
-          '<tr>' + inventoryTodoField("确认口径", task.caliber) + inventoryTodoField("当前状态", task.status) + '</tr>' +
+          '<tr>' + inventoryTodoField("发起人", task.initiator) + inventoryTodoField("负责人", map["办理人"] || task.owner) + '</tr>' +
+          '<tr>' + inventoryTodoField("应盘数量", isCompany ? "284" : "42") + inventoryTodoField("已盘数量", isInventoryStaff ? "188" : "0") + '</tr>' +
+          '<tr>' + inventoryTodoField("差异数量", isInventoryStaff ? "6" : "0") + inventoryTodoField("任务状态", task.status) + '</tr>' +
           '<tr><td class="qa-lab">办理意见</td><td class="qa-val" colspan="3"><textarea class="qa-ta" id="inventoryTodoOpinion" rows="2" placeholder="请输入办理意见"></textarea></td></tr>' +
           '</tbody></table></div>' +
           '<div class="qa-mat-lines-block ' + (isInventoryStaff ? "" : "qa-mat-lines-block--readonly ") + 'qa-mat-detail-list-block">' +
