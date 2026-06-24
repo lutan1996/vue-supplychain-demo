@@ -33,11 +33,28 @@
     .inv-tab.is-active { background: #1677ff; border-color: #1677ff; color: #fff; }
     .inv-tab-panel[hidden] { display: none !important; }
     .inv-ledger-note { padding: 10px 16px; border-bottom: 1px solid #f0f0f0; color: #60728b; font-size: 12px; background: #fbfdff; }
+    .inv-report-summary { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; margin-bottom: 14px; }
+    .inv-report-card { border: 1px solid #d9e8ff; border-radius: 6px; background: #fbfdff; padding: 12px; min-height: 76px; box-sizing: border-box; }
+    .inv-report-card span { display: block; color: #60728b; font-size: 12px; line-height: 1.4; }
+    .inv-report-card b { display: block; margin-top: 8px; color: #1f3551; font-size: 24px; line-height: 1; }
+    .inv-report-card.is-rate { background: #e6f4ff; border-color: #91caff; }
+    .inv-report-card.is-rate b { color: #0958d9; }
+    .inv-report-section { border: 1px solid #e8eef7; border-radius: 6px; overflow: hidden; margin-top: 12px; }
+    .inv-report-section h4 { margin: 0; padding: 10px 12px; background: #f5f7fa; color: #334155; font-size: 13px; }
+    .inv-report-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0; }
+    .inv-report-field { display: grid; grid-template-columns: 132px minmax(0, 1fr); gap: 10px; padding: 10px 12px; border-top: 1px solid #eef2f7; color: #262626; font-size: 13px; }
+    .inv-report-field:nth-child(-n+2) { border-top: 0; }
+    .inv-report-field span { color: #60728b; }
+    .inv-report-table { width: 100%; border-collapse: collapse; table-layout: fixed; font-size: 12px; }
+    .inv-report-table th, .inv-report-table td { border-top: 1px solid #eef2f7; padding: 9px 12px; color: #262626; text-align: left; }
+    .inv-report-table th { background: #fbfdff; color: #334155; }
     .inv-table-wrap { overflow: auto; padding: 0 16px 12px; }
     .inv-table { width: 100%; min-width: 1920px; border-collapse: collapse; table-layout: fixed; font-size: 12px; }
     .inv-table--ledger { min-width: 2380px; }
     .inv-table th, .inv-table td { border: 1px solid #e8e8e8; padding: 8px; text-align: left; color: #262626; }
     .inv-table th { background: #f5f5f5; color: #334155; white-space: nowrap; }
+    .inv-table--ledger th,
+    .inv-table--ledger td { white-space: normal; word-break: break-word; overflow-wrap: anywhere; line-height: 1.45; vertical-align: middle; }
     .inv-op { display: inline-flex; flex-wrap: wrap; gap: 8px; white-space: nowrap; }
     .inv-op button, .inv-op [role="button"] { border: none; background: transparent; color: #1677ff; cursor: pointer; font-size: 12px; padding: 0; font-family: inherit; }
     .inv-tag { display: inline-flex; align-items: center; height: 22px; padding: 0 8px; border-radius: 4px; border: 1px solid transparent; font-size: 11px; }
@@ -48,6 +65,7 @@
     .page-inventory-task .wh-modal-box--lg { width: min(97vw, 1760px); max-width: 97vw; }
     .page-inventory-task #detailMask .wh-modal-box { width: min(98vw, 1920px); max-width: 98vw; }
     .page-inventory-task #flowMask .wh-modal-box { width: min(86vw, 1680px); max-width: 92vw; border-radius: 8px; }
+    .page-inventory-task #reportMask .wh-modal-box { width: min(92vw, 1080px); max-width: 92vw; }
     .page-inventory-task .wh-modal-body { max-height: calc(100vh - 170px); overflow: auto; }
     .inv-detail-table { width: 100%; min-width: 8200px; border-collapse: collapse; table-layout: auto; font-size: 12px; }
     .inv-detail-table th, .inv-detail-table td { border: 1px solid #e8e8e8; padding: 8px; color: #262626; text-align: left; white-space: nowrap; vertical-align: top; }
@@ -68,8 +86,54 @@
     .inv-task-info-grid .inv-task-field { display: block; }
     .inv-task-info-grid .inv-task-field span { display: block; margin-bottom: 6px; color: #516a87; font-weight: 600; }
     .inv-task-info-grid .inv-task-field b { display: flex; align-items: center; min-height: 36px; box-sizing: border-box; border: 1px solid #d9d9d9; border-radius: 4px; background: #fff; color: #262626; padding: 0 12px; font-weight: 400; }
+    .inv-task-select-wrap { position: relative; }
+    .inv-task-select-wrap::after { content: "▾"; position: absolute; right: 12px; top: 50%; transform: translateY(-50%); pointer-events: none; color: #8c8c8c; font-size: 12px; }
+    .inv-task-select-wrap.is-open::after { transform: translateY(-50%) rotate(180deg); }
+    .inv-task-select-input {
+      width: 100%;
+      height: 36px;
+      box-sizing: border-box;
+      border: 1px solid #d9d9d9;
+      border-radius: 4px;
+      background: #fff;
+      color: #262626;
+      padding: 0 28px 0 12px;
+      font-size: 13px;
+      font-family: inherit;
+      outline: none;
+    }
+    .inv-task-select-input:focus { border-color: #91caff; box-shadow: 0 0 0 2px rgba(22, 119, 255, .08); }
+    .inv-task-select-menu {
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: calc(100% + 4px);
+      z-index: 20;
+      display: none;
+      max-height: 190px;
+      overflow: auto;
+      border: 1px solid #d9d9d9;
+      border-radius: 4px;
+      background: #fff;
+      box-shadow: 0 6px 18px rgba(15, 35, 60, .14);
+      padding: 4px 0;
+    }
+    .inv-task-select-wrap.is-open .inv-task-select-menu { display: block; }
+    .inv-task-select-option {
+      height: 32px;
+      display: flex;
+      align-items: center;
+      padding: 0 12px;
+      color: #262626;
+      font-size: 13px;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .inv-task-select-option:hover,
+    .inv-task-select-option.is-active { background: #e6f4ff; color: #1677ff; }
+    .inv-task-select-empty { padding: 8px 12px; color: #8c8c8c; font-size: 13px; }
     .inv-task-mini-table-wrap { overflow: auto; margin-top: 8px; }
-    .inv-task-mini-table { width: 100%; min-width: 1760px; border-collapse: collapse; table-layout: fixed; font-size: 12px; }
+    .inv-task-mini-table { width: 100%; min-width: 1840px; border-collapse: collapse; table-layout: fixed; font-size: 12px; }
     .inv-task-mini-table th, .inv-task-mini-table td { border: 1px solid #e8e8e8; padding: 8px 6px; color: #262626; text-align: left; white-space: normal; word-break: break-all; line-height: 1.45; }
     .inv-task-mini-table th { background: #f5f7fa; color: #334155; }
     .inv-task-track-panel { margin-top: 14px; border-top: 1px solid #e8eef7; padding-top: 14px; }
@@ -107,21 +171,30 @@
     .inv-material-filters .wh-field { margin-bottom: 0; }
     .inv-material-filters .wh-input { height: 36px; }
     .inv-material-query-field { align-self: end; }
-    .inv-material-query-field .inv-btn { width: 100%; height: 36px; }
+    .inv-material-query-field .inv-btn { min-width: 96px; height: 36px; }
     .inv-material-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 10px; }
     .inv-material-table-wrap { overflow: auto; margin-top: 8px; }
-    .inv-material-table { width: 100%; min-width: 1880px; border-collapse: collapse; table-layout: fixed; font-size: 12px; }
+    .inv-material-table { width: 100%; min-width: 1840px; border-collapse: collapse; table-layout: fixed; font-size: 12px; }
     .inv-material-table th, .inv-material-table td { border: 1px solid #1677ff33; padding: 8px 6px; color: #262626; text-align: left; white-space: normal; word-break: break-all; vertical-align: top; line-height: 1.45; }
     .inv-material-table th { background: #f5f7fa; color: #334155; }
     .inv-material-empty { padding: 46px 0; text-align: center; color: #8c8c8c; border: 1px solid #e8eef7; border-top: 0; }
     .inv-material-cell-input, .inv-material-cell-select, .inv-material-cell-textarea { width: 100%; min-width: 0; border: 1px solid #d9d9d9; border-radius: 4px; font: inherit; color: #262626; background: #fff; box-sizing: border-box; }
     .inv-material-cell-input, .inv-material-cell-select { height: 30px; padding: 0 8px; }
     .inv-material-cell-textarea { min-height: 54px; padding: 6px 8px; resize: vertical; }
+    .inv-material-upload { display: inline-flex; align-items: center; justify-content: center; min-width: 88px; height: 30px; padding: 0 10px; border: 1px solid #91caff; border-radius: 4px; background: #e6f4ff; color: #1677ff; font-size: 12px; cursor: pointer; box-sizing: border-box; white-space: nowrap; }
+    .inv-material-upload input { display: none; }
+    .inv-task-reminder { position: fixed; right: 24px; bottom: 26px; z-index: 9998; width: min(360px, calc(100vw - 48px)); border: 1px solid #d9e8ff; border-radius: 12px; background: #fff; box-shadow: 0 10px 28px rgba(15, 35, 60, .18); overflow: hidden; }
+    .inv-task-reminder-head { display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; border-bottom: 1px solid #eef2f7; color: #1f3551; font-size: 16px; font-weight: 700; }
+    .inv-task-reminder-close { border: 0; background: transparent; color: #8aa0b8; font-size: 24px; line-height: 1; cursor: pointer; }
+    .inv-task-reminder-body { padding: 14px 18px 4px; color: #2b405c; font-size: 13px; line-height: 1.75; }
+    .inv-task-reminder-body p { position: relative; margin: 0 0 10px; padding-left: 16px; }
+    .inv-task-reminder-body p::before { content: ""; position: absolute; left: 0; top: .75em; width: 6px; height: 6px; border-radius: 50%; background: #1677ff; }
+    .inv-task-reminder-foot { display: flex; justify-content: flex-end; gap: 10px; padding: 12px 18px 16px; border-top: 1px solid #eef2f7; }
+    .inv-task-reminder-btn { height: 32px; border-radius: 5px; border: 1px solid #d9d9d9; background: #fff; padding: 0 14px; color: #262626; font-size: 13px; cursor: pointer; }
+    .inv-task-reminder-btn.primary { border-color: #1677ff; background: #1677ff; color: #fff; }
+    .inv-task-reminder[hidden] { display: none !important; }
     .inv-modal-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px 18px; }
     .inv-modal-grid .wh-field { margin-bottom: 0; }
-    .inv-auto-grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px 14px; margin-bottom: 12px; padding: 12px; border: 1px solid #e8eef7; border-radius: 6px; background: #fbfdff; }
-    .inv-auto-grid .wh-field { margin-bottom: 0; }
-    .inv-auto-grid .wh-input[readonly] { background: #f5f7fa; color: #595959; cursor: default; }
     #detailMask .wh-modal-head,
     #taskCreateMask .wh-modal-head,
     #materialCheckMask .wh-modal-head,
@@ -159,6 +232,10 @@
       .inv-material-filters { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .inv-task-view-layout { grid-template-columns: 1fr; }
       .inv-task-location-grid { grid-template-columns: 1fr; }
+      .inv-report-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .inv-report-grid { grid-template-columns: 1fr; }
+      .inv-report-field:nth-child(-n+2) { border-top: 1px solid #eef2f7; }
+      .inv-report-field:first-child { border-top: 0; }
     }
   </style>
 </head>
@@ -171,7 +248,7 @@
         <a class="header-logo" href="#" aria-label="国家能源集团"><img src="assets/logo-chenergy.png" alt="国家能源集团 CHN ENERGY" width="220" height="40" /></a>
         <div class="header-source-brand"><p>新能源供应链管理系统</p></div>
       </div>
-      <div class="header-right"><select class="inv-role-select" id="inventoryRoleSelect" title="切换角色"><option value="dept_specialist">部门物资专责</option><option value="dept_head">部门负责人</option><option value="material_specialist">物资管理部门物资专责</option><option value="material_head">物资管理部门负责人</option><option value="finance_head">财务负责人</option><option value="business_head">业务部门负责人</option></select><span class="clock" id="clock"></span><div class="user-avatar" title="用户">用</div></div>
+      <div class="header-right"><select class="inv-role-select" id="inventoryRoleSelect" title="切换角色"><option value="dept_specialist">部门物资专责</option><option value="dept_head">部门负责人</option><option value="material_specialist">物资管理部门物资专责</option><option value="material_head">物资管理部门负责人</option><option value="finance_head">财务负责人</option><option value="business_head">业务部门负责人</option><option value="inventory_staff">盘点人员</option></select><span class="clock" id="clock"></span><div class="user-avatar" title="用户">用</div></div>
     </header>
     <div class="layout">
       <aside class="sidebar" aria-label="主导航">
@@ -192,11 +269,6 @@
       <main class="main-scroll">
         <h1 class="carrier-page-title">盘点任务管理</h1>
         <div class="inv-wrap">
-          <div class="inv-rule-summary">
-            <div class="inv-rule-card"><b>自动生成差异</b>盘点提交时，系统按物资唯一码读取手填确认结果，数量、位置、使用人、状态不一致的记录自动归入盘点差异处理。</div>
-            <div class="inv-rule-card"><b>盘库数据源</b>存货类物资带入最近盘库单号、盘库日期、盘库账面数量、盘库实盘数量和盘库差异，作为盘点确认依据。</div>
-            <div class="inv-rule-card"><b>审批与归档</b>普通差异处理后归档台帐；固定资产盘亏且原值不低于50万元，系统标记大额盘亏并进入我的任务审批。</div>
-          </div>
           <div class="inv-tabs" role="tablist" aria-label="盘点任务页签">
             <button type="button" class="inv-tab is-active" data-inv-tab="task" role="tab" aria-selected="true">盘点任务</button>
             <button type="button" class="inv-tab" data-inv-tab="ledger" role="tab" aria-selected="false">盘点台帐</button>
@@ -206,8 +278,7 @@
               <div class="inv-filters">
                 <div class="wh-field"><label for="fNo">盘点单号</label><input id="fNo" type="text" placeholder="请输入盘点单号"></div>
                 <div class="wh-field"><label for="fDept">盘点部门</label><select id="fDept"><option value="">全部部门</option><option>机械研究所</option><option>电控所</option><option>经营发展中心</option><option>华北运维部</option></select></div>
-                <div class="wh-field"><label for="fType">盘点类型</label><select id="fType"><option value="">全部类型</option><option>部门盘点</option><option>公司盘点</option></select></div>
-                <div class="wh-field"><label for="fStatus">任务状态</label><select id="fStatus"><option value="">全部状态</option><option>待开始</option><option>盘点中</option><option>待物资负责人分配</option><option>待业务部门分配</option><option>待三方确认</option><option>待部门负责人审阅</option><option>待财务负责人审阅</option><option>待物资管理部门审阅</option><option>待阅知</option><option>待差异处理</option><option>已完成</option></select></div>
+                <div class="wh-field"><label for="fStatus">任务状态</label><select id="fStatus"><option value="">全部状态</option><option>待开始</option><option>盘点中</option><option>待分配</option><option>待业务部门分配</option><option>待三方确认</option><option>待部门负责人审阅</option><option>待财务负责人审阅</option><option>待物资管理部门审阅</option><option>待阅知</option><option>待差异处理</option><option>已完成</option></select></div>
                 <div class="wh-field"><label for="fKeeper">负责人</label><input id="fKeeper" type="text" placeholder="请输入负责人"></div>
               </div>
               <div class="inv-actions">
@@ -234,13 +305,15 @@
               <div class="inv-actions">
                 <button class="inv-btn primary" id="btnLedgerRefresh">刷新台帐</button>
                 <button class="inv-btn" id="btnLedgerExport">导出台帐</button>
-                <button class="inv-btn" id="btnLedgerPrint">打印盘点表</button>
               </div>
               <div class="inv-table-wrap">
                 <table class="inv-table inv-table--ledger">
+                  <colgroup>
+                    <col style="width:64px"><col style="width:96px"><col style="width:104px"><col style="width:148px"><col style="width:132px"><col style="width:128px"><col style="width:116px"><col style="width:120px"><col style="width:120px"><col style="width:112px"><col style="width:112px"><col style="width:160px"><col style="width:92px"><col style="width:108px"><col style="width:92px"><col style="width:92px"><col style="width:104px"><col style="width:104px"><col style="width:92px"><col style="width:120px"><col style="width:72px">
+                  </colgroup>
                   <thead>
                     <tr>
-                      <th>序号</th><th>盘点单号</th><th>资产编号</th><th>物资唯一码</th><th>物资类型编码</th><th>产品编码</th><th>物资名称</th><th>物资类型名称</th><th>所属部门/场站</th><th>所属仓库</th><th>所属库区</th><th>库位/存放地点</th><th>使用人</th><th>在库/领用状态</th><th>账面数量</th><th>实盘数量</th><th>盘点结果</th><th>差异状态</th><th>操作人</th><th>盘点时间</th><th>操作</th>
+                      <th>序号</th><th>盘点单号</th><th>资产编号</th><th>物资唯一码</th><th>物资类型编码</th><th>产品编码</th><th>产品名称</th><th>物资类型名称</th><th>所属部门/场站</th><th>所属仓库</th><th>所属库区</th><th>库位/存放地点</th><th>使用人</th><th>在库/领用状态</th><th>账面数量</th><th>实盘数量</th><th>盘点结果</th><th>差异状态</th><th>操作人</th><th>盘点时间</th><th>操作</th>
                     </tr>
                   </thead>
                   <tbody id="ledgerBody"></tbody>
@@ -287,14 +360,13 @@
           <div class="wh-field"><label class="wh-label">是否与系统台账一致</label><select class="wh-input" id="confirmSame"><option>一致</option><option>不一致</option></select></div>
           <div class="wh-field"><label class="wh-label">实盘存储地点</label><input class="wh-input" id="confirmLoc"></div>
           <div class="wh-field"><label class="wh-label">实盘使用人/负责人</label><input class="wh-input" id="confirmUser"></div>
-          <div class="wh-field"><label class="wh-label">差异类型</label><select class="wh-input" id="confirmDiffType"><option>无差异</option><option>数量差异</option><option>位置不符</option><option>负责人不符</option><option>状态异常</option><option>编码信息不符</option><option>盘盈</option><option>盘亏</option></select></div>
           <div class="wh-field"><label class="wh-label">系统台账值</label><input class="wh-input" id="confirmBookValue"></div>
           <div class="wh-field"><label class="wh-label">实盘确认值</label><input class="wh-input" id="confirmRealValue"></div>
           <div class="wh-field"><label class="wh-label">责任部门</label><input class="wh-input" id="confirmDept"></div>
           <div class="wh-field"><label class="wh-label">责任人</label><input class="wh-input" id="confirmOwner"></div>
           <div class="wh-field" style="grid-column:1 / -1"><label class="wh-label">差异原因</label><input class="wh-input" id="confirmReason" placeholder="不一致时填写差异原因"></div>
           <div class="wh-field"><label class="wh-label">处理建议</label><input class="wh-input" id="confirmAdvice" value="进入盘点差异处理"></div>
-          <div class="wh-field"><label class="wh-label">附件/照片</label><input class="wh-input" id="confirmAttachment" value="现场照片待上传"></div>
+          <div class="wh-field"><label class="wh-label">附件/说明</label><input class="wh-input" id="confirmAttachment" value="盘点说明待上传"></div>
         </div>
         <div class="inv-rule-box">保存后，系统按物资唯一码把不一致记录归入盘点差异处理；存货类同时带入最近盘库日期、盘库账面数量、盘库实盘数量和盘库差异。</div>
       </div>
@@ -314,8 +386,6 @@
           <div class="wh-field"><label class="wh-label">盘点任务名称</label><input class="wh-input" id="createName" placeholder="请输入盘点任务名称"></div>
           <div class="wh-field"><label class="wh-label">盘点类型</label><select class="wh-input" id="createType"><option>部门盘点</option><option>公司盘点</option></select></div>
           <div class="wh-field"><label class="wh-label">盘点部门</label><select class="wh-input" id="createDept"><option>机械研究所</option><option>电气控制所</option><option>经营发展中心</option><option>全部业务部门</option></select></div>
-          <div class="wh-field"><label class="wh-label">盘点范围</label><input class="wh-input" id="createScope" value="本部门在库及已领用物资"></div>
-          <div class="wh-field"><label class="wh-label">资产类型范围</label><select class="wh-input" id="createAssetRange"><option>固定资产、存货、无形资产</option><option>固定资产</option><option>存货</option><option>无形资产</option><option>全部</option></select></div>
           <div class="wh-field"><label class="wh-label">计划开始日期</label><input class="wh-input" id="createStart" type="date" value="2026-07-08"></div>
           <div class="wh-field"><label class="wh-label">计划结束日期</label><input class="wh-input" id="createEnd" type="date" value="2026-07-12"></div>
           <div class="wh-field"><label class="wh-label">发起人</label><input class="wh-input" id="createOwner" value="宋中波"></div>
@@ -337,25 +407,18 @@
         </div>
       </div>
       <div class="wh-modal-body">
-        <div class="inv-auto-grid">
-          <div class="wh-field"><label class="wh-label">盘点单号</label><input class="wh-input" id="mcNo" readonly></div>
-          <div class="wh-field"><label class="wh-label">所属仓库</label><input class="wh-input" id="mcWarehouse" readonly></div>
-          <div class="wh-field"><label class="wh-label">所属库区</label><input class="wh-input" id="mcArea" readonly></div>
-          <div class="wh-field"><label class="wh-label">操作人</label><input class="wh-input" id="mcOperator" readonly></div>
-          <div class="wh-field"><label class="wh-label">盘点时间</label><input class="wh-input" id="mcCheckTime" readonly></div>
-        </div>
         <div class="inv-material-filters">
           <div class="wh-field"><label class="wh-label">盘点类型</label><select class="wh-input" id="mcAssetType"><option>全部</option><option>部门盘点</option><option>公司盘点</option></select></div>
-          <div class="wh-field"><label class="wh-label">所属仓库/存放地点</label><input class="wh-input" id="mcLoc" placeholder="请输入仓库或存放地点"></div>
-          <div class="wh-field"><label class="wh-label">物资名称</label><input class="wh-input" id="mcName" placeholder="请输入物资名称"></div>
+          <div class="wh-field"><label class="wh-label">所属仓库</label><div class="inv-task-select-wrap" id="mcLocWrap"><input class="inv-task-select-input" id="mcLoc" autocomplete="off" placeholder="请选择或搜索所属仓库"><div class="inv-task-select-menu" id="mcLocMenu" role="listbox"></div></div></div>
+          <div class="wh-field"><label class="wh-label">产品名称</label><input class="wh-input" id="mcName" placeholder="请输入产品名称"></div>
           <div class="wh-field inv-material-query-field"><label class="wh-label">&nbsp;</label><button type="button" class="inv-btn primary" id="btnMaterialQuery">查询</button></div>
         </div>
         <div class="inv-material-toolbar">
-          <div class="inv-table-title" style="margin:0">盘点物资明细表</div>
+          <div class="inv-table-title" id="materialTableTitle" style="margin:0">盘点部门所属物资明细表</div>
         </div>
         <div class="inv-material-table-wrap">
           <table class="inv-material-table">
-            <colgroup>
+            <colgroup id="materialCheckCols">
               <col style="width:72px">
               <col style="width:118px">
               <col style="width:132px">
@@ -376,8 +439,13 @@
               <col style="width:124px">
               <col style="width:118px">
               <col style="width:170px">
+              <col style="width:126px">
+              <col style="width:118px">
+              <col style="width:118px">
+              <col style="width:132px">
+              <col style="width:176px">
             </colgroup>
-            <thead><tr><th>序号</th><th>资产编号</th><th>物资唯一码</th><th>物资类型编码</th><th>产品编码</th><th>物资名称</th><th>物资类型名称</th><th>所属部门</th><th>存储地点/仓库货位</th><th>使用人</th><th>在库/领用状态</th><th>账面数量</th><th>盘点确认数量</th><th>单位</th><th>状态是否完好</th><th>盘点结果</th><th>差异类型</th><th>原值</th><th>差异金额</th><th>差异说明</th></tr></thead>
+            <thead id="materialCheckHead"><tr><th>序号</th><th>资产编号</th><th>物资唯一码</th><th>物资类型编码</th><th>产品编码</th><th>产品名称</th><th>产品型号</th><th>物资类型名称</th><th>所属部门</th><th>存储地点/仓库货位</th><th>使用人</th><th>保管人</th><th>使用年限</th><th>产权</th><th>在库/领用状态</th><th>账面数量</th><th>单位</th></tr></thead>
             <tbody id="materialCheckBody"></tbody>
           </table>
           <div class="inv-material-empty" id="materialCheckEmpty" hidden>暂无数据</div>
@@ -385,6 +453,14 @@
       </div>
       <div class="wh-modal-foot"><button type="button" class="wh-btn wh-btn--ghost" data-close>取消</button><button type="button" class="wh-btn wh-btn--primary" id="btnMaterialSubmit">盘点提交</button></div>
     </div>
+  </div>
+  <div class="inv-task-reminder" id="inventoryTaskReminder">
+    <div class="inv-task-reminder-head"><span>任务提醒</span><button type="button" class="inv-task-reminder-close" id="inventoryTaskReminderClose" aria-label="关闭">×</button></div>
+    <div class="inv-task-reminder-body">
+      <p>预警提醒：你有新的盘点任务待办理，请及时进入我的待办处理。</p>
+      <p>到期提醒：公司二季度物资盘点已分配，请按流程完成盘点确认。</p>
+    </div>
+    <div class="inv-task-reminder-foot"><button type="button" class="inv-task-reminder-btn primary" id="inventoryTaskReminderGo">查看提醒</button><button type="button" class="inv-task-reminder-btn" id="inventoryTaskReminderDismiss">关闭弹窗</button></div>
   </div>
 
   <div class="wh-modal-mask" id="taskInfoMask" aria-hidden="true">
@@ -421,6 +497,14 @@
     </div>
   </div>
 
+  <div class="wh-modal-mask" id="reportMask" aria-hidden="true">
+    <div class="wh-modal-box" role="dialog" aria-modal="true" aria-labelledby="reportTitle">
+      <div class="wh-modal-head"><h3 class="wh-modal-title" id="reportTitle">盘点报告</h3><button type="button" class="wh-modal-close" data-close aria-label="关闭">×</button></div>
+      <div class="wh-modal-body" id="reportBody"></div>
+      <div class="wh-modal-foot"><button type="button" class="wh-btn wh-btn--ghost" data-close>关闭</button><button type="button" class="wh-btn wh-btn--primary" id="btnReportExport">导出报告</button></div>
+    </div>
+  </div>
+
   <div class="wh-modal-mask" id="trackMask" aria-hidden="true">
     <div class="wh-modal-box wh-modal-box--lg" role="dialog" aria-modal="true" aria-labelledby="trackTitle">
       <div class="wh-modal-head"><h3 class="wh-modal-title" id="trackTitle">物资跟踪</h3><button type="button" class="wh-modal-close" data-close aria-label="关闭">×</button></div>
@@ -440,19 +524,19 @@
     (function () {
       var rows = [
         { id: 1, no: "PD-2026-001", name: "机械研究所二季度部门盘点", type: "部门盘点", dept: "机械研究所", scope: "本部门在库及已领用物资", assetTypeRange: "固定资产、存货、无形资产", start: "2026-06-25", end: "2026-06-30", owner: "许学良", deptHead: "李仁堂", materialOwner: "宋中波", should: 126, done: 92, diff: 3, status: "盘点中" },
-        { id: 2, no: "PD-2026-002", name: "公司二季度物资全面盘点", type: "公司盘点", dept: "全部业务部门", scope: "公司所有已入库、未入库物资", assetTypeRange: "全部", start: "2026-06-28", end: "2026-07-03", owner: "宋中波", deptHead: "王超", materialOwner: "宋中波", financeHead: "孙睿", financeOwner: "杜欣鑫", bizHead: "陈亮、李仁堂、王贺", bizOwner: "成明锴、许学良、喻家敏", should: 284, done: 188, diff: 6, status: "待物资负责人分配" },
+        { id: 2, no: "PD-2026-002", name: "公司二季度物资全面盘点", type: "公司盘点", dept: "全部业务部门", scope: "公司所有已入库未出库物资", assetTypeRange: "全部", start: "2026-06-28", end: "2026-07-03", owner: "宋中波", deptHead: "王超", materialOwner: "宋中波", financeHead: "孙睿", financeOwner: "杜欣鑫", bizHead: "陈亮、李仁堂、王贺", bizOwner: "成明锴、许学良、喻家敏", should: 284, done: 188, diff: 6, status: "待分配" },
         { id: 3, no: "PD-2026-003", name: "经营发展中心部门盘点", type: "部门盘点", dept: "经营发展中心", scope: "本部门在库及已领用物资", assetTypeRange: "固定资产、无形资产", start: "2026-07-01", end: "2026-07-05", owner: "宋中波", deptHead: "王超", materialOwner: "宋中波", should: 57, done: 0, diff: 0, status: "待开始" },
         { id: 4, no: "PD-2026-004", name: "电气控制所部门盘点", type: "部门盘点", dept: "电气控制所", scope: "本部门在库及已领用物资", assetTypeRange: "固定资产、存货", start: "2026-06-10", end: "2026-06-15", owner: "成明锴", deptHead: "陈亮", materialOwner: "宋中波", should: 98, done: 98, diff: 0, status: "已完成" }
       ];
       var lines = [
-        { task: "PD-2026-001", assetNo: "ZC-2026-0001", code: "C20260000001", typeCode: "A0010020001", product: "B00001234", assetName: "变桨轴承", spec: "BP-2.0MW", materialTypeName: "固定资产", dept: "机械研究所", loc: "机械研究所/华北主仓A-01", user: "李仁堂", state: "在库", health: "完好", lastNo: "PD-2026-001", lastDate: "2026-06-25", book: 1, real: 1, result: "账实相符", lineStatus: "已确认", diffType: "无差异", reason: "", keeper: "李仁堂", serviceLife: "8年", originalValue: 680000, qty: 1, unit: "台", checkQty: 1, useStatus: "正常", checkResult: "账实相符", remark1: "固定资产", remark2: "状态完好", remark3: "无需调整" },
-        { task: "PD-2026-001", assetNo: "ZC-2026-0002", code: "C20260000002", typeCode: "A0010020002", product: "B00001235", assetName: "齿轮箱滤芯", spec: "GX-LX-90", materialTypeName: "存货", dept: "机械研究所", loc: "机械研究所/华北主仓A-03", user: "许学良", state: "在库", health: "完好", lastNo: "PD-2026-001", lastDate: "2026-06-25", book: 12, real: 10, result: "盘亏", lineStatus: "有差异", diffType: "数量差异", reason: "账面数量与实盘数量不一致，需进入盘点差异处理", warehouseLoc: "华北主仓A-03", stockNo: "PK-2026-0412", stockDate: "2026-06-20", stockBook: 12, stockReal: 10, stockDiff: -2, confirmQty: 10, stockStatus: "在库", diffQty: -2, unit: "件", checkResult: "盘亏" },
-        { task: "PD-2026-002", assetNo: "ZC-2026-0003", code: "C20260000003", typeCode: "A0020010006", product: "B00001888", assetName: "变频器模块", spec: "VF-800", materialTypeName: "存货", dept: "电气控制所", loc: "电气控制所/备用柜", user: "成明锴", state: "已入库", health: "待核验", lastNo: "PD-2026-002", lastDate: "2026-06-28", book: 2, real: 3, result: "盘盈", lineStatus: "有差异", diffType: "数量差异", reason: "现场多出一件未入账物资，需核对采购合同和入库记录", warehouseLoc: "备用柜", stockNo: "PK-2026-0415", stockDate: "2026-06-22", stockBook: 2, stockReal: 3, stockDiff: 1, confirmQty: 3, stockStatus: "已入库", diffQty: 1, unit: "件", checkResult: "盘盈" },
-        { task: "PD-2026-002", assetNo: "ZC-2026-0011", code: "C20260000011", typeCode: "A0030010004", product: "B00002119", assetName: "偏航电机", spec: "PY-DJ-55", materialTypeName: "固定资产", dept: "现场服务中心", loc: "现场服务中心/张北场站", user: "喻家敏", state: "已领用", health: "完好", lastNo: "PD-2026-002", lastDate: "2026-06-28", book: 1, real: 1, result: "位置不符", lineStatus: "有差异", diffType: "位置不符", reason: "实物已流转但系统台账位置未同步", keeper: "喻家敏", serviceLife: "10年", originalValue: 520000, qty: 1, unit: "台", checkQty: 1, useStatus: "正常", checkResult: "位置不符", remark1: "固定资产", remark2: "台账位置待更正", remark3: "需业务部门确认" },
-        { task: "PD-2026-003", assetNo: "WX-2026-0001", code: "C20260000021", typeCode: "A0060010001", product: "B00004101", assetName: "风机诊断软件授权", spec: "V3.2 企业版", materialTypeName: "无形资产", dept: "经营发展中心", loc: "经营发展中心/系统账号", user: "王超", state: "使用中", health: "完好", lastNo: "PD-2026-003", lastDate: "待盘点", book: 1, real: 0, result: "未盘点", lineStatus: "未盘点", diffType: "无差异", reason: "", authNo: "AUTH-2026-0315", useDept: "经营发展中心", useOwner: "王超", authStart: "2026-03-15", authEnd: "2029-03-14", bookOriginal: 260000, bookNet: 238000, intangibleStatus: "使用中", clearResult: "待清查" }
+        { task: "PD-2026-001", assetNo: "ZC-2026-0001", code: "C20260000001", typeCode: "A0010020001", product: "B00001234", assetName: "变桨轴承", spec: "BP-2.0MW", materialTypeName: "固定资产", dept: "机械研究所", loc: "机械研究所/华北主仓A-01", user: "李仁堂", state: "在库", health: "完好", lastNo: "PD-2026-001", lastDate: "2026-06-25", book: 1, real: 1, result: "正常", lineStatus: "已确认", diffType: "正常", reason: "", keeper: "李仁堂", serviceLife: "8年", originalValue: 680000, qty: 1, unit: "台", checkQty: 1, useStatus: "正常", checkResult: "正常", remark1: "固定资产", remark2: "状态完好", remark3: "无需调整" },
+        { task: "PD-2026-001", assetNo: "ZC-2026-0002", code: "C20260000002", typeCode: "A0010020002", product: "B00001235", assetName: "齿轮箱滤芯", spec: "GX-LX-90", materialTypeName: "存货", dept: "机械研究所", loc: "机械研究所/华北主仓A-03", user: "许学良", state: "在库", health: "完好", lastNo: "PD-2026-001", lastDate: "2026-06-25", book: 12, real: 10, result: "盘亏", lineStatus: "有差异", diffType: "盘亏", reason: "账面数量与实盘数量不一致，需进入盘点差异处理", warehouseLoc: "华北主仓A-03", stockNo: "PK-2026-0412", stockDate: "2026-06-20", stockBook: 12, stockReal: 10, stockDiff: -2, confirmQty: 10, stockStatus: "在库", diffQty: -2, unit: "件", checkResult: "盘亏" },
+        { task: "PD-2026-002", assetNo: "ZC-2026-0003", code: "C20260000003", typeCode: "A0020010006", product: "B00001888", assetName: "变频器模块", spec: "VF-800", materialTypeName: "存货", dept: "电气控制所", loc: "电气控制所/备用柜", user: "成明锴", state: "已入库", health: "待核验", lastNo: "PD-2026-002", lastDate: "2026-06-28", book: 2, real: 3, result: "盘盈", lineStatus: "有差异", diffType: "盘盈", reason: "现场多出一件未入账物资，需核对采购合同和入库记录", warehouseLoc: "备用柜", stockNo: "PK-2026-0415", stockDate: "2026-06-22", stockBook: 2, stockReal: 3, stockDiff: 1, confirmQty: 3, stockStatus: "已入库", diffQty: 1, unit: "件", checkResult: "盘盈" },
+        { task: "PD-2026-002", assetNo: "ZC-2026-0011", code: "C20260000011", typeCode: "A0030010004", product: "B00002119", assetName: "偏航电机", spec: "PY-DJ-55", materialTypeName: "固定资产", dept: "现场服务中心", loc: "现场服务中心/张北场站", user: "喻家敏", state: "已领用", health: "完好", lastNo: "PD-2026-002", lastDate: "2026-06-28", book: 1, real: 1, result: "损毁", lineStatus: "有差异", diffType: "损毁", reason: "实物已流转但系统台账位置未同步", keeper: "喻家敏", serviceLife: "10年", originalValue: 520000, qty: 1, unit: "台", checkQty: 1, useStatus: "正常", checkResult: "损毁", remark1: "固定资产", remark2: "台账位置待更正", remark3: "需业务部门确认" },
+        { task: "PD-2026-003", assetNo: "WX-2026-0001", code: "C20260000021", typeCode: "A0060010001", product: "B00004101", assetName: "风机诊断软件授权", spec: "V3.2 企业版", materialTypeName: "无形资产", dept: "经营发展中心", loc: "经营发展中心/系统台账", user: "王超", state: "使用中", health: "完好", lastNo: "PD-2026-003", lastDate: "待盘点", book: 1, real: 0, result: "未盘点", lineStatus: "未盘点", diffType: "正常", reason: "", authNo: "AUTH-2026-0315", useDept: "经营发展中心", useOwner: "王超", authStart: "2026-03-15", authEnd: "2029-03-14", bookOriginal: 260000, bookNet: 238000, intangibleStatus: "使用中", clearResult: "待清查" }
       ];
       var state = { filters: {}, current: null, currentLine: null, role: localStorage.getItem("inventoryDemoRole") || "dept_specialist" };
-      var roleNames = { dept_specialist: "部门物资专责", dept_head: "部门负责人", material_specialist: "物资管理部门物资专责", material_head: "物资管理部门负责人", finance_head: "财务负责人", business_head: "业务部门负责人" };
+      var roleNames = { dept_specialist: "部门物资专责", dept_head: "部门负责人", material_specialist: "物资管理部门物资专责", material_head: "物资管理部门负责人", finance_head: "财务负责人", business_head: "业务部门负责人", inventory_staff: "盘点人员" };
       function storedDiffs() {
         try { return JSON.parse(localStorage.getItem("inventoryDemoDiffs") || "[]"); } catch (e) { return []; }
       }
@@ -466,18 +550,27 @@
         var qty = Number(line.book || line.qty || 1) || 1;
         return originalAmount(line) ? originalAmount(line) / qty : 0;
       }
+      function normalizeDiffType(type, line) {
+        if (type === "盘盈" || type === "盘亏" || type === "损毁" || type === "正常") return type;
+        if (type === "无差异" || type === "账实相符") return "正常";
+        if (type === "数量差异") {
+          return Number((line && (line.real || line.realQty || line.confirmQty)) || 0) > Number((line && (line.book || line.bookQty)) || 0) ? "盘盈" : "盘亏";
+        }
+        if (type === "位置不符" || type === "负责人不符" || type === "状态异常" || type === "价值差异") return "损毁";
+        return "正常";
+      }
       function inferDiffType(line) {
-        if (line.diffType && line.diffType !== "无差异") return line.diffType;
-        if (Number(line.real) !== Number(line.book)) return Number(line.real) > Number(line.book) ? "盘盈" : "数量差异";
-        if (line.health && line.health !== "完好") return "状态异常";
-        if (line.result && line.result !== "账实相符" && line.result !== "无差异") return line.result;
-        return "无差异";
+        if (line.diffType && line.diffType !== "正常") return normalizeDiffType(line.diffType, line);
+        if (Number(line.real) !== Number(line.book)) return Number(line.real) > Number(line.book) ? "盘盈" : "盘亏";
+        if (line.health && line.health !== "完好") return "损毁";
+        if (line.result && line.result !== "正常") return normalizeDiffType(line.result, line);
+        return "正常";
       }
       function syncDiffRecords(task) {
         var list = storedDiffs().filter(function (x) { return x.task !== task.no; });
         linesForTask(task).filter(function (line) { return line.lineStatus === "有差异"; }).forEach(function (line) {
           var diffType = inferDiffType(line);
-          var amount = (diffType === "盘亏" || diffType === "数量差异" || diffType === "盘盈") ? Math.abs(Number(line.book || 0) - Number(line.real || line.confirmQty || 0)) * unitPrice(line) : 0;
+          var amount = (diffType === "盘亏" || diffType === "盘盈") ? Math.abs(Number(line.book || 0) - Number(line.real || line.confirmQty || 0)) * unitPrice(line) : 0;
           list.push({
             id: Date.now() + Math.floor(Math.random() * 1000), task: task.no, flowType: task.type,
             assetNo: line.assetNo, code: line.code, typeCode: line.typeCode, product: line.product,
@@ -488,7 +581,7 @@
             owner: task.owner, deptHead: task.deptHead, materialOwner: task.materialOwner || "宋中波",
             financeHead: task.financeHead || "孙睿", status: line.materialTypeName === "固定资产" && diffType === "盘亏" && originalAmount(line) >= 500000 ? "待提交审批" : "待处理",
             adjustNo: "待生成", reason: line.reason || "盘点确认与系统台账不一致",
-            proof: line.materialTypeName === "存货" ? ((line.stockNo || "盘库单") + "、现场照片、盘点说明") : "现场照片、台账记录、责任部门说明",
+            proof: line.materialTypeName === "存货" ? ((line.stockNo || "盘库单") + "、盘点说明") : (line.materialTypeName === "无形资产" ? "台账记录、使用说明" : "台账记录、责任部门说明"),
             nextUser: task.deptHead || "李仁堂"
           });
         });
@@ -501,14 +594,21 @@
       function cell(v) {
         return v === "" || v == null ? "-" : v;
       }
+      function inputValue(v) {
+        return String(v == null || v === "" ? "" : v)
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;");
+      }
       function resultText(v) {
-        if (v && v !== "账实相符" && v !== "无差异" && v !== "未盘点") return '<span class="inv-text-danger">' + v + '</span>';
-        if (v === "账实相符" || v === "无差异") return '<span class="inv-text-ok">' + v + '</span>';
+        if (v && v !== "正常" && v !== "未盘点") return '<span class="inv-text-danger">' + v + '</span>';
+        if (v === "正常") return '<span class="inv-text-ok">' + v + '</span>';
         return '<span class="inv-text-muted">' + cell(v) + '</span>';
       }
       function tag(status) {
         if (status === "待开始") return '<span class="inv-tag wait">待开始</span>';
-        if (status === "盘点中" || status === "待物资负责人分配" || status === "待业务部门分配" || status === "待三方确认" || status === "待部门负责人审阅" || status === "待财务负责人审阅" || status === "待物资管理部门审阅" || status === "待阅知") return '<span class="inv-tag run">' + status + '</span>';
+        if (status === "盘点中" || status === "待分配" || status === "待业务部门分配" || status === "待三方确认" || status === "待部门负责人审阅" || status === "待财务负责人审阅" || status === "待物资管理部门审阅" || status === "待阅知") return '<span class="inv-tag run">' + status + '</span>';
         if (status === "已完成") return '<span class="inv-tag done">已完成</span>';
         return '<span class="inv-tag wait">待差异处理</span>';
       }
@@ -522,7 +622,6 @@
       }
       function taskActions(row) {
         var btns = [];
-        if (canStartInventory(row)) btns.push('<span role="button" tabindex="0" data-inv-act="start" data-id="' + row.id + '">盘点开始</span>');
         btns.push('<span role="button" tabindex="0" data-inv-act="view" data-id="' + row.id + '">查看</span>');
         return '<span class="inv-op">' + btns.join("") + '</span>';
       }
@@ -573,9 +672,19 @@
       function normalizeFlowType(row) {
         return row && row.type === "公司盘点" ? "company" : "dept";
       }
+      function materialCheckFlowRow() {
+        var row = Object.assign({}, state.current || getRows()[0] || rows[0] || {});
+        var selected = document.getElementById("mcAssetType");
+        row.type = selected && selected.value === "公司盘点" ? "公司盘点" : "部门盘点";
+        return row;
+      }
+      function materialCheckSelectedType() {
+        var sel = document.getElementById("mcAssetType");
+        return sel && sel.value === "公司盘点" ? "公司盘点" : "部门盘点";
+      }
       function flowIndex(row) {
         var deptMap = { "待开始": 0, "盘点中": 2, "待部门负责人审阅": 3, "待物资管理部门审阅": 4, "已完成": 5, "待差异处理": 4 };
-        var companyMap = { "待开始": 0, "待物资负责人分配": 2, "待业务部门分配": 4, "待三方确认": 6, "待财务负责人审阅": 7, "待物资管理部门审阅": 8, "待阅知": 9, "待差异处理": 9, "已完成": 9 };
+        var companyMap = { "待开始": 0, "待分配": 2, "待业务部门分配": 4, "待三方确认": 6, "待财务负责人审阅": 7, "待物资管理部门审阅": 8, "待阅知": 9, "待差异处理": 9, "已完成": 9 };
         var map = normalizeFlowType(row) === "company" ? companyMap : deptMap;
         return map[row.status] == null ? 0 : map[row.status];
       }
@@ -583,7 +692,7 @@
         if (normalizeFlowType(row) === "company") {
           return [
             { name: "发起公司物资盘点", person: "宋中波", text: "物资管理部门物资专责宋中波发起公司物资盘点" },
-            { name: "生成公司物资清单", person: "宋中波", text: "系统根据物资管理部门物资专责宋中波发起的信息生成公司所有已入库、未入库物资清单，存货类同步带入最近盘库日期、盘库账面数量、盘库实盘数量和盘库差异" },
+            { name: "生成公司物资清单", person: "宋中波", text: "系统根据物资管理部门物资专责宋中波发起的信息生成公司所有已入库未出库物资清单，存货类同步带入最近盘库日期、盘库账面数量、盘库实盘数量和盘库差异" },
             { name: "物资部门负责人同意", person: "王超", text: "物资管理部门负责人王超同意公司物资盘点" },
             { name: "物资部门分配人员", person: "王超、宋中波", text: "物资管理部门负责人王超分配本部门盘点人员宋中波" },
             { name: "业务部门同意并分配", person: row.bizHead || "李仁堂、陈亮、王贺", text: "所有业务部门负责人" + (row.bizHead || "李仁堂、陈亮、王贺") + "同意，并分配本部门盘点人员" },
@@ -614,6 +723,33 @@
           return { node: step.name, person: step.person, time: time, result: result, opinion: step.text };
         });
       }
+      function flowChartText(step) {
+        var names = (step.person || "").split("、").filter(Boolean);
+        var text = step.text || step.name;
+        names.forEach(function (name) {
+          text = text.split(name).join("");
+        });
+        return text.replace(/、+/g, "、")
+          .replace(/，+/g, "，")
+          .replace(/负责人、同意/g, "负责人同意")
+          .replace(/负责人、分配/g, "负责人分配")
+          .replace(/负责人、审阅/g, "负责人审阅")
+          .replace(/专责、发起/g, "专责发起")
+          .replace(/专责、点/g, "专责点")
+          .replace(/专责、逐条/g, "专责逐条")
+          .replace(/专责、审阅/g, "专责审阅")
+          .replace(/专责、确认/g, "专责确认")
+          .replace(/专责、阅知/g, "专责阅知")
+          .replace(/人员、收到/g, "人员收到")
+          .replace(/人员、按/g, "人员按")
+          .replace(/、同意/g, "同意")
+          .replace(/、收到/g, "收到")
+          .replace(/、审阅/g, "审阅")
+          .replace(/、阅知/g, "阅知")
+          .replace(/、确认/g, "确认")
+          .replace(/、$/g, "")
+          .trim();
+      }
       function switchApprovalTab(key) {
         document.querySelectorAll("[data-approval-tab]").forEach(function (btn) {
           btn.classList.toggle("is-active", btn.getAttribute("data-approval-tab") === key);
@@ -625,7 +761,7 @@
       function renderTable() {
         var list = getRows();
         document.getElementById("tbody").innerHTML = list.map(function (x, i) {
-          return '<tr><td>' + (i + 1) + '</td><td>' + x.no + '</td><td>' + x.name + '</td><td>' + x.type + '</td><td>' + x.dept + '</td><td>' + x.scope + '</td><td>' + (x.assetTypeRange || "全部") + '</td><td>' + x.start + '</td><td>' + x.end + '</td><td>' + x.owner + '</td><td>' + responsiblePerson(x) + '</td><td>' + x.should + '</td><td>' + x.done + '</td><td>' + x.diff + '</td><td>' + tag(x.status) + '</td><td>' + taskActions(x) + '</td></tr>';
+          return '<tr><td>' + (i + 1) + '</td><td>' + x.no + '</td><td>' + x.name + '</td><td>' + x.type + '</td><td>' + x.dept + '</td><td>' + x.start + '</td><td>' + x.end + '</td><td>' + x.owner + '</td><td>' + responsiblePerson(x) + '</td><td>' + x.should + '</td><td>' + x.done + '</td><td>' + x.diff + '</td><td>' + tag(x.status) + '</td><td>' + taskActions(x) + '</td></tr>';
         }).join("");
       }
       function renderLedger() {
@@ -633,6 +769,58 @@
           var loc = splitLocation(x.loc);
           return '<tr class="' + (x.lineStatus === "有差异" ? "inv-row-diff" : "") + '"><td>' + (i + 1) + '</td><td>' + x.lastNo + '</td><td>' + x.assetNo + '</td><td>' + x.code + '</td><td>' + x.typeCode + '</td><td>' + x.product + '</td><td>' + x.assetName + '</td><td>' + x.materialTypeName + '</td><td>' + x.dept + '</td><td>' + loc.warehouse + '</td><td>' + loc.area + '</td><td>' + x.loc + '</td><td>' + x.user + '</td><td>' + x.state + '</td><td>' + x.book + '</td><td>' + x.real + '</td><td>' + resultText(x.result) + '</td><td>' + resultText(x.diffType || x.result) + '</td><td>' + (x.operator || x.user) + '</td><td>' + (x.checkTime || (x.lastDate + " 09:00")) + '</td><td>' + lineActions(x, false) + '</td></tr>';
         }).join("");
+      }
+      function reportStats() {
+        var total = lines.length;
+        var checked = lines.filter(function (x) { return x.result !== "未盘点" && x.lineStatus !== "未盘点"; }).length;
+        var normal = lines.filter(function (x) { return normalizeDiffType(x.diffType || x.result, x) === "正常" && x.result !== "未盘点"; }).length;
+        var diff = lines.filter(function (x) { return normalizeDiffType(x.diffType || x.result, x) !== "正常" && x.result !== "未盘点"; }).length;
+        var pending = total - checked;
+        return {
+          total: total,
+          checked: checked,
+          normal: normal,
+          diff: diff,
+          pending: pending,
+          rate: checked ? Math.round((normal / checked) * 1000) / 10 : 0
+        };
+      }
+      function typeCount(type) {
+        return lines.filter(function (x) { return normalizeDiffType(x.diffType || x.result, x) === type && x.result !== "未盘点"; }).length;
+      }
+      function openReport() {
+        var stats = reportStats();
+        var today = new Date();
+        var reportNo = "BG-" + today.getFullYear() + String(today.getMonth() + 1).padStart(2, "0") + String(today.getDate()).padStart(2, "0") + "-001";
+        document.getElementById("reportBody").innerHTML =
+          '<div class="inv-report-summary">' +
+            '<div class="inv-report-card"><span>台账总数</span><b>' + stats.total + '</b></div>' +
+            '<div class="inv-report-card"><span>已盘数量</span><b>' + stats.checked + '</b></div>' +
+            '<div class="inv-report-card"><span>正常数量</span><b>' + stats.normal + '</b></div>' +
+            '<div class="inv-report-card"><span>差异数量</span><b>' + stats.diff + '</b></div>' +
+            '<div class="inv-report-card"><span>待盘数量</span><b>' + stats.pending + '</b></div>' +
+          '</div>' +
+          '<div class="inv-report-section">' +
+            '<h4>报告信息</h4>' +
+            '<div class="inv-report-grid">' +
+              '<div class="inv-report-field"><span>报告编号</span><b>' + reportNo + '</b></div>' +
+              '<div class="inv-report-field"><span>报告名称</span><b>盘点台账报告</b></div>' +
+              '<div class="inv-report-field"><span>盘点范围</span><b>当前盘点台账全部物资</b></div>' +
+              '<div class="inv-report-field"><span>生成时间</span><b>' + today.toLocaleString("zh-CN", { hour12: false }) + '</b></div>' +
+              '<div class="inv-report-field"><span>生成角色</span><b>' + (roleNames[state.role] || "部门物资专责") + '</b></div>' +
+              '<div class="inv-report-field"><span>报告状态</span><b>待确认</b></div>' +
+            '</div>' +
+          '</div>' +
+          '<div class="inv-report-section">' +
+            '<h4>差异汇总</h4>' +
+            '<table class="inv-report-table"><thead><tr><th>差异类型</th><th>数量</th><th>处理说明</th></tr></thead><tbody>' +
+              '<tr><td>正常</td><td>' + typeCount("正常") + '</td><td>账、卡、物一致，纳入台账归档</td></tr>' +
+              '<tr><td>盘盈</td><td>' + typeCount("盘盈") + '</td><td>核对采购、入库及领用记录，责任部门确认后调整库存</td></tr>' +
+              '<tr><td>盘亏</td><td>' + typeCount("盘亏") + '</td><td>查明原因后提交差异处理；固定资产大额盘亏按规则提交审批</td></tr>' +
+              '<tr><td>损毁</td><td>' + typeCount("损毁") + '</td><td>补充盘点说明，按资产类别办理处置或台账更正</td></tr>' +
+            '</tbody></table>' +
+          '</div>';
+        open(document.getElementById("reportMask"));
       }
       function open(mask) {
         mask.classList.add("is-open");
@@ -680,6 +868,44 @@
       function taskLines(row) {
         return linesForTask(row || state.current || rows[0]);
       }
+      var inventoryDetailHeaders = ["序号", "资产编号", "物资唯一码", "物资类型编码", "产品编码", "产品名称", "产品型号", "物资类型名称", "所属部门", "存储地点/仓库货位", "使用人", "保管人", "使用年限", "产权", "在库/领用状态", "账面数量", "单位", "盘点确认数量", "状态是否完好", "盘点结果", "盘点依据", "差异类型", "差异金额", "差异说明"];
+      function diffAmountText(line) {
+        var type = inferDiffType(line || {});
+        if (type !== "盘亏" && type !== "盘盈") return "¥0";
+        var qty = Math.abs(Number((line && line.book) || 0) - Number((line && (line.real || line.confirmQty)) || 0));
+        return money(qty * unitPrice(line || {}));
+      }
+      function readonlyDetailRow(line, idx) {
+        var diffType = inferDiffType(line || {});
+        var proof = (line && line.proof) || (line && line.materialTypeName === "存货" ? ((line.stockNo || "最近盘库单") + "、盘点说明") : "台账记录、盘点照片");
+        var cells = [
+          idx + 1,
+          line.assetNo,
+          line.code,
+          line.typeCode,
+          line.product,
+          line.assetName,
+          line.spec,
+          line.materialTypeName,
+          line.dept,
+          line.loc,
+          line.user,
+          line.keeper || line.user,
+          line.serviceLife,
+          line.remark1 || line.authNo || "-",
+          line.state,
+          line.book,
+          line.unit || "件",
+          line.confirmQty || line.real || line.checkQty || line.book,
+          line.health,
+          line.result || line.checkResult || "正常",
+          proof,
+          diffType,
+          diffAmountText(line),
+          line.reason || (diffType === "正常" ? "无差异" : "盘点确认与系统台账不一致")
+        ];
+        return "<tr>" + cells.map(function (v) { return "<td>" + cell(v) + "</td>"; }).join("") + "</tr>";
+      }
       function inventoryPhoto(line) {
         if (!line) return "images/demo-inline-1.jpg";
         if (line.assetName.indexOf("软件") > -1 || line.assetName.indexOf("授权") > -1) return "https://statics.zwsoft.cn/web/index/img/index_cad.jpg";
@@ -706,8 +932,6 @@
             taskField("盘点任务名称", row.name) +
             taskField("盘点类型", row.type) +
             taskField("盘点部门", row.dept) +
-            taskField("盘点范围", row.scope) +
-            taskField("资产类型范围", row.assetTypeRange || "全部") +
             taskField("计划开始日期", row.start) +
             taskField("计划结束日期", row.end) +
             taskField("发起人", row.owner) +
@@ -715,11 +939,9 @@
             taskField("任务状态", row.status) +
             taskField("确认口径", isCompany ? "物资、财务、业务三方共同确认" : "部门物资专责逐条确认") +
           '</div>',
-          '<div class="inv-table-title">盘点物资明细表</div>',
-          '<div class="inv-task-mini-table-wrap"><table class="inv-task-mini-table"><thead><tr><th>序号</th><th>资产编号</th><th>物资唯一码</th><th>物资类型编码</th><th>产品编码</th><th>物资名称</th><th>物资类型名称</th><th>所属部门</th><th>存储地点/仓库货位</th><th>使用人</th><th>在库/领用状态</th><th>账面数量</th><th>盘点确认数量</th><th>单位</th><th>状态是否完好</th><th>盘点结果</th><th>差异类型</th><th>原值</th><th>差异金额</th><th>差异说明</th><th>操作</th></tr></thead><tbody>' +
-            list.map(function (x, i) {
-              return '<tr><td>' + (i + 1) + '</td><td>' + cell(x.assetNo) + '</td><td>' + cell(x.code) + '</td><td>' + cell(x.typeCode) + '</td><td>' + cell(x.product) + '</td><td>' + cell(x.assetName) + '</td><td>' + cell(x.materialTypeName) + '</td><td>' + cell(x.dept) + '</td><td>' + cell(x.loc) + '</td><td>' + cell(x.user) + '</td><td>' + cell(x.state) + '</td><td>' + cell(x.book) + '</td><td>' + cell(x.confirmQty || x.real) + '</td><td>' + cell(x.unit || "件") + '</td><td>' + cell(x.health) + '</td><td>' + cell(x.result) + '</td><td>' + cell(x.diffType || "无差异") + '</td><td>' + money(x.originalValue || x.bookOriginal || 0) + '</td><td>' + money(Math.abs(Number(x.diffQty || 0)) * (Number(x.originalValue || x.bookOriginal || 0) || 0)) + '</td><td>' + cell(x.reason) + '</td><td><span class="inv-op"><span role="button" tabindex="0" data-task-view="' + x.code + '">查看</span><span role="button" tabindex="0" data-task-track="' + x.code + '">物资跟踪</span></span></td></tr>';
-            }).join("") +
+          '<div class="inv-table-title">' + (isCompany ? "盘点已入库未出库物资明细表" : "盘点部门所属物资明细表") + '</div>',
+          '<div class="inv-task-mini-table-wrap"><table class="inv-task-mini-table"><thead><tr>' + inventoryDetailHeaders.map(function (x) { return "<th>" + x + "</th>"; }).join("") + '</tr></thead><tbody>' +
+            list.map(readonlyDetailRow).join("") +
           '</tbody></table></div>',
           '<div class="inv-task-track-panel" id="taskTrackPanel" hidden></div>'
         ].join("");
@@ -731,7 +953,7 @@
         document.getElementById("taskInfoBody").innerHTML = [
           '<div class="inv-task-view-layout">',
             '<div class="inv-task-view-fields">',
-              taskField("物资名称", line.assetName),
+              taskField("产品名称", line.assetName),
               taskField("规格型号", line.spec),
               taskField("物资类型名称", line.materialTypeName),
               taskField("物资类型编码", line.typeCode),
@@ -792,9 +1014,51 @@
           return true;
         });
       }
+      var mcLocOptions = ["华北主仓A-01", "华北主仓A-03", "备用柜", "现场服务中心/张北场站", "机械研究所/华北主仓A-01", "机械研究所/华北主仓A-03", "电气控制所/备用柜"];
+      function renderMcLocMenu(keyword) {
+        var menu = document.getElementById("mcLocMenu");
+        if (!menu) return;
+        var kw = (keyword || "").trim();
+        var options = mcLocOptions.filter(function (x) { return !kw || x.indexOf(kw) >= 0; });
+        menu.innerHTML = options.length ? options.map(function (x) {
+          return '<div class="inv-task-select-option" role="option" data-mc-loc="' + cell(x) + '">' + cell(x) + '</div>';
+        }).join("") : '<div class="inv-task-select-empty">暂无匹配</div>';
+      }
+      function openMcLocMenu() {
+        var wrap = document.getElementById("mcLocWrap");
+        var input = document.getElementById("mcLoc");
+        if (!wrap || !input) return;
+        renderMcLocMenu(input.value);
+        wrap.classList.add("is-open");
+      }
+      function closeMcLocMenu() {
+        var wrap = document.getElementById("mcLocWrap");
+        if (wrap) wrap.classList.remove("is-open");
+      }
       function renderMaterialCheck() {
         var list = materialRows();
+        var isCompany = materialCheckSelectedType() === "公司盘点";
+        var title = document.getElementById("materialTableTitle");
+        var cols = document.getElementById("materialCheckCols");
+        var head = document.getElementById("materialCheckHead");
+        var baseWidths = [72, 118, 132, 124, 118, 124, 104, 112, 148, 128, 110, 90, 116, 78, 124, 118, 78];
+        var editWidths = [124, 124, 118, 170, 126, 118, 176];
+        if (title) title.textContent = isCompany ? "盘点已入库未出库物资明细表" : "盘点部门所属物资明细表";
+        if (cols) {
+          cols.innerHTML = (isCompany ? baseWidths : baseWidths.concat(editWidths)).map(function (w) { return '<col style="width:' + w + 'px">'; }).join("");
+        }
+        if (head) {
+          head.innerHTML = '<tr><th>序号</th><th>资产编号</th><th>物资唯一码</th><th>物资类型编码</th><th>产品编码</th><th>产品名称</th><th>产品型号</th><th>物资类型名称</th><th>所属部门</th><th>存储地点/仓库货位</th><th>使用人</th><th>保管人</th><th>使用年限</th><th>产权</th><th>在库/领用状态</th><th>账面数量</th><th>单位</th>' + (isCompany ? "" : '<th>盘点确认数量</th><th>状态是否完好</th><th>盘点结果</th><th>盘点依据</th><th>差异类型</th><th>差异金额</th><th>差异说明</th>') + '</tr>';
+        }
         document.getElementById("materialCheckBody").innerHTML = list.map(function (x, i) {
+          var editableCells = isCompany ? "" :
+            '<td><input class="inv-material-cell-input" value="' + inputValue(x.confirmQty || x.real || "") + '" placeholder="手动填写"></td>' +
+            '<td><select class="inv-material-cell-select"><option>完好</option><option>待核验</option><option>损坏</option><option>缺失</option></select></td>' +
+            '<td><select class="inv-material-cell-select"><option>盘盈</option><option>盘亏</option><option>毁损</option><option>正常</option></select></td>' +
+            '<td><label class="inv-material-upload">上传<input type="file" accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,.txt"></label></td>' +
+            '<td><select class="inv-material-cell-select"><option>正常</option><option>盘盈</option><option>盘亏</option><option>损毁</option></select></td>' +
+            '<td><input class="inv-material-cell-input" value="" placeholder="填写差异金额"></td>' +
+            '<td><textarea class="inv-material-cell-textarea" placeholder="手动填写差异说明">' + inputValue(x.reason || "") + '</textarea></td>';
           return '<tr>' +
             '<td>' + (i + 1) + '</td>' +
             '<td>' + cell(x.assetNo) + '</td>' +
@@ -802,20 +1066,18 @@
             '<td>' + cell(x.typeCode) + '</td>' +
             '<td>' + cell(x.product) + '</td>' +
             '<td>' + cell(x.assetName) + '</td>' +
+            '<td>' + cell(x.spec) + '</td>' +
             '<td>' + cell(x.materialTypeName) + '</td>' +
             '<td>' + cell(x.dept) + '</td>' +
-            '<td><input class="inv-material-cell-input" value="" placeholder="手动确认存储地点"></td>' +
-            '<td><input class="inv-material-cell-input" value="" placeholder="手动确认使用人"></td>' +
+            '<td>' + cell(x.loc) + '</td>' +
+            '<td>' + cell(x.user) + '</td>' +
+            '<td>' + cell(x.keeper || x.user) + '</td>' +
+            '<td>' + cell(x.serviceLife) + '</td>' +
+            '<td>' + cell(x.remark1 || x.authNo || "-") + '</td>' +
             '<td>' + cell(x.state) + '</td>' +
             '<td>' + cell(x.book) + '</td>' +
-            '<td><input class="inv-material-cell-input" value="" placeholder="手动填写"></td>' +
             '<td>' + cell(x.unit || "件") + '</td>' +
-            '<td><select class="inv-material-cell-select"><option value="">请选择</option><option>完好</option><option>待核验</option><option>损坏</option><option>缺失</option></select></td>' +
-            '<td><select class="inv-material-cell-select"><option value="">请选择</option><option>账实相符</option><option>盘亏</option><option>盘盈</option><option>位置不符</option><option>未盘点</option></select></td>' +
-            '<td><select class="inv-material-cell-select"><option value="">请选择</option><option>无差异</option><option>数量差异</option><option>位置不符</option><option>负责人不符</option><option>状态异常</option><option>盘盈</option><option>盘亏</option><option>价值差异</option></select></td>' +
-            '<td>' + money(x.originalValue || x.bookOriginal || 0) + '</td>' +
-            '<td><input class="inv-material-cell-input" value="" placeholder="系统判断/手动确认"></td>' +
-            '<td><textarea class="inv-material-cell-textarea" placeholder="手动填写差异说明"></textarea></td>' +
+            editableCells +
           '</tr>';
         }).join("");
         document.getElementById("materialCheckEmpty").hidden = list.length > 0;
@@ -825,8 +1087,6 @@
         document.getElementById("createName").value = "";
         document.getElementById("createType").value = "部门盘点";
         document.getElementById("createDept").value = "机械研究所";
-        document.getElementById("createScope").value = "本部门在库及已领用物资";
-        document.getElementById("createAssetRange").value = "固定资产、存货、无形资产";
         document.getElementById("createStart").value = "2026-07-08";
         document.getElementById("createEnd").value = "2026-07-12";
         document.getElementById("createOwner").value = "宋中波";
@@ -845,8 +1105,7 @@
           name: document.getElementById("createName").value || (dept + "盘点任务"),
           type: type,
           dept: dept,
-          scope: document.getElementById("createScope").value,
-          assetTypeRange: document.getElementById("createAssetRange").value,
+          scope: type === "公司盘点" ? "公司所有已入库未出库物资" : "本部门在库及已领用物资",
           start: document.getElementById("createStart").value,
           end: document.getElementById("createEnd").value,
           owner: owner,
@@ -862,11 +1121,6 @@
         state.current = row || state.current || getRows()[0] || rows[0];
         var isCompany = normalizeFlowType(state.current) === "company";
         document.getElementById("materialCheckTitle").textContent = isCompany ? "公司物资盘点明细" : "物料盘点明细";
-        document.getElementById("mcNo").value = state.current.no;
-        document.getElementById("mcWarehouse").value = taskWarehouse(state.current);
-        document.getElementById("mcArea").value = taskArea(state.current);
-        document.getElementById("mcOperator").value = state.current.owner || "宋中波";
-        document.getElementById("mcCheckTime").value = taskCheckTime(state.current);
         document.getElementById("mcAssetType").value = state.current.type || "全部";
         ["mcLoc", "mcName"].forEach(function (id) { document.getElementById(id).value = ""; });
         renderMaterialCheck();
@@ -874,7 +1128,7 @@
       }
       function openTrack(line) {
         document.getElementById("trackGrid").innerHTML = [
-          ["资产编号", line.assetNo], ["物资唯一码", line.code], ["物资类型编码", line.typeCode], ["产品编码", line.product], ["物资类型名称", line.materialTypeName], ["物资名称", line.assetName],
+          ["资产编号", line.assetNo], ["物资唯一码", line.code], ["物资类型编码", line.typeCode], ["产品编码", line.product], ["物资类型名称", line.materialTypeName], ["产品名称", line.assetName],
           ["规格型号", line.spec], ["所属部门", line.dept], ["当前位置", line.loc], ["盘点结果", line.result]
         ].map(function (x) { return '<div class="wh-detail-item"><span class="wh-detail-label">' + x[0] + '</span><span class="wh-detail-value">' + x[1] + '</span></div>'; }).join("");
         document.getElementById("trackFlow").innerHTML = [
@@ -892,7 +1146,7 @@
           var cls = i < activeIndex ? " done" : (i === activeIndex ? " active" : "");
           if (i === steps.length - 1) cls += " is-end";
           var arrow = i < steps.length - 1 ? '<span class="inv-arrow">→</span>' : "";
-          return '<div class="inv-step' + cls + '"><strong>' + step.text + '</strong><span>' + step.person + '</span></div>' + arrow;
+          return '<div class="inv-step' + cls + '"><strong>' + flowChartText(step) + '</strong><span>' + step.person + '</span></div>' + arrow;
         }).join("");
         document.getElementById("approvalInfoBody").innerHTML = approvalRowsFor(state.current).map(function (x, i) {
           return '<p class="inv-approval-line">' + (i + 1) + '、' + x.opinion + '（' + x.time + '）</p>';
@@ -905,8 +1159,8 @@
         state.current = row;
         document.getElementById("detailGrid").innerHTML = [
           ["盘点单号", row.no], ["盘点名称", row.name], ["盘点类型", row.type], ["盘点部门", row.dept],
-          ["盘点范围", row.scope], ["资产类型范围", row.assetTypeRange || "全部"], ["计划日期", row.start + " 至 " + row.end], ["发起/负责人员", row.owner], ["部门负责人", row.deptHead || "按所属部门匹配"],
-          ["物资管理部门物资专责", row.materialOwner || "宋中波"], ["财务负责人", row.financeHead || "-"], ["任务状态", row.status], ["数据来源", normalizeFlowType(row) === "company" ? "公司所有已入库、未入库物资清单" : row.dept + "所属物资清单"]
+          ["计划日期", row.start + " 至 " + row.end], ["发起/负责人员", row.owner], ["部门负责人", row.deptHead || "按所属部门匹配"],
+          ["物资管理部门物资专责", row.materialOwner || "宋中波"], ["财务负责人", row.financeHead || "-"], ["任务状态", row.status], ["数据来源", normalizeFlowType(row) === "company" ? "公司所有已入库未出库物资清单" : row.dept + "所属物资清单"]
         ].map(function (x) { return '<div class="wh-detail-item"><span class="wh-detail-label">' + x[0] + '</span><span class="wh-detail-value">' + x[1] + '</span></div>'; }).join("");
         renderDetailLines();
         open(document.getElementById("detailMask"));
@@ -921,23 +1175,21 @@
           document.getElementById("confirmSame").value = line.lineStatus === "有差异" ? "不一致" : "一致";
           document.getElementById("confirmLoc").value = line.loc;
           document.getElementById("confirmUser").value = line.user;
-          document.getElementById("confirmDiffType").value = line.diffType || "无差异";
           document.getElementById("confirmBookValue").value = "盘点单号：" + line.lastNo + "；所属仓库：" + locInfo.warehouse + "；所属库区：" + locInfo.area;
           document.getElementById("confirmRealValue").value = "账面数量：" + line.book + "；实盘数量：" + line.real + "；盘点时间：" + (line.checkTime || (line.lastDate + " 09:00"));
           document.getElementById("confirmDept").value = line.dept;
           document.getElementById("confirmOwner").value = line.operator || line.user;
           document.getElementById("confirmReason").value = line.reason || "";
           document.getElementById("confirmAdvice").value = line.lineStatus === "有差异" ? "进入盘点差异处理" : "台帐归档";
-          document.getElementById("confirmAttachment").value = "盘点照片/库位图已归档";
+          document.getElementById("confirmAttachment").value = "盘点说明/库位信息已归档";
           open(document.getElementById("confirmMask"));
           return;
         }
         document.getElementById("confirmCode").value = line.assetNo + " / " + line.code;
-        document.getElementById("confirmHealth").value = line.health === "待核验" ? "待核验" : "完好";
-        document.getElementById("confirmSame").value = line.lineStatus === "有差异" ? "不一致" : "一致";
-        document.getElementById("confirmLoc").value = line.loc;
-        document.getElementById("confirmUser").value = line.user;
-        document.getElementById("confirmDiffType").value = mode === "diff" ? (line.diffType === "无差异" ? "数量差异" : line.diffType) : (line.diffType || "无差异");
+          document.getElementById("confirmHealth").value = line.health === "待核验" ? "待核验" : "完好";
+          document.getElementById("confirmSame").value = line.lineStatus === "有差异" ? "不一致" : "一致";
+          document.getElementById("confirmLoc").value = line.loc;
+          document.getElementById("confirmUser").value = line.user;
         document.getElementById("confirmBookValue").value = "位置：" + line.loc + "；数量：" + line.book;
         document.getElementById("confirmRealValue").value = "位置：" + line.loc + "；数量：" + line.real;
         document.getElementById("confirmDept").value = line.dept;
@@ -962,9 +1214,9 @@
           if (lineOp.getAttribute("data-line-act") === "track") openTrack(line);
           if (lineOp.getAttribute("data-line-act") === "ok") {
             line.lineStatus = "已确认";
-            line.result = "账实相符";
-            line.checkResult = "账实相符";
-            line.diffType = "无差异";
+            line.result = "正常";
+            line.checkResult = "正常";
+            line.diffType = "正常";
             line.reason = "";
             renderDetailLines();
             renderLedger();
@@ -991,6 +1243,26 @@
           renderMaterialCheck();
           return;
         }
+        if (e.target.id === "inventoryTaskReminderGo") {
+          window.location.href = "my-tasks-prototype-list.html?scene=todo";
+          return;
+        }
+        if (e.target.id === "inventoryTaskReminderClose" || e.target.id === "inventoryTaskReminderDismiss") {
+          var reminder = document.getElementById("inventoryTaskReminder");
+          if (reminder) reminder.hidden = true;
+          return;
+        }
+        if (e.target.id === "mcLoc") {
+          openMcLocMenu();
+          return;
+        }
+        var mcLocOption = e.target.closest("[data-mc-loc]");
+        if (mcLocOption) {
+          document.getElementById("mcLoc").value = mcLocOption.getAttribute("data-mc-loc") || "";
+          closeMcLocMenu();
+          renderMaterialCheck();
+          return;
+        }
         if (e.target.id === "btnMaterialSubmit") {
           var current = state.current || getRows()[0] || rows[0];
           var checked = materialRows();
@@ -1004,31 +1276,32 @@
           return;
         }
         if (e.target.id === "btnDetailFlow") openFlow(state.current || rows[0]);
-        if (e.target.id === "btnMaterialFlow") openFlow(state.current || rows[0]);
+        if (e.target.id === "btnMaterialFlow") openFlow(materialCheckFlowRow());
         if (e.target.id === "btnTaskInfoFlow") openFlow(state.current || rows[0]);
         if (e.target.id === "btnSearch") {
-          state.filters = { no: fNo.value.trim(), dept: fDept.value, type: fType.value, status: fStatus.value, owner: fKeeper.value.trim() };
+          state.filters = { no: fNo.value.trim(), dept: fDept.value, status: fStatus.value, owner: fKeeper.value.trim() };
           renderTable();
         }
         if (e.target.id === "btnReset") {
           ["fNo", "fKeeper"].forEach(function (id) { document.getElementById(id).value = ""; });
-          ["fDept", "fType", "fStatus"].forEach(function (id) { document.getElementById(id).value = ""; });
+          ["fDept", "fStatus"].forEach(function (id) { document.getElementById(id).value = ""; });
           state.filters = {};
           renderTable();
         }
         if (e.target.id === "btnLedgerRefresh") { renderLedger(); alert("盘点台帐已刷新（演示）"); }
         if (e.target.id === "btnLedgerExport") alert("正在导出盘点台帐（演示）");
-        if (e.target.id === "btnLedgerPrint") alert("正在生成盘点表打印预览（演示）");
+        if (e.target.id === "btnLedgerReport") openReport();
+        if (e.target.id === "btnReportExport") alert("正在导出盘点报告（演示）");
         if (e.target.id === "btnConfirmOk" && state.currentLine) {
           var line = state.currentLine;
-          var isDiff = document.getElementById("confirmSame").value === "不一致" || document.getElementById("confirmDiffType").value !== "无差异";
+          var isDiff = document.getElementById("confirmSame").value === "不一致";
           line.health = document.getElementById("confirmHealth").value;
           line.loc = document.getElementById("confirmLoc").value;
           line.user = document.getElementById("confirmUser").value;
           line.lineStatus = isDiff ? "有差异" : "已确认";
-          line.diffType = isDiff ? document.getElementById("confirmDiffType").value : "无差异";
+          line.diffType = isDiff ? (line.diffType || "盘亏") : "正常";
           line.reason = isDiff ? (document.getElementById("confirmReason").value || "盘点确认与系统台账不一致，进入盘点差异处理") : "";
-          line.result = isDiff ? line.diffType : "账实相符";
+          line.result = isDiff ? line.diffType : "正常";
           line.checkResult = line.result;
           if (state.current) {
             state.current.diff = linesForTask(state.current).filter(function (x) { return x.lineStatus === "有差异"; }).length;
@@ -1068,10 +1341,18 @@
         if (e.target.id === "createType") {
           var isCompanyCreate = e.target.value === "公司盘点";
           document.getElementById("createDept").value = isCompanyCreate ? "全部业务部门" : "机械研究所";
-          document.getElementById("createScope").value = isCompanyCreate ? "公司所有已入库、未入库物资" : "本部门在库及已领用物资";
           document.getElementById("createResp").value = isCompanyCreate ? "王超" : "李仁堂";
           document.getElementById("createOwner").value = isCompanyCreate ? "宋中波" : "许学良";
         }
+        if (e.target.id === "mcAssetType") {
+          renderMaterialCheck();
+        }
+      });
+      document.addEventListener("input", function (e) {
+        if (e.target.id === "mcLoc") openMcLocMenu();
+      });
+      document.addEventListener("click", function (e) {
+        if (!e.target.closest("#mcLocWrap")) closeMcLocMenu();
       });
       var startBtn = document.getElementById("btnStartInventory");
       if (startBtn) {
