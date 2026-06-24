@@ -545,6 +545,130 @@
       line-height: 1;
       z-index: 1;
     }
+    .inventory-progress-mask {
+      position: fixed;
+      inset: 0;
+      z-index: 10020;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(15, 23, 42, 0.46);
+    }
+    .inventory-progress-dialog {
+      width: min(1120px, 92vw);
+      max-height: 82vh;
+      background: #fff;
+      border-radius: 6px;
+      box-shadow: 0 18px 48px rgba(15, 23, 42, 0.22);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    .inventory-progress-hd {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 18px;
+      border-bottom: 1px solid #e8eef5;
+      color: #1f3551;
+      font-size: 18px;
+      font-weight: 600;
+    }
+    .inventory-progress-close {
+      width: 30px;
+      height: 30px;
+      border: none;
+      background: transparent;
+      color: #8b9ab0;
+      cursor: pointer;
+      font-size: 26px;
+      line-height: 1;
+    }
+    .inventory-progress-bd {
+      padding: 18px 22px 20px;
+      overflow: auto;
+    }
+    .inventory-progress-tabs {
+      display: flex;
+      gap: 22px;
+      border-bottom: 1px solid #e8eef5;
+      margin-bottom: 22px;
+    }
+    .inventory-progress-tab {
+      padding: 0 0 9px;
+      border-bottom: 2px solid transparent;
+      color: #5f7288;
+      font-size: 14px;
+      font-weight: 600;
+    }
+    .inventory-progress-tab.is-active {
+      color: #1677ff;
+      border-bottom-color: #1677ff;
+    }
+    .inventory-progress-flow {
+      border: 1px solid #edf1f6;
+      border-radius: 8px;
+      padding: 26px 18px;
+      overflow-x: auto;
+      background: #fff;
+    }
+    .inventory-progress-row {
+      display: inline-flex;
+      align-items: center;
+      gap: 22px;
+      min-width: 100%;
+    }
+    .inventory-progress-step {
+      flex: 0 0 148px;
+      min-height: 74px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px;
+      border: 1px solid #bfe8c8;
+      border-radius: 8px;
+      background: #f0fff3;
+      color: #37674a;
+      text-align: center;
+      line-height: 1.45;
+      font-size: 14px;
+      font-weight: 600;
+      box-sizing: border-box;
+      white-space: normal;
+    }
+    .inventory-progress-step.is-current {
+      border-color: #91caff;
+      background: #e6f4ff;
+      color: #1f3551;
+    }
+    .inventory-progress-step.is-end {
+      border-color: #ffd591;
+      background: #fff7e6;
+      color: #8a5a00;
+      min-height: 42px;
+    }
+    .inventory-progress-arrow {
+      flex: 0 0 auto;
+      color: #8aa0b8;
+      font-size: 24px;
+    }
+    .inventory-progress-ft {
+      display: flex;
+      justify-content: flex-end;
+      padding: 12px 18px;
+      border-top: 1px solid #e8eef5;
+      background: #fafbfd;
+    }
+    .inventory-progress-ft .proc-btn {
+      height: 32px;
+      padding: 0 16px;
+      border: 1px solid #d9d9d9;
+      border-radius: 4px;
+      background: #fff;
+      color: #334155;
+      cursor: pointer;
+      font-size: 13px;
+    }
     #procModalMask.qa-accept-mode .proc-modal-box.fullscreen {
       max-width: min(1200px, 98vw);
       width: 100%;
@@ -842,14 +966,16 @@
           page: "10条/页",
           pageBtns: ["1", "2", "3"],
           rows: [
-            ["", "1", "盘点任务审批", "pdtask_dept", "机械研究所部门盘点负责人审阅", "李仁堂", "待审批", "2026-06-25 10:30:00", "handle"],
-            ["", "2", "盘点任务审批", "pdtask_company", "公司二季度物资盘点物资部门负责人同意", "王超", "待审批", "2026-06-28 15:30:00", "handle"],
-            ["", "13", "盘点任务审批", "pdtask_company_assign_material", "公司二季度物资盘点分配物资部门盘点人员", "宋中波", "待办理", "2026-06-28 16:00:00", "handle"],
-            ["", "14", "盘点任务审批", "pdtask_company_assign_business", "公司二季度物资盘点业务部门分配盘点人员", "李仁堂", "待办理", "2026-06-28 16:30:00", "handle"],
-            ["", "15", "盘点任务审批", "pdtask_company_staff", "公司二季度物资盘点开始盘点", "成明锴", "待办理", "2026-06-29 09:30:00", "handle"],
-            ["", "16", "盘点任务审阅", "pdtask_company_review_finance", "公司二季度物资盘点财务负责人审阅", "孙睿", "待审批", "2026-06-29 15:30:00", "handle"],
-            ["", "17", "盘点任务审阅", "pdtask_company_review_material_head", "公司二季度物资盘点物资部门负责人审阅", "王超", "待审批", "2026-06-29 16:00:00", "handle"],
-            ["", "18", "盘点任务审阅", "pdtask_company_review_material_specialist", "公司二季度物资盘点物资专责阅知", "宋中波", "待阅知", "2026-06-29 16:30:00", "handle"],
+            ["", "1", "部门盘点任务审批", "pdtask_dept", "机械研究所部门盘点负责人审阅", "李仁堂", "待审批", "2026-06-25 10:30:00", "handle"],
+            ["", "2", "部门盘点任务审批", "pdtask_dept_finance", "机械研究所部门盘点财务负责人审阅", "孙睿", "待审批", "2026-06-25 11:00:00", "handle"],
+            ["", "3", "部门盘点任务审批", "pdtask_dept_material", "机械研究所部门盘点物资专责审阅确认", "宋中波", "待审批", "2026-06-25 11:30:00", "handle"],
+            ["", "4", "公司盘点任务审批", "pdtask_company", "公司二季度物资盘点物资部门负责人同意", "王超", "待审批", "2026-06-28 15:30:00", "handle"],
+            ["", "13", "公司盘点任务审批", "pdtask_company_assign_material", "公司二季度物资盘点分配物资部门盘点人员", "宋中波", "待办理", "2026-06-28 16:00:00", "handle"],
+            ["", "14", "公司盘点任务审批", "pdtask_company_assign_business", "公司二季度物资盘点业务部门分配盘点人员", "李仁堂", "待办理", "2026-06-28 16:30:00", "handle"],
+            ["", "15", "公司盘点任务审批", "pdtask_company_staff", "公司二季度物资盘点开始盘点", "成明锴", "待办理", "2026-06-29 09:30:00", "handle"],
+            ["", "16", "公司盘点任务审批", "pdtask_company_review_finance", "公司二季度物资盘点财务负责人审阅", "孙睿", "待审批", "2026-06-29 15:30:00", "handle"],
+            ["", "17", "公司盘点任务审批", "pdtask_company_review_material_head", "公司二季度物资盘点物资部门负责人审阅", "王超", "待审批", "2026-06-29 16:00:00", "handle"],
+            ["", "18", "公司盘点任务审批", "pdtask_company_review_material_specialist", "公司二季度物资盘点物资专责阅知", "宋中波", "待阅知", "2026-06-29 16:30:00", "handle"],
             ["", "3", "库存管理审批", "kcglsp", "库存管理审批", "业务部门专责", "待审批", "2024-12-09 11:02:22", "handle"],
             ["", "4", "库存管理审批", "kcglsp", "库存管理审批", "业务部门专责", "待审批", "2024-12-09 11:06:33", "handle"],
             ["", "5", "库存管理审批", "kcglsp", "库存管理审批", "业务部门专责", "待审批", "2024-12-09 11:12:30", "handle"],
@@ -1242,25 +1368,22 @@
       function inventoryTodoFlow(isCompany, map) {
         if (isCompany) {
           return [
-            ["发起公司物资盘点", "宋中波", "已通过"],
-            ["生成公司物资清单", "系统", "已通过"],
-            ["物资管理部门负责人同意", "王超", "已通过"],
-            ["物资管理部门分配人员", "王超、宋中波", "已通过"],
-            ["业务部门同意并分配", "陈亮、李仁堂、王贺", "已通过"],
-            ["参与人员收到流程", "宋中波、杜欣鑫、成明锴、许学良、喻家敏", "已通过"],
-            ["三方逐条共同确认", "物资、财务、业务三方", "已通过"],
-            ["财务负责人审阅", map["办理人"] || "孙睿", "处理中"],
+            ["物资管理部门负责人同意公司物资盘点", "王超", "已通过"],
+            ["物资管理部门负责人分配本部门盘点人员", "王超、宋中波", "已通过"],
+            ["所有业务部门负责人同意，并分配本部门盘点人员", "陈亮、李仁堂、王贺", "已通过"],
+            ["所有参与盘点人员收到公司盘点流程", "宋中波、杜欣鑫、成明锴、许学良、喻家敏", "已通过"],
+            ["所有参与盘点人员按清单逐条确认，物资、财务、业务三方共同确认物资型号、编码、存储地点、使用人/负责人等信息是否与系统台账一致，状态是否完好", "物资、财务、业务三方", "已通过"],
+            ["盘点完毕，提交财务负责人审阅", map["办理人"] || "孙睿", "处理中"],
             ["物资管理部门负责人审阅", "王超", "待处理"],
             ["物资专责阅知并结束", "宋中波", "待处理"]
           ];
         }
         return [
-          ["盘点开始", "许学良", "已通过"],
-          ["生成部门所属物资清单", "系统", "已通过"],
-          ["部门物资专责逐条确认", "许学良", "已通过"],
-          ["部门负责人审阅", map["办理人"] || "李仁堂", "处理中"],
-          ["物资专责审阅确认", "宋中波", "待处理"],
-          ["部门盘点结束", "宋中波", "待处理"]
+          ["业务部门物资负责人录入设备清单，提交申请入库", "许学良", "已通过"],
+          ["业务部门负责人审批，同意入库", "李仁堂", "已通过"],
+          ["物资管理部门物资负责人审核分类", "宋中波", "处理中"],
+          ["分管领导部门负责人审批，同意", "王超", "待处理"],
+          ["部门领导审批，审批通过", "李仁堂", "待处理"]
         ];
       }
       function inventoryTodoTask(isCompany, map) {
@@ -1360,6 +1483,43 @@
       function inventoryTodoField(label, value) {
         return '<td class="qa-lab">' + mtEsc(label) + '</td><td class="qa-val"><div class="qa-inp qa-inp--auto">' + mtEsc(value) + '</div></td>';
       }
+      function inventoryTodoIsCompany(map) {
+        var key = String(map && map["流程定义KEY"] || "");
+        return key.indexOf("company") >= 0 || String(map && map["任务名称"] || "").indexOf("公司") >= 0;
+      }
+      function openInventoryTodoProgress(map) {
+        var isCompany = inventoryTodoIsCompany(map);
+        var title = isCompany ? "审批记录 - 公司盘点" : "审批记录 - 部门盘点";
+        var steps = inventoryTodoFlow(isCompany, map || {});
+        var rowHtml = steps.map(function (step, idx) {
+          var cls = step[2] === "处理中" ? " is-current" : "";
+          var text = '<div class="inventory-progress-step' + cls + '">' + mtEsc(step[0]) + '</div>';
+          if (idx < steps.length - 1) text += '<div class="inventory-progress-arrow">→</div>';
+          return text;
+        }).join("") + '<div class="inventory-progress-arrow">→</div><div class="inventory-progress-step is-end">结束</div>';
+        var old = document.getElementById("inventoryTodoProgressMask");
+        if (old && old.parentNode) old.parentNode.removeChild(old);
+        var html =
+          '<div class="inventory-progress-mask" id="inventoryTodoProgressMask">' +
+            '<div class="inventory-progress-dialog" role="dialog" aria-modal="true" aria-labelledby="inventoryTodoProgressTitle">' +
+              '<div class="inventory-progress-hd"><span id="inventoryTodoProgressTitle">' + mtEsc(title) + '</span><button type="button" class="inventory-progress-close" data-close-progress="1" aria-label="关闭">×</button></div>' +
+              '<div class="inventory-progress-bd">' +
+                '<div class="inventory-progress-tabs"><span class="inventory-progress-tab is-active">流程图</span><span class="inventory-progress-tab">审批信息</span></div>' +
+                '<div class="inventory-progress-flow"><div class="inventory-progress-row">' + rowHtml + '</div></div>' +
+              '</div>' +
+              '<div class="inventory-progress-ft"><button type="button" class="proc-btn" data-close-progress="1">关闭</button></div>' +
+            '</div>' +
+          '</div>';
+        document.body.insertAdjacentHTML("beforeend", html);
+        var mask = document.getElementById("inventoryTodoProgressMask");
+        if (mask) {
+          mask.addEventListener("click", function (e) {
+            if (e.target === mask || (e.target && e.target.getAttribute("data-close-progress") === "1")) {
+              mask.parentNode.removeChild(mask);
+            }
+          });
+        }
+      }
       function inventoryTodoShowResultColumns(map) {
         var key = String(map["流程定义KEY"] || "");
         if (key === "pdtask_company_staff") return true;
@@ -1368,8 +1528,8 @@
       function inventoryTodoHtml(map) {
         var role = localStorage.getItem("inventoryDemoRole") || "dept_specialist";
         var taskKey = String(map["流程定义KEY"] || "");
-        var isMaterialSpecialistTask = role === "material_specialist" && (map["流程定义名称"] === "盘点任务审批" || taskKey.indexOf("pdtask_") === 0);
-        var isCompany = String(map["流程定义KEY"] || "").indexOf("company") >= 0 || String(map["任务名称"] || "").indexOf("公司") >= 0 || isMaterialSpecialistTask;
+        var isMaterialSpecialistTask = role === "material_specialist" && ((map["流程定义名称"] || "").indexOf("盘点") >= 0 || taskKey.indexOf("pdtask_") === 0);
+        var isCompany = inventoryTodoIsCompany(map) || (isMaterialSpecialistTask && taskKey.indexOf("dept") < 0);
         var isInventoryStaff = String(map["流程定义KEY"] || "") === "pdtask_company_staff";
         var showResultColumns = inventoryTodoShowResultColumns(map);
         var canEditInventoryLines = isInventoryStaff;
@@ -1426,9 +1586,9 @@
         mt$("procModalFoot").innerHTML = '<button type="button" class="proc-btn" id="procModalClose">取消</button>';
         var flowBtn = mt$("procModalFlow");
         if (flowBtn) {
-          flowBtn.hidden = true;
-          flowBtn.setAttribute("aria-hidden", "true");
-          flowBtn.onclick = null;
+          flowBtn.hidden = false;
+          flowBtn.setAttribute("aria-hidden", "false");
+          flowBtn.onclick = function () { openInventoryTodoProgress(map); };
         }
         var resetClose = mt$("procModalClose");
         if (resetClose) resetClose.onclick = closeInventoryTodoModal;
@@ -1582,6 +1742,8 @@
           if (procKey === "pdtask_company_review_material_specialist") return invRole === "material_specialist";
           if (invRole === "inventory_staff") return procKey === "pdtask_company_staff";
           if (procKey === "pdtask_company_staff") return invRole === "inventory_staff";
+          if (procKey === "pdtask_dept_finance") return invRole === "finance_head";
+          if (procKey === "pdtask_dept_material") return invRole === "material_specialist";
           if (procKey === "pdtask_dept") return invRole === "dept_specialist" || invRole === "dept_head";
           return true;
         });
@@ -1814,7 +1976,7 @@
                   "退换货管理审批": 1
                 };
                 var procKey = map["流程定义KEY"] || "";
-                if (procName === "盘点任务审批" || procName === "盘点差异审批" || procKey.indexOf("pdtask_") === 0 || procKey.indexOf("pddiff_") === 0) {
+                if (procName.indexOf("盘点任务") >= 0 || procName === "盘点差异审批" || procKey.indexOf("pdtask_") === 0 || procKey.indexOf("pddiff_") === 0) {
                   try {
                     if (procKey.indexOf("pddiff_") === 0) {
                       var invTodo = inventoryStoredTodos().filter(function (x) { return x.key === procKey; })[0];
