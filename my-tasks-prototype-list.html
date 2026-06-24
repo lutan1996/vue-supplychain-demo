@@ -1322,34 +1322,39 @@
         return '<td class="qa-lab">' + mtEsc(label) + '</td><td class="qa-val"><div class="qa-inp qa-inp--auto">' + mtEsc(value) + '</div></td>';
       }
       function inventoryTodoHtml(map) {
-        var isCompany = String(map["流程定义KEY"] || "").indexOf("company") >= 0 || String(map["任务名称"] || "").indexOf("公司") >= 0;
+        var role = localStorage.getItem("inventoryDemoRole") || "dept_specialist";
+        var isMaterialSpecialistTask = role === "material_specialist" && (map["流程定义名称"] === "盘点任务审批" || String(map["流程定义KEY"] || "").indexOf("pdtask_") === 0);
+        var isCompany = String(map["流程定义KEY"] || "").indexOf("company") >= 0 || String(map["任务名称"] || "").indexOf("公司") >= 0 || isMaterialSpecialistTask;
         var isInventoryStaff = String(map["流程定义KEY"] || "") === "pdtask_company_staff";
+        var isMaterialSpecialistCompany = isCompany && role === "material_specialist";
+        var canEditInventoryLines = isInventoryStaff || isMaterialSpecialistCompany;
         inventoryTodoRows._map = map;
         var task = inventoryTodoTask(isCompany, map);
+        if (isMaterialSpecialistCompany) task.type = "公司盘点";
         var lines = inventoryTodoRows(isCompany);
-        var flow = inventoryTodoFlow(isCompany, map);
-        var flowHtml = flow.map(function (x) {
-          return '<div class="inv-todo-step' + (x[2] === "处理中" ? " is-active" : "") + '">' + mtEsc(x[0]) + '<span>' + mtEsc(x[1]) + " / " + mtEsc(x[2]) + '</span></div>';
-        }).join("");
-        var baseHead = '<th>序号</th><th>资产编号</th><th>物资唯一码</th><th>物资类型编码</th><th>产品编码</th><th>产品名称</th><th>物资类型名称</th><th>所属部门</th><th>存储地点/仓库货位</th><th>使用人</th><th>在库/领用状态</th><th>账面数量</th><th>单位</th>';
+        var baseHead = '<th>序号</th><th>资产编号</th><th>物资唯一码</th><th>物资类型编码</th><th>产品编码</th><th>产品名称</th><th>产品型号</th><th>物资类型名称</th><th>所属部门</th><th>存储地点/仓库货位</th><th>使用人</th><th>保管人</th><th>使用年限</th><th>产权</th><th>在库/领用状态</th><th>账面数量</th><th>单位</th>';
         var staffHead = '<th>盘点确认数量</th><th>状态是否完好</th><th>盘点结果</th><th>盘点依据</th><th>差异类型</th><th>差异金额</th><th>差异说明</th>';
         var rowsHtml = lines.map(function (x, i) {
-          var row = '<tr><td>' + (i + 1) + '</td><td>' + mtEsc(x.assetNo) + '</td><td>' + mtEsc(x.code) + '</td><td>' + mtEsc(x.typeCode) + '</td><td>' + mtEsc(x.product) + '</td><td>' + mtEsc(x.name) + '</td><td>' + mtEsc(x.typeName) + '</td><td>' + mtEsc(x.dept) + '</td><td>' + mtEsc(x.loc) + '</td><td>' + mtEsc(x.user) + '</td><td>' + mtEsc(x.state) + '</td><td>' + mtEsc(x.book) + '</td><td>' + mtEsc(x.unit) + '</td>';
-          if (isInventoryStaff) {
+          var health = x.health || "完好";
+          var result = x.result || "正常";
+          var diffType = result === "正常" ? "正常" : result;
+          var row = '<tr><td>' + (i + 1) + '</td><td>' + mtEsc(x.assetNo) + '</td><td>' + mtEsc(x.code) + '</td><td>' + mtEsc(x.typeCode) + '</td><td>' + mtEsc(x.product) + '</td><td>' + mtEsc(x.name) + '</td><td>' + mtEsc(x.spec || "标准型") + '</td><td>' + mtEsc(x.typeName) + '</td><td>' + mtEsc(x.dept) + '</td><td>' + mtEsc(x.loc) + '</td><td>' + mtEsc(x.user) + '</td><td>' + mtEsc(x.keeper || x.user) + '</td><td>' + mtEsc(x.serviceLife || "5年") + '</td><td>' + mtEsc(x.property || "固定资产") + '</td><td>' + mtEsc(x.state) + '</td><td>' + mtEsc(x.book) + '</td><td>' + mtEsc(x.unit) + '</td>';
+          if (canEditInventoryLines) {
             row += '<td><input class="qa-inp" value="' + mtEsc(x.confirm) + '"></td>' +
-              '<td><select class="qa-select"><option>完好</option><option>待核验</option><option>损坏</option><option>缺失</option></select></td>' +
-              '<td><select class="qa-select"><option>盘盈</option><option>盘亏</option><option>毁损</option><option>正常</option></select></td>' +
+              '<td><select class="qa-select"><option' + (health === "完好" ? " selected" : "") + '>完好</option><option' + (health === "待核验" ? " selected" : "") + '>待核验</option><option' + (health === "损坏" ? " selected" : "") + '>损坏</option><option' + (health === "缺失" ? " selected" : "") + '>缺失</option></select></td>' +
+              '<td><select class="qa-select"><option' + (result === "盘盈" ? " selected" : "") + '>盘盈</option><option' + (result === "盘亏" ? " selected" : "") + '>盘亏</option><option' + (result === "毁损" ? " selected" : "") + '>毁损</option><option' + (result === "正常" ? " selected" : "") + '>正常</option></select></td>' +
               '<td><label class="qa-upload-btn">上传<input type="file" accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,.txt"></label></td>' +
-              '<td><select class="qa-select"><option>正常</option><option>盘盈</option><option>盘亏</option><option>损毁</option></select></td>' +
+              '<td><select class="qa-select"><option' + (diffType === "正常" ? " selected" : "") + '>正常</option><option' + (diffType === "盘盈" ? " selected" : "") + '>盘盈</option><option' + (diffType === "盘亏" ? " selected" : "") + '>盘亏</option><option' + (diffType === "损毁" ? " selected" : "") + '>损毁</option></select></td>' +
               '<td><input class="qa-inp" value="¥0"></td>' +
               '<td><textarea class="qa-inp" rows="2">' + mtEsc(x.reason) + '</textarea></td>';
+          } else {
+            row += '<td>' + mtEsc(x.confirm) + '</td><td>' + mtEsc(health) + '</td><td>' + mtEsc(result) + '</td><td>' + mtEsc(x.proof || "台账记录、盘点照片") + '</td><td>' + mtEsc(diffType) + '</td><td>¥0</td><td>' + mtEsc(x.reason || "无差异") + '</td>';
           }
           return row + '</tr>';
         }).join("");
-        var tableTitle = isInventoryStaff ? "盘点已入库未出库物资明细表" : "盘点物资明细表";
+        var tableTitle = canEditInventoryLines ? "盘点已出库未出库物资明细表" : "盘点物资明细表";
         return '<div class="qa-accept-wrap">' +
           '<div class="qa-accept-toolbar"><div class="qa-accept-toolbar-title">' + mtEsc(map["流程定义名称"] === "盘点差异审批" ? "盘点差异办理" : "盘点任务办理") + '</div></div>' +
-          '<div class="inv-todo-flow"><div class="inv-todo-flow-title">' + (isCompany ? "公司物资盘点流程" : "部门物资盘点流程") + '</div><div class="inv-todo-flow-row">' + flowHtml + '</div></div>' +
           '<div class="qa-accept-form-shell"><table class="qa-accept-grid" role="presentation"><tbody>' +
           '<tr>' + inventoryTodoField("盘点单号", task.no) + inventoryTodoField("盘点任务名称", task.name) + '</tr>' +
           '<tr>' + inventoryTodoField("盘点类型", task.type) + inventoryTodoField("盘点部门", task.dept) + '</tr>' +
@@ -1359,9 +1364,9 @@
           '<tr>' + inventoryTodoField("差异数量", isInventoryStaff ? "6" : "0") + inventoryTodoField("任务状态", task.status) + '</tr>' +
           '<tr><td class="qa-lab">办理意见</td><td class="qa-val" colspan="3"><textarea class="qa-ta" id="inventoryTodoOpinion" rows="2" placeholder="请输入办理意见"></textarea></td></tr>' +
           '</tbody></table></div>' +
-          '<div class="qa-mat-lines-block ' + (isInventoryStaff ? "" : "qa-mat-lines-block--readonly ") + 'qa-mat-detail-list-block">' +
+          '<div class="qa-mat-lines-block ' + (canEditInventoryLines ? "" : "qa-mat-lines-block--readonly ") + 'qa-mat-detail-list-block">' +
           '<div style="font-size:14px;font-weight:600;color:#1f3551;margin-bottom:8px;">' + tableTitle + '</div>' +
-          '<div class="qa-mat-lines-table-wrap"><table class="qa-mat-lines-table"><thead><tr>' + baseHead + (isInventoryStaff ? staffHead : "") + '</tr></thead><tbody>' + rowsHtml + '</tbody></table></div>' +
+          '<div class="qa-mat-lines-table-wrap"><table class="qa-mat-lines-table"><thead><tr>' + baseHead + staffHead + '</tr></thead><tbody>' + rowsHtml + '</tbody></table></div>' +
           '</div></div>';
       }
       function closeInventoryTodoModal() {
@@ -1441,12 +1446,9 @@
           '<button type="button" class="proc-btn proc-btn-primary" id="inventoryTodoApprove">' + (isInventoryStaffHandle ? "提交盘点" : "通过") + '</button>';
         var flowBtn = mt$("procModalFlow");
         if (flowBtn) {
-          flowBtn.hidden = false;
-          flowBtn.setAttribute("aria-hidden", "false");
-          flowBtn.onclick = function () {
-            var block = document.querySelector("#procModalMask .inv-todo-flow");
-            if (block) block.scrollIntoView({ behavior: "smooth", block: "start" });
-          };
+          flowBtn.hidden = true;
+          flowBtn.setAttribute("aria-hidden", "true");
+          flowBtn.onclick = null;
         }
         mask.classList.add("is-open", "inventory-handle-mode");
         mask.setAttribute("aria-hidden", "false");

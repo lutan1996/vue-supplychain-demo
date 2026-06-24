@@ -871,6 +871,44 @@
       function taskLines(row) {
         return linesForTask(row || state.current || rows[0]);
       }
+      var inventoryDetailHeaders = ["序号", "资产编号", "物资唯一码", "物资类型编码", "产品编码", "产品名称", "产品型号", "物资类型名称", "所属部门", "存储地点/仓库货位", "使用人", "保管人", "使用年限", "产权", "在库/领用状态", "账面数量", "单位", "盘点确认数量", "状态是否完好", "盘点结果", "盘点依据", "差异类型", "差异金额", "差异说明"];
+      function diffAmountText(line) {
+        var type = inferDiffType(line || {});
+        if (type !== "盘亏" && type !== "盘盈") return "¥0";
+        var qty = Math.abs(Number((line && line.book) || 0) - Number((line && (line.real || line.confirmQty)) || 0));
+        return money(qty * unitPrice(line || {}));
+      }
+      function readonlyDetailRow(line, idx) {
+        var diffType = inferDiffType(line || {});
+        var proof = (line && line.proof) || (line && line.materialTypeName === "存货" ? ((line.stockNo || "最近盘库单") + "、盘点说明") : "台账记录、盘点照片");
+        var cells = [
+          idx + 1,
+          line.assetNo,
+          line.code,
+          line.typeCode,
+          line.product,
+          line.assetName,
+          line.spec,
+          line.materialTypeName,
+          line.dept,
+          line.loc,
+          line.user,
+          line.keeper || line.user,
+          line.serviceLife,
+          line.remark1 || line.authNo || "-",
+          line.state,
+          line.book,
+          line.unit || "件",
+          line.confirmQty || line.real || line.checkQty || line.book,
+          line.health,
+          line.result || line.checkResult || "正常",
+          proof,
+          diffType,
+          diffAmountText(line),
+          line.reason || (diffType === "正常" ? "无差异" : "盘点确认与系统台账不一致")
+        ];
+        return "<tr>" + cells.map(function (v) { return "<td>" + cell(v) + "</td>"; }).join("") + "</tr>";
+      }
       function inventoryPhoto(line) {
         if (!line) return "images/demo-inline-1.jpg";
         if (line.assetName.indexOf("软件") > -1 || line.assetName.indexOf("授权") > -1) return "https://statics.zwsoft.cn/web/index/img/index_cad.jpg";
@@ -908,10 +946,8 @@
             taskField("确认口径", isCompany ? "物资、财务、业务三方共同确认" : "部门物资专责逐条确认") +
           '</div>',
           '<div class="inv-table-title">' + (isCompany ? "盘点已入库未出库物资明细表" : "盘点部门所属物资明细表") + '</div>',
-          '<div class="inv-task-mini-table-wrap"><table class="inv-task-mini-table"><thead><tr><th>序号</th><th>资产编号</th><th>物资唯一码</th><th>物资类型编码</th><th>产品编码</th><th>产品名称</th><th>产品型号</th><th>物资类型名称</th><th>所属部门</th><th>存储地点/仓库货位</th><th>使用人</th><th>保管人</th><th>使用年限</th><th>产权</th><th>在库/领用状态</th><th>账面数量</th><th>单位</th></tr></thead><tbody>' +
-            list.map(function (x, i) {
-              return '<tr><td>' + (i + 1) + '</td><td>' + cell(x.assetNo) + '</td><td>' + cell(x.code) + '</td><td>' + cell(x.typeCode) + '</td><td>' + cell(x.product) + '</td><td>' + cell(x.assetName) + '</td><td>' + cell(x.spec) + '</td><td>' + cell(x.materialTypeName) + '</td><td>' + cell(x.dept) + '</td><td>' + cell(x.loc) + '</td><td>' + cell(x.user) + '</td><td>' + cell(x.keeper || x.user) + '</td><td>' + cell(x.serviceLife) + '</td><td>' + cell(x.remark1 || x.authNo || "-") + '</td><td>' + cell(x.state) + '</td><td>' + cell(x.book) + '</td><td>' + cell(x.unit || "件") + '</td></tr>';
-            }).join("") +
+          '<div class="inv-task-mini-table-wrap"><table class="inv-task-mini-table"><thead><tr>' + inventoryDetailHeaders.map(function (x) { return "<th>" + x + "</th>"; }).join("") + '</tr></thead><tbody>' +
+            list.map(readonlyDetailRow).join("") +
           '</tbody></table></div>',
           '<div class="inv-task-track-panel" id="taskTrackPanel" hidden></div>'
         ].join("");
