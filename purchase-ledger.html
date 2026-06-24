@@ -1211,7 +1211,6 @@
             var depList = ["年限平均法","双倍余额递减法","工作量法"];
             var checkResultList = ["账实一致","盘盈1台","盘亏1台","待复核"];
             var reqTot = 2 + (i % 8);
-            var baseStock = 12 + (i % 11);
             var cat = categoryList[i%3];
             var matName = nameList[i%nameList.length];
             return {
@@ -1222,7 +1221,7 @@
               purchaseDept:i%2?"电控所":"经营发展中心",
               unitPriceExcl:(18500 + i * 920).toLocaleString("zh-CN",{minimumFractionDigits:2,maximumFractionDigits:2}),
               requisitionTotal:reqTot,
-              stockQty:Math.max(0, baseStock - reqTot + (i % 3)),
+              stockQty:Math.max(0, reqTot - 1 - (i % 2)),
               status:statusList[i%5],
               invoiceStatus:i%4===0?"已开票":"未开票",
               shipStatus:shipList[i%3],
@@ -1266,7 +1265,7 @@
             var st = ["领用中","已领用"][i % 2];
             var unitPriceExclNum = 18500 + i * 920;
             var requisitionTotal = 2 + (i % 8);
-            var stockQty = Math.max(0, 12 + (i % 11) - requisitionTotal + (i % 3));
+            var stockQty = Math.max(0, requisitionTotal - 1 - (i % 2));
             var reqCat = ["固定资产","存货","无形资产"][i%3];
             var reqName = nameList[i%nameList.length];
             var reqName2 = nameList[(i+1)%nameList.length];

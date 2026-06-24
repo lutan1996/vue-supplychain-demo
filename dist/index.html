@@ -343,7 +343,7 @@ body.map-demo-hide-shell-topbar .shell .main > .topbar{display:none !important;}
       {"title": "购入物资", "file": "sales-purchased-materials.html", "group": "other"},
       {"title": "销售合同报表管理", "file": "sales-contract-report.html", "group": "other"},
       {"title": "部门物资盘点", "file": "inventory-task-management.html", "group": "other"},
-      {"title": "公司物资盘点", "file": "inventory-task-management.html", "group": "other"}
+      {"title": "公司物资盘点", "file": "inventory-task-management.html?scope=company", "group": "other"}
     );
     var pages = typeof window.__DEMO_PAGES__ !== "undefined" ? window.__DEMO_PAGES__ : {};
     /* 强制外链模式：避免 __DEMO_PAGES__ 部分注入导致 pagesList 首项异常（如落到 purchase-ledger）。 */
@@ -458,13 +458,13 @@ body.map-demo-hide-shell-topbar .shell .main > .topbar{display:none !important;}
     actionToFile["sales-order-manage"] = "sales-order-management.html";
     actionToFile["sales-purchase-material"] = "sales-purchased-materials.html";
     actionToFile["sales-contract-report"] = "sales-contract-report.html";
-    actionToFile["inventory-company-task-manage"] = "inventory-task-management.html";
+    actionToFile["inventory-company-task-manage"] = "inventory-task-management.html?scope=company";
     labelToFile["采购合同报表管理"] = "purchase-summary-report.html";
     labelToFile["销售合同报表管理"] = "sales-contract-report.html";
     labelToFile["物资列表"] = "sales-material-list.html";
     labelToFile["购入物资"] = "sales-purchased-materials.html";
     labelToFile["部门物资盘点"] = "inventory-task-management.html";
-    labelToFile["公司物资盘点"] = "inventory-task-management.html";
+    labelToFile["公司物资盘点"] = "inventory-task-management.html?scope=company";
     var demoSceneHintByFile = {};
     var demoTabHintByFile = {};
 
