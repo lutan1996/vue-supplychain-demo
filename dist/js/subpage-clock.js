@@ -607,9 +607,9 @@
         panel: secondaryPanel,
         aclModuleKey: 'inventoryMgmt',
         rowHtml:
-          '<button type="button" class="warehouse-secondary-link" data-action="inventory-task-manage" data-label="盘点任务管理">盘点任务管理</button>' +
-          '<span class="warehouse-secondary-pipe" aria-hidden="true">|</span>' +
-          '<button type="button" class="warehouse-secondary-link" data-action="inventory-difference-handle" data-label="盘点差异处理">盘点差异处理</button>'
+          '<button type="button" class="warehouse-secondary-link" data-action="inventory-task-manage" data-label="部门物资盘点">部门物资盘点</button>' +
+          '<span class="warehouse-secondary-break" aria-hidden="true" style="flex-basis:100%;height:0;"></span>' +
+          '<button type="button" class="warehouse-secondary-link" data-action="inventory-company-task-manage" data-label="公司物资盘点">公司物资盘点</button>'
       },
       logistics: {
         text: '物流管理',
