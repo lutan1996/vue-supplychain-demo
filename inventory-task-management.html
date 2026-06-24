@@ -133,7 +133,7 @@
     .inv-task-select-option.is-active { background: #e6f4ff; color: #1677ff; }
     .inv-task-select-empty { padding: 8px 12px; color: #8c8c8c; font-size: 13px; }
     .inv-task-mini-table-wrap { overflow: auto; margin-top: 8px; }
-    .inv-task-mini-table { width: 100%; min-width: 2140px; border-collapse: collapse; table-layout: fixed; font-size: 12px; }
+    .inv-task-mini-table { width: 100%; min-width: 1840px; border-collapse: collapse; table-layout: fixed; font-size: 12px; }
     .inv-task-mini-table th, .inv-task-mini-table td { border: 1px solid #e8e8e8; padding: 8px 6px; color: #262626; text-align: left; white-space: normal; word-break: break-all; line-height: 1.45; }
     .inv-task-mini-table th { background: #f5f7fa; color: #334155; }
     .inv-task-track-panel { margin-top: 14px; border-top: 1px solid #e8eef7; padding-top: 14px; }
@@ -174,7 +174,7 @@
     .inv-material-query-field .inv-btn { min-width: 96px; height: 36px; }
     .inv-material-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 10px; }
     .inv-material-table-wrap { overflow: auto; margin-top: 8px; }
-    .inv-material-table { width: 100%; min-width: 2520px; border-collapse: collapse; table-layout: fixed; font-size: 12px; }
+    .inv-material-table { width: 100%; min-width: 1840px; border-collapse: collapse; table-layout: fixed; font-size: 12px; }
     .inv-material-table th, .inv-material-table td { border: 1px solid #1677ff33; padding: 8px 6px; color: #262626; text-align: left; white-space: normal; word-break: break-all; vertical-align: top; line-height: 1.45; }
     .inv-material-table th { background: #f5f7fa; color: #334155; }
     .inv-material-empty { padding: 46px 0; text-align: center; color: #8c8c8c; border: 1px solid #e8eef7; border-top: 0; }
@@ -183,6 +183,16 @@
     .inv-material-cell-textarea { min-height: 54px; padding: 6px 8px; resize: vertical; }
     .inv-material-upload { display: inline-flex; align-items: center; justify-content: center; min-width: 88px; height: 30px; padding: 0 10px; border: 1px solid #91caff; border-radius: 4px; background: #e6f4ff; color: #1677ff; font-size: 12px; cursor: pointer; box-sizing: border-box; white-space: nowrap; }
     .inv-material-upload input { display: none; }
+    .inv-task-reminder { position: fixed; right: 24px; bottom: 26px; z-index: 9998; width: min(360px, calc(100vw - 48px)); border: 1px solid #d9e8ff; border-radius: 12px; background: #fff; box-shadow: 0 10px 28px rgba(15, 35, 60, .18); overflow: hidden; }
+    .inv-task-reminder-head { display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; border-bottom: 1px solid #eef2f7; color: #1f3551; font-size: 16px; font-weight: 700; }
+    .inv-task-reminder-close { border: 0; background: transparent; color: #8aa0b8; font-size: 24px; line-height: 1; cursor: pointer; }
+    .inv-task-reminder-body { padding: 14px 18px 4px; color: #2b405c; font-size: 13px; line-height: 1.75; }
+    .inv-task-reminder-body p { position: relative; margin: 0 0 10px; padding-left: 16px; }
+    .inv-task-reminder-body p::before { content: ""; position: absolute; left: 0; top: .75em; width: 6px; height: 6px; border-radius: 50%; background: #1677ff; }
+    .inv-task-reminder-foot { display: flex; justify-content: flex-end; gap: 10px; padding: 12px 18px 16px; border-top: 1px solid #eef2f7; }
+    .inv-task-reminder-btn { height: 32px; border-radius: 5px; border: 1px solid #d9d9d9; background: #fff; padding: 0 14px; color: #262626; font-size: 13px; cursor: pointer; }
+    .inv-task-reminder-btn.primary { border-color: #1677ff; background: #1677ff; color: #fff; }
+    .inv-task-reminder[hidden] { display: none !important; }
     .inv-modal-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px 18px; }
     .inv-modal-grid .wh-field { margin-bottom: 0; }
     #detailMask .wh-modal-head,
@@ -238,7 +248,7 @@
         <a class="header-logo" href="#" aria-label="国家能源集团"><img src="assets/logo-chenergy.png" alt="国家能源集团 CHN ENERGY" width="220" height="40" /></a>
         <div class="header-source-brand"><p>新能源供应链管理系统</p></div>
       </div>
-      <div class="header-right"><select class="inv-role-select" id="inventoryRoleSelect" title="切换角色"><option value="dept_specialist">部门物资专责</option><option value="dept_head">部门负责人</option><option value="material_specialist">物资管理部门物资专责</option><option value="material_head">物资管理部门负责人</option><option value="finance_head">财务负责人</option><option value="business_head">业务部门负责人</option></select><span class="clock" id="clock"></span><div class="user-avatar" title="用户">用</div></div>
+      <div class="header-right"><select class="inv-role-select" id="inventoryRoleSelect" title="切换角色"><option value="dept_specialist">部门物资专责</option><option value="dept_head">部门负责人</option><option value="material_specialist">物资管理部门物资专责</option><option value="material_head">物资管理部门负责人</option><option value="finance_head">财务负责人</option><option value="business_head">业务部门负责人</option><option value="inventory_staff">盘点人员</option></select><span class="clock" id="clock"></span><div class="user-avatar" title="用户">用</div></div>
     </header>
     <div class="layout">
       <aside class="sidebar" aria-label="主导航">
@@ -407,11 +417,11 @@
           <div class="wh-field inv-material-query-field"><label class="wh-label">&nbsp;</label><button type="button" class="inv-btn primary" id="btnMaterialQuery">查询</button></div>
         </div>
         <div class="inv-material-toolbar">
-          <div class="inv-table-title" style="margin:0">盘点物资明细表</div>
+          <div class="inv-table-title" id="materialTableTitle" style="margin:0">盘点部门所属物资明细表</div>
         </div>
         <div class="inv-material-table-wrap">
           <table class="inv-material-table">
-            <colgroup>
+            <colgroup id="materialCheckCols">
               <col style="width:72px">
               <col style="width:118px">
               <col style="width:132px">
@@ -438,7 +448,7 @@
               <col style="width:132px">
               <col style="width:176px">
             </colgroup>
-            <thead><tr><th>序号</th><th>资产编号</th><th>物资唯一码</th><th>物资类型编码</th><th>产品编码</th><th>产品名称</th><th>产品型号</th><th>物资类型名称</th><th>所属部门</th><th>存储地点/仓库货位</th><th>使用人</th><th>保管人</th><th>使用年限</th><th>产权</th><th>在库/领用状态</th><th>账面数量</th><th>盘点确认数量</th><th>单位</th><th>状态是否完好</th><th>盘点结果</th><th>盘点依据</th><th>差异类型</th><th>原值</th><th>差异金额</th><th>差异说明</th></tr></thead>
+            <thead id="materialCheckHead"><tr><th>序号</th><th>资产编号</th><th>物资唯一码</th><th>物资类型编码</th><th>产品编码</th><th>产品名称</th><th>产品型号</th><th>物资类型名称</th><th>所属部门</th><th>存储地点/仓库货位</th><th>使用人</th><th>保管人</th><th>使用年限</th><th>产权</th><th>在库/领用状态</th><th>账面数量</th><th>单位</th></tr></thead>
             <tbody id="materialCheckBody"></tbody>
           </table>
           <div class="inv-material-empty" id="materialCheckEmpty" hidden>暂无数据</div>
@@ -446,6 +456,14 @@
       </div>
       <div class="wh-modal-foot"><button type="button" class="wh-btn wh-btn--ghost" data-close>取消</button><button type="button" class="wh-btn wh-btn--primary" id="btnMaterialSubmit">盘点提交</button></div>
     </div>
+  </div>
+  <div class="inv-task-reminder" id="inventoryTaskReminder">
+    <div class="inv-task-reminder-head"><span>任务提醒</span><button type="button" class="inv-task-reminder-close" id="inventoryTaskReminderClose" aria-label="关闭">×</button></div>
+    <div class="inv-task-reminder-body">
+      <p>预警提醒：你有新的盘点任务待办理，请及时进入我的待办处理。</p>
+      <p>到期提醒：公司二季度物资盘点已分配，请按流程完成盘点确认。</p>
+    </div>
+    <div class="inv-task-reminder-foot"><button type="button" class="inv-task-reminder-btn primary" id="inventoryTaskReminderGo">查看提醒</button><button type="button" class="inv-task-reminder-btn" id="inventoryTaskReminderDismiss">关闭弹窗</button></div>
   </div>
 
   <div class="wh-modal-mask" id="taskInfoMask" aria-hidden="true">
@@ -521,7 +539,7 @@
         { task: "PD-2026-003", assetNo: "WX-2026-0001", code: "C20260000021", typeCode: "A0060010001", product: "B00004101", assetName: "风机诊断软件授权", spec: "V3.2 企业版", materialTypeName: "无形资产", dept: "经营发展中心", loc: "经营发展中心/系统台账", user: "王超", state: "使用中", health: "完好", lastNo: "PD-2026-003", lastDate: "待盘点", book: 1, real: 0, result: "未盘点", lineStatus: "未盘点", diffType: "正常", reason: "", authNo: "AUTH-2026-0315", useDept: "经营发展中心", useOwner: "王超", authStart: "2026-03-15", authEnd: "2029-03-14", bookOriginal: 260000, bookNet: 238000, intangibleStatus: "使用中", clearResult: "待清查" }
       ];
       var state = { filters: {}, current: null, currentLine: null, role: localStorage.getItem("inventoryDemoRole") || "dept_specialist" };
-      var roleNames = { dept_specialist: "部门物资专责", dept_head: "部门负责人", material_specialist: "物资管理部门物资专责", material_head: "物资管理部门负责人", finance_head: "财务负责人", business_head: "业务部门负责人" };
+      var roleNames = { dept_specialist: "部门物资专责", dept_head: "部门负责人", material_specialist: "物资管理部门物资专责", material_head: "物资管理部门负责人", finance_head: "财务负责人", business_head: "业务部门负责人", inventory_staff: "盘点人员" };
       function storedDiffs() {
         try { return JSON.parse(localStorage.getItem("inventoryDemoDiffs") || "[]"); } catch (e) { return []; }
       }
@@ -655,6 +673,10 @@
         var selected = document.getElementById("mcAssetType");
         row.type = selected && selected.value === "公司盘点" ? "公司盘点" : "部门盘点";
         return row;
+      }
+      function materialCheckSelectedType() {
+        var sel = document.getElementById("mcAssetType");
+        return sel && sel.value === "公司盘点" ? "公司盘点" : "部门盘点";
       }
       function flowIndex(row) {
         var deptMap = { "待开始": 0, "盘点中": 2, "待部门负责人审阅": 3, "待物资管理部门审阅": 4, "已完成": 5, "待差异处理": 4 };
@@ -878,10 +900,10 @@
             taskField("任务状态", row.status) +
             taskField("确认口径", isCompany ? "物资、财务、业务三方共同确认" : "部门物资专责逐条确认") +
           '</div>',
-          '<div class="inv-table-title">盘点物资明细表</div>',
-          '<div class="inv-task-mini-table-wrap"><table class="inv-task-mini-table"><thead><tr><th>序号</th><th>资产编号</th><th>物资唯一码</th><th>物资类型编码</th><th>产品编码</th><th>产品名称</th><th>产品型号</th><th>物资类型名称</th><th>所属部门</th><th>存储地点/仓库货位</th><th>使用人</th><th>保管人</th><th>使用年限</th><th>产权</th><th>在库/领用状态</th><th>账面数量</th><th>盘点确认数量</th><th>单位</th><th>状态是否完好</th><th>盘点结果</th><th>差异类型</th><th>原值</th><th>差异金额</th><th>差异说明</th><th>操作</th></tr></thead><tbody>' +
+          '<div class="inv-table-title">' + (isCompany ? "盘点已入库未出库物资明细表" : "盘点部门所属物资明细表") + '</div>',
+          '<div class="inv-task-mini-table-wrap"><table class="inv-task-mini-table"><thead><tr><th>序号</th><th>资产编号</th><th>物资唯一码</th><th>物资类型编码</th><th>产品编码</th><th>产品名称</th><th>产品型号</th><th>物资类型名称</th><th>所属部门</th><th>存储地点/仓库货位</th><th>使用人</th><th>保管人</th><th>使用年限</th><th>产权</th><th>在库/领用状态</th><th>账面数量</th><th>单位</th></tr></thead><tbody>' +
             list.map(function (x, i) {
-              return '<tr><td>' + (i + 1) + '</td><td>' + cell(x.assetNo) + '</td><td>' + cell(x.code) + '</td><td>' + cell(x.typeCode) + '</td><td>' + cell(x.product) + '</td><td>' + cell(x.assetName) + '</td><td>' + cell(x.spec) + '</td><td>' + cell(x.materialTypeName) + '</td><td>' + cell(x.dept) + '</td><td>' + cell(x.loc) + '</td><td>' + cell(x.user) + '</td><td>' + cell(x.keeper || x.user) + '</td><td>' + cell(x.serviceLife) + '</td><td>' + cell(x.remark1 || x.authNo || "-") + '</td><td>' + cell(x.state) + '</td><td>' + cell(x.book) + '</td><td>' + cell(x.confirmQty || x.real) + '</td><td>' + cell(x.unit || "件") + '</td><td>' + cell(x.health) + '</td><td>' + cell(x.result) + '</td><td>' + cell(normalizeDiffType(x.diffType || "正常", x)) + '</td><td>' + money(x.originalValue || x.bookOriginal || 0) + '</td><td>' + money(Math.abs(Number(x.diffQty || 0)) * (Number(x.originalValue || x.bookOriginal || 0) || 0)) + '</td><td>' + cell(x.reason) + '</td><td><span class="inv-op"><span role="button" tabindex="0" data-task-view="' + x.code + '">查看</span><span role="button" tabindex="0" data-task-track="' + x.code + '">物资跟踪</span></span></td></tr>';
+              return '<tr><td>' + (i + 1) + '</td><td>' + cell(x.assetNo) + '</td><td>' + cell(x.code) + '</td><td>' + cell(x.typeCode) + '</td><td>' + cell(x.product) + '</td><td>' + cell(x.assetName) + '</td><td>' + cell(x.spec) + '</td><td>' + cell(x.materialTypeName) + '</td><td>' + cell(x.dept) + '</td><td>' + cell(x.loc) + '</td><td>' + cell(x.user) + '</td><td>' + cell(x.keeper || x.user) + '</td><td>' + cell(x.serviceLife) + '</td><td>' + cell(x.remark1 || x.authNo || "-") + '</td><td>' + cell(x.state) + '</td><td>' + cell(x.book) + '</td><td>' + cell(x.unit || "件") + '</td></tr>';
             }).join("") +
           '</tbody></table></div>',
           '<div class="inv-task-track-panel" id="taskTrackPanel" hidden></div>'
@@ -978,6 +1000,19 @@
       }
       function renderMaterialCheck() {
         var list = materialRows();
+        var isCompany = materialCheckSelectedType() === "公司盘点";
+        var title = document.getElementById("materialTableTitle");
+        var cols = document.getElementById("materialCheckCols");
+        var head = document.getElementById("materialCheckHead");
+        if (title) title.textContent = isCompany ? "盘点已入库未出库物资明细表" : "盘点部门所属物资明细表";
+        if (cols) {
+          cols.innerHTML = [
+            72, 118, 132, 124, 118, 124, 104, 112, 148, 128, 110, 90, 116, 78, 124, 118, 78
+          ].map(function (w) { return '<col style="width:' + w + 'px">'; }).join("");
+        }
+        if (head) {
+          head.innerHTML = '<tr><th>序号</th><th>资产编号</th><th>物资唯一码</th><th>物资类型编码</th><th>产品编码</th><th>产品名称</th><th>产品型号</th><th>物资类型名称</th><th>所属部门</th><th>存储地点/仓库货位</th><th>使用人</th><th>保管人</th><th>使用年限</th><th>产权</th><th>在库/领用状态</th><th>账面数量</th><th>单位</th></tr>';
+        }
         document.getElementById("materialCheckBody").innerHTML = list.map(function (x, i) {
           return '<tr>' +
             '<td>' + (i + 1) + '</td>' +
@@ -996,15 +1031,7 @@
             '<td>' + cell(x.remark1 || x.authNo || "-") + '</td>' +
             '<td>' + cell(x.state) + '</td>' +
             '<td>' + cell(x.book) + '</td>' +
-            '<td><input class="inv-material-cell-input" value="" placeholder="手动填写"></td>' +
             '<td>' + cell(x.unit || "件") + '</td>' +
-            '<td><select class="inv-material-cell-select"><option value="">请选择</option><option>完好</option><option>待核验</option><option>损坏</option><option>缺失</option></select></td>' +
-            '<td><select class="inv-material-cell-select"><option value="">请选择</option><option>盘盈</option><option>盘亏</option><option>毁损</option><option>正常</option></select></td>' +
-            '<td><label class="inv-material-upload">上传<input type="file" accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,.txt"></label></td>' +
-            '<td><select class="inv-material-cell-select"><option value="">请选择</option><option>正常</option><option>盘盈</option><option>盘亏</option><option>损毁</option></select></td>' +
-            '<td>' + money(x.originalValue || x.bookOriginal || 0) + '</td>' +
-            '<td><input class="inv-material-cell-input" value="" placeholder="系统判断/手动确认"></td>' +
-            '<td><textarea class="inv-material-cell-textarea" placeholder="手动填写差异说明"></textarea></td>' +
           '</tr>';
         }).join("");
         document.getElementById("materialCheckEmpty").hidden = list.length > 0;
@@ -1175,6 +1202,15 @@
           renderMaterialCheck();
           return;
         }
+        if (e.target.id === "inventoryTaskReminderGo") {
+          window.location.href = "my-tasks-prototype-list.html?scene=todo";
+          return;
+        }
+        if (e.target.id === "inventoryTaskReminderClose" || e.target.id === "inventoryTaskReminderDismiss") {
+          var reminder = document.getElementById("inventoryTaskReminder");
+          if (reminder) reminder.hidden = true;
+          return;
+        }
         if (e.target.id === "mcLoc") {
           openMcLocMenu();
           return;
@@ -1266,6 +1302,9 @@
           document.getElementById("createDept").value = isCompanyCreate ? "全部业务部门" : "机械研究所";
           document.getElementById("createResp").value = isCompanyCreate ? "王超" : "李仁堂";
           document.getElementById("createOwner").value = isCompanyCreate ? "宋中波" : "许学良";
+        }
+        if (e.target.id === "mcAssetType") {
+          renderMaterialCheck();
         }
       });
       document.addEventListener("input", function (e) {
