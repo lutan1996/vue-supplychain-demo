@@ -220,7 +220,7 @@
                 <table class="inv-table">
                   <thead>
                     <tr>
-                      <th>序号</th><th>盘点单号</th><th>盘点任务名称</th><th>盘点类型</th><th>盘点部门</th><th>盘点范围</th><th>资产类型范围</th><th>计划开始日期</th><th>计划结束日期</th><th>发起人</th><th>负责人</th><th>应盘数量</th><th>已盘数量</th><th>差异数量</th><th>任务状态</th><th>操作</th>
+                      <th>序号</th><th>盘点单号</th><th>盘点任务名称</th><th>盘点类型</th><th>盘点部门</th><th>盘点范围</th><th>资产类型范围</th><th>计划开始日期</th><th>计划结束日期</th><th>发起人</th><th>负责人</th><th>任务状态</th><th>操作</th>
                     </tr>
                   </thead>
                   <tbody id="tbody"></tbody>
@@ -320,9 +320,6 @@
           <div class="wh-field"><label class="wh-label">计划结束日期</label><input class="wh-input" id="createEnd" type="date" value="2026-07-12"></div>
           <div class="wh-field"><label class="wh-label">发起人</label><input class="wh-input" id="createOwner" value="宋中波"></div>
           <div class="wh-field"><label class="wh-label">负责人</label><input class="wh-input" id="createResp" value="王超"></div>
-          <div class="wh-field"><label class="wh-label">应盘数量</label><input class="wh-input" id="createShould" value="0"></div>
-          <div class="wh-field"><label class="wh-label">已盘数量</label><input class="wh-input" id="createDone" readonly value="0"></div>
-          <div class="wh-field"><label class="wh-label">差异数量</label><input class="wh-input" id="createDiff" readonly value="0"></div>
           <div class="wh-field"><label class="wh-label">任务状态</label><input class="wh-input" id="createStatus" readonly value="待开始"></div>
         </div>
       </div>
@@ -715,9 +712,6 @@
             taskField("计划结束日期", row.end) +
             taskField("发起人", row.owner) +
             taskField("负责人", responsiblePerson(row)) +
-            taskField("应盘数量", row.should) +
-            taskField("已盘数量", row.done) +
-            taskField("差异数量", row.diff) +
             taskField("任务状态", row.status) +
             taskField("确认口径", isCompany ? "物资、财务、业务三方共同确认" : "部门物资专责逐条确认") +
           '</div>',
@@ -837,9 +831,7 @@
         document.getElementById("createEnd").value = "2026-07-12";
         document.getElementById("createOwner").value = "宋中波";
         document.getElementById("createResp").value = "王超";
-        document.getElementById("createShould").value = "0";
-        document.getElementById("createDone").value = "0";
-        document.getElementById("createDiff").value = "0";
+        document.getElementById("createResp").value = "王超";
         document.getElementById("createStatus").value = "待开始";
         open(document.getElementById("taskCreateMask"));
       }
@@ -861,9 +853,6 @@
           deptHead: document.getElementById("createResp").value || "王超",
           materialOwner: "宋中波",
           financeHead: type === "公司盘点" ? "孙睿" : "",
-          should: Number(document.getElementById("createShould").value || 0),
-          done: 0,
-          diff: 0,
           status: "待开始"
         });
         close(document.getElementById("taskCreateMask"));
