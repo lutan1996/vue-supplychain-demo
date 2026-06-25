@@ -1522,41 +1522,68 @@
           price: map.price || 0
         };
       }
-      function inventoryTodoFlow(isCompany, map) {
+      function inventoryTodoProgressIndex(map, isCompany) {
+        var role = inventoryTodoRoleKeyForMap(map);
+        var status = String(map && map["流程状态"] || "");
         if (isCompany) {
-          var role = inventoryTodoRoleKeyForMap(map);
-          var financeName = map["办理人"] || map.handler || "孙睿";
-          var companyCurrent = {
-            material_head: 2,
-            finance_head: 5,
-            business_head: 4,
-            material_specialist: 7,
-            inventory_staff: 5
-          };
-          var currentIndex = companyCurrent[role] == null ? 5 : companyCurrent[role];
-          function companyStatus(idx) {
-            return idx < currentIndex ? "已通过" : (idx === currentIndex ? "处理中" : "待处理");
+          if (status === "已完成") return 10;
+          if (role === "finance_head") return 7;
+          if (role === "material_specialist") return 9;
+          if (role === "inventory_staff") return 7;
+          if (role === "material_head") {
+            return String(map && map["流程定义KEY"] || "").indexOf("_assign_") >= 0 ? 2 : 8;
           }
+          if (role === "business_head") return 2;
+          return 7;
+        }
+        if (status === "已完成") return 5;
+        if (role === "material_specialist") return 4;
+        if (role === "dept_head") return 3;
+        return 2;
+      }
+      function inventoryTodoProgressSteps(map, isCompany) {
+        var task = inventoryTodoTask(isCompany, map || {});
+        if (isCompany) {
+          var financeHead = "孙睿";
+          var businessHead = "李仁堂";
           return [
-            ["物资管理部门物资专责发起公司物资盘点", "宋中波", companyStatus(0)],
-            ["系统根据物资管理部门物资专责发起的信息生成公司所有已入库未出库物资清单", "系统", companyStatus(1)],
-            ["物资管理部门负责人同意并分配部门盘点人员", "王超", companyStatus(2)],
-            ["财务部门负责人同意并分配部门盘点人员", "孙睿", companyStatus(3)],
-            ["业务部门负责人同意并分配部门盘点人员", "李仁堂", companyStatus(4)],
-            ["盘点完毕，上传盘点结果，提交财务负责人审阅。", financeName, companyStatus(5)],
-            ["物资管理部门负责人审阅", "王超", companyStatus(6)],
-            ["物资管理部门物资专责阅知", "宋中波", companyStatus(7)],
-            ["盘点结束", "宋中波", companyStatus(8)]
+            { node: "发起公司物资盘点", person: "宋中波", opinion: "物资管理部门物资专责宋中波发起公司物资盘点" },
+            { node: "生成公司物资清单", person: "宋中波", opinion: "系统根据物资管理部门物资专责宋中波发起的信息生成公司所有已入库未出库物资清单，存货类同步带入最近盘库日期、盘库账面数量、盘库实盘数量和盘库差异" },
+            { node: "物资部门负责人同意", person: "王超", opinion: "物资管理部门负责人王超同意公司物资盘点" },
+            { node: "物资部门分配人员", person: "王超、宋中波", opinion: "物资管理部门负责人王超分配本部门盘点人员宋中波" },
+            { node: "财务部门分配人员", person: financeHead, opinion: "财务负责人" + financeHead + "分配财务盘点确认人员" },
+            { node: "业务部门同意并分配", person: businessHead, opinion: "业务部门负责人" + businessHead + "同意，并分配本部门盘点人员" },
+            { node: "参与人员收到流程", person: "宋中波、杜欣鑫、成明锴", opinion: "所有参与盘点人员宋中波、杜欣鑫、成明锴收到公司盘点流程" },
+            { node: "三方逐条共同确认", person: "宋中波、杜欣鑫、成明锴", opinion: "所有参与盘点人员按清单逐条确认，物资、财务、业务三方共同确认物资型号、编码、存储地点、使用人/负责人等信息是否与系统台帐一致，状态是否完好" },
+            { node: "财务负责人审阅", person: financeHead, opinion: "盘点完毕，提交财务负责人" + financeHead + "审阅" },
+            { node: "物资管理部门负责人审阅", person: "王超", opinion: "物资管理部门负责人王超审阅" },
+            { node: "物资专责阅知", person: "宋中波", opinion: "物资管理部门物资专责宋中波阅知" },
+            { node: "盘点结束", person: "宋中波", opinion: "物资管理部门物资专责宋中波阅知后确认公司盘点结束" }
           ];
         }
         return [
-          ["部门物资专责发起部门物资盘点", "许学良", "已通过"],
-          ["确认盘点结果是否与系统台帐一致", "许学良", "已通过"],
-          ["盘点完毕，上传盘点结果", "许学良", "处理中"],
-          ["部门负责人审阅", "李仁堂", "待处理"],
-          ["物资管理部门物资专责阅知", "宋中波", "待处理"],
-          ["盘点结束", "宋中波", "待处理"]
+          { node: "盘点开始", person: "许学良", opinion: "部门物资专责许学良点“盘点开始”，进入部门内物资盘点" },
+          { node: "生成部门物资清单", person: "许学良", opinion: "系统根据部门物资专责许学良发起的信息生成机械研究所所属物资清单，存货类同步带入最近盘库日期、盘库账面数量、盘库实盘数量和盘库差异" },
+          { node: "逐条盘点确认", person: "许学良", opinion: "部门物资专责许学良逐条确认物资型号、编码、存储地点、使用人/负责人是否与系统台帐一致，状态是否完好" },
+          { node: "部门负责人审阅", person: "李仁堂", opinion: "盘点完毕，提交部门负责人李仁堂审阅，盘点无误" },
+          { node: "物资专责审阅确认", person: "宋中波", opinion: "物资管理部门物资专责宋中波审阅，确认" },
+          { node: "部门盘点结束", person: "宋中波", opinion: "物资管理部门物资专责宋中波确认部门盘点结束" }
         ];
+      }
+      function inventoryTodoProgressApprovals(map, isCompany) {
+        var steps = inventoryTodoProgressSteps(map, isCompany);
+        var active = inventoryTodoProgressIndex(map, isCompany);
+        return steps.map(function (step, i) {
+          var result = i < active ? "已通过" : (i === active ? "处理中" : "待处理");
+          if (i === steps.length - 1 && active >= steps.length - 1) result = "已完成";
+          return {
+            node: step.node,
+            person: step.person,
+            time: i <= active ? "2026-06-" + String(24 + Math.min(i, 6)).padStart(2, "0") + " 09:" + String(10 + i * 5).padStart(2, "0") : "-",
+            opinion: step.opinion,
+            result: result
+          };
+        });
       }
       function inventoryTodoTask(isCompany, map) {
         var role = inventoryTodoRoleKeyForMap(map);
@@ -1665,11 +1692,11 @@
         var isCompanyProc = procName.indexOf("公司盘点任务审批") >= 0;
         var isCompany = isCompanyProc || (!isDeptProc && inventoryTodoIsCompany(map));
         var title = isCompany ? "审批记录 - 公司盘点" : "审批记录 - 部门盘点";
-        var steps = inventoryTodoFlow(isCompany, map || {});
+        var approvals = inventoryTodoProgressApprovals(map || {}, isCompany);
         var rowClass = isCompany ? "inventory-progress-row is-company-branch" : "inventory-progress-row";
         var currentStepIndex = -1;
-        steps.forEach(function (step, idx) {
-          if (step[2] === "处理中" && currentStepIndex < 0) currentStepIndex = idx;
+        approvals.forEach(function (step, idx) {
+          if (step.result === "处理中" && currentStepIndex < 0) currentStepIndex = idx;
         });
         function progressStep(text, idx, isEnd) {
           var cls = "";
@@ -1709,9 +1736,8 @@
             if (idx === arr.length - 1) cls += " is-end";
             return '<div class="inventory-progress-step' + cls + '">' + mtEsc(text) + '</div>' + (idx < arr.length - 1 ? '<div class="inventory-progress-arrow">→</div>' : "");
           }).join("");
-        var infoHtml = steps.map(function (step, idx) {
-          var timeText = step[2] === "待处理" ? "-" : ("2026-06-" + String(24 + Math.min(idx, 6)).padStart(2, "0") + " 09:" + String(10 + idx * 5).padStart(2, "0"));
-          return '<p class="inventory-progress-info-line">' + (idx + 1) + '、' + mtEsc(step[0]) + '；办理人：' + mtEsc(step[1]) + '；办理时间：' + mtEsc(timeText) + '；办理内容：' + mtEsc(step[0]) + '；办理结果：' + mtEsc(step[2]) + '</p>';
+        var infoHtml = approvals.map(function (step, idx) {
+          return '<p class="inventory-progress-info-line">' + (idx + 1) + '、' + mtEsc(step.node) + '；办理人：' + mtEsc(step.person) + '；办理时间：' + mtEsc(step.time) + '；办理内容：' + mtEsc(step.opinion) + '；办理结果：' + mtEsc(step.result) + '</p>';
         }).join("");
         var old = document.getElementById("inventoryTodoProgressMask");
         if (old && old.parentNode) old.parentNode.removeChild(old);
