@@ -255,18 +255,8 @@
     .inv-step.is-end { border-color: #f5d79b; color: #7a4d05; background: #fff8e8; }
     .inv-arrow { flex: 0 0 auto; color: #8aa0b8; font-size: 24px; line-height: 1; }
     .inv-flow-note { display: none; }
-    .inv-approval-list { margin-top: 20px; display: grid; gap: 12px; }
-    .inv-approval-card { border: 1px solid #e8eef5; border-radius: 8px; background: #fff; padding: 14px 16px; }
-    .inv-approval-card-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 10px; }
-    .inv-approval-card-title { color: #1f3551; font-size: 15px; font-weight: 600; }
-    .inv-approval-card-result { display: inline-flex; align-items: center; justify-content: center; min-width: 72px; height: 28px; padding: 0 10px; border-radius: 999px; background: #f5f7fa; color: #51657d; font-size: 12px; font-weight: 600; }
-    .inv-approval-card-result.done { background: #f6ffed; color: #389e0d; }
-    .inv-approval-card-result.active { background: #e6f4ff; color: #1677ff; }
-    .inv-approval-card-result.pending { background: #fff7e6; color: #ad6800; }
-    .inv-approval-meta { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 18px; margin-bottom: 10px; }
-    .inv-approval-meta p { margin: 0; color: #51657d; font-size: 13px; line-height: 1.7; }
-    .inv-approval-meta b { color: #1f3551; font-weight: 600; }
-    .inv-approval-opinion { margin: 0; color: #334155; font-size: 13px; line-height: 1.8; }
+    .inv-approval-list { margin-top: 20px; color: #51657d; font-size: 14px; line-height: 1.9; }
+    .inv-approval-line { margin: 0 0 8px; color: #51657d; }
     @media (max-width: 1100px) {
       .inv-filters { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .inv-track-flow { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -1227,6 +1217,9 @@
           return true;
         });
       }
+      function inventoryLineConfirmed(line) {
+        return cell(line && line.health) === "完好" && cell(line && line.result) === "一致";
+      }
       function buildSummaryRowsFor(source, currentRow, mode) {
         var map = {};
         source.forEach(function (x) {
@@ -1242,6 +1235,7 @@
               stockQty: Math.max(0, receive - 1),
               requisitionQty: receive,
               confirmQty: 0,
+              confirmedCount: 0,
               detailCount: 0,
               dept: x.dept,
               user: x.user,
@@ -1254,9 +1248,10 @@
             map[key].stockQty += Math.max(0, nextReceive - 1);
           }
           map[key].detailCount += 1;
+          if (inventoryLineConfirmed(x)) map[key].confirmedCount += 1;
         });
         Object.keys(map).forEach(function (key) {
-          map[key].confirmQty = mode === "view" ? Math.max(map[key].detailCount, 2) : map[key].detailCount;
+          map[key].confirmQty = mode === "view" ? Math.max(map[key].detailCount, 2) : map[key].confirmedCount;
         });
         return Object.keys(map).map(function (key) { return map[key]; });
       }
@@ -1495,12 +1490,7 @@
           }).join("");
         }
         document.getElementById("approvalInfoBody").innerHTML = approvalRowsFor(state.current).map(function (x, i) {
-          var resultCls = x.result === "已通过" || x.result === "已完成" ? "done" : (x.result === "处理中" ? "active" : "pending");
-          return '<div class="inv-approval-card">' +
-            '<div class="inv-approval-card-head"><div class="inv-approval-card-title">' + (i + 1) + '、' + x.node + '</div><span class="inv-approval-card-result ' + resultCls + '">' + x.result + '</span></div>' +
-            '<div class="inv-approval-meta"><p><b>办理人：</b>' + x.person + '</p><p><b>办理时间：</b>' + x.time + '</p></div>' +
-            '<p class="inv-approval-opinion"><b>办理内容：</b>' + x.opinion + '</p>' +
-          '</div>';
+          return '<p class="inv-approval-line">' + (i + 1) + '、' + x.node + '；办理人：' + x.person + '；办理时间：' + x.time + '；办理内容：' + x.opinion + '；办理结果：' + x.result + '</p>';
         }).join("");
         document.getElementById("flowNote").textContent = state.current.no + "，当前状态：" + state.current.status + "；当前流程严格按" + (isCompany ? "公司物资盘点" : "部门物资盘点") + "执行。";
         switchApprovalTab("flow");
@@ -1713,7 +1703,7 @@
             var inconsistent = e.target.value === "不一致";
             currentLine.lineStatus = inconsistent ? "有差异" : "已确认";
             currentLine.diffType = inconsistent ? (currentLine.diffType && currentLine.diffType !== "正常" ? currentLine.diffType : "盘亏") : "正常";
-            currentLine.result = inconsistent ? currentLine.diffType : "正常";
+            currentLine.result = e.target.value;
             currentLine.checkResult = currentLine.result;
             return;
           }

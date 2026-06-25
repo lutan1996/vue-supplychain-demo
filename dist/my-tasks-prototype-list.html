@@ -720,18 +720,8 @@
       color: #8aa0b8;
       font-size: 24px;
     }
-    .inventory-progress-info { margin-top: 14px; display: grid; gap: 12px; }
-    .inventory-progress-info-card { border: 1px solid #e8eef5; border-radius: 8px; background: #fff; padding: 14px 16px; }
-    .inventory-progress-info-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 10px; }
-    .inventory-progress-info-title { color: #1f3551; font-size: 15px; font-weight: 600; }
-    .inventory-progress-info-status { display: inline-flex; align-items: center; justify-content: center; min-width: 72px; height: 28px; padding: 0 10px; border-radius: 999px; background: #f5f7fa; color: #51657d; font-size: 12px; font-weight: 600; }
-    .inventory-progress-info-status.done { background: #f6ffed; color: #389e0d; }
-    .inventory-progress-info-status.active { background: #e6f4ff; color: #1677ff; }
-    .inventory-progress-info-status.pending { background: #fff7e6; color: #ad6800; }
-    .inventory-progress-info-meta { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 18px; margin-bottom: 10px; }
-    .inventory-progress-info-meta p { margin: 0; color: #51657d; font-size: 13px; line-height: 1.7; }
-    .inventory-progress-info-meta b { color: #1f3551; font-weight: 600; }
-    .inventory-progress-info-text { margin: 0; color: #334155; font-size: 13px; line-height: 1.8; }
+    .inventory-progress-info { margin-top: 14px; color: #51657d; font-size: 13px; line-height: 1.9; }
+    .inventory-progress-info-line { margin: 0 0 8px; color: #51657d; }
     .inventory-progress-ft {
       display: flex;
       justify-content: flex-end;
@@ -1712,13 +1702,8 @@
             return '<div class="inventory-progress-step' + cls + '">' + mtEsc(text) + '</div>' + (idx < arr.length - 1 ? '<div class="inventory-progress-arrow">→</div>' : "");
           }).join("");
         var infoHtml = steps.map(function (step, idx) {
-          var statusCls = step[2] === "已通过" || step[2] === "已完成" ? "done" : (step[2] === "处理中" ? "active" : "pending");
           var timeText = step[2] === "待处理" ? "-" : ("2026-06-" + String(24 + Math.min(idx, 6)).padStart(2, "0") + " 09:" + String(10 + idx * 5).padStart(2, "0"));
-          return '<div class="inventory-progress-info-card">' +
-            '<div class="inventory-progress-info-head"><div class="inventory-progress-info-title">' + (idx + 1) + '、' + mtEsc(step[0]) + '</div><span class="inventory-progress-info-status ' + statusCls + '">' + mtEsc(step[2]) + '</span></div>' +
-            '<div class="inventory-progress-info-meta"><p><b>办理人：</b>' + mtEsc(step[1]) + '</p><p><b>办理时间：</b>' + mtEsc(timeText) + '</p></div>' +
-            '<p class="inventory-progress-info-text"><b>办理内容：</b>' + mtEsc(step[0]) + '</p>' +
-          '</div>';
+          return '<p class="inventory-progress-info-line">' + (idx + 1) + '、' + mtEsc(step[0]) + '；办理人：' + mtEsc(step[1]) + '；办理时间：' + mtEsc(timeText) + '；办理内容：' + mtEsc(step[0]) + '；办理结果：' + mtEsc(step[2]) + '</p>';
         }).join("");
         var old = document.getElementById("inventoryTodoProgressMask");
         if (old && old.parentNode) old.parentNode.removeChild(old);
@@ -1761,7 +1746,10 @@
         inventoryTodoRows._summaryConfirm = inventoryTodoRows._summaryConfirm || {};
         inventoryTodoRows._summaryConfirm[inventoryTodoSummaryKey(map, typeCode)] = value;
       }
-      function inventoryTodoSummaryRows(lines) {
+      function inventoryTodoLineConfirmed(line) {
+        return String(line && line.health || "") === "完好" && String(line && line.result || "") === "一致";
+      }
+      function inventoryTodoSummaryRows(lines, autoConfirm) {
         var grouped = {};
         lines.forEach(function (x) {
           var key = x.typeCode || x.typeName;
@@ -1775,6 +1763,7 @@
               stockQty: Math.max(0, Number(x.book || 0) - 1),
               requisitionQty: Number(x.book || 0),
               confirmQty: 0,
+              confirmedCount: 0,
               detailCount: 0,
               dept: x.dept,
               user: x.user,
@@ -1786,9 +1775,10 @@
             grouped[key].requisitionQty += Number(x.book || 0);
           }
           grouped[key].detailCount += 1;
+          if (inventoryTodoLineConfirmed(x)) grouped[key].confirmedCount += 1;
         });
         Object.keys(grouped).forEach(function (key) {
-          grouped[key].confirmQty = grouped[key].detailCount;
+          grouped[key].confirmQty = autoConfirm ? grouped[key].confirmedCount : grouped[key].detailCount;
         });
         return Object.keys(grouped).map(function (key) { return grouped[key]; });
       }
@@ -1815,21 +1805,21 @@
         var filteredLines = lines.filter(function (x) {
           return !nameFilter || String(x.name || "").indexOf(nameFilter) >= 0;
         });
-        var summaryRows = inventoryTodoSummaryRows(filteredLines);
+        var summaryRows = inventoryTodoSummaryRows(filteredLines, canEditInventoryLines);
         var detailLines = isSummary ? [] : inventoryTodoExpandedLines(filteredLines.filter(function (x) { return x.typeCode === detailType; }));
         var baseHead = '<th>序号</th><th>产品名称</th><th>规格型号</th><th>产品编码</th><th>物资唯一码</th><th>物资类型名称</th><th>物资类型编码</th><th>采购部门</th><th>供应商</th><th>平均采购单价（含税）</th><th>是否在本部门</th><th>是否开票</th><th>使用人</th><th>资产类型</th><th>资产编号</th><th>存放地点</th><th>使用年限</th><th>原值</th><th>单位</th>';
         var staffHead = '<th>状态是否完好</th><th>盘点结果</th><th>证明材料</th><th>备注</th>';
         var rowsHtml = detailLines.map(function (x, i) {
-          var health = x.health || "完好";
-          var result = x.result === "一致" || x.result === "不一致" ? x.result : ((x.result && x.result !== "正常") ? "不一致" : "一致");
+          var health = x.health || "";
+          var result = x.result === "一致" || x.result === "不一致" ? x.result : "";
           var price = x.price != null ? x.price : (x.bookOriginal || x.originalValue || 0);
           var row = '<tr><td>' + (i + 1) + '</td><td>' + mtEsc(x.name) + '</td><td>' + mtEsc(x.spec || "标准型") + '</td><td>' + mtEsc(x.product) + '</td><td>' + mtEsc(x.code) + '</td><td>' + mtEsc(x.typeName) + '</td><td>' + mtEsc(x.typeCode) + '</td><td>' + mtEsc(x.dept) + '</td><td>' + mtEsc(x.supplier || "中车电气") + '</td><td>' + (price ? Number(price).toLocaleString("zh-CN", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : "-") + '</td><td>' + mtEsc(x.dept === task.dept || task.dept === "全部业务部门" ? "是" : "否") + '</td><td>' + mtEsc(x.invoice || "已开票") + '</td><td>' + mtEsc(x.user) + '</td><td>' + mtEsc(x.assetType || x.typeName) + '</td><td>' + mtEsc(x.assetNo) + '</td><td>' + mtEsc(x.loc) + '</td><td>' + (canEditInventoryLines ? '<input class="qa-inp qa-inp--auto" data-inventory-line-field="serviceLife" data-inventory-line-code="' + mtEsc(x.code) + '" placeholder="填写使用年限" value="' + mtEsc(x.manualServiceLife || "") + '">' : mtEsc(x.serviceLife || "5年")) + '</td><td>' + (price ? Number(price).toLocaleString("zh-CN", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : "-") + '</td><td>' + mtEsc(x.unit || "件") + '</td>';
           if (!showResultColumns) {
             return row + '</tr>';
           }
           if (canEditInventoryLines) {
-            row += '<td><select class="qa-select"><option value="">请选择</option><option>完好</option><option>损坏</option><option>缺失</option></select></td>' +
-              '<td><select class="qa-select"><option value="">请选择</option><option>一致</option><option>不一致</option></select></td>' +
+            row += '<td><select class="qa-select" data-inventory-line-field="health" data-inventory-line-code="' + mtEsc(x.code) + '"><option value="">请选择</option><option' + (health === "完好" ? " selected" : "") + '>完好</option><option' + (health === "损坏" ? " selected" : "") + '>损坏</option><option' + (health === "缺失" ? " selected" : "") + '>缺失</option></select></td>' +
+              '<td><select class="qa-select" data-inventory-line-field="result" data-inventory-line-code="' + mtEsc(x.code) + '"><option value="">请选择</option><option' + (result === "一致" ? " selected" : "") + '>一致</option><option' + (result === "不一致" ? " selected" : "") + '>不一致</option></select></td>' +
               '<td><label class="qa-upload-btn">上传<input type="file" accept="image/*,.pdf"></label></td>' +
               '<td><textarea class="qa-inp" rows="2" placeholder="填写备注"></textarea></td>';
           } else {
@@ -1936,6 +1926,15 @@
         inventoryTodoRows._detailType = "";
         inventoryTodoRows._name = "";
         inventoryTodoRows._summaryConfirm = inventoryTodoRows._summaryConfirm || {};
+        if (String(map["流程定义KEY"] || "") === "pdtask_company_staff" && !map._inventoryStaffCheckInitialized) {
+          inventoryTodoRows(true).forEach(function (line) {
+            line.health = "";
+            line.result = "";
+            line.reason = "";
+            line.attachments = [];
+          });
+          map._inventoryStaffCheckInitialized = true;
+        }
         function rerenderInventoryTodoBody() {
           mt$("procModalBody").innerHTML = inventoryTodoHtml(map);
           var body = mt$("procModalBody");
@@ -1947,6 +1946,15 @@
               var targetLine = inventoryTodoRows(isCompany).find(function (item) { return String(item.code) === String(lineCode); });
               if (targetLine) targetLine.manualServiceLife = evt.target.value;
             }
+          };
+          body.onchange = function (evt) {
+            var lineField = evt.target.getAttribute("data-inventory-line-field");
+            var lineCode = evt.target.getAttribute("data-inventory-line-code");
+            if (!lineField || !lineCode) return;
+            var targetLine = inventoryTodoRows(isCompany).find(function (item) { return String(item.code) === String(lineCode); });
+            if (!targetLine) return;
+            if (lineField === "health") targetLine.health = evt.target.value;
+            if (lineField === "result") targetLine.result = evt.target.value;
           };
           body.onclick = function (evt) {
             var summaryView = evt.target.closest("[data-inventory-summary-view]");
