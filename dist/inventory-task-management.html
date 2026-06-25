@@ -1160,7 +1160,7 @@
             taskField("任务状态", row.status) +
           '</div>',
           '<div class="inv-material-toolbar">' +
-            '<div class="inv-table-title" style="margin:0">' + (isSummary ? "盘点物资汇总表" : "盘点物资明细表") + '</div>' +
+            '<div class="inv-table-title" style="margin:0">' + (isSummary ? "盘点物资汇总表" : (isCompany ? "盘点物资明细表（已入库未出库）" : "盘点物资明细表")) + '</div>' +
             (isSummary ? '' : '<button type="button" class="inv-btn" id="btnTaskInfoBack">返回汇总</button>') +
           '</div>',
           '<div class="inv-task-mini-table-wrap"><table class="inv-task-mini-table"><thead><tr>' +
@@ -1199,7 +1199,7 @@
         var head = document.getElementById("materialCheckHead");
         var summaryWidths = [170, 150, 120, 150, 120, 110, 200, 100, 100, 140, 96];
         var detailWidths = [72, 118, 104, 118, 132, 124, 124, 112, 112, 132, 110, 96, 104, 96, 118, 150, 124, 92, 78, 112, 112, 170, 176];
-        if (title) title.textContent = isSummary ? "盘点物资汇总表" : "盘点物资明细表";
+        if (title) title.textContent = isSummary ? "盘点物资汇总表" : (isCompany ? "盘点物资明细表（已入库未出库）" : "盘点物资明细表");
         if (back) back.hidden = isSummary;
         if (cols) {
           cols.innerHTML = (isSummary ? summaryWidths : detailWidths).map(function (w) { return '<col style="width:' + w + 'px">'; }).join("");
@@ -1244,7 +1244,9 @@
             '<td>' + cell(x.remark1 || x.materialTypeName) + '</td>' +
             '<td>' + cell(x.assetNo) + '</td>' +
             '<td>' + cell(x.loc) + '</td>' +
-            '<td>' + cell(x.serviceLife || "-") + '</td>' +
+            '<td>' + (isCompany
+              ? '<input class="inv-material-cell-input" data-line-field="serviceLife" data-line-code="' + cell(x.code) + '" value="' + inputValue(x.manualServiceLife || "") + '" placeholder="填写使用年限">'
+              : cell(x.serviceLife || "-")) + '</td>' +
             '<td>' + money(originalAmount(x)) + '</td>' +
             '<td>' + cell(x.unit || "件") + '</td>' +
             '<td><select class="inv-material-cell-select" data-line-field="health" data-line-code="' + cell(x.code) + '"><option value="">请选择</option><option' + (health === "完好" ? " selected" : "") + '>完好</option><option' + (health === "损坏" ? " selected" : "") + '>损坏</option><option' + (health === "缺失" ? " selected" : "") + '>缺失</option></select></td>' +
@@ -1639,6 +1641,10 @@
           }
           if (lineField === "reason") {
             currentLine.reason = e.target.value;
+            return;
+          }
+          if (lineField === "serviceLife") {
+            currentLine.manualServiceLife = e.target.value;
             return;
           }
         }
