@@ -86,6 +86,7 @@
     .inv-task-field b { color: #111; font-size: 13px; font-weight: 600; line-height: 1.5; word-break: break-all; }
     .inv-task-info-grid { display: grid; grid-template-columns: repeat(4, minmax(180px, 1fr)); gap: 12px 18px; width: 100%; align-items: start; }
     .inv-task-info-grid.is-start-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    .inv-task-info-grid.is-start-dept-grid .inv-task-field.start-fill { grid-column: span 2; }
     .inv-task-info-grid .inv-task-field { display: block; }
     .inv-task-info-grid .inv-task-field span { display: block; margin-bottom: 6px; color: #516a87; font-weight: 600; }
     .inv-task-info-grid .inv-task-field b,
@@ -876,9 +877,12 @@
           "业务部门盘点人员": true
         };
         var isStart = mode === "start";
-        return '<div class="inv-task-info-grid' + (isStart ? ' is-start-grid' : '') + '">' + inventoryTaskMetaFields(row, mode).map(function (item) {
-          if (mode === "start" && roleFields[item[0]]) return inventoryMetaSelect(item[0], item[1], row, false);
-          return inventoryReadonlyMetaField(item[0], item[1], item[0] === "盘点任务名称");
+        var isDeptStart = isStart && normalizeFlowType(row) !== "company";
+        return '<div class="inv-task-info-grid' + (isStart ? ' is-start-grid' : '') + (isDeptStart ? ' is-start-dept-grid' : '') + '">' + inventoryTaskMetaFields(row, mode).map(function (item) {
+          var label = item[0];
+          var isWide = label === "盘点任务名称" || (isDeptStart && (label === "部门负责人" || label === "物资管理部门物资专责"));
+          if (mode === "start" && roleFields[label]) return inventoryMetaSelect(label, item[1], row, isWide);
+          return inventoryReadonlyMetaField(label, item[1], isWide);
         }).join("") + '</div>';
       }
       function inventoryPurchaseTotal(price, qty) {
