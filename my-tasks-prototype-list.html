@@ -1603,6 +1603,18 @@
         if (key === "pdtask_company_staff") return true;
         return key.indexOf("_review_") >= 0 || key.indexOf("pddiff_") === 0 || map["流程定义名称"] === "盘点差异审批";
       }
+      function inventoryTodoSummaryKey(map, typeCode) {
+        return String((map && (map["流程定义KEY"] || map["流程定义名称"] || "")) + "::" + (typeCode || ""));
+      }
+      function inventoryTodoSummaryValue(map, typeCode, fallback) {
+        inventoryTodoRows._summaryConfirm = inventoryTodoRows._summaryConfirm || {};
+        var key = inventoryTodoSummaryKey(map, typeCode);
+        return Object.prototype.hasOwnProperty.call(inventoryTodoRows._summaryConfirm, key) ? inventoryTodoRows._summaryConfirm[key] : fallback;
+      }
+      function inventoryTodoSetSummaryValue(map, typeCode, value) {
+        inventoryTodoRows._summaryConfirm = inventoryTodoRows._summaryConfirm || {};
+        inventoryTodoRows._summaryConfirm[inventoryTodoSummaryKey(map, typeCode)] = value;
+      }
       function inventoryTodoSummaryRows(lines) {
         var grouped = {};
         lines.forEach(function (x) {
@@ -1613,6 +1625,7 @@
               typeName: x.typeName,
               assetType: x.assetType || x.typeName,
               price: x.price != null ? x.price : (x.bookOriginal || x.originalValue || 0),
+              bookQty: Number(x.book || 0),
               stockQty: Math.max(0, Number(x.book || 0) - 1),
               requisitionQty: Number(x.book || 0),
               confirmQty: 0,
@@ -1622,6 +1635,7 @@
               loc: x.loc
             };
           } else {
+            grouped[key].bookQty += Number(x.book || 0);
             grouped[key].stockQty += Math.max(0, Number(x.book || 0) - 1);
             grouped[key].requisitionQty += Number(x.book || 0);
           }
@@ -1655,15 +1669,18 @@
         var filteredLines = lines.filter(function (x) {
           return !nameFilter || String(x.name || "").indexOf(nameFilter) >= 0;
         });
-        var summaryRows = inventoryTodoSummaryRows(filteredLines);
+        var summaryRows = inventoryTodoSummaryRows(filteredLines).map(function (item) {
+          if (canEditInventoryLines) item.confirmQty = inventoryTodoSummaryValue(map, item.typeCode, "");
+          return item;
+        });
         var detailLines = isSummary ? [] : inventoryTodoExpandedLines(filteredLines.filter(function (x) { return x.typeCode === detailType; }));
-        var baseHead = '<th>序号</th><th>产品名称</th><th>规格型号</th><th>产品编码</th><th>物资唯一码</th><th>物资类型名称</th><th>物资类型编码</th><th>采购部门</th><th>供应商</th><th>采购单价（含税）</th><th>是否在本部门</th><th>是否开票</th><th>使用人</th><th>资产类型</th><th>资产编号</th><th>存放地点</th><th>使用年限</th><th>原值</th><th>在库/领用状态</th><th>账面数量</th><th>单位</th>';
+        var baseHead = '<th>序号</th><th>产品名称</th><th>规格型号</th><th>产品编码</th><th>物资唯一码</th><th>物资类型名称</th><th>物资类型编码</th><th>采购部门</th><th>供应商</th><th>采购单价（含税）</th><th>是否在本部门</th><th>是否开票</th><th>使用人</th><th>资产类型</th><th>资产编号</th><th>存放地点</th><th>使用年限</th><th>原值</th><th>在库/领用状态</th><th>单位</th>';
         var staffHead = '<th>状态是否完好</th><th>盘点结果</th><th>证明材料</th><th>备注</th>';
         var rowsHtml = detailLines.map(function (x, i) {
           var health = x.health || "完好";
           var result = x.result === "一致" || x.result === "不一致" ? x.result : ((x.result && x.result !== "正常") ? "不一致" : "一致");
           var price = x.price != null ? x.price : (x.bookOriginal || x.originalValue || 0);
-          var row = '<tr><td>' + (i + 1) + '</td><td>' + mtEsc(x.name) + '</td><td>' + mtEsc(x.spec || "标准型") + '</td><td>' + mtEsc(x.product) + '</td><td>' + mtEsc(x.code) + '</td><td>' + mtEsc(x.typeName) + '</td><td>' + mtEsc(x.typeCode) + '</td><td>' + mtEsc(x.dept) + '</td><td>' + mtEsc(x.supplier || "中车电气") + '</td><td>' + (price ? Number(price).toLocaleString("zh-CN", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : "-") + '</td><td>' + mtEsc(x.dept === task.dept || task.dept === "全部业务部门" ? "是" : "否") + '</td><td>' + mtEsc(x.invoice || "已开票") + '</td><td>' + mtEsc(x.user) + '</td><td>' + mtEsc(x.assetType || x.typeName) + '</td><td>' + mtEsc(x.assetNo) + '</td><td>' + mtEsc(x.loc) + '</td><td>' + mtEsc(x.serviceLife || "5年") + '</td><td>' + (price ? Number(price).toLocaleString("zh-CN", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : "-") + '</td><td>' + mtEsc(x.state) + '</td><td>' + mtEsc(x.book) + '</td><td>' + mtEsc(x.unit || "件") + '</td>';
+          var row = '<tr><td>' + (i + 1) + '</td><td>' + mtEsc(x.name) + '</td><td>' + mtEsc(x.spec || "标准型") + '</td><td>' + mtEsc(x.product) + '</td><td>' + mtEsc(x.code) + '</td><td>' + mtEsc(x.typeName) + '</td><td>' + mtEsc(x.typeCode) + '</td><td>' + mtEsc(x.dept) + '</td><td>' + mtEsc(x.supplier || "中车电气") + '</td><td>' + (price ? Number(price).toLocaleString("zh-CN", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : "-") + '</td><td>' + mtEsc(x.dept === task.dept || task.dept === "全部业务部门" ? "是" : "否") + '</td><td>' + mtEsc(x.invoice || "已开票") + '</td><td>' + mtEsc(x.user) + '</td><td>' + mtEsc(x.assetType || x.typeName) + '</td><td>' + mtEsc(x.assetNo) + '</td><td>' + mtEsc(x.loc) + '</td><td>' + mtEsc(x.serviceLife || "5年") + '</td><td>' + (price ? Number(price).toLocaleString("zh-CN", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : "-") + '</td><td>' + mtEsc(x.state) + '</td><td>' + mtEsc(x.unit || "件") + '</td>';
           if (!showResultColumns) {
             return row + '</tr>';
           }
@@ -1679,13 +1696,13 @@
         }).join("");
         var summaryHtml = summaryRows.map(function (x) {
           return '<tr>' +
-            '<td>' + mtEsc(x.typeName) + '</td><td>' + mtEsc(x.typeCode) + '</td><td>' + mtEsc(x.assetType) + '</td><td>' + (x.price ? Number(x.price).toLocaleString("zh-CN", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : "-") + '</td><td>' + mtEsc(x.stockQty) + '</td><td>' + mtEsc(x.requisitionQty) + '</td><td>' + mtEsc(x.confirmQty) + '</td><td>' + mtEsc(x.dept) + '</td><td>' + mtEsc(x.user) + '</td><td>' + mtEsc(x.loc) + '</td><td><span class="inv-op"><span role="button" tabindex="0" data-inventory-summary-view="' + mtEsc(x.typeCode) + '">' + (canEditInventoryLines ? "编辑" : "查看") + '</span></span></td>' +
+            '<td>' + mtEsc(x.typeName) + '</td><td>' + mtEsc(x.typeCode) + '</td><td>' + mtEsc(x.assetType) + '</td><td>' + (x.price ? Number(x.price).toLocaleString("zh-CN", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : "-") + '</td><td>' + mtEsc(x.dept) + '</td><td>' + mtEsc(x.user) + '</td><td>' + mtEsc(x.loc) + '</td><td>' + mtEsc(x.bookQty) + '</td><td>' + mtEsc(x.stockQty) + '</td><td>' + mtEsc(x.requisitionQty) + '</td><td>' + (canEditInventoryLines ? '<input class="qa-inp qa-inp--auto" data-inventory-summary-confirm="' + mtEsc(x.typeCode) + '" placeholder="请填写盘点确认数量" value="' + mtEsc(x.confirmQty) + '">' : mtEsc(x.confirmQty)) + '</td><td><span class="inv-op"><span role="button" tabindex="0" data-inventory-summary-view="' + mtEsc(x.typeCode) + '">' + (canEditInventoryLines ? "编辑" : "查看") + '</span></span></td>' +
           '</tr>';
         }).join("");
-        var tableTitle = isSummary ? "待盘点物资汇总表" : (isCompany ? "盘点已入库未出库物资明细表" : "盘点物资明细表");
+        var tableTitle = isSummary ? "盘点物资汇总表" : (isCompany ? "盘点已入库未出库物资明细表" : "盘点物资明细表");
         return '<div class="qa-accept-wrap">' +
           '<div class="qa-accept-toolbar"><div class="qa-accept-toolbar-title">' + mtEsc(map["流程定义名称"] === "盘点差异审批" ? "盘点差异办理" : "盘点任务办理") + '</div></div>' +
-          '<div style="display:grid;grid-template-columns:minmax(220px,1fr) minmax(220px,1fr);gap:14px;align-items:end;margin:0 0 12px;">' +
+          '<div style="display:flex;align-items:end;justify-content:flex-start;gap:14px;margin:0 0 12px;">' +
             '<div><div style="font-size:14px;color:#1f3551;font-weight:600;margin-bottom:8px;">产品名称</div><input class="qa-inp qa-inp--auto" id="inventoryTodoName" placeholder="请输入产品名称" value="' + mtEsc(nameFilter) + '"></div>' +
             '<div><button type="button" class="proc-btn proc-btn-primary" id="inventoryTodoSearch" style="min-width:120px;">查询</button></div>' +
           '</div>' +
@@ -1693,7 +1710,7 @@
           '<div style="font-size:14px;font-weight:600;color:#1f3551;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;gap:12px;">' + tableTitle + (isSummary ? '' : '<button type="button" class="proc-btn" id="inventoryTodoBack">返回汇总</button>') + '</div>' +
           '<div class="qa-mat-lines-table-wrap"><table class="qa-mat-lines-table"><thead><tr>' +
             (isSummary
-              ? '<th>物资类型名称</th><th>物资类型编码</th><th>资产类型</th><th>采购单价（含税）</th><th>库存数量</th><th>领用数量</th><th>盘点确认数量</th><th>领用部门</th><th>领用人</th><th>存放地点</th><th>操作</th>'
+              ? '<th>物资类型名称</th><th>物资类型编码</th><th>资产类型</th><th>采购单价（含税）</th><th>领用部门</th><th>领用人</th><th>存放地点</th><th>账面数量</th><th>库存数量</th><th>领用数量</th><th>盘点确认数量</th><th>操作</th>'
               : baseHead + (showResultColumns ? staffHead : "")) +
           '</tr></thead><tbody>' + (isSummary ? summaryHtml : rowsHtml) + '</tbody></table></div>' +
           '</div>' +
@@ -1772,10 +1789,17 @@
         if (!mask) return;
         inventoryTodoRows._detailType = "";
         inventoryTodoRows._name = "";
+        inventoryTodoRows._summaryConfirm = inventoryTodoRows._summaryConfirm || {};
         function rerenderInventoryTodoBody() {
           mt$("procModalBody").innerHTML = inventoryTodoHtml(map);
           var body = mt$("procModalBody");
           if (!body) return;
+          body.oninput = function (evt) {
+            var summaryInput = evt.target.getAttribute("data-inventory-summary-confirm");
+            if (summaryInput) {
+              inventoryTodoSetSummaryValue(map, summaryInput, evt.target.value);
+            }
+          };
           body.onclick = function (evt) {
             var summaryView = evt.target.closest("[data-inventory-summary-view]");
             if (summaryView) {
