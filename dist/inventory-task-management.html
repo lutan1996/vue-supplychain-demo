@@ -216,20 +216,11 @@
     .inv-approval-pane.is-active { display: block; }
     .inv-flow { overflow-x: auto; border: 1px solid #eef2f7; border-radius: 8px; padding: 30px 24px; margin-top: 20px; background: #fff; }
     .inv-flow-row { display: inline-flex; align-items: center; min-width: 1980px; gap: 26px; }
-    .inv-flow-row.is-company-branch { display: block; min-width: 3300px; }
-    .inv-company-flow { display: inline-flex; align-items: flex-start; gap: 24px; }
-    .inv-company-flow .inv-step { flex-basis: 164px; width: 164px; }
-    .inv-flow-stage { position: relative; flex: 0 0 640px; min-height: 330px; padding-top: 148px; }
-    .inv-flow-stage.is-review { flex-basis: 700px; }
-    .inv-flow-stage-label { position: absolute; top: 0; left: 50%; transform: translateX(-50%); min-height: 84px; width: 180px; border-color: #f5d79b; color: #7a4d05; background: #fff8e8; }
-    .inv-flow-stage-rail { position: absolute; top: 118px; left: 0; right: 0; border-top: 1px solid #bfd0e3; }
-    .inv-flow-stage-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; align-items: start; }
-    .inv-flow-stage-item { position: relative; display: flex; flex-direction: column; align-items: center; gap: 14px; padding-top: 42px; }
-    .inv-flow-stage-item::before { content: ""; position: absolute; top: 0; left: 50%; width: 1px; height: 18px; background: #bfd0e3; }
-    .inv-flow-stage-item .inv-step { width: 100%; }
-    .inv-flow-branch-arrow { position: absolute; top: 8px; left: 50%; color: #8aa0b8; font-size: 26px; line-height: 1; transform: translateX(-50%); }
-    .inv-flow-stage-item.is-left .inv-flow-branch-arrow { transform: translateX(-50%) translateX(-4px); }
-    .inv-flow-stage-item.is-right .inv-flow-branch-arrow { transform: translateX(-50%) translateX(4px); }
+    .inv-flow-row.is-company-branch { display: inline-flex; align-items: center; gap: 18px; min-width: 3360px; }
+    .inv-company-stack { display: flex; flex-direction: column; gap: 12px; }
+    .inv-company-stack-row { display: flex; align-items: center; gap: 12px; }
+    .inv-company-stack-row .inv-step { flex-basis: 188px; width: 188px; min-height: 96px; }
+    .inv-company-branch-link { flex: 0 0 30px; color: #8aa0b8; font-size: 30px; line-height: 1; text-align: center; }
     .inv-step { flex: 0 0 132px; width: 132px; min-height: 112px; display: flex; align-items: center; justify-content: center; text-align: center; border: 1px solid #c8e6ce; border-radius: 10px; padding: 10px 12px; font-size: 13px; font-weight: 400; color: #426b45; line-height: 1.45; background: #f0fbf0; }
     .inv-step strong { color: inherit; font-size: 13px; font-weight: 400; }
     .inv-step span { display: none; }
@@ -1202,40 +1193,44 @@
         document.getElementById("flowTitle").textContent = isCompany ? "审批记录 - 公司盘点" : "审批记录 - 部门盘点";
         var flowEl = document.getElementById("flowSteps");
         if (isCompany) {
-          function companyBranchRoleStep(text, cls) {
+          function companyStep(text, stage, isEnd, extraClass) {
+            var cls = "";
+            if (activeIndex > stage) cls = " done";
+            else if (activeIndex === stage) cls = " active";
+            if (isEnd) cls += " is-end";
+            if (extraClass) cls += " " + extraClass;
             return '<div class="inv-step' + cls + '"><strong>' + text + '</strong></div>';
           }
-          var stepHtml = steps.map(function (step, i) {
-            var cls = i < activeIndex ? " done" : (i === activeIndex ? " active" : "");
-            if (i === steps.length - 1) cls += " is-end";
-            return '<div class="inv-step' + cls + '"><strong>' + flowChartText(step) + '</strong><span>' + step.person + '</span></div>';
-          });
-          var branchRoleCls = activeIndex > 6 ? " done" : (activeIndex >= 6 ? " active" : "");
+          var branchStage = activeIndex >= 2 && activeIndex < 6 ? 2 : -1;
           flowEl.classList.add("is-company-branch");
           flowEl.innerHTML =
-            '<div class="inv-company-flow">' +
-              stepHtml[0] + '<span class="inv-arrow">→</span>' + stepHtml[1] + '<span class="inv-arrow">→</span>' + stepHtml[2] +
-              '<div class="inv-flow-stage">' +
-                '<div class="inv-step inv-flow-stage-label"><strong>三方分支</strong></div>' +
-                '<div class="inv-flow-stage-rail"></div>' +
-                '<div class="inv-flow-stage-grid">' +
-                  '<div class="inv-flow-stage-item is-left"><div class="inv-flow-branch-arrow">↙</div>' + stepHtml[3] + '</div>' +
-                  '<div class="inv-flow-stage-item is-mid"><div class="inv-flow-branch-arrow">↓</div>' + stepHtml[4] + '</div>' +
-                  '<div class="inv-flow-stage-item is-right"><div class="inv-flow-branch-arrow">↘</div>' + stepHtml[5] + '</div>' +
-                '</div>' +
+            companyStep("物资管理部门物资专责发起公司物资盘点", 0) +
+            '<span class="inv-arrow">→</span>' +
+            companyStep("系统根据物资管理部门物资专责发起的信息生成公司所有已入库未出库物资清单", 1) +
+            '<div class="inv-company-stack">' +
+              '<div class="inv-company-stack-row">' +
+                '<span class="inv-company-branch-link">↗</span>' +
+                companyStep("物资管理部门负责人同意并分配部门盘点人员", branchStage > -1 ? branchStage : 2) +
+                '<span class="inv-company-branch-link">↘</span>' +
               '</div>' +
-              '<span class="inv-arrow">→</span>' + stepHtml[6] +
-              '<div class="inv-flow-stage is-review">' +
-                '<div class="inv-step inv-flow-stage-label"><strong>三方盘点</strong></div>' +
-                '<div class="inv-flow-stage-rail"></div>' +
-                '<div class="inv-flow-stage-grid">' +
-                  '<div class="inv-flow-stage-item is-left"><div class="inv-flow-branch-arrow">↙</div>' + companyBranchRoleStep("物资盘点人员逐条确认", branchRoleCls) + '</div>' +
-                  '<div class="inv-flow-stage-item is-mid"><div class="inv-flow-branch-arrow">↓</div>' + companyBranchRoleStep("财务盘点确认人员逐条确认", branchRoleCls) + '</div>' +
-                  '<div class="inv-flow-stage-item is-right"><div class="inv-flow-branch-arrow">↘</div>' + companyBranchRoleStep("业务盘点人员逐条确认", branchRoleCls) + '</div>' +
-                '</div>' +
+              '<div class="inv-company-stack-row">' +
+                '<span class="inv-company-branch-link">→</span>' +
+                companyStep("财务部门负责人同意并分配部门盘点人员", branchStage > -1 ? branchStage : 2) +
+                '<span class="inv-company-branch-link">→</span>' +
               '</div>' +
-              '<span class="inv-arrow">→</span>' + stepHtml[7] + '<span class="inv-arrow">→</span>' + stepHtml[8] + '<span class="inv-arrow">→</span>' + stepHtml[9] + '<span class="inv-arrow">→</span>' + stepHtml[10] + '<span class="inv-arrow">→</span>' + stepHtml[11] +
-            '</div>';
+              '<div class="inv-company-stack-row">' +
+                '<span class="inv-company-branch-link">↘</span>' +
+                companyStep("业务部门负责人同意并分配部门盘点人员", branchStage > -1 ? branchStage : 2) +
+                '<span class="inv-company-branch-link">↗</span>' +
+              '</div>' +
+            '</div>' +
+            companyStep("盘点完毕，上传盘点结果，提交财务负责人审阅。", 7) +
+            '<span class="inv-arrow">→</span>' +
+            companyStep("物资管理部门负责人审阅", 8) +
+            '<span class="inv-arrow">→</span>' +
+            companyStep("物资管理部门物资专责阅知", 9) +
+            '<span class="inv-arrow">→</span>' +
+            companyStep("物资管理部门物资专责阅知后确认公司盘点结束", 10, true);
         } else {
           flowEl.classList.remove("is-company-branch");
           flowEl.innerHTML = steps.map(function (step, i) {
