@@ -568,7 +568,7 @@
         { task: "PD-2026-003", assetNo: "WX-2026-0001", code: "C20260000021", typeCode: "A0060010001", product: "B00004101", assetName: "风机诊断软件授权", spec: "V3.2 企业版", materialTypeName: "无形资产", dept: "经营发展中心", loc: "经营发展中心/系统台账", user: "王超", state: "使用中", health: "完好", lastNo: "PD-2026-003", lastDate: "待盘点", book: 1, real: 0, result: "未盘点", lineStatus: "未盘点", diffType: "正常", reason: "", authNo: "AUTH-2026-0315", useDept: "经营发展中心", useOwner: "王超", authStart: "2026-03-15", authEnd: "2029-03-14", bookOriginal: 260000, bookNet: 238000, intangibleStatus: "使用中", clearResult: "待清查" },
         { task: "PD-2026-003", assetNo: "WX-2026-0002", code: "C20260000022", typeCode: "A0060010002", product: "B00004102", assetName: "风机巡检软件授权", spec: "V4.0 企业版", materialTypeName: "无形资产", dept: "经营发展中心", loc: "经营发展中心/软件台账", user: "宋中波", state: "使用中", health: "完好", lastNo: "PD-2026-003", lastDate: "待盘点", book: 1, real: 1, result: "正常", lineStatus: "已确认", diffType: "正常", reason: "", authNo: "AUTH-2026-0410", useDept: "经营发展中心", useOwner: "宋中波", authStart: "2026-04-10", authEnd: "2029-04-09", bookOriginal: 180000, bookNet: 162000, intangibleStatus: "使用中", clearResult: "待清查" }
       ];
-      var state = { filters: {}, current: null, currentLine: null, currentMaterialType: "", role: localStorage.getItem("inventoryDemoRole") || "dept_specialist" };
+      var state = { filters: {}, current: null, currentLine: null, currentMaterialType: "", role: localStorage.getItem("inventoryDemoRole") || "dept_specialist", summaryConfirm: {} };
       var roleNames = { dept_specialist: "部门物资专责", dept_head: "部门负责人", material_specialist: "物资管理部门物资专责", material_head: "物资管理部门负责人", finance_head: "财务负责人", business_head: "业务部门负责人", inventory_staff: "盘点人员" };
       function storedDiffs() {
         try { return JSON.parse(localStorage.getItem("inventoryDemoDiffs") || "[]"); } catch (e) { return []; }
@@ -610,6 +610,22 @@
         if (normalizeFlowType(currentRow) === "company") return Number(line.confirmQty || 1);
         var val = Number(line.confirmQty);
         return Number.isFinite(val) ? val : 0;
+      }
+      function summaryConfirmKey(row, typeCode) {
+        var currentRow = row || state.current || rows[0] || {};
+        return String((currentRow && currentRow.no) || "") + "::" + String(typeCode || "");
+      }
+      function summaryConfirmInputValue(row, typeCode) {
+        var key = summaryConfirmKey(row, typeCode);
+        return state.summaryConfirm[key] == null ? 0 : state.summaryConfirm[key];
+      }
+      function setSummaryConfirmValue(row, typeCode, value) {
+        state.summaryConfirm[summaryConfirmKey(row, typeCode)] = value;
+      }
+      function expandDisplayLines(list) {
+        if (!Array.isArray(list) || !list.length) return [];
+        if (list.length > 1) return list;
+        return [list[0], Object.assign({}, list[0])];
       }
       function attachmentListForLine(line) {
         if (!line) return [];
@@ -952,7 +968,7 @@
       function taskLines(row) {
         return linesForTask(row || state.current || rows[0]);
       }
-      var inventoryDetailHeaders = ["序号", "产品名称", "规格型号", "产品编码", "物资唯一码", "物资类型名称", "物资类型编码", "采购部门", "供应商", "采购单价（含税）", "是否在本部门", "是否开票", "使用人", "资产类型", "资产编号", "存放地点", "使用年限", "原值", "在库/领用状态", "账面数量", "单位", "盘点确认数量", "状态是否完好", "盘点结果", "证明材料", "备注", "操作"];
+      var inventoryDetailHeaders = ["序号", "产品名称", "规格型号", "产品编码", "物资唯一码", "物资类型名称", "物资类型编码", "采购部门", "供应商", "采购单价（含税）", "是否在本部门", "是否开票", "使用人", "资产类型", "资产编号", "存放地点", "使用年限", "原值", "在库/领用状态", "账面数量", "单位", "状态是否完好", "盘点结果", "证明材料", "备注", "操作"];
       function diffAmountText(line) {
         var type = inferDiffType(line || {});
         if (type !== "盘亏" && type !== "盘盈") return "¥0";
@@ -984,7 +1000,6 @@
           line.state,
           line.book,
           line.unit || "件",
-          confirmQtyValue(line),
           line.health,
           consistencyResult(line),
           renderAttachmentCell(line),
@@ -1083,7 +1098,7 @@
           return true;
         });
       }
-      function buildSummaryRowsFor(source, currentRow) {
+      function buildSummaryRowsFor(source, currentRow, mode) {
         var map = {};
         source.forEach(function (x) {
           var key = x.typeCode || x.materialTypeName;
@@ -1097,6 +1112,7 @@
               stockQty: Math.max(0, receive - 1),
               requisitionQty: receive,
               confirmQty: 0,
+              detailCount: 0,
               dept: x.dept,
               user: x.user,
               loc: x.loc
@@ -1106,7 +1122,14 @@
             map[key].requisitionQty += nextReceive;
             map[key].stockQty += Math.max(0, nextReceive - 1);
           }
-          map[key].confirmQty += confirmQtyValue(x, currentRow);
+          map[key].detailCount += 1;
+        });
+        Object.keys(map).forEach(function (key) {
+          if (mode === "start") {
+            map[key].confirmQty = summaryConfirmInputValue(currentRow, key);
+          } else {
+            map[key].confirmQty = Math.max(map[key].detailCount, 2);
+          }
         });
         return Object.keys(map).map(function (key) { return map[key]; });
       }
@@ -1116,15 +1139,15 @@
         var source = linesForTask(state.current || currentTaskForAction()).filter(function (x) {
           return !name || x.assetName.indexOf(name) >= 0;
         });
-        return buildSummaryRowsFor(source, currentRow);
+        return buildSummaryRowsFor(source, currentRow, "start");
       }
       function renderTaskInfoBody() {
         var row = state.current;
         var list = taskLines(row);
         var isCompany = normalizeFlowType(row) === "company";
         var isSummary = !state.taskInfoMaterialType;
-        var summaryRows = buildSummaryRowsFor(list, row);
-        var detailRows = isSummary ? [] : list.filter(function (x) { return x.typeCode === state.taskInfoMaterialType; });
+        var summaryRows = buildSummaryRowsFor(list, row, "view");
+        var detailRows = isSummary ? [] : expandDisplayLines(list.filter(function (x) { return x.typeCode === state.taskInfoMaterialType; }));
         document.getElementById("taskInfoTitle").textContent = "盘点任务详情";
         document.getElementById("taskInfoBody").innerHTML = [
           '<div class="inv-task-info-grid">' +
@@ -1170,7 +1193,7 @@
       }
       function renderMaterialCheck() {
         var isSummary = !state.currentMaterialType;
-        var list = isSummary ? materialSummaryRows() : materialRows();
+        var list = isSummary ? materialSummaryRows() : expandDisplayLines(materialRows());
         var isCompany = materialCheckSelectedType() === "公司盘点";
         var title = document.getElementById("materialTableTitle");
         var back = document.getElementById("btnMaterialBack");
@@ -1186,7 +1209,7 @@
         if (head) {
           head.innerHTML = isSummary
             ? '<tr><th>物资类型名称</th><th>物资类型编码</th><th>资产类型</th><th>采购单价（含税）</th><th>库存数量</th><th>领用数量</th><th>盘点确认数量</th><th>领用部门</th><th>领用人</th><th>存放地点</th><th>操作</th></tr>'
-            : '<tr><th>序号</th><th>产品名称</th><th>规格型号</th><th>产品编码</th><th>物资唯一码</th><th>物资类型名称</th><th>物资类型编码</th><th>采购部门</th><th>供应商</th><th>采购单价（含税）</th><th>是否在本部门</th><th>是否开票</th><th>使用人</th><th>资产类型</th><th>资产编号</th><th>存放地点</th><th>使用年限</th><th>原值</th><th>在库/领用状态</th><th>账面数量</th><th>单位</th><th>盘点确认数量</th><th>状态是否完好</th><th>盘点结果</th><th>证明材料</th><th>备注</th><th>操作</th></tr>';
+            : '<tr><th>序号</th><th>产品名称</th><th>规格型号</th><th>产品编码</th><th>物资唯一码</th><th>物资类型名称</th><th>物资类型编码</th><th>采购部门</th><th>供应商</th><th>采购单价（含税）</th><th>是否在本部门</th><th>是否开票</th><th>使用人</th><th>资产类型</th><th>资产编号</th><th>存放地点</th><th>使用年限</th><th>原值</th><th>在库/领用状态</th><th>账面数量</th><th>单位</th><th>状态是否完好</th><th>盘点结果</th><th>证明材料</th><th>备注</th><th>操作</th></tr>';
         }
         document.getElementById("materialCheckBody").innerHTML = list.map(function (x, i) {
           if (isSummary) {
@@ -1197,7 +1220,7 @@
               '<td>' + (x.price ? Number(x.price).toLocaleString("zh-CN", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : "-") + '</td>' +
               '<td>' + cell(x.stockQty) + '</td>' +
               '<td>' + cell(x.requisitionQty) + '</td>' +
-              '<td>' + cell(x.confirmQty) + '</td>' +
+              '<td><input class="inv-material-cell-input" data-summary-confirm="' + cell(x.typeCode) + '" value="' + inputValue(x.confirmQty) + '" placeholder="请填写盘点确认数量"></td>' +
               '<td>' + cell(x.dept) + '</td>' +
               '<td>' + cell(x.user) + '</td>' +
               '<td>' + cell(x.loc) + '</td>' +
@@ -1230,9 +1253,8 @@
             '<td>' + cell(x.state) + '</td>' +
             '<td>' + cell(x.book) + '</td>' +
             '<td>' + cell(x.unit || "件") + '</td>' +
-            '<td>' + cell(confirmQtyValue(x, state.current)) + '</td>' +
-            '<td>' + cell(health) + '</td>' +
-            '<td>' + cell(result) + '</td>' +
+              '<td>' + cell(health) + '</td>' +
+              '<td>' + cell(result) + '</td>' +
             '<td>' + renderAttachmentCell(x) + '</td>' +
             '<td>' + cell(x.reason || "无差异") + '</td>' +
             '<td><span class="inv-op"><span role="button" tabindex="0" data-task-view="' + cell(x.code) + '">查看</span></span></td>' +
@@ -1260,7 +1282,6 @@
             '<td>' + cell(x.state) + '</td>' +
             '<td>' + cell(x.book) + '</td>' +
             '<td>' + cell(x.unit || "件") + '</td>' +
-            '<td><input class="inv-material-cell-input" data-line-field="confirmQty" data-line-code="' + cell(x.code) + '" value="' + inputValue(qtyValue) + '"' + (isCompany ? ' readonly' : ' placeholder="请填写盘点数量"') + '></td>' +
             '<td><select class="inv-material-cell-select" data-line-field="health" data-line-code="' + cell(x.code) + '"><option' + (health === "完好" ? " selected" : "") + '>完好</option><option' + (health === "损坏" ? " selected" : "") + '>损坏</option><option' + (health === "缺失" ? " selected" : "") + '>缺失</option></select></td>' +
             '<td><select class="inv-material-cell-select" data-line-field="result" data-line-code="' + cell(x.code) + '"><option' + (result === "一致" ? " selected" : "") + '>一致</option><option' + (result === "不一致" ? " selected" : "") + '>不一致</option></select></td>' +
             '<td>' + uploadOnlyCell(x) + '</td>' +
@@ -1520,11 +1541,11 @@
         if (e.target.id === "btnMaterialSubmit") {
           var current = state.current || getRows()[0] || rows[0];
           var checked = materialRows();
-          var isCompanySubmit = normalizeFlowType(current) === "company";
-          var filledRows = checked.filter(function (x) { return isCompanySubmit ? true : confirmQtyValue(x, current) > 0; });
+          var summaryRows = materialSummaryRows();
+          var totalConfirm = summaryRows.reduce(function (sum, item) { return sum + Number(item.confirmQty || 0); }, 0);
           current.status = current.type === "公司盘点" ? "待财务负责人审阅" : "待部门负责人审阅";
-          current.done = filledRows.length;
-          current.diff = filledRows.filter(function (x) { return x.lineStatus === "有差异"; }).length;
+          current.done = totalConfirm;
+          current.diff = checked.filter(function (x) { return x.lineStatus === "有差异"; }).length;
           syncDiffRecords(current);
           if (current.diff > 0) alert("已根据盘点确认结果标记 " + current.diff + " 条不一致记录，请在当前任务中补充盘点说明。");
           close(document.getElementById("materialCheckMask"));
@@ -1634,6 +1655,11 @@
         }
       });
       document.addEventListener("input", function (e) {
+        var summaryTypeCode = e.target.getAttribute("data-summary-confirm");
+        if (summaryTypeCode) {
+          setSummaryConfirmValue(state.current || currentTaskForAction(), summaryTypeCode, e.target.value);
+          return;
+        }
         var lineField = e.target.getAttribute("data-line-field");
         if (lineField) {
           var currentLine = findLine(e.target.getAttribute("data-line-code"));
