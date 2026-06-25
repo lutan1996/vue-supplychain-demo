@@ -260,7 +260,7 @@
     #mtQaAcceptMask .qa-accept-grid .qa-inp[readonly].qa-inp--auto {
       background: #ebebeb !important;
       border-color: #d9d9d9;
-      color: #8c8c8c !important;
+      color: #262626 !important;
       cursor: not-allowed;
     }
     #procModalMask.proc-modal-mask {
@@ -397,6 +397,59 @@
       margin-top: 4px;
       color: #000;
     }
+    #procModalMask.inventory-handle-mode .inv-task-info-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px 18px;
+      margin: 0 0 12px;
+    }
+    #procModalMask.inventory-handle-mode .inv-task-field {
+      display: block;
+      color: #000;
+    }
+    #procModalMask.inventory-handle-mode .inv-task-field.wide-2 {
+      grid-column: span 2;
+    }
+    #procModalMask.inventory-handle-mode .inv-task-field span {
+      display: block;
+      margin-bottom: 6px;
+      color: #516a87;
+      font-size: 13px;
+      font-weight: 600;
+      line-height: 1.5;
+    }
+    #procModalMask.inventory-handle-mode .inv-task-field b {
+      display: flex;
+      align-items: center;
+      width: 100%;
+      min-height: 40px;
+      box-sizing: border-box;
+      border: 1px solid #d9d9d9;
+      border-radius: 4px;
+      background: #fff;
+      color: #000;
+      padding: 0 12px;
+      font-size: 13px;
+      font-weight: 400;
+      line-height: 1.5;
+      word-break: break-all;
+    }
+    #procModalMask.inventory-handle-mode .qa-accept-wrap,
+    #procModalMask.inventory-handle-mode .qa-accept-wrap .qa-lab,
+    #procModalMask.inventory-handle-mode .qa-accept-wrap .qa-val,
+    #procModalMask.inventory-handle-mode .qa-accept-wrap .qa-accept-toolbar-title,
+    #procModalMask.inventory-handle-mode .qa-accept-wrap .qa-block-title,
+    #procModalMask.inventory-handle-mode .qa-accept-wrap .proc-mini-table th,
+    #procModalMask.inventory-handle-mode .qa-accept-wrap .proc-mini-table td {
+      color: #000;
+    }
+    #procModalMask.inventory-handle-mode .qa-accept-wrap input,
+    #procModalMask.inventory-handle-mode .qa-accept-wrap textarea,
+    #procModalMask.inventory-handle-mode .qa-accept-wrap select,
+    #procModalMask.inventory-handle-mode .qa-accept-wrap .qa-inp,
+    #procModalMask.inventory-handle-mode .qa-accept-wrap .qa-select {
+      color: #000;
+    }
     #procModalMask.qa-accept-mode .qa-accept-wrap {
       padding: 12px 16px 14px;
       background: #f5f7fa;
@@ -492,7 +545,7 @@
     #procModalMask .qa-mat-lines-block--readonly .qa-inp,
     #procModalMask .qa-mat-lines-block--readonly .qa-select {
       background: #ebebeb !important;
-      color: #8c8c8c !important;
+      color: #262626 !important;
       cursor: not-allowed;
     }
     #procModalMask.qa-accept-mode .qa-detail-ro {
@@ -1423,7 +1476,7 @@
       }
       function inventoryTodoTaskMetaHtml(task, isCompany) {
         return '<div class="inv-task-info-grid" style="margin:0 0 12px;">' + inventoryTodoTaskMetaFields(task, isCompany).map(function (item) {
-          return '<div class="inv-task-field"><span>' + mtEsc(item[0]) + '</span><b>' + mtEsc(item[1]) + '</b></div>';
+          return '<div class="inv-task-field' + ((item[0] === "盘点任务名称" || item[0] === "盘点部门") ? ' wide-2' : '') + '"><span>' + mtEsc(item[0]) + '</span><b>' + mtEsc(item[1]) + '</b></div>';
         }).join("") + '</div>';
       }
       var inventoryTodoLines = [
@@ -1759,7 +1812,7 @@
         });
         var summaryRows = inventoryTodoSummaryRows(filteredLines);
         var detailLines = isSummary ? [] : inventoryTodoExpandedLines(filteredLines.filter(function (x) { return x.typeCode === detailType; }));
-        var baseHead = '<th>序号</th><th>产品名称</th><th>规格型号</th><th>产品编码</th><th>物资唯一码</th><th>物资类型名称</th><th>物资类型编码</th><th>采购部门</th><th>供应商</th><th>采购单价（含税）</th><th>是否在本部门</th><th>是否开票</th><th>使用人</th><th>资产类型</th><th>资产编号</th><th>存放地点</th><th>使用年限</th><th>原值</th><th>单位</th>';
+        var baseHead = '<th>序号</th><th>产品名称</th><th>规格型号</th><th>产品编码</th><th>物资唯一码</th><th>物资类型名称</th><th>物资类型编码</th><th>采购部门</th><th>供应商</th><th>平均采购单价（含税）</th><th>是否在本部门</th><th>是否开票</th><th>使用人</th><th>资产类型</th><th>资产编号</th><th>存放地点</th><th>使用年限</th><th>原值</th><th>单位</th>';
         var staffHead = '<th>状态是否完好</th><th>盘点结果</th><th>证明材料</th><th>备注</th>';
         var rowsHtml = detailLines.map(function (x, i) {
           var health = x.health || "完好";
@@ -1796,7 +1849,7 @@
           '<div style="font-size:14px;font-weight:600;color:#1f3551;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;gap:12px;">' + tableTitle + (isSummary ? '' : '<button type="button" class="proc-btn" id="inventoryTodoBack">返回汇总</button>') + '</div>' +
           '<div class="qa-mat-lines-table-wrap"><table class="qa-mat-lines-table"><thead><tr>' +
             (isSummary
-              ? '<th>物资类型编码</th><th>资产类型</th><th>采购单价（含税）</th><th>采购总价</th><th>领用部门</th><th>领用人</th><th>存放地点</th><th>库存数量</th><th>盘点确认数量</th><th>操作</th>'
+              ? '<th>物资类型编码</th><th>资产类型</th><th>平均采购单价（含税）</th><th>采购总价（含税）</th><th>使用部门</th><th>使用人</th><th>存放地点</th><th>库存数量</th><th>盘点确认数量</th><th>操作</th>'
               : baseHead + (showResultColumns ? staffHead : "")) +
           '</tr></thead><tbody>' + (isSummary ? summaryHtml : rowsHtml) + '</tbody></table></div>' +
           '</div>' +

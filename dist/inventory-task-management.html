@@ -84,10 +84,13 @@
     .inv-task-field { display: grid; grid-template-columns: 110px minmax(0, 1fr); align-items: center; gap: 10px; color: #111; }
     .inv-task-field span { color: #111; font-size: 13px; line-height: 1.5; }
     .inv-task-field b { color: #111; font-size: 13px; font-weight: 600; line-height: 1.5; word-break: break-all; }
-    .inv-task-info-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px 14px; }
+    .inv-task-info-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px 18px; }
     .inv-task-info-grid .inv-task-field { display: block; }
     .inv-task-info-grid .inv-task-field span { display: block; margin-bottom: 6px; color: #516a87; font-weight: 600; }
-    .inv-task-info-grid .inv-task-field b { display: flex; align-items: center; min-height: 36px; box-sizing: border-box; border: 1px solid #d9d9d9; border-radius: 4px; background: #fff; color: #262626; padding: 0 12px; font-weight: 400; }
+    .inv-task-info-grid .inv-task-field b,
+    .inv-task-info-grid .inv-task-field .inv-task-field-box { display: flex; align-items: center; width: 100%; min-height: 40px; box-sizing: border-box; border: 1px solid #d9d9d9; border-radius: 4px; background: #fff; color: #262626; padding: 0 12px; font-weight: 400; }
+    .inv-task-info-grid .inv-task-field .inv-task-field-box { padding: 0; border: none; min-height: auto; background: transparent; }
+    .inv-task-info-grid .inv-task-field.wide-2 { grid-column: span 2; }
     .inv-task-select-wrap { position: relative; }
     .inv-task-select-wrap::after { content: "▾"; position: absolute; right: 12px; top: 50%; transform: translateY(-50%); pointer-events: none; color: #8c8c8c; font-size: 12px; }
     .inv-task-select-wrap.is-open::after { transform: translateY(-50%) rotate(180deg); }
@@ -105,6 +108,7 @@
       outline: none;
     }
     .inv-task-select-input:focus { border-color: #91caff; box-shadow: 0 0 0 2px rgba(22, 119, 255, .08); }
+    .inv-task-field-note { display: block; margin-top: 4px; color: #8c8c8c; font-size: 12px; line-height: 1.5; }
     .inv-task-select-menu {
       position: absolute;
       left: 0;
@@ -299,7 +303,6 @@
               <div class="inv-actions">
                 <button class="inv-btn primary" id="btnSearch">搜索</button>
                 <button class="inv-btn" id="btnReset">重置</button>
-                <button class="inv-btn" id="btnCreateTask">新增</button>
                 <button class="inv-btn soft" id="btnStartInventory">盘点开始</button>
               </div>
               <div class="inv-table-wrap">
@@ -771,6 +774,51 @@
       function inventoryCompanyParticipantReady(row) {
         return row && (row.status === "已完成" || row.status === "待阅知" || row.status === "待差异处理");
       }
+      function inventoryMetaOptions(label, row) {
+        var optionsMap = {
+          "部门物资专责": [row.owner || "许学良", "李仁堂"],
+          "部门负责人": [row.deptHead || "李仁堂", "王超"],
+          "物资管理部门物资专责": [row.materialOwner || "宋中波", "许学良"],
+          "物资管理部门负责人": [row.materialHead || "王超", "宋中波"],
+          "财务部门负责人": [row.financeHead || "孙睿", "杜欣鑫"],
+          "业务部门负责人": [row.bizHead || "李仁堂", "陈亮", "王贺"],
+          "物资管理部门盘点人员": [row.materialChecker || "宋中波", "许学良"],
+          "财务部门盘点人员": [row.financeChecker || "杜欣鑫", "孙睿"],
+          "业务部门盘点人员": [row.bizChecker || "成明锴", "陈亮", "喻家敏"]
+        };
+        return optionsMap[label] || [row[label] || "-"];
+      }
+      function inventoryMetaNote(label) {
+        var notes = {
+          "部门物资专责": "灰字提示：部门盘点开始环节自动带入。",
+          "部门负责人": "灰字提示：部门负责人审阅环节可见。",
+          "物资管理部门物资专责": "灰字提示：物资管理部门确认/阅知环节可见。",
+          "物资管理部门负责人": "灰字提示：物资管理部门负责人审批环节可见。",
+          "财务部门负责人": "灰字提示：财务部门负责人审批环节可见。",
+          "业务部门负责人": "灰字提示：业务部门负责人审批环节可见。",
+          "物资管理部门盘点人员": "灰字提示：物资管理部门分配盘点人员环节可选。",
+          "财务部门盘点人员": "灰字提示：财务部门分配盘点人员环节可选。",
+          "业务部门盘点人员": "灰字提示：业务部门分配盘点人员环节可选。"
+        };
+        return notes[label] || "";
+      }
+      function inventoryMetaSelect(label, value, row) {
+        var options = inventoryMetaOptions(label, row);
+        var current = cell(value || options[0] || "-");
+        var html = '<div class="inv-task-field wide-2"><span>' + label + '</span><div class="inv-task-field-box"><div class="inv-task-select-wrap"><select class="inv-task-select-input">';
+        options.forEach(function (option) {
+          var text = cell(option);
+          html += '<option value="' + inputValue(text) + '"' + (text === current ? " selected" : "") + '>' + text + '</option>';
+        });
+        html += '</select></div></div>';
+        var note = inventoryMetaNote(label);
+        if (note) html += '<em class="inv-task-field-note">' + note + '</em>';
+        html += '</div>';
+        return html;
+      }
+      function inventoryReadonlyMetaField(label, value, isWide) {
+        return '<div class="inv-task-field' + (isWide ? " wide-2" : "") + '"><span>' + label + '</span><b>' + cell(value) + '</b></div>';
+      }
       function inventoryTaskMetaFields(row, mode) {
         var isCompany = normalizeFlowType(row) === "company";
         var participantReady = inventoryCompanyParticipantReady(row);
@@ -780,6 +828,12 @@
           ["盘点类型", row.type],
           ["盘点部门", isCompany ? inventoryCompanyDeptText() : row.dept]
         ];
+        if (mode === "start") {
+          fields = fields.concat([
+            ["计划开始日期", row.start || "-"],
+            ["计划结束日期", row.end || "-"]
+          ]);
+        }
         if (isCompany) {
           fields = fields.concat([
             ["物资管理部门物资专责", row.materialOwner || "宋中波"],
@@ -800,8 +854,20 @@
         return fields;
       }
       function inventoryTaskMetaHtml(row, mode) {
+        var roleFields = {
+          "部门物资专责": true,
+          "部门负责人": true,
+          "物资管理部门物资专责": true,
+          "物资管理部门负责人": true,
+          "财务部门负责人": true,
+          "业务部门负责人": true,
+          "物资管理部门盘点人员": true,
+          "财务部门盘点人员": true,
+          "业务部门盘点人员": true
+        };
         return '<div class="inv-task-info-grid">' + inventoryTaskMetaFields(row, mode).map(function (item) {
-          return taskField(item[0], item[1]);
+          if (mode === "start" && roleFields[item[0]]) return inventoryMetaSelect(item[0], item[1], row);
+          return inventoryReadonlyMetaField(item[0], item[1], item[0] === "盘点任务名称" || item[0] === "盘点部门");
         }).join("") + '</div>';
       }
       function inventoryPurchaseTotal(price, qty) {
@@ -1017,7 +1083,7 @@
       function taskLines(row) {
         return linesForTask(row || state.current || rows[0]);
       }
-      var inventoryDetailHeaders = ["序号", "产品名称", "规格型号", "产品编码", "物资唯一码", "物资类型名称", "物资类型编码", "采购部门", "供应商", "采购单价（含税）", "是否在本部门", "是否开票", "使用人", "资产类型", "资产编号", "存放地点", "使用年限", "原值", "单位", "状态是否完好", "盘点结果", "证明材料", "备注"];
+      var inventoryDetailHeaders = ["序号", "产品名称", "规格型号", "产品编码", "物资唯一码", "物资类型名称", "物资类型编码", "采购部门", "供应商", "平均采购单价（含税）", "是否在本部门", "是否开票", "使用人", "资产类型", "资产编号", "存放地点", "使用年限", "原值", "单位", "状态是否完好", "盘点结果", "证明材料", "备注"];
       function diffAmountText(line) {
         var type = inferDiffType(line || {});
         if (type !== "盘亏" && type !== "盘盈") return "¥0";
@@ -1197,7 +1263,7 @@
           '</div>',
           '<div class="inv-task-mini-table-wrap"><table class="inv-task-mini-table"><thead><tr>' +
             (isSummary
-              ? '<th>物资类型编码</th><th>资产类型</th><th>采购单价（含税）</th><th>采购总价</th><th>领用部门</th><th>领用人</th><th>存放地点</th><th>库存数量</th><th>盘点确认数量</th><th>操作</th>'
+              ? '<th>物资类型编码</th><th>资产类型</th><th>平均采购单价（含税）</th><th>采购总价（含税）</th><th>使用部门</th><th>使用人</th><th>存放地点</th><th>库存数量</th><th>盘点确认数量</th><th>操作</th>'
               : inventoryDetailHeaders.map(function (x) { return "<th>" + x + "</th>"; }).join("")) +
           '</tr></thead><tbody>' +
             (isSummary
@@ -1239,8 +1305,8 @@
         }
         if (head) {
           head.innerHTML = isSummary
-            ? '<tr><th>物资类型编码</th><th>资产类型</th><th>采购单价（含税）</th><th>采购总价</th><th>领用部门</th><th>领用人</th><th>存放地点</th><th>库存数量</th><th>盘点确认数量</th><th>操作</th></tr>'
-            : '<tr><th>序号</th><th>产品名称</th><th>规格型号</th><th>产品编码</th><th>物资唯一码</th><th>物资类型名称</th><th>物资类型编码</th><th>采购部门</th><th>供应商</th><th>采购单价（含税）</th><th>是否在本部门</th><th>是否开票</th><th>使用人</th><th>资产类型</th><th>资产编号</th><th>存放地点</th><th>使用年限</th><th>原值</th><th>单位</th><th>状态是否完好</th><th>盘点结果</th><th>证明材料</th><th>备注</th></tr>';
+            ? '<tr><th>物资类型编码</th><th>资产类型</th><th>平均采购单价（含税）</th><th>采购总价（含税）</th><th>使用部门</th><th>使用人</th><th>存放地点</th><th>库存数量</th><th>盘点确认数量</th><th>操作</th></tr>'
+            : '<tr><th>序号</th><th>产品名称</th><th>规格型号</th><th>产品编码</th><th>物资唯一码</th><th>物资类型名称</th><th>物资类型编码</th><th>采购部门</th><th>供应商</th><th>平均采购单价（含税）</th><th>是否在本部门</th><th>是否开票</th><th>使用人</th><th>资产类型</th><th>资产编号</th><th>存放地点</th><th>使用年限</th><th>原值</th><th>单位</th><th>状态是否完好</th><th>盘点结果</th><th>证明材料</th><th>备注</th></tr>';
         }
         document.getElementById("materialCheckBody").innerHTML = list.map(function (x, i) {
           if (isSummary) {
