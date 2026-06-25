@@ -85,6 +85,7 @@
     .inv-task-field span { color: #111; font-size: 13px; line-height: 1.5; }
     .inv-task-field b { color: #111; font-size: 13px; font-weight: 600; line-height: 1.5; word-break: break-all; }
     .inv-task-info-grid { display: grid; grid-template-columns: repeat(4, minmax(180px, 1fr)); gap: 12px 18px; width: 100%; align-items: start; }
+    .inv-task-info-grid.is-start-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
     .inv-task-info-grid .inv-task-field { display: block; }
     .inv-task-info-grid .inv-task-field span { display: block; margin-bottom: 6px; color: #516a87; font-weight: 600; }
     .inv-task-info-grid .inv-task-field b,
@@ -869,9 +870,10 @@
           "财务部门盘点人员": true,
           "业务部门盘点人员": true
         };
-        return '<div class="inv-task-info-grid">' + inventoryTaskMetaFields(row, mode).map(function (item) {
+        var isStart = mode === "start";
+        return '<div class="inv-task-info-grid' + (isStart ? ' is-start-grid' : '') + '">' + inventoryTaskMetaFields(row, mode).map(function (item) {
           if (mode === "start" && roleFields[item[0]]) return inventoryMetaSelect(item[0], item[1], row, false);
-          return inventoryReadonlyMetaField(item[0], item[1], item[0] === "盘点任务名称");
+          return inventoryReadonlyMetaField(item[0], item[1], !isStart && item[0] === "盘点任务名称");
         }).join("") + '</div>';
       }
       function inventoryPurchaseTotal(price, qty) {
