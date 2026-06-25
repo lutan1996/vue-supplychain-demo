@@ -821,7 +821,7 @@
         <a class="header-logo" href="#"><img src="assets/logo-chenergy.png" alt="" width="220" height="40" /></a>
         <div class="header-source-brand"><p>新能源供应链管理系统</p></div>
       </div>
-      <div class="header-right"><select class="inv-role-select" id="inventoryRoleSelect" title="切换角色"><option value="dept_specialist">部门物资专责</option><option value="dept_head">部门负责人</option><option value="material_specialist">物资管理部门物资专责</option><option value="material_head">物资管理部门负责人</option><option value="finance_head">财务负责人</option><option value="business_head">业务部门负责人</option><option value="inventory_staff">盘点人员</option></select><span class="clock" id="clock"></span><div class="user-avatar" title="用户">用</div></div>
+      <div class="header-right"><span class="clock" id="clock"></span><div class="user-avatar" title="用户">用</div></div>
     </header>
     <div class="layout">
       <aside class="sidebar" aria-label="主导航">
@@ -1357,18 +1357,31 @@
         dept_head: "部门负责人",
         material_specialist: "物资管理部门物资专责",
         material_head: "物资管理部门负责人",
-        finance_head: "财务负责人",
-        business_head: "业务部门负责人",
+        finance_head: "财务部门负责人",
+        business_head: "业务部门",
         inventory_staff: "盘点人员"
       };
-      function inventoryTodoRoleName() {
-        var role = localStorage.getItem("inventoryDemoRole") || "dept_specialist";
-        return inventoryRoleNames[role] || "办理人";
+      function inventoryTodoRoleKeyForMap(map) {
+        var key = String((map && map["流程定义KEY"]) || "");
+        if (key === "pdtask_dept") return "dept_head";
+        if (key === "pdtask_dept_finance") return "finance_head";
+        if (key === "pdtask_dept_material") return "material_specialist";
+        if (key === "pdtask_company") return "material_head";
+        if (key === "pdtask_company_assign_material") return "material_specialist";
+        if (key === "pdtask_company_assign_business") return "business_head";
+        if (key === "pdtask_company_staff") return "inventory_staff";
+        if (key === "pdtask_company_review_finance") return "finance_head";
+        if (key === "pdtask_company_review_material_head") return "material_head";
+        if (key === "pdtask_company_review_material_specialist") return "material_specialist";
+        return "dept_specialist";
       }
-      function inventoryTodoPrefixedProcName(name) {
+      function inventoryTodoRoleNameForMap(map) {
+        return inventoryRoleNames[inventoryTodoRoleKeyForMap(map)] || "办理人";
+      }
+      function inventoryTodoPrefixedProcName(name, map) {
         var text = String(name || "");
         if (text === "公司盘点任务审批" || text === "部门盘点任务审批") {
-          return inventoryTodoRoleName() + text;
+          return inventoryTodoRoleNameForMap(map) + text;
         }
         return text;
       }
@@ -1452,7 +1465,7 @@
       }
       function inventoryTodoFlow(isCompany, map) {
         if (isCompany) {
-          var role = localStorage.getItem("inventoryDemoRole") || "dept_specialist";
+          var role = inventoryTodoRoleKeyForMap(map);
           var financeName = map["办理人"] || map.handler || "孙睿";
           var companyCurrent = {
             material_head: 2,
@@ -1487,7 +1500,7 @@
         ];
       }
       function inventoryTodoTask(isCompany, map) {
-        var role = localStorage.getItem("inventoryDemoRole") || "dept_specialist";
+        var role = inventoryTodoRoleKeyForMap(map);
         var isDiff = String(map["流程定义KEY"] || "").indexOf("pddiff_") === 0 || map["流程定义名称"] === "盘点差异审批";
         if (isDiff) {
           return {
@@ -1574,7 +1587,7 @@
       }
       function inventoryTodoCanAssign(map) {
         if (!map) return false;
-        var role = localStorage.getItem("inventoryDemoRole") || "dept_specialist";
+        var role = inventoryTodoRoleKeyForMap(map);
         var key = String(map["流程定义KEY"] || "");
         var isCompany = key.indexOf("company") >= 0 || String(map["任务名称"] || "").indexOf("公司") >= 0;
         if (!isCompany) return false;
@@ -1727,7 +1740,7 @@
         return [list[0], Object.assign({}, list[0])];
       }
       function inventoryTodoHtml(map) {
-        var role = localStorage.getItem("inventoryDemoRole") || "dept_specialist";
+        var role = inventoryTodoRoleKeyForMap(map);
         var taskKey = String(map["流程定义KEY"] || "");
         var isMaterialSpecialistTask = role === "material_specialist" && ((map["流程定义名称"] || "").indexOf("盘点") >= 0 || taskKey.indexOf("pdtask_") === 0);
         var isCompany = inventoryTodoIsCompany(map) || (isMaterialSpecialistTask && taskKey.indexOf("dept") < 0);
@@ -1768,7 +1781,7 @@
         }).join("");
         var summaryHtml = summaryRows.map(function (x) {
           return '<tr>' +
-            '<td>' + mtEsc(x.typeCode) + '</td><td>' + mtEsc(x.assetType) + '</td><td>' + inventoryTodoMoney(x.price) + '</td><td>' + inventoryTodoMoney(inventoryTodoPurchaseTotal(x.price, x.bookQty)) + '</td><td>' + mtEsc(x.dept) + '</td><td>' + mtEsc(x.user) + '</td><td>' + mtEsc(x.loc) + '</td><td>' + mtEsc(x.stockQty) + '</td><td>' + mtEsc(x.requisitionQty) + '</td><td>' + mtEsc(x.confirmQty) + '</td><td><span class="inv-op"><span role="button" tabindex="0" data-inventory-summary-view="' + mtEsc(x.typeCode) + '">物资明细</span></span></td>' +
+            '<td>' + mtEsc(x.typeCode) + '</td><td>' + mtEsc(x.assetType) + '</td><td>' + inventoryTodoMoney(x.price) + '</td><td>' + inventoryTodoMoney(inventoryTodoPurchaseTotal(x.price, x.bookQty)) + '</td><td>' + mtEsc(x.dept) + '</td><td>' + mtEsc(x.user) + '</td><td>' + mtEsc(x.loc) + '</td><td>' + mtEsc(x.stockQty) + '</td><td>' + mtEsc(x.confirmQty) + '</td><td><span class="inv-op"><span role="button" tabindex="0" data-inventory-summary-view="' + mtEsc(x.typeCode) + '">物资明细</span></span></td>' +
           '</tr>';
         }).join("");
         var tableTitle = isSummary ? "盘点物资汇总表" : (isCompany ? "盘点物资明细表（已入库未出库）" : "盘点物资明细表");
@@ -1783,11 +1796,11 @@
           '<div style="font-size:14px;font-weight:600;color:#1f3551;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;gap:12px;">' + tableTitle + (isSummary ? '' : '<button type="button" class="proc-btn" id="inventoryTodoBack">返回汇总</button>') + '</div>' +
           '<div class="qa-mat-lines-table-wrap"><table class="qa-mat-lines-table"><thead><tr>' +
             (isSummary
-              ? '<th>物资类型编码</th><th>资产类型</th><th>采购单价（含税）</th><th>采购总价</th><th>领用部门</th><th>领用人</th><th>存放地点</th><th>库存数量</th><th>领用数量</th><th>盘点确认数量</th><th>操作</th>'
+              ? '<th>物资类型编码</th><th>资产类型</th><th>采购单价（含税）</th><th>采购总价</th><th>领用部门</th><th>领用人</th><th>存放地点</th><th>库存数量</th><th>盘点确认数量</th><th>操作</th>'
               : baseHead + (showResultColumns ? staffHead : "")) +
           '</tr></thead><tbody>' + (isSummary ? summaryHtml : rowsHtml) + '</tbody></table></div>' +
           '</div>' +
-          '<div style="margin-top:12px;"><div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:8px;"><div style="font-size:14px;color:#1f3551;font-weight:600;">' + mtEsc(inventoryTodoRoleName() + '办理意见') + '</div>' + (inventoryTodoCanAssign(map) ? '<button type="button" class="proc-btn proc-btn-primary" id="inventoryTodoAssignInline">分配盘点人员</button>' : '') + '</div><textarea class="qa-ta" id="inventoryTodoOpinion" rows="2" placeholder="请输入办理意见"></textarea></div>' +
+          '<div style="margin-top:12px;"><div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:8px;"><div style="font-size:14px;color:#1f3551;font-weight:600;">' + mtEsc(inventoryTodoRoleNameForMap(map) + '办理意见') + '</div>' + (inventoryTodoCanAssign(map) ? '<button type="button" class="proc-btn proc-btn-primary" id="inventoryTodoAssignInline">分配盘点人员</button>' : '') + '</div><textarea class="qa-ta" id="inventoryTodoOpinion" rows="2" placeholder="请输入办理意见"></textarea></div>' +
           '</div>';
       }
       function closeInventoryTodoModal() {
@@ -1812,7 +1825,7 @@
         var oldMask = document.getElementById("inventoryAssignModalMask");
         if (oldMask && oldMask.parentNode) oldMask.parentNode.removeChild(oldMask);
         var task = inventoryTodoTask(true, map || {});
-        var role = localStorage.getItem("inventoryDemoRole") || "dept_specialist";
+        var role = inventoryTodoRoleKeyForMap(map);
         var people = role === "business_head" ? ["成明锴", "许学良", "喻家敏"] : ["宋中波", "杜欣鑫", "成明锴", "许学良"];
         var assignTitle = role === "business_head" ? "分配业务部门盘点人员" : "分配物资部门盘点人员";
         var maskHtml =
@@ -1911,7 +1924,7 @@
             };
           }
         }
-        mt$("procModalTitle").textContent = "办理 · " + inventoryTodoPrefixedProcName(map["流程定义名称"] || "盘点任务审批");
+        mt$("procModalTitle").textContent = "办理 · " + inventoryTodoPrefixedProcName(map["流程定义名称"] || "盘点任务审批", map);
         rerenderInventoryTodoBody();
         var isInventoryStaffHandle = String(map["流程定义KEY"] || "") === "pdtask_company_staff";
         mt$("procModalFoot").innerHTML =
@@ -1940,14 +1953,6 @@
       var procXBtn = mt$("procModalX");
       if (procCloseBtn) procCloseBtn.onclick = closeInventoryTodoModal;
       if (procXBtn) procXBtn.onclick = closeInventoryTodoModal;
-      var invRoleSelect = mt$("inventoryRoleSelect");
-      if (invRoleSelect) {
-        invRoleSelect.value = localStorage.getItem("inventoryDemoRole") || "dept_specialist";
-        invRoleSelect.onchange = function () {
-          localStorage.setItem("inventoryDemoRole", invRoleSelect.value);
-          renderMtTable();
-        };
-      }
       var reminderGo = mt$("inventoryTaskReminderGo");
       var reminderClose = mt$("inventoryTaskReminderClose");
       var reminderDismiss = mt$("inventoryTaskReminderDismiss");
@@ -1987,17 +1992,7 @@
         var invRole = localStorage.getItem("inventoryDemoRole") || "dept_specialist";
         base = base.filter(function (row) {
           var procKey = String(row[3] || "");
-          if (procKey === "pdtask_company") return invRole === "material_head";
-          if (procKey === "pdtask_company_assign_material") return invRole === "material_specialist";
-          if (procKey === "pdtask_company_assign_business") return invRole === "business_head";
-          if (procKey === "pdtask_company_review_finance") return invRole === "finance_head";
-          if (procKey === "pdtask_company_review_material_head") return invRole === "material_head";
-          if (procKey === "pdtask_company_review_material_specialist") return invRole === "material_specialist";
-          if (invRole === "inventory_staff") return procKey === "pdtask_company_staff";
-          if (procKey === "pdtask_company_staff") return invRole === "inventory_staff";
-          if (procKey === "pdtask_dept_finance") return invRole === "finance_head";
-          if (procKey === "pdtask_dept_material") return invRole === "material_specialist";
-          if (procKey === "pdtask_dept") return invRole === "dept_specialist" || invRole === "dept_head";
+          if (procKey.indexOf("pdtask_") === 0) return true;
           return true;
         });
 
@@ -2102,7 +2097,12 @@
             } else if (cfg.cols[j] === "办理人") {
               td.innerHTML = "<span class='mt-status mt-s1'>" + val + "</span>";
             } else if (cfg.cols[j] === "流程定义名称") {
-              td.textContent = inventoryTodoPrefixedProcName(val);
+              td.textContent = inventoryTodoPrefixedProcName(val, {
+                "流程定义名称": String(val || ""),
+                "流程定义KEY": String(displayRows[i][3] || ""),
+                "任务名称": String(displayRows[i][4] || ""),
+                "办理人": String(displayRows[i][5] || "")
+              });
             } else if (cfg.cols[j] === "操作" && val === "icons") {
               /* 我发起的：已驳回可改/删/看；待审核类（审核中、待审批等）仅查看 + 流程跟踪 */
               var statusIdx = cfg.cols.indexOf("流程状态");

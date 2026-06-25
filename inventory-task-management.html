@@ -266,7 +266,7 @@
         <a class="header-logo" href="#" aria-label="国家能源集团"><img src="assets/logo-chenergy.png" alt="国家能源集团 CHN ENERGY" width="220" height="40" /></a>
         <div class="header-source-brand"><p>新能源供应链管理系统</p></div>
       </div>
-      <div class="header-right"><select class="inv-role-select" id="inventoryRoleSelect" title="切换角色"><option value="dept_specialist">部门物资专责</option><option value="dept_head">部门负责人</option><option value="material_specialist">物资管理部门物资专责</option><option value="material_head">物资管理部门负责人</option><option value="finance_head">财务负责人</option><option value="business_head">业务部门负责人</option><option value="inventory_staff">盘点人员</option></select><span class="clock" id="clock"></span><div class="user-avatar" title="用户">用</div></div>
+      <div class="header-right"><span class="clock" id="clock"></span><div class="user-avatar" title="用户">用</div></div>
     </header>
     <div class="layout">
       <aside class="sidebar" aria-label="主导航">
@@ -1197,7 +1197,7 @@
           '</div>',
           '<div class="inv-task-mini-table-wrap"><table class="inv-task-mini-table"><thead><tr>' +
             (isSummary
-              ? '<th>物资类型编码</th><th>资产类型</th><th>采购单价（含税）</th><th>采购总价</th><th>领用部门</th><th>领用人</th><th>存放地点</th><th>库存数量</th><th>领用数量</th><th>盘点确认数量</th><th>操作</th>'
+              ? '<th>物资类型编码</th><th>资产类型</th><th>采购单价（含税）</th><th>采购总价</th><th>领用部门</th><th>领用人</th><th>存放地点</th><th>库存数量</th><th>盘点确认数量</th><th>操作</th>'
               : inventoryDetailHeaders.map(function (x) { return "<th>" + x + "</th>"; }).join("")) +
           '</tr></thead><tbody>' +
             (isSummary
@@ -1211,7 +1211,6 @@
                   '<td>' + cell(x.user) + '</td>' +
                   '<td>' + cell(x.loc) + '</td>' +
                   '<td>' + cell(x.stockQty) + '</td>' +
-                  '<td>' + cell(x.requisitionQty) + '</td>' +
                   '<td>' + cell(x.confirmQty) + '</td>' +
                   '<td><span class="inv-op"><span role="button" tabindex="0" data-task-summary-view="' + cell(x.typeCode) + '">物资明细</span></span></td>' +
                 '</tr>';
@@ -1240,7 +1239,7 @@
         }
         if (head) {
           head.innerHTML = isSummary
-            ? '<tr><th>物资类型编码</th><th>资产类型</th><th>采购单价（含税）</th><th>采购总价</th><th>领用部门</th><th>领用人</th><th>存放地点</th><th>库存数量</th><th>领用数量</th><th>盘点确认数量</th><th>操作</th></tr>'
+            ? '<tr><th>物资类型编码</th><th>资产类型</th><th>采购单价（含税）</th><th>采购总价</th><th>领用部门</th><th>领用人</th><th>存放地点</th><th>库存数量</th><th>盘点确认数量</th><th>操作</th></tr>'
             : '<tr><th>序号</th><th>产品名称</th><th>规格型号</th><th>产品编码</th><th>物资唯一码</th><th>物资类型名称</th><th>物资类型编码</th><th>采购部门</th><th>供应商</th><th>采购单价（含税）</th><th>是否在本部门</th><th>是否开票</th><th>使用人</th><th>资产类型</th><th>资产编号</th><th>存放地点</th><th>使用年限</th><th>原值</th><th>单位</th><th>状态是否完好</th><th>盘点结果</th><th>证明材料</th><th>备注</th></tr>';
         }
         document.getElementById("materialCheckBody").innerHTML = list.map(function (x, i) {
@@ -1254,7 +1253,6 @@
               '<td>' + cell(x.user) + '</td>' +
               '<td>' + cell(x.loc) + '</td>' +
               '<td>' + cell(x.stockQty) + '</td>' +
-              '<td>' + cell(x.requisitionQty) + '</td>' +
               '<td>' + cell(x.confirmQty) + '</td>' +
               '<td><span class="inv-op"><span role="button" tabindex="0" data-material-summary-view="' + cell(x.typeCode) + '">物资明细</span></span></td>' +
             '</tr>';
@@ -1651,12 +1649,6 @@
             return;
           }
         }
-        if (e.target.id === "inventoryRoleSelect") {
-          state.role = e.target.value;
-          localStorage.setItem("inventoryDemoRole", state.role);
-          renderTable();
-          return;
-        }
         if (e.target.id === "createType") {
           var isCompanyCreate = e.target.value === "公司盘点";
           document.getElementById("createDept").value = isCompanyCreate ? "全部业务部门" : "机械研究所";
@@ -1699,8 +1691,6 @@
           openMaterialCheck(currentTaskForAction());
         };
       }
-      var roleSel = document.getElementById("inventoryRoleSelect");
-      if (roleSel) roleSel.value = state.role;
       function syncInventoryPageTitle() {
         document.title = pageTitle + " - 新能源物资供应链管理系统";
         var pageTitleEl = document.getElementById("inventoryPageTitle");
