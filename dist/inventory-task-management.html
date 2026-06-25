@@ -345,7 +345,7 @@
         <div class="inv-table-title">盘点物资明细表</div>
         <div style="overflow:auto" data-skip-demo-unify>
           <table class="inv-detail-table">
-            <thead><tr><th>资产编号</th><th>物资唯一码</th><th>物资类型编码</th><th>产品编码</th><th>资产名称</th><th>规格型号</th><th>物资类型名称</th><th>存放地点</th><th>保管人</th><th>使用年限</th><th>原值</th><th>数量</th><th>单位</th><th>盘点数量</th><th>使用状况</th><th>盘点结果</th><th>备注1</th><th>备注2</th><th>备注3</th><th>仓库/货位</th><th>最近盘库单号</th><th>最近盘库日期</th><th>盘库账面数量</th><th>盘库实盘数量</th><th>盘库差异</th><th>盘点确认数量</th><th>库存状态</th><th>差异数量</th><th>权属/授权编号</th><th>使用部门</th><th>使用负责人</th><th>授权开始日期</th><th>授权到期日期</th><th>账面原值</th><th>账面净值</th><th>使用状态</th><th>清查结果</th><th>操作</th></tr></thead>
+            <thead><tr><th>资产编号</th><th>物资唯一码</th><th>物资类型编码</th><th>产品编码</th><th>资产名称</th><th>规格型号</th><th>物资类型名称</th><th>存放地点</th><th>使用人</th><th>原值</th><th>数量</th><th>单位</th><th>盘点数量</th><th>使用状况</th><th>盘点结果</th><th>备注1</th><th>备注2</th><th>备注3</th><th>仓库/货位</th><th>最近盘库单号</th><th>最近盘库日期</th><th>盘库账面数量</th><th>盘库实盘数量</th><th>盘库差异</th><th>盘点确认数量</th><th>库存状态</th><th>差异数量</th><th>权属/授权编号</th><th>使用部门</th><th>使用负责人</th><th>授权开始日期</th><th>授权到期日期</th><th>账面原值</th><th>账面净值</th><th>使用状态</th><th>清查结果</th><th>操作</th></tr></thead>
             <tbody id="detailLines"></tbody>
           </table>
         </div>
@@ -370,10 +370,10 @@
           <div class="wh-field"><label class="wh-label">责任部门</label><input class="wh-input" id="confirmDept"></div>
           <div class="wh-field"><label class="wh-label">责任人</label><input class="wh-input" id="confirmOwner"></div>
           <div class="wh-field" style="grid-column:1 / -1"><label class="wh-label">差异原因</label><input class="wh-input" id="confirmReason" placeholder="不一致时填写差异原因"></div>
-          <div class="wh-field"><label class="wh-label">处理建议</label><input class="wh-input" id="confirmAdvice" value="进入盘点差异处理"></div>
+          <div class="wh-field"><label class="wh-label">处理建议</label><input class="wh-input" id="confirmAdvice" value="补充盘点说明"></div>
           <div class="wh-field"><label class="wh-label">附件/说明</label><input class="wh-input" id="confirmAttachment" value="盘点说明待上传"></div>
         </div>
-        <div class="inv-rule-box">保存后，系统按物资唯一码把不一致记录归入盘点差异处理；存货类同时带入最近盘库日期、盘库账面数量、盘库实盘数量和盘库差异。</div>
+        <div class="inv-rule-box">保存后，系统按盘点确认结果更新当前任务记录；存货类同时带入最近盘库日期、盘库账面数量、盘库实盘数量和盘库差异。</div>
       </div>
       <div class="wh-modal-foot"><button type="button" class="wh-btn wh-btn--ghost" data-close>取消</button><button type="button" class="wh-btn wh-btn--primary" id="btnConfirmOk">保存</button></div>
     </div>
@@ -449,7 +449,7 @@
               <col style="width:132px">
               <col style="width:176px">
             </colgroup>
-            <thead id="materialCheckHead"><tr><th>序号</th><th>资产编号</th><th>物资唯一码</th><th>物资类型编码</th><th>产品编码</th><th>产品名称</th><th>产品型号</th><th>物资类型名称</th><th>所属部门</th><th>存储地点/仓库货位</th><th>使用人</th><th>保管人</th><th>使用年限</th><th>产权</th><th>在库/领用状态</th><th>账面数量</th><th>单位</th></tr></thead>
+            <thead id="materialCheckHead"><tr><th>序号</th><th>资产编号</th><th>物资唯一码</th><th>物资类型编码</th><th>产品编码</th><th>产品名称</th><th>产品型号</th><th>物资类型名称</th><th>所属部门</th><th>存储地点/仓库货位</th><th>使用人</th><th>产权</th><th>在库/领用状态</th><th>账面数量</th><th>单位</th></tr></thead>
             <tbody id="materialCheckBody"></tbody>
           </table>
           <div class="inv-material-empty" id="materialCheckEmpty" hidden>暂无数据</div>
@@ -541,7 +541,7 @@
       ];
       var lines = [
         { task: "PD-2026-001", assetNo: "ZC-2026-0001", code: "C20260000001", typeCode: "A0010020001", product: "B00001234", assetName: "变桨轴承", spec: "BP-2.0MW", materialTypeName: "固定资产", dept: "机械研究所", loc: "机械研究所/华北主仓A-01", user: "李仁堂", state: "在库", health: "完好", lastNo: "PD-2026-001", lastDate: "2026-06-25", book: 1, real: 1, result: "正常", lineStatus: "已确认", diffType: "正常", reason: "", keeper: "李仁堂", serviceLife: "8年", originalValue: 680000, qty: 1, unit: "台", checkQty: 1, useStatus: "正常", checkResult: "正常", remark1: "固定资产", remark2: "状态完好", remark3: "无需调整" },
-        { task: "PD-2026-001", assetNo: "ZC-2026-0002", code: "C20260000002", typeCode: "A0010020002", product: "B00001235", assetName: "齿轮箱滤芯", spec: "GX-LX-90", materialTypeName: "存货", dept: "机械研究所", loc: "机械研究所/华北主仓A-03", user: "许学良", state: "在库", health: "完好", lastNo: "PD-2026-001", lastDate: "2026-06-25", book: 12, real: 10, result: "盘亏", lineStatus: "有差异", diffType: "盘亏", reason: "账面数量与实盘数量不一致，需进入盘点差异处理", warehouseLoc: "华北主仓A-03", stockNo: "PK-2026-0412", stockDate: "2026-06-20", stockBook: 12, stockReal: 10, stockDiff: -2, confirmQty: 10, stockStatus: "在库", diffQty: -2, unit: "件", checkResult: "盘亏" },
+        { task: "PD-2026-001", assetNo: "ZC-2026-0002", code: "C20260000002", typeCode: "A0010020002", product: "B00001235", assetName: "齿轮箱滤芯", spec: "GX-LX-90", materialTypeName: "存货", dept: "机械研究所", loc: "机械研究所/华北主仓A-03", user: "许学良", state: "在库", health: "完好", lastNo: "PD-2026-001", lastDate: "2026-06-25", book: 12, real: 10, result: "盘亏", lineStatus: "有差异", diffType: "盘亏", reason: "账面数量与实盘数量不一致，待补充盘点说明", warehouseLoc: "华北主仓A-03", stockNo: "PK-2026-0412", stockDate: "2026-06-20", stockBook: 12, stockReal: 10, stockDiff: -2, confirmQty: 10, stockStatus: "在库", diffQty: -2, unit: "件", checkResult: "盘亏" },
         { task: "PD-2026-001", assetNo: "ZC-2026-0004", code: "C20260000004", typeCode: "A0010020003", product: "B00001236", assetName: "塔筒振动传感器", spec: "TS-300", materialTypeName: "固定资产", dept: "机械研究所", loc: "机械研究所/华北主仓A-02", user: "李仁堂", state: "在库", health: "完好", lastNo: "PD-2026-001", lastDate: "2026-06-25", book: 1, real: 1, result: "正常", lineStatus: "已确认", diffType: "正常", reason: "", keeper: "李仁堂", serviceLife: "5年", originalValue: 210000, qty: 1, unit: "台", checkQty: 1, useStatus: "正常", checkResult: "正常", remark1: "固定资产", remark2: "状态完好", remark3: "无需调整" },
         { task: "PD-2026-001", assetNo: "ZC-2026-0005", code: "C20260000005", typeCode: "A0010020004", product: "B00001237", assetName: "润滑油滤网", spec: "LY-50", materialTypeName: "存货", dept: "机械研究所", loc: "机械研究所/华北主仓A-04", user: "许学良", state: "在库", health: "完好", lastNo: "PD-2026-001", lastDate: "2026-06-25", book: 8, real: 8, result: "正常", lineStatus: "已确认", diffType: "正常", reason: "", warehouseLoc: "华北主仓A-04", stockNo: "PK-2026-0413", stockDate: "2026-06-20", stockBook: 8, stockReal: 8, stockDiff: 0, confirmQty: 8, stockStatus: "在库", diffQty: 0, unit: "件", checkResult: "正常" },
         { task: "PD-2026-002", assetNo: "ZC-2026-0003", code: "C20260000003", typeCode: "A0020010006", product: "B00001888", assetName: "变频器模块", spec: "VF-800", materialTypeName: "存货", dept: "电气控制所", loc: "电气控制所/备用柜", user: "成明锴", state: "已入库", health: "待核验", lastNo: "PD-2026-002", lastDate: "2026-06-28", book: 2, real: 3, result: "盘盈", lineStatus: "有差异", diffType: "盘盈", reason: "现场多出一件未入账物资，需核对采购合同和入库记录", warehouseLoc: "备用柜", stockNo: "PK-2026-0415", stockDate: "2026-06-22", stockBook: 2, stockReal: 3, stockDiff: 1, confirmQty: 3, stockStatus: "已入库", diffQty: 1, unit: "件", checkResult: "盘盈" },
@@ -580,6 +580,9 @@
         if (line.health && line.health !== "完好") return "损毁";
         if (line.result && line.result !== "正常") return normalizeDiffType(line.result, line);
         return "正常";
+      }
+      function consistencyResult(line) {
+        return inferDiffType(line || {}) === "正常" ? "一致" : "不一致";
       }
       function syncDiffRecords(task) {
         var list = storedDiffs().filter(function (x) { return x.task !== task.no; });
@@ -827,12 +830,10 @@
             '</div>' +
           '</div>' +
           '<div class="inv-report-section">' +
-            '<h4>差异汇总</h4>' +
-            '<table class="inv-report-table"><thead><tr><th>差异类型</th><th>数量</th><th>处理说明</th></tr></thead><tbody>' +
-              '<tr><td>正常</td><td>' + typeCount("正常") + '</td><td>账、卡、物一致，纳入台账归档</td></tr>' +
-              '<tr><td>盘盈</td><td>' + typeCount("盘盈") + '</td><td>核对采购、入库及领用记录，责任部门确认后调整库存</td></tr>' +
-              '<tr><td>盘亏</td><td>' + typeCount("盘亏") + '</td><td>查明原因后提交差异处理；固定资产大额盘亏按规则提交审批</td></tr>' +
-              '<tr><td>损毁</td><td>' + typeCount("损毁") + '</td><td>补充盘点说明，按资产类别办理处置或台账更正</td></tr>' +
+            '<h4>盘点结果汇总</h4>' +
+            '<table class="inv-report-table"><thead><tr><th>盘点结果</th><th>数量</th><th>处理说明</th></tr></thead><tbody>' +
+              '<tr><td>一致</td><td>' + typeCount("正常") + '</td><td>账、卡、物一致，纳入台账归档</td></tr>' +
+              '<tr><td>不一致</td><td>' + (typeCount("盘盈") + typeCount("盘亏") + typeCount("损毁")) + '</td><td>补充盘点说明，结合台账、盘点照片和现场记录继续核实</td></tr>' +
             '</tbody></table>' +
           '</div>';
         open(document.getElementById("reportMask"));
@@ -868,7 +869,7 @@
       function renderDetailLines() {
         var list = linesForTask(state.current);
         document.getElementById("detailLines").innerHTML = list.map(function (x) {
-          return '<tr class="' + (x.lineStatus === "有差异" ? "inv-row-diff" : "") + '"><td>' + cell(x.assetNo) + '</td><td>' + cell(x.code) + '</td><td>' + cell(x.typeCode) + '</td><td>' + cell(x.product) + '</td><td>' + cell(x.assetName) + '</td><td>' + cell(x.spec) + '</td><td>' + cell(x.materialTypeName) + '</td><td>' + cell(x.loc) + '</td><td>' + cell(x.keeper || x.user) + '</td><td>' + cell(x.serviceLife) + '</td><td>' + money(x.originalValue) + '</td><td>' + cell(x.qty) + '</td><td>' + cell(x.unit) + '</td><td>' + cell(x.checkQty || x.confirmQty || x.real) + '</td><td>' + cell(x.useStatus || x.health) + '</td><td>' + resultText(x.checkResult || x.result) + '</td><td>' + cell(x.remark1) + '</td><td>' + cell(x.remark2) + '</td><td>' + cell(x.remark3) + '</td><td>' + cell(x.warehouseLoc) + '</td><td>' + cell(x.stockNo) + '</td><td>' + cell(x.stockDate) + '</td><td>' + cell(x.stockBook) + '</td><td>' + cell(x.stockReal) + '</td><td>' + resultText(x.stockDiff) + '</td><td>' + cell(x.confirmQty) + '</td><td>' + cell(x.stockStatus) + '</td><td>' + resultText(x.diffQty) + '</td><td>' + cell(x.authNo) + '</td><td>' + cell(x.useDept) + '</td><td>' + cell(x.useOwner) + '</td><td>' + cell(x.authStart) + '</td><td>' + cell(x.authEnd) + '</td><td>' + money(x.bookOriginal) + '</td><td>' + money(x.bookNet) + '</td><td>' + cell(x.intangibleStatus) + '</td><td>' + resultText(x.clearResult) + '</td><td>' + lineActions(x) + '</td></tr>';
+          return '<tr class="' + (x.lineStatus === "有差异" ? "inv-row-diff" : "") + '"><td>' + cell(x.assetNo) + '</td><td>' + cell(x.code) + '</td><td>' + cell(x.typeCode) + '</td><td>' + cell(x.product) + '</td><td>' + cell(x.assetName) + '</td><td>' + cell(x.spec) + '</td><td>' + cell(x.materialTypeName) + '</td><td>' + cell(x.loc) + '</td><td>' + cell(x.user) + '</td><td>' + money(x.originalValue) + '</td><td>' + cell(x.qty) + '</td><td>' + cell(x.unit) + '</td><td>' + cell(x.checkQty || x.confirmQty || x.real) + '</td><td>' + cell(x.useStatus || x.health) + '</td><td>' + cell(consistencyResult(x)) + '</td><td>' + cell(x.remark1) + '</td><td>' + cell(x.remark2) + '</td><td>' + cell(x.remark3) + '</td><td>' + cell(x.warehouseLoc) + '</td><td>' + cell(x.stockNo) + '</td><td>' + cell(x.stockDate) + '</td><td>' + cell(x.stockBook) + '</td><td>' + cell(x.stockReal) + '</td><td>' + resultText(x.stockDiff) + '</td><td>' + cell(x.confirmQty) + '</td><td>' + cell(x.stockStatus) + '</td><td>' + resultText(x.diffQty) + '</td><td>' + cell(x.authNo) + '</td><td>' + cell(x.useDept) + '</td><td>' + cell(x.useOwner) + '</td><td>' + cell(x.authStart) + '</td><td>' + cell(x.authEnd) + '</td><td>' + money(x.bookOriginal) + '</td><td>' + money(x.bookNet) + '</td><td>' + cell(x.intangibleStatus) + '</td><td>' + resultText(x.clearResult) + '</td><td>' + lineActions(x) + '</td></tr>';
         }).join("");
         var diffList = list.filter(function (x) { return x.lineStatus === "有差异"; });
         var reasonBox = document.getElementById("detailReason");
@@ -883,7 +884,7 @@
       function taskLines(row) {
         return linesForTask(row || state.current || rows[0]);
       }
-      var inventoryDetailHeaders = ["序号", "产品名称", "产品型号", "产品编码", "物资唯一码", "物资类型名称", "物资类型编码", "采购部门", "供应商", "采购单价（含税）", "是否在本部门", "是否开票", "使用人", "资产类型", "资产编号", "存放地点", "在库/领用状态", "账面数量", "单位", "盘点确认数量", "使用状态", "盘点结果", "盘点依据", "差异类型", "备注"];
+      var inventoryDetailHeaders = ["序号", "产品名称", "产品型号", "产品编码", "物资唯一码", "物资类型名称", "物资类型编码", "采购部门", "供应商", "采购单价（含税）", "是否在本部门", "是否开票", "使用人", "资产类型", "资产编号", "存放地点", "在库/领用状态", "账面数量", "单位", "盘点确认数量", "状态是否完好", "盘点结果", "证明材料", "备注"];
       function diffAmountText(line) {
         var type = inferDiffType(line || {});
         if (type !== "盘亏" && type !== "盘盈") return "¥0";
@@ -915,9 +916,8 @@
           line.unit || "件",
           1,
           line.health,
-          line.result || line.checkResult || "正常",
+          consistencyResult(line),
           proof,
-          diffType,
           line.reason || (diffType === "正常" ? "无差异" : "盘点确认与系统台账不一致")
         ];
         return "<tr>" + cells.map(function (v) { return "<td>" + cell(v) + "</td>"; }).join("") + "</tr>";
@@ -981,8 +981,8 @@
               taskField("使用人", line.user),
               taskField("库存数量", cell(line.confirmQty || line.real) + cell(line.unit || "件")),
               taskField("在库/领用状态", statusPillText(line)),
-              taskField("使用状态", line.health),
-              taskField("盘点结果", line.result),
+              taskField("状态是否完好", line.health),
+              taskField("盘点结果", consistencyResult(line)),
             '</div>',
             '<div>',
               '<div class="inv-task-media">',
@@ -1008,8 +1008,8 @@
         panel.innerHTML = '<h4>物资跟踪 - ' + cell(line.assetName) + '</h4><div class="inv-task-track-list">' +
           '<div class="inv-task-track-item">2026.4.20 入库：' + cell(line.assetName) + '（' + cell(line.product) + '）<span class="inv-task-track-sub">入库时间：2026.4.20 10:18；入库地点：' + cell(line.loc) + '；入库单号：RK-2026-0420；办理人：宋中波</span></div>' +
           '<div class="inv-task-track-item">2026.5.10 被' + cell(line.dept) + '领用<span class="inv-task-track-sub">领用时间：2026.5.10 15:08；领用单号：LY-2026-0510；领用部门：' + cell(line.dept) + '；领用人/负责人：' + cell(line.user) + '</span></div>' +
-          '<div class="inv-task-track-item">2026.5.12 使用人变更（初始保管人 → ' + cell(line.user) + '）<span class="inv-task-track-sub">变更时间：2026.5.12 09:20；原存放地点：' + cell(line.loc) + '；变更人：部门物资专责；接收人：' + cell(line.user) + '；变更原因：岗位调整</span></div>' +
-          '<div class="inv-task-track-item">2026.5.18 存放位置复核<span class="inv-task-track-sub">复核时间：2026.5.18 14:36；当前位置：' + cell(line.loc) + '；复核人：' + cell(line.user) + '；盘点结果：' + cell(line.result) + '</span></div>' +
+          '<div class="inv-task-track-item">2026.5.12 使用人变更（初始使用人 → ' + cell(line.user) + '）<span class="inv-task-track-sub">变更时间：2026.5.12 09:20；原存放地点：' + cell(line.loc) + '；变更人：部门物资专责；接收人：' + cell(line.user) + '；变更原因：岗位调整</span></div>' +
+          '<div class="inv-task-track-item">2026.5.18 存放位置复核<span class="inv-task-track-sub">复核时间：2026.5.18 14:36；当前位置：' + cell(line.loc) + '；复核人：' + cell(line.user) + '；盘点结果：' + cell(consistencyResult(line)) + '</span></div>' +
         '</div>';
       }
       function taskField(label, value, isHtml) {
@@ -1079,7 +1079,7 @@
         if (head) {
           head.innerHTML = isSummary
             ? '<tr><th>物资类型名称</th><th>物资类型编码</th><th>资产类型</th><th>采购单价（含税）</th><th>库存数量</th><th>领用数量</th><th>盘点确认数量</th><th>领用部门</th><th>领用人</th><th>存放地点</th><th>操作</th></tr>'
-            : '<tr><th>序号</th><th>产品名称</th><th>产品型号</th><th>产品编码</th><th>物资唯一码</th><th>物资类型名称</th><th>物资类型编码</th><th>采购部门</th><th>供应商</th><th>采购单价（含税）</th><th>是否在本部门</th><th>是否开票</th><th>使用人</th><th>资产类型</th><th>资产编号</th><th>存放地点</th><th>在库/领用状态</th><th>账面数量</th><th>单位</th><th>盘点确认数量</th><th>使用状态</th><th>盘点结果</th><th>盘点依据</th><th>差异类型</th><th>备注</th></tr>';
+            : '<tr><th>序号</th><th>产品名称</th><th>产品型号</th><th>产品编码</th><th>物资唯一码</th><th>物资类型名称</th><th>物资类型编码</th><th>采购部门</th><th>供应商</th><th>采购单价（含税）</th><th>是否在本部门</th><th>是否开票</th><th>使用人</th><th>资产类型</th><th>资产编号</th><th>存放地点</th><th>在库/领用状态</th><th>账面数量</th><th>单位</th><th>盘点确认数量</th><th>状态是否完好</th><th>盘点结果</th><th>证明材料</th><th>备注</th></tr>';
         }
         document.getElementById("materialCheckBody").innerHTML = list.map(function (x, i) {
           if (isSummary) {
@@ -1098,8 +1098,7 @@
             '</tr>';
           }
           var health = x.health || "完好";
-          var result = x.result && x.result !== "未盘点" ? x.result : "一致";
-          var diffType = inferDiffType(x);
+          var result = consistencyResult(x);
           return '<tr>' +
             '<td>' + (i + 1) + '</td>' +
             '<td>' + cell(x.assetName) + '</td>' +
@@ -1122,9 +1121,8 @@
             '<td>' + cell(x.unit || "件") + '</td>' +
             '<td><input class="inv-material-cell-input" value="1" readonly></td>' +
             '<td><select class="inv-material-cell-select"><option' + (health === "完好" ? " selected" : "") + '>完好</option><option' + (health === "损坏" ? " selected" : "") + '>损坏</option><option' + (health === "缺失" ? " selected" : "") + '>缺失</option></select></td>' +
-            '<td><select class="inv-material-cell-select"><option' + (result === "一致" || result === "正常" ? " selected" : "") + '>一致</option><option' + (result === "不一致" || result === "盘盈" || result === "盘亏" || result === "损毁" ? " selected" : "") + '>不一致</option></select></td>' +
+            '<td><select class="inv-material-cell-select"><option' + (result === "一致" ? " selected" : "") + '>一致</option><option' + (result === "不一致" ? " selected" : "") + '>不一致</option></select></td>' +
             '<td><label class="inv-material-upload">上传<input type="file" accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,.txt"></label></td>' +
-            '<td><select class="inv-material-cell-select"><option' + (diffType === "正常" ? " selected" : "") + '>正常</option><option' + (diffType === "盘盈" ? " selected" : "") + '>盘盈</option><option' + (diffType === "盘亏" ? " selected" : "") + '>盘亏</option><option' + (diffType === "损毁" ? " selected" : "") + '>损毁</option></select></td>' +
             '<td><textarea class="inv-material-cell-textarea" placeholder="填写备注">' + inputValue(x.reason || "") + '</textarea></td>' +
           '</tr>';
         }).join("");
@@ -1178,7 +1176,7 @@
       function openTrack(line) {
         document.getElementById("trackGrid").innerHTML = [
           ["资产编号", line.assetNo], ["物资唯一码", line.code], ["物资类型编码", line.typeCode], ["产品编码", line.product], ["物资类型名称", line.materialTypeName], ["产品名称", line.assetName],
-          ["规格型号", line.spec], ["所属部门", line.dept], ["当前位置", line.loc], ["盘点结果", line.result]
+          ["规格型号", line.spec], ["所属部门", line.dept], ["当前位置", line.loc], ["盘点结果", consistencyResult(line)]
         ].map(function (x) { return '<div class="wh-detail-item"><span class="wh-detail-label">' + x[0] + '</span><span class="wh-detail-value">' + x[1] + '</span></div>'; }).join("");
         document.getElementById("trackFlow").innerHTML = [
           "产品目录建档", "合同关联", "收货入库", "部门领用/流转", "盘点复核"
@@ -1272,7 +1270,7 @@
           document.getElementById("confirmDept").value = line.dept;
           document.getElementById("confirmOwner").value = line.operator || line.user;
           document.getElementById("confirmReason").value = line.reason || "";
-          document.getElementById("confirmAdvice").value = line.lineStatus === "有差异" ? "进入盘点差异处理" : "台帐归档";
+          document.getElementById("confirmAdvice").value = line.lineStatus === "有差异" ? "补充盘点说明" : "台账归档";
           document.getElementById("confirmAttachment").value = "盘点说明/库位信息已归档";
           open(document.getElementById("confirmMask"));
           return;
@@ -1362,7 +1360,7 @@
           current.done = checked.length;
           current.diff = checked.filter(function (x) { return x.lineStatus === "有差异"; }).length;
           syncDiffRecords(current);
-          if (current.diff > 0) alert("已根据盘点确认结果自动生成 " + current.diff + " 条盘点差异记录，可到盘点差异处理页面查看。");
+          if (current.diff > 0) alert("已根据盘点确认结果标记 " + current.diff + " 条不一致记录，请在当前任务中补充盘点说明。");
           close(document.getElementById("materialCheckMask"));
           renderTable();
           return;
@@ -1392,7 +1390,7 @@
           line.user = document.getElementById("confirmUser").value;
           line.lineStatus = isDiff ? "有差异" : "已确认";
           line.diffType = isDiff ? (line.diffType || "盘亏") : "正常";
-          line.reason = isDiff ? (document.getElementById("confirmReason").value || "盘点确认与系统台账不一致，进入盘点差异处理") : "";
+          line.reason = isDiff ? (document.getElementById("confirmReason").value || "盘点确认与系统台账不一致，待补充盘点说明") : "";
           line.result = isDiff ? line.diffType : "正常";
           line.checkResult = line.result;
           if (state.current) {
