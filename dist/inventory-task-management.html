@@ -84,13 +84,14 @@
     .inv-task-field { display: grid; grid-template-columns: 110px minmax(0, 1fr); align-items: center; gap: 10px; color: #111; }
     .inv-task-field span { color: #111; font-size: 13px; line-height: 1.5; }
     .inv-task-field b { color: #111; font-size: 13px; font-weight: 600; line-height: 1.5; word-break: break-all; }
-    .inv-task-info-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px 18px; }
+    .inv-task-info-grid { display: grid; grid-template-columns: repeat(4, minmax(180px, 1fr)); gap: 12px 18px; width: 100%; align-items: start; }
     .inv-task-info-grid .inv-task-field { display: block; }
     .inv-task-info-grid .inv-task-field span { display: block; margin-bottom: 6px; color: #516a87; font-weight: 600; }
     .inv-task-info-grid .inv-task-field b,
     .inv-task-info-grid .inv-task-field .inv-task-field-box { display: flex; align-items: center; width: 100%; min-height: 40px; box-sizing: border-box; border: 1px solid #d9d9d9; border-radius: 4px; background: #fff; color: #262626; padding: 0 12px; font-weight: 400; }
     .inv-task-info-grid .inv-task-field .inv-task-field-box { padding: 0; border: none; min-height: auto; background: transparent; }
     .inv-task-info-grid .inv-task-field.wide-2 { grid-column: span 2; }
+    .inv-task-info-grid .inv-task-field b { white-space: normal; word-break: break-word; }
     .inv-task-select-wrap { position: relative; }
     .inv-task-select-wrap::after { content: "▾"; position: absolute; right: 12px; top: 50%; transform: translateY(-50%); pointer-events: none; color: #8c8c8c; font-size: 12px; }
     .inv-task-select-wrap.is-open::after { transform: translateY(-50%) rotate(180deg); }
@@ -790,22 +791,22 @@
       }
       function inventoryMetaNote(label) {
         var notes = {
-          "部门物资专责": "灰字提示：部门盘点开始环节自动带入。",
-          "部门负责人": "灰字提示：部门负责人审阅环节可见。",
-          "物资管理部门物资专责": "灰字提示：物资管理部门确认/阅知环节可见。",
-          "物资管理部门负责人": "灰字提示：物资管理部门负责人审批环节可见。",
-          "财务部门负责人": "灰字提示：财务部门负责人审批环节可见。",
-          "业务部门负责人": "灰字提示：业务部门负责人审批环节可见。",
-          "物资管理部门盘点人员": "灰字提示：物资管理部门分配盘点人员环节可选。",
-          "财务部门盘点人员": "灰字提示：财务部门分配盘点人员环节可选。",
-          "业务部门盘点人员": "灰字提示：业务部门分配盘点人员环节可选。"
+          "部门物资专责": "部门盘点开始环节自动带入。",
+          "部门负责人": "部门负责人审阅环节可见。",
+          "物资管理部门物资专责": "物资管理部门确认/阅知环节可见。",
+          "物资管理部门负责人": "物资管理部门负责人审批环节可见。",
+          "财务部门负责人": "财务部门负责人审批环节可见。",
+          "业务部门负责人": "业务部门负责人审批环节可见。",
+          "物资管理部门盘点人员": "物资管理部门分配盘点人员环节可选。",
+          "财务部门盘点人员": "财务部门分配盘点人员环节可选。",
+          "业务部门盘点人员": "业务部门分配盘点人员环节可选。"
         };
         return notes[label] || "";
       }
-      function inventoryMetaSelect(label, value, row) {
+      function inventoryMetaSelect(label, value, row, isWide) {
         var options = inventoryMetaOptions(label, row);
         var current = cell(value || options[0] || "-");
-        var html = '<div class="inv-task-field wide-2"><span>' + label + '</span><div class="inv-task-field-box"><div class="inv-task-select-wrap"><select class="inv-task-select-input">';
+        var html = '<div class="inv-task-field' + (isWide ? ' wide-2' : '') + '"><span>' + label + '</span><div class="inv-task-field-box"><div class="inv-task-select-wrap"><select class="inv-task-select-input">';
         options.forEach(function (option) {
           var text = cell(option);
           html += '<option value="' + inputValue(text) + '"' + (text === current ? " selected" : "") + '>' + text + '</option>';
@@ -866,8 +867,8 @@
           "业务部门盘点人员": true
         };
         return '<div class="inv-task-info-grid">' + inventoryTaskMetaFields(row, mode).map(function (item) {
-          if (mode === "start" && roleFields[item[0]]) return inventoryMetaSelect(item[0], item[1], row);
-          return inventoryReadonlyMetaField(item[0], item[1], item[0] === "盘点任务名称" || item[0] === "盘点部门");
+          if (mode === "start" && roleFields[item[0]]) return inventoryMetaSelect(item[0], item[1], row, false);
+          return inventoryReadonlyMetaField(item[0], item[1], item[0] === "盘点任务名称");
         }).join("") + '</div>';
       }
       function inventoryPurchaseTotal(price, qty) {
