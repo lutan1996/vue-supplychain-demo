@@ -330,7 +330,7 @@
       background: #fff;
     }
     #procModalMask.inventory-handle-mode .proc-modal-box {
-      max-width: min(1320px, 98vw);
+      max-width: min(1840px, 98vw);
       width: 100%;
       margin: 3vh auto;
       max-height: 94vh;
@@ -418,7 +418,7 @@
     }
     #procModalMask .qa-mat-lines-table {
       width: 100%;
-      min-width: 2480px;
+      min-width: 2280px;
       border-collapse: collapse;
       font-size: 12px;
     }
@@ -436,6 +436,11 @@
       padding: 4px 6px;
       vertical-align: middle;
       color: #000;
+    }
+    #procModalMask .qa-mat-lines-table thead th:last-child,
+    #procModalMask .qa-mat-lines-table tbody td:last-child {
+      min-width: 84px;
+      white-space: nowrap;
     }
     #procModalMask .qa-inp:not(.qa-inp--auto):not(textarea) {
       width: 100%;
@@ -1696,7 +1701,7 @@
         }).join("");
         var summaryHtml = summaryRows.map(function (x) {
           return '<tr>' +
-            '<td>' + mtEsc(x.typeName) + '</td><td>' + mtEsc(x.typeCode) + '</td><td>' + mtEsc(x.assetType) + '</td><td>' + (x.price ? Number(x.price).toLocaleString("zh-CN", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : "-") + '</td><td>' + mtEsc(x.dept) + '</td><td>' + mtEsc(x.user) + '</td><td>' + mtEsc(x.loc) + '</td><td>' + mtEsc(x.bookQty) + '</td><td>' + mtEsc(x.stockQty) + '</td><td>' + mtEsc(x.requisitionQty) + '</td><td>' + (canEditInventoryLines ? '<input class="qa-inp qa-inp--auto" data-inventory-summary-confirm="' + mtEsc(x.typeCode) + '" placeholder="请填写盘点确认数量" value="' + mtEsc(x.confirmQty) + '">' : mtEsc(x.confirmQty)) + '</td><td><span class="inv-op"><span role="button" tabindex="0" data-inventory-summary-view="' + mtEsc(x.typeCode) + '">' + (canEditInventoryLines ? "编辑" : "查看") + '</span></span></td>' +
+            '<td>' + mtEsc(x.typeName) + '</td><td>' + mtEsc(x.typeCode) + '</td><td>' + mtEsc(x.assetType) + '</td><td>' + (x.price ? Number(x.price).toLocaleString("zh-CN", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : "-") + '</td><td>' + mtEsc(x.dept) + '</td><td>' + mtEsc(x.user) + '</td><td>' + mtEsc(x.loc) + '</td><td>' + mtEsc(x.requisitionQty) + '</td><td>' + mtEsc(x.stockQty) + '</td><td>' + (canEditInventoryLines ? '<input class="qa-inp qa-inp--auto" data-inventory-summary-confirm="' + mtEsc(x.typeCode) + '" placeholder="请填写盘点确认数量" value="' + mtEsc(x.confirmQty) + '">' : mtEsc(x.confirmQty)) + '</td><td><span class="inv-op"><span role="button" tabindex="0" data-inventory-summary-view="' + mtEsc(x.typeCode) + '">' + (canEditInventoryLines ? "编辑" : "查看") + '</span></span></td>' +
           '</tr>';
         }).join("");
         var tableTitle = isSummary ? "盘点物资汇总表" : (isCompany ? "盘点已入库未出库物资明细表" : "盘点物资明细表");
@@ -1710,7 +1715,7 @@
           '<div style="font-size:14px;font-weight:600;color:#1f3551;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;gap:12px;">' + tableTitle + (isSummary ? '' : '<button type="button" class="proc-btn" id="inventoryTodoBack">返回汇总</button>') + '</div>' +
           '<div class="qa-mat-lines-table-wrap"><table class="qa-mat-lines-table"><thead><tr>' +
             (isSummary
-              ? '<th>物资类型名称</th><th>物资类型编码</th><th>资产类型</th><th>采购单价（含税）</th><th>领用部门</th><th>领用人</th><th>存放地点</th><th>账面数量</th><th>库存数量</th><th>领用数量</th><th>盘点确认数量</th><th>操作</th>'
+              ? '<th>物资类型名称</th><th>物资类型编码</th><th>资产类型</th><th>采购单价（含税）</th><th>领用部门</th><th>领用人</th><th>存放地点</th><th>领用数量</th><th>库存数量</th><th>盘点确认数量</th><th>操作</th>'
               : baseHead + (showResultColumns ? staffHead : "")) +
           '</tr></thead><tbody>' + (isSummary ? summaryHtml : rowsHtml) + '</tbody></table></div>' +
           '</div>' +

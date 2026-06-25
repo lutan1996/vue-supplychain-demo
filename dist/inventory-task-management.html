@@ -62,7 +62,9 @@
     .inv-tag.run { background: #e6f4ff; border-color: #91caff; color: #0958d9; }
     .inv-tag.done { background: #f6ffed; border-color: #b7eb8f; color: #389e0d; }
     .inv-table-title { margin: 14px 0 8px; color: #334155; font-size: 13px; font-weight: 600; }
-    .page-inventory-task .wh-modal-box--lg { width: min(97vw, 1760px); max-width: 97vw; }
+    .page-inventory-task .wh-modal-box--lg { width: min(98vw, 1860px); max-width: 98vw; }
+    .page-inventory-task #materialCheckMask .wh-modal-box,
+    .page-inventory-task #taskInfoMask .wh-modal-box { width: min(98vw, 1880px); max-width: 98vw; }
     .page-inventory-task #detailMask .wh-modal-box { width: min(98vw, 1920px); max-width: 98vw; }
     .page-inventory-task #flowMask .wh-modal-box { width: min(86vw, 1680px); max-width: 92vw; border-radius: 8px; }
     .page-inventory-task #reportMask .wh-modal-box { width: min(92vw, 1080px); max-width: 92vw; }
@@ -181,9 +183,10 @@
     .inv-material-query-field .inv-btn { min-width: 96px; height: 36px; }
     .inv-material-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 10px; }
     .inv-material-table-wrap { overflow: auto; margin-top: 8px; }
-    .inv-material-table { width: 100%; min-width: 1840px; border-collapse: collapse; table-layout: fixed; font-size: 12px; }
+    .inv-material-table { width: 100%; min-width: 1680px; border-collapse: collapse; table-layout: fixed; font-size: 12px; }
     .inv-material-table th, .inv-material-table td { border: 1px solid #1677ff33; padding: 8px 6px; color: #262626; text-align: left; white-space: normal; word-break: break-all; vertical-align: top; line-height: 1.45; }
     .inv-material-table th { background: #f5f7fa; color: #334155; }
+    .inv-material-table th:last-child, .inv-material-table td:last-child { min-width: 84px; white-space: nowrap; }
     .inv-material-empty { padding: 46px 0; text-align: center; color: #8c8c8c; border: 1px solid #e8eef7; border-top: 0; }
     .inv-material-cell-input, .inv-material-cell-select, .inv-material-cell-textarea { width: 100%; min-width: 0; border: 1px solid #d9d9d9; border-radius: 4px; font: inherit; color: #262626; background: #fff; box-sizing: border-box; }
     .inv-material-cell-input, .inv-material-cell-select { height: 30px; padding: 0 8px; }
@@ -1163,7 +1166,7 @@
           '</div>',
           '<div class="inv-task-mini-table-wrap"><table class="inv-task-mini-table"><thead><tr>' +
             (isSummary
-              ? '<th>物资类型名称</th><th>物资类型编码</th><th>资产类型</th><th>采购单价（含税）</th><th>领用部门</th><th>领用人</th><th>存放地点</th><th>账面数量</th><th>库存数量</th><th>领用数量</th><th>盘点确认数量</th><th>操作</th>'
+              ? '<th>物资类型名称</th><th>物资类型编码</th><th>资产类型</th><th>采购单价（含税）</th><th>领用部门</th><th>领用人</th><th>存放地点</th><th>领用数量</th><th>库存数量</th><th>盘点确认数量</th><th>操作</th>'
               : inventoryDetailHeaders.map(function (x) { return "<th>" + x + "</th>"; }).join("")) +
           '</tr></thead><tbody>' +
             (isSummary
@@ -1176,9 +1179,8 @@
                   '<td>' + cell(x.dept) + '</td>' +
                   '<td>' + cell(x.user) + '</td>' +
                   '<td>' + cell(x.loc) + '</td>' +
-                  '<td>' + cell(x.bookQty) + '</td>' +
-                  '<td>' + cell(x.stockQty) + '</td>' +
                   '<td>' + cell(x.requisitionQty) + '</td>' +
+                  '<td>' + cell(x.stockQty) + '</td>' +
                   '<td>' + cell(x.confirmQty) + '</td>' +
                   '<td><span class="inv-op"><span role="button" tabindex="0" data-task-summary-view="' + cell(x.typeCode) + '">查看</span></span></td>' +
                 '</tr>';
@@ -1196,7 +1198,7 @@
         var back = document.getElementById("btnMaterialBack");
         var cols = document.getElementById("materialCheckCols");
         var head = document.getElementById("materialCheckHead");
-        var summaryWidths = [150, 150, 112, 132, 96, 96, 120, 128, 112, 150, 80];
+        var summaryWidths = [170, 150, 120, 150, 120, 110, 200, 100, 100, 140, 96];
         var detailWidths = [72, 118, 104, 118, 132, 124, 124, 112, 112, 132, 110, 96, 104, 96, 118, 150, 124, 92, 124, 78, 112, 112, 170, 176];
         if (title) title.textContent = isSummary ? "盘点物资汇总表" : "盘点物资明细表";
         if (back) back.hidden = isSummary;
@@ -1205,7 +1207,7 @@
         }
         if (head) {
           head.innerHTML = isSummary
-            ? '<tr><th>物资类型名称</th><th>物资类型编码</th><th>资产类型</th><th>采购单价（含税）</th><th>领用部门</th><th>领用人</th><th>存放地点</th><th>账面数量</th><th>库存数量</th><th>领用数量</th><th>盘点确认数量</th><th>操作</th></tr>'
+            ? '<tr><th>物资类型名称</th><th>物资类型编码</th><th>资产类型</th><th>采购单价（含税）</th><th>领用部门</th><th>领用人</th><th>存放地点</th><th>领用数量</th><th>库存数量</th><th>盘点确认数量</th><th>操作</th></tr>'
             : '<tr><th>序号</th><th>产品名称</th><th>规格型号</th><th>产品编码</th><th>物资唯一码</th><th>物资类型名称</th><th>物资类型编码</th><th>采购部门</th><th>供应商</th><th>采购单价（含税）</th><th>是否在本部门</th><th>是否开票</th><th>使用人</th><th>资产类型</th><th>资产编号</th><th>存放地点</th><th>使用年限</th><th>原值</th><th>在库/领用状态</th><th>单位</th><th>状态是否完好</th><th>盘点结果</th><th>证明材料</th><th>备注</th></tr>';
         }
         document.getElementById("materialCheckBody").innerHTML = list.map(function (x, i) {
@@ -1218,9 +1220,8 @@
               '<td>' + cell(x.dept) + '</td>' +
               '<td>' + cell(x.user) + '</td>' +
               '<td>' + cell(x.loc) + '</td>' +
-              '<td>' + cell(x.bookQty) + '</td>' +
-              '<td>' + cell(x.stockQty) + '</td>' +
               '<td>' + cell(x.requisitionQty) + '</td>' +
+              '<td>' + cell(x.stockQty) + '</td>' +
               '<td><input class="inv-material-cell-input" data-summary-confirm="' + cell(x.typeCode) + '" value="' + inputValue(x.confirmQty) + '" placeholder="请填写盘点确认数量"></td>' +
               '<td><span class="inv-op"><span role="button" tabindex="0" data-material-summary-view="' + cell(x.typeCode) + '">编辑</span></span></td>' +
             '</tr>';
