@@ -1440,7 +1440,7 @@
         return text;
       }
       function inventoryTodoCompanyDeptText() {
-        return "物资管理部、财务部门、业务部门（电气控制所）";
+        return "电控所";
       }
       function inventoryTodoMoney(v) {
         if (!v && v !== 0) return "-";
@@ -1537,7 +1537,7 @@
             ["系统根据物资管理部门物资专责发起的信息生成公司所有已入库未出库物资清单", "系统", companyStatus(1)],
             ["物资管理部门负责人同意并分配部门盘点人员", "王超", companyStatus(2)],
             ["财务部门负责人同意并分配部门盘点人员", "孙睿", companyStatus(3)],
-            ["业务部门负责人同意并分配部门盘点人员", "李仁堂、陈亮、王贺", companyStatus(4)],
+            ["业务部门负责人同意并分配部门盘点人员", "李仁堂", companyStatus(4)],
             ["盘点完毕，上传盘点结果，提交财务负责人审阅。", financeName, companyStatus(5)],
             ["物资管理部门负责人审阅", "王超", companyStatus(6)],
             ["物资管理部门物资专责阅知", "宋中波", companyStatus(7)],
@@ -1600,7 +1600,7 @@
           no: "PD-2026-002",
           name: "公司二季度物资全面盘点",
           type: "公司盘点",
-          dept: "全部业务部门",
+          dept: "电控所",
           scope: "公司所有已入库未出库物资",
           assetRange: "固定资产、存货、无形资产",
             start: "2026-06-28",

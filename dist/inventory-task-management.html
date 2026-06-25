@@ -568,10 +568,10 @@
       var pageTitle = pageMode === "company" ? "公司物资盘点" : "部门物资盘点";
       var rows = [
         { id: 1, no: "PD-2026-001", name: "机械研究所二季度部门盘点", type: "部门盘点", dept: "机械研究所", scope: "本部门在库及已领用物资", assetTypeRange: "固定资产、存货、无形资产", start: "2026-06-25", end: "2026-06-30", owner: "许学良", deptHead: "李仁堂", materialOwner: "宋中波", should: 126, done: 92, diff: 3, status: "盘点中" },
-        { id: 2, no: "PD-2026-002", name: "公司二季度物资全面盘点", type: "公司盘点", dept: "全部业务部门", scope: "公司所有已入库未出库物资", assetTypeRange: "全部", start: "2026-06-28", end: "2026-07-03", owner: "宋中波", deptHead: "王超", materialOwner: "宋中波", financeHead: "孙睿", financeOwner: "杜欣鑫", bizHead: "陈亮、李仁堂、王贺", bizOwner: "成明锴、许学良、喻家敏", should: 284, done: 188, diff: 6, status: "待分配" },
-        { id: 5, no: "PD-2026-005", name: "公司三季度固定资产专项盘点", type: "公司盘点", dept: "全部业务部门", scope: "公司固定资产及已领用重点物资", assetTypeRange: "固定资产", start: "2026-07-10", end: "2026-07-18", owner: "宋中波", deptHead: "王超", materialOwner: "宋中波", financeHead: "孙睿", financeOwner: "杜欣鑫", bizHead: "陈亮、李仁堂、王贺", bizOwner: "成明锴、许学良、喻家敏", should: 168, done: 0, diff: 0, status: "待开始" },
-        { id: 6, no: "PD-2026-006", name: "公司存货物资专项复盘", type: "公司盘点", dept: "全部业务部门", scope: "公司已入库未出库存货物资", assetTypeRange: "存货", start: "2026-07-20", end: "2026-07-25", owner: "宋中波", deptHead: "王超", materialOwner: "宋中波", financeHead: "孙睿", financeOwner: "杜欣鑫", bizHead: "陈亮、李仁堂、王贺", bizOwner: "成明锴、许学良、喻家敏", should: 132, done: 48, diff: 2, status: "盘点中" },
-        { id: 7, no: "PD-2026-007", name: "公司无形资产使用状态盘点", type: "公司盘点", dept: "全部业务部门", scope: "公司授权类无形资产及使用记录", assetTypeRange: "无形资产", start: "2026-08-01", end: "2026-08-06", owner: "宋中波", deptHead: "王超", materialOwner: "宋中波", financeHead: "孙睿", financeOwner: "杜欣鑫", bizHead: "陈亮、李仁堂、王贺", bizOwner: "成明锴、许学良、喻家敏", should: 46, done: 0, diff: 0, status: "待开始" },
+        { id: 2, no: "PD-2026-002", name: "公司二季度物资全面盘点", type: "公司盘点", dept: "电控所", scope: "公司所有已入库未出库物资", assetTypeRange: "全部", start: "2026-06-28", end: "2026-07-03", owner: "宋中波", deptHead: "王超", materialOwner: "宋中波", financeHead: "孙睿", financeOwner: "杜欣鑫", bizHead: "李仁堂", bizOwner: "成明锴、许学良、喻家敏", should: 284, done: 188, diff: 6, status: "待分配" },
+        { id: 5, no: "PD-2026-005", name: "公司三季度固定资产专项盘点", type: "公司盘点", dept: "电控所", scope: "公司固定资产及已领用重点物资", assetTypeRange: "固定资产", start: "2026-07-10", end: "2026-07-18", owner: "宋中波", deptHead: "王超", materialOwner: "宋中波", financeHead: "孙睿", financeOwner: "杜欣鑫", bizHead: "李仁堂", bizOwner: "成明锴、许学良、喻家敏", should: 168, done: 0, diff: 0, status: "待开始" },
+        { id: 6, no: "PD-2026-006", name: "公司存货物资专项复盘", type: "公司盘点", dept: "电控所", scope: "公司已入库未出库存货物资", assetTypeRange: "存货", start: "2026-07-20", end: "2026-07-25", owner: "宋中波", deptHead: "王超", materialOwner: "宋中波", financeHead: "孙睿", financeOwner: "杜欣鑫", bizHead: "李仁堂", bizOwner: "成明锴、许学良、喻家敏", should: 132, done: 48, diff: 2, status: "盘点中" },
+        { id: 7, no: "PD-2026-007", name: "公司无形资产使用状态盘点", type: "公司盘点", dept: "电控所", scope: "公司授权类无形资产及使用记录", assetTypeRange: "无形资产", start: "2026-08-01", end: "2026-08-06", owner: "宋中波", deptHead: "王超", materialOwner: "宋中波", financeHead: "孙睿", financeOwner: "杜欣鑫", bizHead: "李仁堂", bizOwner: "成明锴、许学良、喻家敏", should: 46, done: 0, diff: 0, status: "待开始" },
         { id: 3, no: "PD-2026-003", name: "机械研究所三季度部门盘点", type: "部门盘点", dept: "机械研究所", scope: "本部门在库及已领用物资", assetTypeRange: "固定资产、无形资产", start: "2026-07-01", end: "2026-07-05", owner: "宋中波", deptHead: "王超", materialOwner: "宋中波", should: 57, done: 0, diff: 0, status: "待开始" },
         { id: 4, no: "PD-2026-004", name: "机械研究所专项部门盘点", type: "部门盘点", dept: "机械研究所", scope: "本部门在库及已领用物资", assetTypeRange: "固定资产、存货", start: "2026-06-10", end: "2026-06-15", owner: "成明锴", deptHead: "陈亮", materialOwner: "宋中波", should: 98, done: 98, diff: 0, status: "已完成" }
       ];
@@ -777,7 +777,7 @@
         return row.deptHead || row.owner || "-";
       }
       function inventoryCompanyDeptText() {
-        return "物资管理部、财务部门、业务部门（电气控制所）";
+        return "电控所";
       }
       function inventoryAutoPerson(value, allowValue) {
         return allowValue ? (value || "-") : "-";
@@ -792,7 +792,7 @@
           "物资管理部门物资专责": [row.materialOwner || "宋中波", "许学良"],
           "物资管理部门负责人": [row.materialHead || "王超", "宋中波"],
           "财务部门负责人": [row.financeHead || "孙睿", "杜欣鑫"],
-          "业务部门负责人": [row.bizHead || "李仁堂", "陈亮", "王贺"],
+          "业务部门负责人": [row.bizHead || "李仁堂"],
           "物资管理部门盘点人员": [row.materialChecker || "宋中波", "许学良"],
           "财务部门盘点人员": [row.financeChecker || "杜欣鑫", "孙睿"],
           "业务部门盘点人员": [row.bizChecker || "成明锴", "陈亮", "喻家敏"]
@@ -927,7 +927,7 @@
             { name: "物资部门负责人同意", person: "王超", text: "物资管理部门负责人王超同意公司物资盘点" },
             { name: "物资部门分配人员", person: "王超、宋中波", text: "物资管理部门负责人王超分配本部门盘点人员宋中波" },
             { name: "财务部门分配人员", person: row.financeHead || "孙睿", text: "财务负责人" + (row.financeHead || "孙睿") + "分配财务盘点确认人员" },
-            { name: "业务部门同意并分配", person: row.bizHead || "李仁堂、陈亮、王贺", text: "所有业务部门负责人" + (row.bizHead || "李仁堂、陈亮、王贺") + "同意，并分配本部门盘点人员" },
+            { name: "业务部门同意并分配", person: row.bizHead || "李仁堂", text: "业务部门负责人" + (row.bizHead || "李仁堂") + "同意，并分配本部门盘点人员" },
             { name: "参与人员收到流程", person: "宋中波、杜欣鑫、" + (row.bizOwner || "成明锴、许学良"), text: "所有参与盘点人员宋中波、杜欣鑫、" + (row.bizOwner || "成明锴、许学良") + "收到公司盘点流程" },
             { name: "三方逐条共同确认", person: "宋中波、杜欣鑫、" + (row.bizOwner || "成明锴、许学良"), text: "所有参与盘点人员按清单逐条确认，物资、财务、业务三方共同确认物资型号、编码、存储地点、使用人/负责人等信息是否与系统台帐一致，状态是否完好" },
             { name: "财务负责人审阅", person: row.financeHead || "孙睿", text: "盘点完毕，提交财务负责人" + (row.financeHead || "孙睿") + "审阅" },
