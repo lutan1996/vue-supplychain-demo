@@ -330,7 +330,7 @@
       background: #fff;
     }
     #procModalMask.inventory-handle-mode .proc-modal-box {
-      max-width: min(1320px, 98vw);
+      max-width: min(1840px, 98vw);
       width: 100%;
       margin: 3vh auto;
       max-height: 94vh;
@@ -418,7 +418,7 @@
     }
     #procModalMask .qa-mat-lines-table {
       width: 100%;
-      min-width: 2480px;
+      min-width: 2280px;
       border-collapse: collapse;
       font-size: 12px;
     }
@@ -436,6 +436,11 @@
       padding: 4px 6px;
       vertical-align: middle;
       color: #000;
+    }
+    #procModalMask .qa-mat-lines-table thead th:last-child,
+    #procModalMask .qa-mat-lines-table tbody td:last-child {
+      min-width: 84px;
+      white-space: nowrap;
     }
     #procModalMask .qa-inp:not(.qa-inp--auto):not(textarea) {
       width: 100%;
@@ -618,15 +623,11 @@
       gap: 22px;
       min-width: 100%;
     }
-    .inventory-progress-row.is-company-tree { gap: 20px; min-width: 1880px; align-items: flex-start; }
-    .inventory-progress-fork { flex: 0 0 540px; display: grid; grid-template-columns: 1fr; gap: 12px; align-items: center; justify-items: center; }
-    .inventory-progress-fork-head { display: flex; justify-content: center; }
-    .inventory-progress-fork-grid { width: 100%; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; align-items: start; }
-    .inventory-progress-fork-item { display: flex; flex-direction: column; align-items: center; gap: 10px; position: relative; }
-    .inventory-progress-fork-arrow { color: #8aa0b8; font-size: 24px; line-height: 1; }
-    .inventory-progress-fork-item::before { content: ""; position: absolute; top: -12px; left: 50%; width: 1px; height: 12px; background: #bfd0e3; }
-    .inventory-progress-fork-item::after { content: ""; position: absolute; top: -12px; left: 50%; width: calc(100% + 28px); height: 1px; background: #bfd0e3; transform: translateX(-50%); }
-    .inventory-progress-merge { flex: 0 0 auto; display: flex; align-items: center; gap: 18px; }
+    .inventory-progress-row.is-company-branch { align-items: center; gap: 18px; min-width: 3200px; }
+    .inventory-progress-stack { display: flex; flex-direction: column; gap: 12px; }
+    .inventory-progress-stack-row { display: flex; align-items: center; gap: 12px; }
+    .inventory-progress-stack-row .inventory-progress-step { flex: 0 0 188px; width: 188px; min-height: 88px; }
+    .inventory-progress-branch-link { flex: 0 0 30px; color: #8aa0b8; font-size: 30px; line-height: 1; text-align: center; }
     .inventory-progress-step {
       flex: 0 0 148px;
       min-height: 74px;
@@ -1351,9 +1352,71 @@
           .replace(/>/g, "&gt;")
           .replace(/"/g, "&quot;");
       }
+      var inventoryRoleNames = {
+        dept_specialist: "部门物资专责",
+        dept_head: "部门负责人",
+        material_specialist: "物资管理部门物资专责",
+        material_head: "物资管理部门负责人",
+        finance_head: "财务负责人",
+        business_head: "业务部门负责人",
+        inventory_staff: "盘点人员"
+      };
+      function inventoryTodoRoleName() {
+        var role = localStorage.getItem("inventoryDemoRole") || "dept_specialist";
+        return inventoryRoleNames[role] || "办理人";
+      }
+      function inventoryTodoPrefixedProcName(name) {
+        var text = String(name || "");
+        if (text === "公司盘点任务审批" || text === "部门盘点任务审批") {
+          return inventoryTodoRoleName() + text;
+        }
+        return text;
+      }
+      function inventoryTodoCompanyDeptText() {
+        return "物资管理部、财务部门、业务部门（电气控制所）";
+      }
+      function inventoryTodoMoney(v) {
+        if (!v && v !== 0) return "-";
+        return Number(v).toLocaleString("zh-CN", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      }
+      function inventoryTodoPurchaseTotal(price, qty) {
+        return Number(price || 0) * Number(qty || 0);
+      }
+      function inventoryTodoTaskMetaFields(task, isCompany) {
+        if (isCompany) {
+          return [
+            ["盘点单号", task.no],
+            ["盘点任务名称", task.name],
+            ["盘点类型", task.type],
+            ["盘点部门", inventoryTodoCompanyDeptText()],
+            ["物资管理部门物资专责", "宋中波"],
+            ["物资管理部门负责人", "王超"],
+            ["财务部门负责人", "孙睿"],
+            ["业务部门负责人", "李仁堂"],
+            ["物资管理部门盘点人员", "宋中波"],
+            ["财务部门盘点人员", "杜欣鑫"],
+            ["业务部门盘点人员", task.status === "已完成" ? "成明锴" : "成明锴"]
+          ];
+        }
+        return [
+          ["盘点单号", task.no],
+          ["盘点任务名称", task.name],
+          ["盘点类型", task.type],
+          ["盘点部门", task.dept],
+          ["部门物资专责", "许学良"],
+          ["部门负责人", "李仁堂"],
+          ["物资管理部门物资专责", "宋中波"]
+        ];
+      }
+      function inventoryTodoTaskMetaHtml(task, isCompany) {
+        return '<div class="inv-task-info-grid" style="margin:0 0 12px;">' + inventoryTodoTaskMetaFields(task, isCompany).map(function (item) {
+          return '<div class="inv-task-field"><span>' + mtEsc(item[0]) + '</span><b>' + mtEsc(item[1]) + '</b></div>';
+        }).join("") + '</div>';
+      }
       var inventoryTodoLines = [
         { assetNo: "ZC-2026-0001", code: "C20260000001", typeCode: "A0010020001", product: "B00001234", name: "变桨轴承", typeName: "固定资产", dept: "机械研究所", loc: "机械研究所/华北主仓A-01", user: "李仁堂", state: "在库", book: 1, confirm: 1, unit: "台", health: "完好", result: "正常", reason: "", supplier: "中车电气", invoice: "已开票", assetType: "固定资产", price: 680000 },
-        { assetNo: "ZC-2026-0002", code: "C20260000002", typeCode: "A0010020002", product: "B00001235", name: "齿轮箱滤芯", typeName: "存货", dept: "机械研究所", loc: "机械研究所/华北主仓A-03", user: "许学良", state: "在库", book: 12, confirm: 10, unit: "件", health: "完好", result: "盘亏", reason: "账面数量与实盘数量不一致，需进入盘点差异处理", supplier: "中车电气", invoice: "已开票", assetType: "存货", price: 72000 },
+        { assetNo: "ZC-2026-0002", code: "C20260000002", typeCode: "A0010020002", product: "B00001235", name: "齿轮箱滤芯", typeName: "存货", dept: "机械研究所", loc: "机械研究所/华北主仓A-03", user: "许学良", state: "在库", book: 12, confirm: 10, unit: "件", health: "完好", result: "盘亏", reason: "账面数量与实盘数量不一致，待补充盘点说明", supplier: "中车电气", invoice: "已开票", assetType: "存货", price: 72000 },
+        { assetNo: "ZC-2026-0002", code: "C20260000002", typeCode: "A0010020002", product: "B00001235", name: "齿轮箱滤芯", typeName: "存货", dept: "机械研究所", loc: "机械研究所/华北主仓A-03", user: "许学良", state: "在库", book: 12, confirm: 10, unit: "件", health: "完好", result: "盘亏", reason: "账面数量与实盘数量不一致，待补充盘点说明", supplier: "中车电气", invoice: "已开票", assetType: "存货", price: 72000 },
         { assetNo: "ZC-2026-0004", code: "C20260000004", typeCode: "A0010020003", product: "B00001236", name: "塔筒振动传感器", typeName: "固定资产", dept: "机械研究所", loc: "机械研究所/华北主仓A-02", user: "李仁堂", state: "在库", book: 1, confirm: 1, unit: "台", health: "完好", result: "正常", reason: "", supplier: "中车电气", invoice: "已开票", assetType: "固定资产", price: 210000 },
         { assetNo: "ZC-2026-0005", code: "C20260000005", typeCode: "A0010020004", product: "B00001237", name: "润滑油滤网", typeName: "存货", dept: "机械研究所", loc: "机械研究所/华北主仓A-04", user: "许学良", state: "在库", book: 8, confirm: 8, unit: "件", health: "完好", result: "正常", reason: "", supplier: "中车电气", invoice: "已开票", assetType: "存货", price: 5800 },
         { assetNo: "ZC-2026-0003", code: "C20260000003", typeCode: "A0020010006", product: "B00001888", name: "变频器模块", typeName: "存货", dept: "电气控制所", loc: "电气控制所/备用柜", user: "成明锴", state: "已入库", book: 2, confirm: 3, unit: "件", health: "待复核", result: "盘盈", reason: "现场多出一件未入账物资，需核对采购合同和入库记录", supplier: "中车电气", invoice: "已开票", assetType: "存货", price: 21944.6 },
@@ -1389,16 +1452,29 @@
       }
       function inventoryTodoFlow(isCompany, map) {
         if (isCompany) {
+          var role = localStorage.getItem("inventoryDemoRole") || "dept_specialist";
+          var financeName = map["办理人"] || map.handler || "孙睿";
+          var companyCurrent = {
+            material_head: 2,
+            finance_head: 5,
+            business_head: 4,
+            material_specialist: 7,
+            inventory_staff: 5
+          };
+          var currentIndex = companyCurrent[role] == null ? 5 : companyCurrent[role];
+          function companyStatus(idx) {
+            return idx < currentIndex ? "已通过" : (idx === currentIndex ? "处理中" : "待处理");
+          }
           return [
-            ["物资管理部门负责人同意公司物资盘点", "王超", "已通过"],
-            ["物资管理部门负责人分配本部门盘点人员", "王超、宋中波", "已通过"],
-            ["财务负责人分配财务盘点确认人员", "孙睿、杜欣鑫", "已通过"],
-            ["所有业务部门负责人同意，并分配本部门盘点人员", "陈亮、李仁堂、王贺", "已通过"],
-            ["所有参与盘点人员收到公司盘点流程", "宋中波、杜欣鑫、成明锴、许学良、喻家敏", "已通过"],
-            ["所有参与盘点人员按清单逐条确认，物资、财务、业务三方共同确认物资型号、编码、存储地点、使用人/负责人等信息是否与系统台账一致，状态是否完好", "物资、财务、业务三方", "已通过"],
-            ["盘点完毕，提交财务负责人审阅", map["办理人"] || "孙睿", "处理中"],
-            ["物资管理部门负责人审阅", "王超", "待处理"],
-            ["物资专责阅知并结束", "宋中波", "待处理"]
+            ["物资管理部门物资专责发起公司物资盘点", "宋中波", companyStatus(0)],
+            ["系统根据物资管理部门物资专责发起的信息生成公司所有已入库未出库物资清单", "系统", companyStatus(1)],
+            ["物资管理部门负责人同意并分配部门盘点人员", "王超", companyStatus(2)],
+            ["财务部门负责人同意并分配部门盘点人员", "孙睿", companyStatus(3)],
+            ["业务部门负责人同意并分配部门盘点人员", "李仁堂、陈亮、王贺", companyStatus(4)],
+            ["盘点完毕，上传盘点结果，提交财务负责人审阅。", financeName, companyStatus(5)],
+            ["物资管理部门负责人审阅", "王超", companyStatus(6)],
+            ["物资管理部门物资专责阅知", "宋中波", companyStatus(7)],
+            ["物资管理部门物资专责阅知后确认公司盘点结束", "宋中波", companyStatus(8)]
           ];
         }
         return [
@@ -1516,24 +1592,60 @@
         var title = isCompany ? "审批记录 - 公司盘点" : "审批记录 - 部门盘点";
         var steps = inventoryTodoFlow(isCompany, map || {});
         var rowClass = isCompany ? "inventory-progress-row is-company-tree" : "inventory-progress-row";
+        var currentStepIndex = -1;
+        steps.forEach(function (step, idx) {
+          if (step[2] === "处理中" && currentStepIndex < 0) currentStepIndex = idx;
+        });
+        function progressStep(text, idx, isEnd) {
+          var cls = "";
+          if (idx === currentStepIndex) cls += " is-current";
+          if (isEnd) cls += " is-end";
+          return '<div class="inventory-progress-step' + cls + '">' + mtEsc(text) + '</div>';
+        }
         var stepNodes = steps.map(function (step) {
           var cls = step[2] === "处理中" ? " is-current" : "";
           return '<div class="inventory-progress-step' + cls + '">' + mtEsc(step[0]) + '</div>';
         });
         var rowHtml = isCompany
-          ? stepNodes[0] + '<div class="inventory-progress-arrow">→</div>' + stepNodes[1] + '<div class="inventory-progress-arrow">→</div>' + stepNodes[2] +
-            '<div class="inventory-progress-fork">' +
-              '<div class="inventory-progress-fork-head"><div class="inventory-progress-step is-end" style="min-height:72px;width:170px;flex-basis:170px">三方分支</div></div>' +
-              '<div class="inventory-progress-fork-grid">' +
-                '<div class="inventory-progress-fork-item"><div class="inventory-progress-fork-arrow">↙</div>' + stepNodes[3] + '</div>' +
-                '<div class="inventory-progress-fork-item"><div class="inventory-progress-fork-arrow">↓</div>' + stepNodes[4] + '</div>' +
-                '<div class="inventory-progress-fork-item"><div class="inventory-progress-fork-arrow">↘</div>' + stepNodes[5] + '</div>' +
+          ? progressStep("物资管理部门物资专责发起公司物资盘点", 0) +
+            '<div class="inventory-progress-arrow">→</div>' +
+            progressStep("系统根据物资管理部门物资专责发起的信息生成公司所有已入库未出库物资清单", 1) +
+            '<div class="inventory-progress-stack">' +
+              '<div class="inventory-progress-stack-row">' +
+                '<div class="inventory-progress-branch-link">↗</div>' +
+                progressStep("物资管理部门负责人同意并分配部门盘点人员", 2) +
+                '<div class="inventory-progress-branch-link">↘</div>' +
+              '</div>' +
+              '<div class="inventory-progress-stack-row">' +
+                '<div class="inventory-progress-branch-link">→</div>' +
+                progressStep("财务部门负责人同意并分配部门盘点人员", 3) +
+                '<div class="inventory-progress-branch-link">→</div>' +
+              '</div>' +
+              '<div class="inventory-progress-stack-row">' +
+                '<div class="inventory-progress-branch-link">↘</div>' +
+                progressStep("业务部门负责人同意并分配部门盘点人员", 4) +
+                '<div class="inventory-progress-branch-link">↗</div>' +
               '</div>' +
             '</div>' +
-            '<div class="inventory-progress-merge"><span class="inventory-progress-arrow">→</span>' + stepNodes.slice(6).join('<span class="inventory-progress-arrow">→</span>') + '</div>'
-          : stepNodes.map(function (node, idx) {
-            return node + (idx < stepNodes.length - 1 ? '<div class="inventory-progress-arrow">→</div>' : "");
-          }).join("") + '<div class="inventory-progress-arrow">→</div><div class="inventory-progress-step is-end">结束</div>';
+            progressStep("盘点完毕，上传盘点结果，提交财务负责人审阅。", 5) +
+            '<div class="inventory-progress-arrow">→</div>' +
+            progressStep("物资管理部门负责人审阅", 6) +
+            '<div class="inventory-progress-arrow">→</div>' +
+            progressStep("物资管理部门物资专责阅知", 7) +
+            '<div class="inventory-progress-arrow">→</div>' +
+            progressStep("盘点结束", 8, true)
+          : [
+            "部门物资专责发起部门物资盘点",
+            "确认盘点结果是否与系统台帐一致",
+            "盘点完毕，上传盘点结果",
+            "部门负责人审阅",
+            "物资管理部门物资专责阅知",
+            "盘点结束"
+          ].map(function (text, idx, arr) {
+            var cls = idx === currentStepIndex ? " is-current" : "";
+            if (idx === arr.length - 1) cls += " is-end";
+            return '<div class="inventory-progress-step' + cls + '">' + mtEsc(text) + '</div>' + (idx < arr.length - 1 ? '<div class="inventory-progress-arrow">→</div>' : "");
+          }).join("");
         var infoHtml = steps.map(function (step, idx) {
           return '<div>' + (idx + 1) + '、' + mtEsc(step[0]) + '；办理人：' + mtEsc(step[1]) + '；状态：' + mtEsc(step[2]) + '</div>';
         }).join("");
@@ -1566,6 +1678,54 @@
         if (key === "pdtask_company_staff") return true;
         return key.indexOf("_review_") >= 0 || key.indexOf("pddiff_") === 0 || map["流程定义名称"] === "盘点差异审批";
       }
+      function inventoryTodoSummaryKey(map, typeCode) {
+        return String((map && (map["流程定义KEY"] || map["流程定义名称"] || "")) + "::" + (typeCode || ""));
+      }
+      function inventoryTodoSummaryValue(map, typeCode, fallback) {
+        inventoryTodoRows._summaryConfirm = inventoryTodoRows._summaryConfirm || {};
+        var key = inventoryTodoSummaryKey(map, typeCode);
+        return Object.prototype.hasOwnProperty.call(inventoryTodoRows._summaryConfirm, key) ? inventoryTodoRows._summaryConfirm[key] : fallback;
+      }
+      function inventoryTodoSetSummaryValue(map, typeCode, value) {
+        inventoryTodoRows._summaryConfirm = inventoryTodoRows._summaryConfirm || {};
+        inventoryTodoRows._summaryConfirm[inventoryTodoSummaryKey(map, typeCode)] = value;
+      }
+      function inventoryTodoSummaryRows(lines) {
+        var grouped = {};
+        lines.forEach(function (x) {
+          var key = x.typeCode || x.typeName;
+          if (!grouped[key]) {
+            grouped[key] = {
+              typeCode: x.typeCode,
+              typeName: x.typeName,
+              assetType: x.assetType || x.typeName,
+              price: x.price != null ? x.price : (x.bookOriginal || x.originalValue || 0),
+              bookQty: Number(x.book || 0),
+              stockQty: Math.max(0, Number(x.book || 0) - 1),
+              requisitionQty: Number(x.book || 0),
+              confirmQty: 0,
+              detailCount: 0,
+              dept: x.dept,
+              user: x.user,
+              loc: x.loc
+            };
+          } else {
+            grouped[key].bookQty += Number(x.book || 0);
+            grouped[key].stockQty += Math.max(0, Number(x.book || 0) - 1);
+            grouped[key].requisitionQty += Number(x.book || 0);
+          }
+          grouped[key].detailCount += 1;
+        });
+        Object.keys(grouped).forEach(function (key) {
+          grouped[key].confirmQty = grouped[key].detailCount;
+        });
+        return Object.keys(grouped).map(function (key) { return grouped[key]; });
+      }
+      function inventoryTodoExpandedLines(list) {
+        if (!Array.isArray(list) || !list.length) return [];
+        if (list.length > 1) return list;
+        return [list[0], Object.assign({}, list[0])];
+      }
       function inventoryTodoHtml(map) {
         var role = localStorage.getItem("inventoryDemoRole") || "dept_specialist";
         var taskKey = String(map["流程定义KEY"] || "");
@@ -1578,47 +1738,57 @@
         var task = inventoryTodoTask(isCompany, map);
         if (isCompany) task.type = "公司盘点";
         var lines = inventoryTodoRows(isCompany);
-        var baseHead = '<th>序号</th><th>产品名称</th><th>产品型号</th><th>产品编码</th><th>物资唯一码</th><th>物资类型名称</th><th>物资类型编码</th><th>采购部门</th><th>供应商</th><th>采购单价（含税）</th><th>是否在本部门</th><th>是否开票</th><th>使用人</th><th>资产类型</th><th>资产编号</th><th>存放地点</th><th>在库/领用状态</th><th>账面数量</th><th>单位</th>';
-        var staffHead = '<th>盘点确认数量</th><th>使用状态</th><th>盘点结果</th><th>盘点依据</th><th>差异类型</th><th>备注</th>';
-        var rowsHtml = lines.map(function (x, i) {
+        var nameFilter = String(inventoryTodoRows._name || "").trim();
+        var detailType = inventoryTodoRows._detailType || "";
+        var isSummary = !detailType;
+        var filteredLines = lines.filter(function (x) {
+          return !nameFilter || String(x.name || "").indexOf(nameFilter) >= 0;
+        });
+        var summaryRows = inventoryTodoSummaryRows(filteredLines);
+        var detailLines = isSummary ? [] : inventoryTodoExpandedLines(filteredLines.filter(function (x) { return x.typeCode === detailType; }));
+        var baseHead = '<th>序号</th><th>产品名称</th><th>规格型号</th><th>产品编码</th><th>物资唯一码</th><th>物资类型名称</th><th>物资类型编码</th><th>采购部门</th><th>供应商</th><th>采购单价（含税）</th><th>是否在本部门</th><th>是否开票</th><th>使用人</th><th>资产类型</th><th>资产编号</th><th>存放地点</th><th>使用年限</th><th>原值</th><th>单位</th>';
+        var staffHead = '<th>状态是否完好</th><th>盘点结果</th><th>证明材料</th><th>备注</th>';
+        var rowsHtml = detailLines.map(function (x, i) {
           var health = x.health || "完好";
-          var result = x.result || "正常";
-          var diffType = result === "正常" ? "正常" : result;
+          var result = x.result === "一致" || x.result === "不一致" ? x.result : ((x.result && x.result !== "正常") ? "不一致" : "一致");
           var price = x.price != null ? x.price : (x.bookOriginal || x.originalValue || 0);
-          var row = '<tr><td>' + (i + 1) + '</td><td>' + mtEsc(x.name) + '</td><td>' + mtEsc(x.spec || "标准型") + '</td><td>' + mtEsc(x.product) + '</td><td>' + mtEsc(x.code) + '</td><td>' + mtEsc(x.typeName) + '</td><td>' + mtEsc(x.typeCode) + '</td><td>' + mtEsc(x.dept) + '</td><td>' + mtEsc(x.supplier || "中车电气") + '</td><td>' + (price ? Number(price).toLocaleString("zh-CN", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : "-") + '</td><td>' + mtEsc(x.dept === task.dept || task.dept === "全部业务部门" ? "是" : "否") + '</td><td>' + mtEsc(x.invoice || "已开票") + '</td><td>' + mtEsc(x.user) + '</td><td>' + mtEsc(x.assetType || x.typeName) + '</td><td>' + mtEsc(x.assetNo) + '</td><td>' + mtEsc(x.loc) + '</td><td>' + mtEsc(x.state) + '</td><td>' + mtEsc(x.book) + '</td><td>' + mtEsc(x.unit || "件") + '</td>';
+          var row = '<tr><td>' + (i + 1) + '</td><td>' + mtEsc(x.name) + '</td><td>' + mtEsc(x.spec || "标准型") + '</td><td>' + mtEsc(x.product) + '</td><td>' + mtEsc(x.code) + '</td><td>' + mtEsc(x.typeName) + '</td><td>' + mtEsc(x.typeCode) + '</td><td>' + mtEsc(x.dept) + '</td><td>' + mtEsc(x.supplier || "中车电气") + '</td><td>' + (price ? Number(price).toLocaleString("zh-CN", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : "-") + '</td><td>' + mtEsc(x.dept === task.dept || task.dept === "全部业务部门" ? "是" : "否") + '</td><td>' + mtEsc(x.invoice || "已开票") + '</td><td>' + mtEsc(x.user) + '</td><td>' + mtEsc(x.assetType || x.typeName) + '</td><td>' + mtEsc(x.assetNo) + '</td><td>' + mtEsc(x.loc) + '</td><td>' + (canEditInventoryLines ? '<input class="qa-inp qa-inp--auto" data-inventory-line-field="serviceLife" data-inventory-line-code="' + mtEsc(x.code) + '" placeholder="填写使用年限" value="' + mtEsc(x.manualServiceLife || "") + '">' : mtEsc(x.serviceLife || "5年")) + '</td><td>' + (price ? Number(price).toLocaleString("zh-CN", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : "-") + '</td><td>' + mtEsc(x.unit || "件") + '</td>';
           if (!showResultColumns) {
             return row + '</tr>';
           }
           if (canEditInventoryLines) {
-            row += '<td><input class="qa-inp" value="1" readonly></td>' +
-              '<td><select class="qa-select"><option value="">请选择</option><option>完好</option><option>损坏</option><option>缺失</option></select></td>' +
+            row += '<td><select class="qa-select"><option value="">请选择</option><option>完好</option><option>损坏</option><option>缺失</option></select></td>' +
               '<td><select class="qa-select"><option value="">请选择</option><option>一致</option><option>不一致</option></select></td>' +
-              '<td><label class="qa-upload-btn">上传<input type="file" accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,.txt"></label></td>' +
-              '<td><select class="qa-select"><option value="">请选择</option><option>正常</option><option>盘盈</option><option>盘亏</option><option>损毁</option></select></td>' +
+              '<td><label class="qa-upload-btn">上传<input type="file" accept="image/*,.pdf"></label></td>' +
               '<td><textarea class="qa-inp" rows="2" placeholder="填写备注"></textarea></td>';
           } else {
-            row += '<td>1</td><td>' + mtEsc(health) + '</td><td>' + mtEsc(result === "正常" ? "一致" : result) + '</td><td>' + mtEsc(x.proof || "台账记录、盘点照片") + '</td><td>' + mtEsc(diffType) + '</td><td>' + mtEsc(x.reason || "无差异") + '</td>';
+            row += '<td>' + mtEsc(health) + '</td><td>' + mtEsc(result) + '</td><td style="white-space:normal;word-break:break-all;">' + mtEsc(x.proof || "盘点照片、盘点说明") + '</td><td>' + mtEsc(x.reason || "无差异") + '</td>';
           }
           return row + '</tr>';
         }).join("");
-        var tableTitle = isCompany ? "盘点已入库未出库物资明细表" : "盘点物资明细表";
+        var summaryHtml = summaryRows.map(function (x) {
+          return '<tr>' +
+            '<td>' + mtEsc(x.typeCode) + '</td><td>' + mtEsc(x.assetType) + '</td><td>' + inventoryTodoMoney(x.price) + '</td><td>' + inventoryTodoMoney(inventoryTodoPurchaseTotal(x.price, x.bookQty)) + '</td><td>' + mtEsc(x.dept) + '</td><td>' + mtEsc(x.user) + '</td><td>' + mtEsc(x.loc) + '</td><td>' + mtEsc(x.stockQty) + '</td><td>' + mtEsc(x.requisitionQty) + '</td><td>' + mtEsc(x.confirmQty) + '</td><td><span class="inv-op"><span role="button" tabindex="0" data-inventory-summary-view="' + mtEsc(x.typeCode) + '">物资明细</span></span></td>' +
+          '</tr>';
+        }).join("");
+        var tableTitle = isSummary ? "盘点物资汇总表" : (isCompany ? "盘点物资明细表（已入库未出库）" : "盘点物资明细表");
         return '<div class="qa-accept-wrap">' +
           '<div class="qa-accept-toolbar"><div class="qa-accept-toolbar-title">' + mtEsc(map["流程定义名称"] === "盘点差异审批" ? "盘点差异办理" : "盘点任务办理") + '</div></div>' +
-          '<div class="qa-accept-form-shell"><table class="qa-accept-grid" role="presentation"><tbody>' +
-          '<tr>' + inventoryTodoField("盘点单号", task.no) + inventoryTodoField("盘点任务名称", task.name) + '</tr>' +
-          '<tr>' + inventoryTodoField("盘点类型", task.type) + inventoryTodoField("盘点部门", task.dept) + '</tr>' +
-          '<tr>' + inventoryTodoField("盘点范围", task.scope) + inventoryTodoField("资产类型范围", task.assetRange) + '</tr>' +
-          '<tr>' + inventoryTodoField("计划开始日期", task.start) + inventoryTodoField("计划结束日期", task.end) + '</tr>' +
-          '<tr>' + inventoryTodoField("发起人", task.initiator) + inventoryTodoField("负责人", map["办理人"] || task.owner) + '</tr>' +
-          '<tr>' + inventoryTodoField("应盘数量", isCompany ? "284" : "42") + inventoryTodoField("已盘数量", isInventoryStaff ? "188" : "0") + '</tr>' +
-          '<tr>' + inventoryTodoField("差异数量", isInventoryStaff ? "6" : "0") + inventoryTodoField("任务状态", task.status) + '</tr>' +
-          '<tr><td class="qa-lab">确认口径</td><td class="qa-val" colspan="3"><div class="qa-inp qa-inp--auto">' + mtEsc(task.caliber) + '</div></td></tr>' +
-          '<tr><td class="qa-lab">办理意见</td><td class="qa-val" colspan="3"><textarea class="qa-ta" id="inventoryTodoOpinion" rows="2" placeholder="请输入办理意见"></textarea></td></tr>' +
-          '</tbody></table></div>' +
+          inventoryTodoTaskMetaHtml(task, isCompany) +
+          '<div style="display:flex;align-items:end;justify-content:flex-start;gap:14px;margin:0 0 12px;">' +
+            '<div><div style="font-size:14px;color:#1f3551;font-weight:600;margin-bottom:8px;">产品名称</div><input class="qa-inp qa-inp--auto" id="inventoryTodoName" placeholder="请输入产品名称" value="' + mtEsc(nameFilter) + '"></div>' +
+            '<div><button type="button" class="proc-btn proc-btn-primary" id="inventoryTodoSearch" style="min-width:120px;">查询</button></div>' +
+          '</div>' +
           '<div class="qa-mat-lines-block ' + (canEditInventoryLines ? "" : "qa-mat-lines-block--readonly ") + 'qa-mat-detail-list-block">' +
-          '<div style="font-size:14px;font-weight:600;color:#1f3551;margin-bottom:8px;">' + tableTitle + '</div>' +
-          '<div class="qa-mat-lines-table-wrap"><table class="qa-mat-lines-table"><thead><tr>' + baseHead + (showResultColumns ? staffHead : "") + '</tr></thead><tbody>' + rowsHtml + '</tbody></table></div>' +
-          '</div></div>';
+          '<div style="font-size:14px;font-weight:600;color:#1f3551;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;gap:12px;">' + tableTitle + (isSummary ? '' : '<button type="button" class="proc-btn" id="inventoryTodoBack">返回汇总</button>') + '</div>' +
+          '<div class="qa-mat-lines-table-wrap"><table class="qa-mat-lines-table"><thead><tr>' +
+            (isSummary
+              ? '<th>物资类型编码</th><th>资产类型</th><th>采购单价（含税）</th><th>采购总价</th><th>领用部门</th><th>领用人</th><th>存放地点</th><th>库存数量</th><th>领用数量</th><th>盘点确认数量</th><th>操作</th>'
+              : baseHead + (showResultColumns ? staffHead : "")) +
+          '</tr></thead><tbody>' + (isSummary ? summaryHtml : rowsHtml) + '</tbody></table></div>' +
+          '</div>' +
+          '<div style="margin-top:12px;"><div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:8px;"><div style="font-size:14px;color:#1f3551;font-weight:600;">' + mtEsc(inventoryTodoRoleName() + '办理意见') + '</div>' + (inventoryTodoCanAssign(map) ? '<button type="button" class="proc-btn proc-btn-primary" id="inventoryTodoAssignInline">分配盘点人员</button>' : '') + '</div><textarea class="qa-ta" id="inventoryTodoOpinion" rows="2" placeholder="请输入办理意见"></textarea></div>' +
+          '</div>';
       }
       function closeInventoryTodoModal() {
         var mask = mt$("procModalMask");
@@ -1631,7 +1801,9 @@
         if (flowBtn) {
           flowBtn.hidden = false;
           flowBtn.setAttribute("aria-hidden", "false");
-          flowBtn.onclick = function () { openInventoryTodoProgress(map); };
+          flowBtn.onclick = function () {
+            if (inventoryTodoRows._currentMap) openInventoryTodoProgress(inventoryTodoRows._currentMap);
+          };
         }
         var resetClose = mt$("procModalClose");
         if (resetClose) resetClose.onclick = closeInventoryTodoModal;
@@ -1674,7 +1846,6 @@
           if (e.target && e.target.getAttribute("data-ok-assign") === "1") {
             mtQaToast("已分配盘点人员（演示）");
             closeAssignModal();
-            closeInventoryTodoModal();
           }
         });
         var search = modalMask.querySelector(".inventory-assign-search");
@@ -1690,8 +1861,58 @@
       function openInventoryTodoHandleModal(map) {
         var mask = mt$("procModalMask");
         if (!mask) return;
-        mt$("procModalTitle").textContent = "办理 · " + (map["流程定义名称"] || "盘点任务审批");
-        mt$("procModalBody").innerHTML = inventoryTodoHtml(map);
+        inventoryTodoRows._currentMap = map;
+        inventoryTodoRows._detailType = "";
+        inventoryTodoRows._name = "";
+        inventoryTodoRows._summaryConfirm = inventoryTodoRows._summaryConfirm || {};
+        function rerenderInventoryTodoBody() {
+          mt$("procModalBody").innerHTML = inventoryTodoHtml(map);
+          var body = mt$("procModalBody");
+          if (!body) return;
+          body.oninput = function (evt) {
+            var lineField = evt.target.getAttribute("data-inventory-line-field");
+            var lineCode = evt.target.getAttribute("data-inventory-line-code");
+            if (lineField === "serviceLife" && lineCode) {
+              var targetLine = inventoryTodoRows(isCompany).find(function (item) { return String(item.code) === String(lineCode); });
+              if (targetLine) targetLine.manualServiceLife = evt.target.value;
+            }
+          };
+          body.onclick = function (evt) {
+            var summaryView = evt.target.closest("[data-inventory-summary-view]");
+            if (summaryView) {
+              inventoryTodoRows._detailType = summaryView.getAttribute("data-inventory-summary-view") || "";
+              rerenderInventoryTodoBody();
+              return;
+            }
+            if (evt.target.id === "inventoryTodoBack") {
+              inventoryTodoRows._detailType = "";
+              rerenderInventoryTodoBody();
+              return;
+            }
+            if (evt.target.id === "inventoryTodoSearch") {
+              var nameInput = mt$("inventoryTodoName");
+              inventoryTodoRows._name = nameInput ? String(nameInput.value || "").trim() : "";
+              inventoryTodoRows._detailType = "";
+              rerenderInventoryTodoBody();
+              return;
+            }
+            if (evt.target.id === "inventoryTodoAssignInline") {
+              openInventoryAssignModal(map);
+            }
+          };
+          var nameInput = mt$("inventoryTodoName");
+          if (nameInput) {
+            nameInput.onkeydown = function (evt) {
+              if (evt.key === "Enter") {
+                inventoryTodoRows._name = String(nameInput.value || "").trim();
+                inventoryTodoRows._detailType = "";
+                rerenderInventoryTodoBody();
+              }
+            };
+          }
+        }
+        mt$("procModalTitle").textContent = "办理 · " + inventoryTodoPrefixedProcName(map["流程定义名称"] || "盘点任务审批");
+        rerenderInventoryTodoBody();
         var isInventoryStaffHandle = String(map["流程定义KEY"] || "") === "pdtask_company_staff";
         mt$("procModalFoot").innerHTML =
           '<button type="button" class="proc-btn" id="inventoryTodoCancel">取消</button>' +
@@ -1699,9 +1920,9 @@
           '<button type="button" class="proc-btn proc-btn-primary" id="inventoryTodoApprove">' + (isInventoryStaffHandle ? "提交盘点" : "通过") + '</button>';
         var flowBtn = mt$("procModalFlow");
         if (flowBtn) {
-          flowBtn.hidden = true;
-          flowBtn.setAttribute("aria-hidden", "true");
-          flowBtn.onclick = null;
+          flowBtn.hidden = false;
+          flowBtn.setAttribute("aria-hidden", "false");
+          flowBtn.onclick = function () { openInventoryTodoProgress(map); };
         }
         mask.classList.add("is-open", "inventory-handle-mode");
         mask.setAttribute("aria-hidden", "false");
@@ -1711,17 +1932,6 @@
         if (cancel) cancel.onclick = closeInventoryTodoModal;
         if (reject) reject.onclick = function () { mtQaToast("已驳回（演示）"); closeInventoryTodoModal(); };
         if (approve) approve.onclick = function () {
-          if (inventoryTodoCanAssign(map)) {
-            mt$("procModalFoot").innerHTML =
-              '<button type="button" class="proc-btn" id="inventoryTodoCancelAfter">取消</button>' +
-              '<button type="button" class="proc-btn proc-btn-primary" id="inventoryTodoAssign">分配盘点人员</button>';
-            var cancelAfter = mt$("inventoryTodoCancelAfter");
-            var assignBtn = mt$("inventoryTodoAssign");
-            if (cancelAfter) cancelAfter.onclick = closeInventoryTodoModal;
-            if (assignBtn) assignBtn.onclick = function () { openInventoryAssignModal(map); };
-            mtQaToast("已同意，请继续分配盘点人员（演示）");
-            return;
-          }
           mtQaToast("已通过（演示）");
           closeInventoryTodoModal();
         };
@@ -1891,6 +2101,8 @@
               td.innerHTML = "<span class='mt-status mt-s1'>" + val + "</span>";
             } else if (cfg.cols[j] === "办理人") {
               td.innerHTML = "<span class='mt-status mt-s1'>" + val + "</span>";
+            } else if (cfg.cols[j] === "流程定义名称") {
+              td.textContent = inventoryTodoPrefixedProcName(val);
             } else if (cfg.cols[j] === "操作" && val === "icons") {
               /* 我发起的：已驳回可改/删/看；待审核类（审核中、待审批等）仅查看 + 流程跟踪 */
               var statusIdx = cfg.cols.indexOf("流程状态");

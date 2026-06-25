@@ -429,6 +429,7 @@
           <div class="wh-field"><label class="wh-label">产品名称</label><input class="wh-input" id="mcName" placeholder="请输入产品名称"></div>
           <div class="wh-field inv-material-query-field"><label class="wh-label">&nbsp;</label><button type="button" class="inv-btn primary" id="btnMaterialQuery">查询</button></div>
         </div>
+        <div class="inv-task-info-grid" id="materialInfoGrid" style="margin-bottom:16px"></div>
         <div class="inv-material-toolbar">
           <div class="inv-table-title" id="materialTableTitle" style="margin:0">盘点部门所属物资明细表</div>
           <button type="button" class="inv-btn" id="btnMaterialBack" hidden>返回汇总</button>
@@ -760,6 +761,51 @@
       function responsiblePerson(row) {
         if (row.type === "公司盘点") return row.materialOwner || "宋中波";
         return row.deptHead || row.owner || "-";
+      }
+      function inventoryCompanyDeptText() {
+        return "物资管理部、财务部门、业务部门（电气控制所）";
+      }
+      function inventoryAutoPerson(value, allowValue) {
+        return allowValue ? (value || "-") : "-";
+      }
+      function inventoryCompanyParticipantReady(row) {
+        return row && (row.status === "已完成" || row.status === "待阅知" || row.status === "待差异处理");
+      }
+      function inventoryTaskMetaFields(row, mode) {
+        var isCompany = normalizeFlowType(row) === "company";
+        var participantReady = inventoryCompanyParticipantReady(row);
+        var fields = [
+          ["盘点单号", row.no],
+          ["盘点任务名称", row.name],
+          ["盘点类型", row.type],
+          ["盘点部门", isCompany ? inventoryCompanyDeptText() : row.dept]
+        ];
+        if (isCompany) {
+          fields = fields.concat([
+            ["物资管理部门物资专责", row.materialOwner || "宋中波"],
+            ["物资管理部门负责人", row.materialHead || "王超"],
+            ["财务部门负责人", row.financeHead || "孙睿"],
+            ["业务部门负责人", row.bizHead || "李仁堂"],
+            ["物资管理部门盘点人员", inventoryAutoPerson(row.materialChecker || "宋中波", mode === "start" || participantReady)],
+            ["财务部门盘点人员", inventoryAutoPerson(row.financeChecker || "杜欣鑫", mode === "start" || participantReady)],
+            ["业务部门盘点人员", inventoryAutoPerson(row.bizChecker || "成明锴", mode === "start" || participantReady)]
+          ]);
+        } else {
+          fields = fields.concat([
+            ["部门物资专责", row.owner || "许学良"],
+            ["部门负责人", row.deptHead || "李仁堂"],
+            ["物资管理部门物资专责", row.materialOwner || "宋中波"]
+          ]);
+        }
+        return fields;
+      }
+      function inventoryTaskMetaHtml(row, mode) {
+        return '<div class="inv-task-info-grid">' + inventoryTaskMetaFields(row, mode).map(function (item) {
+          return taskField(item[0], item[1]);
+        }).join("") + '</div>';
+      }
+      function inventoryPurchaseTotal(price, qty) {
+        return Number(price || 0) * Number(qty || 0);
       }
       function lineActions(line, showTrack) {
         return '<span class="inv-op"><span role="button" tabindex="0" data-line-act="view" data-code="' + line.code + '">查看</span></span>';
@@ -1123,11 +1169,7 @@
           map[key].detailCount += 1;
         });
         Object.keys(map).forEach(function (key) {
-          if (mode === "start") {
-            map[key].confirmQty = summaryConfirmInputValue(currentRow, key);
-          } else {
-            map[key].confirmQty = Math.max(map[key].detailCount, 2);
-          }
+          map[key].confirmQty = mode === "view" ? Math.max(map[key].detailCount, 2) : map[key].detailCount;
         });
         return Object.keys(map).map(function (key) { return map[key]; });
       }
@@ -1148,40 +1190,30 @@
         var detailRows = isSummary ? [] : expandDisplayLines(list.filter(function (x) { return x.typeCode === state.taskInfoMaterialType; }));
         document.getElementById("taskInfoTitle").textContent = "盘点任务详情";
         document.getElementById("taskInfoBody").innerHTML = [
-          '<div class="inv-task-info-grid">' +
-            taskField("盘点单号", row.no) +
-            taskField("盘点任务名称", row.name) +
-            taskField("盘点类型", row.type) +
-            taskField("盘点部门", row.dept) +
-            taskField("计划开始日期", row.start) +
-            taskField("计划结束日期", row.end) +
-            taskField("发起人", row.owner) +
-            taskField("负责人", responsiblePerson(row)) +
-            taskField("任务状态", row.status) +
-          '</div>',
+          inventoryTaskMetaHtml(row, "view"),
           '<div class="inv-material-toolbar">' +
             '<div class="inv-table-title" style="margin:0">' + (isSummary ? "盘点物资汇总表" : (isCompany ? "盘点物资明细表（已入库未出库）" : "盘点物资明细表")) + '</div>' +
             (isSummary ? '' : '<button type="button" class="inv-btn" id="btnTaskInfoBack">返回汇总</button>') +
           '</div>',
           '<div class="inv-task-mini-table-wrap"><table class="inv-task-mini-table"><thead><tr>' +
             (isSummary
-              ? '<th>物资类型名称</th><th>物资类型编码</th><th>资产类型</th><th>采购单价（含税）</th><th>领用部门</th><th>领用人</th><th>存放地点</th><th>领用数量</th><th>库存数量</th><th>盘点确认数量</th><th>操作</th>'
+              ? '<th>物资类型编码</th><th>资产类型</th><th>采购单价（含税）</th><th>采购总价</th><th>领用部门</th><th>领用人</th><th>存放地点</th><th>库存数量</th><th>领用数量</th><th>盘点确认数量</th><th>操作</th>'
               : inventoryDetailHeaders.map(function (x) { return "<th>" + x + "</th>"; }).join("")) +
           '</tr></thead><tbody>' +
             (isSummary
               ? summaryRows.map(function (x) {
                 return '<tr>' +
-                  '<td>' + cell(x.materialTypeName) + '</td>' +
                   '<td>' + cell(x.typeCode) + '</td>' +
                   '<td>' + cell(x.assetType) + '</td>' +
                   '<td>' + (x.price ? Number(x.price).toLocaleString("zh-CN", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : "-") + '</td>' +
+                  '<td>' + money(inventoryPurchaseTotal(x.price, x.bookQty)) + '</td>' +
                   '<td>' + cell(x.dept) + '</td>' +
                   '<td>' + cell(x.user) + '</td>' +
                   '<td>' + cell(x.loc) + '</td>' +
-                  '<td>' + cell(x.requisitionQty) + '</td>' +
                   '<td>' + cell(x.stockQty) + '</td>' +
+                  '<td>' + cell(x.requisitionQty) + '</td>' +
                   '<td>' + cell(x.confirmQty) + '</td>' +
-                  '<td><span class="inv-op"><span role="button" tabindex="0" data-task-summary-view="' + cell(x.typeCode) + '">查看</span></span></td>' +
+                  '<td><span class="inv-op"><span role="button" tabindex="0" data-task-summary-view="' + cell(x.typeCode) + '">物资明细</span></span></td>' +
                 '</tr>';
               }).join("")
               : detailRows.map(readonlyDetailRow).join("")) +
@@ -1197,8 +1229,10 @@
         var back = document.getElementById("btnMaterialBack");
         var cols = document.getElementById("materialCheckCols");
         var head = document.getElementById("materialCheckHead");
-        var summaryWidths = [170, 150, 120, 150, 120, 110, 200, 100, 100, 140, 96];
+        var infoGrid = document.getElementById("materialInfoGrid");
+        var summaryWidths = [150, 120, 150, 150, 120, 110, 200, 100, 100, 140, 110];
         var detailWidths = [72, 118, 104, 118, 132, 124, 124, 112, 112, 132, 110, 96, 104, 96, 118, 150, 124, 92, 78, 112, 112, 170, 176];
+        if (infoGrid) infoGrid.innerHTML = inventoryTaskMetaHtml(state.current || currentTaskForAction(), "start");
         if (title) title.textContent = isSummary ? "盘点物资汇总表" : (isCompany ? "盘点物资明细表（已入库未出库）" : "盘点物资明细表");
         if (back) back.hidden = isSummary;
         if (cols) {
@@ -1206,23 +1240,23 @@
         }
         if (head) {
           head.innerHTML = isSummary
-            ? '<tr><th>物资类型名称</th><th>物资类型编码</th><th>资产类型</th><th>采购单价（含税）</th><th>领用部门</th><th>领用人</th><th>存放地点</th><th>领用数量</th><th>库存数量</th><th>盘点确认数量</th><th>操作</th></tr>'
+            ? '<tr><th>物资类型编码</th><th>资产类型</th><th>采购单价（含税）</th><th>采购总价</th><th>领用部门</th><th>领用人</th><th>存放地点</th><th>库存数量</th><th>领用数量</th><th>盘点确认数量</th><th>操作</th></tr>'
             : '<tr><th>序号</th><th>产品名称</th><th>规格型号</th><th>产品编码</th><th>物资唯一码</th><th>物资类型名称</th><th>物资类型编码</th><th>采购部门</th><th>供应商</th><th>采购单价（含税）</th><th>是否在本部门</th><th>是否开票</th><th>使用人</th><th>资产类型</th><th>资产编号</th><th>存放地点</th><th>使用年限</th><th>原值</th><th>单位</th><th>状态是否完好</th><th>盘点结果</th><th>证明材料</th><th>备注</th></tr>';
         }
         document.getElementById("materialCheckBody").innerHTML = list.map(function (x, i) {
           if (isSummary) {
             return '<tr>' +
-              '<td>' + cell(x.materialTypeName) + '</td>' +
               '<td>' + cell(x.typeCode) + '</td>' +
               '<td>' + cell(x.assetType) + '</td>' +
               '<td>' + (x.price ? Number(x.price).toLocaleString("zh-CN", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : "-") + '</td>' +
+              '<td>' + money(inventoryPurchaseTotal(x.price, x.bookQty)) + '</td>' +
               '<td>' + cell(x.dept) + '</td>' +
               '<td>' + cell(x.user) + '</td>' +
               '<td>' + cell(x.loc) + '</td>' +
-              '<td>' + cell(x.requisitionQty) + '</td>' +
               '<td>' + cell(x.stockQty) + '</td>' +
-              '<td><input class="inv-material-cell-input" data-summary-confirm="' + cell(x.typeCode) + '" value="' + inputValue(x.confirmQty) + '" placeholder="请填写盘点确认数量"></td>' +
-              '<td><span class="inv-op"><span role="button" tabindex="0" data-material-summary-view="' + cell(x.typeCode) + '">编辑</span></span></td>' +
+              '<td>' + cell(x.requisitionQty) + '</td>' +
+              '<td>' + cell(x.confirmQty) + '</td>' +
+              '<td><span class="inv-op"><span role="button" tabindex="0" data-material-summary-view="' + cell(x.typeCode) + '">物资明细</span></span></td>' +
             '</tr>';
           }
           var health = x.health || "";
@@ -1367,14 +1401,20 @@
             '<span class="inv-arrow">→</span>' +
             companyStep("物资管理部门物资专责阅知", 9) +
             '<span class="inv-arrow">→</span>' +
-            companyStep("物资管理部门物资专责阅知后确认公司盘点结束", 10, true);
+            companyStep("盘点结束", 10, true);
         } else {
           flowEl.classList.remove("is-company-branch");
-          flowEl.innerHTML = steps.map(function (step, i) {
+          flowEl.innerHTML = [
+            "部门物资专责发起部门物资盘点",
+            "确认盘点结果是否与系统台帐一致",
+            "盘点完毕，上传盘点结果",
+            "部门负责人审阅",
+            "物资管理部门物资专责阅知",
+            "盘点结束"
+          ].map(function (text, i, arr) {
             var cls = i < activeIndex ? " done" : (i === activeIndex ? " active" : "");
-            if (i === steps.length - 1) cls += " is-end";
-            var arrow = i < steps.length - 1 ? '<span class="inv-arrow">→</span>' : "";
-            return '<div class="inv-step' + cls + '"><strong>' + flowChartText(step) + '</strong><span>' + step.person + '</span></div>' + arrow;
+            if (i === arr.length - 1) cls += " is-end";
+            return '<div class="inv-step' + cls + '"><strong>' + text + '</strong></div>' + (i < arr.length - 1 ? '<span class="inv-arrow">→</span>' : "");
           }).join("");
         }
         document.getElementById("approvalInfoBody").innerHTML = approvalRowsFor(state.current).map(function (x, i) {
