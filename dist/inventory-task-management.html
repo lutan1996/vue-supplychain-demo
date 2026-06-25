@@ -195,8 +195,25 @@
     .inv-material-filters > .wh-field:first-child { grid-column: span 2; }
     .inv-material-query-field { align-self: end; grid-column: span 2; }
     .inv-material-query-actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .inv-material-query-action { display: flex; flex-direction: column; align-items: flex-start; }
     .inv-material-query-field .inv-btn { min-width: 96px; height: 36px; }
     .inv-material-query-note { margin-top: 6px; color: #98a1b2; font-size: 12px; line-height: 1.6; }
+    #materialCheckMask #materialInfoGrid { display: block; width: 100%; }
+    #materialCheckMask #materialInfoGrid > .inv-task-info-grid.is-start-grid {
+      display: grid !important;
+      width: 100% !important;
+      grid-template-columns: repeat(4, minmax(220px, 1fr)) !important;
+      gap: 18px 24px !important;
+      align-items: start !important;
+      justify-items: stretch !important;
+    }
+    #materialCheckMask #materialInfoGrid > .inv-task-info-grid.is-start-grid .inv-task-field {
+      width: 100% !important;
+      min-width: 0 !important;
+    }
+    #materialCheckMask #materialInfoGrid > .inv-task-info-grid.is-start-grid .inv-task-field.wide-2 {
+      grid-column: span 1 !important;
+    }
     .inv-material-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 10px; }
     .inv-material-table-wrap { overflow: auto; margin-top: 8px; }
     .inv-material-table { width: 100%; min-width: 1680px; border-collapse: collapse; table-layout: fixed; font-size: 12px; }
@@ -451,10 +468,14 @@
           <div class="wh-field inv-material-query-field">
             <label class="wh-label">&nbsp;</label>
             <div class="inv-material-query-actions">
-              <button type="button" class="inv-btn primary" id="btnMaterialQuery">查询</button>
-              <button type="button" class="inv-btn" id="btnMaterialAssign">分配盘点人员</button>
+              <div class="inv-material-query-action">
+                <button type="button" class="inv-btn primary" id="btnMaterialQuery">查询</button>
+              </div>
+              <div class="inv-material-query-action">
+                <button type="button" class="inv-btn" id="btnMaterialAssign">分配盘点人员</button>
+                <div class="inv-material-query-note">物资管理部门负责人，业务部门负责人，财务部门负责人角色登陆可见</div>
+              </div>
             </div>
-            <div class="inv-material-query-note">物资管理部门负责人，业务部门负责人，财务部门负责人角色登陆可见</div>
           </div>
         </div>
         <div id="materialInfoGrid" style="margin-bottom:16px"></div>

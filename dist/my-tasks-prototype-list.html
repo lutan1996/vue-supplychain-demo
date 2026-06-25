@@ -1439,6 +1439,11 @@
         }
         return text;
       }
+      function inventoryTodoIsProcess(map) {
+        var procName = String(map && map["流程定义名称"] || "");
+        var procKey = String(map && map["流程定义KEY"] || "");
+        return procName.indexOf("盘点任务审批") >= 0 || procName === "盘点差异审批" || procKey.indexOf("pdtask_") === 0 || procKey.indexOf("pddiff_") === 0;
+      }
       function inventoryTodoCompanyDeptText() {
         return "电控所";
       }
@@ -1927,6 +1932,7 @@
         var mask = mt$("procModalMask");
         if (!mask) return;
         inventoryTodoRows._currentMap = map;
+        window.__inventoryTodoCurrentMap = map;
         inventoryTodoRows._detailType = "";
         inventoryTodoRows._name = "";
         inventoryTodoRows._summaryConfirm = inventoryTodoRows._summaryConfirm || {};
@@ -2023,6 +2029,18 @@
       var procXBtn = mt$("procModalX");
       if (procCloseBtn) procCloseBtn.onclick = closeInventoryTodoModal;
       if (procXBtn) procXBtn.onclick = closeInventoryTodoModal;
+      (function overrideUnifiedInventoryProgress() {
+        var oldUnifiedProgress = window.openUnifiedProgressModal;
+        window.openUnifiedProgressModal = function () {
+          var currentMap = window.__inventoryTodoCurrentMap || inventoryTodoRows._currentMap;
+          if (currentMap && inventoryTodoIsProcess(currentMap)) {
+            openInventoryTodoProgress(currentMap);
+            return true;
+          }
+          if (typeof oldUnifiedProgress === "function") return oldUnifiedProgress.apply(this, arguments);
+          return false;
+        };
+      })();
       var reminderGo = mt$("inventoryTaskReminderGo");
       var reminderClose = mt$("inventoryTaskReminderClose");
       var reminderDismiss = mt$("inventoryTaskReminderDismiss");
