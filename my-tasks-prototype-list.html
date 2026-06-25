@@ -1655,7 +1655,10 @@
         return key.indexOf("company") >= 0 || String(map && map["任务名称"] || "").indexOf("公司") >= 0;
       }
       function openInventoryTodoProgress(map) {
-        var isCompany = inventoryTodoIsCompany(map);
+        var procName = String(map && map["流程定义名称"] || "");
+        var isDeptProc = procName.indexOf("部门盘点任务审批") >= 0;
+        var isCompanyProc = procName.indexOf("公司盘点任务审批") >= 0;
+        var isCompany = isCompanyProc || (!isDeptProc && inventoryTodoIsCompany(map));
         var title = isCompany ? "审批记录 - 公司盘点" : "审批记录 - 部门盘点";
         var steps = inventoryTodoFlow(isCompany, map || {});
         var rowClass = isCompany ? "inventory-progress-row is-company-branch" : "inventory-progress-row";
