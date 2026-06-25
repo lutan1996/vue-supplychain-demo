@@ -85,7 +85,7 @@
     .inv-task-field span { color: #111; font-size: 13px; line-height: 1.5; }
     .inv-task-field b { color: #111; font-size: 13px; font-weight: 600; line-height: 1.5; word-break: break-all; }
     .inv-task-info-grid { display: grid; grid-template-columns: repeat(4, minmax(180px, 1fr)); gap: 12px 18px; width: 100%; align-items: start; }
-    .inv-task-info-grid.is-start-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .inv-task-info-grid.is-start-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
     .inv-task-info-grid .inv-task-field { display: block; }
     .inv-task-info-grid .inv-task-field span { display: block; margin-bottom: 6px; color: #516a87; font-weight: 600; }
     .inv-task-info-grid .inv-task-field b,
@@ -581,8 +581,8 @@
         { id: 5, no: "PD-2026-005", name: "公司三季度固定资产专项盘点", type: "公司盘点", dept: "全部业务部门", scope: "公司固定资产及已领用重点物资", assetTypeRange: "固定资产", start: "2026-07-10", end: "2026-07-18", owner: "宋中波", deptHead: "王超", materialOwner: "宋中波", financeHead: "孙睿", financeOwner: "杜欣鑫", bizHead: "陈亮、李仁堂、王贺", bizOwner: "成明锴、许学良、喻家敏", should: 168, done: 0, diff: 0, status: "待开始" },
         { id: 6, no: "PD-2026-006", name: "公司存货物资专项复盘", type: "公司盘点", dept: "全部业务部门", scope: "公司已入库未出库存货物资", assetTypeRange: "存货", start: "2026-07-20", end: "2026-07-25", owner: "宋中波", deptHead: "王超", materialOwner: "宋中波", financeHead: "孙睿", financeOwner: "杜欣鑫", bizHead: "陈亮、李仁堂、王贺", bizOwner: "成明锴、许学良、喻家敏", should: 132, done: 48, diff: 2, status: "盘点中" },
         { id: 7, no: "PD-2026-007", name: "公司无形资产使用状态盘点", type: "公司盘点", dept: "全部业务部门", scope: "公司授权类无形资产及使用记录", assetTypeRange: "无形资产", start: "2026-08-01", end: "2026-08-06", owner: "宋中波", deptHead: "王超", materialOwner: "宋中波", financeHead: "孙睿", financeOwner: "杜欣鑫", bizHead: "陈亮、李仁堂、王贺", bizOwner: "成明锴、许学良、喻家敏", should: 46, done: 0, diff: 0, status: "待开始" },
-        { id: 3, no: "PD-2026-003", name: "经营发展中心部门盘点", type: "部门盘点", dept: "经营发展中心", scope: "本部门在库及已领用物资", assetTypeRange: "固定资产、无形资产", start: "2026-07-01", end: "2026-07-05", owner: "宋中波", deptHead: "王超", materialOwner: "宋中波", should: 57, done: 0, diff: 0, status: "待开始" },
-        { id: 4, no: "PD-2026-004", name: "电气控制所部门盘点", type: "部门盘点", dept: "电气控制所", scope: "本部门在库及已领用物资", assetTypeRange: "固定资产、存货", start: "2026-06-10", end: "2026-06-15", owner: "成明锴", deptHead: "陈亮", materialOwner: "宋中波", should: 98, done: 98, diff: 0, status: "已完成" }
+        { id: 3, no: "PD-2026-003", name: "机械研究所三季度部门盘点", type: "部门盘点", dept: "机械研究所", scope: "本部门在库及已领用物资", assetTypeRange: "固定资产、无形资产", start: "2026-07-01", end: "2026-07-05", owner: "宋中波", deptHead: "王超", materialOwner: "宋中波", should: 57, done: 0, diff: 0, status: "待开始" },
+        { id: 4, no: "PD-2026-004", name: "机械研究所专项部门盘点", type: "部门盘点", dept: "机械研究所", scope: "本部门在库及已领用物资", assetTypeRange: "固定资产、存货", start: "2026-06-10", end: "2026-06-15", owner: "成明锴", deptHead: "陈亮", materialOwner: "宋中波", should: 98, done: 98, diff: 0, status: "已完成" }
       ];
       var lines = [
         { task: "PD-2026-001", assetNo: "ZC-2026-0001", code: "C20260000001", typeCode: "A0010020001", product: "B00001234", assetName: "变桨轴承", spec: "BP-2.0MW", materialTypeName: "固定资产", dept: "机械研究所", loc: "机械研究所/华北主仓A-01", user: "李仁堂", state: "在库", health: "完好", lastNo: "PD-2026-001", lastDate: "2026-06-25", book: 1, real: 1, result: "正常", lineStatus: "已确认", diffType: "正常", reason: "", keeper: "李仁堂", serviceLife: "8年", originalValue: 680000, qty: 1, unit: "台", checkQty: 1, useStatus: "正常", checkResult: "正常", remark1: "固定资产", remark2: "状态完好", remark3: "无需调整" },
@@ -888,7 +888,7 @@
         var isStart = mode === "start";
         return '<div class="inv-task-info-grid' + (isStart ? ' is-start-grid' : '') + '">' + inventoryTaskMetaFields(row, mode).map(function (item) {
           if (mode === "start" && roleFields[item[0]]) return inventoryMetaSelect(item[0], item[1], row, false);
-          return inventoryReadonlyMetaField(item[0], item[1], !isStart && item[0] === "盘点任务名称");
+          return inventoryReadonlyMetaField(item[0], item[1], item[0] === "盘点任务名称");
         }).join("") + '</div>';
       }
       function inventoryPurchaseTotal(price, qty) {
