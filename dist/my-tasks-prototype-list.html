@@ -1807,13 +1807,13 @@
         });
         var summaryRows = inventoryTodoSummaryRows(filteredLines, canEditInventoryLines);
         var detailLines = isSummary ? [] : inventoryTodoExpandedLines(filteredLines.filter(function (x) { return x.typeCode === detailType; }));
-        var baseHead = '<th>序号</th><th>产品名称</th><th>规格型号</th><th>产品编码</th><th>物资唯一码</th><th>物资类型名称</th><th>物资类型编码</th><th>采购部门</th><th>供应商</th><th>平均采购单价（含税）</th><th>是否在本部门</th><th>是否开票</th><th>使用人</th><th>资产类型</th><th>资产编号</th><th>存放地点</th><th>使用年限</th><th>原值</th><th>单位</th>';
+        var baseHead = '<th>序号</th><th>产品名称</th><th>规格型号</th><th>产品编码</th><th>物资唯一码</th><th>物资类型编码</th><th>采购部门</th><th>供应商</th><th>平均采购单价（含税）</th><th>是否在本部门</th><th>是否开票</th><th>使用人</th><th>资产类型</th><th>资产编号</th><th>存放地点</th><th>使用年限</th><th>原值</th><th>单位</th>';
         var staffHead = '<th>状态是否完好</th><th>盘点结果</th><th>证明材料</th><th>备注</th>';
         var rowsHtml = detailLines.map(function (x, i) {
           var health = x.health || "";
           var result = x.result === "一致" || x.result === "不一致" ? x.result : "";
           var price = x.price != null ? x.price : (x.bookOriginal || x.originalValue || 0);
-          var row = '<tr><td>' + (i + 1) + '</td><td>' + mtEsc(x.name) + '</td><td>' + mtEsc(x.spec || "标准型") + '</td><td>' + mtEsc(x.product) + '</td><td>' + mtEsc(x.code) + '</td><td>' + mtEsc(x.typeName) + '</td><td>' + mtEsc(x.typeCode) + '</td><td>' + mtEsc(x.dept) + '</td><td>' + mtEsc(x.supplier || "中车电气") + '</td><td>' + (price ? Number(price).toLocaleString("zh-CN", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : "-") + '</td><td>' + mtEsc(x.dept === task.dept || task.dept === "全部业务部门" ? "是" : "否") + '</td><td>' + mtEsc(x.invoice || "已开票") + '</td><td>' + mtEsc(x.user) + '</td><td>' + mtEsc(x.assetType || x.typeName) + '</td><td>' + mtEsc(x.assetNo) + '</td><td>' + mtEsc(x.loc) + '</td><td>' + (canEditInventoryLines ? '<input class="qa-inp qa-inp--auto" data-inventory-line-field="serviceLife" data-inventory-line-code="' + mtEsc(x.code) + '" placeholder="填写使用年限" value="' + mtEsc(x.manualServiceLife || "") + '">' : mtEsc(x.serviceLife || "5年")) + '</td><td>' + (price ? Number(price).toLocaleString("zh-CN", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : "-") + '</td><td>' + mtEsc(x.unit || "件") + '</td>';
+          var row = '<tr><td>' + (i + 1) + '</td><td>' + mtEsc(x.name) + '</td><td>' + mtEsc(x.spec || "标准型") + '</td><td>' + mtEsc(x.product) + '</td><td>' + mtEsc(x.code) + '</td><td>' + mtEsc(x.typeCode) + '</td><td>' + mtEsc(x.dept) + '</td><td>' + mtEsc(x.supplier || "中车电气") + '</td><td>' + (price ? Number(price).toLocaleString("zh-CN", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : "-") + '</td><td>' + mtEsc(x.dept === task.dept || task.dept === "全部业务部门" ? "是" : "否") + '</td><td>' + mtEsc(x.invoice || "已开票") + '</td><td>' + mtEsc(x.user) + '</td><td>' + mtEsc(x.assetType || x.typeName) + '</td><td>' + mtEsc(x.assetNo) + '</td><td>' + mtEsc(x.loc) + '</td><td>' + (canEditInventoryLines ? '<input class="qa-inp qa-inp--auto" data-inventory-line-field="serviceLife" data-inventory-line-code="' + mtEsc(x.code) + '" placeholder="填写使用年限" value="' + mtEsc(x.manualServiceLife || "") + '">' : mtEsc(x.serviceLife || "5年")) + '</td><td>' + (price ? Number(price).toLocaleString("zh-CN", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : "-") + '</td><td>' + mtEsc(x.unit || "件") + '</td>';
           if (!showResultColumns) {
             return row + '</tr>';
           }
@@ -1836,9 +1836,10 @@
         return '<div class="qa-accept-wrap">' +
           '<div class="qa-accept-toolbar"><div class="qa-accept-toolbar-title">' + mtEsc(map["流程定义名称"] === "盘点差异审批" ? "盘点差异办理" : "盘点任务办理") + '</div></div>' +
           inventoryTodoTaskMetaHtml(task, isCompany) +
-          '<div style="display:flex;align-items:end;justify-content:flex-start;gap:14px;margin:0 0 12px;">' +
+          '<div style="display:flex;align-items:end;justify-content:flex-start;gap:14px;flex-wrap:wrap;margin:0 0 12px;">' +
             '<div><div style="font-size:14px;color:#1f3551;font-weight:600;margin-bottom:8px;">产品名称</div><input class="qa-inp qa-inp--auto" id="inventoryTodoName" placeholder="请输入产品名称" value="' + mtEsc(nameFilter) + '"></div>' +
             '<div><button type="button" class="proc-btn proc-btn-primary" id="inventoryTodoSearch" style="min-width:120px;">查询</button></div>' +
+            (inventoryTodoCanAssign(map) ? '<div><button type="button" class="proc-btn proc-btn-primary" id="inventoryTodoAssignInline" style="min-width:120px;">分配盘点人员</button></div>' : '') +
           '</div>' +
           '<div class="qa-mat-lines-block ' + (canEditInventoryLines ? "" : "qa-mat-lines-block--readonly ") + 'qa-mat-detail-list-block">' +
           '<div style="font-size:14px;font-weight:600;color:#1f3551;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;gap:12px;">' + tableTitle + (isSummary ? '' : '<button type="button" class="proc-btn" id="inventoryTodoBack">返回汇总</button>') + '</div>' +
@@ -1848,7 +1849,7 @@
               : baseHead + (showResultColumns ? staffHead : "")) +
           '</tr></thead><tbody>' + (isSummary ? summaryHtml : rowsHtml) + '</tbody></table></div>' +
           '</div>' +
-          '<div style="margin-top:12px;"><div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:8px;"><div style="font-size:14px;color:#1f3551;font-weight:600;">' + mtEsc(inventoryTodoRoleNameForMap(map) + '办理意见') + '</div>' + (inventoryTodoCanAssign(map) ? '<button type="button" class="proc-btn proc-btn-primary" id="inventoryTodoAssignInline">分配盘点人员</button>' : '') + '</div><textarea class="qa-ta" id="inventoryTodoOpinion" rows="2" placeholder="请输入办理意见"></textarea></div>' +
+          '<div style="margin-top:12px;"><div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:8px;"><div style="font-size:14px;color:#1f3551;font-weight:600;">' + mtEsc(inventoryTodoRoleNameForMap(map) + '办理意见') + '</div></div><textarea class="qa-ta" id="inventoryTodoOpinion" rows="2" placeholder="请输入办理意见"></textarea></div>' +
           '</div>';
       }
       function closeInventoryTodoModal() {

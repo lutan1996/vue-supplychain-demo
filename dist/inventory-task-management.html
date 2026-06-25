@@ -190,7 +190,9 @@
     .inv-material-filters .wh-field { margin-bottom: 0; }
     .inv-material-filters .wh-input { height: 36px; }
     .inv-material-query-field { align-self: end; }
+    .inv-material-query-actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
     .inv-material-query-field .inv-btn { min-width: 96px; height: 36px; }
+    .inv-material-query-note { margin-top: 6px; color: #98a1b2; font-size: 12px; line-height: 1.6; }
     .inv-material-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 10px; }
     .inv-material-table-wrap { overflow: auto; margin-top: 8px; }
     .inv-material-table { width: 100%; min-width: 1680px; border-collapse: collapse; table-layout: fixed; font-size: 12px; }
@@ -441,7 +443,14 @@
       <div class="wh-modal-body">
         <div class="inv-material-filters">
           <div class="wh-field"><label class="wh-label">产品名称</label><input class="wh-input" id="mcName" placeholder="请输入产品名称"></div>
-          <div class="wh-field inv-material-query-field"><label class="wh-label">&nbsp;</label><button type="button" class="inv-btn primary" id="btnMaterialQuery">查询</button></div>
+          <div class="wh-field inv-material-query-field">
+            <label class="wh-label">&nbsp;</label>
+            <div class="inv-material-query-actions">
+              <button type="button" class="inv-btn primary" id="btnMaterialQuery">查询</button>
+              <button type="button" class="inv-btn" id="btnMaterialAssign">分配盘点人员</button>
+            </div>
+            <div class="inv-material-query-note">物资管理部门负责人，业务部门负责人，财务部门负责人角色登陆可见</div>
+          </div>
         </div>
         <div class="inv-task-info-grid" id="materialInfoGrid" style="margin-bottom:16px"></div>
         <div class="inv-material-toolbar">
@@ -477,7 +486,7 @@
               <col style="width:132px">
               <col style="width:176px">
             </colgroup>
-            <thead id="materialCheckHead"><tr><th>序号</th><th>资产编号</th><th>物资唯一码</th><th>物资类型编码</th><th>产品编码</th><th>产品名称</th><th>产品型号</th><th>物资类型名称</th><th>所属部门</th><th>存储地点/仓库货位</th><th>使用人</th><th>产权</th><th>在库/领用状态</th><th>账面数量</th><th>单位</th></tr></thead>
+            <thead id="materialCheckHead"><tr><th>序号</th><th>资产编号</th><th>物资唯一码</th><th>物资类型编码</th><th>产品编码</th><th>产品名称</th><th>产品型号</th><th>所属部门</th><th>存储地点/仓库货位</th><th>使用人</th><th>产权</th><th>在库/领用状态</th><th>账面数量</th><th>单位</th></tr></thead>
             <tbody id="materialCheckBody"></tbody>
           </table>
           <div class="inv-material-empty" id="materialCheckEmpty" hidden>暂无数据</div>
@@ -1098,7 +1107,7 @@
       function taskLines(row) {
         return linesForTask(row || state.current || rows[0]);
       }
-      var inventoryDetailHeaders = ["序号", "产品名称", "规格型号", "产品编码", "物资唯一码", "物资类型名称", "物资类型编码", "采购部门", "供应商", "平均采购单价（含税）", "是否在本部门", "是否开票", "使用人", "资产类型", "资产编号", "存放地点", "使用年限", "原值", "单位", "状态是否完好", "盘点结果", "证明材料", "备注"];
+      var inventoryDetailHeaders = ["序号", "产品名称", "规格型号", "产品编码", "物资唯一码", "物资类型编码", "采购部门", "供应商", "平均采购单价（含税）", "是否在本部门", "是否开票", "使用人", "资产类型", "资产编号", "存放地点", "使用年限", "原值", "单位", "状态是否完好", "盘点结果", "证明材料", "备注"];
       function diffAmountText(line) {
         var type = inferDiffType(line || {});
         if (type !== "盘亏" && type !== "盘盈") return "¥0";
@@ -1113,7 +1122,6 @@
           '<td>' + cell(line.spec) + '</td>' +
           '<td>' + cell(line.product) + '</td>' +
           '<td>' + cell(line.code) + '</td>' +
-          '<td>' + cell(line.materialTypeName) + '</td>' +
           '<td>' + cell(line.typeCode) + '</td>' +
           '<td>' + cell(line.dept) + '</td>' +
           '<td>' + cell(line.supplier || "中车电气") + '</td>' +
@@ -1326,7 +1334,7 @@
         if (head) {
           head.innerHTML = isSummary
             ? '<tr><th>物资类型编码</th><th>资产类型</th><th>平均采购单价（含税）</th><th>采购总价（含税）</th><th>使用部门</th><th>使用人</th><th>存放地点</th><th>库存数量</th><th>盘点确认数量</th><th>操作</th></tr>'
-            : '<tr><th>序号</th><th>产品名称</th><th>规格型号</th><th>产品编码</th><th>物资唯一码</th><th>物资类型名称</th><th>物资类型编码</th><th>采购部门</th><th>供应商</th><th>平均采购单价（含税）</th><th>是否在本部门</th><th>是否开票</th><th>使用人</th><th>资产类型</th><th>资产编号</th><th>存放地点</th><th>使用年限</th><th>原值</th><th>单位</th><th>状态是否完好</th><th>盘点结果</th><th>证明材料</th><th>备注</th></tr>';
+            : '<tr><th>序号</th><th>产品名称</th><th>规格型号</th><th>产品编码</th><th>物资唯一码</th><th>物资类型编码</th><th>采购部门</th><th>供应商</th><th>平均采购单价（含税）</th><th>是否在本部门</th><th>是否开票</th><th>使用人</th><th>资产类型</th><th>资产编号</th><th>存放地点</th><th>使用年限</th><th>原值</th><th>单位</th><th>状态是否完好</th><th>盘点结果</th><th>证明材料</th><th>备注</th></tr>';
         }
         document.getElementById("materialCheckBody").innerHTML = list.map(function (x, i) {
           if (isSummary) {
@@ -1351,7 +1359,6 @@
             '<td>' + cell(x.spec) + '</td>' +
             '<td>' + cell(x.product) + '</td>' +
             '<td>' + cell(x.code) + '</td>' +
-            '<td>' + cell(x.materialTypeName) + '</td>' +
             '<td>' + cell(x.typeCode) + '</td>' +
             '<td>' + cell(x.dept) + '</td>' +
             '<td>' + cell(x.supplier || "中车电气") + '</td>' +
@@ -1586,6 +1593,10 @@
         }
         if (e.target.id === "btnMaterialQuery") {
           renderMaterialCheck();
+          return;
+        }
+        if (e.target.id === "btnMaterialAssign") {
+          alert("请选择盘点人员后提交分配。");
           return;
         }
         if (e.target.id === "inventoryTaskReminderGo") {
