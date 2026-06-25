@@ -190,6 +190,9 @@
     .inv-material-cell-textarea { min-height: 54px; padding: 6px 8px; resize: vertical; }
     .inv-material-upload { display: inline-flex; align-items: center; justify-content: center; min-width: 88px; height: 30px; padding: 0 10px; border: 1px solid #91caff; border-radius: 4px; background: #e6f4ff; color: #1677ff; font-size: 12px; cursor: pointer; box-sizing: border-box; white-space: nowrap; }
     .inv-material-upload input { display: none; }
+    .inv-attach-list { display: grid; gap: 6px; max-width: 100%; }
+    .inv-attach-link { color: #1677ff; text-decoration: none; white-space: normal; word-break: break-all; overflow-wrap: anywhere; }
+    .inv-attach-link:hover { text-decoration: underline; }
     .inv-task-reminder { position: fixed; right: 24px; bottom: 26px; z-index: 9998; width: min(360px, calc(100vw - 48px)); border: 1px solid #d9e8ff; border-radius: 12px; background: #fff; box-shadow: 0 10px 28px rgba(15, 35, 60, .18); overflow: hidden; }
     .inv-task-reminder-head { display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; border-bottom: 1px solid #eef2f7; color: #1f3551; font-size: 16px; font-weight: 700; }
     .inv-task-reminder-close { border: 0; background: transparent; color: #8aa0b8; font-size: 24px; line-height: 1; cursor: pointer; }
@@ -672,6 +675,18 @@
           .replace(/>/g, "&gt;")
           .replace(/"/g, "&quot;");
       }
+      function renderAttachmentCell(line) {
+        var materialName = cell((line && line.assetName) || "盘点附件");
+        var photoName = materialName + "-盘点照片.jpg";
+        var noteName = "盘点说明.pdf";
+        return '<div class="inv-attach-list">' +
+          '<a class="inv-attach-link" href="' + inventoryPhoto(line) + '" target="_blank" rel="noopener noreferrer">' + photoName + '</a>' +
+          '<a class="inv-attach-link" href="docs/notice.pdf" target="_blank" rel="noopener noreferrer">' + noteName + '</a>' +
+        '</div>';
+      }
+      function uploadOnlyCell(line) {
+        return '<label class="inv-material-upload">上传<input type="file" data-line-field="attachment" data-line-code="' + inputValue((line && line.code) || "") + '" accept="image/*,.pdf"></label>';
+      }
       function resultText(v) {
         if (v && v !== "正常" && v !== "未盘点") return '<span class="inv-text-danger">' + v + '</span>';
         if (v === "正常") return '<span class="inv-text-ok">' + v + '</span>';
@@ -937,7 +952,7 @@
       function taskLines(row) {
         return linesForTask(row || state.current || rows[0]);
       }
-      var inventoryDetailHeaders = ["序号", "产品名称", "产品型号", "产品编码", "物资唯一码", "物资类型名称", "物资类型编码", "采购部门", "供应商", "采购单价（含税）", "是否在本部门", "是否开票", "使用人", "资产类型", "资产编号", "存放地点", "在库/领用状态", "账面数量", "单位", "盘点确认数量", "状态是否完好", "盘点结果", "证明材料", "备注", "操作"];
+      var inventoryDetailHeaders = ["序号", "产品名称", "规格型号", "产品编码", "物资唯一码", "物资类型名称", "物资类型编码", "采购部门", "供应商", "采购单价（含税）", "是否在本部门", "是否开票", "使用人", "资产类型", "资产编号", "存放地点", "使用年限", "原值（系统自动生成）", "在库/领用状态", "账面数量", "单位", "盘点确认数量", "状态是否完好", "盘点结果", "证明材料", "备注", "操作"];
       function diffAmountText(line) {
         var type = inferDiffType(line || {});
         if (type !== "盘亏" && type !== "盘盈") return "¥0";
@@ -946,6 +961,7 @@
       }
       function readonlyDetailRow(line, idx) {
         var diffType = inferDiffType(line || {});
+        var proof = (line && line.proof) || (line && line.materialTypeName === "存货" ? ((line.stockNo || "最近盘库单") + "、盘点说明") : "盘点照片、盘点说明");
         var cells = [
           idx + 1,
           line.assetName,
@@ -963,6 +979,8 @@
           line.remark1 || line.materialTypeName,
           line.assetNo,
           line.loc,
+          line.serviceLife || "-",
+          money(originalAmount(line)),
           line.state,
           line.book,
           line.unit || "件",
@@ -1168,7 +1186,7 @@
         if (head) {
           head.innerHTML = isSummary
             ? '<tr><th>物资类型名称</th><th>物资类型编码</th><th>资产类型</th><th>采购单价（含税）</th><th>库存数量</th><th>领用数量</th><th>盘点确认数量</th><th>领用部门</th><th>领用人</th><th>存放地点</th><th>操作</th></tr>'
-            : '<tr><th>序号</th><th>产品名称</th><th>产品型号</th><th>产品编码</th><th>物资唯一码</th><th>物资类型名称</th><th>物资类型编码</th><th>采购部门</th><th>供应商</th><th>采购单价（含税）</th><th>是否在本部门</th><th>是否开票</th><th>使用人</th><th>资产类型</th><th>资产编号</th><th>存放地点</th><th>在库/领用状态</th><th>账面数量</th><th>单位</th><th>盘点确认数量</th><th>状态是否完好</th><th>盘点结果</th><th>证明材料</th><th>备注</th><th>操作</th></tr>';
+            : '<tr><th>序号</th><th>产品名称</th><th>规格型号</th><th>产品编码</th><th>物资唯一码</th><th>物资类型名称</th><th>物资类型编码</th><th>采购部门</th><th>供应商</th><th>采购单价（含税）</th><th>是否在本部门</th><th>是否开票</th><th>使用人</th><th>资产类型</th><th>资产编号</th><th>存放地点</th><th>使用年限</th><th>原值（系统自动生成）</th><th>在库/领用状态</th><th>账面数量</th><th>单位</th><th>盘点确认数量</th><th>状态是否完好</th><th>盘点结果</th><th>证明材料</th><th>备注</th><th>操作</th></tr>';
         }
         document.getElementById("materialCheckBody").innerHTML = list.map(function (x, i) {
           if (isSummary) {
@@ -1205,17 +1223,19 @@
               '<td>' + cell(x.invoice || "已开票") + '</td>' +
               '<td>' + cell(x.user) + '</td>' +
               '<td>' + cell(x.remark1 || x.materialTypeName) + '</td>' +
-              '<td>' + cell(x.assetNo) + '</td>' +
-              '<td>' + cell(x.loc) + '</td>' +
-              '<td>' + cell(x.state) + '</td>' +
-              '<td>' + cell(x.book) + '</td>' +
-              '<td>' + cell(x.unit || "件") + '</td>' +
-              '<td>' + cell(confirmQtyValue(x, state.current)) + '</td>' +
-              '<td>' + cell(health) + '</td>' +
-              '<td>' + cell(result) + '</td>' +
-              '<td>' + renderAttachmentCell(x) + '</td>' +
-              '<td>' + cell(x.reason || "无差异") + '</td>' +
-              '<td><span class="inv-op"><span role="button" tabindex="0" data-task-view="' + cell(x.code) + '">查看</span></span></td>' +
+            '<td>' + cell(x.assetNo) + '</td>' +
+            '<td>' + cell(x.loc) + '</td>' +
+            '<td>' + cell(x.serviceLife || "-") + '</td>' +
+            '<td>' + money(originalAmount(x)) + '</td>' +
+            '<td>' + cell(x.state) + '</td>' +
+            '<td>' + cell(x.book) + '</td>' +
+            '<td>' + cell(x.unit || "件") + '</td>' +
+            '<td>' + cell(confirmQtyValue(x, state.current)) + '</td>' +
+            '<td>' + cell(health) + '</td>' +
+            '<td>' + cell(result) + '</td>' +
+            '<td>' + renderAttachmentCell(x) + '</td>' +
+            '<td>' + cell(x.reason || "无差异") + '</td>' +
+            '<td><span class="inv-op"><span role="button" tabindex="0" data-task-view="' + cell(x.code) + '">查看</span></span></td>' +
             '</tr>';
           }
           return '<tr>' +
@@ -1235,13 +1255,15 @@
             '<td>' + cell(x.remark1 || x.materialTypeName) + '</td>' +
             '<td>' + cell(x.assetNo) + '</td>' +
             '<td>' + cell(x.loc) + '</td>' +
+            '<td>' + cell(x.serviceLife || "-") + '</td>' +
+            '<td>' + money(originalAmount(x)) + '</td>' +
             '<td>' + cell(x.state) + '</td>' +
             '<td>' + cell(x.book) + '</td>' +
             '<td>' + cell(x.unit || "件") + '</td>' +
             '<td><input class="inv-material-cell-input" data-line-field="confirmQty" data-line-code="' + cell(x.code) + '" value="' + inputValue(qtyValue) + '"' + (isCompany ? ' readonly' : ' placeholder="请填写盘点数量"') + '></td>' +
             '<td><select class="inv-material-cell-select" data-line-field="health" data-line-code="' + cell(x.code) + '"><option' + (health === "完好" ? " selected" : "") + '>完好</option><option' + (health === "损坏" ? " selected" : "") + '>损坏</option><option' + (health === "缺失" ? " selected" : "") + '>缺失</option></select></td>' +
             '<td><select class="inv-material-cell-select" data-line-field="result" data-line-code="' + cell(x.code) + '"><option' + (result === "一致" ? " selected" : "") + '>一致</option><option' + (result === "不一致" ? " selected" : "") + '>不一致</option></select></td>' +
-            '<td>' + renderAttachmentCell(x) + '<label class="inv-material-upload">上传<input type="file" data-line-field="attachment" data-line-code="' + cell(x.code) + '" accept="image/*,.pdf"></label></td>' +
+            '<td>' + uploadOnlyCell(x) + '</td>' +
             '<td><textarea class="inv-material-cell-textarea" data-line-field="reason" data-line-code="' + cell(x.code) + '" placeholder="填写备注">' + inputValue(x.reason || "") + '</textarea></td>' +
             '<td><span class="inv-op"><span role="button" tabindex="0" data-task-view="' + cell(x.code) + '">查看</span></span></td>' +
           '</tr>';
