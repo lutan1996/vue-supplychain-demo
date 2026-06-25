@@ -85,16 +85,16 @@
     .inv-task-field span { color: #111; font-size: 13px; line-height: 1.5; }
     .inv-task-field b { color: #111; font-size: 13px; font-weight: 600; line-height: 1.5; word-break: break-all; }
     .inv-task-info-grid { display: grid; grid-template-columns: repeat(4, minmax(180px, 1fr)); gap: 12px 18px; width: 100%; align-items: start; }
-    .inv-task-info-grid.is-start-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    .inv-task-info-grid.is-start-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 18px 24px; align-items: start; }
     .inv-task-info-grid.is-start-dept-grid .inv-task-field.start-fill { grid-column: span 2; }
-    .inv-task-info-grid .inv-task-field { display: block; }
+    .inv-task-info-grid .inv-task-field { display: block; min-width: 0; }
     .inv-task-info-grid .inv-task-field span { display: block; margin-bottom: 6px; color: #516a87; font-weight: 600; }
     .inv-task-info-grid .inv-task-field b,
     .inv-task-info-grid .inv-task-field .inv-task-field-box { display: flex; align-items: center; width: 100%; min-height: 40px; box-sizing: border-box; border: 1px solid #d9d9d9; border-radius: 4px; background: #fff; color: #262626; padding: 0 12px; font-weight: 400; }
     .inv-task-info-grid .inv-task-field .inv-task-field-box { padding: 0; border: none; min-height: auto; background: transparent; }
     .inv-task-info-grid .inv-task-field.wide-2 { grid-column: span 2; }
     .inv-task-info-grid .inv-task-field b { white-space: normal; word-break: break-word; }
-    .inv-task-select-wrap { position: relative; }
+    .inv-task-select-wrap { position: relative; display: block; width: 100%; }
     .inv-task-select-wrap::after { content: "▾"; position: absolute; right: 12px; top: 50%; transform: translateY(-50%); pointer-events: none; color: #8c8c8c; font-size: 12px; }
     .inv-task-select-wrap.is-open::after { transform: translateY(-50%) rotate(180deg); }
     .inv-task-select-input {
@@ -189,7 +189,7 @@
     .inv-material-filters { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px 14px; align-items: end; }
     .inv-material-filters .wh-field { margin-bottom: 0; }
     .inv-material-filters .wh-input { height: 36px; }
-    .inv-material-query-field { align-self: end; }
+    .inv-material-query-field { align-self: end; grid-column: span 3; }
     .inv-material-query-actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
     .inv-material-query-field .inv-btn { min-width: 96px; height: 36px; }
     .inv-material-query-note { margin-top: 6px; color: #98a1b2; font-size: 12px; line-height: 1.6; }
@@ -265,6 +265,7 @@
       .inv-track-flow { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .inv-material-task-summary,
       .inv-material-filters { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .inv-material-query-field { grid-column: span 1; }
       .inv-task-view-layout { grid-template-columns: 1fr; }
       .inv-task-location-grid { grid-template-columns: 1fr; }
       .inv-report-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -887,9 +888,12 @@
         };
         var isStart = mode === "start";
         var isDeptStart = isStart && normalizeFlowType(row) !== "company";
+        var isCompanyStart = isStart && normalizeFlowType(row) === "company";
         return '<div class="inv-task-info-grid' + (isStart ? ' is-start-grid' : '') + (isDeptStart ? ' is-start-dept-grid' : '') + '">' + inventoryTaskMetaFields(row, mode).map(function (item) {
           var label = item[0];
-          var isWide = label === "盘点任务名称" || (isDeptStart && (label === "部门负责人" || label === "物资管理部门物资专责"));
+          var isWide = label === "盘点任务名称" ||
+            (isCompanyStart && label === "盘点部门") ||
+            (isDeptStart && (label === "部门负责人" || label === "物资管理部门物资专责"));
           if (mode === "start" && roleFields[label]) return inventoryMetaSelect(label, item[1], row, isWide);
           return inventoryReadonlyMetaField(label, item[1], isWide);
         }).join("") + '</div>';
