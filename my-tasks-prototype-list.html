@@ -1579,6 +1579,31 @@
         if (key === "pdtask_company_staff") return true;
         return key.indexOf("_review_") >= 0 || key.indexOf("pddiff_") === 0 || map["流程定义名称"] === "盘点差异审批";
       }
+      function inventoryTodoSummaryRows(lines) {
+        var grouped = {};
+        lines.forEach(function (x) {
+          var key = x.typeCode || x.typeName;
+          if (!grouped[key]) {
+            grouped[key] = {
+              typeCode: x.typeCode,
+              typeName: x.typeName,
+              assetType: x.assetType || x.typeName,
+              price: x.price != null ? x.price : (x.bookOriginal || x.originalValue || 0),
+              stockQty: Math.max(0, Number(x.book || 0) - 1),
+              requisitionQty: Number(x.book || 0),
+              confirmQty: Number(x.confirm || 0),
+              dept: x.dept,
+              user: x.user,
+              loc: x.loc
+            };
+          } else {
+            grouped[key].stockQty += Math.max(0, Number(x.book || 0) - 1);
+            grouped[key].requisitionQty += Number(x.book || 0);
+            grouped[key].confirmQty += Number(x.confirm || 0);
+          }
+        });
+        return Object.keys(grouped).map(function (key) { return grouped[key]; });
+      }
       function inventoryTodoHtml(map) {
         var role = localStorage.getItem("inventoryDemoRole") || "dept_specialist";
         var taskKey = String(map["流程定义KEY"] || "");
@@ -1591,9 +1616,13 @@
         var task = inventoryTodoTask(isCompany, map);
         if (isCompany) task.type = "公司盘点";
         var lines = inventoryTodoRows(isCompany);
+        var detailType = inventoryTodoRows._detailType || "";
+        var isSummary = !detailType;
+        var summaryRows = inventoryTodoSummaryRows(lines);
+        var detailLines = isSummary ? [] : lines.filter(function (x) { return x.typeCode === detailType; });
         var baseHead = '<th>序号</th><th>产品名称</th><th>产品型号</th><th>产品编码</th><th>物资唯一码</th><th>物资类型名称</th><th>物资类型编码</th><th>采购部门</th><th>供应商</th><th>采购单价（含税）</th><th>是否在本部门</th><th>是否开票</th><th>使用人</th><th>资产类型</th><th>资产编号</th><th>存放地点</th><th>在库/领用状态</th><th>账面数量</th><th>单位</th>';
         var staffHead = '<th>盘点确认数量</th><th>状态是否完好</th><th>盘点结果</th><th>证明材料</th><th>备注</th>';
-        var rowsHtml = lines.map(function (x, i) {
+        var rowsHtml = detailLines.map(function (x, i) {
           var health = x.health || "完好";
           var result = x.result === "一致" || x.result === "不一致" ? x.result : ((x.result && x.result !== "正常") ? "不一致" : "一致");
           var price = x.price != null ? x.price : (x.bookOriginal || x.originalValue || 0);
@@ -1612,7 +1641,12 @@
           }
           return row + '</tr>';
         }).join("");
-        var tableTitle = isCompany ? "盘点已入库未出库物资明细表" : "盘点物资明细表";
+        var summaryHtml = summaryRows.map(function (x) {
+          return '<tr>' +
+            '<td>' + mtEsc(x.typeName) + '</td><td>' + mtEsc(x.typeCode) + '</td><td>' + mtEsc(x.assetType) + '</td><td>' + (x.price ? Number(x.price).toLocaleString("zh-CN", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : "-") + '</td><td>' + mtEsc(x.stockQty) + '</td><td>' + mtEsc(x.requisitionQty) + '</td><td>' + mtEsc(x.confirmQty) + '</td><td>' + mtEsc(x.dept) + '</td><td>' + mtEsc(x.user) + '</td><td>' + mtEsc(x.loc) + '</td><td><span class="inv-op"><span role="button" tabindex="0" data-inventory-summary-view="' + mtEsc(x.typeCode) + '">' + (canEditInventoryLines ? "编辑" : "查看") + '</span></span></td>' +
+          '</tr>';
+        }).join("");
+        var tableTitle = isSummary ? "待盘点物资汇总表" : (isCompany ? "盘点已入库未出库物资明细表" : "盘点物资明细表");
         return '<div class="qa-accept-wrap">' +
           '<div class="qa-accept-toolbar"><div class="qa-accept-toolbar-title">' + mtEsc(map["流程定义名称"] === "盘点差异审批" ? "盘点差异办理" : "盘点任务办理") + '</div></div>' +
           '<div class="qa-accept-form-shell"><table class="qa-accept-grid" role="presentation"><tbody>' +
@@ -1623,12 +1657,15 @@
           '<tr>' + inventoryTodoField("发起人", task.initiator) + inventoryTodoField("负责人", map["办理人"] || task.owner) + '</tr>' +
           '<tr>' + inventoryTodoField("应盘数量", isCompany ? "284" : "42") + inventoryTodoField("已盘数量", isInventoryStaff ? "188" : "0") + '</tr>' +
           '<tr>' + inventoryTodoField("差异数量", isInventoryStaff ? "6" : "0") + inventoryTodoField("任务状态", task.status) + '</tr>' +
-          '<tr><td class="qa-lab">确认口径</td><td class="qa-val" colspan="3"><div class="qa-inp qa-inp--auto">' + mtEsc(task.caliber) + '</div></td></tr>' +
           '<tr><td class="qa-lab">办理意见</td><td class="qa-val" colspan="3"><textarea class="qa-ta" id="inventoryTodoOpinion" rows="2" placeholder="请输入办理意见"></textarea></td></tr>' +
           '</tbody></table></div>' +
           '<div class="qa-mat-lines-block ' + (canEditInventoryLines ? "" : "qa-mat-lines-block--readonly ") + 'qa-mat-detail-list-block">' +
-          '<div style="font-size:14px;font-weight:600;color:#1f3551;margin-bottom:8px;">' + tableTitle + '</div>' +
-          '<div class="qa-mat-lines-table-wrap"><table class="qa-mat-lines-table"><thead><tr>' + baseHead + (showResultColumns ? staffHead : "") + '</tr></thead><tbody>' + rowsHtml + '</tbody></table></div>' +
+          '<div style="font-size:14px;font-weight:600;color:#1f3551;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;gap:12px;">' + tableTitle + (isSummary ? '' : '<button type="button" class="proc-btn" id="inventoryTodoBack">返回汇总</button>') + '</div>' +
+          '<div class="qa-mat-lines-table-wrap"><table class="qa-mat-lines-table"><thead><tr>' +
+            (isSummary
+              ? '<th>物资类型名称</th><th>物资类型编码</th><th>资产类型</th><th>采购单价（含税）</th><th>库存数量</th><th>领用数量</th><th>盘点确认数量</th><th>领用部门</th><th>领用人</th><th>存放地点</th><th>操作</th>'
+              : baseHead + (showResultColumns ? staffHead : "")) +
+          '</tr></thead><tbody>' + (isSummary ? summaryHtml : rowsHtml) + '</tbody></table></div>' +
           '</div></div>';
       }
       function closeInventoryTodoModal() {
@@ -1701,8 +1738,26 @@
       function openInventoryTodoHandleModal(map) {
         var mask = mt$("procModalMask");
         if (!mask) return;
+        inventoryTodoRows._detailType = "";
+        function rerenderInventoryTodoBody() {
+          mt$("procModalBody").innerHTML = inventoryTodoHtml(map);
+          var body = mt$("procModalBody");
+          if (!body) return;
+          body.onclick = function (evt) {
+            var summaryView = evt.target.closest("[data-inventory-summary-view]");
+            if (summaryView) {
+              inventoryTodoRows._detailType = summaryView.getAttribute("data-inventory-summary-view") || "";
+              rerenderInventoryTodoBody();
+              return;
+            }
+            if (evt.target.id === "inventoryTodoBack") {
+              inventoryTodoRows._detailType = "";
+              rerenderInventoryTodoBody();
+            }
+          };
+        }
         mt$("procModalTitle").textContent = "办理 · " + (map["流程定义名称"] || "盘点任务审批");
-        mt$("procModalBody").innerHTML = inventoryTodoHtml(map);
+        rerenderInventoryTodoBody();
         var isInventoryStaffHandle = String(map["流程定义KEY"] || "") === "pdtask_company_staff";
         mt$("procModalFoot").innerHTML =
           '<button type="button" class="proc-btn" id="inventoryTodoCancel">取消</button>' +

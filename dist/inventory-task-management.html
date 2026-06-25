@@ -163,6 +163,13 @@
     .inv-task-location-card .inv-rack-stack { display: grid; gap: 0; }
     .inv-task-location-card .inv-rack-layer { border-radius: 0; background: #f7fbff !important; color: #0b3f8a !important; border-color: #0b4ea2 !important; }
     .inv-task-location-card .inv-rack-layer.is-active { background: #8cc9ff !important; color: #0b3f8a !important; font-weight: 700; }
+    .inv-attach-list { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+    .inv-attach-link { color: #1677ff; cursor: pointer; white-space: nowrap; }
+    .inv-attach-link.download { color: #2f6bff; }
+    .inv-attach-empty { color: #8a94a6; }
+    .inv-preview-body { min-height: 520px; }
+    .inv-preview-frame { width: 100%; height: 520px; border: 1px solid #dfe6f0; border-radius: 8px; background: #fff; }
+    .inv-preview-image { width: 100%; max-height: 520px; object-fit: contain; border: 1px solid #dfe6f0; border-radius: 8px; background: #fff; }
     .inv-side-item { min-width: 0; }
     .inv-side-item span { display: block; margin-bottom: 6px; color: #516a87; font-size: 13px; font-weight: 600; }
     .inv-side-item b { display: flex; align-items: center; width: 100%; height: 36px; box-sizing: border-box; border: 1px solid #d9d9d9; border-radius: 4px; background: #fff; color: #262626; padding: 0 12px; font-size: 13px; font-weight: 400; line-height: 1.35; word-break: break-all; overflow: hidden; }
@@ -520,6 +527,14 @@
     </div>
   </div>
 
+  <div class="wh-modal-mask" id="attachmentPreviewMask" aria-hidden="true">
+    <div class="wh-modal-box wh-modal-box--lg" role="dialog" aria-modal="true" aria-labelledby="attachmentPreviewTitle">
+      <div class="wh-modal-head"><h3 class="wh-modal-title" id="attachmentPreviewTitle">附件在线预览</h3><button type="button" class="wh-modal-close" data-close aria-label="关闭">×</button></div>
+      <div class="wh-modal-body inv-preview-body" id="attachmentPreviewBody"></div>
+      <div class="wh-modal-foot"><button type="button" class="wh-btn wh-btn--ghost" data-close>关闭</button></div>
+    </div>
+  </div>
+
   <script src="js/sidebar-actions.js"></script>
   <script src="js/subpage-feature-title.js"></script>
   <script src="js/site-footer.js"></script>
@@ -583,6 +598,44 @@
       }
       function consistencyResult(line) {
         return inferDiffType(line || {}) === "正常" ? "一致" : "不一致";
+      }
+      function isDepartmentInventoryRow(row) {
+        return normalizeFlowType(row || state.current || {}) !== "company";
+      }
+      function confirmQtyValue(line, row) {
+        var currentRow = row || state.current || {};
+        if (normalizeFlowType(currentRow) === "company") return Number(line.confirmQty || 1);
+        var val = Number(line.confirmQty);
+        return Number.isFinite(val) ? val : 0;
+      }
+      function attachmentListForLine(line) {
+        if (!line) return [];
+        if (Array.isArray(line.attachments) && line.attachments.length) return line.attachments;
+        var photoUrl = inventoryPhoto(line);
+        var pdfUrl = "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf";
+        return [
+          { id: (line.code || "line") + "-photo", name: (line.assetName || "盘点照片") + "-盘点照片.jpg", url: photoUrl, previewType: "image" },
+          { id: (line.code || "line") + "-pdf", name: (line.stockNo || "盘点说明") + "-盘点说明.pdf", url: pdfUrl, previewType: "pdf" }
+        ];
+      }
+      function renderAttachmentCell(line) {
+        var list = attachmentListForLine(line);
+        if (!list.length) return '<span class="inv-attach-empty">暂无附件</span>';
+        return '<div class="inv-attach-list">' + list.map(function (item, idx) {
+          var previewType = item.previewType || (String(item.url || "").toLowerCase().indexOf(".pdf") > -1 ? "pdf" : "image");
+          return '<span class="inv-attach-link" role="button" tabindex="0" data-attachment-preview="' + cell(line.code) + '" data-attachment-index="' + idx + '" data-preview-type="' + previewType + '">' + cell(item.name) + '</span>' +
+            '<a class="inv-attach-link download" href="' + cell(item.url) + '" target="_blank" rel="noopener noreferrer" download>下载</a>';
+        }).join("") + '</div>';
+      }
+      function openAttachmentPreview(line, index) {
+        var list = attachmentListForLine(line);
+        var item = list[index];
+        if (!item) return;
+        document.getElementById("attachmentPreviewTitle").textContent = "附件在线预览 - " + item.name;
+        document.getElementById("attachmentPreviewBody").innerHTML = item.previewType === "pdf"
+          ? '<iframe class="inv-preview-frame" src="' + item.url + '" title="' + cell(item.name) + '"></iframe>'
+          : '<img class="inv-preview-image" src="' + item.url + '" alt="' + cell(item.name) + '">';
+        open(document.getElementById("attachmentPreviewMask"));
       }
       function syncDiffRecords(task) {
         var list = storedDiffs().filter(function (x) { return x.task !== task.no; });
@@ -884,7 +937,7 @@
       function taskLines(row) {
         return linesForTask(row || state.current || rows[0]);
       }
-      var inventoryDetailHeaders = ["序号", "产品名称", "产品型号", "产品编码", "物资唯一码", "物资类型名称", "物资类型编码", "采购部门", "供应商", "采购单价（含税）", "是否在本部门", "是否开票", "使用人", "资产类型", "资产编号", "存放地点", "在库/领用状态", "账面数量", "单位", "盘点确认数量", "状态是否完好", "盘点结果", "证明材料", "备注"];
+      var inventoryDetailHeaders = ["序号", "产品名称", "产品型号", "产品编码", "物资唯一码", "物资类型名称", "物资类型编码", "采购部门", "供应商", "采购单价（含税）", "是否在本部门", "是否开票", "使用人", "资产类型", "资产编号", "存放地点", "在库/领用状态", "账面数量", "单位", "盘点确认数量", "状态是否完好", "盘点结果", "证明材料", "备注", "操作"];
       function diffAmountText(line) {
         var type = inferDiffType(line || {});
         if (type !== "盘亏" && type !== "盘盈") return "¥0";
@@ -893,7 +946,6 @@
       }
       function readonlyDetailRow(line, idx) {
         var diffType = inferDiffType(line || {});
-        var proof = (line && line.proof) || (line && line.materialTypeName === "存货" ? ((line.stockNo || "最近盘库单") + "、盘点说明") : "台账记录、盘点照片");
         var cells = [
           idx + 1,
           line.assetName,
@@ -914,13 +966,16 @@
           line.state,
           line.book,
           line.unit || "件",
-          1,
+          confirmQtyValue(line),
           line.health,
           consistencyResult(line),
-          proof,
-          line.reason || (diffType === "正常" ? "无差异" : "盘点确认与系统台账不一致")
+          renderAttachmentCell(line),
+          line.reason || (diffType === "正常" ? "无差异" : "盘点确认与系统台账不一致"),
+          '<span class="inv-op"><span role="button" tabindex="0" data-task-view="' + cell(line.code) + '">查看</span></span>'
         ];
-        return "<tr>" + cells.map(function (v) { return "<td>" + cell(v) + "</td>"; }).join("") + "</tr>";
+        return "<tr>" + cells.map(function (v, i) {
+          return "<td>" + (i === cells.length - 3 || i === cells.length - 1 ? v : cell(v)) + "</td>";
+        }).join("") + "</tr>";
       }
       function inventoryPhoto(line) {
         if (!line) return "images/demo-inline-1.jpg";
@@ -939,28 +994,8 @@
       }
       function openTaskInfo(row) {
         state.current = row;
-        var list = taskLines(row);
-        var isCompany = normalizeFlowType(row) === "company";
-        document.getElementById("taskInfoTitle").textContent = "盘点任务详情";
-        document.getElementById("taskInfoBody").innerHTML = [
-          '<div class="inv-task-info-grid">' +
-            taskField("盘点单号", row.no) +
-            taskField("盘点任务名称", row.name) +
-            taskField("盘点类型", row.type) +
-            taskField("盘点部门", row.dept) +
-            taskField("计划开始日期", row.start) +
-            taskField("计划结束日期", row.end) +
-            taskField("发起人", row.owner) +
-            taskField("负责人", responsiblePerson(row)) +
-            taskField("任务状态", row.status) +
-            taskField("确认口径", isCompany ? "物资、财务、业务三方共同确认" : "部门物资专责逐条确认") +
-          '</div>',
-          '<div class="inv-table-title">' + (isCompany ? "盘点已入库未出库物资明细表" : "盘点部门所属物资明细表") + '</div>',
-          '<div class="inv-task-mini-table-wrap"><table class="inv-task-mini-table"><thead><tr>' + inventoryDetailHeaders.map(function (x) { return "<th>" + x + "</th>"; }).join("") + '</tr></thead><tbody>' +
-            list.map(readonlyDetailRow).join("") +
-          '</tbody></table></div>',
-          '<div class="inv-task-track-panel" id="taskTrackPanel" hidden></div>'
-        ].join("");
+        state.taskInfoMaterialType = "";
+        renderTaskInfoBody();
         open(document.getElementById("taskInfoMask"));
       }
       function openMaterialInfo(line) {
@@ -1030,11 +1065,7 @@
           return true;
         });
       }
-      function materialSummaryRows() {
-        var name = document.getElementById("mcName").value.trim();
-        var source = linesForTask(state.current || currentTaskForAction()).filter(function (x) {
-          return !name || x.assetName.indexOf(name) >= 0;
-        });
+      function buildSummaryRowsFor(source, currentRow) {
         var map = {};
         source.forEach(function (x) {
           var key = x.typeCode || x.materialTypeName;
@@ -1057,9 +1088,67 @@
             map[key].requisitionQty += nextReceive;
             map[key].stockQty += Math.max(0, nextReceive - 1);
           }
-          map[key].confirmQty += 1;
+          map[key].confirmQty += confirmQtyValue(x, currentRow);
         });
         return Object.keys(map).map(function (key) { return map[key]; });
+      }
+      function materialSummaryRows() {
+        var name = document.getElementById("mcName").value.trim();
+        var currentRow = state.current || currentTaskForAction();
+        var source = linesForTask(state.current || currentTaskForAction()).filter(function (x) {
+          return !name || x.assetName.indexOf(name) >= 0;
+        });
+        return buildSummaryRowsFor(source, currentRow);
+      }
+      function renderTaskInfoBody() {
+        var row = state.current;
+        var list = taskLines(row);
+        var isCompany = normalizeFlowType(row) === "company";
+        var isSummary = !state.taskInfoMaterialType;
+        var summaryRows = buildSummaryRowsFor(list, row);
+        var detailRows = isSummary ? [] : list.filter(function (x) { return x.typeCode === state.taskInfoMaterialType; });
+        document.getElementById("taskInfoTitle").textContent = "盘点任务详情";
+        document.getElementById("taskInfoBody").innerHTML = [
+          '<div class="inv-task-info-grid">' +
+            taskField("盘点单号", row.no) +
+            taskField("盘点任务名称", row.name) +
+            taskField("盘点类型", row.type) +
+            taskField("盘点部门", row.dept) +
+            taskField("计划开始日期", row.start) +
+            taskField("计划结束日期", row.end) +
+            taskField("发起人", row.owner) +
+            taskField("负责人", responsiblePerson(row)) +
+            taskField("任务状态", row.status) +
+          '</div>',
+          '<div class="inv-material-toolbar">' +
+            '<div class="inv-table-title" style="margin:0">' + (isSummary ? "待盘点物资汇总表" : "盘点物资明细表") + '</div>' +
+            (isSummary ? '' : '<button type="button" class="inv-btn" id="btnTaskInfoBack">返回汇总</button>') +
+          '</div>',
+          '<div class="inv-task-mini-table-wrap"><table class="inv-task-mini-table"><thead><tr>' +
+            (isSummary
+              ? '<th>物资类型名称</th><th>物资类型编码</th><th>资产类型</th><th>采购单价（含税）</th><th>库存数量</th><th>领用数量</th><th>盘点确认数量</th><th>领用部门</th><th>领用人</th><th>存放地点</th><th>操作</th>'
+              : inventoryDetailHeaders.map(function (x) { return "<th>" + x + "</th>"; }).join("")) +
+          '</tr></thead><tbody>' +
+            (isSummary
+              ? summaryRows.map(function (x) {
+                return '<tr>' +
+                  '<td>' + cell(x.materialTypeName) + '</td>' +
+                  '<td>' + cell(x.typeCode) + '</td>' +
+                  '<td>' + cell(x.assetType) + '</td>' +
+                  '<td>' + (x.price ? Number(x.price).toLocaleString("zh-CN", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : "-") + '</td>' +
+                  '<td>' + cell(x.stockQty) + '</td>' +
+                  '<td>' + cell(x.requisitionQty) + '</td>' +
+                  '<td>' + cell(x.confirmQty) + '</td>' +
+                  '<td>' + cell(x.dept) + '</td>' +
+                  '<td>' + cell(x.user) + '</td>' +
+                  '<td>' + cell(x.loc) + '</td>' +
+                  '<td><span class="inv-op"><span role="button" tabindex="0" data-task-summary-view="' + cell(x.typeCode) + '">查看</span></span></td>' +
+                '</tr>';
+              }).join("")
+              : detailRows.map(readonlyDetailRow).join("")) +
+          '</tbody></table></div>',
+          '<div class="inv-task-track-panel" id="taskTrackPanel" hidden></div>'
+        ].join("");
       }
       function renderMaterialCheck() {
         var isSummary = !state.currentMaterialType;
@@ -1079,7 +1168,7 @@
         if (head) {
           head.innerHTML = isSummary
             ? '<tr><th>物资类型名称</th><th>物资类型编码</th><th>资产类型</th><th>采购单价（含税）</th><th>库存数量</th><th>领用数量</th><th>盘点确认数量</th><th>领用部门</th><th>领用人</th><th>存放地点</th><th>操作</th></tr>'
-            : '<tr><th>序号</th><th>产品名称</th><th>产品型号</th><th>产品编码</th><th>物资唯一码</th><th>物资类型名称</th><th>物资类型编码</th><th>采购部门</th><th>供应商</th><th>采购单价（含税）</th><th>是否在本部门</th><th>是否开票</th><th>使用人</th><th>资产类型</th><th>资产编号</th><th>存放地点</th><th>在库/领用状态</th><th>账面数量</th><th>单位</th><th>盘点确认数量</th><th>状态是否完好</th><th>盘点结果</th><th>证明材料</th><th>备注</th></tr>';
+            : '<tr><th>序号</th><th>产品名称</th><th>产品型号</th><th>产品编码</th><th>物资唯一码</th><th>物资类型名称</th><th>物资类型编码</th><th>采购部门</th><th>供应商</th><th>采购单价（含税）</th><th>是否在本部门</th><th>是否开票</th><th>使用人</th><th>资产类型</th><th>资产编号</th><th>存放地点</th><th>在库/领用状态</th><th>账面数量</th><th>单位</th><th>盘点确认数量</th><th>状态是否完好</th><th>盘点结果</th><th>证明材料</th><th>备注</th><th>操作</th></tr>';
         }
         document.getElementById("materialCheckBody").innerHTML = list.map(function (x, i) {
           if (isSummary) {
@@ -1094,11 +1183,41 @@
               '<td>' + cell(x.dept) + '</td>' +
               '<td>' + cell(x.user) + '</td>' +
               '<td>' + cell(x.loc) + '</td>' +
-              '<td><span class="inv-op"><span role="button" tabindex="0" data-material-summary-view="' + cell(x.typeCode) + '">查看</span></span></td>' +
+              '<td><span class="inv-op"><span role="button" tabindex="0" data-material-summary-view="' + cell(x.typeCode) + '">' + (isCompany ? "查看" : "编辑") + '</span></span></td>' +
             '</tr>';
           }
           var health = x.health || "完好";
           var result = consistencyResult(x);
+          var qtyValue = isCompany ? 1 : (x.confirmQty == null || x.confirmQty === "" ? "" : x.confirmQty);
+          if (isCompany) {
+            return '<tr>' +
+              '<td>' + (i + 1) + '</td>' +
+              '<td>' + cell(x.assetName) + '</td>' +
+              '<td>' + cell(x.spec) + '</td>' +
+              '<td>' + cell(x.product) + '</td>' +
+              '<td>' + cell(x.code) + '</td>' +
+              '<td>' + cell(x.materialTypeName) + '</td>' +
+              '<td>' + cell(x.typeCode) + '</td>' +
+              '<td>' + cell(x.dept) + '</td>' +
+              '<td>' + cell(x.supplier || "中车电气") + '</td>' +
+              '<td>' + (unitPrice(x) ? Number(unitPrice(x)).toLocaleString("zh-CN", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : "-") + '</td>' +
+              '<td>' + (x.dept === (state.current && state.current.dept) ? "是" : "否") + '</td>' +
+              '<td>' + cell(x.invoice || "已开票") + '</td>' +
+              '<td>' + cell(x.user) + '</td>' +
+              '<td>' + cell(x.remark1 || x.materialTypeName) + '</td>' +
+              '<td>' + cell(x.assetNo) + '</td>' +
+              '<td>' + cell(x.loc) + '</td>' +
+              '<td>' + cell(x.state) + '</td>' +
+              '<td>' + cell(x.book) + '</td>' +
+              '<td>' + cell(x.unit || "件") + '</td>' +
+              '<td>' + cell(confirmQtyValue(x, state.current)) + '</td>' +
+              '<td>' + cell(health) + '</td>' +
+              '<td>' + cell(result) + '</td>' +
+              '<td>' + renderAttachmentCell(x) + '</td>' +
+              '<td>' + cell(x.reason || "无差异") + '</td>' +
+              '<td><span class="inv-op"><span role="button" tabindex="0" data-task-view="' + cell(x.code) + '">查看</span></span></td>' +
+            '</tr>';
+          }
           return '<tr>' +
             '<td>' + (i + 1) + '</td>' +
             '<td>' + cell(x.assetName) + '</td>' +
@@ -1119,11 +1238,12 @@
             '<td>' + cell(x.state) + '</td>' +
             '<td>' + cell(x.book) + '</td>' +
             '<td>' + cell(x.unit || "件") + '</td>' +
-            '<td><input class="inv-material-cell-input" value="1" readonly></td>' +
-            '<td><select class="inv-material-cell-select"><option' + (health === "完好" ? " selected" : "") + '>完好</option><option' + (health === "损坏" ? " selected" : "") + '>损坏</option><option' + (health === "缺失" ? " selected" : "") + '>缺失</option></select></td>' +
-            '<td><select class="inv-material-cell-select"><option' + (result === "一致" ? " selected" : "") + '>一致</option><option' + (result === "不一致" ? " selected" : "") + '>不一致</option></select></td>' +
-            '<td><label class="inv-material-upload">上传<input type="file" accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,.txt"></label></td>' +
-            '<td><textarea class="inv-material-cell-textarea" placeholder="填写备注">' + inputValue(x.reason || "") + '</textarea></td>' +
+            '<td><input class="inv-material-cell-input" data-line-field="confirmQty" data-line-code="' + cell(x.code) + '" value="' + inputValue(qtyValue) + '"' + (isCompany ? ' readonly' : ' placeholder="请填写盘点数量"') + '></td>' +
+            '<td><select class="inv-material-cell-select" data-line-field="health" data-line-code="' + cell(x.code) + '"><option' + (health === "完好" ? " selected" : "") + '>完好</option><option' + (health === "损坏" ? " selected" : "") + '>损坏</option><option' + (health === "缺失" ? " selected" : "") + '>缺失</option></select></td>' +
+            '<td><select class="inv-material-cell-select" data-line-field="result" data-line-code="' + cell(x.code) + '"><option' + (result === "一致" ? " selected" : "") + '>一致</option><option' + (result === "不一致" ? " selected" : "") + '>不一致</option></select></td>' +
+            '<td>' + renderAttachmentCell(x) + '<label class="inv-material-upload">上传<input type="file" data-line-field="attachment" data-line-code="' + cell(x.code) + '" accept="image/*,.pdf"></label></td>' +
+            '<td><textarea class="inv-material-cell-textarea" data-line-field="reason" data-line-code="' + cell(x.code) + '" placeholder="填写备注">' + inputValue(x.reason || "") + '</textarea></td>' +
+            '<td><span class="inv-op"><span role="button" tabindex="0" data-task-view="' + cell(x.code) + '">查看</span></span></td>' +
           '</tr>';
         }).join("");
         document.getElementById("materialCheckEmpty").hidden = list.length > 0;
@@ -1168,6 +1288,12 @@
         state.current = row || state.current || getRows()[0] || rows[0];
         state.currentMaterialType = "";
         var isCompany = normalizeFlowType(state.current) === "company";
+        if (!isCompany && !state.current._deptCheckInitialized && (state.current.status === "待开始" || state.current.status === "盘点中")) {
+          linesForTask(state.current).forEach(function (line) {
+            line.confirmQty = "";
+          });
+          state.current._deptCheckInitialized = true;
+        }
         document.getElementById("materialCheckTitle").textContent = isCompany ? "公司物资盘点" : "部门物资盘点";
         document.getElementById("mcName").value = "";
         renderMaterialCheck();
@@ -1348,6 +1474,22 @@
           renderMaterialCheck();
           return;
         }
+        var previewBtn = e.target.closest("[data-attachment-preview]");
+        if (previewBtn) {
+          openAttachmentPreview(findLine(previewBtn.getAttribute("data-attachment-preview")), Number(previewBtn.getAttribute("data-attachment-index") || 0));
+          return;
+        }
+        var taskSummaryView = e.target.closest("[data-task-summary-view]");
+        if (taskSummaryView) {
+          state.taskInfoMaterialType = taskSummaryView.getAttribute("data-task-summary-view") || "";
+          renderTaskInfoBody();
+          return;
+        }
+        if (e.target.id === "btnTaskInfoBack") {
+          state.taskInfoMaterialType = "";
+          renderTaskInfoBody();
+          return;
+        }
         if (e.target.id === "btnMaterialBack") {
           state.currentMaterialType = "";
           renderMaterialCheck();
@@ -1356,9 +1498,11 @@
         if (e.target.id === "btnMaterialSubmit") {
           var current = state.current || getRows()[0] || rows[0];
           var checked = materialRows();
+          var isCompanySubmit = normalizeFlowType(current) === "company";
+          var filledRows = checked.filter(function (x) { return isCompanySubmit ? true : confirmQtyValue(x, current) > 0; });
           current.status = current.type === "公司盘点" ? "待财务负责人审阅" : "待部门负责人审阅";
-          current.done = checked.length;
-          current.diff = checked.filter(function (x) { return x.lineStatus === "有差异"; }).length;
+          current.done = filledRows.length;
+          current.diff = filledRows.filter(function (x) { return x.lineStatus === "有差异"; }).length;
           syncDiffRecords(current);
           if (current.diff > 0) alert("已根据盘点确认结果标记 " + current.diff + " 条不一致记录，请在当前任务中补充盘点说明。");
           close(document.getElementById("materialCheckMask"));
@@ -1422,6 +1566,38 @@
         }
       });
       document.addEventListener("change", function (e) {
+        var lineField = e.target.getAttribute("data-line-field");
+        if (lineField) {
+          var currentLine = findLine(e.target.getAttribute("data-line-code"));
+          if (!currentLine) return;
+          if (lineField === "health") {
+            currentLine.health = e.target.value;
+            return;
+          }
+          if (lineField === "result") {
+            var inconsistent = e.target.value === "不一致";
+            currentLine.lineStatus = inconsistent ? "有差异" : "已确认";
+            currentLine.diffType = inconsistent ? (currentLine.diffType && currentLine.diffType !== "正常" ? currentLine.diffType : "盘亏") : "正常";
+            currentLine.result = inconsistent ? currentLine.diffType : "正常";
+            currentLine.checkResult = currentLine.result;
+            return;
+          }
+          if (lineField === "attachment") {
+            var files = Array.prototype.slice.call(e.target.files || []);
+            if (!files.length) return;
+            currentLine.attachments = files.map(function (file, idx) {
+              var isPdf = String(file.type || "").indexOf("pdf") >= 0 || /\.pdf$/i.test(file.name);
+              return {
+                id: (currentLine.code || "line") + "-upload-" + idx,
+                name: file.name,
+                url: URL.createObjectURL(file),
+                previewType: isPdf ? "pdf" : "image"
+              };
+            });
+            renderMaterialCheck();
+            return;
+          }
+        }
         if (e.target.id === "inventoryRoleSelect") {
           state.role = e.target.value;
           localStorage.setItem("inventoryDemoRole", state.role);
@@ -1436,6 +1612,20 @@
         }
       });
       document.addEventListener("input", function (e) {
+        var lineField = e.target.getAttribute("data-line-field");
+        if (lineField) {
+          var currentLine = findLine(e.target.getAttribute("data-line-code"));
+          if (!currentLine) return;
+          if (lineField === "confirmQty") {
+            currentLine.confirmQty = e.target.value === "" ? "" : Number(e.target.value);
+            if (!state.currentMaterialType) renderMaterialCheck();
+            return;
+          }
+          if (lineField === "reason") {
+            currentLine.reason = e.target.value;
+            return;
+          }
+        }
         if (e.target.id === "mcName") {
           state.currentMaterialType = "";
           renderMaterialCheck();
