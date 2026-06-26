@@ -2120,6 +2120,231 @@
           '<div id="reqTrackBox" style="display:none;margin-top:10px;border:1px solid #e9edf4;border-radius:8px;background:#fff;padding:10px 12px"></div>'
         );
       }
+      function buildReqDetailOperationHtml(productName, productCode) {
+        return (
+          '<span class="req-op-wrap">' +
+          '<a href="#" class="req-track-link" data-track-name="' +
+          esc(productName) +
+          '" data-track-code="' +
+          esc(productCode) +
+          '" style="color:#1677ff;text-decoration:none">物资跟踪</a>' +
+          '<a href="#" class="req-user-change-link" data-product-name="' +
+          esc(productName) +
+          '" data-product-code="' +
+          esc(productCode) +
+          '" style="color:#1677ff;text-decoration:none">变更使用人</a>' +
+          '<a href="#" class="req-external-borrow-link" data-product-name="' +
+          esc(productName) +
+          '" data-product-code="' +
+          esc(productCode) +
+          '" style="color:#1677ff;text-decoration:none">外部借用</a>' +
+          "</span>"
+        );
+      }
+      function removeReqFloatingModal(id) {
+        var node = document.getElementById(id);
+        if (node && node.parentNode) node.parentNode.removeChild(node);
+      }
+      function buildReqProgressFlowHtml(type) {
+        var steps = type === "external"
+          ? [
+              "使用人发起外部借用",
+              "公司主管审批",
+              "外部借用对象确认",
+              "经营发展中心知悉",
+              "借用完成"
+            ]
+          : [
+              "使用人发起内部变更",
+              "部门主管审批",
+              "新使用人确认",
+              "经营发展中心知悉",
+              "变更完成"
+            ];
+        return (
+          '<div style="padding:10px 2px 6px">' +
+            '<div style="display:flex;align-items:stretch;justify-content:space-between;gap:12px;flex-wrap:nowrap;overflow:auto">' +
+              steps.map(function (text, idx) {
+                var isLast = idx === steps.length - 1;
+                return '' +
+                  '<div style="display:flex;align-items:center;gap:12px;flex:1 1 0;min-width:' + (isLast ? '170px' : '210px') + '">' +
+                    '<div style="flex:1 1 auto;min-height:108px;border:1px solid ' + (isLast ? '#f6c86f' : '#c8efd4') + ';background:' + (isLast ? '#fff6e5' : '#f1fff4') + ';border-radius:16px;padding:18px 14px;display:flex;align-items:center;justify-content:center;text-align:center;color:#426b4b;font-size:14px;font-weight:600;line-height:1.6">' + esc(text) + '</div>' +
+                    (isLast ? '' : '<div style="color:#9fb3cf;font-size:30px;font-weight:500;flex:none">→</div>') +
+                  '</div>';
+              }).join("") +
+            "</div>" +
+          "</div>"
+        );
+      }
+      function buildReqProgressApprovalHtml(type) {
+        var records = type === "external"
+          ? [
+              { node: "1. 使用人发起", user: "当前使用人", time: "2026-06-26 09:30", content: "发起外部借用申请，填写外部单位、借用人、联系方式及借用原因。" },
+              { node: "2. 公司主管审批", user: "公司主管", time: "待审批", content: "审批外部借用事项，确认借用必要性及借用风险。" },
+              { node: "3. 外部借用对象确认", user: "外部借用对象", time: "待确认", content: "确认借用信息、借用期限及物资交接安排。" },
+              { node: "4. 经营发展中心知悉", user: "经营发展中心", time: "待知悉", content: "对外部借用结果进行登记留痕并完成知悉。" },
+              { node: "5. 借用完成", user: "系统节点", time: "待完成", content: "流程结束，保留审批及借用记录。" }
+            ]
+          : [
+              { node: "1. 使用人发起", user: "当前使用人", time: "2026-06-26 09:30", content: "发起本部门内部变更使用申请，确认当前物资仅限同部门内调整使用。" },
+              { node: "2. 部门主管审批", user: "部门主管", time: "待审批", content: "审批内部变更事项，确认变更后使用安排符合部门管理要求。" },
+              { node: "3. 新使用人确认", user: "接收使用人", time: "待确认", content: "确认接收该物资并承接后续使用责任。" },
+              { node: "4. 经营发展中心知悉", user: "经营发展中心", time: "待知悉", content: "登记内部变更使用结果，留存知悉记录。" },
+              { node: "5. 变更完成", user: "系统节点", time: "待完成", content: "流程结束，变更使用人信息完成更新。" }
+            ];
+        return (
+          '<div style="display:flex;flex-direction:column;gap:14px;padding:4px 0 2px">' +
+            records.map(function (item) {
+              return '' +
+                '<div style="border:1px solid #e8edf5;border-radius:14px;padding:16px 18px;background:#fff">' +
+                  '<div style="display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:10px">' +
+                    '<div style="font-size:15px;font-weight:700;color:#1f3551">' + esc(item.node) + '</div>' +
+                    '<span style="display:inline-flex;align-items:center;justify-content:center;min-width:84px;height:32px;padding:0 14px;border-radius:999px;background:#fff6e5;color:#c88608;font-size:13px;font-weight:600">待处理</span>' +
+                  '</div>' +
+                  '<div style="display:grid;grid-template-columns:minmax(280px,1fr) minmax(200px,280px);gap:10px 18px;font-size:14px;line-height:1.8;color:#1f3551">' +
+                    '<div><span style="font-weight:700">办理人：</span>' + esc(item.user) + "</div>" +
+                    '<div><span style="font-weight:700">办理时间：</span>' + esc(item.time) + "</div>" +
+                    '<div style="grid-column:1 / -1"><span style="font-weight:700">办理内容：</span>' + esc(item.content) + "</div>" +
+                  "</div>" +
+                "</div>";
+            }).join("") +
+          "</div>"
+        );
+      }
+      function openReqProgressModal(type) {
+        removeReqFloatingModal("reqBizProgressMask");
+        var title = type === "external" ? "审批记录 - 外部借用" : "审批记录 - 变更使用人";
+        var maskHtml =
+          '<div class="modal-mask show" id="reqBizProgressMask" style="z-index:10001">' +
+            '<div class="modal" style="width:min(1120px,96vw);max-height:86vh;overflow:auto">' +
+              '<div class="modal-hd"><span>' + title + '</span><button type="button" class="x-btn" data-close-req-progress="1">×</button></div>' +
+              '<div class="modal-bd">' +
+                '<div style="display:flex;gap:28px;border-bottom:1px solid #e8edf5;padding-bottom:12px;margin-bottom:16px">' +
+                  '<button type="button" data-req-progress-tab="flow" class="tab-btn active" style="border:none;background:none;padding:0 0 10px;color:#1677ff;font-size:15px;font-weight:700;border-bottom:3px solid #1677ff;cursor:pointer">流程图</button>' +
+                  '<button type="button" data-req-progress-tab="approval" class="tab-btn" style="border:none;background:none;padding:0 0 10px;color:#51627a;font-size:15px;font-weight:700;cursor:pointer">审批信息</button>' +
+                "</div>" +
+                '<div data-req-progress-panel="flow">' + buildReqProgressFlowHtml(type) + "</div>" +
+                '<div data-req-progress-panel="approval" style="display:none">' + buildReqProgressApprovalHtml(type) + "</div>" +
+              '</div>' +
+              '<div class="modal-ft"><button type="button" class="btn secondary" data-close-req-progress="1">关闭</button></div>' +
+            "</div>" +
+          "</div>";
+        document.body.insertAdjacentHTML("beforeend", maskHtml);
+        var mask = document.getElementById("reqBizProgressMask");
+        if (!mask) return;
+        mask.addEventListener("click", function (ev) {
+          if (ev.target === mask || (ev.target && ev.target.getAttribute("data-close-req-progress") === "1")) {
+            removeReqFloatingModal("reqBizProgressMask");
+            return;
+          }
+          var tab = ev.target && ev.target.getAttribute("data-req-progress-tab");
+          if (!tab) return;
+          var flowBtn = mask.querySelector('[data-req-progress-tab="flow"]');
+          var approvalBtn = mask.querySelector('[data-req-progress-tab="approval"]');
+          var flowPanel = mask.querySelector('[data-req-progress-panel="flow"]');
+          var approvalPanel = mask.querySelector('[data-req-progress-panel="approval"]');
+          var isFlow = tab === "flow";
+          if (flowBtn) {
+            flowBtn.style.color = isFlow ? "#1677ff" : "#51627a";
+            flowBtn.style.borderBottom = isFlow ? "3px solid #1677ff" : "3px solid transparent";
+          }
+          if (approvalBtn) {
+            approvalBtn.style.color = isFlow ? "#51627a" : "#1677ff";
+            approvalBtn.style.borderBottom = isFlow ? "3px solid transparent" : "3px solid #1677ff";
+          }
+          if (flowPanel) flowPanel.style.display = isFlow ? "" : "none";
+          if (approvalPanel) approvalPanel.style.display = isFlow ? "none" : "";
+        });
+      }
+      function openReqUserChangeModal(productName, productCode) {
+        removeReqFloatingModal("reqUserChangeModalMask");
+        var maskHtml =
+          '<div class="modal-mask show" id="reqUserChangeModalMask" style="z-index:9999">' +
+            '<div class="modal" style="width:min(620px,94vw);max-height:84vh;overflow:auto">' +
+              '<div class="modal-hd"><span>变更使用人</span><div style="display:flex;align-items:center;gap:14px"><button type="button" data-open-req-progress="internal" style="border:none;background:none;color:#1677ff;font-size:15px;font-weight:700;cursor:pointer">流程进度</button><button type="button" class="x-btn" data-close-user-change="1">×</button></div></div>' +
+              '<div class="modal-bd">' +
+                '<div style="font-size:12px;color:#64748b;margin-bottom:8px">物资：' + esc(productName || "-") + '（' + esc(productCode || "-") + '）</div>' +
+                '<div style="margin-bottom:10px;padding:10px 12px;border:1px solid #d9e7ff;border-radius:10px;background:#f5f9ff;color:#5b6f8c;font-size:12px;line-height:1.7">本部门内部变更使用，仅限同一部门内调整；如需跨部门流转，请走物资流转流程。</div>' +
+                '<div style="font-size:13px;color:#1f3551;font-weight:600;margin-bottom:6px">接收使用人</div>' +
+                '<input class="carrier-search req-user-search" placeholder="输入姓名搜索" autocomplete="off" style="width:100%;height:36px;border:1px solid #e9ecef;border-radius:8px;padding:0 10px;box-sizing:border-box;font-family:inherit;font-size:13px;margin-bottom:8px" />' +
+                '<div class="req-user-options" style="border:1px solid #e9ecef;border-radius:8px;overflow:hidden;background:#fff">' +
+                  ["张三","李四","王五","赵六","宋中波","成明锴"].map(function (name, idx) {
+                    return '<label class="req-user-option" style="display:flex;align-items:center;gap:8px;height:38px;border-bottom:' + (idx === 5 ? '0' : '1px solid #f0f2f5') + ';background:#fff;padding:0 12px;cursor:pointer;font-size:13px;color:#262626"><input type="radio" name="reqChangeUser" value="' + esc(name) + '"' + (idx === 0 ? ' checked' : '') + '/><span>' + esc(name) + '</span></label>';
+                  }).join("") +
+                '</div>' +
+                '<div style="margin-top:12px;font-size:13px;color:#1f3551;font-weight:600;margin-bottom:6px">变更原因</div>' +
+                '<textarea id="reqUserChangeReason" class="carrier-search" placeholder="请输入变更原因" style="width:100%;height:82px;border:1px solid #e9ecef;border-radius:8px;padding:8px 10px;box-sizing:border-box;font-family:inherit;font-size:13px;resize:vertical"></textarea>' +
+              '</div>' +
+              '<div class="modal-ft"><button type="button" class="btn secondary" data-close-user-change="1">取消</button><button type="button" class="btn primary" data-ok-user-change="1">确定</button></div>' +
+            '</div>' +
+          '</div>';
+        document.body.insertAdjacentHTML("beforeend", maskHtml);
+        var modalMask = document.getElementById("reqUserChangeModalMask");
+        var userSearch = modalMask ? modalMask.querySelector(".req-user-search") : null;
+        var userOptions = modalMask ? modalMask.querySelectorAll(".req-user-option") : [];
+        if (userSearch) {
+          userSearch.addEventListener("input", function () {
+            var kw = String(userSearch.value || "").trim();
+            Array.prototype.forEach.call(userOptions, function (label) {
+              label.style.display = !kw || String(label.textContent || "").indexOf(kw) >= 0 ? "flex" : "none";
+            });
+          });
+        }
+        if (modalMask) {
+          modalMask.addEventListener("click", function (ev) {
+            if (ev.target === modalMask || (ev.target && ev.target.getAttribute("data-close-user-change") === "1")) {
+              removeReqFloatingModal("reqUserChangeModalMask");
+              return;
+            }
+            if (ev.target && ev.target.getAttribute("data-ok-user-change") === "1") {
+              removeReqFloatingModal("reqUserChangeModalMask");
+              return;
+            }
+            if (ev.target && ev.target.getAttribute("data-open-req-progress") === "internal") {
+              openReqProgressModal("internal");
+            }
+          });
+        }
+      }
+      function openReqExternalBorrowModal(productName, productCode) {
+        removeReqFloatingModal("reqExternalBorrowModalMask");
+        var maskHtml =
+          '<div class="modal-mask show" id="reqExternalBorrowModalMask" style="z-index:9999">' +
+            '<div class="modal" style="width:min(640px,94vw);max-height:84vh;overflow:auto">' +
+              '<div class="modal-hd"><span>外部借用</span><div style="display:flex;align-items:center;gap:14px"><button type="button" data-open-req-progress="external" style="border:none;background:none;color:#1677ff;font-size:15px;font-weight:700;cursor:pointer">流程进度</button><button type="button" class="x-btn" data-close-external-borrow="1">×</button></div></div>' +
+              '<div class="modal-bd">' +
+                '<div style="font-size:12px;color:#64748b;margin-bottom:8px">物资：' + esc(productName || "-") + '（' + esc(productCode || "-") + '）</div>' +
+                '<div style="margin-bottom:12px;padding:10px 12px;border:1px solid #d9e7ff;border-radius:10px;background:#f5f9ff;color:#5b6f8c;font-size:12px;line-height:1.7">外部借用需发起审批，经公司主管同意后办理借用交接，并由经营发展中心留痕登记。</div>' +
+                '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px 14px">' +
+                  '<div><div style="font-size:13px;color:#1f3551;font-weight:600;margin-bottom:6px">外部单位</div><input class="carrier-search" id="reqBorrowOrg" placeholder="请输入外部单位名称" style="width:100%;height:36px;border:1px solid #e9ecef;border-radius:8px;padding:0 10px;box-sizing:border-box;font-family:inherit;font-size:13px" /></div>' +
+                  '<div><div style="font-size:13px;color:#1f3551;font-weight:600;margin-bottom:6px">借用人姓名</div><input class="carrier-search" id="reqBorrowUser" placeholder="请输入借用人姓名" style="width:100%;height:36px;border:1px solid #e9ecef;border-radius:8px;padding:0 10px;box-sizing:border-box;font-family:inherit;font-size:13px" /></div>' +
+                  '<div><div style="font-size:13px;color:#1f3551;font-weight:600;margin-bottom:6px">联系方式</div><input class="carrier-search" id="reqBorrowContact" placeholder="请输入联系方式" style="width:100%;height:36px;border:1px solid #e9ecef;border-radius:8px;padding:0 10px;box-sizing:border-box;font-family:inherit;font-size:13px" /></div>' +
+                  '<div><div style="font-size:13px;color:#1f3551;font-weight:600;margin-bottom:6px">预计归还日期</div><input class="carrier-search" id="reqBorrowDate" placeholder="如 2026-07-15" style="width:100%;height:36px;border:1px solid #e9ecef;border-radius:8px;padding:0 10px;box-sizing:border-box;font-family:inherit;font-size:13px" /></div>' +
+                '</div>' +
+                '<div style="margin-top:12px;font-size:13px;color:#1f3551;font-weight:600;margin-bottom:6px">借用理由</div>' +
+                '<textarea id="reqBorrowReason" class="carrier-search" placeholder="请输入借用理由" style="width:100%;height:82px;border:1px solid #e9ecef;border-radius:8px;padding:8px 10px;box-sizing:border-box;font-family:inherit;font-size:13px;resize:vertical"></textarea>' +
+              '</div>' +
+              '<div class="modal-ft"><button type="button" class="btn secondary" data-close-external-borrow="1">取消</button><button type="button" class="btn primary" data-ok-external-borrow="1">确定</button></div>' +
+            '</div>' +
+          '</div>';
+        document.body.insertAdjacentHTML("beforeend", maskHtml);
+        var modalMask = document.getElementById("reqExternalBorrowModalMask");
+        if (modalMask) {
+          modalMask.addEventListener("click", function (ev) {
+            if (ev.target === modalMask || (ev.target && ev.target.getAttribute("data-close-external-borrow") === "1")) {
+              removeReqFloatingModal("reqExternalBorrowModalMask");
+              return;
+            }
+            if (ev.target && ev.target.getAttribute("data-ok-external-borrow") === "1") {
+              removeReqFloatingModal("reqExternalBorrowModalMask");
+              return;
+            }
+            if (ev.target && ev.target.getAttribute("data-open-req-progress") === "external") {
+              openReqProgressModal("external");
+            }
+          });
+        }
+      }
       function restoreLedgerDetailOperationButtons() {
         var title = document.getElementById("detailTitle");
         if (!title || String(title.textContent || "").replace(/\s+/g, "").indexOf("物资详情-") !== 0) return;
@@ -2137,51 +2362,15 @@
             if (!cell) return;
             var txt = String(cell.textContent || "").replace(/\s+/g, "");
             if (txt.indexOf("物资跟踪") >= 0) {
-              cell.querySelectorAll("a.req-track-link").forEach(function (a) {
-                a.style.display = "inline-flex";
-                a.style.visibility = "visible";
-              });
-              var changeLinks = cell.querySelectorAll("a.req-user-change-link");
-              if (!changeLinks.length) {
-                var oldTrack = cell.querySelector("a.req-track-link");
-                var pn = oldTrack ? oldTrack.getAttribute("data-track-name") || "" : "";
-                var pc = oldTrack ? oldTrack.getAttribute("data-track-code") || "" : "";
-                cell.innerHTML =
-                  '<span class="req-op-wrap">' +
-                  '<a href="#" class="req-track-link" data-track-name="' +
-                  esc(pn) +
-                  '" data-track-code="' +
-                  esc(pc) +
-                  '" style="color:#1677ff;text-decoration:none">物资跟踪</a>' +
-                  '<a href="#" class="req-user-change-link" data-product-name="' +
-                  esc(pn) +
-                  '" data-product-code="' +
-                  esc(pc) +
-                  '" style="color:#1677ff;text-decoration:none">变更使用人</a>' +
-                  "</span>";
-              } else {
-                changeLinks.forEach(function (a) {
-                  a.style.display = "inline-flex";
-                  a.style.visibility = "visible";
-                });
-              }
+              var oldTrack = cell.querySelector("a.req-track-link");
+              var pn = oldTrack ? oldTrack.getAttribute("data-track-name") || "" : "";
+              var pc = oldTrack ? oldTrack.getAttribute("data-track-code") || "" : "";
+              cell.innerHTML = buildReqDetailOperationHtml(pn, pc);
               return;
             }
             var productName = cells[1] ? String(cells[1].textContent || "").trim() : "";
             var productCode = cells[3] ? String(cells[3].textContent || "").trim() : "";
-            cell.innerHTML =
-              '<span class="req-op-wrap">' +
-              '<a href="#" class="req-track-link" data-track-name="' +
-              esc(productName) +
-              '" data-track-code="' +
-              esc(productCode) +
-              '" style="color:#1677ff;text-decoration:none">物资跟踪</a>' +
-              '<a href="#" class="req-user-change-link" data-product-name="' +
-              esc(productName) +
-              '" data-product-code="' +
-              esc(productCode) +
-              '" style="color:#1677ff;text-decoration:none">变更使用人</a>' +
-              "</span>";
+            cell.innerHTML = buildReqDetailOperationHtml(productName, productCode);
           });
         });
       }
@@ -3284,48 +3473,15 @@
           var linkEl = e.target.classList && e.target.classList.contains("req-user-change-link") ? e.target : e.target.parentElement;
           var pn = linkEl.getAttribute("data-product-name") || "";
           var pc = linkEl.getAttribute("data-product-code") || "";
-          var oldMask = document.getElementById("reqUserChangeModalMask");
-          if (oldMask && oldMask.parentNode) oldMask.parentNode.removeChild(oldMask);
-          var maskHtml =
-            '<div class="modal-mask show" id="reqUserChangeModalMask" style="z-index:9999">' +
-              '<div class="modal" style="width:min(560px,92vw);max-height:82vh;overflow:auto">' +
-                '<div class="modal-hd"><span>变更使用人</span><button type="button" class="x-btn" data-close-user-change="1">×</button></div>' +
-                '<div class="modal-bd">' +
-                  '<div style="font-size:12px;color:#64748b;margin-bottom:8px">物资：' + esc(pn || "-") + '（' + esc(pc || "-") + '）</div>' +
-                  '<input class="carrier-search req-user-search" placeholder="输入姓名搜索" autocomplete="off" style="width:100%;height:36px;border:1px solid #e9ecef;border-radius:8px;padding:0 10px;box-sizing:border-box;font-family:inherit;font-size:13px;margin-bottom:8px" />' +
-                  '<div class="req-user-options" style="border:1px solid #e9ecef;border-radius:8px;overflow:hidden;background:#fff">' +
-                    ["张三","李四","王五","赵六","宋中波","成明锴"].map(function (name, idx) {
-                      return '<label class="req-user-option" style="display:flex;align-items:center;gap:8px;height:34px;border-bottom:' + (idx === 5 ? '0' : '1px solid #f0f2f5') + ';background:#fff;padding:0 10px;cursor:pointer;font-size:13px;color:#262626"><input type="radio" name="reqChangeUser" value="' + esc(name) + '"' + (idx === 0 ? ' checked' : '') + '/><span>' + esc(name) + '</span></label>';
-                    }).join("") +
-                  '</div>' +
-                  '<div style="margin-top:10px;font-size:12px;color:#64748b;margin-bottom:4px">变更原因</div>' +
-                  '<textarea id="reqUserChangeReason" class="carrier-search" placeholder="请输入变更原因" style="width:100%;height:72px;border:1px solid #e9ecef;border-radius:8px;padding:8px 10px;box-sizing:border-box;font-family:inherit;font-size:13px;resize:vertical"></textarea>' +
-                '</div>' +
-                '<div class="modal-ft"><button type="button" class="btn secondary" data-close-user-change="1">取消</button><button type="button" class="btn primary" data-ok-user-change="1">确定</button></div>' +
-              '</div>' +
-            '</div>';
-          document.body.insertAdjacentHTML("beforeend", maskHtml);
-          var modalMask = document.getElementById("reqUserChangeModalMask");
-          var userSearch = modalMask ? modalMask.querySelector(".req-user-search") : null;
-          var userOptions = modalMask ? modalMask.querySelectorAll(".req-user-option") : [];
-          function closeUserChangeModal() {
-            var m = document.getElementById("reqUserChangeModalMask");
-            if (m && m.parentNode) m.parentNode.removeChild(m);
-          }
-          if (userSearch) {
-            userSearch.addEventListener("input", function () {
-              var kw = String(userSearch.value || "").trim();
-              Array.prototype.forEach.call(userOptions, function (label) {
-                label.style.display = !kw || String(label.textContent || "").indexOf(kw) >= 0 ? "flex" : "none";
-              });
-            });
-          }
-          if (modalMask) {
-            modalMask.addEventListener("click", function (ev) {
-              if (ev.target === modalMask || (ev.target && ev.target.getAttribute("data-close-user-change") === "1")) closeUserChangeModal();
-              if (ev.target && ev.target.getAttribute("data-ok-user-change") === "1") closeUserChangeModal();
-            });
-          }
+          openReqUserChangeModal(pn, pc);
+          return;
+        }
+        if (e.target.classList && (e.target.classList.contains("req-external-borrow-link") || (e.target.parentElement && e.target.parentElement.classList && e.target.parentElement.classList.contains("req-external-borrow-link")))) {
+          e.preventDefault();
+          var extLinkEl = e.target.classList && e.target.classList.contains("req-external-borrow-link") ? e.target : e.target.parentElement;
+          var extPn = extLinkEl.getAttribute("data-product-name") || "";
+          var extPc = extLinkEl.getAttribute("data-product-code") || "";
+          openReqExternalBorrowModal(extPn, extPc);
           return;
         }
         if (e.target.classList && e.target.classList.contains("trf-track-link")) {
