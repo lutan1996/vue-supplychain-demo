@@ -527,7 +527,7 @@
       <div class="wh-modal-foot"><button type="button" class="wh-btn wh-btn--ghost" data-close>取消</button><button type="button" class="wh-btn wh-btn--primary" id="btnMaterialSubmit">盘点提交</button></div>
     </div>
   </div>
-  <div class="wh-modal-mask" id="materialAssignMask" aria-hidden="true">
+  <div class="wh-modal-mask" id="materialAssignMask" aria-hidden="true" style="z-index:10003">
     <div class="wh-modal-box" style="width:min(520px,92vw)" role="dialog" aria-modal="true" aria-labelledby="materialAssignTitle">
       <div class="wh-modal-head">
         <h3 class="wh-modal-title" id="materialAssignTitle">分配盘点人员</h3>
@@ -869,9 +869,9 @@
           "物资管理部门负责人": "物资管理部门负责人审批环节可见。",
           "财务部门负责人": "财务部门负责人审批环节可见。",
           "业务部门负责人": "业务部门负责人审批环节可见。",
-          "物资管理部门盘点人员": "物资管理部门分配盘点人员环节可选。",
-          "财务部门盘点人员": "财务部门分配盘点人员环节可选。",
-          "业务部门盘点人员": "业务部门分配盘点人员环节可选。"
+          "物资管理部门盘点人员": "选完盘点人员后这些框可见，并且自动带入盘点人员名称。",
+          "财务部门盘点人员": "选完盘点人员后这些框可见，并且自动带入盘点人员名称。",
+          "业务部门盘点人员": "选完盘点人员后这些框可见，并且自动带入盘点人员名称。"
         };
         return notes[label] || "";
       }
@@ -1686,7 +1686,11 @@
         if (e.target.id === "btnMaterialAssignConfirm") {
           var checkedAssign = document.querySelector('input[name="materialAssignRadio"]:checked');
           if (!checkedAssign) {
-            alert("请选择盘点人员后提交分配。");
+            var firstAssign = document.querySelector('#materialAssignOptions input[name="materialAssignRadio"]');
+            if (firstAssign) firstAssign.checked = true;
+            checkedAssign = firstAssign;
+          }
+          if (!checkedAssign) {
             return;
           }
           close(document.getElementById("materialAssignMask"));
