@@ -2148,28 +2148,29 @@
       function buildReqProgressFlowHtml(type) {
         var steps = type === "external"
           ? [
-              "使用人发起外部借用",
-              "公司主管审批",
-              "外部借用对象确认",
-              "经营发展中心知悉",
-              "借用完成"
+              { text: "使用人发起外部借用申请", end: false },
+              { text: "部门负责人初审借用必要性", end: false },
+              { text: "公司负责人审批外部借用事项", end: false },
+              { text: "外部借用对象确认借用信息", end: false },
+              { text: "物资管理部门物资专责登记借用台账", end: false },
+              { text: "外部借用完成", end: true }
             ]
           : [
-              "使用人发起内部变更",
-              "部门主管审批",
-              "新使用人确认",
-              "经营发展中心知悉",
-              "变更完成"
+              { text: "当前使用人发起变更使用申请", end: false },
+              { text: "部门负责人审批是否同意本部门内部变更", end: false },
+              { text: "新使用人确认接收该物资", end: false },
+              { text: "物资管理部门物资专责知悉并登记", end: false },
+              { text: "变更完成", end: true }
             ];
         return (
-          '<div style="padding:10px 2px 6px">' +
-            '<div style="display:flex;align-items:stretch;justify-content:space-between;gap:12px;flex-wrap:nowrap;overflow:auto">' +
-              steps.map(function (text, idx) {
-                var isLast = idx === steps.length - 1;
+          '<div style="padding:12px 2px 8px">' +
+            '<div style="display:flex;align-items:stretch;gap:14px;flex-wrap:nowrap;overflow:auto;padding-bottom:6px">' +
+              steps.map(function (item, idx) {
+                var isLast = !!item.end;
                 return '' +
-                  '<div style="display:flex;align-items:center;gap:12px;flex:1 1 0;min-width:' + (isLast ? '170px' : '210px') + '">' +
-                    '<div style="flex:1 1 auto;min-height:108px;border:1px solid ' + (isLast ? '#f6c86f' : '#c8efd4') + ';background:' + (isLast ? '#fff6e5' : '#f1fff4') + ';border-radius:16px;padding:18px 14px;display:flex;align-items:center;justify-content:center;text-align:center;color:#426b4b;font-size:14px;font-weight:600;line-height:1.6">' + esc(text) + '</div>' +
-                    (isLast ? '' : '<div style="color:#9fb3cf;font-size:30px;font-weight:500;flex:none">→</div>') +
+                  '<div style="display:flex;align-items:center;gap:14px;flex:1 1 0;min-width:' + (isLast ? '190px' : '220px') + '">' +
+                    '<div style="flex:1 1 auto;min-height:118px;border:1px solid ' + (isLast ? '#f6c86f' : '#c8efd4') + ';background:' + (isLast ? '#fff6e5' : '#f1fff4') + ';border-radius:16px;padding:18px 16px;display:flex;align-items:center;justify-content:center;text-align:center;color:' + (isLast ? '#9a6700' : '#426b4b') + ';font-size:14px;font-weight:600;line-height:1.7;box-sizing:border-box">' + esc(item.text) + '</div>' +
+                    (isLast ? '' : '<div style="color:#9fb3cf;font-size:28px;font-weight:600;flex:none">→</div>') +
                   '</div>';
               }).join("") +
             "</div>" +
@@ -2179,27 +2180,30 @@
       function buildReqProgressApprovalHtml(type) {
         var records = type === "external"
           ? [
-              { node: "1. 使用人发起", user: "当前使用人", time: "2026-06-26 09:30", content: "发起外部借用申请，填写外部单位、借用人、联系方式及借用原因。" },
-              { node: "2. 公司主管审批", user: "公司主管", time: "待审批", content: "审批外部借用事项，确认借用必要性及借用风险。" },
-              { node: "3. 外部借用对象确认", user: "外部借用对象", time: "待确认", content: "确认借用信息、借用期限及物资交接安排。" },
-              { node: "4. 经营发展中心知悉", user: "经营发展中心", time: "待知悉", content: "对外部借用结果进行登记留痕并完成知悉。" },
-              { node: "5. 借用完成", user: "系统节点", time: "待完成", content: "流程结束，保留审批及借用记录。" }
+              { node: "1. 发起申请", user: "当前使用人", time: "2026-06-26 09:30", content: "发起外部借用申请，填写外部单位、借用人、联系方式、借用理由及预计归还日期。", status: "已发起" },
+              { node: "2. 部门负责人初审", user: "部门负责人", time: "待审批", content: "确认该物资是否可外借，审核借用必要性与借用风险。", status: "待审批" },
+              { node: "3. 公司负责人审批", user: "公司负责人", time: "待审批", content: "审批外部借用事项，确认是否同意对外借出。", status: "待审批" },
+              { node: "4. 外部借用对象确认", user: "外部借用人", time: "待确认", content: "确认借用物资、借用期限及物资交接安排。", status: "待确认" },
+              { node: "5. 物资管理部门登记", user: "物资管理部门物资专责", time: "待登记", content: "登记外部借用台账，留存审批与借用记录。", status: "待登记" },
+              { node: "6. 完成", user: "系统", time: "待完成", content: "外部借用流程完成。", status: "待完成" }
             ]
           : [
-              { node: "1. 使用人发起", user: "当前使用人", time: "2026-06-26 09:30", content: "发起本部门内部变更使用申请，确认当前物资仅限同部门内调整使用。" },
-              { node: "2. 部门主管审批", user: "部门主管", time: "待审批", content: "审批内部变更事项，确认变更后使用安排符合部门管理要求。" },
-              { node: "3. 新使用人确认", user: "接收使用人", time: "待确认", content: "确认接收该物资并承接后续使用责任。" },
-              { node: "4. 经营发展中心知悉", user: "经营发展中心", time: "待知悉", content: "登记内部变更使用结果，留存知悉记录。" },
-              { node: "5. 变更完成", user: "系统节点", time: "待完成", content: "流程结束，变更使用人信息完成更新。" }
+              { node: "1. 发起申请", user: "当前使用人", time: "2026-06-26 09:30", content: "发起物资变更使用申请，填写原使用人、新使用人及变更原因。", status: "已发起" },
+              { node: "2. 部门负责人审批", user: "部门负责人", time: "待审批", content: "审批本部门内部变更使用是否合理，确认责任归属。", status: "待审批" },
+              { node: "3. 新使用人确认", user: "新使用人", time: "待确认", content: "确认接收该物资，并承接后续使用责任。", status: "待确认" },
+              { node: "4. 物资管理部门知悉", user: "物资管理部门物资专责", time: "待知悉", content: "登记变更结果，更新台账留痕。", status: "待知悉" },
+              { node: "5. 完成", user: "系统", time: "待完成", content: "物资使用人信息更新完成。", status: "待完成" }
             ];
         return (
           '<div style="display:flex;flex-direction:column;gap:14px;padding:4px 0 2px">' +
             records.map(function (item) {
+              var statusBg = item.status === "已发起" ? "#edf7ff" : "#fff6e5";
+              var statusColor = item.status === "已发起" ? "#1677ff" : "#c88608";
               return '' +
                 '<div style="border:1px solid #e8edf5;border-radius:14px;padding:16px 18px;background:#fff">' +
                   '<div style="display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:10px">' +
                     '<div style="font-size:15px;font-weight:700;color:#1f3551">' + esc(item.node) + '</div>' +
-                    '<span style="display:inline-flex;align-items:center;justify-content:center;min-width:84px;height:32px;padding:0 14px;border-radius:999px;background:#fff6e5;color:#c88608;font-size:13px;font-weight:600">待处理</span>' +
+                    '<span style="display:inline-flex;align-items:center;justify-content:center;min-width:84px;height:32px;padding:0 14px;border-radius:999px;background:' + statusBg + ';color:' + statusColor + ';font-size:13px;font-weight:600">' + esc(item.status) + '</span>' +
                   '</div>' +
                   '<div style="display:grid;grid-template-columns:minmax(280px,1fr) minmax(200px,280px);gap:10px 18px;font-size:14px;line-height:1.8;color:#1f3551">' +
                     '<div><span style="font-weight:700">办理人：</span>' + esc(item.user) + "</div>" +
@@ -3468,19 +3472,19 @@
           }
           return;
         }
-        if (e.target.classList && (e.target.classList.contains("req-user-change-link") || (e.target.parentElement && e.target.parentElement.classList && e.target.parentElement.classList.contains("req-user-change-link")))) {
+        var reqUserChangeLink = e.target && e.target.closest ? e.target.closest("a.req-user-change-link") : null;
+        if (reqUserChangeLink) {
           e.preventDefault();
-          var linkEl = e.target.classList && e.target.classList.contains("req-user-change-link") ? e.target : e.target.parentElement;
-          var pn = linkEl.getAttribute("data-product-name") || "";
-          var pc = linkEl.getAttribute("data-product-code") || "";
+          var pn = reqUserChangeLink.getAttribute("data-product-name") || "";
+          var pc = reqUserChangeLink.getAttribute("data-product-code") || "";
           openReqUserChangeModal(pn, pc);
           return;
         }
-        if (e.target.classList && (e.target.classList.contains("req-external-borrow-link") || (e.target.parentElement && e.target.parentElement.classList && e.target.parentElement.classList.contains("req-external-borrow-link")))) {
+        var reqExternalBorrowLink = e.target && e.target.closest ? e.target.closest("a.req-external-borrow-link") : null;
+        if (reqExternalBorrowLink) {
           e.preventDefault();
-          var extLinkEl = e.target.classList && e.target.classList.contains("req-external-borrow-link") ? e.target : e.target.parentElement;
-          var extPn = extLinkEl.getAttribute("data-product-name") || "";
-          var extPc = extLinkEl.getAttribute("data-product-code") || "";
+          var extPn = reqExternalBorrowLink.getAttribute("data-product-name") || "";
+          var extPc = reqExternalBorrowLink.getAttribute("data-product-code") || "";
           openReqExternalBorrowModal(extPn, extPc);
           return;
         }
