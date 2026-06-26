@@ -198,6 +198,12 @@
     .inv-material-query-action { display: flex; flex-direction: column; align-items: flex-start; }
     .inv-material-query-field .inv-btn { min-width: 96px; height: 36px; }
     .inv-material-query-note { margin-top: 6px; color: #98a1b2; font-size: 12px; line-height: 1.6; }
+    .inv-assign-list { border: 1px solid #e9ecef; border-radius: 8px; overflow: hidden; background: #fff; }
+    .inv-assign-item { display: flex; align-items: center; gap: 8px; min-height: 34px; padding: 0 10px; border-bottom: 1px solid #f0f2f5; color: #262626; font-size: 13px; cursor: pointer; }
+    .inv-assign-item:last-child { border-bottom: 0; }
+    .inv-assign-item input { margin: 0; }
+    .inv-assign-note-label { margin-top: 10px; margin-bottom: 4px; color: #64748b; font-size: 12px; }
+    .inv-assign-note { width: 100%; min-height: 72px; border: 1px solid #e9ecef; border-radius: 8px; padding: 8px 10px; box-sizing: border-box; font-family: inherit; font-size: 13px; resize: vertical; }
     #materialCheckMask #materialInfoGrid { display: block; width: 100%; }
     #materialCheckMask #materialInfoGrid > .inv-task-info-grid.is-start-grid {
       display: grid !important;
@@ -519,6 +525,27 @@
         </div>
       </div>
       <div class="wh-modal-foot"><button type="button" class="wh-btn wh-btn--ghost" data-close>取消</button><button type="button" class="wh-btn wh-btn--primary" id="btnMaterialSubmit">盘点提交</button></div>
+    </div>
+  </div>
+  <div class="wh-modal-mask" id="materialAssignMask" aria-hidden="true">
+    <div class="wh-modal-box" style="width:min(520px,92vw)" role="dialog" aria-modal="true" aria-labelledby="materialAssignTitle">
+      <div class="wh-modal-head">
+        <h3 class="wh-modal-title" id="materialAssignTitle">分配盘点人员</h3>
+        <button type="button" class="wh-modal-close" data-close aria-label="关闭">×</button>
+      </div>
+      <div class="wh-modal-body">
+        <div style="font-size:12px;color:#64748b;margin-bottom:8px">盘点任务：<span id="materialAssignTaskText">-</span></div>
+        <div class="wh-field" style="margin-bottom:8px">
+          <input class="wh-input" id="materialAssignSearch" placeholder="输入姓名搜索" autocomplete="off">
+        </div>
+        <div class="inv-assign-list" id="materialAssignOptions"></div>
+        <div class="inv-assign-note-label">备注</div>
+        <textarea class="inv-assign-note" id="materialAssignNote" placeholder="请输入备注"></textarea>
+      </div>
+      <div class="wh-modal-foot">
+        <button type="button" class="wh-btn wh-btn--ghost" data-close>取消</button>
+        <button type="button" class="wh-btn wh-btn--primary" id="btnMaterialAssignConfirm">确定</button>
+      </div>
     </div>
   </div>
   <div class="inv-task-reminder" id="inventoryTaskReminder">
@@ -1096,6 +1123,36 @@
         mask.classList.remove("is-open");
         mask.setAttribute("aria-hidden", "true");
       }
+      function materialAssignPeople() {
+        var row = state.current || currentTaskForAction();
+        return normalizeFlowType(row) === "company"
+          ? ["宋中波", "杜欣鑫", "成明锴", "许学良", "喻家敏"]
+          : ["许学良", "李仁堂", "宋中波", "陈亮"];
+      }
+      function renderMaterialAssignOptions() {
+        var box = document.getElementById("materialAssignOptions");
+        if (!box) return;
+        var keyword = String((document.getElementById("materialAssignSearch") || {}).value || "").trim();
+        var people = materialAssignPeople().filter(function (name) {
+          return !keyword || name.indexOf(keyword) >= 0;
+        });
+        box.innerHTML = people.length
+          ? people.map(function (name, idx) {
+              return '<label class="inv-assign-item"><input type="radio" name="materialAssignRadio" value="' + inputValue(name) + '"' + (idx === 0 ? ' checked' : '') + '><span>' + cell(name) + '</span></label>';
+            }).join("")
+          : '<div class="inv-task-select-empty">暂无匹配人员</div>';
+      }
+      function openMaterialAssignModal() {
+        var row = state.current || currentTaskForAction();
+        var taskText = document.getElementById("materialAssignTaskText");
+        var search = document.getElementById("materialAssignSearch");
+        var note = document.getElementById("materialAssignNote");
+        if (taskText) taskText.textContent = cell(row.no) + " " + cell(row.name);
+        if (search) search.value = "";
+        if (note) note.value = "";
+        renderMaterialAssignOptions();
+        open(document.getElementById("materialAssignMask"));
+      }
       function switchTab(key) {
         document.querySelectorAll("[data-inv-tab]").forEach(function (btn) {
           var on = btn.getAttribute("data-inv-tab") === key;
@@ -1623,7 +1680,16 @@
           return;
         }
         if (e.target.id === "btnMaterialAssign") {
-          alert("请选择盘点人员后提交分配。");
+          openMaterialAssignModal();
+          return;
+        }
+        if (e.target.id === "btnMaterialAssignConfirm") {
+          var checkedAssign = document.querySelector('input[name="materialAssignRadio"]:checked');
+          if (!checkedAssign) {
+            alert("请选择盘点人员后提交分配。");
+            return;
+          }
+          close(document.getElementById("materialAssignMask"));
           return;
         }
         if (e.target.id === "inventoryTaskReminderGo") {
@@ -1732,6 +1798,10 @@
           if (op.getAttribute("data-inv-act") === "start") openMaterialCheck(row);
         }
       });
+      var materialAssignSearchEl = document.getElementById("materialAssignSearch");
+      if (materialAssignSearchEl) {
+        materialAssignSearchEl.addEventListener("input", renderMaterialAssignOptions);
+      }
       document.addEventListener("change", function (e) {
         var lineField = e.target.getAttribute("data-line-field");
         if (lineField) {
