@@ -1262,14 +1262,7 @@
     if (!file) return "";
     var f = file.toLowerCase();
     if (f === "purchase-plan-approval-handle.html") return "我的任务";
-    if (f.indexOf("my-tasks") === 0) {
-      try {
-        var qs = typeof location !== "undefined" && location.search ? location.search : "";
-        if (/[?&]scene=todo(?:&|$)/.test(qs)) return "我的待办";
-      } catch (eMt) {}
-      if (f === "my-tasks-todo.html") return "我的待办";
-      return "我的任务";
-    }
+    if (f.indexOf("my-tasks") === 0) return "我的任务";
     if (f.indexOf("scrap-identification") >= 0 || f.indexOf("retire") === 0 || f.indexOf("retired-") === 0 || f === "big-small-reuse.html" || f === "goods-transfer-out.html")
       return "物资出库与处置";
     if (f === "inventory-task-management.html" || f === "inventory-difference-handling.html") return "盘点管理";
@@ -1401,11 +1394,43 @@
         return "";
       }
 
+      function resolveMyTasksLabel(fileName, query) {
+        var scene = "";
+        try {
+          scene = (new URLSearchParams(query || "")).get("scene") || "";
+        } catch (eScene) {}
+        if (!scene) {
+          try {
+            scene = (new URLSearchParams(query || "")).get("tab") || "";
+          } catch (eTabScene) {}
+        }
+        if (!scene) {
+          try {
+            scene = String(document.body && document.body.getAttribute("data-scene") || "");
+          } catch (eBodyScene) {}
+        }
+        if (!scene && fileName === "my-tasks-todo.html") scene = "todo";
+        if (!scene && fileName === "my-tasks-done.html") scene = "done";
+        if (!scene && fileName === "my-tasks-cc.html") scene = "cc";
+        if (!scene && (fileName === "my-tasks-prototype-list.html" || fileName === "my-tasks.html")) scene = "initiated";
+        var map = {
+          initiated: "我发起的",
+          todo: "我的待办",
+          done: "我的已办",
+          cc: "我的抄送"
+        };
+        return map[scene] || "";
+      }
+
       var purchaseSub = "";
       if (mod === "物资采购" || mod === "采购管理") {
         purchaseSub = resolvePurchaseMgmtLabel(file, location.search);
       }
-      var pageLabel = purchaseSub;
+      var taskSub = "";
+      if (file.indexOf("my-tasks") === 0) {
+        taskSub = resolveMyTasksLabel(file, location.search);
+      }
+      var pageLabel = taskSub || purchaseSub;
       if (!pageLabel && file === "base-data-material-ledger.html") {
         pageLabel = "物资类型";
       }
@@ -1417,6 +1442,7 @@
       if (!pageLabel) pageLabel = "当前页";
 
       var displayMod = mod;
+      if (taskSub) displayMod = "我的任务";
       if (purchaseSub) displayMod = "物资采购";
       // 库存管理和物资领用显示实物管理
       if (pageLabel === "库存管理" || pageLabel === "物资领用") displayMod = "实物管理";
@@ -1437,7 +1463,9 @@
       if (existingNav) {
         var segs = existingNav.querySelectorAll("a, span:not(.sep)");
         if (segs.length >= 3) {
-          if (purchaseSub) {
+          if (taskSub) {
+            segs[1].textContent = "我的任务";
+          } else if (purchaseSub) {
             // 库存管理和物资领用显示实物管理，其他显示物资采购
             if (pageLabel === "库存管理" || pageLabel === "物资领用") {
               segs[1].textContent = "实物管理";
