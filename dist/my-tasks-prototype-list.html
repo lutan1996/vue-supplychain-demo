@@ -723,7 +723,7 @@
       color: #8aa0b8;
       font-size: 24px;
     }
-    .inventory-progress-info { margin-top: 14px; color: #51657d; font-size: 13px; line-height: 1.9; }
+    .inventory-progress-info { margin-top: 4px; color: #51657d; font-size: 13px; line-height: 1.9; }
     .inventory-progress-info-line { margin: 0 0 8px; color: #51657d; }
     .inventory-progress-ft {
       display: flex;
@@ -1769,9 +1769,9 @@
             '<div class="inventory-progress-dialog" role="dialog" aria-modal="true" aria-labelledby="inventoryTodoProgressTitle">' +
               '<div class="inventory-progress-hd"><span id="inventoryTodoProgressTitle">' + mtEsc(title) + '</span><button type="button" class="inventory-progress-close" data-close-progress="1" aria-label="关闭">×</button></div>' +
               '<div class="inventory-progress-bd">' +
-                '<div class="inventory-progress-tabs"><span class="inventory-progress-tab is-active">流程图</span><span class="inventory-progress-tab">审批信息</span></div>' +
-                '<div class="inventory-progress-flow"><div class="' + rowClass + '">' + rowHtml + '</div></div>' +
-                '<div class="inventory-progress-info">' + infoHtml + '</div>' +
+                '<div class="inventory-progress-tabs"><span class="inventory-progress-tab is-active" data-progress-tab="flow">流程图</span><span class="inventory-progress-tab" data-progress-tab="info">审批信息</span></div>' +
+                '<div class="inventory-progress-flow' + (isCompany ? ' is-company-flow' : '') + '"><div class="' + rowClass + '">' + rowHtml + '</div></div>' +
+                '<div class="inventory-progress-info" style="display:none">' + infoHtml + '</div>' +
               '</div>' +
               '<div class="inventory-progress-ft"><button type="button" class="proc-btn" data-close-progress="1">关闭</button></div>' +
             '</div>' +
@@ -1782,7 +1782,18 @@
           mask.addEventListener("click", function (e) {
             if (e.target === mask || (e.target && e.target.getAttribute("data-close-progress") === "1")) {
               mask.parentNode.removeChild(mask);
+              return;
             }
+            var tab = e.target && e.target.closest && e.target.closest("[data-progress-tab]");
+            if (!tab) return;
+            var key = tab.getAttribute("data-progress-tab");
+            mask.querySelectorAll("[data-progress-tab]").forEach(function (x) {
+              x.classList.toggle("is-active", x === tab);
+            });
+            var flowPane = mask.querySelector(".inventory-progress-flow");
+            var infoPane = mask.querySelector(".inventory-progress-info");
+            if (flowPane) flowPane.style.display = key === "flow" ? "" : "none";
+            if (infoPane) infoPane.style.display = key === "info" ? "" : "none";
           });
         }
       }
