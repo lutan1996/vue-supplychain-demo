@@ -2148,19 +2148,19 @@
       function buildReqProgressFlowHtml(type) {
         var steps = type === "external"
           ? [
-              { no: "01", title: "发起申请", text: "当前使用人发起外部借用申请，填写外部单位、借用人、借用理由与预计归还日期。", end: false },
-              { no: "02", title: "部门初审", text: "部门负责人审核该物资是否允许外借，确认借用必要性与责任归属。", end: false },
-              { no: "03", title: "公司审批", text: "公司负责人审批外部借用事项，确认是否同意对外借出。", end: false },
-              { no: "04", title: "借用确认", text: "外部借用对象确认借用信息、交接方式及预计归还时间。", end: false },
-              { no: "05", title: "台账登记", text: "物资管理部门物资专责登记外部借用台账并留痕。", end: false },
-              { no: "06", title: "借用完成", text: "借用流程完成，待后续按期归还。", end: true }
+              { no: "01", title: "使用人发起外部借用申请", text: "使用人发起外部借用申请", end: false },
+              { no: "02", title: "部门负责人初审", text: "部门负责人初审借用必要性", end: false },
+              { no: "03", title: "公司负责人审批", text: "公司负责人审批外部借用事项", end: false },
+              { no: "04", title: "外部借用对象确认借用信息", text: "外部借用对象确认借用信息", end: false },
+              { no: "05", title: "物资管理部门物资专责登记并留痕", text: "物资管理部门物资专责登记借用台账", end: false },
+              { no: "06", title: "外部借用完成", text: "外部借用完成", end: true }
             ]
           : [
-              { no: "01", title: "发起申请", text: "当前使用人发起变更使用申请，填写新使用人及变更原因。", end: false },
-              { no: "02", title: "部门审批", text: "部门负责人审批是否同意本部门内部变更，确认责任交接无误。", end: false },
-              { no: "03", title: "接收确认", text: "新使用人确认接收该物资并承接后续使用责任。", end: false },
-              { no: "04", title: "登记知悉", text: "物资管理部门物资专责知悉并更新台账信息。", end: false },
-              { no: "05", title: "变更完成", text: "系统完成使用人信息变更并归档留痕。", end: true }
+              { no: "01", title: "发起申请", text: "当前使用人发起物资变更使用申请，填写原使用人、新使用人、变更原因。", end: false },
+              { no: "02", title: "部门负责人审批", text: "部门负责人审批本部门内部变更使用是否合理，确认责任归属。", end: false },
+              { no: "03", title: "新使用人确认", text: "新使用人确认接收该物资，并承接后续使用责任。", end: false },
+              { no: "04", title: "物资管理部门知悉", text: "物资管理部门物资专责登记变更结果，更新台账留痕。", end: false },
+              { no: "05", title: "完成", text: "物资使用人信息更新完成。", end: true }
             ];
         return (
           '<div style="padding:8px 0 4px">' +
@@ -2184,19 +2184,19 @@
       function buildReqProgressApprovalHtml(type) {
         var records = type === "external"
           ? [
-              { node: "1. 发起申请", user: "当前使用人", time: "2026-06-26 09:30", content: "发起外部借用申请，填写外部单位、借用人、联系方式、借用理由及预计归还日期。", status: "已发起" },
-              { node: "2. 部门负责人初审", user: "部门负责人", time: "待审批", content: "审核借用必要性、风险与责任归属，确认是否同意提交公司审批。", status: "待审批" },
-              { node: "3. 公司负责人审批", user: "公司负责人", time: "待审批", content: "审批外部借用事项，确认是否允许该物资对外借出。", status: "待审批" },
-              { node: "4. 外部借用对象确认", user: "外部借用人", time: "待确认", content: "确认借用信息、交接方式及预计归还时间。", status: "待确认" },
-              { node: "5. 台账登记", user: "物资管理部门物资专责", time: "待登记", content: "借用获批后登记借用台账并留存过程材料。", status: "待登记" },
-              { node: "6. 完成", user: "系统", time: "待完成", content: "外部借用流程完成，进入借出期间跟踪。", status: "待完成" }
+              { node: "1. 发起申请", user: "当前使用人", time: "2026-06-26 09:30", content: "发起外部借用申请，填写外部单位、借用人、联系方式、借用理由、预计归还日期。", status: "已发起" },
+              { node: "2. 部门负责人初审", user: "部门负责人", time: "待审批", content: "确认该物资是否可外借，审核借用必要性与风险。", status: "待审批" },
+              { node: "3. 公司负责人审批", user: "公司负责人", time: "待审批", content: "审批外部借用事项，确认是否同意对外借出。", status: "待审批" },
+              { node: "4. 外部借用对象确认", user: "外部借用人", time: "待确认", content: "确认借用物资、借用期限及交接安排。", status: "待确认" },
+              { node: "5. 物资管理部门登记", user: "物资管理部门物资专责", time: "待登记", content: "登记外部借用台账，留存审批与借用记录。", status: "待登记" },
+              { node: "6. 完成", user: "系统", time: "待完成", content: "外部借用流程完成。", status: "待完成" }
             ]
           : [
-              { node: "1. 发起申请", user: "当前使用人", time: "2026-06-26 09:30", content: "发起物资变更使用申请，填写原使用人、新使用人及变更原因。", status: "已发起" },
-              { node: "2. 部门负责人审批", user: "部门负责人", time: "待审批", content: "审批本部门内部变更使用是否合理，确认责任交接无误。", status: "待审批" },
+              { node: "1. 发起申请", user: "当前使用人", time: "2026-06-26 09:30", content: "发起物资变更使用申请，填写原使用人、新使用人、变更原因。", status: "已发起" },
+              { node: "2. 部门负责人审批", user: "部门负责人", time: "待审批", content: "审批本部门内部变更使用是否合理，确认责任归属。", status: "待审批" },
               { node: "3. 新使用人确认", user: "新使用人", time: "待确认", content: "确认接收该物资，并承接后续使用责任。", status: "待确认" },
-              { node: "4. 物资管理部门知悉", user: "物资管理部门物资专责", time: "待知悉", content: "知悉变更结果并更新物资台账留痕。", status: "待知悉" },
-              { node: "5. 完成", user: "系统", time: "待完成", content: "变更使用人流程完成。", status: "待完成" }
+              { node: "4. 物资管理部门知悉", user: "物资管理部门物资专责", time: "待知悉", content: "登记变更结果，更新台账留痕。", status: "待知悉" },
+              { node: "5. 完成", user: "系统", time: "待完成", content: "物资使用人信息更新完成。", status: "待完成" }
             ];
         return (
           '<div style="display:flex;flex-direction:column;gap:14px;padding:4px 0 2px">' +
