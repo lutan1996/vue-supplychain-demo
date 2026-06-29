@@ -280,11 +280,24 @@
       salesNav.parentNode.insertBefore(el, salesNav.nextSibling);
     }
 
+    function normalizeRetiredNavLabel() {
+      var items = sidebar.querySelectorAll(".nav-item");
+      for (var i = 0; i < items.length; i++) {
+        var item = items[i];
+        var labelEl = item.querySelector(".nav-label");
+        var text = (labelEl ? labelEl.textContent : item.textContent || "").replace(/\s+/g, "");
+        if (text !== "物资出库与处置") continue;
+        item.setAttribute("title", "退役及废旧管理");
+        if (labelEl) labelEl.textContent = "退役及废旧管理";
+      }
+    }
+
     // 统一左侧主菜单：首页、我的任务 + 一级业务模块（含实物管理）+ 基础数据管理
     (function ensureFullSidebar() {
       if (sidebar.getAttribute("data-demo-sidebar-master-v8") === "1") {
         ensurePhysicalMgmtNavItem();
         ensureInventoryNavItem();
+        normalizeRetiredNavLabel();
         return;
       }
       sidebar.setAttribute("data-demo-sidebar-master-v8", "1");
@@ -298,9 +311,10 @@
         '<div class="nav-item" title="资产管理"><span class="nav-label">资产管理</span></div>' +
         '<div class="nav-item" title="物流管理"><span class="nav-label">物流管理</span></div>' +
         '<div class="nav-item" title="仓储管理"><span class="nav-label">仓储管理</span></div>' +
-        '<div class="nav-item" title="物资出库与处置"><span class="nav-label">物资出库与处置</span></div>' +
+        '<div class="nav-item" title="退役及废旧管理"><span class="nav-label">退役及废旧管理</span></div>' +
         '<div class="nav-item" title="综合业务管理"><span class="nav-label">综合业务管理</span></div>' +
         '<div class="nav-item" title="基础数据管理"><span class="nav-label">基础数据管理</span></div>';
+      normalizeRetiredNavLabel();
     })();
 
     // 统一侧栏图标：补齐与驾驶舱一致的模块图标
@@ -332,7 +346,7 @@
           '<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M1 16h11.5V8.5H5V7h11.5v5h2.5l3.5 4.5"/><circle cx="6.5" cy="17.5" r="1.75"/><circle cx="16.5" cy="17.5" r="1.75"/></svg>',
         '仓储管理':
           '<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M3 21h18V10.5L12 6 3 10.5V21z"/><path d="M9 21v-7h6v7"/></svg>',
-        '物资出库与处置':
+        '退役及废旧管理':
           '<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M21 12a9 9 0 0 0-9-9 9.5 9.5 0 0 0-7 3"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.5 9.5 0 0 0 7-3"/><path d="M16 16h5v5"/></svg>',
         '绩效考核':
           '<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><rect x="6" y="3" width="12" height="18" rx="1.5"/><path d="M9 8h6M9 12h6M9 16h5"/></svg>',
@@ -432,25 +446,16 @@
       retiredPanel = document.createElement('aside');
       retiredPanel.id = 'retiredSecondaryPanel';
       retiredPanel.className = 'warehouse-secondary-panel retired-secondary-panel';
-      retiredPanel.setAttribute('aria-label', '物资出库与处置子菜单');
+      retiredPanel.setAttribute('aria-label', '退役及废旧管理子菜单');
       retiredPanel.setAttribute('aria-hidden', 'true');
       retiredPanel.hidden = true;
       retiredPanel.innerHTML =
         '<div class="warehouse-secondary-inner">' +
         '  <div class="retired-main-block">' +
-        '    <div class="retired-main-title retired-main-title--static">以大代小 &amp;循环再利用</div>' +
-        '    <hr class="retired-sub-divider" />' +
-        '    <div class="warehouse-secondary-row warehouse-secondary-row--pipe retired-sub-pipe retired-sub-row">' +
-        '      <button type="button" class="warehouse-secondary-link" data-action="retired-requisition" data-label="物资领用单">物资领用单</button>' +
-        '      <span class="warehouse-secondary-pipe" aria-hidden="true">|</span>' +
-        '      <button type="button" class="warehouse-secondary-link" data-action="retired-project" data-label="项目管理">项目管理</button>' +
-        '    </div>' +
         '    <div class="warehouse-secondary-row warehouse-secondary-row--pipe retired-sub-pipe retired-sub-row">' +
         '      <button type="button" class="warehouse-secondary-link" data-action="retired-apply-main" data-label="退役及报废申请">退役及报废申请</button>' +
         '      <span class="warehouse-secondary-pipe" aria-hidden="true">|</span>' +
         '      <button type="button" class="warehouse-secondary-link" data-action="retired-big-small-reuse" data-label="以大代小循环再利用">以大代小循环再利用</button>' +
-        '      <span class="warehouse-secondary-pipe" aria-hidden="true">|</span>' +
-        '      <button type="button" class="warehouse-secondary-link" data-action="retired-transfer" data-label="货物转出">货物转出</button>' +
         '    </div>' +
         '  </div>' +
         '</div>';
@@ -648,7 +653,7 @@
           '<button type="button" class="warehouse-secondary-link" data-action="warehouse" data-label="仓库管理">仓库管理</button>'
       },
       retired: {
-        text: '物资出库与处置',
+        text: '退役及废旧管理',
         panel: retiredPanel
       },
       performance: {
