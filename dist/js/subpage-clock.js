@@ -3490,6 +3490,17 @@
         }
         var progressBtn = e.target && e.target.closest ? e.target.closest("[data-map-open-progress='1']") : null;
         if (progressBtn) {
+          var curFileForProgress = "";
+          try {
+            curFileForProgress = ((location.pathname || "").split("/").pop() || "").toLowerCase();
+          } catch (eProgressFile) {}
+          if (
+            curFileForProgress === "retire-scrap-application.html" &&
+            progressBtn.closest &&
+            progressBtn.closest("#viewModalMask, #planDetailMask")
+          ) {
+            return;
+          }
           e.preventDefault();
           e.stopPropagation();
           if (typeof window.openUnifiedProgressModal === "function") {

@@ -1333,12 +1333,18 @@
       refs.progressModalMask.addEventListener("click", function (e) {
         if (e.target === refs.progressModalMask) closeProgressModal();
       });
-      refs.btnOpenProgress.addEventListener("click", function () {
+      refs.btnOpenProgress.addEventListener("click", function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        if (e.stopImmediatePropagation) e.stopImmediatePropagation();
         if (!activeViewItem) return;
         openProgressModal(activeViewItem, "apply");
       });
       if (refs.btnOpenPlanProgress) {
-        refs.btnOpenPlanProgress.addEventListener("click", function () {
+        refs.btnOpenPlanProgress.addEventListener("click", function (e) {
+          e.preventDefault();
+          e.stopPropagation();
+          if (e.stopImmediatePropagation) e.stopImmediatePropagation();
           if (!activePlanItem) return;
           openProgressModal(activePlanItem, "plan");
         });
