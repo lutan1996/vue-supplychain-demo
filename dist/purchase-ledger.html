@@ -2264,6 +2264,7 @@
           if (approvalPanel) approvalPanel.style.display = isFlow ? "none" : "";
         });
       }
+      window.openReqProgressModal = openReqProgressModal;
       function openReqUserChangeModal(productName, productCode) {
         removeReqFloatingModal("reqUserChangeModalMask");
         var maskHtml =

@@ -2137,6 +2137,13 @@
 
   function openUnifiedProgressModalGlobal() {
     try {
+      if (
+        window.__inventoryTodoCurrentMap &&
+        typeof window.openInventoryTodoProgress === "function"
+      ) {
+        window.openInventoryTodoProgress(window.__inventoryTodoCurrentMap);
+        return true;
+      }
       var mask = ensureUnifiedProgressModal();
       if (!mask) return false;
       patchProgressModalForPage(mask);
@@ -2164,6 +2171,19 @@
           act === "progresss";
         if (!isProgress) return;
         if (t.id === "salesCartFlowBtn" || (t.closest && t.closest("#salesModalMask"))) return;
+        if (t.id === "procModalFlow" && typeof window.openInventoryTodoProgress === "function" && window.__inventoryTodoCurrentMap) {
+          e.preventDefault();
+          e.stopPropagation();
+          window.openInventoryTodoProgress(window.__inventoryTodoCurrentMap);
+          return;
+        }
+        var reqProgressType = t.getAttribute("data-open-req-progress");
+        if (reqProgressType && typeof window.openReqProgressModal === "function") {
+          e.preventDefault();
+          e.stopPropagation();
+          window.openReqProgressModal(reqProgressType);
+          return;
+        }
         e.preventDefault();
         e.stopPropagation();
         var mask = ensureUnifiedProgressModal();
