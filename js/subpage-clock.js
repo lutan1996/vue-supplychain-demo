@@ -423,7 +423,8 @@
         '.retired-sub-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}' +
         '.retired-sub-row .warehouse-secondary-link{font-size:13px;font-weight:400;line-height:1.5;}' +
         '.retired-sub-row .warehouse-secondary-pipe{opacity:.55;}' +
-        '.retired-sub-row + .retired-sub-row{margin-top:6px;}';
+        '.retired-sub-row + .retired-sub-row{margin-top:6px;}' +
+        '.warehouse-secondary-sep{display:none!important;}';
       document.head.appendChild(style);
     }
 
@@ -617,8 +618,12 @@
       },
       projCompanyInbound: {
         text: '项目公司入库',
-        directAction: 'proj-company-inbound',
-        aclModuleKey: 'purchaseMgmt'
+        panel: secondaryPanel,
+        aclModuleKey: 'purchaseMgmt',
+        rowHtml:
+          '<button type="button" class="warehouse-secondary-link" data-action="proj-company-inbound" data-label="项目公司入库">项目公司入库</button>' +
+          '<span class="warehouse-secondary-pipe" aria-hidden="true">|</span>' +
+          '<button type="button" class="warehouse-secondary-link" data-action="proj-company-inventory" data-label="项目公司库存管理">项目公司库存管理</button>'
       },
       physicalMgmt: {
         text: '实物管理',
