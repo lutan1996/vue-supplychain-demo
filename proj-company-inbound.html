@@ -47,7 +47,7 @@
     }
     #inboundMask.show { display: flex; }
     #inboundMask .modal {
-      width: min(980px, 94vw);
+      width: min(1080px, 94vw);
       max-height: 88vh;
       background: #fff;
       border-radius: 10px;
@@ -56,8 +56,52 @@
       display: flex;
       flex-direction: column;
     }
-    #inboundMask .modal-hd {
-      padding: 12px 16px;
+    #inboundMask .modal-body {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+      min-height: 0;
+    }
+    #inboundMask .modal-sidebar {
+      width: 200px;
+      flex-shrink: 0;
+      background: #f0f4ff;
+      border-right: 1px solid #e8effe;
+      padding: 16px 0;
+    }
+    .modal-sidebar-title {
+      font-size: 13px;
+      color: #64748b;
+      font-weight: 600;
+      padding: 0 16px 10px;
+      border-bottom: 1px solid #e8effe;
+      margin-bottom: 8px;
+    }
+    .modal-sidebar-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 16px;
+      font-size: 13px;
+      color: #1f2d3d;
+      cursor: pointer;
+      border-left: 3px solid transparent;
+      transition: all 0.15s;
+    }
+    .modal-sidebar-item:hover { background: #e6f0ff; color: #1677ff; }
+    .modal-sidebar-item.active {
+      background: #e6f0ff;
+      color: #1677ff;
+      border-left-color: #1677ff;
+      font-weight: 600;
+    }
+    #inboundMask .modal-content {
+      flex: 1;
+      overflow: auto;
+      min-width: 0;
+    }
+    #inboundMask .modal-content-hd {
+      padding: 10px 16px;
       border-bottom: 1px solid #edf2f8;
       display: flex;
       align-items: center;
@@ -65,13 +109,8 @@
       font-weight: 600;
       color: #1f3551;
     }
-    #inboundMask .modal-bd {
-      padding: 14px 16px;
-      overflow: auto;
-      max-height: calc(88vh - 104px);
-      font-size: 13px;
-      line-height: 1.6;
-    }
+    #inboundMask .modal-bd { padding: 14px 16px; font-size: 13px; line-height: 1.6; }
+    #inboundMask .modal-content-bd { padding: 14px 16px; font-size: 13px; line-height: 1.6; }
     #inboundMask .modal-ft {
       padding: 10px 16px;
       border-top: 1px solid #edf2f8;
@@ -168,8 +207,18 @@
   </div>
   <div class="modal-mask" id="inboundMask" aria-hidden="true">
     <div class="modal">
-      <div class="modal-hd"><span id="inboundTitle">新增项目公司入库</span><button class="x-btn" id="inboundX" aria-label="关闭">×</button></div>
-      <div class="modal-bd" id="inboundBody"></div>
+      <div class="modal-hd"><button class="x-btn" id="inboundX" aria-label="关闭">×</button></div>
+      <div class="modal-body" id="inboundBody">
+        <div class="modal-sidebar">
+          <div class="modal-sidebar-title">功能模块</div>
+          <div class="modal-sidebar-item active" data-tab="inbound">项目公司入库</div>
+          <div class="modal-sidebar-item" data-tab="inventory">项目公司库存管理</div>
+        </div>
+        <div class="modal-content">
+          <div class="modal-content-hd"><span id="inboundTitle">项目公司入库</span></div>
+          <div class="modal-content-bd" id="inboundContent"></div>
+        </div>
+      </div>
       <div class="modal-ft">
         <button class="btn" id="inboundCancel">取消</button>
         <button class="btn primary" id="inboundSave">保存</button>
@@ -231,33 +280,108 @@
           "</div>"
         );
       }
+      var invRows = [
+        { no: "IN-2026-001", mat: "风力发电机叶片", spec: "B-1200型", unit: "片", qty: 120, avail: 95, allot: 25, wh: "华东仓", dept: "工程部", upd: "2026-04-20" },
+        { no: "IN-2026-002", mat: "光伏逆变器", spec: "500kW", unit: "台", qty: 48, avail: 48, allot: 0, wh: "华北仓", dept: "物资部", upd: "2026-04-21" },
+        { no: "IN-2026-003", mat: "电缆", spec: "YJV-3×240", unit: "米", qty: 5000, avail: 4200, allot: 800, wh: "华东仓", dept: "财务部", upd: "2026-04-22" }
+      ];
+      while (invRows.length < 10) {
+        var j = invRows.length + 1;
+        invRows.push({
+          no: "IN-2026-" + String(100 + j),
+          mat: ["塔筒", "主轴", "轮毂", "变压器", "开关柜", "支架", "电池组件"][j % 7],
+          spec: ["S-800", "M-1500", "T-2200", "P-1000", "C-3500"][j % 5] + "型",
+          unit: ["台", "套", "米", "片", "个"][j % 5],
+          qty: 50 + j * 15,
+          avail: 40 + j * 12,
+          allot: 10 + j * 3,
+          wh: ["华东仓", "华北仓", "华南仓", "西部仓"][j % 4],
+          dept: ["工程部", "物资部", "财务部", "经营发展中心"][j % 4],
+          upd: "2026-05-" + String(10 + (j % 18)).padStart(2, "0")
+        });
+      }
+
+      var currentTab = "inbound";
       var formMode = "add";
       var formRefNo = "";
-      function deleteHtml(row) {
-        var d = row || {};
+
+      function switchTab(tab) {
+        currentTab = tab;
+        document.querySelectorAll(".modal-sidebar-item").forEach(function (el) {
+          el.classList.toggle("active", el.getAttribute("data-tab") === tab);
+        });
+        var titleEl = document.getElementById("inboundTitle");
+        var saveBtn = document.getElementById("inboundSave");
+        if (tab === "inbound") {
+          titleEl.textContent = "项目公司入库";
+          saveBtn.style.display = "";
+        } else {
+          titleEl.textContent = "项目公司库存管理";
+          saveBtn.style.display = "";
+        }
+      }
+
+      function byInvNo(no) {
+        for (var i = 0; i < invRows.length; i++) if (invRows[i].no === no) return invRows[i];
+        return null;
+      }
+
+      function invOps() { return '<a href="#" data-op="inv-view">查看</a>'; }
+
+      function invFormHtml(data, readonly) {
+        var d = data || { no: "", mat: "", spec: "", unit: "台", qty: "", avail: "", allot: "", wh: "", dept: "" };
+        var ro = readonly ? " readonly " : "";
+        var dis = readonly ? " disabled " : "";
+        var bg = readonly ? "background:#f5f5f5;" : "";
+        function opt(v, cur) { return "<option" + (v === cur ? " selected" : "") + ">" + v + "</option>"; }
         return (
-          '<div style="font-size:14px;line-height:1.9;color:#1f2d3d;padding:8px 2px">' +
-          "<div>是否确认删除该条数据？</div>" +
-          "<div style='margin-top:10px;color:#64748b;font-size:13px'>入库单号：" + esc(d.no || "—") + "</div>" +
-          "<div style='color:#64748b;font-size:13px'>采购订单号：" + esc(d.po || "—") + "</div>" +
-          "<div style='color:#64748b;font-size:13px'>供应商：" + esc(d.supplier || "—") + "</div>" +
+          '<div style="display:grid;grid-template-columns:130px 1fr;gap:10px 12px;font-size:13px;">' +
+          "<label>库存编号</label><input class='carrier-search' id='fInvNo' value='" + esc(d.no) + "' " + ro + " style='" + bg + "min-width:0'>" +
+          "<label>物料名称</label><input class='carrier-search' id='fMat' value='" + esc(d.mat) + "' " + ro + " style='" + bg + "min-width:0'>" +
+          "<label>规格型号</label><input class='carrier-search' id='fSpec' value='" + esc(d.spec) + "' " + ro + " style='" + bg + "min-width:0'>" +
+          "<label>计量单位</label><select class='carrier-select' id='fUnit' " + dis + " style='" + bg + "min-width:0'>" + opt("台", d.unit) + opt("套", d.unit) + opt("片", d.unit) + opt("米", d.unit) + opt("个", d.unit) + opt("批", d.unit) + "</select>" +
+          "<label>总数量</label><input type='number' class='carrier-search' id='fQty' value='" + esc(d.qty) + "' " + ro + " style='" + bg + "min-width:0'>" +
+          "<label>可用库存</label><input type='number' class='carrier-search' id='fAvail' value='" + esc(d.avail) + "' " + ro + " style='" + bg + "min-width:0'>" +
+          "<label>已调拨</label><input type='number' class='carrier-search' id='fAllot' value='" + esc(d.allot) + "' " + ro + " style='" + bg + "min-width:0'>" +
+          "<label>所在仓库</label><select class='carrier-select' id='fWh' " + dis + " style='" + bg + "min-width:0'>" + opt("华东仓", d.wh) + opt("华北仓", d.wh) + opt("华南仓", d.wh) + opt("西部仓", d.wh) + "</select>" +
+          "<label>关联部门</label><select class='carrier-select' id='fDept2' " + dis + " style='" + bg + "min-width:0'>" + opt("工程部", d.dept) + opt("物资部", d.dept) + opt("财务部", d.dept) + opt("经营发展中心", d.dept) + "</select>" +
           "</div>"
         );
       }
-      function openForm(mode, row) {
+
+      function deleteRowHtml(row, label) {
+        return (
+          '<div style="font-size:14px;line-height:1.9;color:#1f2d3d;padding:8px 2px">' +
+          "<div>是否确认删除该条数据？</div>" +
+          "<div style='margin-top:10px;color:#64748b;font-size:13px'>" + esc(label) + "：" + esc(row.no || "—") + "</div>" +
+          "</div>"
+        );
+      }
+
+      function openForm(mode, row, tab) {
+        tab = tab || currentTab;
         formMode = mode;
-        formRefNo = row && row.no ? row.no : "";
+        formRefNo = (row && row.no) ? row.no : "";
+        var titleEl = document.getElementById("inboundTitle");
+        var contentEl = document.getElementById("inboundContent");
         var saveBtn = document.getElementById("inboundSave");
         if (mode === "delete") {
-          document.getElementById("inboundTitle").textContent = "删除项目公司入库";
-          document.getElementById("inboundBody").innerHTML = deleteHtml(row);
-          saveBtn.style.display = "";
+          titleEl.textContent = tab === "inbound" ? "删除项目公司入库" : "删除项目公司库存";
+          contentEl.innerHTML = deleteRowHtml(row, tab === "inbound" ? "入库单号" : "库存编号");
           saveBtn.textContent = "确认删除";
           saveBtn.classList.add("danger");
           saveBtn.classList.remove("primary");
+          saveBtn.style.display = "";
+        } else if (tab === "inbound") {
+          titleEl.textContent = mode === "edit" ? "编辑项目公司入库" : (mode === "view" ? "查看项目公司入库" : "新增项目公司入库");
+          contentEl.innerHTML = formHtml(row, mode === "view");
+          saveBtn.textContent = "保存";
+          saveBtn.classList.remove("danger");
+          saveBtn.classList.add("primary");
+          saveBtn.style.display = mode === "view" ? "none" : "";
         } else {
-          document.getElementById("inboundTitle").textContent = mode === "edit" ? "编辑项目公司入库" : (mode === "view" ? "查看项目公司入库" : "新增项目公司入库");
-          document.getElementById("inboundBody").innerHTML = formHtml(row, mode === "view");
+          titleEl.textContent = mode === "edit" ? "编辑项目公司库存" : (mode === "view" ? "查看项目公司库存" : "新增项目公司库存");
+          contentEl.innerHTML = invFormHtml(row, mode === "view");
           saveBtn.textContent = "保存";
           saveBtn.classList.remove("danger");
           saveBtn.classList.add("primary");
@@ -267,41 +391,22 @@
         mask.classList.add("show");
         mask.setAttribute("aria-hidden", "false");
       }
+
       function closeForm() {
         var mask = document.getElementById("inboundMask");
         mask.classList.remove("show");
         mask.setAttribute("aria-hidden", "true");
       }
-      function updateMetrics(list) {
-        document.getElementById("mTotal").textContent = String(list.length);
-        document.getElementById("mPending").textContent = String(list.filter(function (x) { return x.st === "待入库"; }).length);
-        document.getElementById("mReview").textContent = String(list.filter(function (x) { return x.st === "待确认"; }).length);
-        document.getElementById("mDone").textContent = String(list.filter(function (x) { return x.st === "已确认"; }).length);
-      }
-      function render() {
-        var n = document.getElementById("qNo").value.trim();
-        var s = document.getElementById("qSupplier").value.trim();
-        var st = document.getElementById("qStatus").value.trim();
-        var list = rows.filter(function (r) {
-          if (n && r.no.indexOf(n) < 0) return false;
-          if (s && r.supplier.indexOf(s) < 0) return false;
-          if (st && r.st !== st) return false;
-          return true;
-        });
-        updateMetrics(list);
-        document.getElementById("tb").innerHTML = list.map(function (r) {
-          return "<tr data-no='" + esc(r.no) + "'>" +
-            "<td><input type='checkbox' class='row-chk' data-no='" + esc(r.no) + "'></td>" +
-            "<td>" + esc(r.no) + "</td><td>" + esc(r.po) + "</td><td>" + esc(r.supplier) + "</td><td>" + esc(r.date) + "</td>" +
-            "<td><span class='status-pill status-pass'>" + esc(r.qa) + "</span></td><td><span class='status-pill " + statusClass(r.st) + "'>" + esc(r.st) + "</span></td><td>" + esc(r.dept) + "</td>" +
-            "<td class='map-op-cell'>" + ops(r.st) + "</td></tr>";
-        }).join("");
-      }
 
       document.addEventListener("click", function (e) {
+        var sidebarItem = e.target.closest(".modal-sidebar-item");
+        if (sidebarItem) {
+          switchTab(sidebarItem.getAttribute("data-tab"));
+          return;
+        }
         if (e.target.id === "btnSearch") { render(); return; }
         if (e.target.id === "btnReset") { document.getElementById("qNo").value = ""; document.getElementById("qSupplier").value = ""; document.getElementById("qStatus").value = ""; render(); return; }
-        if (e.target.id === "btnAdd") { openForm("add"); return; }
+        if (e.target.id === "btnAdd") { openForm("add", null, "inbound"); return; }
         if (e.target.id === "btnImport") { alert("导入弹窗（演示）"); return; }
         if (e.target.id === "btnTpl") { alert("下载模板（演示）"); return; }
         if (e.target.id === "btnExport") { alert("导出（演示）"); return; }
@@ -315,10 +420,15 @@
         if (!op) return;
         e.preventDefault();
         var tr = e.target.closest("tr[data-no]");
+        if (op === "inv-view") {
+          var invRow = tr ? byInvNo(tr.getAttribute("data-no")) : null;
+          openForm("view", invRow, "inventory");
+          return;
+        }
         var row = tr ? byNo(tr.getAttribute("data-no")) : null;
-        if (op === "view") openForm("view", row);
-        if (op === "edit") openForm("edit", row);
-        if (op === "delete") openForm("delete", row);
+        if (op === "view") openForm("view", row, "inbound");
+        if (op === "edit") openForm("edit", row, "inbound");
+        if (op === "delete") openForm("delete", row, "inbound");
       });
       document.getElementById("inboundX").addEventListener("click", closeForm);
       document.getElementById("inboundCancel").addEventListener("click", closeForm);
@@ -326,40 +436,62 @@
         if (e.target === this) closeForm();
       });
       document.getElementById("inboundSave").addEventListener("click", function () {
-        var no = (document.getElementById("fNo").value || "").trim() || ("PI-2026-" + String(Math.floor(Math.random() * 900 + 100)));
-        if (formMode === "delete" && formRefNo) {
-          rows = rows.filter(function (x) { return x.no !== formRefNo; });
-          closeForm();
-          render();
-          return;
-        }
-        var row = {
-          no: no,
-          po: (document.getElementById("fPo").value || "").trim(),
-          supplier: (document.getElementById("fSupplier").value || "").trim(),
-          date: (document.getElementById("fDate").value || "").trim(),
-          qa: (document.getElementById("fQa").value || "已通过").trim(),
-          st: (document.getElementById("fSt").value || "草稿").trim(),
-          dept: (document.getElementById("fDept").value || "").trim()
-        };
-        if (formMode === "edit" && formRefNo) {
-          var old = byNo(formRefNo);
-          if (old) {
-            old.no = row.no; old.po = row.po; old.supplier = row.supplier; old.date = row.date; old.qa = row.qa; old.st = row.st; old.dept = row.dept;
+        if (currentTab === "inbound") {
+          if (formMode === "delete" && formRefNo) {
+            rows = rows.filter(function (x) { return x.no !== formRefNo; });
+            closeForm();
+            render();
+            return;
           }
+          var no = (document.getElementById("fNo").value || "").trim() || ("PI-2026-" + String(Math.floor(Math.random() * 900 + 100)));
+          var row = {
+            no: no,
+            po: (document.getElementById("fPo").value || "").trim(),
+            supplier: (document.getElementById("fSupplier").value || "").trim(),
+            date: (document.getElementById("fDate").value || "").trim(),
+            qa: (document.getElementById("fQa").value || "已通过").trim(),
+            st: (document.getElementById("fSt").value || "草稿").trim(),
+            dept: (document.getElementById("fDept").value || "").trim()
+          };
+          if (formMode === "edit" && formRefNo) {
+            var old = byNo(formRefNo);
+            if (old) { old.no = row.no; old.po = row.po; old.supplier = row.supplier; old.date = row.date; old.qa = row.qa; old.st = row.st; old.dept = row.dept; }
+          } else { rows.unshift(row); }
         } else {
-          rows.unshift(row);
+          if (formMode === "delete" && formRefNo) {
+            invRows = invRows.filter(function (x) { return x.no !== formRefNo; });
+            closeForm();
+            render();
+            return;
+          }
+          var invNo = (document.getElementById("fInvNo").value || "").trim() || ("IN-2026-" + String(Math.floor(Math.random() * 900 + 100)));
+          var inv = {
+            no: invNo,
+            mat: (document.getElementById("fMat").value || "").trim(),
+            spec: (document.getElementById("fSpec").value || "").trim(),
+            unit: (document.getElementById("fUnit").value || "台").trim(),
+            qty: parseFloat(document.getElementById("fQty").value) || 0,
+            avail: parseFloat(document.getElementById("fAvail").value) || 0,
+            allot: parseFloat(document.getElementById("fAllot").value) || 0,
+            wh: (document.getElementById("fWh").value || "").trim(),
+            dept: (document.getElementById("fDept2").value || "").trim(),
+            upd: new Date().toISOString().slice(0, 10)
+          };
+          if (formMode === "edit" && formRefNo) {
+            var oldInv = byInvNo(formRefNo);
+            if (oldInv) { for (var k in inv) oldInv[k] = inv[k]; }
+          } else { invRows.unshift(inv); }
         }
         closeForm();
         render();
       });
+
       function initTabFromQuery() {
         try {
           var params = new URLSearchParams(window.location.search || "");
           var tab = (params.get("tab") || "").trim();
-          var pageSub = (params.get("pageSub") || "").trim();
-          if (tab === "stock" || pageSub === "项目公司库存管理") {
-            switchTab("stock");
+          if (tab === "inventory") {
+            switchTab("inventory");
           } else {
             switchTab("inbound");
           }
@@ -367,7 +499,6 @@
           switchTab("inbound");
         }
       }
-
       initTabFromQuery();
       render();
     })();
