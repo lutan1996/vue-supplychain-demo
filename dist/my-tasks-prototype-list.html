@@ -690,33 +690,28 @@
     .inventory-progress-company-merge { display: flex; flex-direction: column; gap: 32px; }
     .inventory-progress-company-merge span { color: #8aa0b8; font-size: 30px; line-height: 1; text-align: center; }
     .inventory-progress-step {
-      flex: 0 0 148px;
-      min-height: 74px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 12px;
-      border: 1px solid #bfe8c8;
-      border-radius: 8px;
+      border-color: #bfe8c8;
       background: #f0fff3;
       color: #37674a;
-      text-align: center;
-      line-height: 1.45;
-      font-size: 14px;
-      font-weight: 600;
-      box-sizing: border-box;
-      white-space: normal;
     }
     .inventory-progress-step.is-current {
-      border-color: #91caff;
-      background: #e6f4ff;
-      color: #1f3551;
+      border-color: #f6c86f;
+      background: #fff7e6;
+      color: #8a5a00;
+    }
+    .inventory-progress-step.is-pending,
+    .inventory-progress-step.is-future {
+      border-color: #dde3ed;
+      background: #f4f6fa;
+      color: #8898b2;
     }
     .inventory-progress-step.is-end {
-      border-color: #ffd591;
+      border-color: #f6c86f;
       background: #fff7e6;
       color: #8a5a00;
       min-height: 42px;
+      font-size: 13px;
+    }
     }
     .inventory-progress-arrow {
       flex: 0 0 auto;

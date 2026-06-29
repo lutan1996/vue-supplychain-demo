@@ -1547,7 +1547,9 @@
       ".map-flow-track{border:1px solid #f0f2f5;border-radius:8px;padding:22px 18px;overflow:visible;}" +
       ".map-flow-row{display:grid;grid-template-columns:repeat(11,1fr);align-items:stretch;gap:6px;}" +
       ".map-flow-node{min-width:0;max-width:none;padding:8px 8px;border-radius:10px;border:1px solid #cfe8cf;background:#edf8ed;color:#315c35;font-size:11.5px;line-height:1.3;text-align:center;white-space:normal;display:flex;align-items:center;justify-content:center;word-break:break-word;grid-column:span 1;}" +
-      ".map-flow-node.end{background:#fff8e6;border-color:#f0dca8;color:#7a5a14;}" +
+      ".map-flow-node.end{background:#fff7e6;border-color:#f6c86f;color:#8a5a00;}" +
+      ".map-flow-node.is-pending{background:#fff7e6;border-color:#f6c86f;color:#8a5a00;}" +
+      ".map-flow-node.is-future{background:#f4f6fa;border-color:#dde3ed;color:#8898b2;}" +
       "/* map-flow-bust:20260615-v4 */" +
       ".map-flow-dot{width:10px;height:10px;border-radius:999px;border:1px solid #7bc67b;background:#ddf5dd;flex:none;}" +
       ".map-flow-dot.end{border-color:#e89292;background:#ffe8e8;}" +
