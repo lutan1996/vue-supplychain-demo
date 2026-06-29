@@ -706,12 +706,8 @@
       color: #8898b2;
     }
     .inventory-progress-step.is-end {
-      border-color: #f6c86f;
-      background: #fff7e6;
-      color: #8a5a00;
       min-height: 42px;
       font-size: 13px;
-    }
     }
     .inventory-progress-arrow {
       flex: 0 0 auto;
@@ -1695,6 +1691,9 @@
         return "dept";
       }
       function openInventoryTodoProgress(map) {
+        map = map || window.__inventoryTodoCurrentMap || window.__inventoryTodoLastMap || {};
+        window.__inventoryTodoCurrentMap = map;
+        window.__inventoryTodoLastMap = map;
         var isCompany = inventoryTodoProgressType(map) === "company";
         var title = isCompany ? "审批记录 - 公司盘点" : "审批记录 - 部门盘点";
         var approvals = inventoryTodoProgressApprovals(map || {}, isCompany);
@@ -1703,9 +1702,14 @@
         approvals.forEach(function (step, idx) {
           if (step.result === "处理中" && currentStepIndex < 0) currentStepIndex = idx;
         });
+        approvals.forEach(function (step, idx) {
+          if (step.result === "待处理" && currentStepIndex < 0) currentStepIndex = idx;
+        });
+        if (currentStepIndex < 0) currentStepIndex = isCompany ? 8 : 5;
         function progressStep(text, idx, isEnd, skipBeforeArrow) {
           var cls = "";
           if (idx === currentStepIndex) cls += " is-current";
+          else if (currentStepIndex >= 0 && idx > currentStepIndex) cls += " is-future";
           if (isEnd) cls += " is-end";
           var beforeArrow = (skipBeforeArrow || idx === 0) ? "" : '<div class="inventory-progress-arrow">→</div>';
           var afterArrow = isEnd ? "" : '<div class="inventory-progress-arrow">→</div>';
@@ -1924,7 +1928,7 @@
           flowBtn.hidden = false;
           flowBtn.setAttribute("aria-hidden", "false");
           flowBtn.onclick = function () {
-            if (inventoryTodoRows._currentMap) openInventoryTodoProgress(inventoryTodoRows._currentMap);
+            openInventoryTodoProgress(inventoryTodoRows._currentMap || window.__inventoryTodoLastMap || {});
           };
         }
         var resetClose = mt$("procModalClose");
@@ -1985,6 +1989,7 @@
         if (!mask) return;
         inventoryTodoRows._currentMap = map;
         window.__inventoryTodoCurrentMap = map;
+        window.__inventoryTodoLastMap = map;
         inventoryTodoRows._detailType = "";
         inventoryTodoRows._name = "";
         inventoryTodoRows._summaryConfirm = inventoryTodoRows._summaryConfirm || {};

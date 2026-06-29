@@ -1557,14 +1557,17 @@
       ".map-flow-track{border:1px solid #f0f2f5;border-radius:8px;padding:22px 18px;overflow:visible;}" +
       ".map-flow-row{display:grid;grid-template-columns:repeat(11,1fr);align-items:stretch;gap:6px;}" +
       ".map-flow-node{min-width:0;max-width:none;padding:8px 8px;border-radius:10px;border:1px solid #cfe8cf;background:#edf8ed;color:#315c35;font-size:11.5px;line-height:1.3;text-align:center;white-space:normal;display:flex;align-items:center;justify-content:center;word-break:break-word;grid-column:span 1;}" +
-      ".map-flow-node.end{background:#fff7e6;border-color:#f6c86f;color:#8a5a00;}" +
-      ".map-flow-node.is-pending{background:#fff7e6;border-color:#f6c86f;color:#8a5a00;}" +
+      ".map-flow-node.end{min-height:42px;font-size:11.5px;}" +
+      ".map-flow-node.is-current,.map-flow-node.is-pending{background:#fff7e6;border-color:#f6c86f;color:#8a5a00;}" +
       ".map-flow-node.is-future{background:#f4f6fa;border-color:#dde3ed;color:#8898b2;}" +
       "/* map-flow-bust:20260615-v4 */" +
       ".map-flow-dot{width:10px;height:10px;border-radius:999px;border:1px solid #7bc67b;background:#ddf5dd;flex:none;}" +
       ".map-flow-dot.end{border-color:#e89292;background:#ffe8e8;}" +
       ".map-flow-arrow{color:#8ca0b3;font-size:16px;line-height:1;display:inline-flex;align-items:center;justify-content:center;flex:none;padding:0 2px;}" +
       ".map-flow-info{font-size:13px;color:#4f647a;line-height:1.9;}" +
+      ".map-flow-info-table{width:100%;border-collapse:collapse;font-size:13px;color:#34495e;}" +
+      ".map-flow-info-table th,.map-flow-info-table td{border:1px solid #e8edf3;padding:10px 12px;text-align:left;vertical-align:top;line-height:1.6;}" +
+      ".map-flow-info-table th{background:#f5f7fa;color:#1f2d3d;font-weight:700;}" +
       ".map-flow-ft{padding:10px 16px;border-top:1px solid #edf2f8;display:flex;justify-content:flex-end;}" +
       ".map-flow-ft button{height:32px;padding:0 16px;border:1px solid #d9d9d9;border-radius:6px;background:#fff;color:#3a4a5a;cursor:pointer;}" +
       ".map-approval-status-pill{display:inline-flex!important;align-items:center;justify-content:center;min-width:0!important;height:auto!important;padding:2px 8px!important;border-radius:999px!important;border:1px solid #d9d9d9;background:#fff;font-size:12px!important;font-weight:500!important;line-height:1.25!important;box-sizing:border-box;white-space:nowrap;vertical-align:middle;}" +
@@ -1985,6 +1988,33 @@
   function ensureUnifiedProgressModal() {
     var existing = document.getElementById("mapUnifiedProgressModal");
     if (existing) return existing;
+    function esc(v) {
+      return String(v == null ? "" : v).replace(/[&<>"']/g, function (s) {
+        return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[s];
+      });
+    }
+    function node(text, idx, currentIdx, isEnd) {
+      var cls = "map-flow-node";
+      if (idx === currentIdx) cls += " is-current";
+      else if (currentIdx >= 0 && idx > currentIdx) cls += " is-future";
+      if (isEnd) cls += " end";
+      return '<span class="' + cls + '">' + esc(text) + "</span>";
+    }
+    function row(steps, currentIdx) {
+      var html = '<div class="map-flow-row" style="grid-template-columns:repeat(' + (steps.length * 2 - 1) + ',1fr)">';
+      steps.forEach(function (text, idx) {
+        if (idx > 0) html += '<span class="map-flow-arrow">→</span>';
+        html += node(text, idx, currentIdx, idx === steps.length - 1);
+      });
+      return html + "</div>";
+    }
+    function table(rows) {
+      return '<table class="map-flow-info-table"><thead><tr><th>办理人</th><th>办理时间</th><th>办理内容</th><th>办理结果</th></tr></thead><tbody>' +
+        rows.map(function (item) {
+          return "<tr><td>" + esc(item.person) + "</td><td>" + esc(item.time) + "</td><td>" + esc(item.content) + "</td><td>" + esc(item.result) + "</td></tr>";
+        }).join("") +
+        "</tbody></table>";
+    }
     var mask = document.createElement("div");
     mask.id = "mapUnifiedProgressModal";
     mask.className = "map-flow-mask";
@@ -1998,23 +2028,18 @@
       '    </div>' +
       '    <div class="map-flow-pane is-active" data-pane="flow">' +
       '      <div class="map-flow-track">' +
-      '        <div class="map-flow-row">' +
-      '          <span class="map-flow-dot"></span><span class="map-flow-node">业务部门物资负责人录入设备清单，提交申请入库</span><span class="map-flow-arrow">→</span>' +
-      '          <span class="map-flow-node">业务部门负责人审批，同意入库</span><span class="map-flow-arrow">→</span>' +
-      '          <span class="map-flow-node">物资管理部门物资负责人审核分类</span><span class="map-flow-arrow">→</span>' +
-      '          <span class="map-flow-node">分管领导部门负责人审批，同意</span><span class="map-flow-arrow">→</span>' +
-      '          <span class="map-flow-node">部门领导审批，审批通过</span><span class="map-flow-arrow">→</span>' +
-      '          <span class="map-flow-node end">结束</span><span class="map-flow-dot end"></span>' +
-      "        </div>" +
+      row(["发起流程", "部门负责人审批", "物资管理部门审核", "分管负责人审批", "流程归档", "结束"], 4) +
       "      </div>" +
       "    </div>" +
       '    <div class="map-flow-pane" data-pane="info">' +
       '      <div class="map-flow-info">' +
-      "        <div>1、电控所物资专责成明锴录入设备清单，提交申请入库（2026-03-20 09:12）（附件：风机采购合同）</div>" +
-      "        <div>2、电控所负责人陈亮审批：已审批，同意入库（2026-03-20 10:03）</div>" +
-      "        <div>3、物资管理部门物资专责宋中波审核分类：已审核（2026-03-20 10:28）</div>" +
-      "        <div>4、物资管理部门负责人王超审批：已审批，同意（2026-03-20 10:48）</div>" +
-      "        <div>5、结束（—）</div>" +
+      table([
+        { person: "发起人", time: "—", content: "提交流程申请。", result: "已提交" },
+        { person: "部门负责人", time: "—", content: "完成部门审批。", result: "已通过" },
+        { person: "物资管理部门", time: "—", content: "完成业务审核。", result: "已通过" },
+        { person: "分管负责人", time: "—", content: "完成最终审批。", result: "处理中" },
+        { person: "系统", time: "—", content: "流程归档。", result: "待处理" }
+      ]) +
       "      </div>" +
       "    </div>" +
       "  </div>" +
@@ -2217,11 +2242,9 @@
 
   function openUnifiedProgressModalGlobal() {
     try {
-      if (
-        window.__inventoryTodoCurrentMap &&
-        typeof window.openInventoryTodoProgress === "function"
-      ) {
-        window.openInventoryTodoProgress(window.__inventoryTodoCurrentMap);
+      var todoMap = window.__inventoryTodoCurrentMap || window.__inventoryTodoLastMap;
+      if (todoMap && typeof window.openInventoryTodoProgress === "function") {
+        window.openInventoryTodoProgress(todoMap);
         return true;
       }
       var mask = ensureUnifiedProgressModal();
@@ -2251,10 +2274,10 @@
           act === "progresss";
         if (!isProgress) return;
         if (t.id === "salesCartFlowBtn" || (t.closest && t.closest("#salesModalMask"))) return;
-        if (t.id === "procModalFlow" && typeof window.openInventoryTodoProgress === "function" && window.__inventoryTodoCurrentMap) {
+        if (t.id === "procModalFlow" && typeof window.openInventoryTodoProgress === "function") {
           e.preventDefault();
           e.stopPropagation();
-          window.openInventoryTodoProgress(window.__inventoryTodoCurrentMap);
+          window.openInventoryTodoProgress(window.__inventoryTodoCurrentMap || window.__inventoryTodoLastMap || {});
           return;
         }
         var reqProgressType = t.getAttribute("data-open-req-progress");
