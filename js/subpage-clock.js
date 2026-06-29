@@ -292,11 +292,34 @@
       }
     }
 
+    function ensureProjCompanyInboundNavItem() {
+      var items = sidebar.querySelectorAll(".nav-item");
+      for (var i = 0; i < items.length; i++) {
+        var labelEl = items[i].querySelector(".nav-label");
+        var t = (labelEl ? labelEl.textContent : items[i].textContent || "").replace(/\s+/g, "");
+        if (t === "项目公司入库") return;
+      }
+      var purchaseNav = null;
+      for (var j = 0; j < items.length; j++) {
+        var lbl = items[j].querySelector(".nav-label");
+        var txt = (lbl ? lbl.textContent : items[j].textContent || "").replace(/\s+/g, "");
+        if (txt === "物资采购") { purchaseNav = items[j]; break; }
+      }
+      if (!purchaseNav) return;
+      var next = purchaseNav.nextSibling;
+      var el = document.createElement("div");
+      el.className = "nav-item";
+      el.setAttribute("title", "项目公司入库");
+      el.innerHTML = '<span class="nav-label">项目公司入库</span>';
+      sidebar.insertBefore(el, next);
+    }
+
     // 统一左侧主菜单：首页、我的任务 + 一级业务模块（含实物管理）+ 基础数据管理
     (function ensureFullSidebar() {
       if (sidebar.getAttribute("data-demo-sidebar-master-v8") === "1") {
         ensurePhysicalMgmtNavItem();
         ensureInventoryNavItem();
+        ensureProjCompanyInboundNavItem();
         normalizeRetiredNavLabel();
         return;
       }
@@ -305,6 +328,7 @@
         '<div class="nav-item" title="首页"><span class="nav-label">首页</span></div>' +
         '<div class="nav-item" title="我的任务"><span class="nav-label">我的任务</span></div>' +
         '<div class="nav-item" title="物资采购"><span class="nav-label">物资采购</span></div>' +
+        '<div class="nav-item" title="项目公司入库"><span class="nav-label">项目公司入库</span></div>' +
         '<div class="nav-item" title="实物管理"><span class="nav-label">实物管理</span></div>' +
         '<div class="nav-item" title="销售管理"><span class="nav-label">销售管理</span></div>' +
         '<div class="nav-item" title="盘点管理"><span class="nav-label">盘点管理</span></div>' +
@@ -334,6 +358,8 @@
           '<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M6 6h14l-1.2 9H7.2L6 6z"/><path d="M6 6V5a1 1 0 0 1 1-1h2"/><circle cx="9" cy="20" r="1.25"/><circle cx="17" cy="20" r="1.25"/></svg>',
         '物资采购':
           '<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M6 6h14l-1.2 9H7.2L6 6z"/><path d="M6 6V5a1 1 0 0 1 1-1h2"/><circle cx="9" cy="20" r="1.25"/><circle cx="17" cy="20" r="1.25"/></svg>',
+        '项目公司入库':
+          '<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M12 10v6M9 13l3-3 3 3"/><path d="M7 4V3a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1v1"/></svg>',
         '资产管理':
           '<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M6 8h12M6 12h8"/></svg>',
         '实物管理':
@@ -404,11 +430,7 @@
     var PHYSICAL_MGMT_ROW_HTML =
       '<button type="button" class="warehouse-secondary-link" data-action="purchase-quality-accept" data-label="库存管理">库存管理</button>' +
       '<span class="warehouse-secondary-sep" aria-hidden="true">|</span>' +
-      '<button type="button" class="warehouse-secondary-link" data-action="material-ledger" data-label="物资领用">物资领用</button>' +
-      '<span class="warehouse-secondary-sep" aria-hidden="true">|</span>' +
-      '<button type="button" class="warehouse-secondary-link" data-action="proj-company-inbound" data-label="项目公司入库">项目公司入库</button>' +
-      '<span class="warehouse-secondary-sep" aria-hidden="true">|</span>' +
-      '<button type="button" class="warehouse-secondary-link" data-action="proj-company-inventory" data-label="项目公司库存管理">项目公司库存管理</button>';
+      '<button type="button" class="warehouse-secondary-link" data-action="material-ledger" data-label="物资领用">物资领用</button>';
 
     // 驾驶舱同款：模块点击弹出蓝色框（二级功能）
     var secondaryPanel = document.getElementById('warehouseSecondaryPanel');
@@ -592,6 +614,11 @@
           '<button type="button" class="warehouse-secondary-link" data-action="asset-dept" data-label="部门资产">部门资产</button>' +
           '<span class="warehouse-secondary-pipe" aria-hidden="true">|</span>' +
           '<button type="button" class="warehouse-secondary-link" data-action="asset-personal" data-label="个人资产">个人资产</button>'
+      },
+      projCompanyInbound: {
+        text: '项目公司入库',
+        directAction: 'proj-company-inbound',
+        aclModuleKey: 'purchaseMgmt'
       },
       physicalMgmt: {
         text: '实物管理',
@@ -807,6 +834,7 @@
       task: "task",
       cockpit: "cockpit",
       purchaseMgmt: "purchaseMgmt",
+      projCompanyInbound: "projCompanyInbound",
       physicalMgmt: "physicalMgmt",
       salesMgmt: "salesMgmt",
       inventoryMgmt: "inventoryMgmt",
@@ -1112,6 +1140,7 @@
       'order-demand-management.html': 'purchaseMgmt',
       'purchase-ledger.html': 'physicalMgmt',
       'proc-quality-accept.html': 'physicalMgmt',
+      'proj-company-inbound.html': 'projCompanyInbound',
       'cargo-ledger.html': 'purchaseMgmt',
       'material-procurement-hub.html': 'purchaseMgmt',
       'return-exchange-management.html': 'purchaseMgmt',
