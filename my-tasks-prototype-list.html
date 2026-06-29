@@ -1686,11 +1686,18 @@
         var key = String(map && map["流程定义KEY"] || "");
         return key.indexOf("company") >= 0 || String(map && map["任务名称"] || "").indexOf("公司") >= 0;
       }
-      function openInventoryTodoProgress(map) {
+      function inventoryTodoProgressType(map) {
         var procName = String(map && map["流程定义名称"] || "");
-        var isDeptProc = procName.indexOf("部门盘点任务审批") >= 0;
-        var isCompanyProc = procName.indexOf("公司盘点任务审批") >= 0;
-        var isCompany = isCompanyProc || (!isDeptProc && inventoryTodoIsCompany(map));
+        var procKey = String(map && map["流程定义KEY"] || "");
+        var taskName = String(map && map["任务名称"] || "");
+        var text = procName + "|" + procKey + "|" + taskName;
+        if (text.indexOf("公司盘点任务审批") >= 0 || procKey.indexOf("pdtask_company") === 0 || taskName.indexOf("公司") >= 0) return "company";
+        if (text.indexOf("部门盘点任务审批") >= 0 || procKey.indexOf("pdtask_dept") === 0 || taskName.indexOf("部门盘点") >= 0) return "dept";
+        if (inventoryTodoIsCompany(map)) return "company";
+        return "dept";
+      }
+      function openInventoryTodoProgress(map) {
+        var isCompany = inventoryTodoProgressType(map) === "company";
         var title = isCompany ? "审批记录 - 公司盘点" : "审批记录 - 部门盘点";
         var approvals = inventoryTodoProgressApprovals(map || {}, isCompany);
         var rowClass = isCompany ? "inventory-progress-row is-company-branch" : "inventory-progress-row";
@@ -1763,6 +1770,7 @@
           });
         }
       }
+      window.openInventoryTodoProgress = openInventoryTodoProgress;
       function inventoryTodoShowResultColumns(map) {
         var key = String(map["流程定义KEY"] || "");
         if (key === "pdtask_company_staff") return true;
@@ -2056,7 +2064,7 @@
       (function overrideUnifiedInventoryProgress() {
         var oldUnifiedProgress = window.openUnifiedProgressModal;
         window.openUnifiedProgressModal = function () {
-          var currentMap = window.__inventoryTodoCurrentMap || inventoryTodoRows._currentMap;
+          var currentMap = window.__inventoryTodoCurrentMap || inventoryTodoRows._currentMap || arguments[0];
           if (currentMap && inventoryTodoIsProcess(currentMap)) {
             openInventoryTodoProgress(currentMap);
             return true;
