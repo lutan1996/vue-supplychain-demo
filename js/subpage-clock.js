@@ -403,7 +403,12 @@
 
     var PHYSICAL_MGMT_ROW_HTML =
       '<button type="button" class="warehouse-secondary-link" data-action="purchase-quality-accept" data-label="库存管理">库存管理</button>' +
-      '<button type="button" class="warehouse-secondary-link" data-action="material-ledger" data-label="物资领用">物资领用</button>';
+      '<span class="warehouse-secondary-sep" aria-hidden="true">|</span>' +
+      '<button type="button" class="warehouse-secondary-link" data-action="material-ledger" data-label="物资领用">物资领用</button>' +
+      '<span class="warehouse-secondary-sep" aria-hidden="true">|</span>' +
+      '<button type="button" class="warehouse-secondary-link" data-action="proj-company-inbound" data-label="项目公司入库">项目公司入库</button>' +
+      '<span class="warehouse-secondary-sep" aria-hidden="true">|</span>' +
+      '<button type="button" class="warehouse-secondary-link" data-action="proj-company-inbound" data-label="项目公司库存管理">项目公司库存管理</button>';
 
     // 驾驶舱同款：模块点击弹出蓝色框（二级功能）
     var secondaryPanel = document.getElementById('warehouseSecondaryPanel');

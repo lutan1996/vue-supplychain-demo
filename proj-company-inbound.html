@@ -353,6 +353,22 @@
         closeForm();
         render();
       });
+      function initTabFromQuery() {
+        try {
+          var params = new URLSearchParams(window.location.search || "");
+          var tab = (params.get("tab") || "").trim();
+          var pageSub = (params.get("pageSub") || "").trim();
+          if (tab === "stock" || pageSub === "项目公司库存管理") {
+            switchTab("stock");
+          } else {
+            switchTab("inbound");
+          }
+        } catch (err) {
+          switchTab("inbound");
+        }
+      }
+
+      initTabFromQuery();
       render();
     })();
   </script>
