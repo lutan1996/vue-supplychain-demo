@@ -649,15 +649,18 @@
     .inventory-progress-tabs {
       display: flex;
       gap: 22px;
-      border-bottom: 1px solid #e8eef5;
-      margin-bottom: 22px;
+      padding-bottom: 0;
+      border-bottom: 1px solid #d0d7e2;
+      margin-bottom: 18px;
     }
     .inventory-progress-tab {
-      padding: 0 0 9px;
-      border-bottom: 2px solid transparent;
+      padding: 0 4px 10px;
       color: #5f7288;
       font-size: 14px;
       font-weight: 600;
+      cursor: pointer;
+      border-bottom: 3px solid transparent;
+      margin-bottom: -1px;
     }
     .inventory-progress-tab.is-active {
       color: #1677ff;
@@ -1743,9 +1746,22 @@
             if (idx === arr.length - 1) cls += " is-end";
             return '<div class="inventory-progress-step' + cls + '">' + mtEsc(text) + '</div>' + (idx < arr.length - 1 ? '<div class="inventory-progress-arrow">→</div>' : "");
           }).join("");
-        var infoHtml = approvals.map(function (step, idx) {
-          return '<p class="inventory-progress-info-line">' + (idx + 1) + '、' + mtEsc(step.node) + '；办理人：' + mtEsc(step.person) + '；办理时间：' + mtEsc(step.time) + '；办理内容：' + mtEsc(step.opinion) + '；办理结果：' + mtEsc(step.result) + '</p>';
-        }).join("");
+        var infoHtml = '<table style="width:100%;border-collapse:collapse;font-size:14px">' +
+          '<thead><tr style="background:#f6f8fb;border-bottom:1px solid #e9edf4">' +
+            '<th style="text-align:left;padding:10px 14px;font-weight:700;color:#1f3551;white-space:nowrap">办理人</th>' +
+            '<th style="text-align:left;padding:10px 14px;font-weight:700;color:#1f3551;white-space:nowrap">办理时间</th>' +
+            '<th style="text-align:left;padding:10px 14px;font-weight:700;color:#1f3551">办理内容</th>' +
+            '<th style="text-align:right;padding:10px 14px;font-weight:700;color:#1f3551;white-space:nowrap">办理结果</th>' +
+          '</tr></thead><tbody>' +
+          approvals.map(function (step) {
+            return '<tr style="border-bottom:1px solid #f0f4f9">' +
+              '<td style="padding:12px 14px;color:#1f3551;vertical-align:top">' + mtEsc(step.person || "—") + '</td>' +
+              '<td style="padding:12px 14px;color:#1f3551;vertical-align:top">' + mtEsc(step.time || "—") + '</td>' +
+              '<td style="padding:12px 14px;color:#1f3551;vertical-align:top">' + mtEsc(step.opinion || "—") + '</td>' +
+              '<td style="padding:12px 14px;text-align:right;color:#1f3551;vertical-align:top">' + mtEsc(step.result || "—") + '</td>' +
+            '</tr>';
+          }).join("") +
+          '</tbody></table>';
         var old = document.getElementById("inventoryTodoProgressMask");
         if (old && old.parentNode) old.parentNode.removeChild(old);
         var html =

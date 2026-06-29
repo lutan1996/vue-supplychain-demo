@@ -1539,9 +1539,9 @@
       ".map-flow-hd{display:flex;justify-content:space-between;align-items:center;padding:14px 16px;border-bottom:1px solid #edf2f8;font-size:20px;font-weight:700;color:#1f2d3d;}" +
       ".map-flow-close{border:none;background:transparent;color:#8c8c8c;font-size:22px;cursor:pointer;line-height:1;}" +
       ".map-flow-body{padding:10px 14px 16px;}" +
-      ".map-flow-tabs{display:flex;gap:16px;padding:2px 0 12px;border-bottom:1px solid #edf2f8;}" +
-      ".map-flow-tab{border:none;background:transparent;padding:0;font-size:13px;color:#5f6f82;cursor:pointer;}" +
-      ".map-flow-tab.is-active{color:#1677ff;text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:8px;}" +
+      ".map-flow-tabs{display:flex;gap:16px;padding:2px 0 0;border-bottom:1px solid #d0d7e2;}" +
+      ".map-flow-tab{border:none;background:transparent;padding:0 4px 12px;font-size:13px;color:#5f6f82;cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-1px;}" +
+      ".map-flow-tab.is-active{color:#1677ff;border-bottom:3px solid #1677ff;text-decoration:none;}" +
       ".map-flow-pane{display:none;padding-top:14px;}" +
       ".map-flow-pane.is-active{display:block;}" +
       ".map-flow-track{border:1px solid #f0f2f5;border-radius:8px;padding:22px 18px;overflow:visible;}" +
@@ -2068,6 +2068,12 @@
     return file === "purchase-ledger.html" && window.__mapProgressFlowScope === scope;
   }
 
+  function setUnifiedProgressModalTitle(mask, title) {
+    if (!mask) return;
+    var titleEl = mask.querySelector(".map-flow-hd span");
+    if (titleEl) titleEl.textContent = title || "审批记录";
+  }
+
   function patchRequisitionProgressFlow(mask) {
     if (!mask || !isPurchaseLedgerFlowScope("purchase-ledger-requisition")) return;
     var track = mask.querySelector(".map-flow-track");
@@ -2129,10 +2135,72 @@
     }
   }
 
+  function patchPurchaseLedgerBizProgressFlow(mask) {
+    if (!mask) return;
+    var scope = window.__mapProgressFlowScope || "";
+    var isUserChange = scope === "purchase-ledger-user-change";
+    var isExternalBorrow = scope === "purchase-ledger-external-borrow";
+    if (!isUserChange && !isExternalBorrow) return;
+    var track = mask.querySelector(".map-flow-track");
+    var info = mask.querySelector(".map-flow-info");
+    if (!track) return;
+
+    if (isUserChange) {
+      setUnifiedProgressModalTitle(mask, "审批记录 - 变更使用人");
+      track.innerHTML =
+        '<div class="map-flow-row" style="grid-template-columns:repeat(9,1fr)">' +
+        '<span class="map-flow-node">发起变更</span>' +
+        '<span class="map-flow-arrow">→</span>' +
+        '<span class="map-flow-node">部门负责人审批</span>' +
+        '<span class="map-flow-arrow">→</span>' +
+        '<span class="map-flow-node">新使用人确认</span>' +
+        '<span class="map-flow-arrow">→</span>' +
+        '<span class="map-flow-node">物资管理部门知悉登记</span>' +
+        '<span class="map-flow-arrow">→</span>' +
+        '<span class="map-flow-node end">完成</span>' +
+        '</div>';
+      if (info) {
+        info.innerHTML =
+          '<div>1、许学良于 2026-06-26 09:30 发起变更，提交新使用人及变更原因。</div>' +
+          '<div>2、李仁堂于 2026-06-26 10:00 完成部门负责人审批，同意本次变更。</div>' +
+          '<div>3、李四于 2026-06-26 10:18 完成新使用人确认，确认接收该物资。</div>' +
+          '<div>4、宋中波于 2026-06-26 10:35 完成物资管理部门知悉登记，更新相关台账。</div>' +
+          '<div>5、2026-06-26 10:40 流程完成，变更使用人生效。</div>';
+      }
+      return;
+    }
+
+    setUnifiedProgressModalTitle(mask, "审批记录 - 外部借用");
+    track.innerHTML =
+      '<div class="map-flow-row" style="grid-template-columns:repeat(11,1fr)">' +
+      '<span class="map-flow-node">发起外借</span>' +
+      '<span class="map-flow-arrow">→</span>' +
+      '<span class="map-flow-node">部门负责人初审</span>' +
+      '<span class="map-flow-arrow">→</span>' +
+      '<span class="map-flow-node">公司负责人审批</span>' +
+      '<span class="map-flow-arrow">→</span>' +
+      '<span class="map-flow-node">外部借用对象确认</span>' +
+      '<span class="map-flow-arrow">→</span>' +
+      '<span class="map-flow-node">物资管理部门登记</span>' +
+      '<span class="map-flow-arrow">→</span>' +
+      '<span class="map-flow-node end">完成</span>' +
+      '</div>';
+    if (info) {
+      info.innerHTML =
+        '<div>1、许学良于 2026-06-26 09:30 发起外借，填写外部借用单位、借用人及借用原因。</div>' +
+        '<div>2、李仁堂于 2026-06-26 09:55 完成部门负责人初审，同意提交公司审批。</div>' +
+        '<div>3、王超于 2026-06-26 10:20 完成公司负责人审批，同意本次外部借用。</div>' +
+        '<div>4、张三于 2026-06-26 10:48 完成外部借用对象确认，确认借用信息与归还时间。</div>' +
+        '<div>5、宋中波于 2026-06-26 11:05 完成物资管理部门登记，登记外借台账。</div>' +
+        '<div>6、2026-06-26 11:10 流程完成，外部借用生效。</div>';
+    }
+  }
+
   function patchProgressModalForPage(mask) {
     patchInventoryInboundProgressFlow(mask);
     patchRequisitionProgressFlow(mask);
     patchTransferProgressFlow(mask);
+    patchPurchaseLedgerBizProgressFlow(mask);
   }
 
   function openUnifiedProgressModalGlobal() {
