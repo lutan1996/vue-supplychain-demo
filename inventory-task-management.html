@@ -1191,7 +1191,7 @@
       function taskLines(row) {
         return linesForTask(row || state.current || rows[0]);
       }
-      var inventoryDetailHeaders = ["序号", "产品名称", "规格型号", "产品编码", "物资唯一码", "物资类型编码", "采购部门", "供应商", "平均采购单价（含税）", "是否在本部门", "是否开票", "使用人", "资产类型", "资产编号", "存放地点", "使用年限", "入库年限", "原值", "单位", "状态是否完好", "盘点结果", "证明材料", "备注"];
+      var inventoryDetailHeaders = ["序号", "产品名称", "规格型号", "产品编码", "物资唯一码", "物资类型编码", "采购部门", "供应商", "平均采购单价（含税）", "是否在本部门", "是否开票", "使用人", "资产类型", "资产编号", "存放地点", "使用年限", "入库年限", "原值", "单位", "盘点结果", "证明材料", "备注"];
       function diffAmountText(line) {
         var type = inferDiffType(line || {});
         if (type !== "盘亏" && type !== "盘盈") return "¥0";
@@ -1220,7 +1220,6 @@
           '<td>' + cell(line.inboundLife || line.stockAge || "2年") + '</td>' +
           '<td>' + money(originalAmount(line)) + '</td>' +
           '<td>' + cell(line.unit || "件") + '</td>' +
-          '<td>' + cell(line.health || "") + '</td>' +
           '<td>' + cell(consistencyResult(line)) + '</td>' +
           '<td>' + renderAttachmentCell(line) + '</td>' +
           '<td>' + cell(line.reason || (diffType === "正常" ? "无差异" : "盘点确认与系统台账不一致")) + '</td>' +
@@ -1419,7 +1418,7 @@
         if (head) {
           head.innerHTML = isSummary
             ? '<tr><th>物资类型编码</th><th>资产类型</th><th>平均采购单价（含税）</th><th>采购总价（含税）</th><th>使用部门</th><th>使用人</th><th>存放地点</th><th>库存数量</th><th>盘点确认数量</th><th>操作</th></tr>'
-            : '<tr><th>序号</th><th>产品名称</th><th>规格型号</th><th>产品编码</th><th>物资唯一码</th><th>物资类型编码</th><th>采购部门</th><th>供应商</th><th>平均采购单价（含税）</th><th>是否在本部门</th><th>是否开票</th><th>使用人</th><th>资产类型</th><th>资产编号</th><th>存放地点</th><th>使用年限</th><th>入库年限</th><th>原值</th><th>单位</th><th>状态是否完好</th><th>盘点结果</th><th>证明材料</th><th>备注</th></tr>';
+            : '<tr><th>序号</th><th>产品名称</th><th>规格型号</th><th>产品编码</th><th>物资唯一码</th><th>物资类型编码</th><th>采购部门</th><th>供应商</th><th>平均采购单价（含税）</th><th>是否在本部门</th><th>是否开票</th><th>使用人</th><th>资产类型</th><th>资产编号</th><th>存放地点</th><th>使用年限</th><th>入库年限</th><th>原值</th><th>单位</th><th>盘点结果</th><th>证明材料</th><th>备注</th></tr>';
         }
         document.getElementById("materialCheckBody").innerHTML = list.map(function (x, i) {
           if (isSummary) {
@@ -1436,7 +1435,6 @@
               '<td><span class="inv-op"><span role="button" tabindex="0" data-material-summary-view="' + cell(x.typeCode) + '">物资明细</span></span></td>' +
             '</tr>';
           }
-          var health = x.health || "";
           var result = x.result === "一致" || x.result === "不一致" ? x.result : "";
           return '<tr>' +
             '<td>' + (i + 1) + '</td>' +
@@ -1460,7 +1458,6 @@
             '<td>' + cell(x.inboundLife || x.stockAge || "2年") + '</td>' +
             '<td>' + money(originalAmount(x)) + '</td>' +
             '<td>' + cell(x.unit || "件") + '</td>' +
-            '<td><select class="inv-material-cell-select" data-line-field="health" data-line-code="' + cell(x.code) + '"><option value="">请选择</option><option' + (health === "完好" ? " selected" : "") + '>完好</option><option' + (health === "损坏" ? " selected" : "") + '>损坏</option><option' + (health === "缺失" ? " selected" : "") + '>缺失</option></select></td>' +
             '<td><select class="inv-material-cell-select" data-line-field="result" data-line-code="' + cell(x.code) + '"><option value="">请选择</option><option' + (result === "一致" ? " selected" : "") + '>一致</option><option' + (result === "不一致" ? " selected" : "") + '>不一致</option></select></td>' +
             '<td>' + uploadOnlyCell(x) + '</td>' +
             '<td><textarea class="inv-material-cell-textarea" data-line-field="reason" data-line-code="' + cell(x.code) + '" placeholder="填写备注">' + inputValue(x.reason || "") + '</textarea></td>' +
