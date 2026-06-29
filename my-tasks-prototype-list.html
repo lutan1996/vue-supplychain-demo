@@ -1703,11 +1703,13 @@
         approvals.forEach(function (step, idx) {
           if (step.result === "处理中" && currentStepIndex < 0) currentStepIndex = idx;
         });
-        function progressStep(text, idx, isEnd) {
+        function progressStep(text, idx, isEnd, skipBeforeArrow) {
           var cls = "";
           if (idx === currentStepIndex) cls += " is-current";
           if (isEnd) cls += " is-end";
-          return '<div class="inventory-progress-step' + cls + '">' + mtEsc(text) + '</div>';
+          var beforeArrow = (skipBeforeArrow || idx === 0) ? "" : '<div class="inventory-progress-arrow">→</div>';
+          var afterArrow = isEnd ? "" : '<div class="inventory-progress-arrow">→</div>';
+          return beforeArrow + '<div class="inventory-progress-step' + cls + '">' + mtEsc(text) + '</div>' + afterArrow;
         }
         var rowHtml = isCompany
           ? '<div class="inventory-progress-company-tree">' +
@@ -1722,12 +1724,9 @@
                 '<div class="inventory-progress-company-merge"><span>↘</span><span>→</span><span>↗</span></div>' +
               '</div>' +
             '</div>' +
-            progressStep("盘点完毕，上传盘点结果，提交财务负责人审阅。", 5) +
-            '<div class="inventory-progress-arrow">→</div>' +
+            progressStep("盘点完毕，上传盘点结果，提交财务负责人审阅。", 5, false, true) +
             progressStep("物资管理部门负责人审阅", 6) +
-            '<div class="inventory-progress-arrow">→</div>' +
             progressStep("物资管理部门物资专责阅知", 7) +
-            '<div class="inventory-progress-arrow">→</div>' +
             progressStep("盘点结束", 8, true)
           : [
             "部门物资专责发起部门物资盘点",
@@ -1737,9 +1736,8 @@
             "物资管理部门物资专责阅知",
             "盘点结束"
           ].map(function (text, idx, arr) {
-            var cls = idx === currentStepIndex ? " is-current" : "";
-            if (idx === arr.length - 1) cls += " is-end";
-            return '<div class="inventory-progress-step' + cls + '">' + mtEsc(text) + '</div>' + (idx < arr.length - 1 ? '<div class="inventory-progress-arrow">→</div>' : "");
+            var isEnd = idx === arr.length - 1;
+            return progressStep(text, idx, isEnd);
           }).join("");
         var infoHtml = '<table style="width:100%;border-collapse:collapse;font-size:14px">' +
           '<thead><tr style="background:#f6f8fb;border-bottom:1px solid #e9edf4">' +
