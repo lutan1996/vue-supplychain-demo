@@ -66,12 +66,14 @@
       font-size: 16px;
       font-weight: 600;
     }
-    #viewModalMask .scrap-detail-header-actions {
+    #viewModalMask .scrap-detail-header-actions,
+    #planDetailMask .scrap-detail-header-actions {
       display: flex;
       align-items: center;
       gap: 10px;
     }
-    #viewModalMask .btn-scrap-progress {
+    #viewModalMask .btn-scrap-progress,
+    #planDetailMask .btn-scrap-progress {
       border: 1px solid #d9d9d9;
       background: #fff;
       color: rgba(0, 0, 0, 0.85);
@@ -81,7 +83,8 @@
       font-weight: 500;
       cursor: pointer;
     }
-    #viewModalMask .btn-scrap-progress:hover {
+    #viewModalMask .btn-scrap-progress:hover,
+    #planDetailMask .btn-scrap-progress:hover {
       border-color: #1890ff;
       color: #1890ff;
     }
@@ -300,43 +303,44 @@
       border-radius: 8px;
       padding: 18px;
       overflow: auto;
-      min-height: 240px;
+      min-height: 320px;
       background: #fff;
     }
-    .flow-line {
-      position: absolute;
-      left: 80px;
-      right: 80px;
-      top: 122px;
-      height: 2px;
-      background: #6fbf73;
-      z-index: 1;
+    .flow-nodes {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      align-items: center;
+      gap: 72px;
+      min-width: 1720px;
+      padding: 86px 24px 72px;
     }
-    .flow-nodes { position: relative; z-index: 2; display: flex; justify-content: space-between; gap: 24px; margin-top: 70px; }
     .flow-node {
-      min-width: 92px;
-      min-height: 52px;
-      border: 1px solid #7ac57f;
+      width: 150px;
+      min-height: 92px;
+      border: 1px solid #c7ebcf;
       border-radius: 10px;
-      background: #edf9ee;
-      color: #256d2a;
+      background: #f0fbf0;
+      color: #2f6b3a;
       font-size: 12px;
+      line-height: 1.55;
       display: flex;
       align-items: center;
       justify-content: center;
       text-align: center;
-      padding: 6px;
+      padding: 10px;
       cursor: default;
       position: relative;
     }
-    .flow-node.is-pending { border-color: #e6b64a; background: #fff7e6; color: #8a6400; }
-    .flow-dot {
-      width: 18px; height: 18px; border-radius: 50%;
-      border: 2px solid #7ac57f; background: #d9f2dc;
-      align-self: center;
-      margin-top: 17px;
+    .flow-node.is-current { border-color: #ffd591; background: #fff7e6; color: #8a5a00; }
+    .flow-node.is-todo { border-color: #d9d9d9; background: #f5f5f5; color: #8c8c8c; }
+    .flow-arrow {
+      flex: 0 0 auto;
+      color: #8fa3bb;
+      font-size: 26px;
+      line-height: 1;
+      margin: 0 -48px;
     }
-    .flow-dot.end { border-color: #f05f5f; background: #ffd6d6; }
     .flow-tooltip {
       position: absolute;
       display: none;
@@ -354,20 +358,30 @@
     .flow-info-table {
       width: 100%;
       border-collapse: collapse;
-      font-size: 12px;
+      font-size: 14px;
     }
     .flow-info-table th, .flow-info-table td {
-      border: 1px solid #edf1f7;
-      padding: 8px 6px;
+      border: none;
+      border-bottom: 1px solid #edf1f7;
+      padding: 18px 16px;
       text-align: left;
       vertical-align: top;
-      color: #334155;
+      color: #1f2d3d;
+      line-height: 1.75;
     }
     .flow-info-table th {
-      background: #f8fafc;
-      color: #64748b;
+      background: #fff;
+      color: #1f2d3d;
       font-weight: 600;
     }
+    .flow-info-table th:nth-child(1),
+    .flow-info-table td:nth-child(1) { width: 22%; }
+    .flow-info-table th:nth-child(2),
+    .flow-info-table td:nth-child(2) { width: 22%; }
+    .flow-info-table th:nth-child(3),
+    .flow-info-table td:nth-child(3) { width: 40%; }
+    .flow-info-table th:nth-child(4),
+    .flow-info-table td:nth-child(4) { width: 16%; }
     /* 报废申请列表：紧凑展示全部字段，尽量避免横向滚动条 */
     #panelScrapApply .carrier-table-wrap {
       overflow-x: hidden;
@@ -691,7 +705,7 @@
   </div>
 
   <div class="modal-mask" id="progressModalMask" aria-hidden="true">
-    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="progressModalTitle" style="width:min(980px,97vw);">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="progressModalTitle" style="width:min(1240px,97vw);">
       <div class="modal-header">
         <h2 class="modal-title" id="progressModalTitle">审批记录</h2>
         <button class="modal-close" id="btnCloseProgressModal" aria-label="关闭">×</button>
@@ -703,15 +717,18 @@
         </div>
         <div class="flow-pane is-active" data-flow-pane="diagram">
           <div class="flow-wrap" id="flowWrap">
-            <div class="flow-line"></div>
             <div class="flow-nodes">
-              <div class="flow-dot" aria-hidden="true"></div>
-              <div class="flow-node" data-flow-tip="">申请人</div>
-              <div class="flow-node" data-flow-tip="">申请部门负责人意见及签字</div>
-              <div class="flow-node" data-flow-tip="">管理处置部门专责意见及签字</div>
-              <div class="flow-node" data-flow-tip="">管理处置部门负责人意见及签字</div>
-              <div class="flow-node is-pending" data-flow-tip="">结束</div>
-              <div class="flow-dot end" aria-hidden="true"></div>
+              <div class="flow-node" data-flow-tip="">业务部门开始提报次年报废计划</div>
+              <div class="flow-arrow" aria-hidden="true">→</div>
+              <div class="flow-node" data-flow-tip="">业务部门提交报废计划</div>
+              <div class="flow-arrow" aria-hidden="true">→</div>
+              <div class="flow-node" data-flow-tip="">业务部门负责人审批</div>
+              <div class="flow-arrow" aria-hidden="true">→</div>
+              <div class="flow-node" data-flow-tip="">物资管理部门物资专责汇总且物资管理部门负责人审批</div>
+              <div class="flow-arrow" aria-hidden="true">→</div>
+              <div class="flow-node" data-flow-tip="">财务部负责人审批</div>
+              <div class="flow-arrow" aria-hidden="true">→</div>
+              <div class="flow-node is-current" data-flow-tip="">物资管理部门物资专责存档，报废结束</div>
             </div>
             <div class="flow-tooltip" id="flowTooltip"></div>
           </div>
@@ -720,15 +737,10 @@
           <table class="flow-info-table">
             <thead>
               <tr>
-                <th>序号</th>
-                <th>任务名称</th>
                 <th>办理人</th>
-                <th>状态</th>
-                <th>审批意见</th>
-                <th>开始时间</th>
-                <th>结束时间</th>
-                <th>耗时</th>
-                <th>附件</th>
+                <th>办理时间</th>
+                <th>办理内容</th>
+                <th>办理结果</th>
               </tr>
             </thead>
             <tbody id="progressInfoBody"></tbody>
@@ -795,9 +807,12 @@
 
   <div class="modal-mask" id="planDetailMask" aria-hidden="true">
     <div class="modal" role="dialog" aria-modal="true" aria-labelledby="planDetailTitle" style="width:min(1060px,97vw);">
-      <div class="modal-header">
+      <div class="modal-header scrap-detail-header">
         <h2 class="modal-title" id="planDetailTitle">计划详情</h2>
-        <button class="modal-close" id="btnClosePlanDetail" aria-label="关闭">×</button>
+        <div class="scrap-detail-header-actions">
+          <button type="button" class="btn-scrap-progress" id="btnOpenPlanProgress">流程进度</button>
+          <button class="modal-close scrap-detail-close" id="btnClosePlanDetail" aria-label="关闭">×</button>
+        </div>
       </div>
       <div class="modal-body" style="display:block;">
         <div class="view-grid" id="planDetailGrid"></div>
@@ -977,9 +992,11 @@
         flowTooltip: document.getElementById("flowTooltip"),
         flowWrap: document.getElementById("flowWrap"),
         flowNodes: document.querySelectorAll(".flow-node"),
-        progressInfoBody: document.getElementById("progressInfoBody")
+        progressInfoBody: document.getElementById("progressInfoBody"),
+        btnOpenPlanProgress: document.getElementById("btnOpenPlanProgress")
       };
       var activeViewItem = null;
+      var activePlanItem = null;
       var currentDept = "设备运维部";
 
       // 报废计划模块数据
@@ -1046,30 +1063,42 @@
         return "分管领导办理";
       }
 
-      function renderProgressInfo(item) {
-        var rows = [
-          { name: "备案", user: "-", status: "已完成", opinion: "-", start: "-", end: "-", cost: "-", file: "-" },
-          { name: "管理处置部门负责人意见及签字", user: "管理处置部门负责人", status: item.status === "pending" ? "待审批" : "通过", opinion: item.manageHeadOpinion || "-", start: item.applyDate + " 11:03:22", end: item.status === "pending" ? "-" : item.applyDate + " 11:05:32", cost: item.status === "pending" ? "-" : "49秒", file: "-" },
-          { name: "管理处置部门专责意见及签字", user: "管理处置部门专责", status: item.status === "rejected" ? "驳回" : "通过", opinion: item.manageSpecialOpinion || "-", start: item.applyDate + " 11:01:45", end: item.applyDate + " 11:02:32", cost: "47秒", file: "-" },
-          { name: "申请部门负责人意见及签字", user: "申请部门负责人", status: item.status === "rejected" ? "驳回" : "通过", opinion: item.deptHeadOpinion || "-", start: item.applyDate + " 11:00:45", end: item.applyDate + " 11:01:32", cost: "47秒", file: "-" },
-          { name: "申请人", user: signerName(item.applicantSign), status: "已提交", opinion: "-", start: item.applyDate + " 11:00:42", end: item.applyDate + " 11:00:45", cost: "2秒", file: "-" }
+      function progressDate(item, fallback) {
+        return (item && (item.submitDate || item.applyDate)) || fallback || new Date().toISOString().slice(0, 10);
+      }
+
+      function progressRows(item, type) {
+        var baseDate = progressDate(item, "2026-06-15");
+        var dept = type === "plan" ? (item.dept || currentDept) : (item.applyDept || currentDept);
+        var applicant = type === "plan" ? (item.applicant || currentUser) : signerName(item.applicantSign || currentUser);
+        var rejected = item && item.status === "rejected";
+        var pending = item && (item.status === "pending" || item.status === "review");
+        return [
+          { node: "业务部门开始提报次年报废计划", user: applicant, time: baseDate + " 09:00:12", content: dept + "发起报废计划填报，梳理拟报废物资范围。", result: "已完成" },
+          { node: "业务部门提交报废计划", user: applicant, time: baseDate + " 09:18:30", content: "提交报废计划及拟报废固定资产清单。", result: "已提交" },
+          { node: "业务部门负责人审批", user: "业务部门负责人", time: baseDate + " 10:05:18", content: rejected ? "审核报废计划，要求补充资产状态及报废依据。" : "确认报废计划内容完整，同意提交后续审批。", result: rejected ? "驳回" : "通过" },
+          { node: "物资管理部门物资专责汇总且物资管理部门负责人审批", user: "物资管理部门物资专责 / 物资管理部门负责人", time: baseDate + " 10:42:06", content: "汇总报废物资信息，核对资产清单、净值及处置路径。", result: rejected ? "未到达" : "通过" },
+          { node: "财务部负责人审批", user: "财务部负责人", time: pending ? "-" : baseDate + " 11:26:40", content: pending ? "待财务负责人审核原值、净值及账务处理口径。" : "审核财务账面信息，确认报废计划可进入存档。", result: pending ? "待处理" : "通过" },
+          { node: "物资管理部门物资专责存档，报废结束", user: "物资管理部门物资专责", time: pending ? "-" : baseDate + " 11:48:15", content: pending ? "待审批完成后归档报废材料。" : "归档报废计划、审批记录及资产清单，流程结束。", result: pending ? "未到达" : "报废结束" }
         ];
-        refs.progressInfoBody.innerHTML = rows.map(function (r, idx) {
-          return "<tr><td>" + (idx + 1) + "</td><td>" + r.name + "</td><td>" + r.user + "</td><td>" + r.status + "</td><td>" + r.opinion + "</td><td>" + r.start + "</td><td>" + r.end + "</td><td>" + r.cost + "</td><td>" + r.file + "</td></tr>";
+      }
+
+      function renderProgressInfo(item, type) {
+        refs.progressInfoBody.innerHTML = progressRows(item, type).map(function (r, idx) {
+          return "<tr><td>" + escHtml(r.user) + "</td><td>" + escHtml(r.time) + "</td><td>" + escHtml(r.node + "：" + r.content) + "</td><td>" + escHtml(r.result) + "</td></tr>";
         }).join("");
       }
 
-      function setFlowTooltips(item) {
-        var tips = [
-          "开始",
-          "审批人: " + signerName(item.applicantSign) + "\n节点名称: 申请人\n开始时间: " + item.applyDate + " 11:00:42\n结束时间: " + item.applyDate + " 11:00:45\n耗时: 2秒\n审批状态: v3",
-          "审批人: 申请部门负责人\n节点名称: 申请部门负责人意见及签字\n开始时间: " + item.applyDate + " 11:00:45\n结束时间: " + item.applyDate + " 11:01:32\n耗时: 47秒\n审批状态: 通过",
-          "审批人: 管理处置部门专责\n节点名称: 管理处置部门专责意见及签字\n开始时间: " + item.applyDate + " 11:01:45\n结束时间: " + item.applyDate + " 11:02:32\n耗时: 47秒\n审批状态: " + (item.status === "rejected" ? "驳回" : "通过"),
-          "审批人: 管理处置部门负责人\n节点名称: 管理处置部门负责人意见及签字\n开始时间: " + item.applyDate + " 11:03:22\n结束时间: " + (item.status === "pending" ? "-" : item.applyDate + " 11:05:32") + "\n耗时: " + (item.status === "pending" ? "-" : "49秒") + "\n审批状态: " + statusMeta(item.status).text,
-          "结束"
-        ];
+      function setFlowTooltips(item, type) {
+        var rows = progressRows(item, type);
+        var currentIdx = rows.findIndex(function (r) { return r.result === "待处理" || r.result === "未到达" || r.result === "报废结束"; });
+        if (currentIdx < 0) currentIdx = rows.length - 1;
         refs.flowNodes.forEach(function (node, i) {
-          node.setAttribute("data-flow-tip", tips[i] || "");
+          var r = rows[i];
+          node.classList.remove("is-current", "is-todo");
+          if (i === currentIdx) node.classList.add("is-current");
+          if (i > currentIdx) node.classList.add("is-todo");
+          node.setAttribute("data-flow-tip", r ? ("办理人: " + r.user + "\n流程节点: " + r.node + "\n办理时间: " + r.time + "\n办理内容: " + r.content + "\n处理结果: " + r.result) : "");
         });
       }
 
@@ -1194,9 +1223,15 @@
         refs.viewModalMask.setAttribute("aria-hidden", "true");
       }
 
-      function openProgressModal(item) {
-        setFlowTooltips(item);
-        renderProgressInfo(item);
+      function openProgressModal(item, type) {
+        setFlowTooltips(item, type || "apply");
+        renderProgressInfo(item, type || "apply");
+        refs.flowTabs.forEach(function (t) { t.classList.remove("is-active"); });
+        refs.flowPanes.forEach(function (p) {
+          p.classList.toggle("is-active", p.getAttribute("data-flow-pane") === "diagram");
+        });
+        var firstTab = document.querySelector('[data-flow-tab="diagram"]');
+        if (firstTab) firstTab.classList.add("is-active");
         refs.progressModalMask.classList.add("show");
         refs.progressModalMask.setAttribute("aria-hidden", "false");
       }
@@ -1300,8 +1335,14 @@
       });
       refs.btnOpenProgress.addEventListener("click", function () {
         if (!activeViewItem) return;
-        openProgressModal(activeViewItem);
+        openProgressModal(activeViewItem, "apply");
       });
+      if (refs.btnOpenPlanProgress) {
+        refs.btnOpenPlanProgress.addEventListener("click", function () {
+          if (!activePlanItem) return;
+          openProgressModal(activePlanItem, "plan");
+        });
+      }
       refs.flowTabs.forEach(function (tab) {
         tab.addEventListener("click", function () {
           var key = tab.getAttribute("data-flow-tab");
@@ -1622,6 +1663,7 @@
       function openPlanDetail(planNo) {
         var item = planRecords.find(function (p) { return p.planNo === planNo; });
         if (!item) return;
+        activePlanItem = item;
         document.getElementById("planDetailGrid").innerHTML =
           '<div class="view-item"><b>计划编号：</b>' + item.planNo + '</div><div class="view-item"><b>计划年度：</b>' + item.year + '</div>' +
           '<div class="view-item"><b>申请部门：</b>' + item.dept + '</div><div class="view-item"><b>申请人：</b>' + item.applicant + '</div>' +
@@ -1639,7 +1681,10 @@
           "<tr><td>管理处置部门负责人意见及签字</td><td>管理处置部门负责人</td><td>" + (item.status === "approved" ? "通过" : item.status === "review" ? "审批中" : "-") + "</td><td>-</td><td>" + (item.status === "approved" ? "完成" : "待处理") + "</td></tr>";
         document.getElementById("planDetailMask").classList.add("show");
       }
-      function closePlanDetail() { document.getElementById("planDetailMask").classList.remove("show"); }
+      function closePlanDetail() {
+        document.getElementById("planDetailMask").classList.remove("show");
+        activePlanItem = null;
+      }
       function openPlanSubmit(planNo) {
         var item = planRecords.find(function (p) { return p.planNo === planNo; });
         if (!item) return;
