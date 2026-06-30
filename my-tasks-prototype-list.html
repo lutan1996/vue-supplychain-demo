@@ -1705,14 +1705,13 @@
           if (step.result === "待处理" && currentStepIndex < 0) currentStepIndex = idx;
         });
         if (currentStepIndex < 0) currentStepIndex = isCompany ? 8 : 5;
-        function progressStep(text, idx, isEnd, skipBeforeArrow) {
+        function progressStep(text, idx, isEnd, skipAfterArrow) {
           var cls = "";
           if (idx === currentStepIndex) cls += " is-current";
           else if (currentStepIndex >= 0 && idx > currentStepIndex) cls += " is-future";
           if (isEnd) cls += " is-end";
-          var beforeArrow = (skipBeforeArrow || idx === 0) ? "" : '<div class="inventory-progress-arrow">→</div>';
-          var afterArrow = isEnd ? "" : '<div class="inventory-progress-arrow">→</div>';
-          return beforeArrow + '<div class="inventory-progress-step' + cls + '">' + mtEsc(text) + '</div>' + afterArrow;
+          var afterArrow = (skipAfterArrow || isEnd) ? "" : '<div class="inventory-progress-arrow">→</div>';
+          return '<div class="inventory-progress-step' + cls + '">' + mtEsc(text) + '</div>' + afterArrow;
         }
         var rowHtml = isCompany
           ? '<div class="inventory-progress-company-tree">' +

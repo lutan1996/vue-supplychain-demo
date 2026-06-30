@@ -602,7 +602,14 @@
           '<span class="warehouse-secondary-pipe" aria-hidden="true">|</span>' +
           '<button type="button" class="warehouse-secondary-link" data-action="purchase-contract-mgmt" data-label="合同信息管理">合同信息管理</button>' +
           '<span class="warehouse-secondary-pipe" aria-hidden="true">|</span>' +
-          '<button type="button" class="warehouse-secondary-link" data-action="purchase-summary-report" data-label="采购合同报表管理">采购合同报表管理</button>'
+          '<button type="button" class="warehouse-secondary-link" data-action="purchase-summary-report" data-label="采购合同报表管理">采购合同报表管理</button>' +
+          '<span class="warehouse-secondary-sep" aria-hidden="true"></span>' +
+          '<span class="warehouse-secondary-label">项目公司</span>' +
+          '<button type="button" class="warehouse-secondary-link" data-action="proj-company-plan-manage" data-label="项目公司采购信息台帐">项目公司采购信息台帐</button>' +
+          '<span class="warehouse-secondary-pipe" aria-hidden="true">|</span>' +
+          '<button type="button" class="warehouse-secondary-link" data-action="proj-company-contract-mgmt" data-label="项目公司合同信息管理">项目公司合同信息管理</button>' +
+          '<span class="warehouse-secondary-pipe" aria-hidden="true">|</span>' +
+          '<button type="button" class="warehouse-secondary-link" data-action="proj-company-summary-report" data-label="项目公司采购合同报表管理">项目公司采购合同报表管理</button>'
       },
       assetMgmt: {
         text: '资产管理',
