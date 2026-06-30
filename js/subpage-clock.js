@@ -1358,6 +1358,11 @@
       if (!mod) mod = "物资采购";
 
       function resolvePurchaseMgmtLabel(fileName, query) {
+        var pageSub = "";
+        try {
+          pageSub = (new URLSearchParams(query || "")).get("pageSub") || "";
+        } catch (ePageSub) {}
+        if (pageSub) return pageSub;
         var tab = "";
         try {
           tab = (new URLSearchParams(query || "")).get("tab") || "";
