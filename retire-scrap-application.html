@@ -923,62 +923,51 @@
     </div>
   </div>
 
-  <!-- 物资选择弹窗（图2样式：左树右表） -->
+  <!-- 物资选择弹窗（顶部筛选样式，匹配合同管理选择物资弹窗） -->
   <div class="modal-mask" id="planAssetPickMask" aria-hidden="true">
-    <div class="modal" role="dialog" style="width:min(980px,96vw);">
+    <div class="modal" role="dialog" style="width:min(1080px,96vw);">
       <div class="modal-header">
         <h2 class="modal-title">选择报废物资</h2>
         <button class="modal-close" id="btnClosePlanAssetPick" aria-label="关闭">×</button>
       </div>
-      <div class="modal-body" style="padding:12px 14px;display:flex;gap:12px;height:min(520px,72vh);box-sizing:border-box;overflow:hidden;">
-        <!-- 左侧：物资类型分类树 -->
-        <div style="width:130px;flex-shrink:0;border:1px solid #e8eef7;border-radius:8px;background:#f8fafc;overflow:auto;">
-          <div style="padding:8px 10px 4px;font-size:12px;color:#64748b;font-weight:600;border-bottom:1px solid #e8eef7;">物资分类</div>
-          <div id="pickCategoryTree">
-            <div class="pick-cat-item pick-cat-active" data-type="">全部</div>
-            <div class="pick-cat-item" data-type="检测设备">检测设备</div>
-            <div class="pick-cat-item" data-type="电测设备">电测设备</div>
-            <div class="pick-cat-item" data-type="工器具">工器具</div>
-          </div>
+      <div class="modal-body" style="padding:12px 16px;">
+        <!-- 顶部筛选栏 -->
+        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:10px;">
+          <input id="pickKeyword" placeholder="产品名称/产品编号" style="height:30px;border:1px solid #dbe6f3;border-radius:6px;padding:0 10px;font-size:12px;width:170px;" />
+          <input id="pickModel" placeholder="规格型号" style="height:30px;border:1px solid #dbe6f3;border-radius:6px;padding:0 10px;font-size:12px;width:150px;" />
+          <input id="pickLocation" placeholder="存放地点" style="height:30px;border:1px solid #dbe6f3;border-radius:6px;padding:0 10px;font-size:12px;width:140px;" />
+          <input id="pickUnit" placeholder="计量单位" style="height:30px;border:1px solid #dbe6f3;border-radius:6px;padding:0 10px;font-size:12px;width:90px;" />
+          <button type="button" id="btnPickFilter" class="btn-sub" style="height:30px;padding:0 16px;white-space:nowrap;">搜索</button>
         </div>
-        <!-- 右侧：搜索 + 表格 -->
-        <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:8px;overflow:hidden;">
-          <!-- 搜索栏 -->
-          <div style="display:flex;gap:8px;align-items:center;">
-            <input id="pickKeyword" placeholder="搜索产品名称/产品编号" style="flex:1;height:30px;border:1px solid #dbe6f3;border-radius:6px;padding:0 10px;font-size:12px;" />
-            <button type="button" id="btnPickFilter" class="btn-sub" style="height:30px;padding:0 14px;white-space:nowrap;">搜索</button>
+        <!-- 表格 -->
+        <div style="max-height:400px;overflow:auto;border:1px solid #e8eef7;border-radius:8px;">
+          <table class="pick-asset-table" id="pickAssetTable" style="table-layout:fixed;">
+            <thead>
+              <tr>
+                <th style="width:42px;text-align:center;"><input type="checkbox" id="pickCheckAll" /></th>
+                <th style="min-width:120px;">产品名称</th>
+                <th style="min-width:110px;">规格型号</th>
+                <th style="min-width:120px;">生产厂家</th>
+                <th style="width:76px;text-align:center;">计量单位</th>
+                <th style="min-width:110px;">存放地点</th>
+                <th style="width:86px;text-align:right;">原值(元)</th>
+                <th style="width:86px;text-align:right;">净值(元)</th>
+              </tr>
+            </thead>
+            <tbody id="pickAssetBody"></tbody>
+          </table>
+        </div>
+        <!-- 底栏 -->
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-top:10px;">
+          <div style="font-size:12px;color:#334155;">
+            共 <b id="pickTotalCount">0</b> 条，
+            已选 <b id="pickSelCount">0</b> 件，
+            净值合计 <b id="pickSelNet">¥ 0.00</b>
           </div>
-          <!-- 表格区 -->
-          <div style="flex:1;overflow:auto;border:1px solid #e8eef7;border-radius:8px;background:#fff;">
-            <table class="pick-asset-table" id="pickAssetTable" style="table-layout:fixed;">
-              <thead>
-                <tr>
-                  <th style="width:42px;text-align:center;"><input type="checkbox" id="pickCheckAll" /></th>
-                  <th style="min-width:110px;">产品名称</th>
-                  <th style="width:110px;">产品编号</th>
-                  <th style="min-width:100px;">规格型号</th>
-                  <th style="min-width:110px;">生产厂家</th>
-                  <th style="width:80px;text-align:center;">计量单位</th>
-                  <th style="width:78px;text-align:right;">原值(元)</th>
-                  <th style="width:78px;text-align:right;">净值(元)</th>
-                  <th style="width:90px;text-align:center;">存放地点</th>
-                </tr>
-              </thead>
-              <tbody id="pickAssetBody"></tbody>
-            </table>
-          </div>
-          <!-- 底栏：统计 + 分页 -->
-          <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
-            <div style="font-size:12px;color:#334155;">
-              共 <b id="pickTotalCount">0</b> 条，
-              已选 <b id="pickSelCount">0</b> 件，
-              净值合计 <b id="pickSelNet">¥ 0.00</b>
-            </div>
-            <div style="display:flex;align-items:center;gap:4px;">
-              <button type="button" id="btnPickPrev" style="width:28px;height:26px;border:1px solid #dbe6f3;border-radius:4px;background:#fff;color:#516a87;font-size:12px;cursor:pointer;">&lt;</button>
-              <span style="font-size:12px;color:#334155;min-width:52px;text-align:center;">第 <b id="pickPageNum">1</b> / <b id="pickPageTotal">1</b> 页</span>
-              <button type="button" id="btnPickNext" style="width:28px;height:26px;border:1px solid #dbe6f3;border-radius:4px;background:#fff;color:#516a87;font-size:12px;cursor:pointer;">&gt;</button>
-            </div>
+          <div style="display:flex;align-items:center;gap:4px;">
+            <button type="button" id="btnPickPrev" style="width:28px;height:26px;border:1px solid #dbe6f3;border-radius:4px;background:#fff;color:#516a87;font-size:12px;cursor:pointer;">&lt;</button>
+            <span style="font-size:12px;color:#334155;min-width:56px;text-align:center;">第 <b id="pickPageNum">1</b> / <b id="pickPageTotal">1</b> 页</span>
+            <button type="button" id="btnPickNext" style="width:28px;height:26px;border:1px solid #dbe6f3;border-radius:4px;background:#fff;color:#516a87;font-size:12px;cursor:pointer;">&gt;</button>
           </div>
         </div>
       </div>
@@ -2114,18 +2103,15 @@
 
       var pickPage = 1;
       var pickPageSize = 10;
-      var pickActiveType = "";
 
       // ── 物资选择弹窗 ──────────────────────────────────────
       function openPlanAssetPick() {
         pickChecked = {};
         pickPage = 1;
-        pickActiveType = "";
         document.getElementById("pickKeyword").value = "";
-        // 高亮"全部"
-        document.querySelectorAll(".pick-cat-item").forEach(function (el) {
-          el.classList.toggle("pick-cat-active", el.getAttribute("data-type") === "");
-        });
+        document.getElementById("pickModel").value = "";
+        document.getElementById("pickLocation").value = "";
+        document.getElementById("pickUnit").value = "";
         renderPickTable();
         document.getElementById("planAssetPickMask").classList.add("show");
       }
@@ -2135,10 +2121,15 @@
         var body = document.getElementById("pickAssetBody");
         if (!body) return;
         var kw = ((document.getElementById("pickKeyword") || {value:""}).value || "").trim().toLowerCase();
+        var model = ((document.getElementById("pickModel") || {value:""}).value || "").trim().toLowerCase();
+        var loc = ((document.getElementById("pickLocation") || {value:""}).value || "").trim().toLowerCase();
+        var unit = ((document.getElementById("pickUnit") || {value:""}).value || "").trim().toLowerCase();
         var rows = planAssets.filter(function (a) {
           if (a.dept !== currentDept) return false;
           if (kw && a.id.toLowerCase().indexOf(kw) < 0 && a.name.toLowerCase().indexOf(kw) < 0) return false;
-          if (pickActiveType && a.type !== pickActiveType) return false;
+          if (model && (a.model || "").toLowerCase().indexOf(model) < 0) return false;
+          if (loc && (a.location || "").toLowerCase().indexOf(loc) < 0) return false;
+          if (unit && (a.unit || "").toLowerCase().indexOf(unit) < 0) return false;
           return true;
         });
         var total = rows.length;
@@ -2153,19 +2144,14 @@
           tr.innerHTML =
             '<td style="text-align:center;"><input type="checkbox" class="pick-cb" data-id="' + a.id + '"' + (checked ? " checked" : "") + "></td>" +
             '<td>' + escHtml(a.name) + '</td>' +
-            '<td>' + a.id + '</td>' +
             '<td>' + escHtml(a.model) + '</td>' +
             '<td style="word-break:break-all;">' + escHtml(a.manufacturer || "-") + '</td>' +
             '<td style="text-align:center;">' + escHtml(a.unit || "台") + '</td>' +
+            '<td>' + escHtml(a.location) + '</td>' +
             '<td style="text-align:right;">' + fmtMoney(a.origin) + '</td>' +
-            '<td style="text-align:right;">' + fmtMoney(a.net) + '</td>' +
-            '<td style="text-align:center;">' + escHtml(a.location) + '</td>';
+            '<td style="text-align:right;">' + fmtMoney(a.net) + '</td>';
           tr.addEventListener("dblclick", function () {
-            if (!pickChecked[a.id]) {
-              pickChecked[a.id] = true;
-              renderPickTable();
-              refreshPickSummary();
-            }
+            if (!pickChecked[a.id]) { pickChecked[a.id] = true; renderPickTable(); refreshPickSummary(); }
           });
           body.appendChild(tr);
         });
@@ -2308,34 +2294,29 @@
         document.getElementById("btnPickConfirm").addEventListener("click", confirmPickItems);
         document.getElementById("planAssetPickMask").addEventListener("click", function (e) { if (e.target.id === "planAssetPickMask") closePlanAssetPick(); });
 
-        // 左侧分类树切换
-        document.getElementById("pickCategoryTree").addEventListener("click", function (e) {
-          var item = e.target.closest(".pick-cat-item");
-          if (!item) return;
-          pickActiveType = item.getAttribute("data-type") || "";
-          pickPage = 1;
-          document.querySelectorAll(".pick-cat-item").forEach(function (el) {
-            el.classList.toggle("pick-cat-active", el === item);
-          });
-          renderPickTable();
+        // 搜索按钮 + 各筛选框回车触发搜索
+        function doPickSearch() { pickPage = 1; renderPickTable(); }
+        document.getElementById("btnPickFilter").addEventListener("click", doPickSearch);
+        ["pickKeyword","pickModel","pickLocation","pickUnit"].forEach(function (id) {
+          var el = document.getElementById(id);
+          if (el) el.addEventListener("keydown", function (e) { if (e.key === "Enter") { e.preventDefault(); doPickSearch(); } });
         });
-
-        // 搜索框回车
-        document.getElementById("pickKeyword").addEventListener("keydown", function (e) {
-          if (e.key === "Enter") { e.preventDefault(); pickPage = 1; renderPickTable(); }
-        });
-        document.getElementById("btnPickFilter").addEventListener("click", function () { pickPage = 1; renderPickTable(); });
 
         // 翻页
         document.getElementById("btnPickPrev").addEventListener("click", function () {
           if (pickPage > 1) { pickPage--; renderPickTable(); }
         });
         document.getElementById("btnPickNext").addEventListener("click", function () {
+          var kw = ((document.getElementById("pickKeyword") || {value:""}).value || "").trim().toLowerCase();
+          var model = ((document.getElementById("pickModel") || {value:""}).value || "").trim().toLowerCase();
+          var loc = ((document.getElementById("pickLocation") || {value:""}).value || "").trim().toLowerCase();
+          var unit = ((document.getElementById("pickUnit") || {value:""}).value || "").trim().toLowerCase();
           var total = planAssets.filter(function (a) {
             if (a.dept !== currentDept) return false;
-            var kw = ((document.getElementById("pickKeyword") || {value:""}).value || "").trim().toLowerCase();
             if (kw && a.id.toLowerCase().indexOf(kw) < 0 && a.name.toLowerCase().indexOf(kw) < 0) return false;
-            if (pickActiveType && a.type !== pickActiveType) return false;
+            if (model && (a.model || "").toLowerCase().indexOf(model) < 0) return false;
+            if (loc && (a.location || "").toLowerCase().indexOf(loc) < 0) return false;
+            if (unit && (a.unit || "").toLowerCase().indexOf(unit) < 0) return false;
             return true;
           }).length;
           var totalPage = Math.max(1, Math.ceil(total / pickPageSize));
