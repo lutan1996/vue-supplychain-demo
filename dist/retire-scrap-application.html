@@ -550,6 +550,44 @@
       font-weight: 600;
       border-left-color: #1677ff;
     }
+    /* 合同同款弹窗样式 */
+    .pl-req-picker-mask{position:fixed;inset:0;background:rgba(0,0,0,.42);display:none;align-items:center;justify-content:center;z-index:4000;}
+    .pl-req-picker-mask.show{display:flex}
+    .pl-req-picker{width:min(1680px,98vw);height:min(680px,90vh);background:#fff;border-radius:4px;border:1px solid #d9e2ef;box-shadow:0 18px 48px rgba(15,23,42,.22);display:flex;flex-direction:column;overflow:hidden;border-top:3px solid #1890ff;}
+    .pl-req-picker-hd{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid #e8eef5;font-size:15px;font-weight:600;color:#1f3551;}
+    .pl-req-picker-bd{flex:1;min-height:0;display:flex;}
+    .pl-req-picker-side{width:260px;flex-shrink:0;border-right:1px solid #e8eef5;background:#fafbfc;display:flex;flex-direction:column;}
+    .pl-req-picker-side-hd{padding:8px 10px;font-size:13px;font-weight:600;color:#1f3551;border-bottom:1px solid #e8eef5;}
+    .pl-req-picker-tree{flex:1;overflow:auto;padding:8px 6px 12px;}
+    .pl-req-picker-node{user-select:none;}
+    .pl-req-picker-node-row{display:flex;align-items:center;gap:4px;padding:5px 6px;border-radius:4px;cursor:pointer;font-size:13px;color:#334155;line-height:1.4;}
+    .pl-req-picker-node-row:hover{background:#eef4ff;}
+    .pl-req-picker-node-row.is-active{background:#e6f4ff;color:#1677ff;font-weight:600;}
+    .pl-req-picker-toggle{width:16px;height:16px;border:none;background:transparent;color:#8b9ab0;cursor:pointer;font-size:10px;padding:0;flex-shrink:0;}
+    .pl-req-picker-toggle.is-leaf{visibility:hidden;}
+    .pl-req-picker-label{flex:1;min-width:0;}
+    .pl-req-picker-count{color:#8b9ab0;font-size:12px;font-weight:400;margin-left:2px;}
+    .pl-req-picker-node-row.is-active .pl-req-picker-count{color:#5b8fd9;}
+    .pl-req-picker-children{margin-left:18px;display:none;}
+    .pl-req-picker-children.is-open{display:block;}
+    .pl-req-picker-main{flex:1;min-width:0;display:flex;flex-direction:column;min-height:0;}
+    .pl-req-picker-toolbar{display:flex;align-items:center;justify-content:flex-end;gap:8px;padding:10px 12px;border-bottom:1px solid #eef2f6;}
+    .pl-req-picker-search{width:220px;height:32px;border:1px solid #d9d9d9;border-radius:4px;padding:0 10px;font-size:13px;}
+    .pl-req-picker-table-wrap{flex:1;min-height:0;overflow-x:hidden;overflow-y:auto;padding:0 12px;}
+    .pl-req-picker-table{width:100% !important;min-width:0 !important;border-collapse:collapse;font-size:11px;table-layout:fixed !important;}
+    .pl-req-picker-table th,.pl-req-picker-table td{border:1px solid #e8eef5;padding:6px 4px;white-space:normal;word-break:break-word;text-align:left;overflow:hidden;line-height:1.35;vertical-align:middle;}
+    .pl-req-picker-table th:first-child,.pl-req-picker-table td:first-child{width:36px;min-width:36px;max-width:36px;text-align:center;white-space:nowrap;padding:6px 2px;}
+    .pl-req-picker-table th{background:#e8f4fc;color:#334155;font-weight:600;}
+    .pl-req-picker-table tbody td{color:#000;}
+    .pl-req-picker-table tbody tr:hover td{background:#f8fbff;}
+    .pl-req-picker-table tbody tr.is-checked td{background:#f0f7ff;}
+    .pl-req-picker-ft{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;border-top:1px solid #e8eef5;background:#fafbfc;font-size:12px;color:#64748b;}
+    .pl-req-picker-pager{display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+    .pl-req-picker-pager button{min-width:28px;height:28px;border:1px solid #d9d9d9;border-radius:4px;background:#fff;cursor:pointer;font-size:12px;color:#334155;}
+    .pl-req-picker-pager button:disabled{opacity:.45;cursor:not-allowed;}
+    .pl-req-picker-actions{display:flex;gap:8px;padding:10px 14px;border-top:1px solid #e8eef5;justify-content:flex-end;}
+    .x-btn{height:28px;min-width:28px;padding:0 6px;border:1px solid #d9d9d9;border-radius:4px;background:#fff;cursor:pointer;font-size:16px;color:#334155;line-height:1;}
+    .btn.primary{background:#1890ff;border-color:#1890ff;color:#fff;}
   </style>
 </head>
 <body class="page-source-navbar page-subpage page-logistics">
@@ -923,57 +961,55 @@
     </div>
   </div>
 
-  <!-- 物资选择弹窗（顶部筛选样式，匹配合同管理选择物资弹窗） -->
-  <div class="modal-mask" id="planAssetPickMask" aria-hidden="true">
-    <div class="modal" role="dialog" style="width:min(1080px,96vw);">
-      <div class="modal-header">
-        <h2 class="modal-title">选择报废物资</h2>
-        <button class="modal-close" id="btnClosePlanAssetPick" aria-label="关闭">×</button>
+  <!-- 物资选择弹窗（合同选择物资同款） -->
+  <div class="pl-req-picker-mask" id="planAssetPickMask" aria-hidden="true">
+    <div class="pl-req-picker" role="dialog" aria-modal="true">
+      <div class="pl-req-picker-hd">
+        <span id="planAssetPickTitle">选择报废物资</span>
+        <button type="button" class="x-btn" id="btnClosePlanAssetPick" aria-label="关闭">×</button>
       </div>
-      <div class="modal-body" style="padding:12px 16px;">
-        <!-- 顶部筛选栏 -->
-        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:10px;">
-          <input id="pickKeyword" placeholder="产品名称/产品编号" style="height:30px;border:1px solid #dbe6f3;border-radius:6px;padding:0 10px;font-size:12px;width:170px;" />
-          <input id="pickModel" placeholder="规格型号" style="height:30px;border:1px solid #dbe6f3;border-radius:6px;padding:0 10px;font-size:12px;width:150px;" />
-          <input id="pickLocation" placeholder="存放地点" style="height:30px;border:1px solid #dbe6f3;border-radius:6px;padding:0 10px;font-size:12px;width:140px;" />
-          <input id="pickUnit" placeholder="计量单位" style="height:30px;border:1px solid #dbe6f3;border-radius:6px;padding:0 10px;font-size:12px;width:90px;" />
-          <button type="button" id="btnPickFilter" class="btn-sub" style="height:30px;padding:0 16px;white-space:nowrap;">搜索</button>
-        </div>
-        <!-- 表格 -->
-        <div style="max-height:400px;overflow:auto;border:1px solid #e8eef7;border-radius:8px;">
-          <table class="pick-asset-table" id="pickAssetTable" style="table-layout:fixed;">
-            <thead>
-              <tr>
-                <th style="width:42px;text-align:center;"><input type="checkbox" id="pickCheckAll" /></th>
-                <th style="min-width:120px;">产品名称</th>
-                <th style="min-width:110px;">规格型号</th>
-                <th style="min-width:120px;">生产厂家</th>
-                <th style="width:76px;text-align:center;">计量单位</th>
-                <th style="min-width:110px;">存放地点</th>
-                <th style="width:86px;text-align:right;">原值(元)</th>
-                <th style="width:86px;text-align:right;">净值(元)</th>
-              </tr>
-            </thead>
-            <tbody id="pickAssetBody"></tbody>
-          </table>
-        </div>
-        <!-- 底栏 -->
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-top:10px;">
-          <div style="font-size:12px;color:#334155;">
-            共 <b id="pickTotalCount">0</b> 条，
-            已选 <b id="pickSelCount">0</b> 件，
-            净值合计 <b id="pickSelNet">¥ 0.00</b>
+      <div class="pl-req-picker-bd">
+        <aside class="pl-req-picker-side">
+          <div class="pl-req-picker-side-hd">物资分类</div>
+          <div class="pl-req-picker-tree" id="planAssetPickTree"></div>
+        </aside>
+        <div class="pl-req-picker-main">
+          <div class="pl-req-picker-toolbar">
+            <input type="search" class="pl-req-picker-search" id="planAssetPickSearch" placeholder="—查询条件—" autocomplete="off" />
           </div>
-          <div style="display:flex;align-items:center;gap:4px;">
-            <button type="button" id="btnPickPrev" style="width:28px;height:26px;border:1px solid #dbe6f3;border-radius:4px;background:#fff;color:#516a87;font-size:12px;cursor:pointer;">&lt;</button>
-            <span style="font-size:12px;color:#334155;min-width:56px;text-align:center;">第 <b id="pickPageNum">1</b> / <b id="pickPageTotal">1</b> 页</span>
-            <button type="button" id="btnPickNext" style="width:28px;height:26px;border:1px solid #dbe6f3;border-radius:4px;background:#fff;color:#516a87;font-size:12px;cursor:pointer;">&gt;</button>
+          <div class="pl-req-picker-table-wrap">
+            <table class="pl-req-picker-table">
+              <thead>
+                <tr>
+                  <th style="width:40px"><input type="checkbox" id="planAssetPickChkAll" title="全选本页" /></th>
+                  <th>产品名称</th>
+                  <th>规格型号</th>
+                  <th>生产厂家</th>
+                  <th>存放地点</th>
+                  <th>计量单位</th>
+                  <th>原值(元)</th>
+                  <th>净值(元)</th>
+                </tr>
+              </thead>
+              <tbody id="planAssetPickTbody"></tbody>
+            </table>
+          </div>
+          <div class="pl-req-picker-ft">
+            <span id="planAssetPickCount">共0条记录</span>
+            <div class="pl-req-picker-pager">
+              <button type="button" id="planAssetPickFirst" title="首页">«</button>
+              <button type="button" id="planAssetPickPrev" title="上一页">‹</button>
+              <span>第 <input type="text" id="planAssetPickPageInp" value="1" style="width:36px;height:26px;text-align:center;border:1px solid #d9d9d9;border-radius:4px" /> 页</span>
+              <button type="button" id="planAssetPickNext" title="下一页">›</button>
+              <button type="button" id="planAssetPickLast" title="末页">»</button>
+              <button type="button" id="planAssetPickGo">GO</button>
+            </div>
           </div>
         </div>
       </div>
-      <div class="modal-footer">
-        <button class="btn" id="btnPickCancel">取消</button>
-        <button class="btn btn-primary" id="btnPickConfirm">确认添加</button>
+      <div class="pl-req-picker-actions">
+        <button type="button" class="btn" id="btnPlanPickCancel">取消</button>
+        <button type="button" class="btn primary" id="btnPlanPickOk">确定</button>
       </div>
     </div>
   </div>
@@ -2101,77 +2137,130 @@
         }
       }
 
-      var pickPage = 1;
-      var pickPageSize = 10;
+      // ═══════════════════════════════════════════════════════════
+      // 物资选择弹窗（合同选择物资同款 pl-req-picker）
+      // ═══════════════════════════════════════════════════════════
+      var PAP = window.__pap = {
+        treeNodeId: "",
+        search: "",
+        page: 1,
+        pageSize: 20,
+        pendingSelected: {}
+      };
 
-      // ── 物资选择弹窗 ──────────────────────────────────────
+      // 物资分类树数据（与planAssets.type对应）
+      var PAP_TREE = [
+        { id: "all", label: "全部", open: true, children: null },
+        { id: "检测设备", label: "检测设备", open: true, children: null },
+        { id: "电测设备", label: "电测设备", open: true, children: null },
+        { id: "工器具", label: "工器具", open: true, children: null }
+      ];
+
+      function papRenderTree() {
+        var root = document.getElementById("planAssetPickTree");
+        if (!root) return;
+        root.innerHTML = PAP_TREE.map(function (n) {
+          var active = n.id === PAP.treeNodeId || (n.id === "all" && !PAP.treeNodeId) ? " is-active" : "";
+          var childrenHtml = n.children
+            ? '<div class="pl-req-picker-children' + (n.open ? " is-open" : "") + '">' +
+                n.children.map(function (c) {
+                  var a2 = c.id === PAP.treeNodeId ? " is-active" : "";
+                  return '<div class="pl-req-picker-node" data-id="' + esc(c.id) + '">' +
+                    '<div class="pl-req-picker-node-row' + a2 + '" data-tree-id="' + esc(c.id) + '">' +
+                    '<button type="button" class="pl-req-picker-toggle is-leaf" aria-hidden="true">▸</button>' +
+                    '<span class="pl-req-picker-label">' + esc(c.label) + '</span>' +
+                    '<span class="pl-req-picker-count"></span></div></div>';
+                }).join("") + "</div>"
+            : "";
+          return '<div class="pl-req-picker-node" data-id="' + esc(n.id) + '">' +
+            '<div class="pl-req-picker-node-row' + active + '" data-tree-id="' + esc(n.id) + '">' +
+            '<button type="button" class="pl-req-picker-toggle' + (n.children ? "" : " is-leaf") + '" aria-hidden="true">▸</button>' +
+            '<span class="pl-req-picker-label">' + esc(n.label) + '</span>' +
+            '<span class="pl-req-picker-count"></span></div>' + childrenHtml + "</div>";
+        }).join("");
+      }
+
+      function papFilteredRows() {
+        var q = String(PAP.search || "").trim().toLowerCase();
+        var typeFilter = PAP.treeNodeId && PAP.treeNodeId !== "all" ? PAP.treeNodeId : "";
+        return planAssets.filter(function (a) {
+          if (a.dept !== currentDept) return false;
+          if (typeFilter && a.type !== typeFilter) return false;
+          if (!q) return true;
+          return a.id.toLowerCase().indexOf(q) >= 0 || a.name.toLowerCase().indexOf(q) >= 0 || (a.manufacturer || "").toLowerCase().indexOf(q) >= 0;
+        });
+      }
+
+      function papRenderTable() {
+        var tbody = document.getElementById("planAssetPickTbody");
+        if (!tbody) return;
+        var all = papFilteredRows();
+        var ps = Math.max(1, Number(PAP.pageSize) || 20);
+        var totalPages = Math.max(1, Math.ceil(all.length / ps) || 1);
+        if (PAP.page > totalPages) PAP.page = totalPages;
+        if (PAP.page < 1) PAP.page = 1;
+        var start = (PAP.page - 1) * ps;
+        var pageRows = all.slice(start, start + ps);
+        tbody.innerHTML = pageRows.map(function (a) {
+          var checked = !!PAP.pendingSelected[a.id];
+          return "<tr" + (checked ? ' class="is-checked"' : "") + ' data-id="' + esc(a.id) + '">' +
+            '<td><input type="checkbox" class="pap-chk"' + (checked ? " checked" : "") + ' data-id="' + esc(a.id) + '" /></td>' +
+            "<td>" + esc(a.name) + "</td>" +
+            "<td>" + esc(a.model) + "</td>" +
+            '<td style="word-break:break-all;">' + esc(a.manufacturer || "-") + "</td>" +
+            "<td>" + esc(a.location) + "</td>" +
+            "<td>" + esc(a.unit || "台") + "</td>" +
+            '<td style="text-align:right;">' + fmtMoney(a.origin) + "</td>" +
+            '<td style="text-align:right;">' + fmtMoney(a.net) + "</td>" +
+            "</tr>";
+        }).join("");
+        if (!pageRows.length) {
+          tbody.innerHTML = '<tr><td colspan="8" style="padding:32px;text-align:center;color:#94a9c4">暂无物资</td></tr>';
+        }
+        var countEl = document.getElementById("planAssetPickCount");
+        if (countEl) countEl.textContent = "共" + all.length + "条记录";
+        var pageInfo = document.getElementById("planAssetPickPageInfo");
+        if (pageInfo) pageInfo.textContent = "共" + totalPages + "页";
+        var pageInp = document.getElementById("planAssetPickPageInp");
+        if (pageInp) pageInp.value = String(PAP.page);
+        // 全选状态
+        var chkAll = document.getElementById("planAssetPickChkAll");
+        if (chkAll) {
+          var allOnPage = pageRows.length > 0 && pageRows.every(function (r) { return !!PAP.pendingSelected[r.id]; });
+          chkAll.checked = allOnPage;
+          chkAll.indeterminate = !allOnPage && pageRows.some(function (r) { return !!PAP.pendingSelected[r.id]; });
+        }
+        ["planAssetPickFirst", "planAssetPickPrev"].forEach(function (id) {
+          var b = document.getElementById(id); if (b) b.disabled = PAP.page <= 1;
+        });
+        ["planAssetPickNext", "planAssetPickLast"].forEach(function (id) {
+          var b = document.getElementById(id); if (b) b.disabled = PAP.page >= totalPages;
+        });
+      }
+
+      function papGoPage(p) {
+        var all = papFilteredRows();
+        var ps = Math.max(1, Number(PAP.pageSize) || 20);
+        var totalPages = Math.max(1, Math.ceil(all.length / ps) || 1);
+        if (p < 1 || p > totalPages) return;
+        PAP.page = p;
+        papRenderTable();
+      }
+
       function openPlanAssetPick() {
-        pickChecked = {};
-        pickPage = 1;
-        document.getElementById("pickKeyword").value = "";
-        document.getElementById("pickModel").value = "";
-        document.getElementById("pickLocation").value = "";
-        document.getElementById("pickUnit").value = "";
-        renderPickTable();
+        PAP.treeNodeId = "";
+        PAP.search = "";
+        PAP.page = 1;
+        PAP.pendingSelected = {};
+        var inp = document.getElementById("planAssetPickSearch");
+        if (inp) inp.value = "";
+        papRenderTree();
+        papRenderTable();
         document.getElementById("planAssetPickMask").classList.add("show");
       }
       function closePlanAssetPick() { document.getElementById("planAssetPickMask").classList.remove("show"); }
-
-      function renderPickTable() {
-        var body = document.getElementById("pickAssetBody");
-        if (!body) return;
-        var kw = ((document.getElementById("pickKeyword") || {value:""}).value || "").trim().toLowerCase();
-        var model = ((document.getElementById("pickModel") || {value:""}).value || "").trim().toLowerCase();
-        var loc = ((document.getElementById("pickLocation") || {value:""}).value || "").trim().toLowerCase();
-        var unit = ((document.getElementById("pickUnit") || {value:""}).value || "").trim().toLowerCase();
-        var rows = planAssets.filter(function (a) {
-          if (a.dept !== currentDept) return false;
-          if (kw && a.id.toLowerCase().indexOf(kw) < 0 && a.name.toLowerCase().indexOf(kw) < 0) return false;
-          if (model && (a.model || "").toLowerCase().indexOf(model) < 0) return false;
-          if (loc && (a.location || "").toLowerCase().indexOf(loc) < 0) return false;
-          if (unit && (a.unit || "").toLowerCase().indexOf(unit) < 0) return false;
-          return true;
-        });
-        var total = rows.length;
-        var totalPage = Math.max(1, Math.ceil(total / pickPageSize));
-        if (pickPage > totalPage) pickPage = totalPage;
-        var pageRows = rows.slice((pickPage - 1) * pickPageSize, pickPage * pickPageSize);
-        body.innerHTML = "";
-        pageRows.forEach(function (a) {
-          var checked = !!pickChecked[a.id];
-          var tr = document.createElement("tr");
-          if (checked) tr.className = "pick-row-selected";
-          tr.innerHTML =
-            '<td style="text-align:center;"><input type="checkbox" class="pick-cb" data-id="' + a.id + '"' + (checked ? " checked" : "") + "></td>" +
-            '<td>' + escHtml(a.name) + '</td>' +
-            '<td>' + escHtml(a.model) + '</td>' +
-            '<td style="word-break:break-all;">' + escHtml(a.manufacturer || "-") + '</td>' +
-            '<td style="text-align:center;">' + escHtml(a.unit || "台") + '</td>' +
-            '<td>' + escHtml(a.location) + '</td>' +
-            '<td style="text-align:right;">' + fmtMoney(a.origin) + '</td>' +
-            '<td style="text-align:right;">' + fmtMoney(a.net) + '</td>';
-          tr.addEventListener("dblclick", function () {
-            if (!pickChecked[a.id]) { pickChecked[a.id] = true; renderPickTable(); refreshPickSummary(); }
-          });
-          body.appendChild(tr);
-        });
-        document.getElementById("pickTotalCount").textContent = total;
-        document.getElementById("pickPageNum").textContent = pickPage;
-        document.getElementById("pickPageTotal").textContent = totalPage;
-        refreshPickSummary();
-      }
-      function refreshPickSummary() {
-        var ids = Object.keys(pickChecked);
-        var totalN = 0;
-        ids.forEach(function (id) {
-          var a = planAssets.find(function (x) { return x.id === id; });
-          if (a) totalN += a.net;
-        });
-        document.getElementById("pickSelCount").textContent = ids.length;
-        document.getElementById("pickSelNet").textContent = "¥ " + fmtMoney(totalN);
-      }
       function confirmPickItems() {
-        var ids = Object.keys(pickChecked);
+        var ids = Object.keys(PAP.pendingSelected);
         ids.forEach(function (id) {
           if (!planItems.some(function (item) { return item.id === id; })) {
             planItems.push({ id: id, qty: 1, reason: "" });
@@ -2287,65 +2376,70 @@
         document.getElementById("btnClosePlanModal").addEventListener("click", closePlanModal);
         document.getElementById("btnPlanCancel").addEventListener("click", closePlanModal);
         document.getElementById("planModalMask").addEventListener("click", function (e) { if (e.target.id === "planModalMask") closePlanModal(); });
-        // 物资选择弹窗事件
+        // 物资选择弹窗事件（合同同款 pl-req-picker）
         document.getElementById("btnOpenAssetPick").addEventListener("click", openPlanAssetPick);
         document.getElementById("btnClosePlanAssetPick").addEventListener("click", closePlanAssetPick);
-        document.getElementById("btnPickCancel").addEventListener("click", closePlanAssetPick);
-        document.getElementById("btnPickConfirm").addEventListener("click", confirmPickItems);
+        document.getElementById("btnPlanPickCancel").addEventListener("click", closePlanAssetPick);
+        document.getElementById("btnPlanPickOk").addEventListener("click", confirmPickItems);
         document.getElementById("planAssetPickMask").addEventListener("click", function (e) { if (e.target.id === "planAssetPickMask") closePlanAssetPick(); });
 
-        // 搜索按钮 + 各筛选框回车触发搜索
-        function doPickSearch() { pickPage = 1; renderPickTable(); }
-        document.getElementById("btnPickFilter").addEventListener("click", doPickSearch);
-        ["pickKeyword","pickModel","pickLocation","pickUnit"].forEach(function (id) {
-          var el = document.getElementById(id);
-          if (el) el.addEventListener("keydown", function (e) { if (e.key === "Enter") { e.preventDefault(); doPickSearch(); } });
+        // 分类树节点点击
+        document.getElementById("planAssetPickTree").addEventListener("click", function (e) {
+          var row = e.target.closest(".pl-req-picker-node-row");
+          if (!row) return;
+          var nodeId = row.getAttribute("data-tree-id");
+          PAP.treeNodeId = nodeId === "all" ? "" : nodeId;
+          PAP.page = 1;
+          papRenderTree();
+          papRenderTable();
         });
 
-        // 翻页
-        document.getElementById("btnPickPrev").addEventListener("click", function () {
-          if (pickPage > 1) { pickPage--; renderPickTable(); }
+        // 搜索框
+        document.getElementById("planAssetPickSearch").addEventListener("input", function () {
+          PAP.search = this.value;
+          PAP.page = 1;
+          papRenderTable();
         });
-        document.getElementById("btnPickNext").addEventListener("click", function () {
-          var kw = ((document.getElementById("pickKeyword") || {value:""}).value || "").trim().toLowerCase();
-          var model = ((document.getElementById("pickModel") || {value:""}).value || "").trim().toLowerCase();
-          var loc = ((document.getElementById("pickLocation") || {value:""}).value || "").trim().toLowerCase();
-          var unit = ((document.getElementById("pickUnit") || {value:""}).value || "").trim().toLowerCase();
-          var total = planAssets.filter(function (a) {
-            if (a.dept !== currentDept) return false;
-            if (kw && a.id.toLowerCase().indexOf(kw) < 0 && a.name.toLowerCase().indexOf(kw) < 0) return false;
-            if (model && (a.model || "").toLowerCase().indexOf(model) < 0) return false;
-            if (loc && (a.location || "").toLowerCase().indexOf(loc) < 0) return false;
-            if (unit && (a.unit || "").toLowerCase().indexOf(unit) < 0) return false;
-            return true;
-          }).length;
-          var totalPage = Math.max(1, Math.ceil(total / pickPageSize));
-          if (pickPage < totalPage) { pickPage++; renderPickTable(); }
+
+        // 翻页按钮
+        document.getElementById("planAssetPickFirst").addEventListener("click", function () { papGoPage(1); });
+        document.getElementById("planAssetPickPrev").addEventListener("click", function () { papGoPage(PAP.page - 1); });
+        document.getElementById("planAssetPickNext").addEventListener("click", function () { papGoPage(PAP.page + 1); });
+        document.getElementById("planAssetPickLast").addEventListener("click", function () {
+          var all = papFilteredRows();
+          var ps = Math.max(1, Number(PAP.pageSize) || 20);
+          papGoPage(Math.max(1, Math.ceil(all.length / ps)));
+        });
+        document.getElementById("planAssetPickGo").addEventListener("click", function () {
+          var inp = document.getElementById("planAssetPickPageInp");
+          var p = parseInt(inp && inp.value, 10);
+          if (!isNaN(p) && p > 0) papGoPage(p);
+        });
+        document.getElementById("planAssetPickPageInp").addEventListener("keydown", function (e) {
+          if (e.key === "Enter") {
+            var p = parseInt(this.value, 10);
+            if (!isNaN(p) && p > 0) papGoPage(p);
+          }
         });
 
         // 全选
-        document.getElementById("pickCheckAll").addEventListener("change", function (e) {
-          var rows = document.querySelectorAll("#pickAssetBody tr");
-          rows.forEach(function (tr) {
-            var cb = tr.querySelector(".pick-cb");
-            if (!cb) return;
-            cb.checked = e.target.checked;
-            var id = cb.getAttribute("data-id");
-            if (e.target.checked) pickChecked[id] = true;
-            else delete pickChecked[id];
-            if (e.target.checked) tr.className = "pick-row-selected";
-            else tr.className = "";
+        document.getElementById("planAssetPickChkAll").addEventListener("change", function () {
+          var pageRows = papFilteredRows().slice((PAP.page - 1) * PAP.pageSize, PAP.page * PAP.pageSize);
+          pageRows.forEach(function (r) {
+            if (document.getElementById("planAssetPickChkAll").checked) PAP.pendingSelected[r.id] = true;
+            else delete PAP.pendingSelected[r.id];
           });
-          refreshPickSummary();
+          papRenderTable();
         });
-        document.getElementById("pickAssetBody").addEventListener("change", function (e) {
-          var cb = e.target.closest(".pick-cb");
+
+        // 行内复选框
+        document.getElementById("planAssetPickTbody").addEventListener("change", function (e) {
+          var cb = e.target.closest(".pap-chk");
           if (!cb) return;
           var id = cb.getAttribute("data-id");
-          var tr = cb.closest("tr");
-          if (cb.checked) { pickChecked[id] = true; tr.className = "pick-row-selected"; }
-          else { delete pickChecked[id]; tr.className = ""; }
-          refreshPickSummary();
+          if (cb.checked) PAP.pendingSelected[id] = true;
+          else delete PAP.pendingSelected[id];
+          papRenderTable();
         });
 
         // 明细表事件：数量/原因编辑、删除
