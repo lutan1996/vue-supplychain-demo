@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>项目公司采购信息台帐 - 新能源物资供应链管理系统</title>
+  <link rel="stylesheet" href="css/vendor/fa-all.min.css" />
+  <link rel="stylesheet" href="css/subpage-base.css" />
+  <link rel="stylesheet" href="css/carrier-management.css" />
+  <link rel="stylesheet" href="css/source-navbar-header.css" />
+  <style>
+    .pcmp-role-bar { display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px;font-size:13px;color:#516a87; }
+    .pcmp-role-bar select{height:32px;border-radius:6px;border:1px solid #d9d9d9;padding:0 8px;min-width:260px; }
+    .pcmp-toolbar-grid { display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end;margin-bottom:12px;padding:12px;background:#fff;border:1px solid #edf2f8;border-radius:8px; }
+    .pcmp-toolbar-grid label{ display:block;font-size:12px;color:#62788f;margin-bottom:4px; }
+    .pcmp-ops{ display:inline-flex;flex-wrap:wrap;gap:8px;align-items:center;max-width:none;justify-content:flex-start; }
+    .pcmp-ops .carrier-btn-add{ min-height:auto;padding:0;border:none;background:transparent;box-shadow:none;color:#1677ff;font-size:14px;font-weight:600;line-height:1.2;text-decoration:none; }
+    .pcmp-ops .carrier-btn-add:hover{ color:#4096ff;text-decoration:underline; }
+    .carrier-table th:last-child,.carrier-table td:last-child{ min-width:280px !important; }
+    .carrier-table td:last-child{ white-space:normal !important; }
+    .cell-num{ text-align:right;font-variant-numeric:tabular-nums; }
+    .pcmp-empty{ text-align:center;padding:24px !important;color:#8c8c8c; }
+    .pcmp-form-grid{ display:grid;gap:10px;margin-bottom:10px; }
+    .pcmp-form-grid-2{ grid-template-columns:1fr 1fr; }
+    @media(max-width:900px){ .pcmp-form-grid-2{ grid-template-columns:1fr; } }
+    .pcmp-form-full{ grid-column:1/-1; }
+    .pcmp-form label{ display:block;font-size:13px;color:#516a87;margin-bottom:4px; }
+    .pcmp-form-seg{ margin:14px 0 8px;font-size:14px;color:#1f3551;border-left:3px solid #1677ff;padding-left:8px; }
+    .pcmp-req{ color:#cf1322; }
+    .pcmp-modal-mask{ position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:2400;display:none;align-items:center;justify-content:center;padding:16px;box-sizing:border-box; }
+    .pcmp-modal-mask.show{ display:flex; }
+    .pcmp-dialog{ background:#fff;border-radius:10px;max-height:92vh;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 16px 48px rgba(0,0,0,.2);width:100%; }
+    .pcmp-dialog--w800{ max-width:800px; }
+    .pcmp-dialog-hd{ padding:12px 16px;border-bottom:1px solid #edf2f8;font-weight:600;display:flex;justify-content:space-between;align-items:center;color:#1f3551; }
+    .pcmp-dialog-bd{ padding:14px 16px;overflow-y:auto;font-size:13px; }
+    .pcmp-dialog-ft{ padding:10px 16px;border-top:1px solid #edf2f8;display:flex;justify-content:flex-end;gap:8px;flex-wrap:wrap; }
+    .pcmp-steps{ display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;align-items:center; }
+    .pcmp-step{ padding:6px 10px;border-radius:6px;background:#fafafa;border:1px solid #d9d9d9;font-size:12px;color:#8c8c8c; }
+    .pcmp-step.done{ background:#f6ffed;border-color:#b7eb8f;color:#389e0d; }
+    .pcmp-step.active{ background:#e6f4ff;border-color:#91caff;color:#1677ff; }
+    .pcmp-table-wrap{ overflow-x:auto;max-width:100%; }
+    .pcmp-table{ min-width:1600px !important;width:max-content !important;table-layout:auto !important; }
+    .pcmp-table th,.pcmp-table td{ white-space:nowrap !important; }
+    .carrier-table thead th{ overflow:visible; }
+    .carrier-table-wrap{ overflow-x:auto !important;max-width:100%; }
+    .carrier-table{ min-width:1800px !important;width:max-content !important;table-layout:auto !important; }
+    .carrier-table th,.carrier-table td{ white-space:nowrap !important; }
+  </style>
+</head>
+<body class="page-source-navbar page-subpage page-logistics">
+  <div class="page-bg" aria-hidden="true"></div>
+  <div class="app">
+    <header class="header">
+      <div class="header-left">
+        <button type="button" class="header-hamburger" aria-label="菜单"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+        <a class="header-logo" href="index-portal-screen-alt.html"><img src="assets/logo-chenergy.png" width="220" height="40" alt="" /></a>
+        <div class="header-source-brand"><p>新能源物资供应链管理系统</p></div>
+      </div>
+      <div class="header-right">
+        <span class="clock" id="clock"></span>
+        <div class="user-avatar" title="用户">用</div>
+      </div>
+    </header>
+    <div class="layout">
+      <aside class="sidebar" aria-label="主导航">
+        <div class="nav-item nav-item--module-active" title="采购管理"><span class="nav-label">采购管理</span></div>
+      </aside>
+      <main class="main-scroll">
+        <nav class="subpage-breadcrumb" aria-label="面包屑">
+          <a href="index-portal-screen-alt.html">首页</a><span class="sep">/</span><span>采购管理</span><span class="sep">/</span><span>项目公司采购信息台帐</span>
+        </nav>
+        <div class="carrier-main-inner">
+          <h1 class="carrier-page-title">项目公司采购信息台帐</h1>
+          <div class="pcmp-toolbar-grid">
+            <div>
+              <label for="pcmpFName">项目名称</label>
+              <input id="pcmpFName" class="carrier-search" placeholder="模糊搜索" />
+            </div>
+            <div>
+              <label for="pcmpFDept">业务部门</label>
+              <select id="pcmpFDept" class="carrier-select"></select>
+            </div>
+            <div>
+              <label for="pcmpFStatus">审批状态</label>
+              <select id="pcmpFStatus" class="carrier-select">
+                <option value="">全部</option>
+                <option>草稿</option>
+                <option>审批中</option>
+                <option>已通过</option>
+                <option>已驳回</option>
+              </select>
+            </div>
+            <div>
+              <label>&nbsp;</label>
+              <button type="button" class="carrier-btn-add" id="pcmpBtnSearch" style="background:#1677ff;border-color:#1677ff;color:#fff;">搜索</button>
+              <button type="button" class="carrier-btn-add" id="pcmpBtnReset">重置</button>
+            </div>
+          </div>
+          <div style="margin-bottom:10px;display:flex;gap:8px;flex-wrap:wrap;">
+            <button type="button" class="carrier-btn-add" id="pcmpBtnAdd" style="background:#1677ff;border-color:#1677ff;color:#fff;">新增</button>
+            <button type="button" class="carrier-btn-add" id="pcmpBtnImport">导入</button>
+            <button type="button" class="carrier-btn-add" id="pcmpBtnTpl">下载模板</button>
+            <button type="button" class="carrier-btn-add" id="pcmpBtnExport">导出</button>
+            <button type="button" class="carrier-btn-add" id="pcmpBtnDelBatch" style="border-color:#ffccc7;color:#cf1322;background:#fff1f0;">批量删除</button>
+          </div>
+          <div class="carrier-table-wrap">
+            <table class="carrier-table">
+              <thead>
+                <tr>
+                  <th><input type="checkbox" id="pcmpChkAll" /></th>
+                  <th>项目名称</th>
+                  <th>采购计划编号</th>
+                  <th>预算金额（万元）</th>
+                  <th>执行金额（万元）</th>
+                  <th>申请部门</th>
+                  <th>申请人</th>
+                  <th>申请时间</th>
+                  <th>采购流程进度</th>
+                  <th>审批状态</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody id="pcmpTb"></tbody>
+            </table>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- 新增/编辑弹窗 -->
+  <div id="pcmpModalEdit" class="pcmp-modal-mask" role="dialog" aria-modal="true">
+    <div class="pcmp-dialog pcmp-dialog--w800">
+      <div class="pcmp-dialog-hd"><span id="pcmpModalTitle">新增采购计划</span><button type="button" class="carrier-btn-add" style="padding:4px 10px" data-close>×</button></div>
+      <div class="pcmp-dialog-bd" id="pcmpModalBody"></div>
+      <div class="pcmp-dialog-ft">
+        <button type="button" class="carrier-btn-add" id="pcmpSave">保存</button>
+        <button type="button" class="carrier-btn-add" data-close style="background:#fff;color:#595959;border:1px solid #d9d9d9">取消</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 删除确认 -->
+  <div id="pcmpModalDel" class="pcmp-modal-mask" role="dialog">
+    <div class="pcmp-dialog" style="max-width:400px">
+      <div class="pcmp-dialog-hd">删除确认 <button type="button" class="carrier-btn-add" style="padding:4px 10px" data-close>×</button></div>
+      <div class="pcmp-dialog-bd"><p style="margin:0;line-height:1.6">是否确认删除所选数据？</p></div>
+      <div class="pcmp-dialog-ft">
+        <button type="button" class="carrier-btn-add" id="pcmpDelOk" style="background:#fff1f0;color:#cf1322;border:1px solid #ffccc7">确认删除</button>
+        <button type="button" class="carrier-btn-add" data-close style="background:#fff;color:#595959;border:1px solid #d9d9d9">取消</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 审批进度 -->
+  <div id="pcmpModalProgress" class="pcmp-modal-mask" role="dialog">
+    <div class="pcmp-dialog" style="max-width:700px">
+      <div class="pcmp-dialog-hd">审批进度 <button type="button" class="carrier-btn-add" style="padding:4px 10px" data-close>×</button></div>
+      <div class="pcmp-dialog-bd">
+        <div class="pcmp-steps" id="pcmpProgressSteps"></div>
+        <div class="carrier-table-wrap">
+          <table class="carrier-table">
+            <thead><tr><th>节点名称</th><th>审批人</th><th>审批时间</th><th>审批结果</th><th>审批意见</th></tr></thead>
+            <tbody id="pcmpProgressTb"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="pcmp-dialog-ft"><button type="button" class="carrier-btn-add" data-close>关闭</button></div>
+    </div>
+  </div>
+
+  <script src="js/sidebar-actions.js"></script>
+  <script src="js/subpage-feature-title.js"></script>
+  <script src="js/site-footer.js"></script>
+  <script src="js/subpage-clock.js"></script>
+  <script>
+  (function(){
+    var STEPS = ["部门专责提报","部门主管审核","主管领导审核","公司采购主管审核","公司采购专责汇总"];
+    var DEPTS = ["综合管理部","财务管理部","生产运营部","项目执行部"];
+    var statusOpts = ['草稿','审批中','已通过','已驳回'];
+
+    var CTX = { list:[], editingId:null, checkedIds:new Set() };
+
+    var sampleData = [
+      {id:"PJT001",name:"宁夏盐池光伏项目备件采购",planNo:"PJT-CG-2026-001",budget:120,execAmt:86.5,dept:"项目执行部",applicant:"张强",applyDate:"2026-01-15",flow:"部门专责提报",status:"已通过"},
+      {id:"PJT002",name:"甘肃酒泉风电场备件补货计划",planNo:"PJT-CG-2026-002",budget:85,budget:60,execAmt:0,dept:"项目执行部",applicant:"李明",applyDate:"2026-02-20",flow:"部门专责提报",status:"审批中"},
+      {id:"PJT003",name:"陕西榆林光伏逆变器采购",planNo:"PJT-CG-2026-003",budget:200,execAmt:145,dept:"生产运营部",applicant:"王芳",applyDate:"2026-03-05",flow:"部门专责提报",status:"已通过"},
+      {id:"PJT004",name:"新疆哈密风电主轴采购",planNo:"PJT-CG-2026-004",budget:350,execAmt:0,dept:"项目执行部",applicant:"赵伟",applyDate:"2026-04-10",flow:"部门专责提报",status:"草稿"},
+      {id:"PJT005",name:"内蒙古乌兰察布光伏支架采购",planNo:"PJT-CG-2026-005",budget:95,execAmt:72,dept:"综合管理部",applicant:"孙丽",applyDate:"2026-03-28",flow:"部门专责提报",status:"已驳回"},
+    ];
+
+    function init(){
+      CTX.list = sampleData.map(function(r){ return Object.assign({},r); });
+      renderDepts();
+      render();
+      bindEvents();
+    }
+
+    function renderDepts(){
+      var sel = document.getElementById("pcmpFDept");
+      sel.innerHTML = '<option value="">全部部门</option>' +
+        DEPTS.map(function(d){ return '<option>'+d+'</option>'; }).join('');
+    }
+
+    function getFiltered(){
+      var name = document.getElementById("pcmpFName").value.trim();
+      var dept = document.getElementById("pcmpFDept").value;
+      var status = document.getElementById("pcmpFStatus").value;
+      return CTX.list.filter(function(r){
+        if(name && r.name.indexOf(name)<0) return false;
+        if(dept && r.dept !== dept) return false;
+        if(status && r.status !== status) return false;
+        return true;
+      });
+    }
+
+    function renderStepBadge(flow, status){
+      var idx = STEPS.indexOf(flow);
+      return STEPS.map(function(s,i){
+        var cls = "pcmp-step";
+        if(i < idx) cls += " done";
+        else if(i === idx) cls += " active";
+        if(status === '已驳回') cls = "pcmp-step";
+        if(status === '已通过' && i <= idx) cls = "pcmp-step done";
+        return '<span class="'+cls+'">'+s+'</span>';
+      }).join('');
+    }
+
+    function render(){
+      var rows = getFiltered();
+      var tb = document.getElementById("pcmpTb");
+      if(!rows.length){
+        tb.innerHTML = '<tr><td colspan="11" class="pcmp-empty">暂无数据</td></tr>';
+        return;
+      }
+      tb.innerHTML = rows.map(function(r){
+        var checked = CTX.checkedIds.has(r.id) ? 'checked' : '';
+        var opEdit = r.status==='草稿'||r.status==='已驳回'
+          ? '<a href="#" class="pcmp-edit" data-id="'+r.id+'">编辑</a>'
+          : '<a href="#" class="pcmp-view" data-id="'+r.id+'">查看</a>';
+        var opDel = r.status==='草稿'
+          ? '<a href="#" class="pcmp-del" data-id="'+r.id+'" style="color:#cf1322">删除</a>'
+          : '<span style="color:#d9d9d9;cursor:default">删除</span>';
+        return '<tr>'+
+          '<td><input type="checkbox" class="pcmp-row-chk" value="'+r.id+'" '+checked+' /></td>'+
+          '<td>'+r.name+'</td>'+
+          '<td>'+r.planNo+'</td>'+
+          '<td class="cell-num">'+r.budget.toFixed(2)+'</td>'+
+          '<td class="cell-num">'+r.execAmt.toFixed(2)+'</td>'+
+          '<td>'+r.dept+'</td>'+
+          '<td>'+r.applicant+'</td>'+
+          '<td>'+r.applyDate+'</td>'+
+          '<td>'+renderStepBadge(r.flow,r.status)+'</td>'+
+          '<td><span class="status-pill status-'+(r.status==='已通过'?'pass':r.status==='审批中'?'pending':r.status==='已驳回'?'reject':'draft')+'">'+r.status+'</span></td>'+
+          '<td><span class="pcmp-ops">'+opEdit+' <a href="#" class="pcmp-progress" data-id="'+r.id+'">进度</a> '+opDel+'</span></td>'+
+        '</tr>';
+      }).join('');
+    }
+
+    function openEditForm(id){
+      var rec = id ? CTX.list.find(function(r){ return r.id===id; }) : null;
+      CTX.editingId = id;
+      var title = id ? '编辑采购计划' : '新增采购计划';
+      document.getElementById("pcmpModalTitle").textContent = title;
+      document.getElementById("pcmpModalBody").innerHTML = buildForm(rec);
+      document.getElementById("pcmpModalEdit").classList.add("show");
+    }
+
+    function buildForm(rec){
+      rec = rec || {};
+      return '<div class="pcmp-form-grid pcmp-form-grid-2">'+
+        '<div class="pcmp-form-full">'+
+          '<label>项目名称 <span class="pcmp-req">*</span></label>'+
+          '<input class="carrier-search" id="pcmpFormName" value="'+esc(rec.name||'')+'" placeholder="请输入项目名称" style="width:100%;box-sizing:border-box" />'+
+        '</div>'+
+        '<div>'+
+          '<label>采购计划编号</label>'+
+          '<input class="carrier-search" id="pcmpFormPlanNo" value="'+esc(rec.planNo||'')+'" placeholder="系统自动生成" style="width:100%;box-sizing:border-box" />'+
+        '</div>'+
+        '<div>'+
+          '<label>申请部门 <span class="pcmp-req">*</span></label>'+
+          '<select id="pcmpFormDept" class="carrier-select" style="width:100%;box-sizing:border-box;height:34px;border:1px solid #d9d9d9;border-radius:8px;padding:0 10px">'+
+            DEPTS.map(function(d){ return '<option'+(rec.dept===d?' selected':'')+'>'+d+'</option>'; }).join('')+
+          '</select>'+
+        '</div>'+
+        '<div>'+
+          '<label>申请人</label>'+
+          '<input class="carrier-search" id="pcmpFormApplicant" value="'+esc(rec.applicant||'')+'" placeholder="请输入申请人" style="width:100%;box-sizing:border-box" />'+
+        '</div>'+
+        '<div>'+
+          '<label>申请时间</label>'+
+          '<input type="date" class="carrier-search" id="pcmpFormDate" value="'+esc(rec.applyDate||'')+'" style="width:100%;box-sizing:border-box;height:34px;border:1px solid #d9d9d9;border-radius:8px;padding:0 10px" />'+
+        '</div>'+
+        '<div>'+
+          '<label>预算金额（万元） <span class="pcmp-req">*</span></label>'+
+          '<input type="number" class="carrier-search" id="pcmpFormBudget" value="'+esc(rec.budget||'')+'" placeholder="0.00" style="width:100%;box-sizing:border-box" />'+
+        '</div>'+
+        '<div class="pcmp-form-full">'+
+          '<label>备注</label>'+
+          '<textarea id="pcmpFormNote" rows="3" style="width:100%;box-sizing:border-box;border:1px solid #d9d9d9;border-radius:8px;padding:8px" placeholder="选填"></textarea>'+
+        '</div>'+
+      '</div>';
+    }
+
+    function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+    function closeModal(id){ document.getElementById(id).classList.remove("show"); }
+
+    function bindEvents(){
+      document.getElementById("pcmpBtnAdd").onclick = function(){ openEditForm(null); };
+      document.getElementById("pcmpBtnSearch").onclick = render;
+      document.getElementById("pcmpBtnReset").onclick = function(){
+        document.getElementById("pcmpFName").value = '';
+        document.getElementById("pcmpFDept").value = '';
+        document.getElementById("pcmpFStatus").value = '';
+        render();
+      };
+      document.getElementById("pcmpBtnDelBatch").onclick = function(){
+        if(CTX.checkedIds.size===0){ alert("请先勾选要删除的数据"); return; }
+        document.getElementById("pcmpModalDel").classList.add("show");
+      };
+      document.getElementById("pcmpChkAll").onchange = function(){
+        var checked = this.checked;
+        document.querySelectorAll(".pcmp-row-chk").forEach(function(el){ el.checked = checked; });
+        if(checked) CTX.list.forEach(function(r){ CTX.checkedIds.add(r.id); });
+        else CTX.checkedIds.clear();
+      };
+      document.getElementById("pcmpTb").onclick = function(e){
+        var t = e.target;
+        var editLink = t.closest(".pcmp-edit");
+        var viewLink = t.closest(".pcmp-view");
+        var delLink = t.closest(".pcmp-del");
+        var progressLink = t.closest(".pcmp-progress");
+        var chk = t.closest(".pcmp-row-chk");
+        if(chk){
+          if(chk.checked) CTX.checkedIds.add(chk.value); else CTX.checkedIds.delete(chk.value);
+          return;
+        }
+        if(editLink){ e.preventDefault(); openEditForm(editLink.dataset.id); return; }
+        if(viewLink){ e.preventDefault(); openEditForm(viewLink.dataset.id); return; }
+        if(delLink){ e.preventDefault(); CTX.editingId = delLink.dataset.id; document.getElementById("pcmpModalDel").classList.add("show"); return; }
+        if(progressLink){
+          e.preventDefault();
+          var rec = CTX.list.find(function(r){ return r.id === progressLink.dataset.id; });
+          if(rec){
+            document.getElementById("pcmpProgressSteps").innerHTML = renderStepBadge(rec.flow, rec.status);
+            var steps2 = ["部门专责提报","部门主管审核","主管领导审核","公司采购主管审核","公司采购专责汇总"];
+            var apprs = ["张强","王超","曾繁礼","王超","王卿明"];
+            var approvers = ["张强","王超","曾繁礼","王超","王卿明"];
+            var results = ["通过","通过","通过","",""]; var times = ["2026-02-01 09:12","2026-02-03 14:30","2026-02-05 10:08","",""]; var notes = ["同意","同意","同意，按计划执行","",""]; var idx2 = steps2.indexOf(rec.flow);
+            if(rec.status==='已驳回'){ results=["通过","通过","驳回","",""]; times=["2026-02-01 09:12","2026-02-03 14:30","2026-02-05 10:08","",""]; notes=["同意","同意","需补充预算明细","",""]; }
+            if(rec.status==='已通过'){ results=["通过","通过","通过","通过","通过"]; times=["2026-02-01 09:12","2026-02-03 14:30","2026-02-05 10:08","2026-02-08 11:20","2026-02-10 15:45"]; notes=["同意","同意","同意","同意","汇总完成"]; }
+            document.getElementById("pcmpProgressTb").innerHTML = steps2.map(function(s,i){
+              var result = results[i]||"待审批"; var rCls='color:#8c8c8c'; if(result==='通过') rCls='color:#389e0d'; if(result==='驳回') rCls='color:#cf1322';
+              return '<tr><td>'+s+'</td><td>'+(approvers[i]||'')+'</td><td>'+(times[i]||'')+'</td><td style="'+rCls+'">'+result+'</td><td>'+(notes[i]||'')+'</td></tr>';
+            }).join('');
+          }
+          document.getElementById("pcmpModalProgress").classList.add("show");
+          return;
+        }
+      };
+      document.getElementById("pcmpSave").onclick = function(){
+        var name = document.getElementById("pcmpFormName").value.trim();
+        var dept = document.getElementById("pcmpFormDept").value;
+        var budget = parseFloat(document.getElementById("pcmpFormBudget").value)||0;
+        var applicant = document.getElementById("pcmpFormApplicant").value.trim();
+        var applyDate = document.getElementById("pcmpFormDate").value;
+        if(!name){ alert("请填写项目名称"); return; }
+        if(!dept){ alert("请选择申请部门"); return; }
+        if(!budget){ alert("请填写预算金额"); return; }
+        var rec = { id: CTX.editingId||('PJT'+Date.now()), name:name, planNo:'PJT-CG-2026-'+(Math.floor(Math.random()*900)+100), budget:budget, execAmt:0, dept:dept, applicant:applicant, applyDate:applyDate||new Date().toISOString().slice(0,10), flow:'部门专责提报', status:'草稿' };
+        if(CTX.editingId){
+          var idx = CTX.list.findIndex(function(r){ return r.id===CTX.editingId; });
+          if(idx>=0) CTX.list[idx]=rec;
+        } else { CTX.list.unshift(rec); }
+        closeModal("pcmpModalEdit");
+        render();
+      };
+      document.getElementById("pcmpDelOk").onclick = function(){
+        if(CTX.editingId){
+          CTX.list = CTX.list.filter(function(r){ return r.id!==CTX.editingId; });
+          CTX.checkedIds.delete(CTX.editingId);
+        } else {
+          CTX.checkedIds.forEach(function(id){ CTX.list=CTX.list.filter(function(r){ return r.id!==id; }); });
+          CTX.checkedIds.clear();
+        }
+        closeModal("pcmpModalDel");
+        render();
+      };
+      [document.getElementById("pcmpModalEdit"),document.getElementById("pcmpModalDel"),document.getElementById("pcmpModalProgress")].forEach(function(el){
+        el.addEventListener("click",function(e){
+          if(e.target===el) closeModal(el.id);
+        });
+        el.querySelectorAll("[data-close]").forEach(function(btn){
+          btn.onclick = function(){ closeModal(el.id); };
+        });
+      });
+      document.getElementById("pcmpBtnImport").onclick = function(){ alert("演示：导入功能"); };
+      document.getElementById("pcmpBtnTpl").onclick = function(){ alert("演示：下载模板"); };
+      document.getElementById("pcmpBtnExport").onclick = function(){ alert("演示：导出功能"); };
+    }
+
+    document.addEventListener("DOMContentLoaded", init);
+  })();
+  </script>
+</body>
+</html>
