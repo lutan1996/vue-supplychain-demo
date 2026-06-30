@@ -1079,6 +1079,8 @@
   <script src="js/sidebar-actions.js"></script>
   <script src="js/subpage-feature-title.js"></script>
   <script src="js/site-footer.js"></script>
+  <script src="js/demo-product-catalog-data.js"></script>
+  <script src="js/demo-product-catalog-picker.js"></script>
   <script src="js/subpage-clock.js"></script>
   <script>
     (function () {
@@ -2268,15 +2270,46 @@
       }
 
       function openPlanAssetPick() {
-        PAP.treeNodeId = "";
-        PAP.search = "";
-        PAP.page = 1;
-        PAP.pendingSelected = {};
-        var inp = document.getElementById("planAssetPickSearch");
-        if (inp) inp.value = "";
-        papRenderTree();
-        papRenderTable();
-        document.getElementById("planAssetPickMask").classList.add("show");
+        if (!window.DemoProductCatalogPicker) return;
+        var products = planAssets.filter(function (a) {
+          return a.dept === currentDept;
+        }).map(function (a) {
+          return {
+            id: a.id,
+            b: a.productCode || a.id,
+            a: "A0100100001",
+            productName: a.name,
+            mfrName: a.manufacturer || "",
+            model: a.model || "",
+            category: "生产类",
+            typeName: a.type || "",
+            treeBig: "A01",
+            treeMid: "01",
+            treeSmall: "001",
+            _scrapAsset: a
+          };
+        });
+        var existingIds = {};
+        planItems.forEach(function (item) {
+          existingIds[item.id] = true;
+        });
+        DemoProductCatalogPicker.open({
+          title: "选择物资",
+          mode: "multi",
+          products: products,
+          initialProducts: products.filter(function (p) { return existingIds[p.id]; }),
+          lockedProductIds: planItems.map(function (item) { return item.id; }),
+          onConfirm: function (picked) {
+            (picked || []).forEach(function (p) {
+              if (!p || !p.id || existingIds[p.id]) return;
+              existingIds[p.id] = true;
+              planItems.push({ id: p.id, qty: 1, reason: "" });
+            });
+            renderPlanItemTable();
+          }
+        });
+        var mask = document.getElementById("demoPdPickerMask");
+        if (mask) mask.style.zIndex = "10060";
       }
       function closePlanAssetPick() { document.getElementById("planAssetPickMask").classList.remove("show"); }
       function confirmPickItems() {
