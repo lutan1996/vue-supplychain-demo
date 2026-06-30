@@ -334,9 +334,7 @@
         '<div class="nav-item" title="盘点管理"><span class="nav-label">盘点管理</span></div>' +
         '<div class="nav-item" title="资产管理"><span class="nav-label">资产管理</span></div>' +
         '<div class="nav-item" title="物流管理"><span class="nav-label">物流管理</span></div>' +
-        '<div class="nav-item" title="仓储管理"><span class="nav-label">仓储管理</span></div>' +
         '<div class="nav-item" title="退役及废旧管理"><span class="nav-label">退役及废旧管理</span></div>' +
-        '<div class="nav-item" title="综合业务管理"><span class="nav-label">综合业务管理</span></div>' +
         '<div class="nav-item" title="基础数据管理"><span class="nav-label">基础数据管理</span></div>';
       normalizeRetiredNavLabel();
     })();
