@@ -1594,14 +1594,26 @@
       ".map-flow-track{border:1px solid #f0f2f5;border-radius:8px;padding:22px 18px;overflow:visible;}" +
       ".map-flow-row{display:grid;grid-template-columns:repeat(11,1fr);align-items:stretch;gap:6px;}" +
       ".map-flow-node{min-width:0;max-width:none;padding:8px 8px;border-radius:10px;border:1px solid #cfe8cf;background:#edf8ed;color:#315c35;font-size:11.5px;line-height:1.3;text-align:center;white-space:normal;display:flex;align-items:center;justify-content:center;word-break:break-word;grid-column:span 1;}" +
-      ".map-flow-node.end{min-height:42px;font-size:11.5px;}" +
+      ".map-flow-node.end{min-height:42px;font-size:11.5px;background:#fff8e6;border-color:#f0dca8;color:#7a5a14;}" +
       ".map-flow-node.is-current,.map-flow-node.is-pending{background:#fff7e6;border-color:#f6c86f;color:#8a5a00;}" +
       ".map-flow-node.is-future{background:#f4f6fa;border-color:#dde3ed;color:#8898b2;}" +
-      "/* map-flow-bust:20260615-v4 */" +
+      "/* map-flow-bust:20260615-v5 */" +
       ".map-flow-dot{width:10px;height:10px;border-radius:999px;border:1px solid #7bc67b;background:#ddf5dd;flex:none;}" +
-      ".map-flow-dot.end{border-color:#e89292;background:#ffe8e8;}" +
+      ".map-flow-dot.end{border-color:#f0dca8;background:#fff8e8;}" +
       ".map-flow-arrow{color:#8ca0b3;font-size:16px;line-height:1;display:inline-block;flex:none;padding:0 2px;}" +
       ".map-flow-info{font-size:13px;color:#4f647a;line-height:1.9;}" +
+      ".map-flow-timeline{padding:4px 0;}" +
+      ".map-flow-tl-item{display:flex;gap:0;align-items:flex-start;position:relative;}" +
+      ".map-flow-tl-dot{width:12px;height:12px;border-radius:50%;flex-shrink:0;margin-top:4px;}" +
+      ".map-flow-tl-line{width:2px;flex:1;min-height:40px;background:#e2e8f0;margin-top:4px;}" +
+      ".map-flow-tl-last .map-flow-tl-line{display:none;}" +
+      ".map-flow-tl-body{flex:1;padding-bottom:24px;min-width:0;padding-left:12px;}" +
+      ".map-flow-tl-last .map-flow-tl-body{padding-bottom:0;}" +
+      ".map-flow-tl-meta{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:5px;}" +
+      ".map-flow-tl-person{font-weight:600;color:#1f3551;font-size:14px;}" +
+      ".map-flow-tl-time{color:#64748b;font-size:13px;}" +
+      ".map-flow-tl-badge{padding:2px 8px;border-radius:4px;font-size:12px;font-weight:500;}" +
+      ".map-flow-tl-content{font-size:13px;color:#51627a;line-height:1.7;}" +
       ".map-flow-info-table{width:100%;border-collapse:collapse;font-size:13px;color:#34495e;}" +
       ".map-flow-info-table th,.map-flow-info-table td{border:1px solid #e8edf3;padding:10px 12px;text-align:left;vertical-align:top;line-height:1.6;}" +
       ".map-flow-info-table th{background:#f5f7fa;color:#1f2d3d;font-weight:700;}" +
@@ -2052,22 +2064,19 @@
           var sc = item.result === "已提交" || item.result === "已通过" || item.result === "已完成" || item.result === "已结束" || item.result === "已处理" ? "#10b981" :
                    item.result === "处理中" || item.result === "审批中" || item.result === "进行中" ? "#1677ff" :
                    item.result === "待处理" || item.result === "待审批" || item.result === "待确认" || item.result === "待知悉" || item.result === "待登记" || item.result === "驳回" || item.result === "拒绝" ? "#f59e0b" : "#64748b";
-          return '<div style="display:flex;gap:0;align-items:flex-start;position:relative">' +
-            '<div style="display:flex;flex-direction:column;align-items:center;flex-shrink:0;width:24px">' +
-              '<div style="width:12px;height:12px;border-radius:50%;background:' + sc + ';flex-shrink:0"></div>' +
-              (!isLast ? '<div style="width:2px;flex:1;min-height:40px;background:#e2e8f0;margin-top:4px"></div>' : '') +
-            '</div>' +
-            '<div style="flex:1;padding-bottom:' + (isLast ? '0' : '24px') + ';min-width:0">' +
-              '<div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:6px">' +
-                '<span style="font-weight:600;color:#1f3551;font-size:14px">' + esc(item.person) + '</span>' +
-                '<span style="color:#64748b;font-size:13px">' + esc(item.time) + '</span>' +
-                '<span style="padding:2px 8px;border-radius:4px;font-size:12px;font-weight:500;background:' + sc + '22;color:' + sc + '">' + esc(item.result) + '</span>' +
+          return '<div class="map-flow-tl-item' + (isLast ? ' map-flow-tl-last' : '') + '">' +
+            '<div class="map-flow-tl-dot" style="background:' + sc + '"></div>' +
+            (!isLast ? '<div class="map-flow-tl-line"></div>' : '') +
+            '<div class="map-flow-tl-body">' +
+              '<div class="map-flow-tl-meta">' +
+                '<span class="map-flow-tl-person">' + esc(item.person) + '</span>' +
+                '<span class="map-flow-tl-time">' + esc(item.time) + '</span>' +
+                '<span class="map-flow-tl-badge" style="background:' + sc + '22;color:' + sc + '">' + esc(item.result) + '</span>' +
               '</div>' +
-              '<div style="font-size:13px;color:#51627a;line-height:1.7">' + esc(item.content) + '</div>' +
+              '<div class="map-flow-tl-content">' + esc(item.content) + '</div>' +
             '</div>' +
           '</div>';
-        }).join("") +
-        '</div>';
+        }).join("") + '</div>';
     }
     var mask = document.createElement("div");
     mask.id = "mapUnifiedProgressModal";
@@ -2145,12 +2154,47 @@
       '<span class="map-flow-dot end"></span>' +
       '</div>';
     if (info) {
-      info.innerHTML =
-        '<div>1、电控所物资专责成明锴录入设备清单，提交申请入库（2026-03-20 09:12）（附件：风机采购合同）</div>' +
-        '<div>2、电控所负责人陈亮审批：同意入库，审核物资符合采购要求（2026-03-20 10:03）</div>' +
-        '<div>3、物资管理部门物资专责宋中波审核分类：同意入库（2026-03-20 10:28）</div>' +
-        '<div>4、物资管理部门负责人王超审批：同意（2026-03-20 10:48）</div>' +
-        '<div>5、入公司库结束（2026-03-20 11:05）</div>';
+      info.innerHTML = '<div class="map-flow-timeline" style="padding:4px 0">' +
+        '<div class="map-flow-tl-item">' +
+          '<div class="map-flow-tl-dot" style="background:#10b981"></div>' +
+          '<div class="map-flow-tl-line"></div>' +
+          '<div class="map-flow-tl-body">' +
+            '<div class="map-flow-tl-meta"><span class="map-flow-tl-person">电控所物资专责成明锴</span><span class="map-flow-tl-time">2026-03-20 09:12</span><span class="map-flow-tl-badge" style="background:#10b98122;color:#10b981">已通过</span></div>' +
+            '<div class="map-flow-tl-content">录入设备清单，提交申请入库（附件：风机采购合同）</div>' +
+          '</div>' +
+        '</div>' +
+        '<div class="map-flow-tl-item">' +
+          '<div class="map-flow-tl-dot" style="background:#10b981"></div>' +
+          '<div class="map-flow-tl-line"></div>' +
+          '<div class="map-flow-tl-body">' +
+            '<div class="map-flow-tl-meta"><span class="map-flow-tl-person">电控所负责人陈亮</span><span class="map-flow-tl-time">2026-03-20 10:03</span><span class="map-flow-tl-badge" style="background:#10b98122;color:#10b981">已通过</span></div>' +
+            '<div class="map-flow-tl-content">审批：同意入库，审核物资符合采购要求</div>' +
+          '</div>' +
+        '</div>' +
+        '<div class="map-flow-tl-item">' +
+          '<div class="map-flow-tl-dot" style="background:#10b981"></div>' +
+          '<div class="map-flow-tl-line"></div>' +
+          '<div class="map-flow-tl-body">' +
+            '<div class="map-flow-tl-meta"><span class="map-flow-tl-person">物资管理部门专责宋中波</span><span class="map-flow-tl-time">2026-03-20 10:28</span><span class="map-flow-tl-badge" style="background:#10b98122;color:#10b981">已通过</span></div>' +
+            '<div class="map-flow-tl-content">审核分类：同意入库</div>' +
+          '</div>' +
+        '</div>' +
+        '<div class="map-flow-tl-item">' +
+          '<div class="map-flow-tl-dot" style="background:#10b981"></div>' +
+          '<div class="map-flow-tl-line"></div>' +
+          '<div class="map-flow-tl-body">' +
+            '<div class="map-flow-tl-meta"><span class="map-flow-tl-person">物资管理部门负责人王超</span><span class="map-flow-tl-time">2026-03-20 10:48</span><span class="map-flow-tl-badge" style="background:#10b98122;color:#10b981">已完成</span></div>' +
+            '<div class="map-flow-tl-content">审批：同意</div>' +
+          '</div>' +
+        '</div>' +
+        '<div class="map-flow-tl-item map-flow-tl-last">' +
+          '<div class="map-flow-tl-dot" style="background:#10b981"></div>' +
+          '<div class="map-flow-tl-body">' +
+            '<div class="map-flow-tl-meta"><span class="map-flow-tl-person">系统</span><span class="map-flow-tl-time">2026-03-20 11:05</span><span class="map-flow-tl-badge" style="background:#10b98122;color:#10b981">已完成</span></div>' +
+            '<div class="map-flow-tl-content">入公司库结束</div>' +
+          '</div>' +
+        '</div>' +
+        '</div>';
     }
   }
 
@@ -2184,12 +2228,42 @@
       '<span class="map-flow-dot end"></span>' +
       '</div>';
     if (info) {
-      info.innerHTML =
-        '<div>1、电控所物资专责成明锴发起领用流程，从公司库中选取物资清单（2026-05-10 09:12）</div>' +
-        '<div>2、电控所负责人陈亮审批：通过（2026-05-10 10:03）</div>' +
-        '<div>3、物资管理部门专责宋中波核对清单：无误（2026-05-10 10:28）</div>' +
-        '<div>4、物资管理部门负责人王超审核：同意（2026-05-10 10:48）</div>' +
-        '<div>5、领用结束，物资归入电控所名下（2026-05-10 11:05）</div>';
+      info.innerHTML = '<div class="map-flow-timeline" style="padding:4px 0">' +
+        '<div class="map-flow-tl-item">' +
+          '<div class="map-flow-tl-dot" style="background:#10b981"></div><div class="map-flow-tl-line"></div>' +
+          '<div class="map-flow-tl-body">' +
+            '<div class="map-flow-tl-meta"><span class="map-flow-tl-person">电控所物资专责成明锴</span><span class="map-flow-tl-time">2026-05-10 09:12</span><span class="map-flow-tl-badge" style="background:#10b98122;color:#10b981">已通过</span></div>' +
+            '<div class="map-flow-tl-content">发起领用流程，从公司库中选取物资清单</div>' +
+          '</div>' +
+        '</div>' +
+        '<div class="map-flow-tl-item">' +
+          '<div class="map-flow-tl-dot" style="background:#10b981"></div><div class="map-flow-tl-line"></div>' +
+          '<div class="map-flow-tl-body">' +
+            '<div class="map-flow-tl-meta"><span class="map-flow-tl-person">电控所负责人陈亮</span><span class="map-flow-tl-time">2026-05-10 10:03</span><span class="map-flow-tl-badge" style="background:#10b98122;color:#10b981">已通过</span></div>' +
+            '<div class="map-flow-tl-content">审批：通过</div>' +
+          '</div>' +
+        '</div>' +
+        '<div class="map-flow-tl-item">' +
+          '<div class="map-flow-tl-dot" style="background:#10b981"></div><div class="map-flow-tl-line"></div>' +
+          '<div class="map-flow-tl-body">' +
+            '<div class="map-flow-tl-meta"><span class="map-flow-tl-person">物资管理部门专责宋中波</span><span class="map-flow-tl-time">2026-05-10 10:28</span><span class="map-flow-tl-badge" style="background:#10b98122;color:#10b981">已通过</span></div>' +
+            '<div class="map-flow-tl-content">核对清单：无误</div>' +
+          '</div>' +
+        '</div>' +
+        '<div class="map-flow-tl-item">' +
+          '<div class="map-flow-tl-dot" style="background:#10b981"></div><div class="map-flow-tl-line"></div>' +
+          '<div class="map-flow-tl-body">' +
+            '<div class="map-flow-tl-meta"><span class="map-flow-tl-person">物资管理部门负责人王超</span><span class="map-flow-tl-time">2026-05-10 10:48</span><span class="map-flow-tl-badge" style="background:#10b98122;color:#10b981">已完成</span></div>' +
+            '<div class="map-flow-tl-content">审核：同意</div>' +
+          '</div>' +
+        '</div>' +
+        '<div class="map-flow-tl-item map-flow-tl-last">' +
+          '<div class="map-flow-tl-dot" style="background:#10b981"></div>' +
+          '<div class="map-flow-tl-body">' +
+            '<div class="map-flow-tl-meta"><span class="map-flow-tl-person">系统</span><span class="map-flow-tl-time">2026-05-10 11:05</span><span class="map-flow-tl-badge" style="background:#10b98122;color:#10b981">已完成</span></div>' +
+            '<div class="map-flow-tl-content">领用结束，物资归入电控所名下</div>' +
+          '</div>' +
+        '</div></div>';
     }
   }
 
@@ -2216,13 +2290,49 @@
       '<span class="map-flow-dot end"></span>' +
       '</div>';
     if (info) {
-      info.innerHTML =
-        '<div>1、电控所发起申请：电控所流转到机械所（2026-05-10 09:12）</div>' +
-        '<div>2、电控所负责人陈亮审批：通过（2026-05-10 10:03）</div>' +
-        '<div>3、机械研究所物资专责许学良审批：通过（2026-05-10 10:28）</div>' +
-        '<div>4、机械研究所负责人李仁堂审批：通过（2026-05-10 10:48）</div>' +
-        '<div>5、物资管理部门物资专责宋中波确认：已确认（2026-05-10 11:05）</div>' +
-        '<div>6、公司内部流转结束（2026-05-10 11:30）</div>';
+      info.innerHTML = '<div class="map-flow-timeline" style="padding:4px 0">' +
+        '<div class="map-flow-tl-item">' +
+          '<div class="map-flow-tl-dot" style="background:#10b981"></div><div class="map-flow-tl-line"></div>' +
+          '<div class="map-flow-tl-body">' +
+            '<div class="map-flow-tl-meta"><span class="map-flow-tl-person">电控所</span><span class="map-flow-tl-time">2026-05-10 09:12</span><span class="map-flow-tl-badge" style="background:#10b98122;color:#10b981">已通过</span></div>' +
+            '<div class="map-flow-tl-content">发起申请：将机械所物资转入本部门</div>' +
+          '</div>' +
+        '</div>' +
+        '<div class="map-flow-tl-item">' +
+          '<div class="map-flow-tl-dot" style="background:#10b981"></div><div class="map-flow-tl-line"></div>' +
+          '<div class="map-flow-tl-body">' +
+            '<div class="map-flow-tl-meta"><span class="map-flow-tl-person">电控所负责人陈亮</span><span class="map-flow-tl-time">2026-05-10 10:03</span><span class="map-flow-tl-badge" style="background:#10b98122;color:#10b981">已通过</span></div>' +
+            '<div class="map-flow-tl-content">审批：通过</div>' +
+          '</div>' +
+        '</div>' +
+        '<div class="map-flow-tl-item">' +
+          '<div class="map-flow-tl-dot" style="background:#10b981"></div><div class="map-flow-tl-line"></div>' +
+          '<div class="map-flow-tl-body">' +
+            '<div class="map-flow-tl-meta"><span class="map-flow-tl-person">机械研究所物资专责许学良</span><span class="map-flow-tl-time">2026-05-10 10:28</span><span class="map-flow-tl-badge" style="background:#10b98122;color:#10b981">已通过</span></div>' +
+            '<div class="map-flow-tl-content">审批：通过</div>' +
+          '</div>' +
+        '</div>' +
+        '<div class="map-flow-tl-item">' +
+          '<div class="map-flow-tl-dot" style="background:#10b981"></div><div class="map-flow-tl-line"></div>' +
+          '<div class="map-flow-tl-body">' +
+            '<div class="map-flow-tl-meta"><span class="map-flow-tl-person">机械研究所负责人李仁堂</span><span class="map-flow-tl-time">2026-05-10 10:48</span><span class="map-flow-tl-badge" style="background:#10b98122;color:#10b981">已通过</span></div>' +
+            '<div class="map-flow-tl-content">审批：通过</div>' +
+          '</div>' +
+        '</div>' +
+        '<div class="map-flow-tl-item">' +
+          '<div class="map-flow-tl-dot" style="background:#10b981"></div><div class="map-flow-tl-line"></div>' +
+          '<div class="map-flow-tl-body">' +
+            '<div class="map-flow-tl-meta"><span class="map-flow-tl-person">物资管理部门专责宋中波</span><span class="map-flow-tl-time">2026-05-10 11:05</span><span class="map-flow-tl-badge" style="background:#10b98122;color:#10b981">已完成</span></div>' +
+            '<div class="map-flow-tl-content">确认：已确认</div>' +
+          '</div>' +
+        '</div>' +
+        '<div class="map-flow-tl-item map-flow-tl-last">' +
+          '<div class="map-flow-tl-dot" style="background:#10b981"></div>' +
+          '<div class="map-flow-tl-body">' +
+            '<div class="map-flow-tl-meta"><span class="map-flow-tl-person">系统</span><span class="map-flow-tl-time">2026-05-10 11:30</span><span class="map-flow-tl-badge" style="background:#10b98122;color:#10b981">已完成</span></div>' +
+            '<div class="map-flow-tl-content">公司内部流转结束</div>' +
+          '</div>' +
+        '</div></div>';
     }
   }
 
@@ -2251,12 +2361,42 @@
         '<span class="map-flow-node end">完成</span>' +
         '</div>';
       if (info) {
-        info.innerHTML =
-          '<div>1、许学良于 2026-06-26 09:30 发起变更，提交新使用人及变更原因。</div>' +
-          '<div>2、李仁堂于 2026-06-26 10:00 完成部门负责人审批，同意本次变更。</div>' +
-          '<div>3、李四于 2026-06-26 10:18 完成新使用人确认，确认接收该物资。</div>' +
-          '<div>4、宋中波于 2026-06-26 10:35 完成物资管理部门知悉登记，更新相关台账。</div>' +
-          '<div>5、2026-06-26 10:40 流程完成，变更使用人生效。</div>';
+        info.innerHTML = '<div class="map-flow-timeline" style="padding:4px 0">' +
+          '<div class="map-flow-tl-item">' +
+            '<div class="map-flow-tl-dot" style="background:#10b981"></div><div class="map-flow-tl-line"></div>' +
+            '<div class="map-flow-tl-body">' +
+              '<div class="map-flow-tl-meta"><span class="map-flow-tl-person">许学良</span><span class="map-flow-tl-time">2026-06-26 09:30</span><span class="map-flow-tl-badge" style="background:#10b98122;color:#10b981">已通过</span></div>' +
+              '<div class="map-flow-tl-content">发起变更，提交新使用人及变更原因</div>' +
+            '</div>' +
+          '</div>' +
+          '<div class="map-flow-tl-item">' +
+            '<div class="map-flow-tl-dot" style="background:#10b981"></div><div class="map-flow-tl-line"></div>' +
+            '<div class="map-flow-tl-body">' +
+              '<div class="map-flow-tl-meta"><span class="map-flow-tl-person">李仁堂</span><span class="map-flow-tl-time">2026-06-26 10:00</span><span class="map-flow-tl-badge" style="background:#10b98122;color:#10b981">已通过</span></div>' +
+              '<div class="map-flow-tl-content">完成部门负责人审批，同意本次变更</div>' +
+            '</div>' +
+          '</div>' +
+          '<div class="map-flow-tl-item">' +
+            '<div class="map-flow-tl-dot" style="background:#10b981"></div><div class="map-flow-tl-line"></div>' +
+            '<div class="map-flow-tl-body">' +
+              '<div class="map-flow-tl-meta"><span class="map-flow-tl-person">李四</span><span class="map-flow-tl-time">2026-06-26 10:18</span><span class="map-flow-tl-badge" style="background:#10b98122;color:#10b981">已通过</span></div>' +
+              '<div class="map-flow-tl-content">完成新使用人确认，确认接收该物资</div>' +
+            '</div>' +
+          '</div>' +
+          '<div class="map-flow-tl-item">' +
+            '<div class="map-flow-tl-dot" style="background:#10b981"></div><div class="map-flow-tl-line"></div>' +
+            '<div class="map-flow-tl-body">' +
+              '<div class="map-flow-tl-meta"><span class="map-flow-tl-person">宋中波</span><span class="map-flow-tl-time">2026-06-26 10:35</span><span class="map-flow-tl-badge" style="background:#10b98122;color:#10b981">已完成</span></div>' +
+              '<div class="map-flow-tl-content">完成物资管理部门知悉登记，更新相关台账</div>' +
+            '</div>' +
+          '</div>' +
+          '<div class="map-flow-tl-item map-flow-tl-last">' +
+            '<div class="map-flow-tl-dot" style="background:#10b981"></div>' +
+            '<div class="map-flow-tl-body">' +
+              '<div class="map-flow-tl-meta"><span class="map-flow-tl-person">系统</span><span class="map-flow-tl-time">2026-06-26 10:40</span><span class="map-flow-tl-badge" style="background:#10b98122;color:#10b981">已完成</span></div>' +
+              '<div class="map-flow-tl-content">流程完成，变更使用人生效</div>' +
+            '</div>' +
+          '</div></div>';
       }
       return;
     }
@@ -2277,13 +2417,49 @@
       '<span class="map-flow-node end">完成</span>' +
       '</div>';
     if (info) {
-      info.innerHTML =
-        '<div>1、许学良于 2026-06-26 09:30 发起外借，填写外部借用单位、借用人及借用原因。</div>' +
-        '<div>2、李仁堂于 2026-06-26 09:55 完成部门负责人初审，同意提交公司审批。</div>' +
-        '<div>3、王超于 2026-06-26 10:20 完成公司负责人审批，同意本次外部借用。</div>' +
-        '<div>4、张三于 2026-06-26 10:48 完成外部借用对象确认，确认借用信息与归还时间。</div>' +
-        '<div>5、宋中波于 2026-06-26 11:05 完成物资管理部门登记，登记外借台账。</div>' +
-        '<div>6、2026-06-26 11:10 流程完成，外部借用生效。</div>';
+      info.innerHTML = '<div class="map-flow-timeline" style="padding:4px 0">' +
+        '<div class="map-flow-tl-item">' +
+          '<div class="map-flow-tl-dot" style="background:#10b981"></div><div class="map-flow-tl-line"></div>' +
+          '<div class="map-flow-tl-body">' +
+            '<div class="map-flow-tl-meta"><span class="map-flow-tl-person">许学良</span><span class="map-flow-tl-time">2026-06-26 09:30</span><span class="map-flow-tl-badge" style="background:#10b98122;color:#10b981">已发起</span></div>' +
+            '<div class="map-flow-tl-content">发起外借，填写外部借用单位、借用人及借用原因</div>' +
+          '</div>' +
+        '</div>' +
+        '<div class="map-flow-tl-item">' +
+          '<div class="map-flow-tl-dot" style="background:#10b981"></div><div class="map-flow-tl-line"></div>' +
+          '<div class="map-flow-tl-body">' +
+            '<div class="map-flow-tl-meta"><span class="map-flow-tl-person">李仁堂</span><span class="map-flow-tl-time">2026-06-26 09:55</span><span class="map-flow-tl-badge" style="background:#10b98122;color:#10b981">已通过</span></div>' +
+            '<div class="map-flow-tl-content">完成部门负责人初审，同意提交公司审批</div>' +
+          '</div>' +
+        '</div>' +
+        '<div class="map-flow-tl-item">' +
+          '<div class="map-flow-tl-dot" style="background:#10b981"></div><div class="map-flow-tl-line"></div>' +
+          '<div class="map-flow-tl-body">' +
+            '<div class="map-flow-tl-meta"><span class="map-flow-tl-person">王超</span><span class="map-flow-tl-time">2026-06-26 10:20</span><span class="map-flow-tl-badge" style="background:#10b98122;color:#10b981">已通过</span></div>' +
+            '<div class="map-flow-tl-content">完成公司负责人审批，同意本次外部借用</div>' +
+          '</div>' +
+        '</div>' +
+        '<div class="map-flow-tl-item">' +
+          '<div class="map-flow-tl-dot" style="background:#10b981"></div><div class="map-flow-tl-line"></div>' +
+          '<div class="map-flow-tl-body">' +
+            '<div class="map-flow-tl-meta"><span class="map-flow-tl-person">张三</span><span class="map-flow-tl-time">2026-06-26 10:48</span><span class="map-flow-tl-badge" style="background:#10b98122;color:#10b981">已确认</span></div>' +
+            '<div class="map-flow-tl-content">完成外部借用对象确认，确认借用信息与归还时间</div>' +
+          '</div>' +
+        '</div>' +
+        '<div class="map-flow-tl-item">' +
+          '<div class="map-flow-tl-dot" style="background:#10b981"></div><div class="map-flow-tl-line"></div>' +
+          '<div class="map-flow-tl-body">' +
+            '<div class="map-flow-tl-meta"><span class="map-flow-tl-person">宋中波</span><span class="map-flow-tl-time">2026-06-26 11:05</span><span class="map-flow-tl-badge" style="background:#10b98122;color:#10b981">已完成</span></div>' +
+            '<div class="map-flow-tl-content">完成物资管理部门登记，登记外借台账</div>' +
+          '</div>' +
+        '</div>' +
+        '<div class="map-flow-tl-item map-flow-tl-last">' +
+          '<div class="map-flow-tl-dot" style="background:#10b981"></div>' +
+          '<div class="map-flow-tl-body">' +
+            '<div class="map-flow-tl-meta"><span class="map-flow-tl-person">系统</span><span class="map-flow-tl-time">2026-06-26 11:10</span><span class="map-flow-tl-badge" style="background:#10b98122;color:#10b981">已完成</span></div>' +
+            '<div class="map-flow-tl-content">流程完成，外部借用生效</div>' +
+          '</div>' +
+        '</div></div>';
     }
   }
 

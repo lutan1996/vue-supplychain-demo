@@ -655,14 +655,14 @@
           (i === nodes.length - 1 ? '<span class="sales-flow-dot end"></span>' : "");
       }).join("") +
       '</div></div></div>' +
-      '<div class="sales-flow-pane" data-pane="info"><div class="sales-flow-info">' +
-      '<div>1、电控所物资专责成明锴在物资列表中录入加购数量并提交订单（2026-06-10 09:12）</div>' +
-      '<div>2、电控所负责人陈亮审批：审核订单明细、购买数量、订单金额以及场站收货信息，同意（2026-06-10 10:03）</div>' +
-      '<div>3、经营发展中心合同专责王卿明登记销售合同编号并补充合同附件（2026-06-11 14:26）</div>' +
-      '<div>4、物流专责李哲维护物流单号、发货日期和发货说明，安排发货（2026-06-14 11:08）</div>' +
-      '<div>5、项目公司收货人张明完成收货确认，购入物资自动关联订单编号并纳入购入物资统计（2026-06-15 16:20）</div>' +
-      '<div>6、流程归档结束（2026-06-15 16:35）</div>' +
-      '</div></div></div><div class="sales-flow-ft"><button type="button" data-sales-flow-close="1">关闭</button></div></div>';
+      '<div class="sales-flow-pane" data-pane="info"><div class="sales-flow-tl">' +
+      '<div class="sales-flow-tl-item"><div class="sales-flow-tl-dot" style="background:#10b981"></div><div class="sales-flow-tl-line"></div><div class="sales-flow-tl-body"><div class="sales-flow-tl-meta"><span class="sales-flow-tl-person">电控所物资专责成明锴</span><span class="sales-flow-tl-time">2026-06-10 09:12</span><span class="sales-flow-tl-badge" style="background:#10b98122;color:#10b981">已通过</span></div><div class="sales-flow-tl-content">在物资列表中录入加购数量并提交订单</div></div></div>' +
+      '<div class="sales-flow-tl-item"><div class="sales-flow-tl-dot" style="background:#10b981"></div><div class="sales-flow-tl-line"></div><div class="sales-flow-tl-body"><div class="sales-flow-tl-meta"><span class="sales-flow-tl-person">电控所负责人陈亮</span><span class="sales-flow-tl-time">2026-06-10 10:03</span><span class="sales-flow-tl-badge" style="background:#10b98122;color:#10b981">已通过</span></div><div class="sales-flow-tl-content">审批：审核订单明细、购买数量、订单金额以及场站收货信息，同意</div></div></div>' +
+      '<div class="sales-flow-tl-item"><div class="sales-flow-tl-dot" style="background:#10b981"></div><div class="sales-flow-tl-line"></div><div class="sales-flow-tl-body"><div class="sales-flow-tl-meta"><span class="sales-flow-tl-person">经营发展中心合同专责王卿明</span><span class="sales-flow-tl-time">2026-06-11 14:26</span><span class="sales-flow-tl-badge" style="background:#10b98122;color:#10b981">已完成</span></div><div class="sales-flow-tl-content">登记销售合同编号并补充合同附件</div></div></div>' +
+      '<div class="sales-flow-tl-item"><div class="sales-flow-tl-dot" style="background:#10b981"></div><div class="sales-flow-tl-line"></div><div class="sales-flow-tl-body"><div class="sales-flow-tl-meta"><span class="sales-flow-tl-person">物流专责李哲</span><span class="sales-flow-tl-time">2026-06-14 11:08</span><span class="sales-flow-tl-badge" style="background:#10b98122;color:#10b981">已完成</span></div><div class="sales-flow-tl-content">维护物流单号、发货日期和发货说明，安排发货</div></div></div>' +
+      '<div class="sales-flow-tl-item"><div class="sales-flow-tl-dot" style="background:#10b981"></div><div class="sales-flow-tl-line"></div><div class="sales-flow-tl-body"><div class="sales-flow-tl-meta"><span class="sales-flow-tl-person">项目公司收货人张明</span><span class="sales-flow-tl-time">2026-06-15 16:20</span><span class="sales-flow-tl-badge" style="background:#10b98122;color:#10b981">已确认</span></div><div class="sales-flow-tl-content">完成收货确认，购入物资自动关联订单编号并纳入购入物资统计</div></div></div>' +
+      '<div class="sales-flow-tl-item sales-flow-tl-last"><div class="sales-flow-tl-dot" style="background:#10b981"></div><div class="sales-flow-tl-body"><div class="sales-flow-tl-meta"><span class="sales-flow-tl-person">系统</span><span class="sales-flow-tl-time">2026-06-15 16:35</span><span class="sales-flow-tl-badge" style="background:#10b98122;color:#10b981">已完成</span></div><div class="sales-flow-tl-content">流程归档结束</div></div></div>' +
+      '</div></div></div></div><div class="sales-flow-ft"><button type="button" data-sales-flow-close="1">关闭</button></div></div>';
     document.body.appendChild(mask);
     mask.addEventListener("click", function (e) {
       if (e.target === mask) closeSalesFlowModal();

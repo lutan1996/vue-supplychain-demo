@@ -163,9 +163,21 @@
 .sales-flow-node{min-width:150px;max-width:190px;padding:8px;border-radius:10px;border:1px solid #cfe8cf;background:#edf8ed;color:#315c35;font-size:11.5px;line-height:1.35;text-align:center;white-space:normal;display:flex;align-items:center;justify-content:center;word-break:break-word;overflow-wrap:anywhere;flex:0 1 190px}
 .sales-flow-node.end{background:#fff8e6;border-color:#f0dca8;color:#7a5a14}
 .sales-flow-dot{width:10px;height:10px;border-radius:999px;border:1px solid #7bc67b;background:#ddf5dd;flex:none}
-.sales-flow-dot.end{border-color:#e89292;background:#ffe8e8}
+.sales-flow-dot.end{border-color:#f0dca8;background:#fff8e8}
 .sales-flow-arrow{color:#8ca0b3;font-size:16px;line-height:1;display:inline-flex;align-items:center;justify-content:center;flex:none;padding:0 2px;align-self:center}
 .sales-flow-info{font-size:13px;color:#4f647a;line-height:1.9;word-break:break-word;overflow-wrap:anywhere}
+.sales-flow-tl{padding:4px 0}
+.sales-flow-tl-item{display:flex;gap:0;align-items:flex-start;position:relative}
+.sales-flow-tl-dot{width:12px;height:12px;border-radius:50%;flex-shrink:0;margin-top:4px}
+.sales-flow-tl-line{width:2px;flex:1;min-height:40px;background:#e2e8f0;margin-top:4px}
+.sales-flow-tl-last .sales-flow-tl-line{display:none}
+.sales-flow-tl-body{flex:1;padding-bottom:24px;min-width:0;padding-left:12px}
+.sales-flow-tl-last .sales-flow-tl-body{padding-bottom:0}
+.sales-flow-tl-meta{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:5px}
+.sales-flow-tl-person{font-weight:600;color:#1f3551;font-size:14px}
+.sales-flow-tl-time{color:#64748b;font-size:13px}
+.sales-flow-tl-badge{padding:2px 8px;border-radius:4px;font-size:12px;font-weight:500}
+.sales-flow-tl-content{font-size:13px;color:#51627a;line-height:1.7}
 .sales-flow-ft{padding:10px 16px;border-top:1px solid #edf2f8;display:flex;justify-content:flex-end}
 .sales-flow-ft button{height:32px;padding:0 16px;border:1px solid #d9d9d9;border-radius:6px;background:#fff;color:#3a4a5a;cursor:pointer}
 .sales-mini-title{margin:14px 0 8px;font-size:13px;font-weight:600;color:#1f3551}
