@@ -888,7 +888,7 @@
       </div>
       <div class="modal-body" style="display:block;">
         <div class="apply-tip" style="margin:0 0 10px;">
-          💡 报废计划需在每年六七月份提交，计划审批通过后方可进行报废申请。只能选择本部门的物资。
+          💡 报废计划需在每年10月份提交次年计划，计划审批通过后方可进行报废申请。只能选择本部门的物资。
         </div>
         <div class="plan-search" style="margin-bottom:8px;">
           <div class="f"><label>计划年度</label><select id="planYearInput"></select></div>
@@ -925,9 +925,6 @@
               </thead>
               <tbody id="planItemBody"></tbody>
             </table>
-          </div>
-          <div id="planItemEmpty" style="text-align:center;color:#8ca0b8;padding:28px;font-size:13px;">
-            暂无物资，请点击右上角「<strong style="color:#1677ff;">选择报废物资</strong>」按钮添加
           </div>
         </div>
         <div class="plan-summary" id="planItemSummary">
@@ -2104,7 +2101,6 @@
       // ── 报废物资明细表渲染 ──────────────────────────────────
       function renderPlanItemTable() {
         var body = document.getElementById("planItemBody");
-        var empty = document.getElementById("planItemEmpty");
         if (!body) return;
         body.innerHTML = "";
         var totalOrigin = 0, totalNet = 0;
@@ -2136,7 +2132,6 @@
             '</td>';
           body.appendChild(tr);
         });
-        empty.style.display = planItems.length ? "none" : "block";
         document.getElementById("planItemCount").textContent = planItems.length;
         document.getElementById("planItemOriginSum").textContent = "¥ " + fmtMoney(totalOrigin);
         document.getElementById("planItemDepSum").textContent = "¥ " + fmtMoney(totalOrigin - totalNet);
