@@ -624,7 +624,7 @@
         panel: secondaryPanel,
         aclModuleKey: 'purchaseMgmt',
         rowHtml:
-          '<button type="button" class="warehouse-secondary-link" data-action="proj-company-inbound" data-label="库存管理">库存管理</button>'
+          '<button type="button" class="warehouse-secondary-link" data-action="proj-company-inbound" data-label="项目公司库存管理">项目公司库存管理</button>'
       },
       physicalMgmt: {
         text: '实物管理',
@@ -1390,7 +1390,7 @@
         if (fileName === "purchase-plan-management.html") return "采购信息台帐";
         if (fileName === "purchase-summary-report.html") return "采购合同报表管理";
         if (fileName === "proc-acceptance-inbound.html") return "公司层面入库";
-        if (fileName === "proj-company-inbound.html") return "项目公司入库";
+        if (fileName === "proj-company-inbound.html") return "项目公司库存管理";
         if (fileName === "proc-use-approval.html") return "领用申请";
         if (fileName === "proc-sales-contract.html") return "销售合同管理";
         if (fileName === "proc-shipment.html") return "发货管理";
