@@ -113,64 +113,6 @@
     #inboundMask .btn.primary { background: #1677ff; color: #fff; border-color: #1677ff; }
     #inboundMask .btn.danger { background: #fff1f0; color: #cf1322; border-color: #ffccc7; }
 
-    #invMask {
-      position: fixed;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.45);
-      z-index: 2700;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      padding: 16px;
-      box-sizing: border-box;
-    }
-    #invMask.show { display: flex; }
-    #invMask .modal {
-      width: min(980px, 94vw);
-      max-height: 88vh;
-      background: #fff;
-      border-radius: 10px;
-      overflow: hidden;
-      box-shadow: 0 16px 48px rgba(0, 0, 0, 0.2);
-      display: flex;
-      flex-direction: column;
-    }
-    #invMask .modal-hd {
-      padding: 12px 16px;
-      border-bottom: 1px solid #edf2f8;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      font-weight: 600;
-      color: #1f3551;
-    }
-    #invMask .modal-bd {
-      padding: 14px 16px;
-      overflow: auto;
-      max-height: calc(88vh - 104px);
-      font-size: 13px;
-      line-height: 1.6;
-    }
-    #invMask .modal-ft {
-      padding: 10px 16px;
-      border-top: 1px solid #edf2f8;
-      display: flex;
-      justify-content: flex-end;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
-    #invMask .x-btn,
-    #invMask .btn {
-      height: 32px;
-      min-width: 80px;
-      border-radius: 6px;
-      border: 1px solid #d9d9d9;
-      background: #fff;
-      color: #595959;
-      cursor: pointer;
-    }
-    #invMask .btn.primary { background: #1677ff; color: #fff; border-color: #1677ff; }
-    #invMask .btn.danger { background: #fff1f0; color: #cf1322; border-color: #ffccc7; }
   </style>
 </head>
 <body class="page-source-navbar page-subpage">
@@ -233,45 +175,6 @@
               <tbody id="tb"></tbody>
             </table>
           </div>
-        </section>
-        <!-- 项目公司库存管理 -->
-        <section class="carrier-card" style="margin-top:16px;">
-          <div class="carrier-toolbar">
-            <div class="toolbar-left">
-              <button type="button" class="carrier-btn-add" id="btnInvAdd">新增</button>
-              <button type="button" class="carrier-btn-add" id="btnInvImport">导入</button>
-              <button type="button" class="carrier-btn-add" id="btnInvExport">导出</button>
-            </div>
-            <div class="toolbar-right">
-              <button type="button" class="carrier-btn-add" id="btnInvSearch" style="background:#1677ff;border-color:#1677ff;color:#fff;">搜索</button>
-            </div>
-          </div>
-          <div class="metrics" style="grid-template-columns:repeat(3,minmax(0,1fr));">
-            <div class="metric"><div class="k">库存总条目</div><div class="v" id="invTotal">0</div></div>
-            <div class="metric"><div class="k">可用库存合计</div><div class="v" id="invAvail">0</div></div>
-            <div class="metric"><div class="k">已调拨合计</div><div class="v" id="invAllot">0</div></div>
-          </div>
-          <div class="carrier-table-wrap">
-            <table class="carrier-table">
-              <thead>
-                <tr>
-                  <th>库存编号</th>
-                  <th>物料名称</th>
-                  <th>规格型号</th>
-                  <th>计量单位</th>
-                  <th>总数量</th>
-                  <th>可用库存</th>
-                  <th>已调拨</th>
-                  <th>所在仓库</th>
-                  <th>关联部门</th>
-                  <th>更新时间</th>
-                  <th>操作</th>
-                </tr>
-              </thead>
-              <tbody id="invTb"></tbody>
-            </table>
-          </div>
-        </section>
       </main>
     </div>
   </div>
@@ -285,15 +188,6 @@
       </div>
     </div>
   </div>
-  <div class="modal-mask" id="invMask" aria-hidden="true">
-    <div class="modal">
-      <div class="modal-hd"><span id="invTitle">新增项目公司库存</span><button class="x-btn" id="invX" aria-label="关闭">×</button></div>
-      <div class="modal-bd" id="invBody"></div>
-      <div class="modal-ft">
-        <button class="btn" id="invCancel">取消</button>
-        <button class="btn primary" id="invSave">保存</button>
-      </div>
-    </div>
   </div>
   <script src="js/sidebar-actions.js"></script>
   <script src="js/subpage-feature-title.js"></script>
@@ -316,28 +210,6 @@
           qa: "已通过",
           st: ["草稿", "待入库", "待确认", "已确认"][i % 4],
           dept: ["工程部", "物资部", "财务部", "经营发展中心"][i % 4]
-        });
-      }
-
-      // ========== 库存数据 ==========
-      var invRows = [
-        { no: "IN-2026-001", mat: "风力发电机叶片", spec: "B-1200型", unit: "片", qty: 120, avail: 95, allot: 25, wh: "华东仓", dept: "工程部", upd: "2026-04-20" },
-        { no: "IN-2026-002", mat: "光伏逆变器", spec: "500kW", unit: "台", qty: 48, avail: 48, allot: 0, wh: "华北仓", dept: "物资部", upd: "2026-04-21" },
-        { no: "IN-2026-003", mat: "电缆", spec: "YJV-3×240", unit: "米", qty: 5000, avail: 4200, allot: 800, wh: "华东仓", dept: "财务部", upd: "2026-04-22" }
-      ];
-      while (invRows.length < 10) {
-        var j = invRows.length + 1;
-        invRows.push({
-          no: "IN-2026-" + String(100 + j),
-          mat: ["塔筒", "主轴", "轮毂", "变压器", "开关柜", "支架", "电池组件"][j % 7],
-          spec: ["S-800", "M-1500", "T-2200", "P-1000", "C-3500"][j % 5] + "型",
-          unit: ["台", "套", "米", "片", "个"][j % 5],
-          qty: 50 + j * 15,
-          avail: 40 + j * 12,
-          allot: 10 + j * 3,
-          wh: ["华东仓", "华北仓", "华南仓", "西部仓"][j % 4],
-          dept: ["工程部", "物资部", "财务部", "经营发展中心"][j % 4],
-          upd: "2026-05-" + String(10 + (j % 18)).padStart(2, "0")
         });
       }
 
@@ -434,88 +306,19 @@
         }).join("");
       }
 
-      // ========== 库存操作 ==========
-      function byInvNo(no) { for (var i = 0; i < invRows.length; i++) if (invRows[i].no === no) return invRows[i]; return null; }
-
-      function invFormHtml(data, readonly) {
-        var d = data || { no: "", mat: "", spec: "", unit: "台", qty: "", avail: "", allot: "", wh: "", dept: "" };
-        var ro = readonly ? " readonly " : "";
-        var dis = readonly ? " disabled " : "";
-        var bg = readonly ? "background:#f5f5f5;" : "";
-        function opt(v, cur) { return "<option" + (v === cur ? " selected" : "") + ">" + v + "</option>"; }
-        return (
-          '<div style="display:grid;grid-template-columns:130px 1fr;gap:10px 12px;font-size:13px;">' +
-          "<label>库存编号</label><input class='carrier-search' id='fInvNo' value='" + esc(d.no) + "' " + ro + " style='" + bg + "min-width:0'>" +
-          "<label>物料名称</label><input class='carrier-search' id='fMat' value='" + esc(d.mat) + "' " + ro + " style='" + bg + "min-width:0'>" +
-          "<label>规格型号</label><input class='carrier-search' id='fSpec' value='" + esc(d.spec) + "' " + ro + " style='" + bg + "min-width:0'>" +
-          "<label>计量单位</label><select class='carrier-select' id='fUnit' " + dis + " style='" + bg + "min-width:0'>" + opt("台", d.unit) + opt("套", d.unit) + opt("片", d.unit) + opt("米", d.unit) + opt("个", d.unit) + opt("批", d.unit) + "</select>" +
-          "<label>总数量</label><input type='number' class='carrier-search' id='fQty' value='" + esc(d.qty) + "' " + ro + " style='" + bg + "min-width:0'>" +
-          "<label>可用库存</label><input type='number' class='carrier-search' id='fAvail' value='" + esc(d.avail) + "' " + ro + " style='" + bg + "min-width:0'>" +
-          "<label>已调拨</label><input type='number' class='carrier-search' id='fAllot' value='" + esc(d.allot) + "' " + ro + " style='" + bg + "min-width:0'>" +
-          "<label>所在仓库</label><select class='carrier-select' id='fWh' " + dis + " style='" + bg + "min-width:0'>" + opt("华东仓", d.wh) + opt("华北仓", d.wh) + opt("华南仓", d.wh) + opt("西部仓", d.wh) + "</select>" +
-          "<label>关联部门</label><select class='carrier-select' id='fDept2' " + dis + " style='" + bg + "min-width:0'>" + opt("工程部", d.dept) + opt("物资部", d.dept) + opt("财务部", d.dept) + opt("经营发展中心", d.dept) + "</select>" +
-          "</div>"
-        );
-      }
-
-      var invMode = "add";
-      var invRefNo = "";
-
-      function openInvForm(mode, row) {
-        invMode = mode;
-        invRefNo = row && row.no ? row.no : "";
-        var titleEl = document.getElementById("invTitle");
-        var bodyEl = document.getElementById("invBody");
-        var saveBtn = document.getElementById("invSave");
-        if (mode === "delete") {
-          titleEl.textContent = "删除项目公司库存";
-          bodyEl.innerHTML = '<div style="font-size:14px;line-height:1.9;color:#1f2d3d;padding:8px 2px"><div>是否确认删除该条数据？</div><div style="margin-top:10px;color:#64748b;font-size:13px">库存编号：' + esc(row && row.no || "—") + '</div></div>';
-          saveBtn.textContent = "确认删除";
-          saveBtn.className = "btn danger";
-        } else {
-          titleEl.textContent = mode === "edit" ? "编辑项目公司库存" : (mode === "view" ? "查看项目公司库存" : "新增项目公司库存");
-          bodyEl.innerHTML = invFormHtml(row, mode === "view");
-          saveBtn.textContent = "保存";
-          saveBtn.className = "btn primary";
-          saveBtn.style.display = mode === "view" ? "none" : "";
-        }
-        var mask = document.getElementById("invMask");
-        mask.classList.add("show");
-        mask.setAttribute("aria-hidden", "false");
-      }
-
-      function closeInvForm() {
-        var mask = document.getElementById("invMask");
-        mask.classList.remove("show");
-        mask.setAttribute("aria-hidden", "true");
-      }
-
-      function updateInvMetrics() {
-        document.getElementById("invTotal").textContent = String(invRows.length);
-        document.getElementById("invAvail").textContent = String(invRows.reduce(function (s, r) { return s + r.avail; }, 0));
-        document.getElementById("invAllot").textContent = String(invRows.reduce(function (s, r) { return s + r.allot; }, 0));
-      }
-
-      function renderInv() {
-        updateInvMetrics();
-        document.getElementById("invTb").innerHTML = invRows.map(function (r) {
-          return "<tr data-no='" + esc(r.no) + "'>" +
-            "<td>" + esc(r.no) + "</td><td>" + esc(r.mat) + "</td><td>" + esc(r.spec) + "</td><td>" + esc(r.unit) + "</td>" +
-            "<td>" + esc(r.qty) + "</td><td>" + esc(r.avail) + "</td><td>" + esc(r.allot) + "</td><td>" + esc(r.wh) + "</td>" +
-            "<td>" + esc(r.dept) + "</td><td>" + esc(r.upd) + "</td>" +
-            "<td class='map-op-cell'><a href='#' data-op='inv-view'>查看</a></td></tr>";
-        }).join("");
-      }
-
-      // ========== 入口：渲染两套表格 ==========
+      // ========== 入口 ==========
       renderInbound();
-      renderInv();
 
-      // ========== 全局点击分发 ==========
+      // ========== 点击事件 ==========
       document.addEventListener("click", function (e) {
-        // 入库工具栏
         if (e.target.id === "btnSearch") { renderInbound(); return; }
-        if (e.target.id === "btnReset") { document.getElementById("qNo").value = ""; document.getElementById("qSupplier").value = ""; document.getElementById("qStatus").value = ""; renderInbound(); return; }
+        if (e.target.id === "btnReset") {
+          document.getElementById("qNo").value = "";
+          document.getElementById("qSupplier").value = "";
+          document.getElementById("qStatus").value = "";
+          renderInbound();
+          return;
+        }
         if (e.target.id === "btnAdd") { openInboundForm("add"); return; }
         if (e.target.id === "btnImport") { alert("导入弹窗（演示）"); return; }
         if (e.target.id === "btnTpl") { alert("下载模板（演示）"); return; }
@@ -526,25 +329,14 @@
           Array.prototype.forEach.call(document.querySelectorAll(".row-chk"), function (c) { c.checked = ck; });
           return;
         }
-        // 入库操作
         var op = e.target.getAttribute("data-op");
-        if (op) {
-          e.preventDefault();
-          var tr = e.target.closest("tr[data-no]");
-          if (op === "inv-view") {
-            openInvForm("view", tr ? byInvNo(tr.getAttribute("data-no")) : null);
-            return;
-          }
-          var row = tr ? byNo(tr.getAttribute("data-no")) : null;
-          if (op === "view") openInboundForm("view", row);
-          if (op === "edit") openInboundForm("edit", row);
-          if (op === "delete") openInboundForm("delete", row);
-          return;
-        }
-        // 库存工具栏
-        if (e.target.id === "btnInvAdd") { openInvForm("add"); return; }
-        if (e.target.id === "btnInvImport") { alert("导入弹窗（演示）"); return; }
-        if (e.target.id === "btnInvExport") { alert("导出（演示）"); return; }
+        if (!op) return;
+        e.preventDefault();
+        var tr = e.target.closest("tr[data-no]");
+        var row = tr ? byNo(tr.getAttribute("data-no")) : null;
+        if (op === "view") openInboundForm("view", row);
+        if (op === "edit") openInboundForm("edit", row);
+        if (op === "delete") openInboundForm("delete", row);
       });
 
       // 入库弹窗事件
@@ -574,38 +366,6 @@
         } else { rows.unshift(row); }
         closeInboundForm();
         renderInbound();
-      });
-
-      // 库存弹窗事件
-      document.getElementById("invX").addEventListener("click", closeInvForm);
-      document.getElementById("invCancel").addEventListener("click", closeInvForm);
-      document.getElementById("invMask").addEventListener("click", function (e) { if (e.target === this) closeInvForm(); });
-      document.getElementById("invSave").addEventListener("click", function () {
-        if (invMode === "delete" && invRefNo) {
-          invRows = invRows.filter(function (x) { return x.no !== invRefNo; });
-          closeInvForm();
-          renderInv();
-          return;
-        }
-        var invNo = (document.getElementById("fInvNo").value || "").trim() || ("IN-2026-" + String(Math.floor(Math.random() * 900 + 100)));
-        var inv = {
-          no: invNo,
-          mat: (document.getElementById("fMat").value || "").trim(),
-          spec: (document.getElementById("fSpec").value || "").trim(),
-          unit: (document.getElementById("fUnit").value || "台").trim(),
-          qty: parseFloat(document.getElementById("fQty").value) || 0,
-          avail: parseFloat(document.getElementById("fAvail").value) || 0,
-          allot: parseFloat(document.getElementById("fAllot").value) || 0,
-          wh: (document.getElementById("fWh").value || "").trim(),
-          dept: (document.getElementById("fDept2").value || "").trim(),
-          upd: new Date().toISOString().slice(0, 10)
-        };
-        if (invMode === "edit" && invRefNo) {
-          var oldInv = byInvNo(invRefNo);
-          if (oldInv) { for (var k in inv) oldInv[k] = inv[k]; }
-        } else { invRows.unshift(inv); }
-        closeInvForm();
-        renderInv();
       });
     })();
   </script>
