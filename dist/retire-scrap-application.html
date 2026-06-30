@@ -1512,6 +1512,7 @@
           .replace(/>/g, "&gt;")
           .replace(/"/g, "&quot;");
       }
+      function esc(s) { return escHtml(s); }
 
       function formatMoneyYuan(n) {
         var x = Number(n);
@@ -2049,7 +2050,7 @@
             "<td>" + (p.submitDate || "-") + "</td>" +
             '<td><span class="tag-status ' + st.cls + '">' + st.txt + "</span></td>" +
             "<td>" + (p.remark || "-") + "</td>" +
-            '<td><div class="wh-ops"><a href="#" data-plan-act="view" data-no="' + p.planNo + '">查看</a><a href="#" data-plan-act="edit" data-no="' + p.planNo + '">编辑</a><a href="#" data-plan-act="submit" data-no="' + p.planNo + '">提交审批</a><a href="#" data-plan-act="print" data-no="' + p.planNo + '">打印</a></div></td>';
+            '<td><div class="wh-ops"><a href="#" data-plan-act="view" data-no="' + p.planNo + '">查看</a></div></td>';
           body.appendChild(tr);
         });
       }
