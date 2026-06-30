@@ -461,6 +461,79 @@
     .view-mini-table { width:100%; border-collapse:collapse; font-size:12px; margin-top:8px; }
     .view-mini-table th, .view-mini-table td { border:1px solid #edf1f7; padding:6px; text-align:left; }
     .view-mini-table th { background:#f8fafc; color:#64748b; }
+    /* 报废物资明细表（新增/编辑弹窗） */
+    .plan-item-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+      table-layout: fixed;
+    }
+    .plan-item-table th, .plan-item-table td {
+      border: 1px solid #edf1f7;
+      padding: 7px 6px;
+      text-align: left;
+      vertical-align: middle;
+      word-break: break-word;
+    }
+    .plan-item-table th {
+      background: #f8fafc;
+      color: #64748b;
+      position: sticky;
+      top: 0;
+      z-index: 1;
+      white-space: nowrap;
+    }
+    .plan-item-table td input[type="number"] {
+      width: 100%;
+      min-width: 44px;
+      height: 28px;
+      border: 1px solid #dbe6f3;
+      border-radius: 4px;
+      padding: 0 6px;
+      font-size: 12px;
+      box-sizing: border-box;
+      text-align: center;
+    }
+    .plan-item-table td textarea {
+      width: 100%;
+      min-height: 26px;
+      border: 1px solid #dbe6f3;
+      border-radius: 4px;
+      padding: 4px 6px;
+      font-size: 12px;
+      resize: vertical;
+      box-sizing: border-box;
+      line-height: 1.4;
+    }
+    .plan-item-ops { display: flex; gap: 6px; align-items: center; justify-content: center; }
+    .plan-item-ops a { color: #1677ff; font-size: 12px; cursor: pointer; text-decoration: none; }
+    .plan-item-ops a:hover { opacity: 0.75; }
+    .plan-item-ops .ops-sep { color: #d0d7de; }
+    /* 物资选择弹窗表格 */
+    .pick-asset-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+      table-layout: fixed;
+    }
+    .pick-asset-table th, .pick-asset-table td {
+      border: 1px solid #edf1f7;
+      padding: 6px;
+      text-align: left;
+      word-break: break-all;
+      vertical-align: middle;
+    }
+    .pick-asset-table th {
+      background: #f8fafc;
+      color: #64748b;
+      position: sticky;
+      top: 0;
+      z-index: 1;
+      white-space: nowrap;
+    }
+    .pick-asset-table tbody tr:hover { background: #f0f9ff; cursor: pointer; }
+    .pick-asset-table tbody tr.pick-row-selected { background: #e6f4ff; }
+    .pick-asset-table tbody tr.pick-row-selected td { color: #0f172a; }
   </style>
 </head>
 <body class="page-source-navbar page-subpage page-logistics">
@@ -785,37 +858,90 @@
           <div class="f"><label>申请日期</label><input id="planDateInput" type="date" /></div>
           <div class="f"><label>报废说明</label><input id="planRemarkInput" placeholder="填写报废计划说明" /></div>
         </div>
-        <div style="font-size:13px;color:#334155;margin:4px 0 6px;">选择报废物资（从本部门资产中勾选）</div>
-        <div class="asset-select-wrap">
-          <div class="asset-select-filter">
-            <input id="assetKeyword" placeholder="资产名称/编号" />
-            <select id="assetTypeFilter"><option value="">资产类型(全部)</option></select>
-            <select id="assetLocationFilter"><option value="">存放地点(全部)</option></select>
-            <button type="button" class="btn-sub" id="btnAssetFilter">筛选</button>
-          </div>
-          <div class="asset-table-wrap">
-            <table class="asset-table">
+        <!-- 报废物资明细表 -->
+        <div style="font-size:13px;font-weight:600;color:#1f3551;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid #e8eef7;">
+          报废物资明细
+          <button type="button" id="btnOpenAssetPick" class="btn-sub" style="float:right;font-size:12px;padding:3px 12px;height:26px;background:#e6f4ff;color:#1677ff;border:1px solid #91caff;border-radius:6px;cursor:pointer;font-weight:normal;">
+            <i class="fa-solid fa-plus"></i> 选择报废物资
+          </button>
+        </div>
+        <div style="border:1px solid #e8eef7;border-radius:8px;overflow:hidden;margin-bottom:8px;">
+          <div style="max-height:320px;overflow:auto;">
+            <table class="plan-item-table" id="planItemTable">
               <thead>
                 <tr>
-                  <th style="width:40px;"><input type="checkbox" id="assetCheckAll" /></th>
-                  <th>资产编号</th><th>资产名称</th><th>型号规格</th><th>存放地点</th><th>保管人</th><th>原值(元)</th><th>净值(元)</th><th>使用年限</th><th>资产状态</th><th style="width:72px;">数量</th><th style="min-width:140px;">拟报废原因</th>
+                  <th style="width:42px;">序号</th>
+                  <th style="min-width:110px;">产品名称</th>
+                  <th style="min-width:110px;">型号及重要参数</th>
+                  <th style="min-width:90px;">生产厂家</th>
+                  <th style="width:72px;">计量单位</th>
+                  <th style="width:70px;">数量</th>
+                  <th style="width:96px;">采购时间</th>
+                  <th style="width:96px;">资产原值(元)</th>
+                  <th style="width:96px;">累计折旧(元)</th>
+                  <th style="width:96px;">净值(元)</th>
+                  <th style="min-width:160px;">拟报废原因</th>
+                  <th style="width:120px;">操作</th>
                 </tr>
               </thead>
-              <tbody id="assetPickBody"></tbody>
+              <tbody id="planItemBody"></tbody>
             </table>
           </div>
+          <div id="planItemEmpty" style="text-align:center;color:#8ca0b8;padding:28px;font-size:13px;">
+            暂无物资，请点击右上角「<strong style="color:#1677ff;">选择报废物资</strong>」按钮添加
+          </div>
         </div>
-        <div class="plan-summary">
-          <span>已选 <b id="pickedCount">0</b> 件物资</span>
-          <span>原值合计：<b id="pickedOrigin">¥ 0.00</b></span>
-          <span>净值合计：<b id="pickedNet">¥ 0.00</b></span>
+        <div class="plan-summary" id="planItemSummary">
+          <span>已选 <b id="planItemCount">0</b> 件物资</span>
+          <span>原值合计：<b id="planItemOriginSum">¥ 0.00</b></span>
+          <span>折旧合计：<b id="planItemDepSum">¥ 0.00</b></span>
+          <span>净值合计：<b id="planItemNetSum">¥ 0.00</b></span>
+          <span id="planEvalTip"></span>
         </div>
-        <div class="tag-eval" id="evalTip">净值合计未超过100万元，无需进行资产评估</div>
       </div>
       <div class="modal-footer">
         <button class="btn" id="btnPlanCancel">取消</button>
         <button class="btn" id="btnPlanSaveDraft">保存草稿</button>
         <button class="btn btn-primary" id="btnPlanSubmit">提交审批</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 物资选择弹窗 -->
+  <div class="modal-mask" id="planAssetPickMask" aria-hidden="true">
+    <div class="modal" role="dialog" style="width:min(960px,96vw);">
+      <div class="modal-header">
+        <h2 class="modal-title">选择报废物资</h2>
+        <div style="font-size:12px;color:#64748b;margin-right:8px;">双击行或点击勾选后确认添加</div>
+        <button class="modal-close" id="btnClosePlanAssetPick" aria-label="关闭">×</button>
+      </div>
+      <div class="modal-body" style="padding:10px 14px;">
+        <div class="asset-select-filter">
+          <input id="pickKeyword" placeholder="产品名称/编号" style="width:100%;height:30px;border:1px solid #dbe6f3;border-radius:6px;padding:0 8px;font-size:12px;" />
+          <select id="pickTypeFilter" style="width:100%;height:30px;border:1px solid #dbe6f3;border-radius:6px;padding:0 8px;font-size:12px;"><option value="">资产类型(全部)</option></select>
+          <select id="pickLocationFilter" style="width:100%;height:30px;border:1px solid #dbe6f3;border-radius:6px;padding:0 8px;font-size:12px;"><option value="">存放地点(全部)</option></select>
+          <button type="button" id="btnPickFilter" class="btn-sub" style="height:30px;padding:0 12px;">筛选</button>
+        </div>
+        <div style="max-height:360px;overflow:auto;margin-top:8px;">
+          <table class="pick-asset-table" id="pickAssetTable">
+            <thead>
+              <tr>
+                <th style="width:42px;"><input type="checkbox" id="pickCheckAll" /></th>
+                <th>产品名称</th><th>资产编号</th><th>型号及重要参数</th><th>生产厂家</th><th>存放地点</th><th>计量单位</th><th>采购时间</th><th>原值(元)</th><th>净值(元)</th><th>使用年限</th><th>资产状态</th>
+              </tr>
+            </thead>
+            <tbody id="pickAssetBody"></tbody>
+          </table>
+        </div>
+        <div style="margin-top:8px;font-size:12px;color:#334155;">
+          已勾选 <b id="pickSelCount">0</b> 件物资，
+          原值合计 <b id="pickSelOrigin">¥ 0.00</b>，
+          净值合计 <b id="pickSelNet">¥ 0.00</b>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn" id="btnPickCancel">取消</button>
+        <button class="btn btn-primary" id="btnPickConfirm">确认添加</button>
       </div>
     </div>
   </div>
@@ -831,10 +957,22 @@
       </div>
       <div class="modal-body" style="display:block;">
         <div class="view-grid" id="planDetailGrid"></div>
-        <table class="view-mini-table">
-          <thead><tr><th>资产编号</th><th>资产名称</th><th>型号规格</th><th>存放地点</th><th>原值</th><th>净值</th><th>数量</th><th>拟报废原因</th></tr></thead>
-          <tbody id="planDetailAssetBody"></tbody>
-        </table>
+        <div style="font-size:13px;font-weight:600;color:#1f3551;margin:12px 0 6px;padding-bottom:6px;border-bottom:1px solid #e8eef7;">报废物资明细</div>
+        <div style="max-height:300px;overflow:auto;border:1px solid #e8eef7;border-radius:8px;margin-bottom:8px;">
+          <table class="view-mini-table" style="table-layout:fixed;">
+            <thead>
+              <tr>
+                <th style="width:42px;">序号</th>
+                <th>产品名称</th><th>型号及重要参数</th><th>生产厂家</th>
+                <th style="width:64px;">计量单位</th><th style="width:60px;">数量</th>
+                <th style="width:88px;">采购时间</th>
+                <th style="width:88px;">原值(元)</th><th style="width:88px;">累计折旧</th><th style="width:88px;">净值(元)</th>
+                <th>拟报废原因</th>
+              </tr>
+            </thead>
+            <tbody id="planDetailAssetBody"></tbody>
+          </table>
+        </div>
         <div style="margin-top:8px;font-size:12px;color:#64748b;">审批流程：部门审批 → 总办会/董事会审批 → 通过后挂北交所拍卖</div>
         <table class="view-mini-table" style="margin-top:8px;">
           <thead><tr><th>节点</th><th>审批人</th><th>意见</th><th>时间</th><th>状态</th></tr></thead>
@@ -1167,12 +1305,12 @@
 
       // 报废计划模块数据
       var planAssets = [
-        { id: "GD-2024-001", name: "风速检测仪", model: "FS-80", location: "华北库房", keeper: "张三", origin: 22500, net: 16800, years: "8年", status: "在用", type: "检测设备", dept: "设备运维部" },
-        { id: "GD-2024-002", name: "振动分析仪", model: "ZD-300", location: "风电场01号", keeper: "李四", origin: 18000, net: 12600, years: "7年", status: "在用", type: "检测设备", dept: "设备运维部" },
-        { id: "GD-2023-088", name: "变流器测试仪", model: "BLT-300", location: "华北库房", keeper: "王磊", origin: 41000, net: 28400, years: "9年", status: "在用", type: "电测设备", dept: "设备运维部" },
-        { id: "LY-2024-015", name: "液压扳手套装", model: "HB-50", location: "风电场02号", keeper: "赵明", origin: 12000, net: 9300, years: "6年", status: "在用", type: "工器具", dept: "设备运维部" },
-        { id: "GD-2022-064", name: "绝缘电阻测试仪", model: "IR-5000", location: "华北库房", keeper: "周凯", origin: 30000, net: 24000, years: "5年", status: "在用", type: "电测设备", dept: "设备运维部" },
-        { id: "HD-2024-101", name: "电缆耐压仪", model: "NY-12", location: "华东库房", keeper: "孙强", origin: 56000, net: 47000, years: "4年", status: "在用", type: "电测设备", dept: "华东运维部" }
+        { id: "GD-2024-001", name: "风速检测仪", model: "FS-80", location: "华北库房", keeper: "张三", origin: 22500, net: 16800, years: "8年", status: "在用", type: "检测设备", dept: "设备运维部", manufacturer: "华测仪器（深圳）有限公司", unit: "台", purchaseDate: "2018-03-15" },
+        { id: "GD-2024-002", name: "振动分析仪", model: "ZD-300", location: "风电场01号", keeper: "李四", origin: 18000, net: 12600, years: "7年", status: "在用", type: "检测设备", dept: "设备运维部", manufacturer: "中科振动技术（上海）有限公司", unit: "台", purchaseDate: "2019-05-20" },
+        { id: "GD-2023-088", name: "变流器测试仪", model: "BLT-300", location: "华北库房", keeper: "王磊", origin: 41000, net: 28400, years: "9年", status: "在用", type: "电测设备", dept: "设备运维部", manufacturer: "北京华电测控技术股份有限公司", unit: "台", purchaseDate: "2017-08-10" },
+        { id: "LY-2024-015", name: "液压扳手套装", model: "HB-50", location: "风电场02号", keeper: "赵明", origin: 12000, net: 9300, years: "6年", status: "在用", type: "工器具", dept: "设备运维部", manufacturer: "德国霍夫曼工具（上海）公司", unit: "套", purchaseDate: "2020-01-08" },
+        { id: "GD-2022-064", name: "绝缘电阻测试仪", model: "IR-5000", location: "华北库房", keeper: "周凯", origin: 30000, net: 24000, years: "5年", status: "在用", type: "电测设备", dept: "设备运维部", manufacturer: "福禄克仪器（苏州）有限公司", unit: "台", purchaseDate: "2021-06-22" },
+        { id: "HD-2024-101", name: "电缆耐压仪", model: "NY-12", location: "华东库房", keeper: "孙强", origin: 56000, net: 47000, years: "4年", status: "在用", type: "电测设备", dept: "华东运维部", manufacturer: "上海电缆研究所股份有限公司", unit: "台", purchaseDate: "2022-09-05" }
       ];
       var planRecords = [
         { planNo: "BF-2026-001", year: "2026", dept: "设备运维部", applicant: currentUser, qty: 3, originSum: 75500, netSum: 54200, submitDate: "2026-06-15", status: "review", assetIds: ["GD-2024-001", "GD-2023-088", "LY-2024-015"], assetQty: {"GD-2024-001":1,"GD-2023-088":1,"LY-2024-015":1}, assetReasons: {"GD-2024-001":"使用年限到期，故障频发","GD-2023-088":"设备老化，精度下降","LY-2024-015":"维修成本过高"}, remark: "年度设备更新，按计划淘汰老旧设备。" },
@@ -1190,9 +1328,8 @@
       var planFilters = { tab: "all" };
       var planEditingNo = "";
       var planSubmitNo = "";
-      var pickedAssetIds = [];
-      var pickedAssetQty = {};
-      var pickedAssetReason = {};
+      var planItems = [];      // [{id, qty, reason}]
+      var pickChecked = {};    // {id: true} for asset pick modal
 
       function statusMeta(code) {
         if (code === "approved") return { cls: "tag-status--approved", text: "已通过" };
@@ -1847,8 +1984,7 @@
       }
       function openPlanModal(planNo) {
         planEditingNo = planNo || "";
-        pickedAssetIds = [];
-        pickedAssetQty = {};
+        planItems = []; // { id, qty, reason }
         var yearSel = document.getElementById("planYearInput");
         if (!yearSel.options.length) {
           var yy = new Date().getFullYear();
@@ -1857,36 +1993,209 @@
             yearSel.appendChild(op);
           });
         }
-        document.getElementById("planDeptInput").value = currentDept + " - 自动";
-        document.getElementById("planUserInput").value = currentUser + " - 自动";
+        document.getElementById("planDeptInput").value = currentDept;
+        document.getElementById("planUserInput").value = currentUser;
         document.getElementById("planDateInput").value = new Date().toISOString().slice(0, 10);
         document.getElementById("planRemarkInput").value = "";
-        document.getElementById("assetKeyword").value = "";
-        document.getElementById("assetTypeFilter").value = "";
-        document.getElementById("assetLocationFilter").value = "";
         if (planNo) {
           var old = planRecords.find(function (p) { return p.planNo === planNo; });
           if (old) {
             yearSel.value = old.year;
             document.getElementById("planDateInput").value = old.submitDate || new Date().toISOString().slice(0, 10);
             document.getElementById("planRemarkInput").value = old.remark || "";
-            pickedAssetIds = old.assetIds.slice();
-            pickedAssetQty = {};
-            pickedAssetReason = {};
-            pickedAssetIds.forEach(function (id) {
+            planItems = (old.assetIds || []).map(function (id) {
+              var asset = planAssets.find(function (a) { return a.id === id; });
               var q = old.assetQty && old.assetQty[id] != null ? Number(old.assetQty[id]) : 1;
-              pickedAssetQty[id] = !isNaN(q) && q >= 1 ? Math.floor(q) : 1;
-              pickedAssetReason[id] = (old.assetReasons && old.assetReasons[id]) ? old.assetReasons[id] : "";
+              return {
+                id: id,
+                qty: (!isNaN(q) && q >= 1) ? Math.floor(q) : 1,
+                reason: (old.assetReasons && old.assetReasons[id]) ? old.assetReasons[id] : ""
+              };
             });
           }
         } else {
           yearSel.value = String(new Date().getFullYear());
         }
-        renderAssetPickTable();
+        renderPlanItemTable();
         document.getElementById("planModalMask").classList.add("show");
       }
       function closePlanModal() { document.getElementById("planModalMask").classList.remove("show"); }
-      function renderAssetPickTable() {
+
+      // ── 报废物资明细表渲染 ──────────────────────────────────
+      function renderPlanItemTable() {
+        var body = document.getElementById("planItemBody");
+        var empty = document.getElementById("planItemEmpty");
+        if (!body) return;
+        body.innerHTML = "";
+        var totalOrigin = 0, totalNet = 0;
+        planItems.forEach(function (item, idx) {
+          var asset = planAssets.find(function (a) { return a.id === item.id; });
+          if (!asset) return;
+          var dep = (asset.origin - asset.net);
+          totalOrigin += asset.origin * item.qty;
+          totalNet += asset.net * item.qty;
+          var tr = document.createElement("tr");
+          tr.innerHTML =
+            '<td style="text-align:center;color:#64748b;">' + (idx + 1) + '</td>' +
+            '<td>' + escHtml(asset.name) + '</td>' +
+            '<td>' + escHtml(asset.model) + '</td>' +
+            '<td style="word-break:break-all;">' + escHtml(asset.manufacturer || "-") + '</td>' +
+            '<td style="text-align:center;">' + escHtml(asset.unit || "台") + '</td>' +
+            '<td><input type="number" min="1" class="pi-qty" data-idx="' + idx + '" value="' + item.qty + '" /></td>' +
+            '<td>' + (asset.purchaseDate || "-") + '</td>' +
+            '<td style="text-align:right;">' + fmtMoney(asset.origin * item.qty) + '</td>' +
+            '<td style="text-align:right;">' + fmtMoney(dep * item.qty) + '</td>' +
+            '<td style="text-align:right;">' + fmtMoney(asset.net * item.qty) + '</td>' +
+            '<td><textarea class="pi-reason" data-idx="' + idx + '" rows="2" placeholder="填写报废原因">' + escHtml(item.reason || "") + '</textarea></td>' +
+            '<td>' +
+              '<div class="plan-item-ops">' +
+                '<a href="#" class="pi-track" data-id="' + asset.id + '">物资跟踪</a>' +
+                '<span class="ops-sep">|</span>' +
+                '<a href="#" class="pi-del" data-idx="' + idx + '" style="color:#ff4d4f;">删除</a>' +
+              '</div>' +
+            '</td>';
+          body.appendChild(tr);
+        });
+        empty.style.display = planItems.length ? "none" : "block";
+        document.getElementById("planItemCount").textContent = planItems.length;
+        document.getElementById("planItemOriginSum").textContent = "¥ " + fmtMoney(totalOrigin);
+        document.getElementById("planItemDepSum").textContent = "¥ " + fmtMoney(totalOrigin - totalNet);
+        document.getElementById("planItemNetSum").textContent = "¥ " + fmtMoney(totalNet);
+        var tip = document.getElementById("planEvalTip");
+        if (totalNet > 1000000) {
+          tip.innerHTML = '<span style="color:#d48806;font-weight:600;">净值超过100万元，需进行资产评估</span>';
+        } else {
+          tip.innerHTML = '<span style="color:#389e0d;">净值未超过100万元，无需进行资产评估</span>';
+        }
+      }
+
+      // ── 物资选择弹窗 ──────────────────────────────────────
+      function openPlanAssetPick() {
+        pickChecked = {};
+        renderPickTable();
+        initPickFilters();
+        document.getElementById("planAssetPickMask").classList.add("show");
+      }
+      function closePlanAssetPick() { document.getElementById("planAssetPickMask").classList.remove("show"); }
+      function initPickFilters() {
+        var tSel = document.getElementById("pickTypeFilter");
+        var lSel = document.getElementById("pickLocationFilter");
+        if (tSel && tSel.options.length <= 1) {
+          var types = {};
+          planAssets.forEach(function (a) { types[a.type] = true; });
+          Object.keys(types).sort().forEach(function (t) {
+            var op = document.createElement("option"); op.value = t; op.textContent = t; tSel.appendChild(op);
+          });
+        }
+        if (lSel && lSel.options.length <= 1) {
+          var locs = {};
+          planAssets.forEach(function (a) { locs[a.location] = true; });
+          Object.keys(locs).sort().forEach(function (l) {
+            var op = document.createElement("option"); op.value = l; op.textContent = l; lSel.appendChild(op);
+          });
+        }
+      }
+      function renderPickTable() {
+        var body = document.getElementById("pickAssetBody");
+        if (!body) return;
+        var kw = ((document.getElementById("pickKeyword") || {value:""}).value || "").trim().toLowerCase();
+        var ty = (document.getElementById("pickTypeFilter") || {value:""}).value;
+        var loc = (document.getElementById("pickLocationFilter") || {value:""}).value;
+        var rows = planAssets.filter(function (a) {
+          if (a.dept !== currentDept) return false;
+          if (kw && a.id.toLowerCase().indexOf(kw) < 0 && a.name.toLowerCase().indexOf(kw) < 0) return false;
+          if (ty && a.type !== ty) return false;
+          if (loc && a.location !== loc) return false;
+          return true;
+        });
+        body.innerHTML = "";
+        rows.forEach(function (a) {
+          var checked = !!pickChecked[a.id];
+          var tr = document.createElement("tr");
+          if (checked) tr.className = "pick-row-selected";
+          tr.innerHTML =
+            '<td style="text-align:center;"><input type="checkbox" class="pick-cb" data-id="' + a.id + '"' + (checked ? " checked" : "") + "></td>" +
+            '<td>' + escHtml(a.name) + '</td>' +
+            '<td>' + a.id + '</td>' +
+            '<td>' + escHtml(a.model) + '</td>' +
+            '<td style="word-break:break-all;">' + escHtml(a.manufacturer || "-") + '</td>' +
+            '<td>' + escHtml(a.location) + '</td>' +
+            '<td style="text-align:center;">' + escHtml(a.unit || "台") + '</td>' +
+            '<td>' + (a.purchaseDate || "-") + '</td>' +
+            '<td style="text-align:right;">' + fmtMoney(a.origin) + '</td>' +
+            '<td style="text-align:right;">' + fmtMoney(a.net) + '</td>' +
+            '<td style="text-align:center;">' + a.years + '</td>' +
+            '<td style="text-align:center;"><span class="tag-status tag-status--pending">' + escHtml(a.status) + '</span></td>';
+          tr.addEventListener("dblclick", function () {
+            if (!pickChecked[a.id]) {
+              pickChecked[a.id] = true;
+              renderPickTable();
+              refreshPickSummary();
+            }
+          });
+          body.appendChild(tr);
+        });
+        refreshPickSummary();
+      }
+      function refreshPickSummary() {
+        var ids = Object.keys(pickChecked);
+        var totalO = 0, totalN = 0;
+        ids.forEach(function (id) {
+          var a = planAssets.find(function (x) { return x.id === id; });
+          if (a) { totalO += a.origin; totalN += a.net; }
+        });
+        document.getElementById("pickSelCount").textContent = ids.length;
+        document.getElementById("pickSelOrigin").textContent = "¥ " + fmtMoney(totalO);
+        document.getElementById("pickSelNet").textContent = "¥ " + fmtMoney(totalN);
+      }
+      function confirmPickItems() {
+        var ids = Object.keys(pickChecked);
+        ids.forEach(function (id) {
+          if (!planItems.some(function (item) { return item.id === id; })) {
+            planItems.push({ id: id, qty: 1, reason: "" });
+          }
+        });
+        closePlanAssetPick();
+        renderPlanItemTable();
+      }
+
+      // ── 保存计划 ────────────────────────────────────────────
+      function savePlan(status) {
+        var year = (document.getElementById("planYearInput") || {value:""}).value;
+        var remark = (document.getElementById("planRemarkInput") || {value:""}).value;
+        var assetIds = planItems.map(function (item) { return item.id; });
+        var assetQty = {};
+        var assetReasons = {};
+        planItems.forEach(function (item) { assetQty[item.id] = item.qty; assetReasons[item.id] = item.reason; });
+        var item = {
+          planNo: planEditingNo || genPlanNo(year),
+          year: year,
+          dept: currentDept,
+          applicant: currentUser,
+          qty: planItems.length,
+          originSum: planItems.reduce(function (s, item) {
+            var a = planAssets.find(function (x) { return x.id === item.id; });
+            return s + (a ? a.origin * item.qty : 0);
+          }, 0),
+          netSum: planItems.reduce(function (s, item) {
+            var a = planAssets.find(function (x) { return x.id === item.id; });
+            return s + (a ? a.net * item.qty : 0);
+          }, 0),
+          submitDate: status === "review" ? new Date().toISOString().slice(0, 10) : "",
+          status: status,
+          assetIds: assetIds,
+          assetQty: assetQty,
+          assetReasons: assetReasons,
+          remark: remark
+        };
+        var idx = planRecords.findIndex(function (p) { return p.planNo === item.planNo; });
+        if (idx > -1) planRecords[idx] = item; else planRecords.unshift(item);
+        closePlanModal();
+        refreshPlanStats();
+        renderPlanTable();
+      }
+
+
         var body = document.getElementById("assetPickBody");
         var kw = (document.getElementById("assetKeyword").value || "").trim().toLowerCase();
         var ty = document.getElementById("assetTypeFilter").value || "";
@@ -1988,11 +2297,24 @@
           '<div class="view-item"><b>提交日期：</b>' + (item.submitDate || "-") + '</div><div class="view-item"><b>审批状态：</b>' + planStatusMeta(item.status).txt + '</div>' +
           '<div class="view-item full"><b>报废说明：</b>' + (item.remark || "-") + "</div>";
         var assets = planAssets.filter(function (a) { return item.assetIds.indexOf(a.id) > -1; });
-        document.getElementById("planDetailAssetBody").innerHTML = assets.map(function (a) {
+        document.getElementById("planDetailAssetBody").innerHTML = assets.map(function (a, idx) {
           var pq = item.assetQty && item.assetQty[a.id] != null ? Number(item.assetQty[a.id]) : 1;
           if (isNaN(pq) || pq < 1) pq = 1;
+          var dep = a.origin - a.net;
           var reason = (item.assetReasons && item.assetReasons[a.id]) ? item.assetReasons[a.id] : "-";
-          return "<tr><td>" + a.id + "</td><td>" + a.name + "</td><td>" + a.model + "</td><td>" + a.location + "</td><td>" + fmtMoney(a.origin) + "</td><td>" + fmtMoney(a.net) + "</td><td>" + pq + "</td><td>" + escHtml(reason) + "</td></tr>";
+          return "<tr>" +
+            "<td style=\"text-align:center;color:#64748b;\">" + (idx + 1) + "</td>" +
+            "<td>" + escHtml(a.name) + "</td>" +
+            "<td>" + escHtml(a.model) + "</td>" +
+            "<td style=\"word-break:break-all;\">" + escHtml(a.manufacturer || "-") + "</td>" +
+            "<td style=\"text-align:center;\">" + escHtml(a.unit || "台") + "</td>" +
+            "<td style=\"text-align:center;\">" + pq + "</td>" +
+            "<td>" + (a.purchaseDate || "-") + "</td>" +
+            "<td style=\"text-align:right;\">" + fmtMoney(a.origin * pq) + "</td>" +
+            "<td style=\"text-align:right;\">" + fmtMoney(dep * pq) + "</td>" +
+            "<td style=\"text-align:right;\">" + fmtMoney(a.net * pq) + "</td>" +
+            "<td>" + escHtml(reason) + "</td>" +
+            "</tr>";
         }).join("");
         document.getElementById("planDetailRecordBody").innerHTML =
           "<tr><td>申请部门负责人意见及签字</td><td>申请部门负责人</td><td>" + (item.status === "rejected" ? "驳回" : "同意") + "</td><td>" + (item.submitDate || "-") + "</td><td>" + (item.status === "rejected" ? "驳回" : "完成") + "</td></tr>" +
@@ -2023,25 +2345,6 @@
         if (deptSel && deptSel.options.length <= 1) {
           [currentDept, "华东运维部", "检修保障部"].forEach(function (d) { var op = document.createElement("option"); op.value = d; op.textContent = d; deptSel.appendChild(op); });
         }
-        var typeSel = document.getElementById("assetTypeFilter");
-        var locSel = document.getElementById("assetLocationFilter");
-        if (typeSel && typeSel.options.length <= 1) {
-          ["检测设备", "电测设备", "工器具"].forEach(function (t) { var op = document.createElement("option"); op.value = t; op.textContent = t; typeSel.appendChild(op); });
-        }
-        if (locSel && locSel.options.length <= 1) {
-          ["华北库房", "风电场01号", "风电场02号"].forEach(function (l) { var op = document.createElement("option"); op.value = l; op.textContent = l; locSel.appendChild(op); });
-        }
-        var planTabBar = document.getElementById("planTabBar");
-        if (planTabBar) {
-          planTabBar.addEventListener("click", function (e) {
-            var btn = e.target.closest("[data-plan-tab]");
-            if (!btn) return;
-            planFilters.tab = btn.getAttribute("data-plan-tab");
-            document.querySelectorAll("[data-plan-tab]").forEach(function (b) { b.classList.remove("is-active"); });
-            btn.classList.add("is-active");
-            renderPlanTable();
-          });
-        }
         document.getElementById("btnPlanSearch").addEventListener("click", renderPlanTable);
         document.getElementById("btnPlanReset").addEventListener("click", function () {
           var ids = ["qPlanNo","qPlanYear","qPlanDept","qPlanUser","qDateStart","qDateEnd"];
@@ -2053,55 +2356,68 @@
         document.getElementById("btnClosePlanModal").addEventListener("click", closePlanModal);
         document.getElementById("btnPlanCancel").addEventListener("click", closePlanModal);
         document.getElementById("planModalMask").addEventListener("click", function (e) { if (e.target.id === "planModalMask") closePlanModal(); });
-        document.getElementById("btnAssetFilter").addEventListener("click", renderAssetPickTable);
-        document.getElementById("assetCheckAll").addEventListener("change", function (e) {
-          var checks = document.querySelectorAll(".asset-row-check");
-          checks.forEach(function (c) {
-            c.checked = e.target.checked;
-            var id = c.getAttribute("data-id");
-            if (c.checked && pickedAssetIds.indexOf(id) < 0) {
-              pickedAssetIds.push(id);
-              if (pickedAssetQty[id] == null || pickedAssetQty[id] < 1) pickedAssetQty[id] = 1;
-            }
-            if (!c.checked) {
-              pickedAssetIds = pickedAssetIds.filter(function (x) { return x !== id; });
-              delete pickedAssetQty[id];
-            }
+        // 物资选择弹窗事件
+        document.getElementById("btnOpenAssetPick").addEventListener("click", openPlanAssetPick);
+        document.getElementById("btnClosePlanAssetPick").addEventListener("click", closePlanAssetPick);
+        document.getElementById("btnPickCancel").addEventListener("click", closePlanAssetPick);
+        document.getElementById("btnPickConfirm").addEventListener("click", confirmPickItems);
+        document.getElementById("planAssetPickMask").addEventListener("click", function (e) { if (e.target.id === "planAssetPickMask") closePlanAssetPick(); });
+        document.getElementById("btnPickFilter").addEventListener("click", renderPickTable);
+        document.getElementById("pickCheckAll").addEventListener("change", function (e) {
+          var rows = document.querySelectorAll("#pickAssetBody tr");
+          rows.forEach(function (tr) {
+            var cb = tr.querySelector(".pick-cb");
+            if (!cb) return;
+            cb.checked = e.target.checked;
+            var id = cb.getAttribute("data-id");
+            if (e.target.checked) pickChecked[id] = true;
+            else delete pickChecked[id];
+            if (e.target.checked) tr.className = "pick-row-selected";
+            else tr.className = "";
           });
-          renderAssetPickTable();
-        });
-        document.getElementById("assetPickBody").addEventListener("change", function (e) {
-          var c = e.target.closest(".asset-row-check");
-          if (!c) return;
-          var id = c.getAttribute("data-id");
-          if (c.checked && pickedAssetIds.indexOf(id) < 0) {
-            pickedAssetIds.push(id);
-            if (pickedAssetQty[id] == null || pickedAssetQty[id] < 1) pickedAssetQty[id] = 1;
-            if (pickedAssetReason[id] == null) pickedAssetReason[id] = "";
-          }
-          if (!c.checked) {
-            pickedAssetIds = pickedAssetIds.filter(function (x) { return x !== id; });
-            delete pickedAssetQty[id];
-            delete pickedAssetReason[id];
-          }
-          renderAssetPickTable();
-        });
-        document.getElementById("assetPickBody").addEventListener("input", function (e) {
-          var inp = e.target.closest(".asset-qty-input");
-          if (!inp || inp.disabled) return;
-          var id = inp.getAttribute("data-id");
-          var v = parseInt(inp.value, 10);
-          if (isNaN(v) || v < 1) v = 1;
-          pickedAssetQty[id] = v;
-          if (String(v) !== String(inp.value)) inp.value = String(v);
           refreshPickSummary();
         });
-        document.getElementById("assetPickBody").addEventListener("input", function (e) {
-          var inp = e.target.closest(".asset-reason-input");
-          if (!inp) return;
-          var id = inp.getAttribute("data-id");
-          pickedAssetReason[id] = inp.value;
+        document.getElementById("pickAssetBody").addEventListener("change", function (e) {
+          var cb = e.target.closest(".pick-cb");
+          if (!cb) return;
+          var id = cb.getAttribute("data-id");
+          var tr = cb.closest("tr");
+          if (cb.checked) { pickChecked[id] = true; tr.className = "pick-row-selected"; }
+          else { delete pickChecked[id]; tr.className = ""; }
+          refreshPickSummary();
         });
+
+        // 明细表事件：数量/原因编辑、删除
+        document.getElementById("planItemBody").addEventListener("input", function (e) {
+          var inp = e.target.closest(".pi-qty");
+          if (inp) {
+            var idx = parseInt(inp.getAttribute("data-idx"), 10);
+            var v = parseInt(inp.value, 10);
+            if (isNaN(v) || v < 1) v = 1;
+            if (planItems[idx]) { planItems[idx].qty = v; }
+            if (String(v) !== String(inp.value)) inp.value = v;
+            renderPlanItemTable();
+          }
+          var ta = e.target.closest(".pi-reason");
+          if (ta) {
+            var idx2 = parseInt(ta.getAttribute("data-idx"), 10);
+            if (planItems[idx2]) planItems[idx2].reason = ta.value;
+          }
+        });
+        document.getElementById("planItemBody").addEventListener("click", function (e) {
+          var del = e.target.closest(".pi-del");
+          if (del) {
+            var idx = parseInt(del.getAttribute("data-idx"), 10);
+            planItems.splice(idx, 1);
+            renderPlanItemTable();
+          }
+          var track = e.target.closest(".pi-track");
+          if (track) {
+            var assetId = track.getAttribute("data-id");
+            alert("物资跟踪：正在跳转到物资「" + assetId + "」的流转记录页面（演示功能）");
+          }
+        });
+
         document.getElementById("btnPlanSaveDraft").addEventListener("click", function () { savePlan("draft"); });
         document.getElementById("btnPlanSubmit").addEventListener("click", function () { savePlan("review"); });
         document.getElementById("planTableBody").addEventListener("click", function (e) {

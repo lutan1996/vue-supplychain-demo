@@ -2345,25 +2345,6 @@
         if (deptSel && deptSel.options.length <= 1) {
           [currentDept, "华东运维部", "检修保障部"].forEach(function (d) { var op = document.createElement("option"); op.value = d; op.textContent = d; deptSel.appendChild(op); });
         }
-        var typeSel = document.getElementById("assetTypeFilter");
-        var locSel = document.getElementById("assetLocationFilter");
-        if (typeSel && typeSel.options.length <= 1) {
-          ["检测设备", "电测设备", "工器具"].forEach(function (t) { var op = document.createElement("option"); op.value = t; op.textContent = t; typeSel.appendChild(op); });
-        }
-        if (locSel && locSel.options.length <= 1) {
-          ["华北库房", "风电场01号", "风电场02号"].forEach(function (l) { var op = document.createElement("option"); op.value = l; op.textContent = l; locSel.appendChild(op); });
-        }
-        var planTabBar = document.getElementById("planTabBar");
-        if (planTabBar) {
-          planTabBar.addEventListener("click", function (e) {
-            var btn = e.target.closest("[data-plan-tab]");
-            if (!btn) return;
-            planFilters.tab = btn.getAttribute("data-plan-tab");
-            document.querySelectorAll("[data-plan-tab]").forEach(function (b) { b.classList.remove("is-active"); });
-            btn.classList.add("is-active");
-            renderPlanTable();
-          });
-        }
         document.getElementById("btnPlanSearch").addEventListener("click", renderPlanTable);
         document.getElementById("btnPlanReset").addEventListener("click", function () {
           var ids = ["qPlanNo","qPlanYear","qPlanDept","qPlanUser","qDateStart","qDateEnd"];
@@ -2375,55 +2356,68 @@
         document.getElementById("btnClosePlanModal").addEventListener("click", closePlanModal);
         document.getElementById("btnPlanCancel").addEventListener("click", closePlanModal);
         document.getElementById("planModalMask").addEventListener("click", function (e) { if (e.target.id === "planModalMask") closePlanModal(); });
-        document.getElementById("btnAssetFilter").addEventListener("click", renderAssetPickTable);
-        document.getElementById("assetCheckAll").addEventListener("change", function (e) {
-          var checks = document.querySelectorAll(".asset-row-check");
-          checks.forEach(function (c) {
-            c.checked = e.target.checked;
-            var id = c.getAttribute("data-id");
-            if (c.checked && pickedAssetIds.indexOf(id) < 0) {
-              pickedAssetIds.push(id);
-              if (pickedAssetQty[id] == null || pickedAssetQty[id] < 1) pickedAssetQty[id] = 1;
-            }
-            if (!c.checked) {
-              pickedAssetIds = pickedAssetIds.filter(function (x) { return x !== id; });
-              delete pickedAssetQty[id];
-            }
+        // 物资选择弹窗事件
+        document.getElementById("btnOpenAssetPick").addEventListener("click", openPlanAssetPick);
+        document.getElementById("btnClosePlanAssetPick").addEventListener("click", closePlanAssetPick);
+        document.getElementById("btnPickCancel").addEventListener("click", closePlanAssetPick);
+        document.getElementById("btnPickConfirm").addEventListener("click", confirmPickItems);
+        document.getElementById("planAssetPickMask").addEventListener("click", function (e) { if (e.target.id === "planAssetPickMask") closePlanAssetPick(); });
+        document.getElementById("btnPickFilter").addEventListener("click", renderPickTable);
+        document.getElementById("pickCheckAll").addEventListener("change", function (e) {
+          var rows = document.querySelectorAll("#pickAssetBody tr");
+          rows.forEach(function (tr) {
+            var cb = tr.querySelector(".pick-cb");
+            if (!cb) return;
+            cb.checked = e.target.checked;
+            var id = cb.getAttribute("data-id");
+            if (e.target.checked) pickChecked[id] = true;
+            else delete pickChecked[id];
+            if (e.target.checked) tr.className = "pick-row-selected";
+            else tr.className = "";
           });
-          renderAssetPickTable();
-        });
-        document.getElementById("assetPickBody").addEventListener("change", function (e) {
-          var c = e.target.closest(".asset-row-check");
-          if (!c) return;
-          var id = c.getAttribute("data-id");
-          if (c.checked && pickedAssetIds.indexOf(id) < 0) {
-            pickedAssetIds.push(id);
-            if (pickedAssetQty[id] == null || pickedAssetQty[id] < 1) pickedAssetQty[id] = 1;
-            if (pickedAssetReason[id] == null) pickedAssetReason[id] = "";
-          }
-          if (!c.checked) {
-            pickedAssetIds = pickedAssetIds.filter(function (x) { return x !== id; });
-            delete pickedAssetQty[id];
-            delete pickedAssetReason[id];
-          }
-          renderAssetPickTable();
-        });
-        document.getElementById("assetPickBody").addEventListener("input", function (e) {
-          var inp = e.target.closest(".asset-qty-input");
-          if (!inp || inp.disabled) return;
-          var id = inp.getAttribute("data-id");
-          var v = parseInt(inp.value, 10);
-          if (isNaN(v) || v < 1) v = 1;
-          pickedAssetQty[id] = v;
-          if (String(v) !== String(inp.value)) inp.value = String(v);
           refreshPickSummary();
         });
-        document.getElementById("assetPickBody").addEventListener("input", function (e) {
-          var inp = e.target.closest(".asset-reason-input");
-          if (!inp) return;
-          var id = inp.getAttribute("data-id");
-          pickedAssetReason[id] = inp.value;
+        document.getElementById("pickAssetBody").addEventListener("change", function (e) {
+          var cb = e.target.closest(".pick-cb");
+          if (!cb) return;
+          var id = cb.getAttribute("data-id");
+          var tr = cb.closest("tr");
+          if (cb.checked) { pickChecked[id] = true; tr.className = "pick-row-selected"; }
+          else { delete pickChecked[id]; tr.className = ""; }
+          refreshPickSummary();
         });
+
+        // 明细表事件：数量/原因编辑、删除
+        document.getElementById("planItemBody").addEventListener("input", function (e) {
+          var inp = e.target.closest(".pi-qty");
+          if (inp) {
+            var idx = parseInt(inp.getAttribute("data-idx"), 10);
+            var v = parseInt(inp.value, 10);
+            if (isNaN(v) || v < 1) v = 1;
+            if (planItems[idx]) { planItems[idx].qty = v; }
+            if (String(v) !== String(inp.value)) inp.value = v;
+            renderPlanItemTable();
+          }
+          var ta = e.target.closest(".pi-reason");
+          if (ta) {
+            var idx2 = parseInt(ta.getAttribute("data-idx"), 10);
+            if (planItems[idx2]) planItems[idx2].reason = ta.value;
+          }
+        });
+        document.getElementById("planItemBody").addEventListener("click", function (e) {
+          var del = e.target.closest(".pi-del");
+          if (del) {
+            var idx = parseInt(del.getAttribute("data-idx"), 10);
+            planItems.splice(idx, 1);
+            renderPlanItemTable();
+          }
+          var track = e.target.closest(".pi-track");
+          if (track) {
+            var assetId = track.getAttribute("data-id");
+            alert("物资跟踪：正在跳转到物资「" + assetId + "」的流转记录页面（演示功能）");
+          }
+        });
+
         document.getElementById("btnPlanSaveDraft").addEventListener("click", function () { savePlan("draft"); });
         document.getElementById("btnPlanSubmit").addEventListener("click", function () { savePlan("review"); });
         document.getElementById("planTableBody").addEventListener("click", function (e) {
