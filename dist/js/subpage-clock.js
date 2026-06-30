@@ -1592,7 +1592,7 @@
       ".map-flow-pane{display:none;padding-top:14px;}" +
       ".map-flow-pane.is-active{display:block;}" +
       ".map-flow-track{border:1px solid #f0f2f5;border-radius:8px;padding:22px 18px;overflow:visible;}" +
-      ".map-flow-row{display:grid;grid-template-columns:repeat(11,1fr);align-items:stretch;gap:6px;}" +
+      ".map-flow-row{display:flex;align-items:center;flex-wrap:nowrap;gap:6px;overflow-x:auto;}" +
       ".map-flow-node{min-width:0;max-width:none;padding:8px 8px;border-radius:10px;border:1px solid #cfe8cf;background:#edf8ed;color:#315c35;font-size:11.5px;line-height:1.3;text-align:center;white-space:normal;display:flex;align-items:center;justify-content:center;word-break:break-word;grid-column:span 1;}" +
       ".map-flow-node.end{min-height:42px;font-size:11.5px;background:#fff8e6;border-color:#f0dca8;color:#7a5a14;}" +
       ".map-flow-node.is-current,.map-flow-node.is-pending{background:#fff7e6;border-color:#f6c86f;color:#8a5a00;}" +
@@ -2050,7 +2050,7 @@
       return '<span class="' + cls + '">' + esc(text) + "</span>";
     }
     function row(steps, currentIdx) {
-      var html = '<div class="map-flow-row" style="grid-template-columns:repeat(' + (steps.length * 2 - 1) + ',1fr)">';
+      var html = '<div class="map-flow-row">';
       steps.forEach(function (text, idx) {
         if (idx > 0) html += '<span class="map-flow-arrow">→</span>';
         html += node(text, idx, currentIdx, idx === steps.length - 1);
@@ -2140,7 +2140,8 @@
     var track = mask.querySelector(".map-flow-track");
     var info = mask.querySelector(".map-flow-info");
     if (!track) return;
-    track.innerHTML = '<div class="map-flow-row" style="grid-template-columns:repeat(11,1fr)">' +
+    track.innerHTML =
+      '<div class="map-flow-row">' +
       '<span class="map-flow-dot"></span>' +
       '<span class="map-flow-node">业务部门物资负责人录入设备清单，提交申请入库</span>' +
       '<span class="map-flow-arrow">→</span>' +
@@ -2215,7 +2216,7 @@
     var info = mask.querySelector(".map-flow-info");
     if (!track) return;
     track.innerHTML =
-      '<div class="map-flow-row" style="grid-template-columns:repeat(11,1fr)">' +
+      '<div class="map-flow-row">' +
       '<span class="map-flow-node">电控所物资专责成明锴发起领用流程，从公司库中选取物资清单</span>' +
       '<span class="map-flow-arrow">→</span>' +
       '<span class="map-flow-node">电控所负责人陈亮审批，通过</span>' +
@@ -2273,7 +2274,7 @@
     var info = mask.querySelector(".map-flow-info");
     if (!track) return;
     track.innerHTML =
-      '<div class="map-flow-row" style="grid-template-columns:repeat(11,1fr)">' +
+      '<div class="map-flow-row">' +
       '<span class="map-flow-node">电控所发起申请，将机械所物资转入本部门</span>' +
       '<span class="map-flow-arrow">→</span>' +
       '<span class="map-flow-node">电控所负责人陈亮审批，通过</span>' +
@@ -2283,9 +2284,8 @@
       '<span class="map-flow-node">机械研究所负责人李仁堂审批，通过</span>' +
       '<span class="map-flow-arrow">→</span>' +
       '<span class="map-flow-node">物资管理部门物资专责宋中波确认</span>' +
-      '<span class="map-flow-arrow">→</span>' +
       '</div>' +
-      '<div class="map-flow-row" style="grid-template-columns:repeat(11,1fr);margin-top:18px">' +
+      '<div class="map-flow-row" style="margin-top:18px">' +
       '<span class="map-flow-node end">公司内部流转结束</span>' +
       '<span class="map-flow-dot end"></span>' +
       '</div>';
@@ -2349,7 +2349,7 @@
     if (isUserChange) {
       setUnifiedProgressModalTitle(mask, "审批记录 - 变更使用人");
       track.innerHTML =
-        '<div class="map-flow-row" style="grid-template-columns:repeat(9,1fr)">' +
+        '<div class="map-flow-row">' +
         '<span class="map-flow-node">发起变更</span>' +
         '<span class="map-flow-arrow">→</span>' +
         '<span class="map-flow-node">部门负责人审批</span>' +
@@ -2403,7 +2403,7 @@
 
     setUnifiedProgressModalTitle(mask, "审批记录 - 外部借用");
     track.innerHTML =
-      '<div class="map-flow-row" style="grid-template-columns:repeat(11,1fr)">' +
+      '<div class="map-flow-row">' +
       '<span class="map-flow-node">发起外借</span>' +
       '<span class="map-flow-arrow">→</span>' +
       '<span class="map-flow-node">部门负责人初审</span>' +

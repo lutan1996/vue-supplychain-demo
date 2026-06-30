@@ -1191,7 +1191,7 @@
         '<div class="qa-accept-toolbar-title">入库审批单</div>' +
         '<button type="button" class="qa-accept-btn-close" id="qaAcceptBtnBack" aria-label="关闭" title="关闭">×</button>' +
         "</div>" +
-        '<p class="qa-accept-legend"><span class="qa-legend-dot" aria-hidden="true"></span>灰色背景为选择「合同编号」后<strong>系统自动带入</strong>；白框为手填。</p>' +
+        '<p class="qa-accept-legend" style="display:none"></p>' +
         '<div class="qa-accept-form-shell">' +
         '<table class="qa-accept-grid" role="presentation">' +
         "<tbody>" +

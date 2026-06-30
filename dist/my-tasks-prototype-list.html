@@ -1718,7 +1718,7 @@
         }
         var rowHtml = isCompany
           ? '<div class="inventory-progress-company-tree">' +
-              progressStep("物资管理部门物资专责发起公司物资盘点", 0) +
+              progressStep("物资管理部门物资专责发起公司物资盘点", 0, false, true) +
               '<div class="inventory-progress-company-branch">' +
                 '<div class="inventory-progress-company-arrows"><span>→</span><span>→</span><span>→</span></div>' +
                 '<div class="inventory-progress-stack">' +
@@ -1726,7 +1726,7 @@
                   '<div class="inventory-progress-stack-row">' + progressStep("财务部门负责人同意并分配部门盘点人员", 3, false, true) + '</div>' +
                   '<div class="inventory-progress-stack-row">' + progressStep("业务部门负责人同意并分配部门盘点人员", 4, false, true) + '</div>' +
                 '</div>' +
-                '<div class="inventory-progress-company-merge"><span>↘</span><span>→</span><span>↗</span></div>' +
+                '<div class="inventory-progress-company-merge"><span>↘</span><span>↙</span><span>↗</span></div>' +
               '</div>' +
             '</div>' +
             progressStep("盘点完毕，上传盘点结果，提交财务负责人审阅。", 5, false, true) +
