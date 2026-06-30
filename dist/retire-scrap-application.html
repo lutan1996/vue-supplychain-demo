@@ -534,6 +534,45 @@
     .pick-asset-table tbody tr:hover { background: #f0f9ff; cursor: pointer; }
     .pick-asset-table tbody tr.pick-row-selected { background: #e6f4ff; }
     .pick-asset-table tbody tr.pick-row-selected td { color: #0f172a; }
+    /* 物资分类树 */
+    .pick-tree-node {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 12px;
+      font-size: 12px;
+      color: #334155;
+      cursor: pointer;
+      border-radius: 0;
+      transition: background 0.15s;
+    }
+    .pick-tree-node:hover { background: #e6f4ff; }
+    .pick-tree-node.active { background: #bae0ff; color: #1677ff; font-weight: 600; }
+    .pick-tree-node .tree-icon { color: #94a3b8; width: 14px; text-align: center; flex-shrink: 0; }
+    .pick-tree-node.active .tree-icon { color: #1677ff; }
+    /* 物资选择弹窗内输入（数量列） */
+    .pick-qty-input {
+      width: 100%;
+      min-width: 44px;
+      height: 26px;
+      border: 1px solid #dbe6f3;
+      border-radius: 4px;
+      padding: 0 4px;
+      font-size: 12px;
+      text-align: center;
+      box-sizing: border-box;
+    }
+    .page-btn {
+      background: #fff;
+      border: 1px solid #dbe6f3;
+      border-radius: 4px;
+      padding: 2px 8px;
+      font-size: 12px;
+      color: #334155;
+      cursor: pointer;
+    }
+    .page-btn:hover:not(:disabled) { background: #e6f4ff; }
+    .page-btn:disabled { color: #c0ccda; cursor: default; }
   </style>
 </head>
 <body class="page-source-navbar page-subpage page-logistics">
@@ -909,39 +948,80 @@
 
   <!-- 物资选择弹窗 -->
   <div class="modal-mask" id="planAssetPickMask" aria-hidden="true">
-    <div class="modal" role="dialog" style="width:min(960px,96vw);">
+    <div class="modal" role="dialog" style="width:min(1020px,97vw);">
       <div class="modal-header">
-        <h2 class="modal-title">选择报废物资</h2>
-        <div style="font-size:12px;color:#64748b;margin-right:8px;">双击行或点击勾选后确认添加</div>
+        <h2 class="modal-title">选择物资</h2>
         <button class="modal-close" id="btnClosePlanAssetPick" aria-label="关闭">×</button>
       </div>
-      <div class="modal-body" style="padding:10px 14px;">
-        <div class="asset-select-filter">
-          <input id="pickKeyword" placeholder="产品名称/编号" style="width:100%;height:30px;border:1px solid #dbe6f3;border-radius:6px;padding:0 8px;font-size:12px;" />
-          <select id="pickTypeFilter" style="width:100%;height:30px;border:1px solid #dbe6f3;border-radius:6px;padding:0 8px;font-size:12px;"><option value="">资产类型(全部)</option></select>
-          <select id="pickLocationFilter" style="width:100%;height:30px;border:1px solid #dbe6f3;border-radius:6px;padding:0 8px;font-size:12px;"><option value="">存放地点(全部)</option></select>
-          <button type="button" id="btnPickFilter" class="btn-sub" style="height:30px;padding:0 12px;">筛选</button>
+      <div class="modal-body" id="planPickBody" style="display:flex;flex-direction:row;padding:12px 14px;gap:12px;height:520px;box-sizing:border-box;">
+        <!-- 左侧：物资分类树 -->
+        <div style="width:180px;flex-shrink:0;border:1px solid #e8eef7;border-radius:8px;background:#fafbfc;overflow:auto;">
+          <div style="padding:10px 12px 6px;font-size:12px;font-weight:600;color:#1f3551;border-bottom:1px solid #e8eef7;">物资分类</div>
+          <div id="pickTypeTree" style="padding:6px 0;">
+            <div class="pick-tree-node pick-tree-root active" data-type="">
+              <span class="tree-icon"><i class="fa-solid fa-folder-open"></i></span>
+              全部
+            </div>
+            <div class="pick-tree-node" data-type="检测设备">
+              <span class="tree-icon"><i class="fa-solid fa-caret-right"></i></span>
+              检测设备
+            </div>
+            <div class="pick-tree-node" data-type="电测设备">
+              <span class="tree-icon"><i class="fa-solid fa-caret-right"></i></span>
+              电测设备
+            </div>
+            <div class="pick-tree-node" data-type="工器具">
+              <span class="tree-icon"><i class="fa-solid fa-caret-right"></i></span>
+              工器具
+            </div>
+          </div>
         </div>
-        <div style="max-height:360px;overflow:auto;margin-top:8px;">
-          <table class="pick-asset-table" id="pickAssetTable">
-            <thead>
-              <tr>
-                <th style="width:42px;"><input type="checkbox" id="pickCheckAll" /></th>
-                <th>产品名称</th><th>资产编号</th><th>型号及重要参数</th><th>生产厂家</th><th>存放地点</th><th>计量单位</th><th>采购时间</th><th>原值(元)</th><th>净值(元)</th><th>使用年限</th><th>资产状态</th>
-              </tr>
-            </thead>
-            <tbody id="pickAssetBody"></tbody>
-          </table>
-        </div>
-        <div style="margin-top:8px;font-size:12px;color:#334155;">
-          已勾选 <b id="pickSelCount">0</b> 件物资，
-          原值合计 <b id="pickSelOrigin">¥ 0.00</b>，
-          净值合计 <b id="pickSelNet">¥ 0.00</b>
+        <!-- 右侧：搜索 + 表格 + 分页 -->
+        <div style="flex:1;display:flex;flex-direction:column;min-width:0;gap:8px;">
+          <!-- 搜索栏 -->
+          <div style="display:flex;gap:8px;align-items:center;">
+            <input id="pickKeyword" placeholder="输入产品名称、资产编号搜索" style="flex:1;height:32px;border:1px solid #dbe6f3;border-radius:6px;padding:0 10px;font-size:13px;" />
+            <button type="button" id="btnPickFilter" class="btn-sub" style="height:32px;padding:0 16px;white-space:nowrap;">搜索</button>
+          </div>
+          <!-- 表格 -->
+          <div style="flex:1;overflow:auto;border:1px solid #e8eef7;border-radius:8px;">
+            <table class="pick-asset-table" id="pickAssetTable">
+              <thead>
+                <tr>
+                  <th style="width:44px;"><input type="checkbox" id="pickCheckAll" /></th>
+                  <th style="min-width:110px;">产品名称</th>
+                  <th style="min-width:100px;">规格型号</th>
+                  <th style="min-width:130px;">生产厂家</th>
+                  <th style="width:68px;">计量单位</th>
+                  <th style="width:88px;">存放地点</th>
+                  <th style="width:84px;">原值(元)</th>
+                  <th style="width:84px;">净值(元)</th>
+                  <th style="width:70px;">在用数量</th>
+                  <th style="width:88px;">报废数量</th>
+                </tr>
+              </thead>
+              <tbody id="pickAssetBody"></tbody>
+            </table>
+          </div>
+          <!-- 分页 + 底栏 -->
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;">
+            <div style="font-size:12px;color:#64748b;">
+              共 <b id="pickTotalText">0</b> 条，已选 <b id="pickSelCount">0</b> 件，
+              净值合计 <b id="pickSelNet">¥ 0.00</b>
+            </div>
+            <div style="display:flex;gap:6px;align-items:center;">
+              <div class="carrier-page-btns" id="pickPagination" style="display:flex;gap:4px;align-items:center;">
+                <button type="button" id="pickPrev" class="page-btn" disabled>&lt;</button>
+                <span id="pickPageInfo" style="font-size:12px;color:#334155;white-space:nowrap;">第 1 页</span>
+                <button type="button" id="pickNext" class="page-btn">&gt;</button>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
       <div class="modal-footer">
         <button class="btn" id="btnPickCancel">取消</button>
-        <button class="btn btn-primary" id="btnPickConfirm">确认添加</button>
+        <button class="btn btn-primary" id="btnPickConfirm">确定</button>
       </div>
     </div>
   </div>
@@ -2070,89 +2150,103 @@
       }
 
       // ── 物资选择弹窗 ──────────────────────────────────────
+      var pickKeyword = "";
+      var pickType = "";
+      var pickPage = 1;
+      var pickPageSize = 8;
+      var pickScrapQty = {};
+
       function openPlanAssetPick() {
         pickChecked = {};
+        pickScrapQty = {};
+        pickKeyword = "";
+        pickType = "";
+        pickPage = 1;
         renderPickTable();
-        initPickFilters();
+        highlightActiveTreeNode("");
         document.getElementById("planAssetPickMask").classList.add("show");
       }
       function closePlanAssetPick() { document.getElementById("planAssetPickMask").classList.remove("show"); }
-      function initPickFilters() {
-        var tSel = document.getElementById("pickTypeFilter");
-        var lSel = document.getElementById("pickLocationFilter");
-        if (tSel && tSel.options.length <= 1) {
-          var types = {};
-          planAssets.forEach(function (a) { types[a.type] = true; });
-          Object.keys(types).sort().forEach(function (t) {
-            var op = document.createElement("option"); op.value = t; op.textContent = t; tSel.appendChild(op);
-          });
-        }
-        if (lSel && lSel.options.length <= 1) {
-          var locs = {};
-          planAssets.forEach(function (a) { locs[a.location] = true; });
-          Object.keys(locs).sort().forEach(function (l) {
-            var op = document.createElement("option"); op.value = l; op.textContent = l; lSel.appendChild(op);
-          });
-        }
-      }
+
       function renderPickTable() {
         var body = document.getElementById("pickAssetBody");
         if (!body) return;
         var kw = ((document.getElementById("pickKeyword") || {value:""}).value || "").trim().toLowerCase();
-        var ty = (document.getElementById("pickTypeFilter") || {value:""}).value;
-        var loc = (document.getElementById("pickLocationFilter") || {value:""}).value;
+        pickKeyword = kw;
         var rows = planAssets.filter(function (a) {
           if (a.dept !== currentDept) return false;
+          if (pickType && a.type !== pickType) return false;
           if (kw && a.id.toLowerCase().indexOf(kw) < 0 && a.name.toLowerCase().indexOf(kw) < 0) return false;
-          if (ty && a.type !== ty) return false;
-          if (loc && a.location !== loc) return false;
           return true;
         });
+        var total = rows.length;
+        var start = (pickPage - 1) * pickPageSize;
+        var pageRows = rows.slice(start, start + pickPageSize);
         body.innerHTML = "";
-        rows.forEach(function (a) {
+        pageRows.forEach(function (a) {
           var checked = !!pickChecked[a.id];
+          var qty = pickScrapQty[a.id] != null ? pickScrapQty[a.id] : 1;
           var tr = document.createElement("tr");
           if (checked) tr.className = "pick-row-selected";
+          tr.setAttribute("data-id", a.id);
           tr.innerHTML =
             '<td style="text-align:center;"><input type="checkbox" class="pick-cb" data-id="' + a.id + '"' + (checked ? " checked" : "") + "></td>" +
-            '<td>' + escHtml(a.name) + '</td>' +
-            '<td>' + a.id + '</td>' +
-            '<td>' + escHtml(a.model) + '</td>' +
-            '<td style="word-break:break-all;">' + escHtml(a.manufacturer || "-") + '</td>' +
-            '<td>' + escHtml(a.location) + '</td>' +
-            '<td style="text-align:center;">' + escHtml(a.unit || "台") + '</td>' +
-            '<td>' + (a.purchaseDate || "-") + '</td>' +
-            '<td style="text-align:right;">' + fmtMoney(a.origin) + '</td>' +
-            '<td style="text-align:right;">' + fmtMoney(a.net) + '</td>' +
-            '<td style="text-align:center;">' + a.years + '</td>' +
-            '<td style="text-align:center;"><span class="tag-status tag-status--pending">' + escHtml(a.status) + '</span></td>';
+            "<td>" + escHtml(a.name) + "</td>" +
+            "<td>" + escHtml(a.model) + "</td>" +
+            "<td style=\"word-break:break-all;\">" + escHtml(a.manufacturer || "-") + "</td>" +
+            '<td style="text-align:center;">' + escHtml(a.unit || "台") + "</td>" +
+            "<td>" + escHtml(a.location) + "</td>" +
+            '<td style="text-align:right;">' + fmtMoney(a.origin) + "</td>" +
+            '<td style="text-align:right;">' + fmtMoney(a.net) + "</td>" +
+            '<td style="text-align:center;">1</td>' +
+            '<td><input type="number" min="1" class="pick-qty-input" data-id="' + a.id + '" value="' + qty + '"' + (checked ? "" : " style=\"opacity:0.4;pointer-events:none;\"") + "></td>";
           tr.addEventListener("dblclick", function () {
             if (!pickChecked[a.id]) {
               pickChecked[a.id] = true;
+              pickScrapQty[a.id] = pickScrapQty[a.id] || 1;
               renderPickTable();
               refreshPickSummary();
             }
           });
           body.appendChild(tr);
         });
+        var allChecked = pageRows.length > 0 && pageRows.every(function (a) { return !!pickChecked[a.id]; });
+        var cbAll = document.getElementById("pickCheckAll");
+        if (cbAll) cbAll.checked = allChecked;
+        document.getElementById("pickTotalText").textContent = total;
+        var totalPages = Math.max(1, Math.ceil(total / pickPageSize));
+        document.getElementById("pickPageInfo").textContent = "第 " + pickPage + " / " + totalPages + " 页";
+        var prevBtn = document.getElementById("pickPrev");
+        var nextBtn = document.getElementById("pickNext");
+        if (prevBtn) prevBtn.disabled = pickPage <= 1;
+        if (nextBtn) nextBtn.disabled = pickPage >= totalPages;
         refreshPickSummary();
       }
+
+      function highlightActiveTreeNode(type) {
+        document.querySelectorAll(".pick-tree-node").forEach(function (n) {
+          n.classList.remove("active");
+          if (n.getAttribute("data-type") === (type || "")) n.classList.add("active");
+        });
+      }
+
       function refreshPickSummary() {
         var ids = Object.keys(pickChecked);
-        var totalO = 0, totalN = 0;
+        var totalN = 0;
         ids.forEach(function (id) {
           var a = planAssets.find(function (x) { return x.id === id; });
-          if (a) { totalO += a.origin; totalN += a.net; }
+          if (a) { var q = pickScrapQty[id] || 1; totalN += a.net * q; }
         });
         document.getElementById("pickSelCount").textContent = ids.length;
-        document.getElementById("pickSelOrigin").textContent = "¥ " + fmtMoney(totalO);
         document.getElementById("pickSelNet").textContent = "¥ " + fmtMoney(totalN);
       }
+
       function confirmPickItems() {
         var ids = Object.keys(pickChecked);
         ids.forEach(function (id) {
+          var q = pickScrapQty[id] || 1;
           if (!planItems.some(function (item) { return item.id === id; })) {
-            planItems.push({ id: id, qty: 1, reason: "" });
+            planItems.push({ id: id, qty: q, reason: "" });
           }
         });
         closePlanAssetPick();
@@ -2271,7 +2365,19 @@
         document.getElementById("btnPickCancel").addEventListener("click", closePlanAssetPick);
         document.getElementById("btnPickConfirm").addEventListener("click", confirmPickItems);
         document.getElementById("planAssetPickMask").addEventListener("click", function (e) { if (e.target.id === "planAssetPickMask") closePlanAssetPick(); });
-        document.getElementById("btnPickFilter").addEventListener("click", renderPickTable);
+        document.getElementById("btnPickFilter").addEventListener("click", function () { pickPage = 1; renderPickTable(); });
+        document.getElementById("pickKeyword").addEventListener("keydown", function (e) { if (e.key === "Enter") { pickPage = 1; renderPickTable(); } });
+        document.getElementById("pickPrev").addEventListener("click", function () { if (pickPage > 1) { pickPage--; renderPickTable(); } });
+        document.getElementById("pickNext").addEventListener("click", function () { pickPage++; renderPickTable(); });
+        // 树分类切换
+        document.getElementById("pickTypeTree").addEventListener("click", function (e) {
+          var node = e.target.closest(".pick-tree-node");
+          if (!node) return;
+          pickType = node.getAttribute("data-type") || "";
+          pickPage = 1;
+          highlightActiveTreeNode(pickType);
+          renderPickTable();
+        });
         document.getElementById("pickCheckAll").addEventListener("change", function (e) {
           var rows = document.querySelectorAll("#pickAssetBody tr");
           rows.forEach(function (tr) {
@@ -2279,10 +2385,8 @@
             if (!cb) return;
             cb.checked = e.target.checked;
             var id = cb.getAttribute("data-id");
-            if (e.target.checked) pickChecked[id] = true;
-            else delete pickChecked[id];
-            if (e.target.checked) tr.className = "pick-row-selected";
-            else tr.className = "";
+            if (e.target.checked) { pickChecked[id] = true; tr.className = "pick-row-selected"; }
+            else { delete pickChecked[id]; tr.className = ""; }
           });
           refreshPickSummary();
         });
@@ -2293,6 +2397,16 @@
           var tr = cb.closest("tr");
           if (cb.checked) { pickChecked[id] = true; tr.className = "pick-row-selected"; }
           else { delete pickChecked[id]; tr.className = ""; }
+          refreshPickSummary();
+        });
+        document.getElementById("pickAssetBody").addEventListener("input", function (e) {
+          var inp = e.target.closest(".pick-qty-input");
+          if (!inp) return;
+          var id = inp.getAttribute("data-id");
+          var v = parseInt(inp.value, 10);
+          if (isNaN(v) || v < 1) v = 1;
+          pickScrapQty[id] = v;
+          if (String(v) !== String(inp.value)) inp.value = v;
           refreshPickSummary();
         });
 
