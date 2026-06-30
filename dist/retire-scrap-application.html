@@ -1790,6 +1790,8 @@
         });
       }
       function refreshPlanStats() {
+        var el = document.getElementById("statYearTotal");
+        if (!el) return;
         var y = String(new Date().getFullYear());
         var yearRows = planRecords.filter(function (p) { return p.year === y; });
         document.getElementById("statYearTotal").textContent = String(yearRows.length);
