@@ -1766,12 +1766,12 @@
         return { txt: "已驳回", cls: "tag-status--rejected" };
       }
       function planRowsByFilter() {
-        var no = (document.getElementById("qPlanNo").value || "").trim().toLowerCase();
-        var year = document.getElementById("qPlanYear").value || "";
-        var dept = document.getElementById("qPlanDept").value || "";
-        var user = (document.getElementById("qPlanUser").value || "").trim().toLowerCase();
-        var ds = document.getElementById("qDateStart").value || "";
-        var de = document.getElementById("qDateEnd").value || "";
+        var no = (document.getElementById("qPlanNo") || {value:""}).value.trim().toLowerCase();
+        var year = (document.getElementById("qPlanYear") || {value:""}).value;
+        var dept = (document.getElementById("qPlanDept") || {value:""}).value;
+        var user = ((document.getElementById("qPlanUser") || {value:""}).value || "").trim().toLowerCase();
+        var ds = (document.getElementById("qDateStart") || {value:""}).value;
+        var de = (document.getElementById("qDateEnd") || {value:""}).value;
         return planRecords.filter(function (p) {
           var byTab = true;
           if (planFilters.tab === "draft") byTab = p.status === "draft";
@@ -2018,17 +2018,21 @@
         if (locSel && locSel.options.length <= 1) {
           ["华北库房", "风电场01号", "风电场02号"].forEach(function (l) { var op = document.createElement("option"); op.value = l; op.textContent = l; locSel.appendChild(op); });
         }
-        document.getElementById("planTabBar").addEventListener("click", function (e) {
-          var btn = e.target.closest("[data-plan-tab]");
-          if (!btn) return;
-          planFilters.tab = btn.getAttribute("data-plan-tab");
-          document.querySelectorAll("[data-plan-tab]").forEach(function (b) { b.classList.remove("is-active"); });
-          btn.classList.add("is-active");
-          renderPlanTable();
-        });
+        var planTabBar = document.getElementById("planTabBar");
+        if (planTabBar) {
+          planTabBar.addEventListener("click", function (e) {
+            var btn = e.target.closest("[data-plan-tab]");
+            if (!btn) return;
+            planFilters.tab = btn.getAttribute("data-plan-tab");
+            document.querySelectorAll("[data-plan-tab]").forEach(function (b) { b.classList.remove("is-active"); });
+            btn.classList.add("is-active");
+            renderPlanTable();
+          });
+        }
         document.getElementById("btnPlanSearch").addEventListener("click", renderPlanTable);
         document.getElementById("btnPlanReset").addEventListener("click", function () {
-          ["qPlanNo","qPlanYear","qPlanDept","qPlanUser","qDateStart","qDateEnd"].forEach(function (id) { document.getElementById(id).value = ""; });
+          var ids = ["qPlanNo","qPlanYear","qPlanDept","qPlanUser","qDateStart","qDateEnd"];
+          ids.forEach(function (id) { var el = document.getElementById(id); if (el) el.value = ""; });
           renderPlanTable();
         });
         document.getElementById("btnPlanExport").addEventListener("click", function () { alert("已导出当前筛选结果（演示）"); });
