@@ -199,14 +199,65 @@
     (function () {
       var aRows=[["XD2026001","风场主机扩容","以大代小","旧齿轮箱A","新齿轮箱C","内部循环","张明","2026-03-01","","进行中","<a href='#'>查看详情</a> <a href='#'>编辑</a> <a href='#'>删除</a>"],["XD2026002","华东电控替换","以大代小","旧主控柜V2","新主控柜V5","报废","李娜","2026-01-08","2026-03-12","已完成","<a href='#'>查看详情</a>"]];
       var bRows=[["HX2026001","旧齿轮箱A","修复齿轮箱组件","2","48000","A类","一级","华北主仓","王磊","2026-03-20","已入库","<a href='#'>查看详情</a> <a href='#'>编辑</a> <a href='#'>销售</a>"],["HX2026002","旧主控柜V2","修复主控模块","1","15000","B类","二级","华东备件仓","张明","2026-03-22","待入库","<a href='#'>查看详情</a> <a href='#'>编辑</a> <a href='#'>删除</a>"]];
-      document.getElementById("tbA").innerHTML=aRows.map(function(r){return "<tr>"+r.map(function(c,i){if(i===9){var cls=c==="已完成"?"tag-green":"tag-blue";return "<td><span class='tag-status "+cls+"'>"+c+"</span></td>";} return "<td>"+c+"</td>";}).join("")+"</tr>";}).join("");
-      document.getElementById("tbB").innerHTML=bRows.map(function(r){return "<tr>"+r.map(function(c,i){if(i===10){var cls=c==="已入库"?"tag-green":"tag-orange";return "<td><span class='tag-status "+cls+"'>"+c+"</span></td>";} return "<td>"+c+"</td>";}).join("")+"</tr>";}).join("");
-      function sw(a){document.getElementById("panelA").style.display=a?"block":"none";document.getElementById("panelB").style.display=a?"none":"block";document.getElementById("tabA").className=a?"on":"";document.getElementById("tabB").className=a?"":"on";}
-      document.getElementById("tabA").onclick=function(){sw(true)};document.getElementById("tabB").onclick=function(){sw(false)};
-      document.getElementById("btnAddProj").onclick=function(){document.getElementById("mA").classList.add("show")};
-      document.getElementById("btnAddReuse").onclick=function(){document.getElementById("mB").classList.add("show")};
-      document.getElementById("mAC").onclick=function(){document.getElementById("mA").classList.remove("show")};
-      document.getElementById("mBC").onclick=function(){document.getElementById("mB").classList.remove("show")};
+
+      // 合并来自设备评估页通过 localStorage 写入的再利用记录
+      try {
+        var extraRecords = JSON.parse(localStorage.getItem("demoReuseRecords") || "[]");
+        extraRecords.forEach(function (r) {
+          var statusCls = r.status === "已入库" ? "tag-green" : "tag-orange";
+          bRows.unshift([
+            r.reuseNo,
+            r.origDevice,
+            r.fixedName,
+            String(r.qty),
+            String(r.cost || 0),
+            r.type || "B类",
+            r.level || "二级",
+            r.warehouse || "华北主仓",
+            r.keeper || "—",
+            r.inDate || "—",
+            r.status,
+            "<a href='#'>查看详情</a> <a href='#'>编辑</a> <a href='#'>销售</a>"
+          ]);
+        });
+      } catch (e) {}
+
+      function renderBRows() {
+        document.getElementById("tbB").innerHTML = bRows.map(function (r) {
+          return "<tr>" + r.map(function (c, i) {
+            if (i === 10) {
+              var cls = c === "已入库" ? "tag-green" : "tag-orange";
+              return "<td><span class='tag-status " + cls + "'>" + c + "</span></td>";
+            }
+            return "<td>" + c + "</td>";
+          }).join("") + "</tr>";
+        }).join("");
+      }
+
+      document.getElementById("tbA").innerHTML = aRows.map(function (r) {
+        return "<tr>" + r.map(function (c, i) {
+          if (i === 9) {
+            var cls = c === "已完成" ? "tag-green" : "tag-blue";
+            return "<td><span class='tag-status " + cls + "'>" + c + "</span></td>";
+          }
+          return "<td>" + c + "</td>";
+        }).join("") + "</tr>";
+      }).join("");
+      renderBRows();
+
+      function sw(a) {
+        document.getElementById("panelA").style.display = a ? "block" : "none";
+        document.getElementById("panelB").style.display = a ? "none" : "block";
+        document.getElementById("tabA").className = a ? "on" : "";
+        document.getElementById("tabB").className = a ? "" : "on";
+        if (!a) renderBRows(); // 每次切换到再利用 Tab 时刷新
+      }
+      document.getElementById("tabA").onclick = function () { sw(true); };
+      document.getElementById("tabB").onclick = function () { sw(false); };
+      document.getElementById("btnAddProj").onclick = function () { document.getElementById("mA").classList.add("show"); };
+      document.getElementById("btnAddReuse").onclick = function () { document.getElementById("mB").classList.add("show"); };
+      document.getElementById("mAC").onclick = function () { document.getElementById("mA").classList.remove("show"); };
+      document.getElementById("mBC").onclick = function () { document.getElementById("mB").classList.remove("show"); };
     })();
   </script>
 </body>

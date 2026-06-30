@@ -2197,24 +2197,26 @@
               { user: "物资管理部门物资专责", time: "待知悉", content: "登记变更结果，更新台账留痕。", status: "待知悉" },
               { user: "系统", time: "待完成", content: "物资使用人信息更新完成。", status: "待完成" }
             ];
-        return (
-          '<table style="width:100%;border-collapse:collapse;font-size:14px">' +
-            '<thead><tr style="background:#f6f8fb;border-bottom:1px solid #e9edf4">' +
-              '<th style="text-align:left;padding:10px 14px;font-weight:700;color:#1f3551;white-space:nowrap">办理人</th>' +
-              '<th style="text-align:left;padding:10px 14px;font-weight:700;color:#1f3551;white-space:nowrap">办理时间</th>' +
-              '<th style="text-align:left;padding:10px 14px;font-weight:700;color:#1f3551">办理内容</th>' +
-              '<th style="text-align:right;padding:10px 14px;font-weight:700;color:#1f3551;white-space:nowrap">办理结果</th>' +
-            '</tr></thead><tbody>' +
-            records.map(function (item) {
-              return '<tr style="border-bottom:1px solid #f0f4f9">' +
-                '<td style="padding:12px 14px;color:#1f3551;vertical-align:top">' + esc(item.user) + '</td>' +
-                '<td style="padding:12px 14px;color:#1f3551;vertical-align:top">' + esc(item.time) + '</td>' +
-                '<td style="padding:12px 14px;color:#1f3551;vertical-align:top">' + esc(item.content) + '</td>' +
-                '<td style="padding:12px 14px;text-align:right;color:#1f3551;vertical-align:top">' + esc(item.status) + '</td>' +
-              '</tr>';
-            }).join("") +
-            '</tbody></table>'
-        );
+        var items = records.map(function(item, idx) {
+          var isLast = idx === records.length - 1;
+          var statusColor = item.status === "已发起" || item.status === "已通过" || item.status === "已完成" ? "#10b981" : 
+                           item.status === "待审批" || item.status === "待确认" || item.status === "待知悉" || item.status === "待登记" ? "#f59e0b" : "#64748b";
+          return '<div class="req-timeline-item" style="display:flex;gap:0;align-items:flex-start;position:relative">' +
+            '<div style="display:flex;flex-direction:column;align-items:center;flex-shrink:0;width:24px">' +
+              '<div style="width:12px;height:12px;border-radius:50%;background:' + statusColor + ';flex-shrink:0"></div>' +
+              (!isLast ? '<div style="width:2px;flex:1;min-height:40px;background:#e2e8f0;margin-top:4px"></div>' : '') +
+            '</div>' +
+            '<div style="flex:1;padding-bottom:' + (isLast ? '0' : '24px') + ';min-width:0">' +
+              '<div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:6px">' +
+                '<span style="font-weight:600;color:#1f3551;font-size:14px">' + esc(item.user) + '</span>' +
+                '<span style="color:#64748b;font-size:13px">' + esc(item.time) + '</span>' +
+                '<span style="padding:2px 8px;border-radius:4px;font-size:12px;font-weight:500;background:' + statusColor + '22;color:' + statusColor + '">' + esc(item.status) + '</span>' +
+              '</div>' +
+              '<div style="font-size:13px;color:#51627a;line-height:1.7">' + esc(item.content) + '</div>' +
+            '</div>' +
+          '</div>';
+        }).join("");
+        return '<div style="padding:4px 0">' + items + '</div>';
       }
       function openReqProgressModal(type) {
         removeReqFloatingModal("reqBizProgressMask");
@@ -2355,28 +2357,29 @@
         var title = document.getElementById("detailTitle");
         if (!title || String(title.textContent || "").replace(/\s+/g, "").indexOf("物资详情-") !== 0) return;
         document.querySelectorAll("#detailBody table").forEach(function (table) {
-          var heads = table.querySelectorAll("thead th");
-          var opIdx = -1;
-          heads.forEach(function (th, idx) {
-            if (String(th.textContent || "").replace(/\s+/g, "") === "操作") opIdx = idx;
-          });
-          if (opIdx < 0) return;
           if (table.classList) table.classList.add("ledger-detail-view-table");
-          table.querySelectorAll("tbody tr").forEach(function (tr) {
+          var rows = table.querySelectorAll("tbody tr");
+          rows.forEach(function (tr) {
             var cells = tr.children || [];
-            var cell = cells[opIdx];
-            if (!cell) return;
-            var txt = String(cell.textContent || "").replace(/\s+/g, "");
-            if (txt.indexOf("物资跟踪") >= 0) {
-              var oldTrack = cell.querySelector("a.req-track-link");
-              var pn = oldTrack ? oldTrack.getAttribute("data-track-name") || "" : "";
-              var pc = oldTrack ? oldTrack.getAttribute("data-track-code") || "" : "";
-              cell.innerHTML = buildReqDetailOperationHtml(pn, pc);
-              return;
+            // 直接在每行末尾添加操作列，不依赖表头的"操作"列
+            var lastCell = cells[cells.length - 1];
+            if (!lastCell) return;
+            var txt = String(lastCell.textContent || "").replace(/\s+/g, "");
+            if (txt.indexOf("物资跟踪") >= 0 || txt.indexOf("变更使用人") >= 0) return; // 已有按钮
+            // 从前一列获取物资名称和编码
+            var productName = "";
+            var productCode = "";
+            // 尝试从多个可能的列获取
+            for (var ci = 0; ci < cells.length - 1; ci++) {
+              var cellTxt = String(cells[ci].textContent || "").trim();
+              if (cellTxt && !productName && ci === 1) productName = cellTxt;
+              if (cellTxt && !productCode && ci === 2) productCode = cellTxt;
             }
-            var productName = cells[1] ? String(cells[1].textContent || "").trim() : "";
-            var productCode = cells[3] ? String(cells[3].textContent || "").trim() : "";
-            cell.innerHTML = buildReqDetailOperationHtml(productName, productCode);
+            if (!productName) productName = "物资";
+            if (!productCode) productCode = "—";
+            var opCell = document.createElement("td");
+            opCell.innerHTML = buildReqDetailOperationHtml(productName, productCode);
+            tr.appendChild(opCell);
           });
         });
       }
@@ -3721,15 +3724,10 @@
         var detailBody = document.getElementById("detailBody");
         if (!detailBody || detailBody.__ledgerDetailRestoreBound) return;
         detailBody.__ledgerDetailRestoreBound = true;
-        var pending = false;
-        new MutationObserver(function () {
-          if (pending) return;
-          pending = true;
-          setTimeout(function () {
-            pending = false;
-            restoreLedgerDetailOperationButtons();
-          }, 0);
-        }).observe(detailBody, { childList: true, subtree: true });
+        var observer = new MutationObserver(function () {
+          restoreLedgerDetailOperationButtons();
+        });
+        observer.observe(detailBody, { childList: true, subtree: true });
       })();
       renderAll();
 })();

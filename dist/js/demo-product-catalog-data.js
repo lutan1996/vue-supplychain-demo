@@ -355,7 +355,7 @@
           var key = catKey(b.code, m.code, s.code);
           var rows = allProducts[key] || [];
           rows.forEach(function (p) {
-          var item = normalizeProduct(
+            var item = normalizeProduct(
               Object.assign({}, p, {
                 treeBig: b.code,
                 treeMid: m.code,

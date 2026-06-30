@@ -496,8 +496,34 @@
         item.disposal = document.getElementById("ecDisp").value;
         var app = scrapApplications.find(function (x) { return x.applyNo === item.relApplyNo; });
         if (app) app.evalResult = item.conclusion;
+        // 根据处置建议自动在再利用/销售模块创建记录
+        var disp = document.getElementById("ecDisp").value;
+        if (disp === "内部循环" || disp === "外部循环") {
+          var reuseRecord = {
+            reuseNo: "HX" + new Date().getFullYear() + String(Math.floor(Math.random() * 9000 + 1000)),
+            origDevice: item.deviceName,
+            fixedName: "修复" + item.deviceName + "组件",
+            qty: 1,
+            cost: 0,
+            type: disp === "内部循环" ? "A类" : "B类",
+            level: disp === "内部循环" ? "一级" : "二级",
+            warehouse: "华北主仓",
+            keeper: ex,
+            inDate: today(),
+            status: "已入库",
+            evalNo: item.evalNo
+          };
+          try {
+            var existing = JSON.parse(localStorage.getItem("demoReuseRecords") || "[]");
+            existing.unshift(reuseRecord);
+            localStorage.setItem("demoReuseRecords", JSON.stringify(existing));
+          } catch (e) {}
+        }
         document.getElementById("evalCompleteMask").classList.remove("show");
         applyFilters();
+        if (disp === "内部循环" || disp === "外部循环") {
+          alert("已根据处置建议「" + disp + "」在再利用物资列表中创建记录，可在「以大代小&循环再利用」页面查看。");
+        }
       });
 
       refs.filterEvalNo.addEventListener("input", applyFilters);

@@ -2925,7 +2925,7 @@
       btn.setAttribute("data-map-open-progress", "1");
       btn.textContent = "流程进度";
       btn.style.cssText =
-        "border:none;background:transparent;color:#1677ff;font-size:12px;font-weight:600;line-height:1;padding:0;min-height:auto;height:auto;box-shadow:none;cursor:pointer;margin-left:auto;";
+        "border:none;background:transparent;color:#1677ff;font-size:12px;font-weight:600;line-height:1;padding:0 6px;min-height:auto;height:auto;box-shadow:none;cursor:pointer;";
       head.insertBefore(btn, xBtn);
     }
 
