@@ -626,7 +626,7 @@
         panel: secondaryPanel,
         aclModuleKey: 'purchaseMgmt',
         rowHtml:
-          '<button type="button" class="warehouse-secondary-link" data-action="proj-company-inventory" data-label="项目公司库存管理">项目公司库存管理</button>'
+          '<button type="button" class="warehouse-secondary-link" data-action="proj-company-inbound" data-label="库存管理">库存管理</button>'
       },
       physicalMgmt: {
         text: '实物管理',
@@ -673,24 +673,7 @@
       warehouse: {
         text: '仓储管理',
         panel: secondaryPanel,
-        rowHtml:
-          '<button type="button" class="warehouse-secondary-link" data-action="slot" data-label="货位管理">货位管理</button>' +
-          '<span class="warehouse-secondary-pipe" aria-hidden="true">|</span>' +
-          '<button type="button" class="warehouse-secondary-link" data-action="receive" data-label="收货入库">收货入库</button>' +
-          '<span class="warehouse-secondary-pipe" aria-hidden="true">|</span>' +
-          '<button type="button" class="warehouse-secondary-link" data-action="scan" data-label="扫码领用">扫码领用</button>' +
-          '<span class="warehouse-secondary-pipe" aria-hidden="true">|</span>' +
-          '<button type="button" class="warehouse-secondary-link" data-action="inventory-check" data-label="盘库管理">盘库管理</button>' +
-          '<span class="warehouse-secondary-pipe" aria-hidden="true">|</span>' +
-          '<button type="button" class="warehouse-secondary-link" data-action="stock" data-label="库存管理">库存管理</button>' +
-          '<span class="warehouse-secondary-pipe" aria-hidden="true">|</span>' +
-          '<button type="button" class="warehouse-secondary-link" data-action="maintenance" data-label="维修管理">维修管理</button>' +
-          '<span class="warehouse-secondary-pipe" aria-hidden="true">|</span>' +
-          '<button type="button" class="warehouse-secondary-link" data-action="biz-domestic-substitute" data-label="国产化替代">国产化替代</button>' +
-          '<span class="warehouse-secondary-pipe" aria-hidden="true">|</span>' +
-          '<button type="button" class="warehouse-secondary-link" data-action="idle" data-label="闲置物资">闲置物资</button>' +
-          '<span class="warehouse-secondary-pipe" aria-hidden="true">|</span>' +
-          '<button type="button" class="warehouse-secondary-link" data-action="warehouse" data-label="仓库管理">仓库管理</button>'
+        rowHtml: ''
       },
       retired: {
         text: '退役及废旧管理',
@@ -715,24 +698,7 @@
       biz: {
         text: '综合业务管理',
         panel: secondaryPanel,
-        rowHtml:
-          '<button type="button" class="warehouse-secondary-link" data-action="biz-finance" data-label="财务管理">财务管理</button>' +
-          '<span class="warehouse-secondary-pipe" aria-hidden="true">|</span>' +
-          '<button type="button" class="warehouse-secondary-link" data-action="biz-repair" data-label="维修管理">维修管理</button>' +
-          '<span class="warehouse-secondary-pipe" aria-hidden="true">|</span>' +
-          '<button type="button" class="warehouse-secondary-link" data-action="biz-transfer" data-label="调剂管理">调剂管理</button>' +
-          '<span class="warehouse-secondary-pipe" aria-hidden="true">|</span>' +
-          '<button type="button" class="warehouse-secondary-link" data-action="biz-emergency" data-label="应急物资管理">应急物资管理</button>' +
-          '<span class="warehouse-secondary-pipe" aria-hidden="true">|</span>' +
-          '<button type="button" class="warehouse-secondary-link" data-action="biz-standard" data-label="标准规范">标准规范</button>' +
-          '<span class="warehouse-secondary-pipe" aria-hidden="true">|</span>' +
-          '<button type="button" class="warehouse-secondary-link" data-action="biz-process-design" data-label="业务流程设计">业务流程设计</button>' +
-          '<span class="warehouse-secondary-pipe" aria-hidden="true">|</span>' +
-          '<button type="button" class="warehouse-secondary-link" data-action="biz-claim" data-label="物资理赔">物资理赔</button>' +
-          '<span class="warehouse-secondary-pipe" aria-hidden="true">|</span>' +
-          '<button type="button" class="warehouse-secondary-link" data-action="biz-domestic-substitute" data-label="国产化替代">国产化替代</button>' +
-          '<span class="warehouse-secondary-pipe" aria-hidden="true">|</span>' +
-          '<button type="button" class="warehouse-secondary-link" data-action="biz-expert" data-label="专家管理">专家管理</button>'
+        rowHtml: ''
       },
       dataNav: {
         text: "基础数据管理",
@@ -1085,7 +1051,7 @@
           }
           closePhysicalMgmtPanel();
           var rowEl = resolveSecondaryRow();
-          if (rowEl && mod.rowHtml) {
+          if (rowEl && typeof mod.rowHtml === 'string') {
             rowEl.innerHTML = applyRoleAclToRowHtml(mod.rowHtml);
             bindPanelActions(secondaryPanel);
           }
