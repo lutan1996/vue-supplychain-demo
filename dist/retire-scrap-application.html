@@ -9,6 +9,10 @@
   <link rel="stylesheet" href="css/carrier-management.css" />
 <link rel="stylesheet" href="css/source-navbar-header.css" />
   <style>
+    /* 表格固定列宽，避免列被内容撑爆 */
+    #planTable {
+      table-layout: fixed;
+    }
     .tag-status--pending { background: #fff7e6; color: #d48806; }
     .tag-status--approved { background: #f6ffed; color: #389e0d; }
     .tag-status--rejected { background: #fff1f0; color: #cf1322; }
@@ -18,8 +22,17 @@
       min-width: 108px;
       width: 9%;
       max-width: 140px;
-      white-space: nowrap;
       box-sizing: border-box;
+      vertical-align: middle;
+    }
+    /* 报废说明列：允许换行，有最大宽度约束，不撑出表格 */
+    #planTable th:nth-child(13),
+    #planTable td:nth-child(13) {
+      max-width: 200px;
+      min-width: 80px;
+      width: 12%;
+      word-break: break-word;
+      white-space: normal;
       vertical-align: middle;
     }
     #planTable .tag-status {
