@@ -2039,11 +2039,28 @@
       return html + "</div>";
     }
     function table(rows) {
-      return '<table class="map-flow-info-table"><thead><tr><th>办理人</th><th>办理时间</th><th>办理内容</th><th>办理结果</th></tr></thead><tbody>' +
-        rows.map(function (item) {
-          return "<tr><td>" + esc(item.person) + "</td><td>" + esc(item.time) + "</td><td>" + esc(item.content) + "</td><td>" + esc(item.result) + "</td></tr>";
+      return '<div class="map-flow-timeline" style="padding:4px 0">' +
+        rows.map(function (item, i) {
+          var isLast = i === rows.length - 1;
+          var sc = item.result === "已提交" || item.result === "已通过" || item.result === "已完成" || item.result === "已结束" || item.result === "已处理" ? "#10b981" :
+                   item.result === "处理中" || item.result === "审批中" || item.result === "进行中" ? "#1677ff" :
+                   item.result === "待处理" || item.result === "待审批" || item.result === "待确认" || item.result === "待知悉" || item.result === "待登记" || item.result === "驳回" || item.result === "拒绝" ? "#f59e0b" : "#64748b";
+          return '<div style="display:flex;gap:0;align-items:flex-start;position:relative">' +
+            '<div style="display:flex;flex-direction:column;align-items:center;flex-shrink:0;width:24px">' +
+              '<div style="width:12px;height:12px;border-radius:50%;background:' + sc + ';flex-shrink:0"></div>' +
+              (!isLast ? '<div style="width:2px;flex:1;min-height:40px;background:#e2e8f0;margin-top:4px"></div>' : '') +
+            '</div>' +
+            '<div style="flex:1;padding-bottom:' + (isLast ? '0' : '24px') + ';min-width:0">' +
+              '<div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:6px">' +
+                '<span style="font-weight:600;color:#1f3551;font-size:14px">' + esc(item.person) + '</span>' +
+                '<span style="color:#64748b;font-size:13px">' + esc(item.time) + '</span>' +
+                '<span style="padding:2px 8px;border-radius:4px;font-size:12px;font-weight:500;background:' + sc + '22;color:' + sc + '">' + esc(item.result) + '</span>' +
+              '</div>' +
+              '<div style="font-size:13px;color:#51627a;line-height:1.7">' + esc(item.content) + '</div>' +
+            '</div>' +
+          '</div>';
         }).join("") +
-        "</tbody></table>";
+        '</div>';
     }
     var mask = document.createElement("div");
     mask.id = "mapUnifiedProgressModal";

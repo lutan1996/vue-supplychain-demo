@@ -602,7 +602,7 @@
         <div class="rx-subtable-wrap">
           <table class="rx-subtable">
             <thead><tr><th>节点名称</th><th>处理人</th><th>处理时间</th><th>处理结果</th><th>处理意见</th></tr></thead>
-            <tbody id="rxFlowTb"></tbody>
+            <tbody id="rxFlowTb" style="display:block"></tbody>
           </table>
         </div>
       </div>
@@ -1053,10 +1053,38 @@
             qty +
             "</td><td>质量问题</td><td>退货退款</td></tr></tbody></table></div>";
 
+          var aprR = st === "rejected" ? "拒绝" : st === "draft" ? "待提交" : "通过";
+          var aprSc = st === "rejected" ? "#f59e0b" : st === "draft" ? "#64748b" : "#10b981";
           document.getElementById("rxDetailP3").innerHTML =
-            '<p style="font-weight:600;margin-bottom:8px;">审批记录</p><div class="rx-subtable-wrap"><table class="rx-subtable"><thead><tr><th>审批人</th><th>审批时间</th><th>审批结果</th><th>审批意见</th></tr></thead><tbody><tr><td>王卿明</td><td>2026-04-22 10:00</td><td>' +
-            (st === "rejected" ? "拒绝" : st === "draft" ? "—" : "通过") +
-            "</td><td>（演示）</td></tr></tbody></table></div>" +
+            '<p style="font-weight:600;margin-bottom:8px;">审批记录</p>' +
+            '<div style="padding:4px 0">' +
+              '<div style="display:flex;gap:0;align-items:flex-start;position:relative">' +
+                '<div style="display:flex;flex-direction:column;align-items:center;flex-shrink:0;width:24px">' +
+                  '<div style="width:12px;height:12px;border-radius:50%;background:#10b981;flex-shrink:0"></div>' +
+                  '<div style="width:2px;flex:1;min-height:40px;background:#e2e8f0;margin-top:4px"></div>' +
+                '</div>' +
+                '<div style="flex:1;padding-bottom:24px;min-width:0">' +
+                  '<div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:6px">' +
+                    '<span style="font-weight:600;color:#1f3551;font-size:14px">申请人提报</span>' +
+                    '<span style="color:#64748b;font-size:13px">' + esc(applicant) + ' ' + esc(time) + '</span>' +
+                    '<span style="padding:2px 8px;border-radius:4px;font-size:12px;font-weight:500;background:#10b98122;color:#10b981">提交</span>' +
+                  '</div>' +
+                '</div>' +
+              '</div>' +
+              '<div style="display:flex;gap:0;align-items:flex-start;position:relative">' +
+                '<div style="display:flex;flex-direction:column;align-items:center;flex-shrink:0;width:24px">' +
+                  '<div style="width:12px;height:12px;border-radius:50%;background:' + aprSc + ';flex-shrink:0"></div>' +
+                '</div>' +
+                '<div style="flex:1;padding-bottom:0;min-width:0">' +
+                  '<div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:6px">' +
+                    '<span style="font-weight:600;color:#1f3551;font-size:14px">采购专责审核</span>' +
+                    '<span style="color:#64748b;font-size:13px">王卿明 2026-04-22 10:00</span>' +
+                    '<span style="padding:2px 8px;border-radius:4px;font-size:12px;font-weight:500;background:' + aprSc + '22;color:' + aprSc + '">' + aprR + '</span>' +
+                  '</div>' +
+                  '<div style="font-size:13px;color:#51627a;line-height:1.7">（演示）</div>' +
+                '</div>' +
+              '</div>' +
+            '</div>' +
             '<p style="font-weight:600;margin:12px 0 8px;">完成记录</p><div class="rx-subtable-wrap"><table class="rx-subtable"><thead><tr><th>完成人</th><th>完成时间</th><th>实际退换数量</th><th>退款金额</th><th>换货新单号</th></tr></thead><tbody><tr><td>' +
             (st === "done" ? "宋中波" : "—") +
             "</td><td>" +
@@ -1128,22 +1156,34 @@
           '">物资专责确认</div><div class="rx-flow-step ' +
           s4 +
           '">结束</div>';
-        var rows =
-          "<tr><td>申请人提报</td><td>" +
-          tr.getAttribute("data-applicant") +
-          "</td><td>" +
-          tr.getAttribute("data-time") +
-          "</td><td>提交</td><td>—</td></tr>";
+        var items = [];
+        var ts = tr.getAttribute("data-time") || "—";
+        var ap = tr.getAttribute("data-applicant") || "—";
+        items.push({ t: "申请人提报", p: ap, s: ts, r: "提交" });
         if (st !== "draft") {
-          rows +=
-            "<tr><td>采购专责审核</td><td>王卿明</td><td>2026-04-22 10:00</td><td>" +
-            (st === "rejected" ? "驳回" : "通过") +
-            "</td><td>（演示）</td></tr>";
+          items.push({ t: "采购专责审核", p: "王卿明", s: "2026-04-22 10:00", r: st === "rejected" ? "驳回" : "通过" });
         }
         if (st === "approved" || st === "done") {
-          rows += "<tr><td>物资专责确认</td><td>宋中波</td><td>" + (st === "done" ? "2026-04-12 15:00" : "—") + "</td><td>" + (st === "done" ? "已完成" : "待办") + "</td><td>—</td></tr>";
+          items.push({ t: "物资专责确认", p: "宋中波", s: st === "done" ? "2026-04-12 15:00" : "—", r: st === "done" ? "已完成" : "待办" });
         }
-        document.getElementById("rxFlowTb").innerHTML = rows;
+        document.getElementById("rxFlowTb").innerHTML = items.map(function (x, i) {
+          var isLast = i === items.length - 1;
+          var sc = x.r === "提交" || x.r === "通过" || x.r === "已完成" || x.r === "已发起" || x.r === "已结束" ? "#10b981" :
+                   x.r === "驳回" || x.r === "拒绝" || x.r === "待办" || x.r === "待处理" || x.r === "待审批" ? "#f59e0b" : "#64748b";
+          return '<div style="display:flex;gap:0;align-items:flex-start;position:relative">' +
+            '<div style="display:flex;flex-direction:column;align-items:center;flex-shrink:0;width:24px">' +
+              '<div style="width:12px;height:12px;border-radius:50%;background:' + sc + ';flex-shrink:0"></div>' +
+              (!isLast ? '<div style="width:2px;flex:1;min-height:40px;background:#e2e8f0;margin-top:4px"></div>' : '') +
+            '</div>' +
+            '<div style="flex:1;padding-bottom:' + (isLast ? '0' : '24px') + ';min-width:0">' +
+              '<div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:6px">' +
+                '<span style="font-weight:600;color:#1f3551;font-size:14px">' + x.t + '</span>' +
+                '<span style="color:#64748b;font-size:13px">' + x.p + ' ' + x.s + '</span>' +
+                '<span style="padding:2px 8px;border-radius:4px;font-size:12px;font-weight:500;background:' + sc + '22;color:' + sc + '">' + x.r + '</span>' +
+              '</div>' +
+            '</div>' +
+          '</div>';
+        }).join("");
       }
 
       tb.addEventListener("click", function (e) {
