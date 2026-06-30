@@ -1593,7 +1593,7 @@
       "/* map-flow-bust:20260615-v4 */" +
       ".map-flow-dot{width:10px;height:10px;border-radius:999px;border:1px solid #7bc67b;background:#ddf5dd;flex:none;}" +
       ".map-flow-dot.end{border-color:#e89292;background:#ffe8e8;}" +
-      ".map-flow-arrow{color:#8ca0b3;font-size:16px;line-height:1;display:inline-flex;align-items:center;justify-content:center;flex:none;padding:0 2px;}" +
+      ".map-flow-arrow{color:#8ca0b3;font-size:16px;line-height:1;display:inline-block;flex:none;padding:0 2px;}" +
       ".map-flow-info{font-size:13px;color:#4f647a;line-height:1.9;}" +
       ".map-flow-info-table{width:100%;border-collapse:collapse;font-size:13px;color:#34495e;}" +
       ".map-flow-info-table th,.map-flow-info-table td{border:1px solid #e8edf3;padding:10px 12px;text-align:left;vertical-align:top;line-height:1.6;}" +
