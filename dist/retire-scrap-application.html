@@ -2269,39 +2269,53 @@
         papRenderTable();
       }
 
+      function planAssetFromProduct(product) {
+        var price = Number(product && product.refPrice) || 0;
+        return {
+          id: product.id,
+          productCode: product.b || product.id,
+          name: product.productName || "",
+          type: product.typeName || product.category || "",
+          model: product.model || "",
+          manufacturer: product.mfrName || "",
+          unit: "台",
+          qty: 1,
+          dept: currentDept,
+          origin: price,
+          net: price,
+          purchaseDate: "-",
+          condition: "正常"
+        };
+      }
+
+      function ensurePlanAssetFromProduct(product) {
+        if (!product || !product.id) return null;
+        var asset = planAssets.find(function (a) { return a.id === product.id; });
+        if (!asset) {
+          asset = planAssetFromProduct(product);
+          planAssets.push(asset);
+        }
+        return asset;
+      }
+
       function openPlanAssetPick() {
         if (!window.DemoProductCatalogPicker) return;
-        var products = planAssets.filter(function (a) {
-          return a.dept === currentDept;
-        }).map(function (a) {
-          return {
-            id: a.id,
-            b: a.productCode || a.id,
-            a: "A0100100001",
-            productName: a.name,
-            mfrName: a.manufacturer || "",
-            model: a.model || "",
-            category: "生产类",
-            typeName: a.type || "",
-            treeBig: "A01",
-            treeMid: "01",
-            treeSmall: "001",
-            _scrapAsset: a
-          };
-        });
+        var products = window.DemoProductCatalogData ? DemoProductCatalogData.flattenAllProducts() : [];
         var existingIds = {};
         planItems.forEach(function (item) {
           existingIds[item.id] = true;
         });
+        var selectedProducts = products.filter(function (p) { return existingIds[p.id]; });
         DemoProductCatalogPicker.open({
           title: "选择物资",
           mode: "multi",
           products: products,
-          initialProducts: products.filter(function (p) { return existingIds[p.id]; }),
-          lockedProductIds: planItems.map(function (item) { return item.id; }),
+          initialProducts: selectedProducts,
+          lockedProductIds: selectedProducts.map(function (p) { return p.id; }),
           onConfirm: function (picked) {
             (picked || []).forEach(function (p) {
               if (!p || !p.id || existingIds[p.id]) return;
+              ensurePlanAssetFromProduct(p);
               existingIds[p.id] = true;
               planItems.push({ id: p.id, qty: 1, reason: "" });
             });
