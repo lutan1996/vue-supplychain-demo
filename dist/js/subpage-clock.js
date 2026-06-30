@@ -477,13 +477,11 @@
       retiredPanel.setAttribute('aria-label', '退役及废旧管理子菜单');
       retiredPanel.setAttribute('aria-hidden', 'true');
       retiredPanel.hidden = true;
-      retiredPanel.innerHTML =
+        retiredPanel.innerHTML =
         '<div class="warehouse-secondary-inner">' +
         '  <div class="retired-main-block">' +
         '    <div class="warehouse-secondary-row warehouse-secondary-row--pipe retired-sub-pipe retired-sub-row">' +
         '      <button type="button" class="warehouse-secondary-link" data-action="retired-apply-main" data-label="退役及报废申请">退役及报废申请</button>' +
-        '      <span class="warehouse-secondary-pipe" aria-hidden="true">|</span>' +
-        '      <button type="button" class="warehouse-secondary-link" data-action="retired-big-small-reuse" data-label="以大代小循环再利用">以大代小循环再利用</button>' +
         '    </div>' +
         '  </div>' +
         '</div>';

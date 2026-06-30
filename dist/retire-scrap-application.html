@@ -13,8 +13,8 @@
     .tag-status--approved { background: #f6ffed; color: #389e0d; }
     .tag-status--rejected { background: #fff1f0; color: #cf1322; }
     /* 报废计划表「审批状态」列：加宽 + 标签单行不换行 */
-    #planTable th:nth-child(11),
-    #planTable td:nth-child(11) {
+    #planTable th:nth-child(12),
+    #planTable td:nth-child(12) {
       min-width: 108px;
       width: 9%;
       max-width: 140px;
@@ -312,7 +312,7 @@
       display: flex;
       align-items: center;
       gap: 72px;
-      min-width: 1720px;
+      min-width: 1440px;
       padding: 86px 24px 72px;
     }
     .flow-node {
@@ -436,6 +436,11 @@
       padding:0 6px; font-size:12px; color:#0f172a; background:#fff; box-sizing:border-box;
     }
     .asset-table .asset-qty-input:disabled { background:#f1f5f9; color:#64748b; border-color:#e2e8f0; }
+    .asset-table .asset-reason-input {
+      width:100%; min-width:120px; max-width:200px; height:28px; border:1px solid #dbe6f3; border-radius:4px;
+      padding:0 6px; font-size:12px; color:#0f172a; background:#fff; box-sizing:border-box;
+    }
+    .asset-table .asset-reason-input:disabled { background:#f1f5f9; color:#94a3b8; border-color:#e2e8f0; cursor:not-allowed; }
     .plan-summary { display:flex; flex-wrap:wrap; gap:12px; margin-top:8px; font-size:12px; color:#334155; }
     .plan-summary b { color:#0f172a; }
     .tag-eval { margin-top:8px; font-size:12px; padding:8px 10px; border-radius:6px; border:1px solid #b7eb8f; background:#f6ffed; color:#389e0d; }
@@ -494,33 +499,6 @@
           </div>
 
           <div id="panelScrapPlan">
-            <h2 style="font-size:16px;margin:0 0 8px;color:#1f2937;">报废计划管理</h2>
-            <div class="plan-stats">
-              <div class="plan-stat"><div class="k">本年计划数</div><div class="v" id="statYearTotal">0</div></div>
-              <div class="plan-stat"><div class="k">待提交</div><div class="v" id="statDraft">0</div></div>
-              <div class="plan-stat"><div class="k">审批中</div><div class="v" id="statReview">0</div></div>
-              <div class="plan-stat"><div class="k">已通过</div><div class="v" id="statApproved">0</div></div>
-            </div>
-            <div class="plan-tabbar" id="planTabBar">
-              <button type="button" class="plan-tab is-active" data-plan-tab="all">全部计划</button>
-              <button type="button" class="plan-tab" data-plan-tab="draft">待提交</button>
-              <button type="button" class="plan-tab" data-plan-tab="review">审批中</button>
-              <button type="button" class="plan-tab" data-plan-tab="approved">已通过</button>
-              <button type="button" class="plan-tab" data-plan-tab="rejected">已驳回</button>
-              <button type="button" class="plan-tab" data-plan-tab="history">历年计划</button>
-            </div>
-            <div class="plan-search">
-              <div class="f"><label>计划编号</label><input id="qPlanNo" placeholder="如 BF-2026-001" /></div>
-              <div class="f"><label>计划年度</label><select id="qPlanYear"><option value="">全部</option></select></div>
-              <div class="f"><label>申请部门</label><select id="qPlanDept"><option value="">全部</option></select></div>
-              <div class="f"><label>申请人</label><input id="qPlanUser" placeholder="申请人" /></div>
-              <div class="f range">
-                <label style="grid-column:1 / -1;">提交日期范围</label>
-                <input id="qDateStart" type="date" />
-                <span>-</span>
-                <input id="qDateEnd" type="date" />
-              </div>
-            </div>
             <div class="carrier-toolbar">
               <div class="toolbar-left">
                 <button type="button" class="btn-sub" id="btnPlanSearch">搜索</button>
@@ -545,6 +523,7 @@
                     <th style="width:98px;">净值合计(元)</th>
                     <th style="width:96px;">提交日期</th>
                     <th style="min-width:108px;width:9%;">审批状态</th>
+                    <th>报废说明</th>
                     <th style="min-width:190px;">操作</th>
                   </tr>
                 </thead>
@@ -590,8 +569,10 @@
                   <th>申请报废原因</th>
                   <th>申请人员签字（电子签）</th>
                   <th>申请部门负责人意见及签字</th>
-                  <th>管理处置部门专责意见及签字</th>
-                  <th>管理处置部门负责人意见及签字</th>
+                  <th>物资专责汇总意见及签字</th>
+                  <th>物资负责人意见及签字</th>
+                  <th>财务负责人审批意见及签字</th>
+                  <th>物资专责存档记录</th>
                   <th>状态</th>
                   <th style="width: 96px;">操作</th>
                 </tr>
@@ -621,61 +602,67 @@
     </div>
   </div>
 
-  <div class="modal-mask" id="applyModalMask" aria-hidden="true">
-    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="applyModalTitle">
+    <div class="modal-mask" id="applyModalMask" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="applyModalTitle" style="width:min(1100px,98vw);">
       <div class="modal-header">
         <h2 class="modal-title" id="applyModalTitle">新增退役及报废申请</h2>
         <button class="modal-close" id="btnCloseModal" aria-label="关闭">×</button>
       </div>
-      <div class="modal-body">
-        <div class="field">
-          <label for="applyDept">申请部门</label>
-          <input id="applyDept" type="text" value="设备运维部" />
+      <div class="modal-body" style="max-height:72vh;overflow-y:auto;padding:14px 16px;">
+        <!-- 第一部分：基本信息 -->
+        <div style="font-size:13px;font-weight:600;color:#1f3551;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid #e8eef7;">基本信息</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px 16px;margin-bottom:14px;">
+          <div><label style="display:block;font-size:12px;color:#516a87;margin-bottom:4px;">申请部门</label><input id="applyDept" style="width:100%;height:32px;border:1px solid #d7e1ee;border-radius:6px;padding:0 10px;font-size:14px;" value="设备运维部" /></div>
+          <div><label style="display:block;font-size:12px;color:#516a87;margin-bottom:4px;">申请日期</label><input id="applyDate" type="date" style="width:100%;height:32px;border:1px solid #d7e1ee;border-radius:6px;padding:0 10px;font-size:14px;" /></div>
+          <div><label style="display:block;font-size:12px;color:#516a87;margin-bottom:4px;">拟报废固定起产块放地点</label><input id="stackLocation" style="width:100%;height:32px;border:1px solid #d7e1ee;border-radius:6px;padding:0 10px;font-size:14px;" placeholder="例如：华北中心仓 D 区报废暂存点" /></div>
+          <div><label style="display:block;font-size:12px;color:#516a87;margin-bottom:4px;">申请报废原因</label><textarea id="scrapReason" style="width:100%;height:60px;border:1px solid #d7e1ee;border-radius:6px;padding:6px 10px;font-size:14px;resize:vertical;" placeholder="依据xxx制度，第xx条，该xx设备……拟申请报废"></textarea></div>
         </div>
-        <div class="field">
-          <label for="applyDate">申请日期</label>
-          <input id="applyDate" type="date" />
+        <!-- 第二部分：拟报废明细表 -->
+        <div style="font-size:13px;font-weight:600;color:#1f3551;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid #e8eef7;">拟报废固定起产明细表</div>
+        <div style="margin-bottom:6px;">
+          <button type="button" id="btnAddApplyItem" style="border:1px solid #1890ff;background:#e6f4ff;color:#1677ff;border-radius:6px;padding:4px 12px;font-size:12px;cursor:pointer;">+ 添加物资</button>
+          <span id="applyItemCount" style="font-size:12px;color:#64748b;margin-left:10px;">共 0 条</span>
         </div>
-        <div class="field">
-          <label for="assetNameQty">拟报废固定资产名称</label>
-          <select id="assetNameQty"></select>
-          <div class="hint">仅显示“在用”物资（来自基础数据台账）。</div>
+        <div style="border:1px solid #e8eef7;border-radius:8px;overflow:hidden;margin-bottom:14px;">
+          <div style="max-height:240px;overflow:auto;">
+            <table style="width:100%;border-collapse:collapse;font-size:12px;table-layout:fixed;">
+              <thead>
+                <tr style="background:#f8fafc;">
+                  <th style="padding:8px 6px;border-bottom:1px solid #e8eef7;text-align:center;color:#64748b;width:36px;">序号</th>
+                  <th style="padding:8px 6px;border-bottom:1px solid #e8eef7;text-align:left;color:#64748b;">起产编号</th>
+                  <th style="padding:8px 6px;border-bottom:1px solid #e8eef7;text-align:left;color:#64748b;">起产名称</th>
+                  <th style="padding:8px 6px;border-bottom:1px solid #e8eef7;text-align:left;color:#64748b;">规格型号</th>
+                  <th style="padding:8px 6px;border-bottom:1px solid #e8eef7;text-align:right;color:#64748b;width:90px;">原值(元)</th>
+                  <th style="padding:8px 6px;border-bottom:1px solid #e8eef7;text-align:right;color:#64748b;width:90px;">净值(元)</th>
+                  <th style="padding:8px 6px;border-bottom:1px solid #e8eef7;text-align:center;color:#64748b;width:60px;">数量</th>
+                  <th style="padding:8px 6px;border-bottom:1px solid #e8eef7;text-align:left;color:#64748b;">拟报废原因</th>
+                  <th style="padding:8px 6px;border-bottom:1px solid #e8eef7;text-align:center;color:#64748b;width:80px;">操作</th>
+                </tr>
+              </thead>
+              <tbody id="applyItemBody"></tbody>
+            </table>
+          </div>
+          <div id="applyItemEmpty" style="text-align:center;color:#8ca0b8;padding:24px;font-size:13px;">暢无物资，请点击上方「添加物资」按钮</div>
         </div>
-        <div class="field">
-          <label for="scrapQty">拟报废数量</label>
-          <input id="scrapQty" type="number" min="1" step="1" value="1" />
+        <div id="applyItemSummary" style="font-size:12px;color:#334155;margin-bottom:14px;padding:6px 10px;background:#f8fbff;border:1px solid #e6edf7;border-radius:6px;">
+          已选 <b id="applyItemTotal">0</b> 件物资，
+          原值合计：<b id="applyOriginSum">¥ 0.00</b>，
+          净值合计：<b id="applyNetSum">¥ 0.00</b>
+          <span id="applyEvalTip" style="margin-left:12px;color:#389e0d;"></span>
         </div>
-        <div class="field">
-          <label for="assetList">拟报废固定资产清单</label>
-          <input id="assetList" type="text" placeholder="填写资产编码、规格、数量明细（可逗号分隔）" />
+        <!-- 第三部分：审批签字 -->
+        <div style="font-size:13px;font-weight:600;color:#1f3551;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid #e8eef7;">审批签字</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px 16px;">
+          <div><label style="display:block;font-size:12px;color:#516a87;margin-bottom:4px;">申请人员签字（电子签）</label><input id="applicantSign" style="width:100%;height:32px;border:1px solid #d7e1ee;border-radius:6px;padding:0 10px;font-size:14px;" value="张明（电子签）" /></div>
+          <div><label style="display:block;font-size:12px;color:#516a87;margin-bottom:4px;">申请部门责任人意见及签字</label><input id="deptHeadOpinion" style="width:100%;height:32px;border:1px solid #d7e1ee;border-radius:6px;padding:0 10px;font-size:14px;" placeholder="责任人审批意见（选填）" /></div>
+          <div><label style="display:block;font-size:12px;color:#516a87;margin-bottom:4px;">物资专责汇总意见及签字</label><input id="manageSpecialOpinion" style="width:100%;height:32px;border:1px solid #d7e1ee;border-radius:6px;padding:0 10px;font-size:14px;" placeholder="物资专责汇总意见（选填）" /></div>
+          <div><label style="display:block;font-size:12px;color:#516a87;margin-bottom:4px;">物资责任人意见及签字</label><input id="manageHeadOpinion" style="width:100%;height:32px;border:1px solid #d7e1ee;border-radius:6px;padding:0 10px;font-size:14px;" placeholder="物资责任人审批意见（选填）" /></div>
+          <div><label style="display:block;font-size:12px;color:#516a87;margin-bottom:4px;">财务责任人审批意见及签字</label><input id="financeOpinionInput" style="width:100%;height:32px;border:1px solid #d7e1ee;border-radius:6px;padding:0 10px;font-size:14px;" placeholder="财务责任人审批意见（选填）" /></div>
+          <div><label style="display:block;font-size:12px;color:#516a87;margin-bottom:4px;">物资专责存档记录</label><input id="archiveRecordInput" style="width:100%;height:32px;border:1px solid #d7e1ee;border-radius:6px;padding:0 10px;font-size:14px;" placeholder="存档记录（选填）" /></div>
         </div>
-        <div class="field">
-          <label for="stackLocation">拟报废固定资产堆放地点</label>
-          <input id="stackLocation" type="text" placeholder="例如：华北中心仓 D 区报废暂存点" />
+        <div style="margin:12px 0 4px;padding:7px 10px;border-radius:6px;background:#f5f5f5;color:#6b7280;font-size:12px;line-height:1.6;">
+          💡 提示：固定起产报废申请签字后，由起产报废鉴定专业部门进行退役鉴定并出典鉴定报告，管理处置部门依据该申请及鉴定报告执行公司固定起产报废内部决策流程。
         </div>
-        <div class="field full">
-          <label for="scrapReason">申请报废原因</label>
-          <textarea id="scrapReason" placeholder="依据xxx制度，第xx条，该xx设备。。。，拟申请报废"></textarea>
-        </div>
-        <div class="field">
-          <label for="applicantSign">申请人员签字（电子签）</label>
-          <input id="applicantSign" type="text" value="张明（电子签）" />
-        </div>
-        <div class="field">
-          <label for="deptHeadOpinion">申请部门负责人意见及签字</label>
-          <input id="deptHeadOpinion" type="text" value="同意报废，王磊（电子签）" />
-        </div>
-        <div class="field">
-          <label for="manageSpecialOpinion">管理处置部门专责意见及签字</label>
-          <input id="manageSpecialOpinion" type="text" value="建议按流程处置，李娜（电子签）" />
-        </div>
-        <div class="field">
-          <label for="manageHeadOpinion">管理处置部门负责人意见及签字</label>
-          <input id="manageHeadOpinion" type="text" value="同意，周强（电子签）" />
-        </div>
-      </div>
-      <div class="apply-tip">
-        提示;(固定资产报废申请》签字后，由资产报度察定专业部门进行投成管定提示，会定报告，管理处置部门依据该申请及鉴定报告执行公司国定资产报废内部决策流程。
       </div>
       <div class="modal-footer">
         <button class="btn" id="btnCancel">取消</button>
@@ -684,7 +671,33 @@
     </div>
   </div>
 
-  <div class="modal-mask" id="viewModalMask" aria-hidden="true">
+  <div class="modal-mask" id="applyItemModalMask" aria-hidden="true">
+    <div class="modal" role="dialog" style="width:min(640px,96vw);">
+      <div class="modal-header">
+        <h2 class="modal-title">添加报废物资</h2>
+        <button class="modal-close" id="btnCloseApplyItem" aria-label="关闭">×</button>
+      </div>
+      <div class="modal-body" style="display:grid;grid-template-columns:1fr 1fr;gap:10px 14px;">
+        <div><label style="display:block;font-size:12px;color:#516a87;margin-bottom:4px;">起产名称</label>
+          <select id="aiAssetName" style="width:100%;height:32px;border:1px solid #d7e1ee;border-radius:6px;padding:0 8px;font-size:13px;"><option value="">请选择起产</option></select>
+        </div>
+        <div><label style="display:block;font-size:12px;color:#516a87;margin-bottom:4px;">起产编号</label><input id="aiAssetCode" readonly style="width:100%;height:32px;border:1px solid #d7e1ee;border-radius:6px;padding:0 10px;font-size:14px;background:#f5f5f5;color:#8c8c8c;" /></div>
+        <div><label style="display:block;font-size:12px;color:#516a87;margin-bottom:4px;">规格型号</label><input id="aiAssetModel" readonly style="width:100%;height:32px;border:1px solid #d7e1ee;border-radius:6px;padding:0 10px;font-size:14px;background:#f5f5f5;color:#8c8c8c;" /></div>
+        <div><label style="display:block;font-size:12px;color:#516a87;margin-bottom:4px;">存放地点</label><input id="aiAssetLocation" readonly style="width:100%;height:32px;border:1px solid #d7e1ee;border-radius:6px;padding:0 10px;font-size:14px;background:#f5f5f5;color:#8c8c8c;" /></div>
+        <div><label style="display:block;font-size:12px;color:#516a87;margin-bottom:4px;">原值(元)</label><input id="aiOrigin" readonly style="width:100%;height:32px;border:1px solid #d7e1ee;border-radius:6px;padding:0 10px;font-size:14px;background:#f5f5f5;color:#8c8c8c;" /></div>
+        <div><label style="display:block;font-size:12px;color:#516a87;margin-bottom:4px;">净值(元)</label><input id="aiNet" readonly style="width:100%;height:32px;border:1px solid #d7e1ee;border-radius:6px;padding:0 10px;font-size:14px;background:#f5f5f5;color:#8c8c8c;" /></div>
+        <div><label style="display:block;font-size:12px;color:#516a87;margin-bottom:4px;">数量</label><input id="aiQty" type="number" min="1" value="1" style="width:100%;height:32px;border:1px solid #d7e1ee;border-radius:6px;padding:0 10px;font-size:14px;" /></div>
+        <div></div>
+        <div style="grid-column:1/-1;"><label style="display:block;font-size:12px;color:#516a87;margin-bottom:4px;">拟报废原因</label><textarea id="aiReason" style="width:100%;height:60px;border:1px solid #d7e1ee;border-radius:6px;padding:6px 10px;font-size:14px;resize:vertical;" placeholder="请填写该物资拟报废原因"></textarea></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn" id="btnCancelApplyItem">取消</button>
+        <button class="btn btn-primary" id="btnConfirmApplyItem">确认添加</button>
+      </div>
+    </div>
+  </div>
+
+<div class="modal-mask" id="viewModalMask" aria-hidden="true">
     <div class="modal modal--scrap-detail" role="dialog" aria-modal="true" aria-labelledby="viewModalTitle">
       <div class="modal-header scrap-detail-header">
         <h2 class="modal-title" id="viewModalTitle">报废申请详情</h2>
@@ -720,11 +733,11 @@
             <div class="flow-nodes">
               <div class="flow-node" data-flow-tip="">业务部门开始提报次年报废计划</div>
               <div class="flow-arrow" aria-hidden="true">→</div>
-              <div class="flow-node" data-flow-tip="">业务部门提交报废计划</div>
-              <div class="flow-arrow" aria-hidden="true">→</div>
               <div class="flow-node" data-flow-tip="">业务部门负责人审批</div>
               <div class="flow-arrow" aria-hidden="true">→</div>
-              <div class="flow-node" data-flow-tip="">物资管理部门物资专责汇总且物资管理部门负责人审批</div>
+              <div class="flow-node" data-flow-tip="">物资管理部门物资专责汇总</div>
+              <div class="flow-arrow" aria-hidden="true">→</div>
+              <div class="flow-node" data-flow-tip="">物资管理部门负责人审批</div>
               <div class="flow-arrow" aria-hidden="true">→</div>
               <div class="flow-node" data-flow-tip="">财务部负责人审批</div>
               <div class="flow-arrow" aria-hidden="true">→</div>
@@ -734,17 +747,7 @@
           </div>
         </div>
         <div class="flow-pane" data-flow-pane="table">
-          <table class="flow-info-table">
-            <thead>
-              <tr>
-                <th>办理人</th>
-                <th>办理时间</th>
-                <th>办理内容</th>
-                <th>办理结果</th>
-              </tr>
-            </thead>
-            <tbody id="progressInfoBody"></tbody>
-          </table>
+          <div id="progressInfoBody" style="padding:8px 0"></div>
         </div>
       </div>
       <div class="modal-footer">
@@ -783,7 +786,7 @@
               <thead>
                 <tr>
                   <th style="width:40px;"><input type="checkbox" id="assetCheckAll" /></th>
-                  <th>资产编号</th><th>资产名称</th><th>型号规格</th><th>存放地点</th><th>保管人</th><th>原值(元)</th><th>净值(元)</th><th>使用年限</th><th>资产状态</th><th style="width:72px;">数量</th>
+                  <th>资产编号</th><th>资产名称</th><th>型号规格</th><th>存放地点</th><th>保管人</th><th>原值(元)</th><th>净值(元)</th><th>使用年限</th><th>资产状态</th><th style="width:72px;">数量</th><th style="min-width:140px;">拟报废原因</th>
                 </tr>
               </thead>
               <tbody id="assetPickBody"></tbody>
@@ -817,7 +820,7 @@
       <div class="modal-body" style="display:block;">
         <div class="view-grid" id="planDetailGrid"></div>
         <table class="view-mini-table">
-          <thead><tr><th>资产编号</th><th>资产名称</th><th>型号规格</th><th>存放地点</th><th>原值</th><th>净值</th><th>数量</th></tr></thead>
+          <thead><tr><th>资产编号</th><th>资产名称</th><th>型号规格</th><th>存放地点</th><th>原值</th><th>净值</th><th>数量</th><th>拟报废原因</th></tr></thead>
           <tbody id="planDetailAssetBody"></tbody>
         </table>
         <div style="margin-top:8px;font-size:12px;color:#64748b;">审批流程：部门审批 → 总办会/董事会审批 → 通过后挂北交所拍卖</div>
@@ -918,6 +921,8 @@
           deptHeadOpinion: "同意报废，王磊（电子签）",
           manageSpecialOpinion: "建议按流程处置，李娜（电子签）",
           manageHeadOpinion: "同意，周强（电子签）",
+          financeOpinion: "审核通过，赵财务（电子签）",
+          archiveRecord: "已存档，归档编号 BF-2026-001-AR，陈洁（电子签）",
           status: "pending",
           originValue: 860000,
           netValue: 118000
@@ -934,6 +939,8 @@
           deptHeadOpinion: "同意报废，刘洋（电子签）",
           manageSpecialOpinion: "资料齐全，建议通过，李娜（电子签）",
           manageHeadOpinion: "同意，周强（电子签）",
+          financeOpinion: "账务核实无误，孙财（电子签）",
+          archiveRecord: "已存档，归档编号 BF-2026-002-AR，陈洁（电子签）",
           status: "approved",
           originValue: 68000,
           netValue: 7000
@@ -950,6 +957,8 @@
           deptHeadOpinion: "建议补充评估后再议，赵峰（电子签）",
           manageSpecialOpinion: "资料暂不完整，孙洁（电子签）",
           manageHeadOpinion: "暂缓，周强（电子签）",
+          financeOpinion: "-",
+          archiveRecord: "-",
           status: "rejected",
           originValue: 320000,
           netValue: 46000
@@ -968,15 +977,34 @@
         btnSubmit: document.getElementById("btnSubmitApply"),
         applyDept: document.getElementById("applyDept"),
         applyDate: document.getElementById("applyDate"),
-        assetNameQty: document.getElementById("assetNameQty"),
-        scrapQty: document.getElementById("scrapQty"),
-        assetList: document.getElementById("assetList"),
         stackLocation: document.getElementById("stackLocation"),
         scrapReason: document.getElementById("scrapReason"),
         applicantSign: document.getElementById("applicantSign"),
         deptHeadOpinion: document.getElementById("deptHeadOpinion"),
         manageSpecialOpinion: document.getElementById("manageSpecialOpinion"),
         manageHeadOpinion: document.getElementById("manageHeadOpinion"),
+        financeOpinionInput: document.getElementById("financeOpinionInput"),
+        archiveRecordInput: document.getElementById("archiveRecordInput"),
+        applyItemBody: document.getElementById("applyItemBody"),
+        btnAddApplyItem: document.getElementById("btnAddApplyItem"),
+        applyItemCount: document.getElementById("applyItemCount"),
+        applyItemEmpty: document.getElementById("applyItemEmpty"),
+        applyItemTotal: document.getElementById("applyItemTotal"),
+        applyOriginSum: document.getElementById("applyOriginSum"),
+        applyNetSum: document.getElementById("applyNetSum"),
+        applyEvalTip: document.getElementById("applyEvalTip"),
+        applyItemModalMask: document.getElementById("applyItemModalMask"),
+        btnCloseApplyItem: document.getElementById("btnCloseApplyItem"),
+        btnCancelApplyItem: document.getElementById("btnCancelApplyItem"),
+        btnConfirmApplyItem: document.getElementById("btnConfirmApplyItem"),
+        aiAssetName: document.getElementById("aiAssetName"),
+        aiAssetCode: document.getElementById("aiAssetCode"),
+        aiAssetModel: document.getElementById("aiAssetModel"),
+        aiAssetLocation: document.getElementById("aiAssetLocation"),
+        aiOrigin: document.getElementById("aiOrigin"),
+        aiNet: document.getElementById("aiNet"),
+        aiQty: document.getElementById("aiQty"),
+        aiReason: document.getElementById("aiReason"),
         viewModalMask: document.getElementById("viewModalMask"),
         btnCloseViewModal: document.getElementById("btnCloseViewModal"),
         btnViewClose: document.getElementById("btnViewClose"),
@@ -1009,17 +1037,18 @@
         { id: "HD-2024-101", name: "电缆耐压仪", model: "NY-12", location: "华东库房", keeper: "孙强", origin: 56000, net: 47000, years: "4年", status: "在用", type: "电测设备", dept: "华东运维部" }
       ];
       var planRecords = [
-        { planNo: "BF-2026-001", year: "2026", dept: "设备运维部", applicant: currentUser, qty: 3, originSum: 75500, netSum: 54200, submitDate: "2026-06-15", status: "review", assetIds: ["GD-2024-001", "GD-2023-088", "LY-2024-015"], remark: "年度设备更新，按计划淘汰老旧设备。" },
-        { planNo: "BF-2026-002", year: "2026", dept: "设备运维部", applicant: currentUser, qty: 2, originSum: 48000, netSum: 35400, submitDate: "", status: "draft", assetIds: ["GD-2024-002", "GD-2022-064"], remark: "现场反馈故障率上升，拟报废。" },
-        { planNo: "BF-2026-003", year: "2026", dept: "设备运维部", applicant: "王磊", qty: 1, originSum: 41000, netSum: 28400, submitDate: "2026-07-03", status: "approved", assetIds: ["GD-2023-088"], remark: "已完成审批，待北交所挂牌。" },
-        { planNo: "BF-2026-004", year: "2026", dept: "设备运维部", applicant: "李四", qty: 1, originSum: 18000, netSum: 12600, submitDate: "2026-07-05", status: "rejected", assetIds: ["GD-2024-002"], remark: "资产仍可修复，暂不报废。" },
-        { planNo: "BF-2025-016", year: "2025", dept: "设备运维部", applicant: "张明", qty: 2, originSum: 52000, netSum: 36000, submitDate: "2025-06-26", status: "approved", assetIds: ["GD-2024-001", "GD-2022-064"], remark: "历年计划，已通过。" }
+        { planNo: "BF-2026-001", year: "2026", dept: "设备运维部", applicant: currentUser, qty: 3, originSum: 75500, netSum: 54200, submitDate: "2026-06-15", status: "review", assetIds: ["GD-2024-001", "GD-2023-088", "LY-2024-015"], assetQty: {"GD-2024-001":1,"GD-2023-088":1,"LY-2024-015":1}, assetReasons: {"GD-2024-001":"使用年限到期，故障频发","GD-2023-088":"设备老化，精度下降","LY-2024-015":"维修成本过高"}, remark: "年度设备更新，按计划淘汰老旧设备。" },
+        { planNo: "BF-2026-002", year: "2026", dept: "设备运维部", applicant: currentUser, qty: 2, originSum: 48000, netSum: 35400, submitDate: "", status: "draft", assetIds: ["GD-2024-002", "GD-2022-064"], assetQty: {"GD-2024-002":1,"GD-2022-064":1}, assetReasons: {"GD-2024-002":"故障率上升，无法正常运转","GD-2022-064":"超期使用，存在安全隐患"}, remark: "现场反馈故障率上升，拟报废。" },
+        { planNo: "BF-2026-003", year: "2026", dept: "设备运维部", applicant: "王磊", qty: 1, originSum: 41000, netSum: 28400, submitDate: "2026-07-03", status: "approved", assetIds: ["GD-2023-088"], assetQty: {"GD-2023-088":1}, assetReasons: {"GD-2023-088":"精度严重下降，无法满足检测需求"}, remark: "已完成审批，待北交所挂牌。" },
+        { planNo: "BF-2026-004", year: "2026", dept: "设备运维部", applicant: "李四", qty: 1, originSum: 18000, netSum: 12600, submitDate: "2026-07-05", status: "rejected", assetIds: ["GD-2024-002"], assetQty: {"GD-2024-002":1}, assetReasons: {"GD-2024-002":"维修后可继续使用"}, remark: "资产仍可修复，暂不报废。" },
+        { planNo: "BF-2025-016", year: "2025", dept: "设备运维部", applicant: "张明", qty: 2, originSum: 52000, netSum: 36000, submitDate: "2025-06-26", status: "approved", assetIds: ["GD-2024-001", "GD-2022-064"], assetQty: {"GD-2024-001":1,"GD-2022-064":1}, assetReasons: {"GD-2024-001":"已淘汰","GD-2022-064":"型号落后"}, remark: "历年计划，已通过。" }
       ];
       var planFilters = { tab: "all" };
       var planEditingNo = "";
       var planSubmitNo = "";
       var pickedAssetIds = [];
       var pickedAssetQty = {};
+      var pickedAssetReason = {};
 
       function statusMeta(code) {
         if (code === "approved") return { cls: "tag-status--approved", text: "已通过" };
@@ -1075,17 +1104,35 @@
         var pending = item && (item.status === "pending" || item.status === "review");
         return [
           { node: "业务部门开始提报次年报废计划", user: applicant, time: baseDate + " 09:00:12", content: dept + "发起报废计划填报，梳理拟报废物资范围。", result: "已完成" },
-          { node: "业务部门提交报废计划", user: applicant, time: baseDate + " 09:18:30", content: "提交报废计划及拟报废固定资产清单。", result: "已提交" },
           { node: "业务部门负责人审批", user: "业务部门负责人", time: baseDate + " 10:05:18", content: rejected ? "审核报废计划，要求补充资产状态及报废依据。" : "确认报废计划内容完整，同意提交后续审批。", result: rejected ? "驳回" : "通过" },
-          { node: "物资管理部门物资专责汇总且物资管理部门负责人审批", user: "物资管理部门物资专责 / 物资管理部门负责人", time: baseDate + " 10:42:06", content: "汇总报废物资信息，核对资产清单、净值及处置路径。", result: rejected ? "未到达" : "通过" },
+          { node: "物资管理部门物资专责汇总", user: "物资管理部门物资专责", time: baseDate + " 10:22:05", content: "汇总拟报废物资清单，核对资产编号、数量及净值。", result: rejected ? "未到达" : "已完成" },
+          { node: "物资管理部门负责人审批", user: "物资管理部门负责人", time: baseDate + " 10:42:06", content: rejected ? "驳回" : "审核物资清单及处置路径，确认可进入财务审批环节。", result: rejected ? "驳回" : "通过" },
           { node: "财务部负责人审批", user: "财务部负责人", time: pending ? "-" : baseDate + " 11:26:40", content: pending ? "待财务负责人审核原值、净值及账务处理口径。" : "审核财务账面信息，确认报废计划可进入存档。", result: pending ? "待处理" : "通过" },
           { node: "物资管理部门物资专责存档，报废结束", user: "物资管理部门物资专责", time: pending ? "-" : baseDate + " 11:48:15", content: pending ? "待审批完成后归档报废材料。" : "归档报废计划、审批记录及资产清单，流程结束。", result: pending ? "未到达" : "报废结束" }
         ];
       }
 
       function renderProgressInfo(item, type) {
-        refs.progressInfoBody.innerHTML = progressRows(item, type).map(function (r, idx) {
-          return "<tr><td>" + escHtml(r.user) + "</td><td>" + escHtml(r.time) + "</td><td>" + escHtml(r.node + "：" + r.content) + "</td><td>" + escHtml(r.result) + "</td></tr>";
+        var rows = progressRows(item, type);
+        refs.progressInfoBody.innerHTML = rows.map(function(r, i) {
+          var isLast = i === rows.length - 1;
+          var resultColor = r.result === "已完成" || r.result === "通过" || r.result === "报废结束" ? "#10b981" : 
+                           r.result === "待处理" || r.result === "驳回" ? "#f59e0b" : "#64748b";
+          return '<div style="display:flex;gap:0;align-items:flex-start;position:relative">' +
+            '<div style="display:flex;flex-direction:column;align-items:center;flex-shrink:0;width:24px">' +
+              '<div style="width:12px;height:12px;border-radius:50%;background:' + resultColor + ';flex-shrink:0"></div>' +
+              (!isLast ? '<div style="width:2px;flex:1;min-height:40px;background:#e2e8f0;margin-top:4px"></div>' : '') +
+            '</div>' +
+            '<div style="flex:1;padding-bottom:' + (isLast ? '0' : '24px') + ';min-width:0">' +
+              '<div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:6px">' +
+                '<span style="font-weight:600;color:#1f3551;font-size:14px">' + escHtml(r.user) + '</span>' +
+                '<span style="color:#64748b;font-size:13px">' + r.node + '</span>' +
+                '<span style="color:#64748b;font-size:13px">' + escHtml(r.time) + '</span>' +
+                '<span style="padding:2px 8px;border-radius:4px;font-size:12px;font-weight:500;background:' + resultColor + '22;color:' + resultColor + '">' + escHtml(r.result) + '</span>' +
+              '</div>' +
+              '<div style="font-size:13px;color:#51627a;line-height:1.7">' + escHtml(r.content) + '</div>' +
+            '</div>' +
+          '</div>';
         }).join("");
       }
 
@@ -1208,8 +1255,10 @@
           '<div class="ex-row"><b>申请报废原因：</b>' + escHtml(item.scrapReason || "—") + "</div>" +
           '<div class="ex-row"><b>申请人员签字：</b>' + escHtml(item.applicantSign || "—") + "</div>" +
           '<div class="ex-row"><b>申请部门负责人意见及签字：</b>' + escHtml(item.deptHeadOpinion || "—") + "</div>" +
-          '<div class="ex-row"><b>管理处置部门专责意见及签字：</b>' + escHtml(item.manageSpecialOpinion || "—") + "</div>" +
-          '<div class="ex-row"><b>管理处置部门负责人意见及签字：</b>' + escHtml(item.manageHeadOpinion || "—") + "</div>" +
+          '<div class="ex-row"><b>物资专责汇总意见及签字：</b>' + escHtml(item.manageSpecialOpinion || "—") + "</div>" +
+          '<div class="ex-row"><b>物资负责人意见及签字：</b>' + escHtml(item.manageHeadOpinion || "—") + "</div>" +
+          '<div class="ex-row"><b>财务负责人审批意见及签字：</b>' + escHtml(item.financeOpinion || "—") + "</div>" +
+          '<div class="ex-row"><b>物资专责存档记录：</b>' + escHtml(item.archiveRecord || "—") + "</div>" +
           "</div></div>";
         var can = canHandle(item);
         refs.btnViewApprove.style.display = can ? "inline-block" : "none";
@@ -1245,7 +1294,7 @@
       function render(rows) {
         refs.tbody.innerHTML = "";
         if (!rows.length) {
-          refs.tbody.innerHTML = '<tr><td colspan="13" style="text-align:center;color:#8ca0b8;padding:24px;">暂无数据</td></tr>';
+          refs.tbody.innerHTML = '<tr><td colspan="15" style="text-align:center;color:#8ca0b8;padding:24px;">暂无数据</td></tr>';
           refs.total.textContent = "共 0 条";
           return;
         }
@@ -1265,6 +1314,8 @@
             "<td>" + (x.deptHeadOpinion || "-") + "</td>" +
             "<td>" + (x.manageSpecialOpinion || "-") + "</td>" +
             "<td>" + (x.manageHeadOpinion || "-") + "</td>" +
+            "<td>" + (x.financeOpinion || "-") + "</td>" +
+            "<td>" + (x.archiveRecord || "-") + "</td>" +
             '<td><span class="tag-status ' + st.cls + '">' + st.text + "</span></td>" +
             '<td><div class="wh-ops">' +
             '<a href="#" data-action="view">查看</a>' +
@@ -1291,23 +1342,75 @@
       }
 
       function fillDeviceOptions() {
-        refs.assetNameQty.innerHTML = "";
+        refs.aiAssetName.innerHTML = '<option value="">请选择资产</option>';
         activeMaterials().forEach(function (x) {
           var opt = document.createElement("option");
           opt.value = x.code;
           opt.textContent = x.name;
-          refs.assetNameQty.appendChild(opt);
+          refs.aiAssetName.appendChild(opt);
         });
       }
 
+      var applyItemRows = [];
+
+      function refreshApplyItemTable() {
+        var body = refs.applyItemBody;
+        body.innerHTML = "";
+        if (!applyItemRows.length) {
+          refs.applyItemEmpty.style.display = "block";
+          refs.applyItemCount.textContent = "共 0 条";
+          refs.applyItemTotal.textContent = "0";
+          refs.applyOriginSum.textContent = "¥ 0.00";
+          refs.applyNetSum.textContent = "¥ 0.00";
+          refs.applyEvalTip.textContent = "";
+          return;
+        }
+        refs.applyItemEmpty.style.display = "none";
+        var total = 0, oSum = 0, nSum = 0;
+        applyItemRows.forEach(function (row, idx) {
+          total += Number(row.qty) || 0;
+          oSum += (Number(row.origin) || 0) * (Number(row.qty) || 1);
+          nSum += (Number(row.net) || 0) * (Number(row.qty) || 1);
+          var tr = document.createElement("tr");
+          tr.innerHTML =
+            '<td style="padding:8px 6px;text-align:center;color:#64748b;">' + (idx + 1) + '</td>' +
+            '<td style="padding:8px 6px;">' + escHtml(row.code) + '</td>' +
+            '<td style="padding:8px 6px;">' + escHtml(row.name) + '</td>' +
+            '<td style="padding:8px 6px;">' + escHtml(row.model || "-") + '</td>' +
+            '<td style="padding:8px 6px;text-align:right;">' + fmtMoney(row.origin) + '</td>' +
+            '<td style="padding:8px 6px;text-align:right;">' + fmtMoney(row.net) + '</td>' +
+            '<td style="padding:8px 6px;text-align:center;">' + (Number(row.qty) || 1) + '</td>' +
+            '<td style="padding:8px 6px;font-size:12px;color:#334155;max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="' + escHtml(row.reason) + '">' + escHtml(row.reason || "-") + '</td>' +
+            '<td style="padding:8px 6px;text-align:center;"><a href="#" class="ai-remove" data-idx="' + idx + '" style="color:#cf1322;font-size:12px;">移除</a></td>';
+          body.appendChild(tr);
+        });
+        refs.applyItemCount.textContent = "共 " + applyItemRows.length + " 条";
+        refs.applyItemTotal.textContent = String(total);
+        refs.applyOriginSum.textContent = "¥ " + fmtMoney(oSum);
+        refs.applyNetSum.textContent = "¥ " + fmtMoney(nSum);
+        if (nSum >= 1000000) {
+          refs.applyEvalTip.textContent = "⚠ 净值合计超过100万元，需进行设备评估";
+          refs.applyEvalTip.style.color = "#d48806";
+        } else {
+          refs.applyEvalTip.textContent = "✓ 净值合计未超过100万元，无需评估";
+          refs.applyEvalTip.style.color = "#389e0d";
+        }
+      }
+
       function openModal() {
-        fillDeviceOptions();
-        refs.scrapQty.value = "1";
-        refs.assetList.value = "";
+        applyItemRows = [];
+        refs.applyDept.value = "设备运维部";
+        refs.applyDate.value = new Date().toISOString().slice(0, 10);
         refs.stackLocation.value = "";
         refs.scrapReason.value = "";
         refs.applicantSign.value = currentUser + "（电子签）";
-        refs.applyDate.value = new Date().toISOString().slice(0, 10);
+        refs.deptHeadOpinion.value = "";
+        refs.manageSpecialOpinion.value = "";
+        refs.manageHeadOpinion.value = "";
+        refs.financeOpinionInput.value = "";
+        refs.archiveRecordInput.value = "";
+        fillDeviceOptions();
+        refreshApplyItemTable();
         refs.modalMask.classList.add("show");
         refs.modalMask.setAttribute("aria-hidden", "false");
       }
@@ -1376,42 +1479,98 @@
         });
       });
       refs.btnSubmit.addEventListener("click", function () {
-        if (!refs.assetNameQty.value) {
-          alert("当前无可选在用物资。");
+        if (!applyItemRows.length) {
+          alert("请至少添加一条报废物资。");
           return;
         }
-        var code = refs.assetNameQty.value;
-        var mat = materialLedger.find(function (x) { return x.code === code; });
-        var fin = financeBook[code] || { originValue: 0, netValue: 0 };
-        var d = new Date();
-        var date = refs.applyDate.value || d.toISOString().slice(0, 10);
-        var qty = Math.max(1, Number(refs.scrapQty.value || 1));
-        var nameQty = (mat ? mat.name : "未知设备") + " x " + qty;
-        var reasonText = (refs.scrapReason.value || "").trim();
-        if (!reasonText) {
-          alert("请填写申请报废原因。");
-          return;
-        }
-
+        var date = refs.applyDate.value || new Date().toISOString().slice(0, 10);
+        var nameQtyParts = applyItemRows.map(function (r) { return r.name + " x " + (Number(r.qty) || 1); });
+        var assetListParts = applyItemRows.map(function (r) { return r.code + "：" + r.name + "（" + (Number(r.qty) || 1) + "台）"; });
+        var oSum = 0, nSum = 0;
+        applyItemRows.forEach(function (r) {
+          oSum += (Number(r.origin) || 0) * (Number(r.qty) || 1);
+          nSum += (Number(r.net) || 0) * (Number(r.qty) || 1);
+        });
         applications.unshift({
           applyNo: genApplyNo(),
           applyDept: (refs.applyDept.value || "设备运维部").trim(),
           applyDate: date,
-          assetNameQty: nameQty,
-          assetList: (refs.assetList.value || (code + "：" + (mat ? mat.name : "设备") + "（" + qty + "台）")).trim(),
+          assetNameQty: nameQtyParts.join("；"),
+          assetList: assetListParts.join("；"),
           stackLocation: (refs.stackLocation.value || "待补充").trim(),
-          scrapReason: reasonText,
+          scrapReason: (refs.scrapReason.value || "").trim(),
           applicantSign: (refs.applicantSign.value || (currentUser + "（电子签）")).trim(),
           deptHeadOpinion: (refs.deptHeadOpinion.value || "").trim(),
           manageSpecialOpinion: (refs.manageSpecialOpinion.value || "").trim(),
           manageHeadOpinion: (refs.manageHeadOpinion.value || "").trim(),
+          financeOpinion: (refs.financeOpinionInput.value || "").trim(),
+          archiveRecord: (refs.archiveRecordInput.value || "").trim(),
           status: "pending",
-          originValue: fin.originValue,
-          netValue: fin.netValue,
-          deviceCode: code
+          originValue: oSum,
+          netValue: nSum,
+          applyItems: applyItemRows.slice()
         });
         closeModal();
         applyFilters();
+      });
+
+      // 明细表弹窗：添加物资
+      refs.btnAddApplyItem.addEventListener("click", function () {
+        fillDeviceOptions();
+        refs.aiAssetCode.value = "";
+        refs.aiAssetModel.value = "";
+        refs.aiAssetLocation.value = "";
+        refs.aiOrigin.value = "";
+        refs.aiNet.value = "";
+        refs.aiQty.value = "1";
+        refs.aiReason.value = "";
+        refs.applyItemModalMask.classList.add("show");
+      });
+      refs.btnCloseApplyItem.addEventListener("click", function () {
+        refs.applyItemModalMask.classList.remove("show");
+      });
+      refs.btnCancelApplyItem.addEventListener("click", function () {
+        refs.applyItemModalMask.classList.remove("show");
+      });
+      refs.applyItemModalMask.addEventListener("click", function (e) {
+        if (e.target === refs.applyItemModalMask) refs.applyItemModalMask.classList.remove("show");
+      });
+      refs.aiAssetName.addEventListener("change", function () {
+        var code = refs.aiAssetName.value;
+        if (!code) {
+          refs.aiAssetCode.value = ""; refs.aiAssetModel.value = "";
+          refs.aiAssetLocation.value = ""; refs.aiOrigin.value = ""; refs.aiNet.value = "";
+          return;
+        }
+        var mat = materialLedger.find(function (x) { return x.code === code; });
+        var fin = financeBook[code] || { originValue: 0, netValue: 0 };
+        refs.aiAssetCode.value = code;
+        refs.aiAssetModel.value = mat ? mat.name : "-";
+        refs.aiAssetLocation.value = "-";
+        refs.aiOrigin.value = "¥ " + fmtMoney(fin.originValue);
+        refs.aiNet.value = "¥ " + fmtMoney(fin.netValue);
+      });
+      refs.btnConfirmApplyItem.addEventListener("click", function () {
+        var code = refs.aiAssetName.value;
+        if (!code) { alert("请选择资产名称。"); return; }
+        var name = refs.aiAssetName.options[refs.aiAssetName.selectedIndex].textContent;
+        var qty = Math.max(1, parseInt(refs.aiQty.value, 10) || 1);
+        var fin = financeBook[code] || { originValue: 0, netValue: 0 };
+        var reason = refs.aiReason.value.trim();
+        applyItemRows.push({ code: code, name: name, model: refs.aiAssetModel.value || "-", origin: fin.originValue, net: fin.netValue, qty: qty, reason: reason });
+        refreshApplyItemTable();
+        refs.applyItemModalMask.classList.remove("show");
+      });
+
+      // 明细表：移除按钮
+      refs.applyItemBody.addEventListener("click", function (e) {
+        var a = e.target.closest(".ai-remove");
+        if (!a) return;
+        var idx = parseInt(a.getAttribute("data-idx"), 10);
+        if (!isNaN(idx) && idx >= 0 && idx < applyItemRows.length) {
+          applyItemRows.splice(idx, 1);
+          refreshApplyItemTable();
+        }
       });
 
       refs.tbody.addEventListener("click", function (e) {
@@ -1513,7 +1672,7 @@
         var rows = planRowsByFilter();
         body.innerHTML = "";
         if (!rows.length) {
-          body.innerHTML = '<tr><td colspan="12" style="text-align:center;color:#8ca0b8;padding:20px;">暂无计划数据</td></tr>';
+          body.innerHTML = '<tr><td colspan="13" style="text-align:center;color:#8ca0b8;padding:20px;">暂无计划数据</td></tr>';
           return;
         }
         rows.forEach(function (p, idx) {
@@ -1531,6 +1690,7 @@
             "<td>" + fmtMoney(p.netSum) + "</td>" +
             "<td>" + (p.submitDate || "-") + "</td>" +
             '<td><span class="tag-status ' + st.cls + '">' + st.txt + "</span></td>" +
+            "<td>" + (p.remark || "-") + "</td>" +
             '<td><div class="wh-ops"><a href="#" data-plan-act="view" data-no="' + p.planNo + '">查看</a><a href="#" data-plan-act="edit" data-no="' + p.planNo + '">编辑</a><a href="#" data-plan-act="submit" data-no="' + p.planNo + '">提交审批</a><a href="#" data-plan-act="print" data-no="' + p.planNo + '">打印</a></div></td>';
           body.appendChild(tr);
         });
@@ -1565,9 +1725,12 @@
             document.getElementById("planDateInput").value = old.submitDate || new Date().toISOString().slice(0, 10);
             document.getElementById("planRemarkInput").value = old.remark || "";
             pickedAssetIds = old.assetIds.slice();
+            pickedAssetQty = {};
+            pickedAssetReason = {};
             pickedAssetIds.forEach(function (id) {
               var q = old.assetQty && old.assetQty[id] != null ? Number(old.assetQty[id]) : 1;
               pickedAssetQty[id] = !isNaN(q) && q >= 1 ? Math.floor(q) : 1;
+              pickedAssetReason[id] = (old.assetReasons && old.assetReasons[id]) ? old.assetReasons[id] : "";
             });
           }
         } else {
@@ -1596,10 +1759,12 @@
           if (checked) tr.className = "asset-row-selected";
           var qVal = pickedAssetQty[a.id] != null ? pickedAssetQty[a.id] : 1;
           if (typeof qVal !== "number" || isNaN(qVal) || qVal < 1) qVal = 1;
+          var reasonVal = (pickedAssetReason[a.id] != null ? pickedAssetReason[a.id] : "");
           tr.innerHTML =
             '<td><input type="checkbox" class="asset-row-check" data-id="' + a.id + '"' + (checked ? " checked" : "") + "></td>" +
             "<td>" + a.id + "</td><td>" + a.name + "</td><td>" + a.model + "</td><td>" + a.location + "</td><td>" + a.keeper + "</td><td>" + fmtMoney(a.origin) + "</td><td>" + fmtMoney(a.net) + "</td><td>" + a.years + "</td><td>" + a.status + "</td>" +
-            '<td><input type="number" class="asset-qty-input" data-id="' + a.id + '" min="1" step="1" value="' + qVal + '"' + (checked ? "" : " disabled") + "></td>";
+            '<td><input type="number" class="asset-qty-input" data-id="' + a.id + '" min="1" step="1" value="' + qVal + '"' + (checked ? "" : " disabled") + "></td>" +
+            '<td><input type="text" class="asset-reason-input" data-id="' + a.id + '" placeholder="请填写报废原因"' + (checked ? "" : " disabled style='background:#f1f5f9;color:#94a3b8;'") + ' value="' + escHtml(reasonVal) + '" /></td>';
           body.appendChild(tr);
         });
         refreshPickSummary();
@@ -1658,6 +1823,7 @@
           status: status,
           assetIds: pickedAssetIds.slice(),
           assetQty: assetQty,
+          assetReasons: Object.assign({}, pickedAssetReason),
           remark: (document.getElementById("planRemarkInput").value || "").trim()
         };
         var idx = planRecords.findIndex(function (p) { return p.planNo === item.planNo; });
@@ -1679,7 +1845,8 @@
         document.getElementById("planDetailAssetBody").innerHTML = assets.map(function (a) {
           var pq = item.assetQty && item.assetQty[a.id] != null ? Number(item.assetQty[a.id]) : 1;
           if (isNaN(pq) || pq < 1) pq = 1;
-          return "<tr><td>" + a.id + "</td><td>" + a.name + "</td><td>" + a.model + "</td><td>" + a.location + "</td><td>" + fmtMoney(a.origin) + "</td><td>" + fmtMoney(a.net) + "</td><td>" + pq + "</td></tr>";
+          var reason = (item.assetReasons && item.assetReasons[a.id]) ? item.assetReasons[a.id] : "-";
+          return "<tr><td>" + a.id + "</td><td>" + a.name + "</td><td>" + a.model + "</td><td>" + a.location + "</td><td>" + fmtMoney(a.origin) + "</td><td>" + fmtMoney(a.net) + "</td><td>" + pq + "</td><td>" + escHtml(reason) + "</td></tr>";
         }).join("");
         document.getElementById("planDetailRecordBody").innerHTML =
           "<tr><td>申请部门负责人意见及签字</td><td>申请部门负责人</td><td>" + (item.status === "rejected" ? "驳回" : "同意") + "</td><td>" + (item.submitDate || "-") + "</td><td>" + (item.status === "rejected" ? "驳回" : "完成") + "</td></tr>" +
@@ -1761,10 +1928,12 @@
           if (c.checked && pickedAssetIds.indexOf(id) < 0) {
             pickedAssetIds.push(id);
             if (pickedAssetQty[id] == null || pickedAssetQty[id] < 1) pickedAssetQty[id] = 1;
+            if (pickedAssetReason[id] == null) pickedAssetReason[id] = "";
           }
           if (!c.checked) {
             pickedAssetIds = pickedAssetIds.filter(function (x) { return x !== id; });
             delete pickedAssetQty[id];
+            delete pickedAssetReason[id];
           }
           renderAssetPickTable();
         });
@@ -1777,6 +1946,12 @@
           pickedAssetQty[id] = v;
           if (String(v) !== String(inp.value)) inp.value = String(v);
           refreshPickSummary();
+        });
+        document.getElementById("assetPickBody").addEventListener("input", function (e) {
+          var inp = e.target.closest(".asset-reason-input");
+          if (!inp) return;
+          var id = inp.getAttribute("data-id");
+          pickedAssetReason[id] = inp.value;
         });
         document.getElementById("btnPlanSaveDraft").addEventListener("click", function () { savePlan("draft"); });
         document.getElementById("btnPlanSubmit").addEventListener("click", function () { savePlan("review"); });
