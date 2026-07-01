@@ -474,10 +474,11 @@
       text-align: left;
       vertical-align: middle;
       word-break: break-word;
+      color: #1f3551;
     }
     .plan-item-table th {
       background: #f8fafc;
-      color: #64748b;
+      color: #1f3551;
       position: sticky;
       top: 0;
       z-index: 1;
@@ -883,7 +884,7 @@
               <div class="flow-arrow" aria-hidden="true">→</div>
               <div class="flow-node" data-flow-tip="">财务部负责人审批</div>
               <div class="flow-arrow" aria-hidden="true">→</div>
-              <div class="flow-node is-current" data-flow-tip="">物资管理部门物资专责存档，报废结束</div>
+              <div class="flow-node" data-flow-tip="">物资管理部门物资专责存档，报废结束</div>
             </div>
             <div class="flow-tooltip" id="flowTooltip"></div>
           </div>
@@ -943,7 +944,7 @@
                   <th style="width:104px;">净值（万元）</th>
                   <th style="width:96px;">采购时间</th>
                   <th style="min-width:150px;">拟报废原因</th>
-                  <th style="width:90px;">操作</th>
+                  <th style="width:120px;">操作</th>
                 </tr>
               </thead>
               <tbody id="planItemBody"></tbody>
@@ -960,6 +961,8 @@
           <span>净值合计：<b id="planItemNetSum">¥ 0.00</b></span>
           <span id="planEvalTip"></span>
         </div>
+        <div style="font-size:13px;font-weight:600;color:#1f3551;margin:12px 0 6px;padding-bottom:6px;border-bottom:1px solid #e8eef7;">物资跟踪</div>
+        <div id="planItemTracking" class="map-flow-timeline" style="padding:4px 0;"></div>
       </div>
       <div class="modal-footer">
         <button class="btn" id="btnPlanCancel">取消</button>
@@ -1059,6 +1062,8 @@
           <thead><tr><th>节点</th><th>审批人</th><th>意见</th><th>时间</th><th>状态</th></tr></thead>
           <tbody id="planDetailRecordBody"></tbody>
         </table>
+        <div style="font-size:13px;font-weight:600;color:#1f3551;margin:12px 0 6px;padding-bottom:6px;border-bottom:1px solid #e8eef7;">物资跟踪</div>
+        <div id="planDetailTracking" class="map-flow-timeline" style="padding:4px 0;"></div>
       </div>
       <div class="modal-footer">
         <button class="btn" id="btnPlanDetailClose">关闭</button>
@@ -2199,6 +2204,8 @@
             '<td><textarea class="pi-reason" data-idx="' + idx + '" rows="2" placeholder="填写报废原因">' + escHtml(item.reason || "") + '</textarea></td>' +
             '<td>' +
               '<div class="plan-item-ops">' +
+                '<a href="#" class="pi-track" data-id="' + escHtml(asset.id) + '" title="物资跟踪">物资跟踪</a>' +
+                '<span class="ops-sep">|</span>' +
                 '<a href="#" class="pi-del" data-idx="' + idx + '" style="color:#ff4d4f;">删除</a>' +
               '</div>' +
             '</td>';
@@ -2215,6 +2222,39 @@
         } else {
           tip.innerHTML = '<span style="color:#389e0d;">净值未超过100万元，无需进行资产评估</span>';
         }
+        renderTrackingTimeline();
+      }
+
+      function renderTrackingTimeline() {
+        var box = document.getElementById("planItemTracking");
+        if (!box) return;
+        var rows = [];
+        planItems.forEach(function (item, idx) {
+          var asset = planAssets.find(function (a) { return a.id === item.id; });
+          if (!asset) return;
+          var qty = planQtyNumber(item.qty);
+          rows.push({ person: currentUser, time: new Date().toISOString().slice(0, 10) + " 00:00", result: "已登记", content: "物资「" + asset.name + "」纳入报废计划，数量" + (qty || "待填") + "，" + (item.reason || "无报废原因") });
+        });
+        if (!rows.length) {
+          box.innerHTML = '<div style="text-align:center;color:#8ca0b8;padding:20px;font-size:13px;">暂无跟踪记录</div>';
+          return;
+        }
+        box.innerHTML = rows.map(function (r, i) {
+          var isLast = i === rows.length - 1;
+          var sc = "#10b981";
+          return '<div class="map-flow-tl-item' + (isLast ? ' map-flow-tl-last' : '') + '">' +
+            '<div class="map-flow-tl-dot" style="background:' + sc + '"></div>' +
+            (!isLast ? '<div class="map-flow-tl-line"></div>' : '') +
+            '<div class="map-flow-tl-body">' +
+              '<div class="map-flow-tl-meta">' +
+                '<span class="map-flow-tl-person">' + escHtml(r.person) + '</span>' +
+                '<span class="map-flow-tl-time">' + escHtml(r.time) + '</span>' +
+                '<span class="map-flow-tl-badge" style="background:#10b98122;color:#10b981">' + escHtml(r.result) + '</span>' +
+              '</div>' +
+              '<div class="map-flow-tl-content">' + escHtml(r.content) + '</div>' +
+            '</div>' +
+          '</div>';
+        }).join("");
       }
 
       // ═══════════════════════════════════════════════════════════
@@ -2477,9 +2517,35 @@
             "</tr>";
         }).join("");
         document.getElementById("planDetailRecordBody").innerHTML =
-          "<tr><td>申请部门负责人意见及签字</td><td>申请部门负责人</td><td>" + (item.status === "rejected" ? "驳回" : "同意") + "</td><td>" + (item.submitDate || "-") + "</td><td>" + (item.status === "rejected" ? "驳回" : "完成") + "</td></tr>" +
-          "<tr><td>管理处置部门专责意见及签字</td><td>管理处置部门专责</td><td>" + (item.status === "rejected" ? "驳回" : "同意") + "</td><td>-</td><td>" + (item.status === "rejected" ? "驳回" : "完成") + "</td></tr>" +
-          "<tr><td>管理处置部门负责人意见及签字</td><td>管理处置部门负责人</td><td>" + (item.status === "approved" ? "通过" : item.status === "review" ? "审批中" : "-") + "</td><td>-</td><td>" + (item.status === "approved" ? "完成" : "待处理") + "</td></tr>";
+          "<tr><td>业务部门开始提报次年报废计划</td><td>" + escHtml(item.applicant || currentUser) + "</td><td>于" + (item.submitDate || "-") + "执行业务部门开始提报次年报废计划，梳理" + (item.dept || currentDept) + "次年拟报废物资范围，处理结果为已通过。</td><td>" + (item.submitDate || "-") + "</td><td>已通过</td></tr>" +
+          "<tr><td>业务部门提交报废计划</td><td>" + escHtml(item.applicant || currentUser) + "</td><td>于" + (item.submitDate || "-") + "执行业务部门提交报废计划，提交报废计划、拟报废物资明细及报废说明，处理结果为已通过。</td><td>" + (item.submitDate || "-") + "</td><td>已通过</td></tr>" +
+          "<tr><td>业务部门负责人审批</td><td>李仁堂</td><td>于" + (item.submitDate || "-") + "执行业务部门负责人审批，确认报废计划内容完整并同意提交后续审批，处理结果为已通过。</td><td>" + (item.submitDate || "-") + "</td><td>已通过</td></tr>" +
+          "<tr><td>物资管理部门的物资专责汇总且物资管理部门负责人审批</td><td>宋中波</td><td>于" + (item.submitDate || "-") + "执行物资管理部门的物资专责汇总且物资管理部门负责人审批，汇总拟报废物资清单并确认处置路径，处理结果为已通过。</td><td>" + (item.submitDate || "-") + "</td><td>已通过</td></tr>" +
+          "<tr><td>财务部负责人审批</td><td>孙睿</td><td>待执行财务部负责人审批，待审核资产原值、累计折旧、净值及账务处理口径，处理结果为待处理。</td><td>-</td><td>待处理</td></tr>" +
+          "<tr><td>物资管理部门物资专责存档，报废结束</td><td>宋中波</td><td>待执行物资管理部门物资专责存档，报废结束，待审批完成后归档报废计划、审批记录及资产清单，处理结果为未到达。</td><td>-</td><td>未到达</td></tr>";
+        var detailTrackingBox = document.getElementById("planDetailTracking");
+        if (detailTrackingBox) {
+          var detailRows = [];
+          assets.forEach(function (a) {
+            var pq = planQtyNumber(item.assetQty && item.assetQty[a.id] != null ? item.assetQty[a.id] : "");
+            detailRows.push({ person: (item.applicant || currentUser), time: (item.submitDate || "-") + " 00:00", result: "已登记", content: "物资「" + a.name + "」纳入报废计划，数量" + (pq || "待填") + "，" + ((item.assetReasons && item.assetReasons[a.id]) || "无报废原因") });
+          });
+          detailTrackingBox.innerHTML = detailRows.map(function (r, i) {
+            var isLast = i === detailRows.length - 1;
+            return '<div class="map-flow-tl-item' + (isLast ? ' map-flow-tl-last' : '') + '">' +
+              '<div class="map-flow-tl-dot" style="background:#10b981"></div>' +
+              (!isLast ? '<div class="map-flow-tl-line"></div>' : '') +
+              '<div class="map-flow-tl-body">' +
+                '<div class="map-flow-tl-meta">' +
+                  '<span class="map-flow-tl-person">' + escHtml(r.person) + '</span>' +
+                  '<span class="map-flow-tl-time">' + escHtml(r.time) + '</span>' +
+                  '<span class="map-flow-tl-badge" style="background:#10b98122;color:#10b981">' + escHtml(r.result) + '</span>' +
+                '</div>' +
+                '<div class="map-flow-tl-content">' + escHtml(r.content) + '</div>' +
+              '</div>' +
+            '</div>';
+          }).join("");
+        }
         document.getElementById("planDetailMask").classList.add("show");
       }
       function closePlanDetail() {

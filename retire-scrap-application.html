@@ -741,15 +741,15 @@
     </div>
   </div>
 
-    <div class="modal-mask" id="applyModalMask" aria-hidden="true">
+  <div class="modal-mask" id="applyModalMask" aria-hidden="true">
     <div class="modal" role="dialog" aria-modal="true" aria-labelledby="applyModalTitle" style="width:min(1100px,98vw);">
       <div class="modal-header">
         <h2 class="modal-title" id="applyModalTitle">新增退役及报废申请</h2>
         <div class="scrap-detail-header-actions">
           <button type="button" class="btn-scrap-progress" id="btnOpenApplyModalProgress">流程进度</button>
-          <button class="modal-close" id="btnCloseModal" aria-label="关闭">×</button>
-        </div>
+        <button class="modal-close" id="btnCloseModal" aria-label="关闭">×</button>
       </div>
+        </div>
       <div class="modal-body" style="max-height:72vh;overflow-y:auto;padding:14px 16px;">
         <!-- 第一部分：基本信息 -->
         <div style="font-size:13px;font-weight:600;color:#1f3551;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid #e8eef7;">基本信息</div>
@@ -783,7 +783,7 @@
               </thead>
               <tbody id="applyItemBody"></tbody>
             </table>
-          </div>
+        </div>
           <div id="applyItemEmpty" style="text-align:center;color:#8ca0b8;padding:24px;font-size:13px;">暢无物资，请点击上方「添加物资」按钮</div>
         </div>
         <div id="applyItemSummary" style="font-size:12px;color:#334155;margin-bottom:14px;padding:6px 10px;background:#f8fbff;border:1px solid #e6edf7;border-radius:6px;">
@@ -805,13 +805,13 @@
         <div style="margin:12px 0 4px;padding:7px 10px;border-radius:6px;background:#f5f5f5;color:#6b7280;font-size:12px;line-height:1.6;">
           💡 提示：固定起产报废申请签字后，由起产报废鉴定专业部门进行退役鉴定并出典鉴定报告，管理处置部门依据该申请及鉴定报告执行公司固定起产报废内部决策流程。
         </div>
-      </div>
+        </div>
       <div class="modal-footer">
         <button class="btn" id="btnCancel">取消</button>
         <button class="btn btn-primary" id="btnSubmitApply">提交申请</button>
+        </div>
+        </div>
       </div>
-    </div>
-  </div>
 
   <div class="modal-mask" id="applyItemModalMask" aria-hidden="true">
     <div class="modal" role="dialog" style="width:min(640px,96vw);">
@@ -839,7 +839,7 @@
     </div>
   </div>
 
-<div class="modal-mask" id="viewModalMask" aria-hidden="true">
+  <div class="modal-mask" id="viewModalMask" aria-hidden="true">
     <div class="modal modal--scrap-detail" role="dialog" aria-modal="true" aria-labelledby="viewModalTitle">
       <div class="modal-header scrap-detail-header">
         <h2 class="modal-title" id="viewModalTitle">报废申请详情</h2>
@@ -883,7 +883,7 @@
               <div class="flow-arrow" aria-hidden="true">→</div>
               <div class="flow-node" data-flow-tip="">财务部负责人审批</div>
               <div class="flow-arrow" aria-hidden="true">→</div>
-              <div class="flow-node is-current" data-flow-tip="">物资管理部门物资专责存档，报废结束</div>
+              <div class="flow-node" data-flow-tip="">物资管理部门物资专责存档，报废结束</div>
             </div>
             <div class="flow-tooltip" id="flowTooltip"></div>
           </div>
@@ -904,7 +904,7 @@
         <h2 class="modal-title" id="planModalTitle">新增报废计划</h2>
         <div class="scrap-detail-header-actions">
           <button type="button" class="btn-scrap-progress" id="btnOpenPlanModalProgress">流程进度</button>
-          <button class="modal-close" id="btnClosePlanModal" aria-label="关闭">×</button>
+        <button class="modal-close" id="btnClosePlanModal" aria-label="关闭">×</button>
         </div>
       </div>
       <div class="modal-body" style="display:block;">
@@ -924,7 +924,7 @@
           <button type="button" id="btnOpenAssetPick" class="btn-sub" style="float:right;font-size:12px;padding:3px 12px;height:26px;background:#e6f4ff;color:#1677ff;border:1px solid #91caff;border-radius:6px;cursor:pointer;font-weight:normal;">
             <i class="fa-solid fa-plus"></i> 选择报废物资
           </button>
-        </div>
+          </div>
         <div style="border:1px solid #e8eef7;border-radius:8px;overflow:hidden;margin-bottom:8px;">
           <div style="max-height:320px;overflow:auto;">
             <table class="plan-item-table" id="planItemTable">
@@ -951,7 +951,7 @@
           </div>
           <div id="planItemEmpty" style="text-align:center;color:#8ca0b8;padding:28px;font-size:13px;">
             暂无物资，请点击右上角「<strong style="color:#1677ff;">选择报废物资</strong>」按钮添加
-          </div>
+        </div>
         </div>
         <div class="plan-summary" id="planItemSummary">
           <span>已选 <b id="planItemCount">0</b> 件物资</span>
@@ -1051,8 +1051,8 @@
                 <th>采购时间</th><th>拟报废原因</th>
               </tr>
             </thead>
-            <tbody id="planDetailAssetBody"></tbody>
-          </table>
+          <tbody id="planDetailAssetBody"></tbody>
+        </table>
         </div>
         <div style="margin-top:8px;font-size:12px;color:#64748b;">审批流程：部门审批 → 总办会/董事会审批 → 通过后挂北交所拍卖</div>
         <table class="view-mini-table" style="margin-top:8px;">
@@ -2477,9 +2477,12 @@
             "</tr>";
         }).join("");
         document.getElementById("planDetailRecordBody").innerHTML =
-          "<tr><td>申请部门负责人意见及签字</td><td>申请部门负责人</td><td>" + (item.status === "rejected" ? "驳回" : "同意") + "</td><td>" + (item.submitDate || "-") + "</td><td>" + (item.status === "rejected" ? "驳回" : "完成") + "</td></tr>" +
-          "<tr><td>管理处置部门专责意见及签字</td><td>管理处置部门专责</td><td>" + (item.status === "rejected" ? "驳回" : "同意") + "</td><td>-</td><td>" + (item.status === "rejected" ? "驳回" : "完成") + "</td></tr>" +
-          "<tr><td>管理处置部门负责人意见及签字</td><td>管理处置部门负责人</td><td>" + (item.status === "approved" ? "通过" : item.status === "review" ? "审批中" : "-") + "</td><td>-</td><td>" + (item.status === "approved" ? "完成" : "待处理") + "</td></tr>";
+          "<tr><td>业务部门开始提报次年报废计划</td><td>" + escHtml(item.applicant || currentUser) + "</td><td>于" + (item.submitDate || "-") + "执行业务部门开始提报次年报废计划，梳理" + (item.dept || currentDept) + "次年拟报废物资范围，处理结果为已通过。</td><td>" + (item.submitDate || "-") + "</td><td>已通过</td></tr>" +
+          "<tr><td>业务部门提交报废计划</td><td>" + escHtml(item.applicant || currentUser) + "</td><td>于" + (item.submitDate || "-") + "执行业务部门提交报废计划，提交报废计划、拟报废物资明细及报废说明，处理结果为已通过。</td><td>" + (item.submitDate || "-") + "</td><td>已通过</td></tr>" +
+          "<tr><td>业务部门负责人审批</td><td>李仁堂</td><td>于" + (item.submitDate || "-") + "执行业务部门负责人审批，确认报废计划内容完整并同意提交后续审批，处理结果为已通过。</td><td>" + (item.submitDate || "-") + "</td><td>已通过</td></tr>" +
+          "<tr><td>物资管理部门的物资专责汇总且物资管理部门负责人审批</td><td>宋中波</td><td>于" + (item.submitDate || "-") + "执行物资管理部门的物资专责汇总且物资管理部门负责人审批，汇总拟报废物资清单并确认处置路径，处理结果为已通过。</td><td>" + (item.submitDate || "-") + "</td><td>已通过</td></tr>" +
+          "<tr><td>财务部负责人审批</td><td>孙睿</td><td>待执行财务部负责人审批，待审核资产原值、累计折旧、净值及账务处理口径，处理结果为待处理。</td><td>-</td><td>待处理</td></tr>" +
+          "<tr><td>物资管理部门物资专责存档，报废结束</td><td>宋中波</td><td>待执行物资管理部门物资专责存档，报废结束，待审批完成后归档报废计划、审批记录及资产清单，处理结果为未到达。</td><td>-</td><td>未到达</td></tr>";
         document.getElementById("planDetailMask").classList.add("show");
       }
       function closePlanDetail() {
