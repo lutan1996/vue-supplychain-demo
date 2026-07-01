@@ -745,7 +745,10 @@
     <div class="modal" role="dialog" aria-modal="true" aria-labelledby="applyModalTitle" style="width:min(1100px,98vw);">
       <div class="modal-header">
         <h2 class="modal-title" id="applyModalTitle">新增退役及报废申请</h2>
-        <button class="modal-close" id="btnCloseModal" aria-label="关闭">×</button>
+        <div class="scrap-detail-header-actions">
+          <button type="button" class="btn-scrap-progress" id="btnOpenApplyModalProgress">流程进度</button>
+          <button class="modal-close" id="btnCloseModal" aria-label="关闭">×</button>
+        </div>
       </div>
       <div class="modal-body" style="max-height:72vh;overflow-y:auto;padding:14px 16px;">
         <!-- 第一部分：基本信息 -->
@@ -872,11 +875,11 @@
             <div class="flow-nodes">
               <div class="flow-node" data-flow-tip="">业务部门开始提报次年报废计划</div>
               <div class="flow-arrow" aria-hidden="true">→</div>
+              <div class="flow-node" data-flow-tip="">业务部门提交报废计划</div>
+              <div class="flow-arrow" aria-hidden="true">→</div>
               <div class="flow-node" data-flow-tip="">业务部门负责人审批</div>
               <div class="flow-arrow" aria-hidden="true">→</div>
-              <div class="flow-node" data-flow-tip="">物资管理部门物资专责汇总</div>
-              <div class="flow-arrow" aria-hidden="true">→</div>
-              <div class="flow-node" data-flow-tip="">物资管理部门负责人审批</div>
+              <div class="flow-node" data-flow-tip="">物资管理部门物资专责汇总且物资管理部门负责人审批</div>
               <div class="flow-arrow" aria-hidden="true">→</div>
               <div class="flow-node" data-flow-tip="">财务部负责人审批</div>
               <div class="flow-arrow" aria-hidden="true">→</div>
@@ -899,7 +902,10 @@
     <div class="modal" role="dialog" aria-modal="true" aria-labelledby="planModalTitle" style="width:min(1160px,98vw);">
       <div class="modal-header">
         <h2 class="modal-title" id="planModalTitle">新增报废计划</h2>
-        <button class="modal-close" id="btnClosePlanModal" aria-label="关闭">×</button>
+        <div class="scrap-detail-header-actions">
+          <button type="button" class="btn-scrap-progress" id="btnOpenPlanModalProgress">流程进度</button>
+          <button class="modal-close" id="btnClosePlanModal" aria-label="关闭">×</button>
+        </div>
       </div>
       <div class="modal-body" style="display:block;">
         <div class="apply-tip" style="margin:0 0 10px;">
@@ -1374,7 +1380,9 @@
         flowWrap: document.getElementById("flowWrap"),
         flowNodes: document.querySelectorAll(".flow-node"),
         progressInfoBody: document.getElementById("progressInfoBody"),
-        btnOpenPlanProgress: document.getElementById("btnOpenPlanProgress")
+        btnOpenPlanProgress: document.getElementById("btnOpenPlanProgress"),
+        btnOpenPlanModalProgress: document.getElementById("btnOpenPlanModalProgress"),
+        btnOpenApplyModalProgress: document.getElementById("btnOpenApplyModalProgress")
       };
       var activeViewItem = null;
       var activePlanItem = null;
@@ -1460,13 +1468,19 @@
         var applicant = type === "plan" ? (item.applicant || currentUser) : signerName(item.applicantSign || currentUser);
         var rejected = item && item.status === "rejected";
         var pending = item && (item.status === "pending" || item.status === "review");
+        var t1 = baseDate + " 09:00:12";
+        var t2 = baseDate + " 09:18:30";
+        var t3 = baseDate + " 10:05:18";
+        var t4 = baseDate + " 10:42:06";
+        var t5 = pending ? "-" : baseDate + " 11:26:40";
+        var t6 = pending ? "-" : baseDate + " 11:48:15";
         return [
-          { node: "业务部门开始提报次年报废计划", user: applicant, time: baseDate + " 09:00:12", content: dept + "发起报废计划填报，梳理拟报废物资范围。", result: "已完成" },
-          { node: "业务部门负责人审批", user: "业务部门负责人", time: baseDate + " 10:05:18", content: rejected ? "审核报废计划，要求补充资产状态及报废依据。" : "确认报废计划内容完整，同意提交后续审批。", result: rejected ? "驳回" : "通过" },
-          { node: "物资管理部门物资专责汇总", user: "物资管理部门物资专责", time: baseDate + " 10:22:05", content: "汇总拟报废物资清单，核对资产编号、数量及净值。", result: rejected ? "未到达" : "已完成" },
-          { node: "物资管理部门负责人审批", user: "物资管理部门负责人", time: baseDate + " 10:42:06", content: rejected ? "驳回" : "审核物资清单及处置路径，确认可进入财务审批环节。", result: rejected ? "驳回" : "通过" },
-          { node: "财务部负责人审批", user: "财务部负责人", time: pending ? "-" : baseDate + " 11:26:40", content: pending ? "待财务负责人审核原值、净值及账务处理口径。" : "审核财务账面信息，确认报废计划可进入存档。", result: pending ? "待处理" : "通过" },
-          { node: "物资管理部门物资专责存档，报废结束", user: "物资管理部门物资专责", time: pending ? "-" : baseDate + " 11:48:15", content: pending ? "待审批完成后归档报废材料。" : "归档报废计划、审批记录及资产清单，流程结束。", result: pending ? "未到达" : "报废结束" }
+          { node: "业务部门开始提报次年报废计划", user: applicant, time: t1, content: applicant + "于" + t1 + "执行业务部门开始提报次年报废计划，梳理" + dept + "次年拟报废物资范围，处理结果为已通过。", result: "已通过" },
+          { node: "业务部门提交报废计划", user: applicant, time: t2, content: applicant + "于" + t2 + "执行业务部门提交报废计划，提交报废计划、拟报废物资明细及报废说明，处理结果为已通过。", result: "已通过" },
+          { node: "业务部门负责人审批", user: "李仁堂", time: t3, content: rejected ? "李仁堂于" + t3 + "执行业务部门负责人审批，要求补充资产状态及报废依据，处理结果为驳回。" : "李仁堂于" + t3 + "执行业务部门负责人审批，确认报废计划内容完整并同意提交后续审批，处理结果为已通过。", result: rejected ? "驳回" : "已通过" },
+          { node: "物资管理部门物资专责汇总且物资管理部门负责人审批", user: "宋中波", time: t4, content: rejected ? "宋中波于" + t4 + "执行物资管理部门物资专责汇总且物资管理部门负责人审批，复核未通过并退回业务部门补正，处理结果为驳回。" : "宋中波于" + t4 + "执行物资管理部门物资专责汇总且物资管理部门负责人审批，汇总拟报废物资清单并确认处置路径，处理结果为已通过。", result: rejected ? "驳回" : "已通过" },
+          { node: "财务部负责人审批", user: "孙睿", time: t5, content: pending ? "孙睿待执行财务部负责人审批，待审核资产原值、累计折旧、净值及账务处理口径，处理结果为待处理。" : "孙睿于" + t5 + "执行财务部负责人审批，审核资产原值、累计折旧、净值及账务处理口径，处理结果为已通过。", result: pending ? "待处理" : "已通过" },
+          { node: "物资管理部门物资专责存档，报废结束", user: "宋中波", time: t6, content: pending ? "宋中波待执行物资管理部门物资专责存档，报废结束，待审批完成后归档报废计划、审批记录及资产清单，处理结果为未到达。" : "宋中波于" + t6 + "执行物资管理部门物资专责存档，报废结束，归档报废计划、审批记录及资产清单，处理结果为报废结束。", result: pending ? "未到达" : "报废结束" }
         ];
       }
 
@@ -1474,7 +1488,7 @@
         var rows = progressRows(item, type);
         refs.progressInfoBody.innerHTML = rows.map(function(r, i) {
           var isLast = i === rows.length - 1;
-          var resultColor = r.result === "已完成" || r.result === "通过" || r.result === "报废结束" ? "#10b981" : 
+          var resultColor = r.result === "已完成" || r.result === "通过" || r.result === "已通过" || r.result === "报废结束" ? "#10b981" : 
                            r.result === "待处理" || r.result === "驳回" ? "#f59e0b" : "#64748b";
           return '<div style="display:flex;gap:0;align-items:flex-start;position:relative">' +
             '<div style="display:flex;flex-direction:column;align-items:center;flex-shrink:0;width:24px">' +
@@ -1809,6 +1823,32 @@
           if (e.stopImmediatePropagation) e.stopImmediatePropagation();
           if (!activePlanItem) return;
           openProgressModal(activePlanItem, "plan");
+        });
+      }
+      if (refs.btnOpenPlanModalProgress) {
+        refs.btnOpenPlanModalProgress.addEventListener("click", function (e) {
+          e.preventDefault();
+          e.stopPropagation();
+          if (e.stopImmediatePropagation) e.stopImmediatePropagation();
+          openProgressModal({
+            dept: (document.getElementById("planDeptInput").value || currentDept).trim(),
+            applicant: (document.getElementById("planUserInput").value || currentUser).trim(),
+            submitDate: document.getElementById("planDateInput").value || new Date().toISOString().slice(0, 10),
+            status: "review"
+          }, "plan");
+        });
+      }
+      if (refs.btnOpenApplyModalProgress) {
+        refs.btnOpenApplyModalProgress.addEventListener("click", function (e) {
+          e.preventDefault();
+          e.stopPropagation();
+          if (e.stopImmediatePropagation) e.stopImmediatePropagation();
+          openProgressModal({
+            applyDept: (refs.applyDept.value || currentDept).trim(),
+            applicantSign: (refs.applicantSign.value || currentUser).trim(),
+            applyDate: refs.applyDate.value || new Date().toISOString().slice(0, 10),
+            status: "review"
+          }, "apply");
         });
       }
       refs.flowTabs.forEach(function (tab) {
