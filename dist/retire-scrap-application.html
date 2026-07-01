@@ -823,32 +823,6 @@
         </div>
       </div>
 
-  <div class="modal-mask" id="applyItemModalMask" aria-hidden="true">
-    <div class="modal" role="dialog" style="width:min(640px,96vw);">
-      <div class="modal-header">
-        <h2 class="modal-title">添加报废物资</h2>
-        <button class="modal-close" id="btnCloseApplyItem" aria-label="关闭">×</button>
-      </div>
-      <div class="modal-body" style="display:grid;grid-template-columns:1fr 1fr;gap:10px 14px;">
-        <div><label style="display:block;font-size:12px;color:#516a87;margin-bottom:4px;">起产名称</label>
-          <select id="aiAssetName" style="width:100%;height:32px;border:1px solid #d7e1ee;border-radius:6px;padding:0 8px;font-size:13px;"><option value="">请选择起产</option></select>
-        </div>
-        <div><label style="display:block;font-size:12px;color:#516a87;margin-bottom:4px;">起产编号</label><input id="aiAssetCode" readonly style="width:100%;height:32px;border:1px solid #d7e1ee;border-radius:6px;padding:0 10px;font-size:14px;background:#f5f5f5;color:#8c8c8c;" /></div>
-        <div><label style="display:block;font-size:12px;color:#516a87;margin-bottom:4px;">规格型号</label><input id="aiAssetModel" readonly style="width:100%;height:32px;border:1px solid #d7e1ee;border-radius:6px;padding:0 10px;font-size:14px;background:#f5f5f5;color:#8c8c8c;" /></div>
-        <div><label style="display:block;font-size:12px;color:#516a87;margin-bottom:4px;">存放地点</label><input id="aiAssetLocation" readonly style="width:100%;height:32px;border:1px solid #d7e1ee;border-radius:6px;padding:0 10px;font-size:14px;background:#f5f5f5;color:#8c8c8c;" /></div>
-        <div><label style="display:block;font-size:12px;color:#516a87;margin-bottom:4px;">原值(元)</label><input id="aiOrigin" readonly style="width:100%;height:32px;border:1px solid #d7e1ee;border-radius:6px;padding:0 10px;font-size:14px;background:#f5f5f5;color:#8c8c8c;" /></div>
-        <div><label style="display:block;font-size:12px;color:#516a87;margin-bottom:4px;">净值(元)</label><input id="aiNet" readonly style="width:100%;height:32px;border:1px solid #d7e1ee;border-radius:6px;padding:0 10px;font-size:14px;background:#f5f5f5;color:#8c8c8c;" /></div>
-        <div><label style="display:block;font-size:12px;color:#516a87;margin-bottom:4px;">数量</label><input id="aiQty" type="number" min="1" value="1" style="width:100%;height:32px;border:1px solid #d7e1ee;border-radius:6px;padding:0 10px;font-size:14px;" /></div>
-        <div></div>
-        <div style="grid-column:1/-1;"><label style="display:block;font-size:12px;color:#516a87;margin-bottom:4px;">拟报废原因</label><textarea id="aiReason" style="width:100%;height:60px;border:1px solid #d7e1ee;border-radius:6px;padding:6px 10px;font-size:14px;resize:vertical;" placeholder="请填写该物资拟报废原因"></textarea></div>
-      </div>
-      <div class="modal-footer">
-        <button class="btn" id="btnCancelApplyItem">取消</button>
-        <button class="btn btn-primary" id="btnConfirmApplyItem">确认添加</button>
-      </div>
-    </div>
-  </div>
-
   <div class="modal-mask" id="viewModalMask" aria-hidden="true">
     <div class="modal modal--scrap-detail" role="dialog" aria-modal="true" aria-labelledby="viewModalTitle">
       <div class="modal-header scrap-detail-header">
@@ -1344,36 +1318,20 @@
         btnCloseModal: document.getElementById("btnCloseModal"),
         btnCancel: document.getElementById("btnCancel"),
         btnSubmit: document.getElementById("btnSubmitApply"),
-        applyDept: document.getElementById("applyDept"),
-        applyDate: document.getElementById("applyDate"),
-        stackLocation: document.getElementById("stackLocation"),
-        scrapReason: document.getElementById("scrapReason"),
-        applicantSign: document.getElementById("applicantSign"),
-        deptHeadOpinion: document.getElementById("deptHeadOpinion"),
-        manageSpecialOpinion: document.getElementById("manageSpecialOpinion"),
-        manageHeadOpinion: document.getElementById("manageHeadOpinion"),
-        financeOpinionInput: document.getElementById("financeOpinionInput"),
-        archiveRecordInput: document.getElementById("archiveRecordInput"),
-        applyItemBody: document.getElementById("applyItemBody"),
-        btnAddApplyItem: document.getElementById("btnAddApplyItem"),
-        applyItemCount: document.getElementById("applyItemCount"),
-        applyItemEmpty: document.getElementById("applyItemEmpty"),
-        applyItemTotal: document.getElementById("applyItemTotal"),
-        applyOriginSum: document.getElementById("applyOriginSum"),
-        applyNetSum: document.getElementById("applyNetSum"),
-        applyEvalTip: document.getElementById("applyEvalTip"),
-        applyItemModalMask: document.getElementById("applyItemModalMask"),
-        btnCloseApplyItem: document.getElementById("btnCloseApplyItem"),
-        btnCancelApplyItem: document.getElementById("btnCancelApplyItem"),
-        btnConfirmApplyItem: document.getElementById("btnConfirmApplyItem"),
-        aiAssetName: document.getElementById("aiAssetName"),
-        aiAssetCode: document.getElementById("aiAssetCode"),
-        aiAssetModel: document.getElementById("aiAssetModel"),
-        aiAssetLocation: document.getElementById("aiAssetLocation"),
-        aiOrigin: document.getElementById("aiOrigin"),
-        aiNet: document.getElementById("aiNet"),
-        aiQty: document.getElementById("aiQty"),
-        aiReason: document.getElementById("aiReason"),
+        btnCloseModal: document.getElementById("btnCloseModal"),
+        btnCancel: document.getElementById("btnCancel"),
+        applyModalMask: document.getElementById("applyModalMask"),
+        btnOpenApplyModalProgress: document.getElementById("btnOpenApplyModalProgress"),
+        btnApplyPrint: document.getElementById("btnApplyPrint"),
+        btnApplyDownload: document.getElementById("btnApplyDownload"),
+        applyOnlineBody: document.getElementById("applyOnlineBody"),
+        applyOnlineEmpty: document.getElementById("applyOnlineEmpty"),
+        applyDetailBody: document.getElementById("applyDetailBody"),
+        applyDetailEmpty: document.getElementById("applyDetailEmpty"),
+        applyDetailCount: document.getElementById("applyDetailCount"),
+        applyDetailOriginSum: document.getElementById("applyDetailOriginSum"),
+        applyDetailDepSum: document.getElementById("applyDetailDepSum"),
+        applyDetailNetSum: document.getElementById("applyDetailNetSum"),
         viewModalMask: document.getElementById("viewModalMask"),
         btnCloseViewModal: document.getElementById("btnCloseViewModal"),
         btnViewClose: document.getElementById("btnViewClose"),
@@ -1500,25 +1458,14 @@
           var isLast = i === rows.length - 1;
           var resultColor = r.result === "已完成" || r.result === "通过" || r.result === "已通过" || r.result === "报废结束" ? "#10b981" :
                            r.result === "待处理" || r.result === "驳回" ? "#f59e0b" : "#64748b";
-          var timeColor = r.time && r.time.indexOf("-") >= 0 ? "#d48806" : "#1f2d3d";
-          return '<div style="display:flex;align-items:flex-start;gap:12px;padding-bottom:' + (isLast ? '0' : '22px') + ';position:relative">' +
-            '<div style="display:flex;flex-direction:column;align-items:center;flex-shrink:0">' +
-              '<div style="width:10px;height:10px;border-radius:50%;background:' + resultColor + ';margin-top:6px"></div>' +
-              (!isLast ? '<div style="width:2px;flex:1;background:#e5e7eb;margin-top:6px;min-height:36px"></div>' : '') +
+          return '<div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid #f0f2f5;">' +
+            '<div style="display:flex;align-items:center;gap:10px;min-width:0;">' +
+              '<span style="font-weight:600;color:#1f2d3d;font-size:13px;">' + escHtml(r.node) + '</span>' +
+              '<span style="color:#64748b;font-size:12px;">' + escHtml(r.user) + ' ' + escHtml(r.time) + '</span>' +
             '</div>' +
-            '<div style="flex:1;min-width:0;border-left:1px solid #e5e7eb;padding-left:12px">' +
-              '<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:4px">' +
-                '<span style="font-weight:600;color:#1f2d3d;font-size:13px">' + escHtml(r.node) + '</span>' +
-                '<span style="padding:2px 8px;border-radius:4px;font-size:12px;font-weight:500;background:' + resultColor + '14;color:' + resultColor + ';border:1px solid ' + resultColor + '33">' + escHtml(r.result) + '</span>' +
-              '</div>' +
-              '<div style="display:flex;align-items:center;gap:10px;color:#64748b;font-size:12px;margin-bottom:4px">' +
-                '<span>' + escHtml(r.user) + '</span>' +
-                '<span style="color:#cbd5e1">|</span>' +
-                '<span>' + escHtml(r.time) + '</span>' +
-              '</div>' +
-              '<div style="font-size:13px;color:#334155;line-height:1.6">' + escHtml(r.content) + '</div>' +
-            '</div>' +
-          '</div>';
+            '<span style="padding:2px 10px;border-radius:4px;font-size:12px;font-weight:500;background:' + resultColor + '22;color:' + resultColor + ';">' + escHtml(r.result) + '</span>' +
+          '</div>' +
+          '<div style="padding:4px 0 0;font-size:13px;color:#334155;line-height:1.6;">' + escHtml(r.content) + '</div>';
         }).join("");
       }
 
@@ -1753,68 +1700,82 @@
         render(rows);
       }
 
-      function activeMaterials() {
-        return materialLedger.filter(function (x) { return x.status === "在用"; });
-      }
+      var applyDetailRows = [];
+      var applySelectedAssetId = null;
 
-      function fillDeviceOptions() {
-        refs.aiAssetName.innerHTML = '<option value="">请选择资产</option>';
-        activeMaterials().forEach(function (x) {
-          var opt = document.createElement("option");
-          opt.value = x.code;
-          opt.textContent = x.name;
-          refs.aiAssetName.appendChild(opt);
-        });
-      }
-
-      var applyItemRows = [];
-
-      function refreshApplyItemTable() {
-        var body = refs.applyItemBody;
+      function refreshApplyOnlineTable() {
+        var body = refs.applyOnlineBody;
         body.innerHTML = "";
-        if (!applyItemRows.length) {
-          refs.applyItemEmpty.style.display = "block";
-          refs.applyItemCount.textContent = "共 0 条";
-          refs.applyItemTotal.textContent = "0";
-          refs.applyOriginSum.textContent = "¥ 0.00";
-          refs.applyNetSum.textContent = "¥ 0.00";
-          refs.applyEvalTip.textContent = "";
-          return;
-        }
-        refs.applyItemEmpty.style.display = "none";
-        var total = 0, oSum = 0, nSum = 0;
-        applyItemRows.forEach(function (row, idx) {
+        var rows = activeMaterials();
+        rows.forEach(function (asset) {
+          var fin = financeBook[asset.id] || { originValue: 0, netValue: 0 };
+          var tr = document.createElement("tr");
+          tr.innerHTML =
+            '<td style="padding:8px 10px;border-bottom:1px solid #f0f2f5;">' + escHtml(asset.name) + '</td>' +
+            '<td style="padding:8px 10px;border-bottom:1px solid #f0f2f5;">' + escHtml(assetProductCode(asset)) + '</td>' +
+            '<td style="padding:8px 10px;border-bottom:1px solid #f0f2f5;word-break:break-all;">' + escHtml(asset.manufacturer || "-") + '</td>' +
+            '<td style="padding:8px 10px;border-bottom:1px solid #f0f2f5;">' + escHtml(asset.model || "-") + '</td>' +
+            '<td style="padding:8px 10px;border-bottom:1px solid #f0f2f5;">' + escHtml(assetTypeCode(asset)) + '</td>' +
+            '<td style="padding:8px 10px;border-bottom:1px solid #f0f2f5;">' + escHtml(assetCategory(asset)) + '</td>' +
+            '<td style="padding:8px 10px;border-bottom:1px solid #f0f2f5;text-align:center;">' + escHtml(asset.unit || "台") + '</td>' +
+            '<td style="padding:8px 10px;border-bottom:1px solid #f0f2f5;text-align:right;">' + fmtWan(fin.originValue) + '</td>' +
+            '<td style="padding:8px 10px;border-bottom:1px solid #f0f2f5;text-align:right;">' + fmtWan(fin.originValue - fin.netValue) + '</td>' +
+            '<td style="padding:8px 10px;border-bottom:1px solid #f0f2f5;text-align:right;">' + fmtWan(fin.netValue) + '</td>' +
+            '<td style="padding:8px 10px;border-bottom:1px solid #f0f2f5;text-align:center;">' + escHtml(asset.purchaseDate || "-") + '</td>' +
+            '<td style="padding:8px 10px;border-bottom:1px solid #f0f2f5;"></td>';
+          tr.style.cursor = "pointer";
+          body.appendChild(tr);
+        });
+        refs.applyOnlineEmpty.style.display = rows.length ? "none" : "block";
+      }
+
+      function refreshApplyDetailTable() {
+        var body = refs.applyDetailBody;
+        body.innerHTML = "";
+        var total = 0, oSum = 0, dSum = 0, nSum = 0;
+        applyDetailRows.forEach(function (row, idx) {
           total += Number(row.qty) || 0;
           oSum += (Number(row.origin) || 0) * (Number(row.qty) || 1);
+          dSum += (Number(row.dep) || 0) * (Number(row.qty) || 1);
           nSum += (Number(row.net) || 0) * (Number(row.qty) || 1);
           var tr = document.createElement("tr");
           tr.innerHTML =
-            '<td style="padding:8px 6px;text-align:center;color:#64748b;">' + (idx + 1) + '</td>' +
-            '<td style="padding:8px 6px;">' + escHtml(row.code) + '</td>' +
-            '<td style="padding:8px 6px;">' + escHtml(row.name) + '</td>' +
-            '<td style="padding:8px 6px;">' + escHtml(row.model || "-") + '</td>' +
-            '<td style="padding:8px 6px;text-align:right;">' + fmtMoney(row.origin) + '</td>' +
-            '<td style="padding:8px 6px;text-align:right;">' + fmtMoney(row.net) + '</td>' +
-            '<td style="padding:8px 6px;text-align:center;">' + (Number(row.qty) || 1) + '</td>' +
-            '<td style="padding:8px 6px;font-size:12px;color:#334155;max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="' + escHtml(row.reason) + '">' + escHtml(row.reason || "-") + '</td>' +
-            '<td style="padding:8px 6px;text-align:center;"><a href="#" class="ai-remove" data-idx="' + idx + '" style="color:#cf1322;font-size:12px;">移除</a></td>';
+            '<td style="padding:8px 10px;border-bottom:1px solid #f0f2f5;">' + escHtml(row.name) + '</td>' +
+            '<td style="padding:8px 10px;border-bottom:1px solid #f0f2f5;">' + escHtml(row.code) + '</td>' +
+            '<td style="padding:8px 10px;border-bottom:1px solid #f0f2f5;word-break:break-all;">' + escHtml(row.manufacturer || "-") + '</td>' +
+            '<td style="padding:8px 10px;border-bottom:1px solid #f0f2f5;">' + escHtml(row.model || "-") + '</td>' +
+            '<td style="padding:8px 10px;border-bottom:1px solid #f0f2f5;">' + escHtml(row.typeCode || "-") + '</td>' +
+            '<td style="padding:8px 10px;border-bottom:1px solid #f0f2f5;">' + escHtml(row.category || "-") + '</td>' +
+            '<td style="padding:8px 10px;border-bottom:1px solid #f0f2f5;text-align:center;">' + escHtml(row.unit || "台") + '</td>' +
+            '<td style="padding:8px 10px;border-bottom:1px solid #f0f2f5;text-align:center;"><input type="number" min="1" class="ap-qty" data-idx="' + idx + '" value="' + escHtml(row.qty || "") + '" placeholder="请输入数量" style="width:80px;height:28px;border:1px solid #d7e1ee;border-radius:6px;padding:0 8px;text-align:center;" /></td>' +
+            '<td style="padding:8px 10px;border-bottom:1px solid #f0f2f5;text-align:right;">' + fmtWan(oSumForRow(row)) + '</td>' +
+            '<td style="padding:8px 10px;border-bottom:1px solid #f0f2f5;text-align:right;">' + fmtWan(dSumForRow(row)) + '</td>' +
+            '<td style="padding:8px 10px;border-bottom:1px solid #f0f2f5;text-align:right;">' + fmtWan(nSumForRow(row)) + '</td>' +
+            '<td style="padding:8px 10px;border-bottom:1px solid #f0f2f5;text-align:center;">' + escHtml(row.purchaseDate || "-") + '</td>' +
+            '<td style="padding:8px 10px;border-bottom:1px solid #f0f2f5;"><textarea class="ap-reason" data-idx="' + idx + '" rows="2" placeholder="填写报废原因" style="width:100%;height:40px;border:1px solid #d7e1ee;border-radius:6px;padding:4px 8px;resize:vertical;">' + escHtml(row.reason || "") + '</textarea></td>' +
+            '<td style="padding:8px 10px;border-bottom:1px solid #f0f2f5;text-align:center;"><a href="#" class="ap-del" data-idx="' + idx + '" style="color:#cf1322;font-size:12px;">移除</a></td>';
           body.appendChild(tr);
         });
-        refs.applyItemCount.textContent = "共 " + applyItemRows.length + " 条";
-        refs.applyItemTotal.textContent = String(total);
-        refs.applyOriginSum.textContent = "¥ " + fmtMoney(oSum);
-        refs.applyNetSum.textContent = "¥ " + fmtMoney(nSum);
-        if (nSum >= 1000000) {
-          refs.applyEvalTip.textContent = "⚠ 净值合计超过100万元，需进行设备评估";
-          refs.applyEvalTip.style.color = "#d48806";
-        } else {
-          refs.applyEvalTip.textContent = "✓ 净值合计未超过100万元，无需评估";
-          refs.applyEvalTip.style.color = "#389e0d";
-        }
+        refs.applyDetailEmpty.style.display = applyDetailRows.length ? "none" : "block";
+        refs.applyDetailCount.textContent = String(total);
+        refs.applyDetailOriginSum.textContent = "¥ " + fmtMoney(oSum);
+        refs.applyDetailDepSum.textContent = "¥ " + fmtMoney(dSum);
+        refs.applyDetailNetSum.textContent = "¥ " + fmtMoney(nSum);
       }
 
-      function openModal() {
-        applyItemRows = [];
+      function oSumForRow(row) {
+        return (Number(row.origin) || 0) * (Number(row.qty) || 1);
+      }
+      function dSumForRow(row) {
+        return (Number(row.dep) || 0) * (Number(row.qty) || 1);
+      }
+      function nSumForRow(row) {
+        return (Number(row.net) || 0) * (Number(row.qty) || 1);
+      }
+
+      function openApplyModal() {
+        applyDetailRows = [];
+        applySelectedAssetId = null;
         refs.applyDept.value = "设备运维部";
         refs.applyDate.value = new Date().toISOString().slice(0, 10);
         refs.stackLocation.value = "";
@@ -1825,22 +1786,43 @@
         refs.manageHeadOpinion.value = "";
         refs.financeOpinionInput.value = "";
         refs.archiveRecordInput.value = "";
-        fillDeviceOptions();
-        refreshApplyItemTable();
-        refs.modalMask.classList.add("show");
-        refs.modalMask.setAttribute("aria-hidden", "false");
+        refreshApplyOnlineTable();
+        refreshApplyDetailTable();
+        refs.applyModalMask.classList.add("show");
+        refs.applyModalMask.setAttribute("aria-hidden", "false");
       }
 
-      function closeModal() {
-        refs.modalMask.classList.remove("show");
-        refs.modalMask.setAttribute("aria-hidden", "true");
+      function closeApplyModal() {
+        refs.applyModalMask.classList.remove("show");
+        refs.applyModalMask.setAttribute("aria-hidden", "true");
       }
 
-      refs.btnCreate.addEventListener("click", openModal);
-      refs.btnCloseModal.addEventListener("click", closeModal);
-      refs.btnCancel.addEventListener("click", closeModal);
-      refs.modalMask.addEventListener("click", function (e) {
-        if (e.target === refs.modalMask) closeModal();
+      function addToApplyDetail(asset) {
+        var fin = financeBook[asset.id] || { originValue: 0, netValue: 0 };
+        var reason = "";
+        applyDetailRows.push({
+          id: asset.id,
+          code: asset.id,
+          name: asset.name,
+          manufacturer: asset.manufacturer,
+          model: asset.model,
+          typeCode: assetTypeCode(asset),
+          category: assetCategory(asset),
+          unit: asset.unit || "台",
+          origin: fin.originValue,
+          dep: (Number(fin.originValue) || 0) - (Number(fin.netValue) || 0),
+          net: fin.netValue,
+          qty: 1,
+          reason: reason,
+          purchaseDate: asset.purchaseDate || "-"
+        });
+        refreshApplyDetailTable();
+      }
+      refs.btnCreate.addEventListener("click", openApplyModal);
+      refs.btnCloseModal.addEventListener("click", closeApplyModal);
+      refs.btnCancel.addEventListener("click", closeApplyModal);
+      refs.applyModalMask.addEventListener("click", function (e) {
+        if (e.target === refs.applyModalMask) closeApplyModal();
       });
       refs.btnCloseViewModal.addEventListener("click", closeViewModal);
       refs.btnViewClose.addEventListener("click", closeViewModal);
@@ -1887,9 +1869,9 @@
           e.stopPropagation();
           if (e.stopImmediatePropagation) e.stopImmediatePropagation();
           openProgressModal({
-            applyDept: (refs.applyDept.value || currentDept).trim(),
-            applicantSign: (refs.applicantSign.value || currentUser).trim(),
-            applyDate: refs.applyDate.value || new Date().toISOString().slice(0, 10),
+            applyDept: ((document.getElementById("applyDept") || {}).value || currentDept).trim(),
+            applicantSign: ((document.getElementById("applicantSign") || {}).value || currentUser).trim(),
+            applyDate: ((document.getElementById("applyDate") || {}).value || new Date().toISOString().slice(0, 10)),
             status: "review"
           }, "apply");
         });
@@ -1921,98 +1903,39 @@
         });
       });
       refs.btnSubmit.addEventListener("click", function () {
-        if (!applyItemRows.length) {
+        if (!applyDetailRows.length) {
           alert("请至少添加一条报废物资。");
           return;
         }
-        var date = refs.applyDate.value || new Date().toISOString().slice(0, 10);
-        var nameQtyParts = applyItemRows.map(function (r) { return r.name + " x " + (Number(r.qty) || 1); });
-        var assetListParts = applyItemRows.map(function (r) { return r.code + "：" + r.name + "（" + (Number(r.qty) || 1) + "台）"; });
+        var date = (document.getElementById("applyDate") || {}).value || new Date().toISOString().slice(0, 10);
+        var nameQtyParts = applyDetailRows.map(function (r) { return r.name + " x " + (Number(r.qty) || 1); });
+        var assetListParts = applyDetailRows.map(function (r) { return r.code + "：" + r.name + "（" + (Number(r.qty) || 1) + "台）"; });
         var oSum = 0, nSum = 0;
-        applyItemRows.forEach(function (r) {
+        applyDetailRows.forEach(function (r) {
           oSum += (Number(r.origin) || 0) * (Number(r.qty) || 1);
           nSum += (Number(r.net) || 0) * (Number(r.qty) || 1);
         });
         applications.unshift({
           applyNo: genApplyNo(),
-          applyDept: (refs.applyDept.value || "设备运维部").trim(),
+          applyDept: ((document.getElementById("applyDept") || {}).value || "设备运维部").trim(),
           applyDate: date,
           assetNameQty: nameQtyParts.join("；"),
           assetList: assetListParts.join("；"),
-          stackLocation: (refs.stackLocation.value || "待补充").trim(),
-          scrapReason: (refs.scrapReason.value || "").trim(),
-          applicantSign: (refs.applicantSign.value || (currentUser + "（电子签）")).trim(),
-          deptHeadOpinion: (refs.deptHeadOpinion.value || "").trim(),
-          manageSpecialOpinion: (refs.manageSpecialOpinion.value || "").trim(),
-          manageHeadOpinion: (refs.manageHeadOpinion.value || "").trim(),
-          financeOpinion: (refs.financeOpinionInput.value || "").trim(),
-          archiveRecord: (refs.archiveRecordInput.value || "").trim(),
+          stackLocation: ((document.getElementById("stackLocation") || {}).value || "待补充").trim(),
+          scrapReason: ((document.getElementById("scrapReason") || {}).value || "").trim(),
+          applicantSign: ((document.getElementById("applicantSign") || {}).value || (currentUser + "（电子签）")).trim(),
+          deptHeadOpinion: ((document.getElementById("deptHeadOpinion") || {}).value || "").trim(),
+          manageSpecialOpinion: ((document.getElementById("manageSpecialOpinion") || {}).value || "").trim(),
+          manageHeadOpinion: ((document.getElementById("manageHeadOpinion") || {}).value || "").trim(),
+          financeOpinion: ((document.getElementById("financeOpinionInput") || {}).value || "").trim(),
+          archiveRecord: ((document.getElementById("archiveRecordInput") || {}).value || "").trim(),
           status: "pending",
           originValue: oSum,
           netValue: nSum,
-          applyItems: applyItemRows.slice()
+          applyItems: applyDetailRows.slice()
         });
-        closeModal();
+        closeApplyModal();
         applyFilters();
-      });
-
-      // 明细表弹窗：添加物资
-      refs.btnAddApplyItem.addEventListener("click", function () {
-        fillDeviceOptions();
-        refs.aiAssetCode.value = "";
-        refs.aiAssetModel.value = "";
-        refs.aiAssetLocation.value = "";
-        refs.aiOrigin.value = "";
-        refs.aiNet.value = "";
-        refs.aiQty.value = "1";
-        refs.aiReason.value = "";
-        refs.applyItemModalMask.classList.add("show");
-      });
-      refs.btnCloseApplyItem.addEventListener("click", function () {
-        refs.applyItemModalMask.classList.remove("show");
-      });
-      refs.btnCancelApplyItem.addEventListener("click", function () {
-        refs.applyItemModalMask.classList.remove("show");
-      });
-      refs.applyItemModalMask.addEventListener("click", function (e) {
-        if (e.target === refs.applyItemModalMask) refs.applyItemModalMask.classList.remove("show");
-      });
-      refs.aiAssetName.addEventListener("change", function () {
-        var code = refs.aiAssetName.value;
-        if (!code) {
-          refs.aiAssetCode.value = ""; refs.aiAssetModel.value = "";
-          refs.aiAssetLocation.value = ""; refs.aiOrigin.value = ""; refs.aiNet.value = "";
-          return;
-        }
-        var mat = materialLedger.find(function (x) { return x.code === code; });
-        var fin = financeBook[code] || { originValue: 0, netValue: 0 };
-        refs.aiAssetCode.value = code;
-        refs.aiAssetModel.value = mat ? mat.name : "-";
-        refs.aiAssetLocation.value = "-";
-        refs.aiOrigin.value = "¥ " + fmtMoney(fin.originValue);
-        refs.aiNet.value = "¥ " + fmtMoney(fin.netValue);
-      });
-      refs.btnConfirmApplyItem.addEventListener("click", function () {
-        var code = refs.aiAssetName.value;
-        if (!code) { alert("请选择资产名称。"); return; }
-        var name = refs.aiAssetName.options[refs.aiAssetName.selectedIndex].textContent;
-        var qty = Math.max(1, parseInt(refs.aiQty.value, 10) || 1);
-        var fin = financeBook[code] || { originValue: 0, netValue: 0 };
-        var reason = refs.aiReason.value.trim();
-        applyItemRows.push({ code: code, name: name, model: refs.aiAssetModel.value || "-", origin: fin.originValue, net: fin.netValue, qty: qty, reason: reason });
-        refreshApplyItemTable();
-        refs.applyItemModalMask.classList.remove("show");
-      });
-
-      // 明细表：移除按钮
-      refs.applyItemBody.addEventListener("click", function (e) {
-        var a = e.target.closest(".ai-remove");
-        if (!a) return;
-        var idx = parseInt(a.getAttribute("data-idx"), 10);
-        if (!isNaN(idx) && idx >= 0 && idx < applyItemRows.length) {
-          applyItemRows.splice(idx, 1);
-          refreshApplyItemTable();
-        }
       });
 
       refs.tbody.addEventListener("click", function (e) {
@@ -2497,24 +2420,14 @@
                              r.result === "待处理" || r.result === "驳回" || r.result === "未到达" ? "#f59e0b" : "#64748b";
             var isLast = i === progressRows(item, "plan").length - 1;
             return '<tr><td colspan="5" style="padding:8px 0;border:none;">' +
-              '<div style="display:flex;align-items:flex-start;gap:12px;padding-bottom:' + (isLast ? '0' : '14px') + '">' +
-                '<div style="display:flex;flex-direction:column;align-items:center;flex-shrink:0">' +
-                  '<div style="width:10px;height:10px;border-radius:50%;background:' + resultColor + ';margin-top:6px"></div>' +
-                  (!isLast ? '<div style="width:2px;flex:1;background:#e5e7eb;margin-top:6px;min-height:32px"></div>' : '') +
+              '<div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid #f0f2f5;">' +
+                '<div style="display:flex;align-items:center;gap:10px;min-width:0;">' +
+                  '<span style="font-weight:600;color:#1f2d3d;font-size:13px;">' + escHtml(r.node) + '</span>' +
+                  '<span style="color:#64748b;font-size:12px;">' + escHtml(r.user) + ' ' + escHtml(r.time) + '</span>' +
                 '</div>' +
-                '<div style="flex:1;min-width:0;border-left:1px solid #e5e7eb;padding-left:12px">' +
-                  '<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:4px">' +
-                    '<span style="font-weight:600;color:#1f2d3d;font-size:13px">' + escHtml(r.node) + '</span>' +
-                    '<span style="padding:2px 8px;border-radius:4px;font-size:12px;font-weight:500;background:' + resultColor + '14;color:' + resultColor + ';border:1px solid ' + resultColor + '33">' + escHtml(r.result) + '</span>' +
-                  '</div>' +
-                  '<div style="display:flex;align-items:center;gap:10px;color:#64748b;font-size:12px;margin-bottom:4px">' +
-                    '<span>' + escHtml(r.user) + '</span>' +
-                    '<span style="color:#cbd5e1">|</span>' +
-                    '<span>' + escHtml(r.time) + '</span>' +
-                  '</div>' +
-                  '<div style="font-size:13px;color:#334155;line-height:1.6">' + escHtml(r.content) + '</div>' +
-                '</div>' +
+                '<span style="padding:2px 10px;border-radius:4px;font-size:12px;font-weight:500;background:' + resultColor + '22;color:' + resultColor + ';">' + escHtml(r.result) + '</span>' +
               '</div>' +
+              '<div style="padding:4px 0 0;font-size:13px;color:#334155;line-height:1.6;">' + escHtml(r.content) + '</div>' +
             '</td></tr>';
           }).join("");
         document.getElementById("planDetailMask").classList.add("show");
