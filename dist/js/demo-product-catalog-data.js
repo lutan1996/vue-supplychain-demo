@@ -241,15 +241,16 @@
     var marker = loadJson(STORAGE_SALES_MATERIAL_FIX, "");
     var shouldFix = marker !== "done";
     if (!shouldFix) shouldFix = String(second.productName || "").trim() !== "叶片";
-    if (!shouldFix) shouldFix = String(second.b || "").trim() !== "B00000005";
+    if (!shouldFix) shouldFix = String(second.id || "").trim() !== "demo-2";
+    if (!shouldFix) shouldFix = String(second.b || "").trim() !== "B00000002";
     if (!shouldFix) shouldFix = String(second.a || "").trim() !== "A0100200001";
     if (!shouldFix) shouldFix = String(second.mfrName || "").trim() !== "中材科技";
     if (!shouldFix) shouldFix = String(second.model || "").trim() !== "SW64-2.0";
     if (!shouldFix) shouldFix = String(second.typeName || "").trim() !== "叶片";
     if (!shouldFix) return false;
     rows[1] = {
-      id: "demo-b1",
-      b: "B00000005",
+      id: "demo-2",
+      b: "B00000002",
       a: "A0100200001",
       productName: "叶片",
       typeName: "叶片",
