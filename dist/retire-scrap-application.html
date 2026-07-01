@@ -2240,20 +2240,15 @@
           return;
         }
         box.innerHTML = rows.map(function (r, i) {
-          var isLast = i === rows.length - 1;
           var sc = "#10b981";
-          return '<div class="map-flow-tl-item' + (isLast ? ' map-flow-tl-last' : '') + '">' +
-            '<div class="map-flow-tl-dot" style="background:' + sc + '"></div>' +
-            (!isLast ? '<div class="map-flow-tl-line"></div>' : '') +
-            '<div class="map-flow-tl-body">' +
-              '<div class="map-flow-tl-meta">' +
-                '<span class="map-flow-tl-person">' + escHtml(r.person) + '</span>' +
-                '<span class="map-flow-tl-time">' + escHtml(r.time) + '</span>' +
-                '<span class="map-flow-tl-badge" style="background:#10b98122;color:#10b981">' + escHtml(r.result) + '</span>' +
-              '</div>' +
-              '<div class="map-flow-tl-content">' + escHtml(r.content) + '</div>' +
+          return '<div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid #f0f2f5;">' +
+            '<div style="display:flex;align-items:center;gap:10px;min-width:0;">' +
+              '<span style="font-weight:600;color:#1f3551;font-size:14px;">' + escHtml(r.person) + '</span>' +
+              '<span style="color:#64748b;font-size:13px;">' + escHtml(r.time) + '</span>' +
             '</div>' +
-          '</div>';
+            '<span style="padding:2px 10px;border-radius:4px;font-size:12px;font-weight:500;background:#10b98122;color:#10b981;">' + escHtml(r.result) + '</span>' +
+          '</div>' +
+          '<div style="padding:4px 0 0;font-size:13px;color:#51627a;line-height:1.7;">' + escHtml(r.content) + '</div>';
         }).join("");
       }
 
@@ -2530,20 +2525,15 @@
             var pq = planQtyNumber(item.assetQty && item.assetQty[a.id] != null ? item.assetQty[a.id] : "");
             detailRows.push({ person: (item.applicant || currentUser), time: (item.submitDate || "-") + " 00:00", result: "已登记", content: "物资「" + a.name + "」纳入报废计划，数量" + (pq || "待填") + "，" + ((item.assetReasons && item.assetReasons[a.id]) || "无报废原因") });
           });
-          detailTrackingBox.innerHTML = detailRows.map(function (r, i) {
-            var isLast = i === detailRows.length - 1;
-            return '<div class="map-flow-tl-item' + (isLast ? ' map-flow-tl-last' : '') + '">' +
-              '<div class="map-flow-tl-dot" style="background:#10b981"></div>' +
-              (!isLast ? '<div class="map-flow-tl-line"></div>' : '') +
-              '<div class="map-flow-tl-body">' +
-                '<div class="map-flow-tl-meta">' +
-                  '<span class="map-flow-tl-person">' + escHtml(r.person) + '</span>' +
-                  '<span class="map-flow-tl-time">' + escHtml(r.time) + '</span>' +
-                  '<span class="map-flow-tl-badge" style="background:#10b98122;color:#10b981">' + escHtml(r.result) + '</span>' +
-                '</div>' +
-                '<div class="map-flow-tl-content">' + escHtml(r.content) + '</div>' +
+          detailTrackingBox.innerHTML =           detailRows.map(function (r, i) {
+            return '<div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid #f0f2f5;">' +
+              '<div style="display:flex;align-items:center;gap:10px;min-width:0;">' +
+                '<span style="font-weight:600;color:#1f3551;font-size:14px;">' + escHtml(r.person) + '</span>' +
+                '<span style="color:#64748b;font-size:13px;">' + escHtml(r.time) + '</span>' +
               '</div>' +
-            '</div>';
+              '<span style="padding:2px 10px;border-radius:4px;font-size:12px;font-weight:500;background:#10b98122;color:#10b981;">' + escHtml(r.result) + '</span>' +
+            '</div>' +
+            '<div style="padding:4px 0 0;font-size:13px;color:#51627a;line-height:1.7;">' + escHtml(r.content) + '</div>';
           }).join("");
         }
         document.getElementById("planDetailMask").classList.add("show");

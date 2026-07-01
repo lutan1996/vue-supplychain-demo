@@ -2063,25 +2063,19 @@
       return html + "</div>";
     }
     function table(rows) {
-      return '<div class="map-flow-timeline" style="padding:4px 0">' +
-        rows.map(function (item, i) {
-          var isLast = i === rows.length - 1;
-          var sc = item.result === "已提交" || item.result === "已通过" || item.result === "已完成" || item.result === "已结束" || item.result === "已处理" ? "#10b981" :
-                   item.result === "处理中" || item.result === "审批中" || item.result === "进行中" ? "#1677ff" :
-                   item.result === "待处理" || item.result === "待审批" || item.result === "待确认" || item.result === "待知悉" || item.result === "待登记" || item.result === "驳回" || item.result === "拒绝" ? "#f59e0b" : "#64748b";
-          return '<div class="map-flow-tl-item' + (isLast ? ' map-flow-tl-last' : '') + '">' +
-            '<div class="map-flow-tl-dot" style="background:' + sc + '"></div>' +
-            (!isLast ? '<div class="map-flow-tl-line"></div>' : '') +
-            '<div class="map-flow-tl-body">' +
-              '<div class="map-flow-tl-meta">' +
-                '<span class="map-flow-tl-person">' + esc(item.person) + '</span>' +
-                '<span class="map-flow-tl-time">' + esc(item.time) + '</span>' +
-                '<span class="map-flow-tl-badge" style="background:' + sc + '22;color:' + sc + '">' + esc(item.result) + '</span>' +
-              '</div>' +
-              '<div class="map-flow-tl-content">' + esc(item.content) + '</div>' +
-            '</div>' +
-          '</div>';
-        }).join("") + '</div>';
+      return rows.map(function (item, i) {
+        var sc = item.result === "已提交" || item.result === "已通过" || item.result === "已完成" || item.result === "已结束" || item.result === "已处理" ? "#10b981" :
+                 item.result === "处理中" || item.result === "审批中" || item.result === "进行中" ? "#1677ff" :
+                 item.result === "待处理" || item.result === "待审批" || item.result === "待确认" || item.result === "待知悉" || item.result === "待登记" || item.result === "驳回" || item.result === "拒绝" ? "#f59e0b" : "#64748b";
+        return '<div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid #f0f2f5;">' +
+          '<div style="display:flex;align-items:center;gap:10px;min-width:0;">' +
+            '<span style="font-weight:600;color:#1f3551;font-size:14px;">' + esc(item.person) + '</span>' +
+            '<span style="color:#64748b;font-size:13px;">' + esc(item.time) + '</span>' +
+          '</div>' +
+          '<span style="padding:2px 10px;border-radius:4px;font-size:12px;font-weight:500;background:' + sc + '22;color:' + sc + ';">' + esc(item.result) + '</span>' +
+        '</div>' +
+        '<div style="padding:4px 0 0;font-size:13px;color:#51627a;line-height:1.7;">' + esc(item.content) + '</div>';
+      }).join("");
     }
     var mask = document.createElement("div");
     mask.id = "mapUnifiedProgressModal";
