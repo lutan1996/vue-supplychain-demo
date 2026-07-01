@@ -2201,18 +2201,18 @@
           var isLast = idx === records.length - 1;
           var statusColor = item.status === "已发起" || item.status === "已通过" || item.status === "已完成" ? "#10b981" : 
                            item.status === "待审批" || item.status === "待确认" || item.status === "待知悉" || item.status === "待登记" ? "#f59e0b" : "#64748b";
-          return '<div class="req-timeline-item" style="display:grid;grid-template-columns:24px minmax(0,1fr);column-gap:12px;align-items:start;position:relative">' +
-            '<div style="position:relative;width:24px;min-height:100%;display:flex;justify-content:center;flex-shrink:0">' +
-              '<div style="width:12px;height:12px;border-radius:50%;background:' + statusColor + ';flex-shrink:0;margin-top:4px;position:relative;z-index:1"></div>' +
-              (!isLast ? '<div style="position:absolute;top:18px;bottom:-24px;left:50%;width:1px;background:#d8e1ee;transform:translateX(-50%)"></div>' : '') +
+          return '<div class="req-timeline-item" style="display:grid;grid-template-columns:44px minmax(0,1fr);column-gap:6px;align-items:start;position:relative">' +
+            '<div style="position:relative;width:44px;min-height:' + (isLast ? '28px' : '118px') + ';display:flex;justify-content:center;flex-shrink:0">' +
+              '<div style="width:16px;height:16px;border-radius:50%;background:' + statusColor + ';flex-shrink:0;margin-top:8px;position:relative;z-index:1"></div>' +
+              (!isLast ? '<div style="position:absolute;top:24px;bottom:-8px;left:50%;width:1px;background:#d8e1ee;transform:translateX(-50%)"></div>' : '') +
             '</div>' +
-            '<div style="flex:1;padding-bottom:' + (isLast ? '0' : '24px') + ';min-width:0">' +
-              '<div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:6px">' +
-                '<span style="font-weight:600;color:#1f3551;font-size:14px">' + esc(item.user) + '</span>' +
-                '<span style="color:#64748b;font-size:13px">' + esc(item.time) + '</span>' +
-                '<span style="padding:2px 8px;border-radius:4px;font-size:12px;font-weight:500;background:' + statusColor + '22;color:' + statusColor + '">' + esc(item.status) + '</span>' +
+            '<div style="padding:4px 0 ' + (isLast ? '0' : '34px') + ';min-width:0">' +
+              '<div style="display:flex;align-items:center;gap:18px;flex-wrap:wrap;margin-bottom:18px">' +
+                '<span style="font-weight:700;color:#1f3551;font-size:16px">' + esc(item.user) + '</span>' +
+                '<span style="color:#64748b;font-size:15px">' + esc(item.time) + '</span>' +
+                '<span style="padding:5px 12px;border-radius:5px;font-size:14px;font-weight:700;background:' + statusColor + '22;color:' + statusColor + '">' + esc(item.status) + '</span>' +
               '</div>' +
-              '<div style="font-size:13px;color:#51627a;line-height:1.7">' + esc(item.content) + '</div>' +
+              '<div style="font-size:15px;color:#51627a;line-height:1.75;font-weight:500">' + esc(item.content) + '</div>' +
             '</div>' +
           '</div>';
         }).join("");

@@ -1602,18 +1602,18 @@
       ".map-flow-dot.end{border-color:#f0dca8;background:#fff8e8;}" +
       ".map-flow-arrow{color:#8ca0b3;font-size:16px;line-height:1;display:inline-block;flex:none;padding:0 2px;}" +
       ".map-flow-info{font-size:13px;color:#4f647a;line-height:1.9;}" +
-      ".map-flow-timeline{padding:4px 0;}" +
-      ".map-flow-tl-item{display:flex;gap:0;align-items:flex-start;position:relative;}" +
-      ".map-flow-tl-dot{width:12px;height:12px;border-radius:50%;flex-shrink:0;margin-top:4px;}" +
-      ".map-flow-tl-line{width:2px;flex:1;min-height:40px;background:#e2e8f0;margin-top:4px;}" +
+      ".map-flow-timeline{padding:20px 0 0;}" +
+      ".map-flow-tl-item{display:grid;grid-template-columns:44px minmax(0,1fr);column-gap:6px;align-items:start;position:relative;}" +
+      ".map-flow-tl-dot{grid-column:1;width:16px;height:16px;border-radius:50%;flex-shrink:0;margin-top:8px;justify-self:center;position:relative;z-index:1;}" +
+      ".map-flow-tl-line{position:absolute;top:24px;bottom:-8px;left:22px;width:1px;background:#d8e1ee;}" +
       ".map-flow-tl-last .map-flow-tl-line{display:none;}" +
-      ".map-flow-tl-body{flex:1;padding-bottom:24px;min-width:0;padding-left:12px;}" +
+      ".map-flow-tl-body{grid-column:2;padding:4px 0 34px;min-width:0;}" +
       ".map-flow-tl-last .map-flow-tl-body{padding-bottom:0;}" +
-      ".map-flow-tl-meta{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:5px;}" +
-      ".map-flow-tl-person{font-weight:600;color:#1f3551;font-size:14px;}" +
-      ".map-flow-tl-time{color:#64748b;font-size:13px;}" +
-      ".map-flow-tl-badge{padding:2px 8px;border-radius:4px;font-size:12px;font-weight:500;}" +
-      ".map-flow-tl-content{font-size:13px;color:#51627a;line-height:1.7;}" +
+      ".map-flow-tl-meta{display:flex;align-items:center;gap:18px;flex-wrap:wrap;margin-bottom:18px;}" +
+      ".map-flow-tl-person{font-weight:700;color:#1f3551;font-size:16px;}" +
+      ".map-flow-tl-time{color:#64748b;font-size:15px;}" +
+      ".map-flow-tl-badge{padding:5px 12px;border-radius:5px;font-size:14px;font-weight:700;}" +
+      ".map-flow-tl-content{font-size:15px;color:#51627a;line-height:1.75;font-weight:500;}" +
       ".map-flow-info-table{width:100%;border-collapse:collapse;font-size:13px;color:#34495e;}" +
       ".map-flow-info-table th,.map-flow-info-table td{border:1px solid #e8edf3;padding:10px 12px;text-align:left;vertical-align:top;line-height:1.6;}" +
       ".map-flow-info-table th{background:#f5f7fa;color:#1f2d3d;font-weight:700;}" +

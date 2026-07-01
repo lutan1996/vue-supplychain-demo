@@ -166,18 +166,18 @@
 .sales-flow-dot.end{border-color:#f0dca8;background:#fff8e8}
 .sales-flow-arrow{color:#8ca0b3;font-size:16px;line-height:1;display:inline-flex;align-items:center;justify-content:center;flex:none;padding:0 2px;align-self:center}
 .sales-flow-info{font-size:13px;color:#4f647a;line-height:1.9;word-break:break-word;overflow-wrap:anywhere}
-.sales-flow-tl{padding:4px 0}
-.sales-flow-tl-item{display:grid;grid-template-columns:24px minmax(0,1fr);column-gap:12px;align-items:start;position:relative}
-.sales-flow-tl-dot{width:12px;height:12px;border-radius:50%;flex-shrink:0;margin-top:4px;position:relative;z-index:1;justify-self:center}
-.sales-flow-tl-line{position:absolute;top:18px;bottom:-24px;left:12px;width:1px;background:#d8e1ee}
+.sales-flow-tl{padding:20px 0 0}
+.sales-flow-tl-item{display:grid;grid-template-columns:44px minmax(0,1fr);column-gap:6px;align-items:start;position:relative}
+.sales-flow-tl-dot{width:16px;height:16px;border-radius:50%;flex-shrink:0;margin-top:8px;position:relative;z-index:1;justify-self:center}
+.sales-flow-tl-line{position:absolute;top:24px;bottom:-8px;left:22px;width:1px;background:#d8e1ee}
 .sales-flow-tl-last .sales-flow-tl-line{display:none}
-.sales-flow-tl-body{grid-column:2;padding-bottom:24px;min-width:0;padding-left:0}
+.sales-flow-tl-body{grid-column:2;padding:4px 0 34px;min-width:0}
 .sales-flow-tl-last .sales-flow-tl-body{padding-bottom:0}
-.sales-flow-tl-meta{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:5px}
-.sales-flow-tl-person{font-weight:600;color:#1f3551;font-size:14px}
-.sales-flow-tl-time{color:#64748b;font-size:13px}
-.sales-flow-tl-badge{padding:2px 8px;border-radius:4px;font-size:12px;font-weight:500}
-.sales-flow-tl-content{font-size:13px;color:#51627a;line-height:1.7}
+.sales-flow-tl-meta{display:flex;align-items:center;gap:18px;flex-wrap:wrap;margin-bottom:18px}
+.sales-flow-tl-person{font-weight:700;color:#1f3551;font-size:16px}
+.sales-flow-tl-time{color:#64748b;font-size:15px}
+.sales-flow-tl-badge{padding:5px 12px;border-radius:5px;font-size:14px;font-weight:700}
+.sales-flow-tl-content{font-size:15px;color:#51627a;line-height:1.75;font-weight:500}
 .sales-flow-ft{padding:10px 16px;border-top:1px solid #edf2f8;display:flex;justify-content:flex-end}
 .sales-flow-ft button{height:32px;padding:0 16px;border:1px solid #d9d9d9;border-radius:6px;background:#fff;color:#3a4a5a;cursor:pointer}
 .sales-mini-title{margin:14px 0 8px;font-size:13px;font-weight:600;color:#1f3551}

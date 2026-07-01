@@ -1463,21 +1463,23 @@
       function renderProgressInfo(item, type) {
         var rows = progressRows(item, type);
         refs.progressInfoBody.innerHTML = rows.map(function(r, i) {
+          var isLast = i === rows.length - 1;
           var resultColor = r.result === "已完成" || r.result === "通过" || r.result === "已通过" || r.result === "报废结束" ? "#10b981" :
-                           r.result === "待处理" || r.result === "驳回" ? "#f59e0b" : "#64748b";
-          return '<div style="padding:10px 0;border-bottom:1px solid #f0f2f5;">' +
-            '<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;">' +
-              '<div style="display:flex;align-items:center;gap:8px;min-width:0;">' +
-                '<span style="width:8px;height:8px;border-radius:50%;background:' + resultColor + ';flex-shrink:0;"></span>' +
-                '<span style="font-weight:600;color:#1f2d3d;font-size:13px;">' + escHtml(r.node) + '</span>' +
-              '</div>' +
-              '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">' +
-                '<span style="color:#64748b;font-size:12px;">' + escHtml(r.user) + '</span>' +
-                '<span style="color:#94a3b8;font-size:12px;">' + escHtml(r.time) + '</span>' +
-                '<span style="padding:2px 8px;border-radius:4px;font-size:12px;font-weight:500;background:' + resultColor + '22;color:' + resultColor + ';">' + escHtml(r.result) + '</span>' +
-              '</div>' +
+                           r.result === "处理中" || r.result === "进行中" ? "#1677ff" :
+                           r.result === "待处理" || r.result === "未到达" || r.result === "驳回" ? "#f59e0b" : "#64748b";
+          return '<div style="display:grid;grid-template-columns:44px minmax(0,1fr);column-gap:6px;position:relative;align-items:start;">' +
+            '<div style="position:relative;display:flex;justify-content:center;min-height:' + (isLast ? '28px' : '118px') + ';">' +
+              '<span style="width:16px;height:16px;border-radius:50%;background:' + resultColor + ';margin-top:8px;position:relative;z-index:1;"></span>' +
+              (!isLast ? '<span style="position:absolute;top:24px;bottom:-8px;left:50%;width:1px;background:#d8e1ee;transform:translateX(-50%);"></span>' : '') +
             '</div>' +
-            '<div style="padding:4px 0 0 16px;font-size:13px;color:#334155;line-height:1.6;">' + escHtml(r.content) + '</div>' +
+            '<div style="padding:4px 0 ' + (isLast ? '0' : '34px') + ';min-width:0;">' +
+              '<div style="display:flex;align-items:center;gap:18px;flex-wrap:wrap;margin-bottom:18px;">' +
+                '<span style="font-weight:700;color:#1f3551;font-size:16px;">' + escHtml(r.user) + '</span>' +
+                '<span style="color:#64748b;font-size:15px;">' + escHtml(r.time) + '</span>' +
+                '<span style="padding:5px 12px;border-radius:5px;font-size:14px;font-weight:700;background:' + resultColor + '22;color:' + resultColor + ';">' + escHtml(r.result) + '</span>' +
+              '</div>' +
+              '<div style="font-size:15px;color:#51627a;line-height:1.75;font-weight:500;">' + escHtml(r.content) + '</div>' +
+            '</div>' +
           '</div>';
         }).join("");
       }

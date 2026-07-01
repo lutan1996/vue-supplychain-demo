@@ -1058,30 +1058,30 @@
           document.getElementById("rxDetailP3").innerHTML =
             '<p style="font-weight:600;margin-bottom:8px;">审批记录</p>' +
             '<div style="padding:4px 0">' +
-              '<div style="display:grid;grid-template-columns:24px minmax(0,1fr);column-gap:12px;align-items:start;position:relative">' +
-                '<div style="position:relative;width:24px;min-height:100%;display:flex;justify-content:center;flex-shrink:0">' +
-                  '<div style="width:12px;height:12px;border-radius:50%;background:#10b981;flex-shrink:0;margin-top:4px;position:relative;z-index:1"></div>' +
-                  '<div style="position:absolute;top:18px;bottom:-24px;left:50%;width:1px;background:#d8e1ee;transform:translateX(-50%)"></div>' +
+              '<div style="display:grid;grid-template-columns:44px minmax(0,1fr);column-gap:6px;align-items:start;position:relative">' +
+                '<div style="position:relative;width:44px;min-height:118px;display:flex;justify-content:center;flex-shrink:0">' +
+                  '<div style="width:16px;height:16px;border-radius:50%;background:#10b981;flex-shrink:0;margin-top:8px;position:relative;z-index:1"></div>' +
+                  '<div style="position:absolute;top:24px;bottom:-8px;left:50%;width:1px;background:#d8e1ee;transform:translateX(-50%)"></div>' +
                 '</div>' +
-                '<div style="flex:1;padding-bottom:24px;min-width:0">' +
-                  '<div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:6px">' +
-                    '<span style="font-weight:600;color:#1f3551;font-size:14px">申请人提报</span>' +
-                    '<span style="color:#64748b;font-size:13px">' + esc(applicant) + ' ' + esc(time) + '</span>' +
-                    '<span style="padding:2px 8px;border-radius:4px;font-size:12px;font-weight:500;background:#10b98122;color:#10b981">提交</span>' +
+                '<div style="padding:4px 0 34px;min-width:0">' +
+                  '<div style="display:flex;align-items:center;gap:18px;flex-wrap:wrap;margin-bottom:18px">' +
+                    '<span style="font-weight:700;color:#1f3551;font-size:16px">申请人提报</span>' +
+                    '<span style="color:#64748b;font-size:15px">' + esc(applicant) + ' ' + esc(time) + '</span>' +
+                    '<span style="padding:5px 12px;border-radius:5px;font-size:14px;font-weight:700;background:#10b98122;color:#10b981">提交</span>' +
                   '</div>' +
                 '</div>' +
               '</div>' +
-              '<div style="display:grid;grid-template-columns:24px minmax(0,1fr);column-gap:12px;align-items:start;position:relative">' +
-                '<div style="position:relative;width:24px;min-height:100%;display:flex;justify-content:center;flex-shrink:0">' +
-                  '<div style="width:12px;height:12px;border-radius:50%;background:' + aprSc + ';flex-shrink:0;margin-top:4px;position:relative;z-index:1"></div>' +
+              '<div style="display:grid;grid-template-columns:44px minmax(0,1fr);column-gap:6px;align-items:start;position:relative">' +
+                '<div style="position:relative;width:44px;min-height:28px;display:flex;justify-content:center;flex-shrink:0">' +
+                  '<div style="width:16px;height:16px;border-radius:50%;background:' + aprSc + ';flex-shrink:0;margin-top:8px;position:relative;z-index:1"></div>' +
                 '</div>' +
-                '<div style="flex:1;padding-bottom:0;min-width:0">' +
-                  '<div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:6px">' +
-                    '<span style="font-weight:600;color:#1f3551;font-size:14px">采购专责审核</span>' +
-                    '<span style="color:#64748b;font-size:13px">王卿明 2026-04-22 10:00</span>' +
-                    '<span style="padding:2px 8px;border-radius:4px;font-size:12px;font-weight:500;background:' + aprSc + '22;color:' + aprSc + '">' + aprR + '</span>' +
+                '<div style="padding:4px 0 0;min-width:0">' +
+                  '<div style="display:flex;align-items:center;gap:18px;flex-wrap:wrap;margin-bottom:18px">' +
+                    '<span style="font-weight:700;color:#1f3551;font-size:16px">采购专责审核</span>' +
+                    '<span style="color:#64748b;font-size:15px">王卿明 2026-04-22 10:00</span>' +
+                    '<span style="padding:5px 12px;border-radius:5px;font-size:14px;font-weight:700;background:' + aprSc + '22;color:' + aprSc + '">' + aprR + '</span>' +
                   '</div>' +
-                  '<div style="font-size:13px;color:#51627a;line-height:1.7">（演示）</div>' +
+                  '<div style="font-size:15px;color:#51627a;line-height:1.75;font-weight:500">（演示）</div>' +
                 '</div>' +
               '</div>' +
             '</div>' +
@@ -1170,16 +1170,16 @@
           var isLast = i === items.length - 1;
           var sc = x.r === "提交" || x.r === "通过" || x.r === "已完成" || x.r === "已发起" || x.r === "已结束" ? "#10b981" :
                    x.r === "驳回" || x.r === "拒绝" || x.r === "待办" || x.r === "待处理" || x.r === "待审批" ? "#f59e0b" : "#64748b";
-          return '<div style="display:grid;grid-template-columns:24px minmax(0,1fr);column-gap:12px;align-items:start;position:relative">' +
-            '<div style="position:relative;width:24px;min-height:100%;display:flex;justify-content:center;flex-shrink:0">' +
-              '<div style="width:12px;height:12px;border-radius:50%;background:' + sc + ';flex-shrink:0;margin-top:4px;position:relative;z-index:1"></div>' +
-              (!isLast ? '<div style="position:absolute;top:18px;bottom:-24px;left:50%;width:1px;background:#d8e1ee;transform:translateX(-50%)"></div>' : '') +
+          return '<div style="display:grid;grid-template-columns:44px minmax(0,1fr);column-gap:6px;align-items:start;position:relative">' +
+            '<div style="position:relative;width:44px;min-height:' + (isLast ? '28px' : '118px') + ';display:flex;justify-content:center;flex-shrink:0">' +
+              '<div style="width:16px;height:16px;border-radius:50%;background:' + sc + ';flex-shrink:0;margin-top:8px;position:relative;z-index:1"></div>' +
+              (!isLast ? '<div style="position:absolute;top:24px;bottom:-8px;left:50%;width:1px;background:#d8e1ee;transform:translateX(-50%)"></div>' : '') +
             '</div>' +
-            '<div style="flex:1;padding-bottom:' + (isLast ? '0' : '24px') + ';min-width:0">' +
-              '<div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:6px">' +
-                '<span style="font-weight:600;color:#1f3551;font-size:14px">' + x.t + '</span>' +
-                '<span style="color:#64748b;font-size:13px">' + x.p + ' ' + x.s + '</span>' +
-                '<span style="padding:2px 8px;border-radius:4px;font-size:12px;font-weight:500;background:' + sc + '22;color:' + sc + '">' + x.r + '</span>' +
+            '<div style="padding:4px 0 ' + (isLast ? '0' : '34px') + ';min-width:0">' +
+              '<div style="display:flex;align-items:center;gap:18px;flex-wrap:wrap;margin-bottom:18px">' +
+                '<span style="font-weight:700;color:#1f3551;font-size:16px">' + x.t + '</span>' +
+                '<span style="color:#64748b;font-size:15px">' + x.p + ' ' + x.s + '</span>' +
+                '<span style="padding:5px 12px;border-radius:5px;font-size:14px;font-weight:700;background:' + sc + '22;color:' + sc + '">' + x.r + '</span>' +
               '</div>' +
             '</div>' +
           '</div>';
