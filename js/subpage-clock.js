@@ -334,7 +334,9 @@
         '<div class="nav-item" title="盘点管理"><span class="nav-label">盘点管理</span></div>' +
         '<div class="nav-item" title="资产管理"><span class="nav-label">资产管理</span></div>' +
         '<div class="nav-item" title="物流管理"><span class="nav-label">物流管理</span></div>' +
+        '<div class="nav-item" title="仓储管理"><span class="nav-label">仓储管理</span></div>' +
         '<div class="nav-item" title="退役及废旧管理"><span class="nav-label">退役及废旧管理</span></div>' +
+        '<div class="nav-item" title="综合业务管理"><span class="nav-label">综合业务管理</span></div>' +
         '<div class="nav-item" title="基础数据管理"><span class="nav-label">基础数据管理</span></div>';
       normalizeRetiredNavLabel();
     })();
@@ -624,7 +626,7 @@
         panel: secondaryPanel,
         aclModuleKey: 'purchaseMgmt',
         rowHtml:
-          '<button type="button" class="warehouse-secondary-link" data-action="proj-company-inbound" data-label="项目公司库存管理">项目公司库存管理</button>'
+          '<button type="button" class="warehouse-secondary-link" data-action="proj-company-inventory" data-label="项目公司库存管理">项目公司库存管理</button>'
       },
       physicalMgmt: {
         text: '实物管理',
@@ -671,7 +673,24 @@
       warehouse: {
         text: '仓储管理',
         panel: secondaryPanel,
-        rowHtml: ''
+        rowHtml:
+          '<button type="button" class="warehouse-secondary-link" data-action="slot" data-label="货位管理">货位管理</button>' +
+          '<span class="warehouse-secondary-pipe" aria-hidden="true">|</span>' +
+          '<button type="button" class="warehouse-secondary-link" data-action="receive" data-label="收货入库">收货入库</button>' +
+          '<span class="warehouse-secondary-pipe" aria-hidden="true">|</span>' +
+          '<button type="button" class="warehouse-secondary-link" data-action="scan" data-label="扫码领用">扫码领用</button>' +
+          '<span class="warehouse-secondary-pipe" aria-hidden="true">|</span>' +
+          '<button type="button" class="warehouse-secondary-link" data-action="inventory-check" data-label="盘库管理">盘库管理</button>' +
+          '<span class="warehouse-secondary-pipe" aria-hidden="true">|</span>' +
+          '<button type="button" class="warehouse-secondary-link" data-action="stock" data-label="库存管理">库存管理</button>' +
+          '<span class="warehouse-secondary-pipe" aria-hidden="true">|</span>' +
+          '<button type="button" class="warehouse-secondary-link" data-action="maintenance" data-label="维修管理">维修管理</button>' +
+          '<span class="warehouse-secondary-pipe" aria-hidden="true">|</span>' +
+          '<button type="button" class="warehouse-secondary-link" data-action="biz-domestic-substitute" data-label="国产化替代">国产化替代</button>' +
+          '<span class="warehouse-secondary-pipe" aria-hidden="true">|</span>' +
+          '<button type="button" class="warehouse-secondary-link" data-action="idle" data-label="闲置物资">闲置物资</button>' +
+          '<span class="warehouse-secondary-pipe" aria-hidden="true">|</span>' +
+          '<button type="button" class="warehouse-secondary-link" data-action="warehouse" data-label="仓库管理">仓库管理</button>'
       },
       retired: {
         text: '退役及废旧管理',
@@ -696,7 +715,24 @@
       biz: {
         text: '综合业务管理',
         panel: secondaryPanel,
-        rowHtml: ''
+        rowHtml:
+          '<button type="button" class="warehouse-secondary-link" data-action="biz-finance" data-label="财务管理">财务管理</button>' +
+          '<span class="warehouse-secondary-pipe" aria-hidden="true">|</span>' +
+          '<button type="button" class="warehouse-secondary-link" data-action="biz-repair" data-label="维修管理">维修管理</button>' +
+          '<span class="warehouse-secondary-pipe" aria-hidden="true">|</span>' +
+          '<button type="button" class="warehouse-secondary-link" data-action="biz-transfer" data-label="调剂管理">调剂管理</button>' +
+          '<span class="warehouse-secondary-pipe" aria-hidden="true">|</span>' +
+          '<button type="button" class="warehouse-secondary-link" data-action="biz-emergency" data-label="应急物资管理">应急物资管理</button>' +
+          '<span class="warehouse-secondary-pipe" aria-hidden="true">|</span>' +
+          '<button type="button" class="warehouse-secondary-link" data-action="biz-standard" data-label="标准规范">标准规范</button>' +
+          '<span class="warehouse-secondary-pipe" aria-hidden="true">|</span>' +
+          '<button type="button" class="warehouse-secondary-link" data-action="biz-process-design" data-label="业务流程设计">业务流程设计</button>' +
+          '<span class="warehouse-secondary-pipe" aria-hidden="true">|</span>' +
+          '<button type="button" class="warehouse-secondary-link" data-action="biz-claim" data-label="物资理赔">物资理赔</button>' +
+          '<span class="warehouse-secondary-pipe" aria-hidden="true">|</span>' +
+          '<button type="button" class="warehouse-secondary-link" data-action="biz-domestic-substitute" data-label="国产化替代">国产化替代</button>' +
+          '<span class="warehouse-secondary-pipe" aria-hidden="true">|</span>' +
+          '<button type="button" class="warehouse-secondary-link" data-action="biz-expert" data-label="专家管理">专家管理</button>'
       },
       dataNav: {
         text: "基础数据管理",
@@ -1049,7 +1085,7 @@
           }
           closePhysicalMgmtPanel();
           var rowEl = resolveSecondaryRow();
-          if (rowEl && typeof mod.rowHtml === 'string') {
+          if (rowEl && mod.rowHtml) {
             rowEl.innerHTML = applyRoleAclToRowHtml(mod.rowHtml);
             bindPanelActions(secondaryPanel);
           }
@@ -1395,7 +1431,7 @@
         if (fileName === "purchase-plan-management.html") return "采购信息台帐";
         if (fileName === "purchase-summary-report.html") return "采购合同报表管理";
         if (fileName === "proc-acceptance-inbound.html") return "公司层面入库";
-        if (fileName === "proj-company-inbound.html") return "项目公司库存管理";
+        if (fileName === "proj-company-inbound.html") return "项目公司入库";
         if (fileName === "proc-use-approval.html") return "领用申请";
         if (fileName === "proc-sales-contract.html") return "销售合同管理";
         if (fileName === "proc-shipment.html") return "发货管理";
@@ -1572,11 +1608,11 @@
       ".map-flow-arrow{color:#8ca0b3;font-size:16px;line-height:1;display:inline-block;flex:none;padding:0 2px;}" +
       ".map-flow-info{font-size:13px;color:#4f647a;line-height:1.9;}" +
       ".map-flow-timeline{padding:4px 0;}" +
-      ".map-flow-tl-item{display:grid;grid-template-columns:24px minmax(0,1fr);column-gap:12px;align-items:start;position:relative;}" +
-      ".map-flow-tl-dot{width:12px;height:12px;border-radius:50%;flex-shrink:0;margin-top:4px;position:relative;z-index:1;justify-self:center;}" +
-      ".map-flow-tl-line{position:absolute;top:18px;bottom:-24px;left:12px;width:1px;background:#d8e1ee;}" +
+      ".map-flow-tl-item{display:flex;gap:0;align-items:flex-start;position:relative;}" +
+      ".map-flow-tl-dot{width:12px;height:12px;border-radius:50%;flex-shrink:0;margin-top:4px;}" +
+      ".map-flow-tl-line{width:2px;flex:1;min-height:40px;background:#e2e8f0;margin-top:4px;}" +
       ".map-flow-tl-last .map-flow-tl-line{display:none;}" +
-      ".map-flow-tl-body{grid-column:2;padding-bottom:24px;min-width:0;padding-left:0;}" +
+      ".map-flow-tl-body{flex:1;padding-bottom:24px;min-width:0;padding-left:12px;}" +
       ".map-flow-tl-last .map-flow-tl-body{padding-bottom:0;}" +
       ".map-flow-tl-meta{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:5px;}" +
       ".map-flow-tl-person{font-weight:600;color:#1f3551;font-size:14px;}" +
@@ -2060,17 +2096,19 @@
       '    </div>' +
       '    <div class="map-flow-pane is-active" data-pane="flow">' +
       '      <div class="map-flow-track">' +
-      row(["发起流程", "部门负责人审批", "物资管理部门审核", "分管负责人审批", "流程归档", "结束"], 4) +
+      row(["业务部门开始提报次年报废计划", "业务部门提交报废计划", "业务部门负责人审批", "财务部负责人审批", "物资管理部门的物资专责汇总且物资管理部门负责人审批", "财务部负责人审批", "物资管理部门物资专责存档，报废结束"], 4) +
       "      </div>" +
       "    </div>" +
       '    <div class="map-flow-pane" data-pane="info">' +
       '      <div class="map-flow-info">' +
       table([
-        { person: "发起人", time: "—", content: "提交流程申请。", result: "已提交" },
-        { person: "部门负责人", time: "—", content: "完成部门审批。", result: "已通过" },
-        { person: "物资管理部门", time: "—", content: "完成业务审核。", result: "已通过" },
-        { person: "分管负责人", time: "—", content: "完成最终审批。", result: "处理中" },
-        { person: "系统", time: "—", content: "流程归档。", result: "待处理" }
+        { person: "业务部门", time: "—", content: "梳理次年拟报废物资范围。", result: "已通过" },
+        { person: "业务部门", time: "—", content: "提交报废计划、拟报废物资明细及报废说明。", result: "已通过" },
+        { person: "业务部门负责人", time: "—", content: "确认报废计划内容完整并同意提交后续审批。", result: "已通过" },
+        { person: "财务部负责人", time: "—", content: "审核资产原值、累计折旧、净值及账务处理口径。", result: "处理中" },
+        { person: "物资管理部门专责", time: "—", content: "汇总拟报废物资清单并确认处置路径。", result: "待处理" },
+        { person: "财务部负责人", time: "—", content: "复核财务处理口径并完成终审。", result: "待处理" },
+        { person: "物资管理部门专责", time: "—", content: "归档报废计划、审批记录及资产清单。", result: "待处理" }
       ]) +
       "      </div>" +
       "    </div>" +
