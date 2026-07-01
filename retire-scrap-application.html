@@ -459,13 +459,8 @@
     .tag-eval { margin-top:8px; font-size:12px; padding:8px 10px; border-radius:6px; border:1px solid #b7eb8f; background:#f6ffed; color:#389e0d; }
     .tag-eval.warn { border-color:#ffe58f; background:#fffbe6; color:#d48806; font-weight:600; }
     .view-mini-table { width:100%; border-collapse:collapse; font-size:12px; margin-top:8px; }
-    .view-mini-table th, .view-mini-table td { border:1px solid #edf1f7; padding:6px; text-align:left; color:#1f2d3d; }
+    .view-mini-table th, .view-mini-table td { border:1px solid #edf1f7; padding:6px; text-align:left; }
     .view-mini-table th { background:#f8fafc; color:#64748b; }
-    #planDetailMask .view-mini-table,
-    #planDetailMask .view-mini-table th,
-    #planDetailMask .view-mini-table td {
-      color: #1f2d3d !important;
-    }
     /* 报废物资明细表（新增/编辑弹窗） */
     .plan-item-table {
       width: 100%;
@@ -510,19 +505,9 @@
       box-sizing: border-box;
       line-height: 1.4;
     }
-    .plan-item-ops { display: flex; gap: 6px; align-items: center; justify-content: center; min-width: 72px; }
-    .plan-item-ops button {
-      border: 1px solid #d9e8ff;
-      background: #f5faff;
-      color: #1677ff;
-      border-radius: 4px;
-      padding: 2px 8px;
-      font-size: 12px;
-      line-height: 20px;
-      cursor: pointer;
-      white-space: nowrap;
-    }
-    .plan-item-ops button:hover { border-color: #1677ff; background: #e6f4ff; }
+    .plan-item-ops { display: flex; gap: 6px; align-items: center; justify-content: center; }
+    .plan-item-ops a { color: #1677ff; font-size: 12px; cursor: pointer; text-decoration: none; }
+    .plan-item-ops a:hover { opacity: 0.75; }
     .plan-item-ops .ops-sep { color: #d0d7de; }
     /* 物资选择弹窗表格 */
     .pick-asset-table {
@@ -688,7 +673,7 @@
 
           <div id="panelScrapApply" style="display:none;">
           <div class="carrier-toolbar">
-            <button type="button" class="carrier-btn-add" id="btnCreateApply" onclick="window.openApplyModal && window.openApplyModal()">
+            <button type="button" class="carrier-btn-add" id="btnCreateApply">
               <i class="fa-solid fa-plus" aria-hidden="true"></i>
               新增报废申请
             </button>
@@ -1053,6 +1038,10 @@
           <tbody id="planDetailAssetBody"></tbody>
         </table>
         </div>
+        <table class="view-mini-table" style="margin-top:8px;">
+          <thead><tr><th>节点</th><th>审批人</th><th>意见</th><th>时间</th><th>状态</th></tr></thead>
+          <tbody id="planDetailRecordBody"></tbody>
+        </table>
       </div>
       <div class="modal-footer">
         <button class="btn" id="btnPlanDetailClose">关闭</button>
@@ -1718,6 +1707,10 @@
       var applyDetailRows = [];
       var applySelectedAssetId = null;
 
+      function activeMaterials() {
+        return materialLedger.filter(function (m) { return m.status !== "已报废"; });
+      }
+
       function refreshApplyOnlineTable() {
         var body = refs.applyOnlineBody;
         body.innerHTML = "";
@@ -1796,7 +1789,6 @@
         refs.applyModalMask.classList.add("show");
         refs.applyModalMask.setAttribute("aria-hidden", "false");
       }
-      window.openApplyModal = openApplyModal;
 
       function closeApplyModal() {
         refs.applyModalMask.classList.remove("show");
@@ -2142,7 +2134,8 @@
             '<td style="color:#1f2d3d;"><textarea class="pi-reason" data-idx="' + idx + '" rows="2" placeholder="填写报废原因" style="color:#1f2d3d;">' + escHtml(item.reason || "") + '</textarea></td>' +
             '<td>' +
               '<div class="plan-item-ops">' +
-                '<button type="button" class="pi-del" data-idx="' + idx + '">删除</button>' +
+                '<a href="#" class="pi-del" data-idx="' + idx + '" style="color:#ff4d4f;">删除</a>' +
+                '<a href="#" class="pi-track" data-id="' + escHtml(asset.id) + '" style="color:#1677ff;margin-left:8px;">物资跟踪</a>' +
               '</div>' +
             '</td>';
           body.appendChild(tr);
@@ -2398,10 +2391,7 @@
           '<div class="view-item"><b>申请部门：</b>' + item.dept + '</div><div class="view-item"><b>申请人：</b>' + item.applicant + '</div>' +
           '<div class="view-item"><b>提交日期：</b>' + (item.submitDate || "-") + '</div><div class="view-item"><b>审批状态：</b>' + planStatusMeta(item.status).txt + '</div>' +
           '<div class="view-item full"><b>报废说明：</b>' + (item.remark || "-") + "</div>";
-        var assets = planAssets.filter(function (a) { return (item.assetIds || []).indexOf(a.id) > -1; });
-        if (!assets.length) {
-          assets = planAssets.filter(function (a) { return a.dept === item.dept || a.dept === currentDept; }).slice(0, 3);
-        }
+        var assets = planAssets.filter(function (a) { return item.assetIds.indexOf(a.id) > -1; });
         document.getElementById("planDetailAssetBody").innerHTML = assets.map(function (a, idx) {
           var pq = planQtyNumber(item.assetQty && item.assetQty[a.id] != null ? item.assetQty[a.id] : "");
           var dep = a.origin - a.net;
@@ -2422,6 +2412,22 @@
             "<td>" + escHtml(reason) + "</td>" +
             "</tr>";
         }).join("");
+        document.getElementById("planDetailRecordBody").innerHTML =
+          progressRows(item, "plan").map(function(r, i) {
+            var resultColor = r.result === "已完成" || r.result === "通过" || r.result === "已通过" || r.result === "报废结束" ? "#10b981" :
+                             r.result === "待处理" || r.result === "驳回" || r.result === "未到达" ? "#f59e0b" : "#64748b";
+            var isLast = i === progressRows(item, "plan").length - 1;
+            return '<tr><td colspan="5" style="padding:8px 0;border:none;">' +
+              '<div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid #f0f2f5;">' +
+                '<div style="display:flex;align-items:center;gap:10px;min-width:0;">' +
+                  '<span style="font-weight:600;color:#1f2d3d;font-size:13px;">' + escHtml(r.node) + '</span>' +
+                  '<span style="color:#64748b;font-size:12px;">' + escHtml(r.user) + ' ' + escHtml(r.time) + '</span>' +
+                '</div>' +
+                '<span style="padding:2px 10px;border-radius:4px;font-size:12px;font-weight:500;background:' + resultColor + '22;color:' + resultColor + ';">' + escHtml(r.result) + '</span>' +
+              '</div>' +
+              '<div style="padding:4px 0 0;font-size:13px;color:#334155;line-height:1.6;">' + escHtml(r.content) + '</div>' +
+            '</td></tr>';
+          }).join("");
         document.getElementById("planDetailMask").classList.add("show");
       }
       function closePlanDetail() {
@@ -2545,10 +2551,14 @@
         document.getElementById("planItemBody").addEventListener("click", function (e) {
           var del = e.target.closest(".pi-del");
           if (del) {
-            e.preventDefault();
             var idx = parseInt(del.getAttribute("data-idx"), 10);
             planItems.splice(idx, 1);
             renderPlanItemTable();
+          }
+          var track = e.target.closest(".pi-track");
+          if (track) {
+            var assetId = track.getAttribute("data-id");
+            alert("物资跟踪：正在跳转到物资「" + assetId + "」的流转记录页面（演示功能）");
           }
         });
 
