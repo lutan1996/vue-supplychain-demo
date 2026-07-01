@@ -421,13 +421,14 @@ a.warehouse-secondary-link {
   margin: 8px 14px;
 }
 .warehouse-secondary-label {
-  padding: 10px 14px 4px;
-  font-size: 13px;
-  font-weight: 700;
-  color: rgba(255, 255, 255, 0.55);
+  padding: 14px 14px 6px;
+  font-size: 15px;
+  font-weight: 800;
+  color: rgba(255, 255, 255, 0.82);
   letter-spacing: 0.5px;
   cursor: default;
   user-select: none;
+  pointer-events: none;
 }
 /* 仓库管理主内容 */
 .main-scroll {
