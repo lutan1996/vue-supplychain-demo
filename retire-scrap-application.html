@@ -1038,7 +1038,6 @@
           <tbody id="planDetailAssetBody"></tbody>
         </table>
         </div>
-        <div style="margin-top:8px;font-size:12px;color:#64748b;">审批流程：部门审批 → 总办会/董事会审批 → 通过后挂北交所拍卖</div>
         <table class="view-mini-table" style="margin-top:8px;">
           <thead><tr><th>节点</th><th>审批人</th><th>意见</th><th>时间</th><th>状态</th></tr></thead>
           <tbody id="planDetailRecordBody"></tbody>
@@ -1318,8 +1317,6 @@
         btnCloseModal: document.getElementById("btnCloseModal"),
         btnCancel: document.getElementById("btnCancel"),
         btnSubmit: document.getElementById("btnSubmitApply"),
-        btnCloseModal: document.getElementById("btnCloseModal"),
-        btnCancel: document.getElementById("btnCancel"),
         applyModalMask: document.getElementById("applyModalMask"),
         btnOpenApplyModalProgress: document.getElementById("btnOpenApplyModalProgress"),
         btnApplyPrint: document.getElementById("btnApplyPrint"),
@@ -1455,17 +1452,22 @@
       function renderProgressInfo(item, type) {
         var rows = progressRows(item, type);
         refs.progressInfoBody.innerHTML = rows.map(function(r, i) {
-          var isLast = i === rows.length - 1;
           var resultColor = r.result === "已完成" || r.result === "通过" || r.result === "已通过" || r.result === "报废结束" ? "#10b981" :
                            r.result === "待处理" || r.result === "驳回" ? "#f59e0b" : "#64748b";
-          return '<div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid #f0f2f5;">' +
-            '<div style="display:flex;align-items:center;gap:10px;min-width:0;">' +
-              '<span style="font-weight:600;color:#1f2d3d;font-size:13px;">' + escHtml(r.node) + '</span>' +
-              '<span style="color:#64748b;font-size:12px;">' + escHtml(r.user) + ' ' + escHtml(r.time) + '</span>' +
+          return '<div style="padding:10px 0;border-bottom:1px solid #f0f2f5;">' +
+            '<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;">' +
+              '<div style="display:flex;align-items:center;gap:8px;min-width:0;">' +
+                '<span style="width:8px;height:8px;border-radius:50%;background:' + resultColor + ';flex-shrink:0;"></span>' +
+                '<span style="font-weight:600;color:#1f2d3d;font-size:13px;">' + escHtml(r.node) + '</span>' +
+              '</div>' +
+              '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">' +
+                '<span style="color:#64748b;font-size:12px;">' + escHtml(r.user) + '</span>' +
+                '<span style="color:#94a3b8;font-size:12px;">' + escHtml(r.time) + '</span>' +
+                '<span style="padding:2px 8px;border-radius:4px;font-size:12px;font-weight:500;background:' + resultColor + '22;color:' + resultColor + ';">' + escHtml(r.result) + '</span>' +
+              '</div>' +
             '</div>' +
-            '<span style="padding:2px 10px;border-radius:4px;font-size:12px;font-weight:500;background:' + resultColor + '22;color:' + resultColor + ';">' + escHtml(r.result) + '</span>' +
-          '</div>' +
-          '<div style="padding:4px 0 0;font-size:13px;color:#334155;line-height:1.6;">' + escHtml(r.content) + '</div>';
+            '<div style="padding:4px 0 0 16px;font-size:13px;color:#334155;line-height:1.6;">' + escHtml(r.content) + '</div>' +
+          '</div>';
         }).join("");
       }
 
@@ -1722,7 +1724,7 @@
             '<td style="padding:8px 10px;border-bottom:1px solid #f0f2f5;text-align:right;">' + fmtWan(fin.originValue - fin.netValue) + '</td>' +
             '<td style="padding:8px 10px;border-bottom:1px solid #f0f2f5;text-align:right;">' + fmtWan(fin.netValue) + '</td>' +
             '<td style="padding:8px 10px;border-bottom:1px solid #f0f2f5;text-align:center;">' + escHtml(asset.purchaseDate || "-") + '</td>' +
-            '<td style="padding:8px 10px;border-bottom:1px solid #f0f2f5;"></td>';
+            '<td style="padding:8px 10px;border-bottom:1px solid #f0f2f5;"><button type="button" class="btn-add-row" data-asset-id="' + escHtml(asset.id) + '" style="border:none;background:#1677ff;color:#fff;border-radius:4px;padding:2px 8px;font-size:12px;cursor:pointer;">加入明细</button></td>';
           tr.style.cursor = "pointer";
           body.appendChild(tr);
         });
