@@ -920,7 +920,7 @@
         </div>
         <!-- 报废物资明细表 -->
         <div style="font-size:13px;font-weight:600;color:#1f3551;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid #e8eef7;">
-          报废物资明细
+          拟报废物资明细表
           <button type="button" id="btnOpenAssetPick" class="btn-sub" style="float:right;font-size:12px;padding:3px 12px;height:26px;background:#e6f4ff;color:#1677ff;border:1px solid #91caff;border-radius:6px;cursor:pointer;font-weight:normal;">
             <i class="fa-solid fa-plus"></i> 选择报废物资
           </button>
@@ -930,18 +930,20 @@
             <table class="plan-item-table" id="planItemTable">
               <thead>
                 <tr>
-                  <th style="width:42px;">序号</th>
-                  <th style="min-width:110px;">产品名称</th>
-                  <th style="min-width:110px;">型号及重要参数</th>
-                  <th style="min-width:90px;">生产厂家</th>
-                  <th style="width:72px;">计量单位</th>
-                  <th style="width:70px;">数量</th>
+                  <th style="min-width:120px;">产品名称</th>
+                  <th style="min-width:110px;">产品编码</th>
+                  <th style="min-width:130px;">制造商</th>
+                  <th style="min-width:110px;">产品型号</th>
+                  <th style="min-width:120px;">物资类型编码</th>
+                  <th style="width:86px;">物资类别</th>
+                  <th style="width:62px;">单位</th>
+                  <th style="width:74px;">数量</th>
+                  <th style="width:104px;">资产原值（万元）</th>
+                  <th style="width:104px;">累计折旧（万元）</th>
+                  <th style="width:104px;">净值（万元）</th>
                   <th style="width:96px;">采购时间</th>
-                  <th style="width:96px;">资产原值(元)</th>
-                  <th style="width:96px;">累计折旧(元)</th>
-                  <th style="width:96px;">净值(元)</th>
-                  <th style="min-width:160px;">拟报废原因</th>
-                  <th style="width:120px;">操作</th>
+                  <th style="min-width:150px;">拟报废原因</th>
+                  <th style="width:90px;">操作</th>
                 </tr>
               </thead>
               <tbody id="planItemBody"></tbody>
@@ -1038,17 +1040,15 @@
       </div>
       <div class="modal-body" style="display:block;">
         <div class="view-grid" id="planDetailGrid"></div>
-        <div style="font-size:13px;font-weight:600;color:#1f3551;margin:12px 0 6px;padding-bottom:6px;border-bottom:1px solid #e8eef7;">报废物资明细</div>
+        <div style="font-size:13px;font-weight:600;color:#1f3551;margin:12px 0 6px;padding-bottom:6px;border-bottom:1px solid #e8eef7;">拟报废物资明细表</div>
         <div style="max-height:300px;overflow:auto;border:1px solid #e8eef7;border-radius:8px;margin-bottom:8px;">
           <table class="view-mini-table" style="table-layout:fixed;">
             <thead>
               <tr>
-                <th style="width:42px;">序号</th>
-                <th>产品名称</th><th>型号及重要参数</th><th>生产厂家</th>
-                <th style="width:64px;">计量单位</th><th style="width:60px;">数量</th>
-                <th style="width:88px;">采购时间</th>
-                <th style="width:88px;">原值(元)</th><th style="width:88px;">累计折旧</th><th style="width:88px;">净值(元)</th>
-                <th>拟报废原因</th>
+                <th>产品名称</th><th>产品编码</th><th>制造商</th><th>产品型号</th>
+                <th>物资类型编码</th><th>物资类别</th><th style="width:52px;">单位</th><th style="width:56px;">数量</th>
+                <th>资产原值（万元）</th><th>累计折旧（万元）</th><th>净值（万元）</th>
+                <th>采购时间</th><th>拟报废原因</th>
               </tr>
             </thead>
             <tbody id="planDetailAssetBody"></tbody>
@@ -1534,6 +1534,35 @@
         var x = Number(n);
         if (!isFinite(x)) x = 0;
         return "¥" + Math.round(x).toLocaleString("zh-CN");
+      }
+
+      function fmtWan(n) {
+        var x = Number(n);
+        if (!isFinite(x)) x = 0;
+        return (x / 10000).toLocaleString("zh-CN", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      }
+
+      function planQtyValue(v) {
+        if (v === "" || v == null) return "";
+        var n = Number(v);
+        return isFinite(n) && n > 0 ? Math.floor(n) : "";
+      }
+
+      function planQtyNumber(v) {
+        var n = Number(v);
+        return isFinite(n) && n > 0 ? Math.floor(n) : 0;
+      }
+
+      function assetProductCode(asset) {
+        return asset.productCode || asset.code || asset.id || "-";
+      }
+
+      function assetTypeCode(asset) {
+        return asset.typeCode || asset.a || "-";
+      }
+
+      function assetCategory(asset) {
+        return asset.category || asset.assetCategory || asset.type || "-";
       }
 
       function buildScrapAssetRows(item) {
@@ -2150,25 +2179,26 @@
           var asset = planAssets.find(function (a) { return a.id === item.id; });
           if (!asset) return;
           var dep = (asset.origin - asset.net);
-          totalOrigin += asset.origin * item.qty;
-          totalNet += asset.net * item.qty;
+          var qty = planQtyNumber(item.qty);
+          totalOrigin += asset.origin * qty;
+          totalNet += asset.net * qty;
           var tr = document.createElement("tr");
           tr.innerHTML =
-            '<td style="text-align:center;color:#64748b;">' + (idx + 1) + '</td>' +
             '<td>' + escHtml(asset.name) + '</td>' +
-            '<td>' + escHtml(asset.model) + '</td>' +
+            '<td>' + escHtml(assetProductCode(asset)) + '</td>' +
             '<td style="word-break:break-all;">' + escHtml(asset.manufacturer || "-") + '</td>' +
+            '<td>' + escHtml(asset.model || "-") + '</td>' +
+            '<td>' + escHtml(assetTypeCode(asset)) + '</td>' +
+            '<td>' + escHtml(assetCategory(asset)) + '</td>' +
             '<td style="text-align:center;">' + escHtml(asset.unit || "台") + '</td>' +
-            '<td><input type="number" min="1" class="pi-qty" data-idx="' + idx + '" value="' + item.qty + '" /></td>' +
+            '<td><input type="number" min="1" class="pi-qty" data-idx="' + idx + '" value="' + escHtml(planQtyValue(item.qty)) + '" placeholder="请输入数量" /></td>' +
+            '<td style="text-align:right;">' + fmtWan(asset.origin * qty) + '</td>' +
+            '<td style="text-align:right;">' + fmtWan(dep * qty) + '</td>' +
+            '<td style="text-align:right;">' + fmtWan(asset.net * qty) + '</td>' +
             '<td>' + (asset.purchaseDate || "-") + '</td>' +
-            '<td style="text-align:right;">' + fmtMoney(asset.origin * item.qty) + '</td>' +
-            '<td style="text-align:right;">' + fmtMoney(dep * item.qty) + '</td>' +
-            '<td style="text-align:right;">' + fmtMoney(asset.net * item.qty) + '</td>' +
             '<td><textarea class="pi-reason" data-idx="' + idx + '" rows="2" placeholder="填写报废原因">' + escHtml(item.reason || "") + '</textarea></td>' +
             '<td>' +
               '<div class="plan-item-ops">' +
-                '<a href="#" class="pi-track" data-id="' + asset.id + '">物资跟踪</a>' +
-                '<span class="ops-sep">|</span>' +
                 '<a href="#" class="pi-del" data-idx="' + idx + '" style="color:#ff4d4f;">删除</a>' +
               '</div>' +
             '</td>';
@@ -2314,8 +2344,10 @@
         return {
           id: product.id,
           productCode: product.b || product.id,
+          typeCode: product.a || "",
           name: product.productName || "",
           type: product.typeName || product.category || "",
+          category: product.category || "",
           model: product.model || "",
           manufacturer: product.mfrName || "",
           unit: "台",
@@ -2357,7 +2389,7 @@
               if (!p || !p.id || existingIds[p.id]) return;
               ensurePlanAssetFromProduct(p);
               existingIds[p.id] = true;
-              planItems.push({ id: p.id, qty: 1, reason: "" });
+              planItems.push({ id: p.id, qty: "", reason: "" });
             });
             renderPlanItemTable();
           }
@@ -2370,7 +2402,7 @@
         var ids = Object.keys(PAP.pendingSelected);
         ids.forEach(function (id) {
           if (!planItems.some(function (item) { return item.id === id; })) {
-            planItems.push({ id: id, qty: 1, reason: "" });
+            planItems.push({ id: id, qty: "", reason: "" });
           }
         });
         closePlanAssetPick();
@@ -2384,7 +2416,7 @@
         var assetIds = planItems.map(function (item) { return item.id; });
         var assetQty = {};
         var assetReasons = {};
-        planItems.forEach(function (item) { assetQty[item.id] = item.qty; assetReasons[item.id] = item.reason; });
+        planItems.forEach(function (item) { assetQty[item.id] = planQtyValue(item.qty); assetReasons[item.id] = item.reason; });
         var item = {
           planNo: planEditingNo || genPlanNo(year),
           year: year,
@@ -2393,11 +2425,11 @@
           qty: planItems.length,
           originSum: planItems.reduce(function (s, item) {
             var a = planAssets.find(function (x) { return x.id === item.id; });
-            return s + (a ? a.origin * item.qty : 0);
+            return s + (a ? a.origin * planQtyNumber(item.qty) : 0);
           }, 0),
           netSum: planItems.reduce(function (s, item) {
             var a = planAssets.find(function (x) { return x.id === item.id; });
-            return s + (a ? a.net * item.qty : 0);
+            return s + (a ? a.net * planQtyNumber(item.qty) : 0);
           }, 0),
           submitDate: status === "review" ? new Date().toISOString().slice(0, 10) : "",
           status: status,
@@ -2425,21 +2457,22 @@
           '<div class="view-item full"><b>报废说明：</b>' + (item.remark || "-") + "</div>";
         var assets = planAssets.filter(function (a) { return item.assetIds.indexOf(a.id) > -1; });
         document.getElementById("planDetailAssetBody").innerHTML = assets.map(function (a, idx) {
-          var pq = item.assetQty && item.assetQty[a.id] != null ? Number(item.assetQty[a.id]) : 1;
-          if (isNaN(pq) || pq < 1) pq = 1;
+          var pq = planQtyNumber(item.assetQty && item.assetQty[a.id] != null ? item.assetQty[a.id] : "");
           var dep = a.origin - a.net;
           var reason = (item.assetReasons && item.assetReasons[a.id]) ? item.assetReasons[a.id] : "-";
           return "<tr>" +
-            "<td style=\"text-align:center;color:#64748b;\">" + (idx + 1) + "</td>" +
             "<td>" + escHtml(a.name) + "</td>" +
-            "<td>" + escHtml(a.model) + "</td>" +
+            "<td>" + escHtml(assetProductCode(a)) + "</td>" +
             "<td style=\"word-break:break-all;\">" + escHtml(a.manufacturer || "-") + "</td>" +
+            "<td>" + escHtml(a.model || "-") + "</td>" +
+            "<td>" + escHtml(assetTypeCode(a)) + "</td>" +
+            "<td>" + escHtml(assetCategory(a)) + "</td>" +
             "<td style=\"text-align:center;\">" + escHtml(a.unit || "台") + "</td>" +
-            "<td style=\"text-align:center;\">" + pq + "</td>" +
+            "<td style=\"text-align:center;\">" + (pq || "-") + "</td>" +
+            "<td style=\"text-align:right;\">" + fmtWan(a.origin * pq) + "</td>" +
+            "<td style=\"text-align:right;\">" + fmtWan(dep * pq) + "</td>" +
+            "<td style=\"text-align:right;\">" + fmtWan(a.net * pq) + "</td>" +
             "<td>" + (a.purchaseDate || "-") + "</td>" +
-            "<td style=\"text-align:right;\">" + fmtMoney(a.origin * pq) + "</td>" +
-            "<td style=\"text-align:right;\">" + fmtMoney(dep * pq) + "</td>" +
-            "<td style=\"text-align:right;\">" + fmtMoney(a.net * pq) + "</td>" +
             "<td>" + escHtml(reason) + "</td>" +
             "</tr>";
         }).join("");
@@ -2554,10 +2587,11 @@
           var inp = e.target.closest(".pi-qty");
           if (inp) {
             var idx = parseInt(inp.getAttribute("data-idx"), 10);
-            var v = parseInt(inp.value, 10);
-            if (isNaN(v) || v < 1) v = 1;
+            var raw = String(inp.value || "").trim();
+            var v = raw === "" ? "" : parseInt(raw, 10);
+            if (v !== "" && (isNaN(v) || v < 1)) v = "";
             if (planItems[idx]) { planItems[idx].qty = v; }
-            if (String(v) !== String(inp.value)) inp.value = v;
+            if (v !== "" && String(v) !== String(inp.value)) inp.value = v;
             renderPlanItemTable();
           }
           var ta = e.target.closest(".pi-reason");
