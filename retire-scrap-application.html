@@ -750,60 +750,70 @@
         <button class="modal-close" id="btnCloseModal" aria-label="关闭">×</button>
       </div>
         </div>
-      <div class="modal-body" style="max-height:72vh;overflow-y:auto;padding:14px 16px;">
-        <!-- 第一部分：基本信息 -->
-        <div style="font-size:13px;font-weight:600;color:#1f3551;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid #e8eef7;">基本信息</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px 16px;margin-bottom:14px;">
-          <div><label style="display:block;font-size:12px;color:#516a87;margin-bottom:4px;">申请部门</label><input id="applyDept" style="width:100%;height:32px;border:1px solid #d7e1ee;border-radius:6px;padding:0 10px;font-size:14px;" value="设备运维部" /></div>
-          <div><label style="display:block;font-size:12px;color:#516a87;margin-bottom:4px;">申请日期</label><input id="applyDate" type="date" style="width:100%;height:32px;border:1px solid #d7e1ee;border-radius:6px;padding:0 10px;font-size:14px;" /></div>
-          <div><label style="display:block;font-size:12px;color:#516a87;margin-bottom:4px;">拟报废固定起产块放地点</label><input id="stackLocation" style="width:100%;height:32px;border:1px solid #d7e1ee;border-radius:6px;padding:0 10px;font-size:14px;" placeholder="例如：华北中心仓 D 区报废暂存点" /></div>
-          <div><label style="display:block;font-size:12px;color:#516a87;margin-bottom:4px;">申请报废原因</label><textarea id="scrapReason" style="width:100%;height:60px;border:1px solid #d7e1ee;border-radius:6px;padding:6px 10px;font-size:14px;resize:vertical;" placeholder="依据xxx制度，第xx条，该xx设备……拟申请报废"></textarea></div>
-        </div>
-        <!-- 第二部分：拟报废明细表 -->
-        <div style="font-size:13px;font-weight:600;color:#1f3551;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid #e8eef7;">拟报废固定起产明细表</div>
-        <div style="margin-bottom:6px;">
-          <button type="button" id="btnAddApplyItem" style="border:1px solid #1890ff;background:#e6f4ff;color:#1677ff;border-radius:6px;padding:4px 12px;font-size:12px;cursor:pointer;">+ 添加物资</button>
-          <span id="applyItemCount" style="font-size:12px;color:#64748b;margin-left:10px;">共 0 条</span>
+      <div class="modal-body" style="display:block;">
+        <div style="font-size:13px;font-weight:600;color:#1f3551;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid #e8eef7;">
+          在线物资列表
+          <span style="float:right;display:flex;gap:8px;">
+            <button type="button" id="btnApplyPrint" style="border:none;background:transparent;color:#64748b;cursor:pointer;font-size:13px;" title="打印"><i class="fa-solid fa-print"></i></button>
+            <button type="button" id="btnApplyDownload" style="border:none;background:transparent;color:#64748b;cursor:pointer;font-size:13px;" title="下载"><i class="fa-solid fa-download"></i></button>
+          </span>
         </div>
         <div style="border:1px solid #e8eef7;border-radius:8px;overflow:hidden;margin-bottom:14px;">
-          <div style="max-height:240px;overflow:auto;">
-            <table style="width:100%;border-collapse:collapse;font-size:12px;table-layout:fixed;">
+          <div style="max-height:280px;overflow:auto;">
+            <table style="width:100%;border-collapse:collapse;font-size:13px;color:#1f2d3d;table-layout:fixed;">
               <thead>
                 <tr style="background:#f8fafc;">
-                  <th style="padding:8px 6px;border-bottom:1px solid #e8eef7;text-align:center;color:#64748b;width:36px;">序号</th>
-                  <th style="padding:8px 6px;border-bottom:1px solid #e8eef7;text-align:left;color:#64748b;">起产编号</th>
-                  <th style="padding:8px 6px;border-bottom:1px solid #e8eef7;text-align:left;color:#64748b;">起产名称</th>
-                  <th style="padding:8px 6px;border-bottom:1px solid #e8eef7;text-align:left;color:#64748b;">规格型号</th>
-                  <th style="padding:8px 6px;border-bottom:1px solid #e8eef7;text-align:right;color:#64748b;width:90px;">原值(元)</th>
-                  <th style="padding:8px 6px;border-bottom:1px solid #e8eef7;text-align:right;color:#64748b;width:90px;">净值(元)</th>
-                  <th style="padding:8px 6px;border-bottom:1px solid #e8eef7;text-align:center;color:#64748b;width:60px;">数量</th>
-                  <th style="padding:8px 6px;border-bottom:1px solid #e8eef7;text-align:left;color:#64748b;">拟报废原因</th>
-                  <th style="padding:8px 6px;border-bottom:1px solid #e8eef7;text-align:center;color:#64748b;width:80px;">操作</th>
+                  <th style="padding:8px 10px;border-bottom:1px solid #e8eef7;text-align:left;color:#1f2d3d;">产品名称</th>
+                  <th style="padding:8px 10px;border-bottom:1px solid #e8eef7;text-align:left;color:#1f2d3d;">产品编码</th>
+                  <th style="padding:8px 10px;border-bottom:1px solid #e8eef7;text-align:left;color:#1f2d3d;">制造商</th>
+                  <th style="padding:8px 10px;border-bottom:1px solid #e8eef7;text-align:left;color:#1f2d3d;">产品型号</th>
+                  <th style="padding:8px 10px;border-bottom:1px solid #e8eef7;text-align:left;color:#1f2d3d;">物资类型编码</th>
+                  <th style="padding:8px 10px;border-bottom:1px solid #e8eef7;text-align:left;color:#1f2d3d;">物资类别</th>
+                  <th style="padding:8px 10px;border-bottom:1px solid #e8eef7;text-align:center;color:#1f2d3d;width:52px;">单位</th>
+                  <th style="padding:8px 10px;border-bottom:1px solid #e8eef7;text-align:right;color:#1f2d3d;width:104px;">资产原值（万元）</th>
+                  <th style="padding:8px 10px;border-bottom:1px solid #e8eef7;text-align:right;color:#1f2d3d;width:104px;">累计折旧（万元）</th>
+                  <th style="padding:8px 10px;border-bottom:1px solid #e8eef7;text-align:right;color:#1f2d3d;width:104px;">净值（万元）</th>
+                  <th style="padding:8px 10px;border-bottom:1px solid #e8eef7;text-align:center;color:#1f2d3d;width:96px;">采购时间</th>
+                  <th style="padding:8px 10px;border-bottom:1px solid #e8eef7;text-align:left;color:#1f2d3d;">拟报废原因</th>
                 </tr>
               </thead>
-              <tbody id="applyItemBody"></tbody>
+              <tbody id="applyOnlineBody"></tbody>
             </table>
+          </div>
+          <div id="applyOnlineEmpty" style="text-align:center;color:#8ca0b8;padding:24px;font-size:13px;">暂无在线物资</div>
         </div>
-          <div id="applyItemEmpty" style="text-align:center;color:#8ca0b8;padding:24px;font-size:13px;">暢无物资，请点击上方「添加物资」按钮</div>
+        <div style="font-size:13px;font-weight:600;color:#1f3551;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid #e8eef7;">拟报废物资明细表</div>
+        <div style="border:1px solid #e8eef7;border-radius:8px;overflow:hidden;margin-bottom:14px;">
+          <div style="max-height:280px;overflow:auto;">
+            <table style="width:100%;border-collapse:collapse;font-size:13px;color:#1f2d3d;table-layout:fixed;">
+              <thead>
+                <tr style="background:#f8fafc;">
+                  <th style="padding:8px 10px;border-bottom:1px solid #e8eef7;text-align:left;color:#1f2d3d;">产品名称</th>
+                  <th style="padding:8px 10px;border-bottom:1px solid #e8eef7;text-align:left;color:#1f2d3d;">产品编码</th>
+                  <th style="padding:8px 10px;border-bottom:1px solid #e8eef7;text-align:left;color:#1f2d3d;">制造商</th>
+                  <th style="padding:8px 10px;border-bottom:1px solid #e8eef7;text-align:left;color:#1f2d3d;">产品型号</th>
+                  <th style="padding:8px 10px;border-bottom:1px solid #e8eef7;text-align:left;color:#1f2d3d;">物资类型编码</th>
+                  <th style="padding:8px 10px;border-bottom:1px solid #e8eef7;text-align:left;color:#1f2d3d;">物资类别</th>
+                  <th style="padding:8px 10px;border-bottom:1px solid #e8eef7;text-align:center;color:#1f2d3d;width:52px;">单位</th>
+                  <th style="padding:8px 10px;border-bottom:1px solid #e8eef7;text-align:center;color:#1f2d3d;width:64px;">数量</th>
+                  <th style="padding:8px 10px;border-bottom:1px solid #e8eef7;text-align:right;color:#1f2d3d;width:104px;">资产原值（万元）</th>
+                  <th style="padding:8px 10px;border-bottom:1px solid #e8eef7;text-align:right;color:#1f2d3d;width:104px;">累计折旧（万元）</th>
+                  <th style="padding:8px 10px;border-bottom:1px solid #e8eef7;text-align:right;color:#1f2d3d;width:104px;">净值（万元）</th>
+                  <th style="padding:8px 10px;border-bottom:1px solid #e8eef7;text-align:center;color:#1f2d3d;width:96px;">采购时间</th>
+                  <th style="padding:8px 10px;border-bottom:1px solid #e8eef7;text-align:left;color:#1f2d3d;">拟报废原因</th>
+                  <th style="padding:8px 10px;border-bottom:1px solid #e8eef7;text-align:center;color:#1f2d3d;width:110px;">操作</th>
+                </tr>
+              </thead>
+              <tbody id="applyDetailBody"></tbody>
+            </table>
+          </div>
+          <div id="applyDetailEmpty" style="text-align:center;color:#8ca0b8;padding:24px;font-size:13px;">请从上方在线物资列表点击行选择物资</div>
         </div>
-        <div id="applyItemSummary" style="font-size:12px;color:#334155;margin-bottom:14px;padding:6px 10px;background:#f8fbff;border:1px solid #e6edf7;border-radius:6px;">
-          已选 <b id="applyItemTotal">0</b> 件物资，
-          原值合计：<b id="applyOriginSum">¥ 0.00</b>，
-          净值合计：<b id="applyNetSum">¥ 0.00</b>
-          <span id="applyEvalTip" style="margin-left:12px;color:#389e0d;"></span>
-        </div>
-        <!-- 第三部分：审批签字 -->
-        <div style="font-size:13px;font-weight:600;color:#1f3551;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid #e8eef7;">审批签字</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px 16px;">
-          <div><label style="display:block;font-size:12px;color:#516a87;margin-bottom:4px;">申请人员签字（电子签）</label><input id="applicantSign" style="width:100%;height:32px;border:1px solid #d7e1ee;border-radius:6px;padding:0 10px;font-size:14px;" value="张明（电子签）" /></div>
-          <div><label style="display:block;font-size:12px;color:#516a87;margin-bottom:4px;">申请部门责任人意见及签字</label><input id="deptHeadOpinion" style="width:100%;height:32px;border:1px solid #d7e1ee;border-radius:6px;padding:0 10px;font-size:14px;" placeholder="责任人审批意见（选填）" /></div>
-          <div><label style="display:block;font-size:12px;color:#516a87;margin-bottom:4px;">物资专责汇总意见及签字</label><input id="manageSpecialOpinion" style="width:100%;height:32px;border:1px solid #d7e1ee;border-radius:6px;padding:0 10px;font-size:14px;" placeholder="物资专责汇总意见（选填）" /></div>
-          <div><label style="display:block;font-size:12px;color:#516a87;margin-bottom:4px;">物资责任人意见及签字</label><input id="manageHeadOpinion" style="width:100%;height:32px;border:1px solid #d7e1ee;border-radius:6px;padding:0 10px;font-size:14px;" placeholder="物资责任人审批意见（选填）" /></div>
-          <div><label style="display:block;font-size:12px;color:#516a87;margin-bottom:4px;">财务责任人审批意见及签字</label><input id="financeOpinionInput" style="width:100%;height:32px;border:1px solid #d7e1ee;border-radius:6px;padding:0 10px;font-size:14px;" placeholder="财务责任人审批意见（选填）" /></div>
-          <div><label style="display:block;font-size:12px;color:#516a87;margin-bottom:4px;">物资专责存档记录</label><input id="archiveRecordInput" style="width:100%;height:32px;border:1px solid #d7e1ee;border-radius:6px;padding:0 10px;font-size:14px;" placeholder="存档记录（选填）" /></div>
-        </div>
-        <div style="margin:12px 0 4px;padding:7px 10px;border-radius:6px;background:#f5f5f5;color:#6b7280;font-size:12px;line-height:1.6;">
-          💡 提示：固定起产报废申请签字后，由起产报废鉴定专业部门进行退役鉴定并出典鉴定报告，管理处置部门依据该申请及鉴定报告执行公司固定起产报废内部决策流程。
+        <div id="applyDetailSummary" style="font-size:12px;color:#334155;margin-bottom:14px;padding:6px 10px;background:#f8fbff;border:1px solid #e6edf7;border-radius:6px;">
+          已选 <b id="applyDetailCount">0</b> 件物资，
+          原值合计：<b id="applyDetailOriginSum">¥ 0.00</b>，
+          折旧合计：<b id="applyDetailDepSum">¥ 0.00</b>，
+          净值合计：<b id="applyDetailNetSum">¥ 0.00</b>
         </div>
         </div>
       <div class="modal-footer">
@@ -1488,21 +1498,25 @@
         var rows = progressRows(item, type);
         refs.progressInfoBody.innerHTML = rows.map(function(r, i) {
           var isLast = i === rows.length - 1;
-          var resultColor = r.result === "已完成" || r.result === "通过" || r.result === "已通过" || r.result === "报废结束" ? "#10b981" : 
+          var resultColor = r.result === "已完成" || r.result === "通过" || r.result === "已通过" || r.result === "报废结束" ? "#10b981" :
                            r.result === "待处理" || r.result === "驳回" ? "#f59e0b" : "#64748b";
-          return '<div style="display:flex;gap:0;align-items:flex-start;position:relative">' +
-            '<div style="display:flex;flex-direction:column;align-items:center;flex-shrink:0;width:24px">' +
-              '<div style="width:12px;height:12px;border-radius:50%;background:' + resultColor + ';flex-shrink:0"></div>' +
-              (!isLast ? '<div style="width:2px;flex:1;min-height:40px;background:#e2e8f0;margin-top:4px"></div>' : '') +
+          var timeColor = r.time && r.time.indexOf("-") >= 0 ? "#d48806" : "#1f2d3d";
+          return '<div style="display:flex;align-items:flex-start;gap:12px;padding-bottom:' + (isLast ? '0' : '22px') + ';position:relative">' +
+            '<div style="display:flex;flex-direction:column;align-items:center;flex-shrink:0">' +
+              '<div style="width:10px;height:10px;border-radius:50%;background:' + resultColor + ';margin-top:6px"></div>' +
+              (!isLast ? '<div style="width:2px;flex:1;background:#e5e7eb;margin-top:6px;min-height:36px"></div>' : '') +
             '</div>' +
-            '<div style="flex:1;padding-bottom:' + (isLast ? '0' : '24px') + ';min-width:0">' +
-              '<div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:6px">' +
-                '<span style="font-weight:600;color:#1f3551;font-size:14px">' + escHtml(r.user) + '</span>' +
-                '<span style="color:#64748b;font-size:13px">' + r.node + '</span>' +
-                '<span style="color:#64748b;font-size:13px">' + escHtml(r.time) + '</span>' +
-                '<span style="padding:2px 8px;border-radius:4px;font-size:12px;font-weight:500;background:' + resultColor + '22;color:' + resultColor + '">' + escHtml(r.result) + '</span>' +
+            '<div style="flex:1;min-width:0;border-left:1px solid #e5e7eb;padding-left:12px">' +
+              '<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:4px">' +
+                '<span style="font-weight:600;color:#1f2d3d;font-size:13px">' + escHtml(r.node) + '</span>' +
+                '<span style="padding:2px 8px;border-radius:4px;font-size:12px;font-weight:500;background:' + resultColor + '14;color:' + resultColor + ';border:1px solid ' + resultColor + '33">' + escHtml(r.result) + '</span>' +
               '</div>' +
-              '<div style="font-size:13px;color:#51627a;line-height:1.7">' + escHtml(r.content) + '</div>' +
+              '<div style="display:flex;align-items:center;gap:10px;color:#64748b;font-size:12px;margin-bottom:4px">' +
+                '<span>' + escHtml(r.user) + '</span>' +
+                '<span style="color:#cbd5e1">|</span>' +
+                '<span>' + escHtml(r.time) + '</span>' +
+              '</div>' +
+              '<div style="font-size:13px;color:#334155;line-height:1.6">' + escHtml(r.content) + '</div>' +
             '</div>' +
           '</div>';
         }).join("");
@@ -2184,22 +2198,23 @@
           totalNet += asset.net * qty;
           var tr = document.createElement("tr");
           tr.innerHTML =
-            '<td>' + escHtml(asset.name) + '</td>' +
-            '<td>' + escHtml(assetProductCode(asset)) + '</td>' +
-            '<td style="word-break:break-all;">' + escHtml(asset.manufacturer || "-") + '</td>' +
-            '<td>' + escHtml(asset.model || "-") + '</td>' +
-            '<td>' + escHtml(assetTypeCode(asset)) + '</td>' +
-            '<td>' + escHtml(assetCategory(asset)) + '</td>' +
-            '<td style="text-align:center;">' + escHtml(asset.unit || "台") + '</td>' +
-            '<td><input type="number" min="1" class="pi-qty" data-idx="' + idx + '" value="' + escHtml(planQtyValue(item.qty)) + '" placeholder="请输入数量" /></td>' +
-            '<td style="text-align:right;">' + fmtWan(asset.origin * qty) + '</td>' +
-            '<td style="text-align:right;">' + fmtWan(dep * qty) + '</td>' +
-            '<td style="text-align:right;">' + fmtWan(asset.net * qty) + '</td>' +
-            '<td>' + (asset.purchaseDate || "-") + '</td>' +
-            '<td><textarea class="pi-reason" data-idx="' + idx + '" rows="2" placeholder="填写报废原因">' + escHtml(item.reason || "") + '</textarea></td>' +
+            '<td style="color:#1f2d3d;">' + escHtml(asset.name) + '</td>' +
+            '<td style="color:#1f2d3d;">' + escHtml(assetProductCode(asset)) + '</td>' +
+            '<td style="word-break:break-all;color:#1f2d3d;">' + escHtml(asset.manufacturer || "-") + '</td>' +
+            '<td style="color:#1f2d3d;">' + escHtml(asset.model || "-") + '</td>' +
+            '<td style="color:#1f2d3d;">' + escHtml(assetTypeCode(asset)) + '</td>' +
+            '<td style="color:#1f2d3d;">' + escHtml(assetCategory(asset)) + '</td>' +
+            '<td style="text-align:center;color:#1f2d3d;">' + escHtml(asset.unit || "台") + '</td>' +
+            '<td><input type="number" min="1" class="pi-qty" data-idx="' + idx + '" value="' + escHtml(planQtyValue(item.qty)) + '" placeholder="请输入数量" style="color:#1f2d3d;" /></td>' +
+            '<td style="text-align:right;color:#1f2d3d;">' + fmtWan(asset.origin * qty) + '</td>' +
+            '<td style="text-align:right;color:#1f2d3d;">' + fmtWan(dep * qty) + '</td>' +
+            '<td style="text-align:right;color:#1f2d3d;">' + fmtWan(asset.net * qty) + '</td>' +
+            '<td style="color:#1f2d3d;">' + (asset.purchaseDate || "-") + '</td>' +
+            '<td style="color:#1f2d3d;"><textarea class="pi-reason" data-idx="' + idx + '" rows="2" placeholder="填写报废原因" style="color:#1f2d3d;">' + escHtml(item.reason || "") + '</textarea></td>' +
             '<td>' +
               '<div class="plan-item-ops">' +
                 '<a href="#" class="pi-del" data-idx="' + idx + '" style="color:#ff4d4f;">删除</a>' +
+                '<a href="#" class="pi-track" data-id="' + escHtml(asset.id) + '" style="color:#1677ff;margin-left:8px;">物资跟踪</a>' +
               '</div>' +
             '</td>';
           body.appendChild(tr);
@@ -2477,12 +2492,31 @@
             "</tr>";
         }).join("");
         document.getElementById("planDetailRecordBody").innerHTML =
-          "<tr><td>业务部门开始提报次年报废计划</td><td>" + escHtml(item.applicant || currentUser) + "</td><td>于" + (item.submitDate || "-") + "执行业务部门开始提报次年报废计划，梳理" + (item.dept || currentDept) + "次年拟报废物资范围，处理结果为已通过。</td><td>" + (item.submitDate || "-") + "</td><td>已通过</td></tr>" +
-          "<tr><td>业务部门提交报废计划</td><td>" + escHtml(item.applicant || currentUser) + "</td><td>于" + (item.submitDate || "-") + "执行业务部门提交报废计划，提交报废计划、拟报废物资明细及报废说明，处理结果为已通过。</td><td>" + (item.submitDate || "-") + "</td><td>已通过</td></tr>" +
-          "<tr><td>业务部门负责人审批</td><td>李仁堂</td><td>于" + (item.submitDate || "-") + "执行业务部门负责人审批，确认报废计划内容完整并同意提交后续审批，处理结果为已通过。</td><td>" + (item.submitDate || "-") + "</td><td>已通过</td></tr>" +
-          "<tr><td>物资管理部门的物资专责汇总且物资管理部门负责人审批</td><td>宋中波</td><td>于" + (item.submitDate || "-") + "执行物资管理部门的物资专责汇总且物资管理部门负责人审批，汇总拟报废物资清单并确认处置路径，处理结果为已通过。</td><td>" + (item.submitDate || "-") + "</td><td>已通过</td></tr>" +
-          "<tr><td>财务部负责人审批</td><td>孙睿</td><td>待执行财务部负责人审批，待审核资产原值、累计折旧、净值及账务处理口径，处理结果为待处理。</td><td>-</td><td>待处理</td></tr>" +
-          "<tr><td>物资管理部门物资专责存档，报废结束</td><td>宋中波</td><td>待执行物资管理部门物资专责存档，报废结束，待审批完成后归档报废计划、审批记录及资产清单，处理结果为未到达。</td><td>-</td><td>未到达</td></tr>";
+          progressRows(item, "plan").map(function(r, i) {
+            var resultColor = r.result === "已完成" || r.result === "通过" || r.result === "已通过" || r.result === "报废结束" ? "#10b981" :
+                             r.result === "待处理" || r.result === "驳回" || r.result === "未到达" ? "#f59e0b" : "#64748b";
+            var isLast = i === progressRows(item, "plan").length - 1;
+            return '<tr><td colspan="5" style="padding:8px 0;border:none;">' +
+              '<div style="display:flex;align-items:flex-start;gap:12px;padding-bottom:' + (isLast ? '0' : '14px') + '">' +
+                '<div style="display:flex;flex-direction:column;align-items:center;flex-shrink:0">' +
+                  '<div style="width:10px;height:10px;border-radius:50%;background:' + resultColor + ';margin-top:6px"></div>' +
+                  (!isLast ? '<div style="width:2px;flex:1;background:#e5e7eb;margin-top:6px;min-height:32px"></div>' : '') +
+                '</div>' +
+                '<div style="flex:1;min-width:0;border-left:1px solid #e5e7eb;padding-left:12px">' +
+                  '<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:4px">' +
+                    '<span style="font-weight:600;color:#1f2d3d;font-size:13px">' + escHtml(r.node) + '</span>' +
+                    '<span style="padding:2px 8px;border-radius:4px;font-size:12px;font-weight:500;background:' + resultColor + '14;color:' + resultColor + ';border:1px solid ' + resultColor + '33">' + escHtml(r.result) + '</span>' +
+                  '</div>' +
+                  '<div style="display:flex;align-items:center;gap:10px;color:#64748b;font-size:12px;margin-bottom:4px">' +
+                    '<span>' + escHtml(r.user) + '</span>' +
+                    '<span style="color:#cbd5e1">|</span>' +
+                    '<span>' + escHtml(r.time) + '</span>' +
+                  '</div>' +
+                  '<div style="font-size:13px;color:#334155;line-height:1.6">' + escHtml(r.content) + '</div>' +
+                '</div>' +
+              '</div>' +
+            '</td></tr>';
+          }).join("");
         document.getElementById("planDetailMask").classList.add("show");
       }
       function closePlanDetail() {
