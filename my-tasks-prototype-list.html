@@ -1687,19 +1687,35 @@
         var procKey = String(map && map["流程定义KEY"] || "");
         var taskName = String(map && map["任务名称"] || "");
         var text = procName + "|" + procKey + "|" + taskName;
+        if (text.indexOf("报废") >= 0 || text.indexOf("退役") >= 0 || text.indexOf("废旧") >= 0 || /scrap|retire/i.test(text)) return "scrap";
         if (text.indexOf("公司盘点任务审批") >= 0 || procKey.indexOf("pdtask_company") === 0 || taskName.indexOf("公司") >= 0) return "company";
         if (text.indexOf("部门盘点任务审批") >= 0 || procKey.indexOf("pdtask_dept") === 0 || taskName.indexOf("部门盘点") >= 0) return "dept";
         if (inventoryTodoIsCompany(map)) return "company";
         return "dept";
       }
+      function inventoryTodoScrapProgressApprovals(map) {
+        var submitDate = String(map && (map["提交日期"] || map["申请日期"] || map.submitDate || map.applyDate) || "2026-07-01").replace(/\//g, "-");
+        var dept = map && (map["申请部门"] || map.dept) || "设备运维部";
+        var applicant = map && (map["申请人"] || map.applicant) || "张明";
+        return [
+          { node: "业务部门开始提报次年报废计划", person: applicant, time: submitDate + " 09:00", opinion: applicant + "于" + submitDate + " 09:00执行业务部门开始提报次年报废计划，梳理" + dept + "次年拟报废物资范围，处理结果为已通过。", result: "已通过" },
+          { node: "业务部门提交报废计划", person: applicant, time: submitDate + " 09:18", opinion: applicant + "于" + submitDate + " 09:18执行业务部门提交报废计划，提交报废计划、拟报废物资明细及报废说明，处理结果为已通过。", result: "已通过" },
+          { node: "业务部门负责人审批", person: "李仁堂", time: submitDate + " 10:05", opinion: "李仁堂于" + submitDate + " 10:05执行业务部门负责人审批，确认报废计划内容完整并同意提交后续审批，处理结果为已通过。", result: "已通过" },
+          { node: "物资管理部门的物资专责汇总且物资管理部门负责人审批", person: "宋中波", time: submitDate + " 10:42", opinion: "宋中波于" + submitDate + " 10:42执行物资管理部门的物资专责汇总且物资管理部门负责人审批，汇总拟报废物资清单并确认处置路径，处理结果为已通过。", result: "已通过" },
+          { node: "财务部负责人审批", person: "孙睿", time: submitDate + " 11:26", opinion: "孙睿于" + submitDate + " 11:26执行财务部负责人审批，审核资产原值、累计折旧、净值及账务处理口径，处理结果为处理中。", result: "处理中" },
+          { node: "物资管理部门物资专责存档，报废结束", person: "宋中波", time: "-", opinion: "宋中波待执行物资管理部门物资专责存档，报废结束，待审批完成后归档报废计划、审批记录及资产清单，处理结果为待处理。", result: "待处理" }
+        ];
+      }
       function openInventoryTodoProgress(map) {
         map = map || window.__inventoryTodoCurrentMap || window.__inventoryTodoLastMap || {};
         window.__inventoryTodoCurrentMap = map;
         window.__inventoryTodoLastMap = map;
-        var isCompany = inventoryTodoProgressType(map) === "company";
-        var title = isCompany ? "审批记录 - 公司盘点" : "审批记录 - 部门盘点";
-        var approvals = inventoryTodoProgressApprovals(map || {}, isCompany);
-        var rowClass = isCompany ? "inventory-progress-row is-company-branch" : "inventory-progress-row";
+        var progressType = inventoryTodoProgressType(map);
+        var isScrap = progressType === "scrap";
+        var isCompany = progressType === "company";
+        var title = isScrap ? "审批记录 - 报废计划" : (isCompany ? "审批记录 - 公司盘点" : "审批记录 - 部门盘点");
+        var approvals = isScrap ? inventoryTodoScrapProgressApprovals(map || {}) : inventoryTodoProgressApprovals(map || {}, isCompany);
+        var rowClass = isScrap ? "inventory-progress-row is-scrap-flow" : (isCompany ? "inventory-progress-row is-company-branch" : "inventory-progress-row");
         var currentStepIndex = -1;
         approvals.forEach(function (step, idx) {
           if (step.result === "处理中" && currentStepIndex < 0) currentStepIndex = idx;
@@ -1707,7 +1723,7 @@
         approvals.forEach(function (step, idx) {
           if (step.result === "待处理" && currentStepIndex < 0) currentStepIndex = idx;
         });
-        if (currentStepIndex < 0) currentStepIndex = isCompany ? 8 : 5;
+        if (currentStepIndex < 0) currentStepIndex = isScrap ? 4 : (isCompany ? 8 : 5);
         function progressStep(text, idx, isEnd, skipAfterArrow) {
           var cls = "";
           if (idx === currentStepIndex) cls += " is-current";
@@ -1716,7 +1732,11 @@
           var afterArrow = (skipAfterArrow || isEnd) ? "" : '<div class="inventory-progress-arrow">→</div>';
           return '<div class="inventory-progress-step' + cls + '">' + mtEsc(text) + '</div>' + afterArrow;
         }
-        var rowHtml = isCompany
+        var rowHtml = isScrap
+          ? approvals.map(function (step, idx, arr) {
+            return progressStep(step.node, idx, idx === arr.length - 1);
+          }).join("")
+          : isCompany
           ? '<div class="inventory-progress-company-tree">' +
               progressStep("物资管理部门物资专责发起公司物资盘点", 0, false, true) +
               '<div class="inventory-progress-company-branch">' +
