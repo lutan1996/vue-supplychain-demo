@@ -395,10 +395,22 @@
   <script src="js/purchase-plan-management-prototype.js"></script>
   <script>
     (function () {
-      var label = new URLSearchParams(location.search || "").get("pageSub") || "";
-      if (!label) return;
-      var segs = document.querySelectorAll(".subpage-breadcrumb a, .subpage-breadcrumb span:not(.sep)");
-      if (segs.length) segs[segs.length - 1].textContent = label;
+      function applyPageSub() {
+        var label = new URLSearchParams(location.search || "").get("pageSub") || "";
+        if (!label) {
+          try {
+            var stored = sessionStorage.getItem("pageSub") || "";
+            if (stored === "项目公司采购信息台帐") label = stored;
+          } catch (eStorage) {}
+        }
+        if (!label) return;
+        var segs = document.querySelectorAll(".subpage-breadcrumb a, .subpage-breadcrumb span:not(.sep)");
+        if (segs.length) segs[segs.length - 1].textContent = label;
+      }
+      applyPageSub();
+      document.addEventListener("DOMContentLoaded", applyPageSub);
+      setTimeout(applyPageSub, 80);
+      setTimeout(applyPageSub, 300);
     })();
   </script>
 </body>
