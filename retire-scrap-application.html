@@ -1776,16 +1776,6 @@
       function openApplyModal() {
         applyDetailRows = [];
         applySelectedAssetId = null;
-        refs.applyDept.value = "设备运维部";
-        refs.applyDate.value = new Date().toISOString().slice(0, 10);
-        refs.stackLocation.value = "";
-        refs.scrapReason.value = "";
-        refs.applicantSign.value = currentUser + "（电子签）";
-        refs.deptHeadOpinion.value = "";
-        refs.manageSpecialOpinion.value = "";
-        refs.manageHeadOpinion.value = "";
-        refs.financeOpinionInput.value = "";
-        refs.archiveRecordInput.value = "";
         refreshApplyOnlineTable();
         refreshApplyDetailTable();
         refs.applyModalMask.classList.add("show");
