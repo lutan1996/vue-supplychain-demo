@@ -644,6 +644,7 @@
     /* 报废物资明细表（新增/编辑弹窗） */
     .plan-item-table {
       width: 100%;
+      min-width: 1580px;
       border-collapse: collapse;
       font-size: 12px;
       table-layout: fixed;
@@ -689,10 +690,15 @@
     .plan-item-table td:last-child {
       width: 150px;
       min-width: 150px;
+      max-width: 150px;
       white-space: nowrap;
+      overflow: visible;
     }
-    .plan-item-ops { display: flex; gap: 6px; align-items: center; justify-content: center; width: 100%; min-width: 0; white-space: nowrap; }
-    .plan-item-ops a { color: #1677ff; font-size: 12px; cursor: pointer; text-decoration: none; }
+    .plan-item-ops { display: flex; gap: 8px; align-items: center; justify-content: center; width: 100%; min-width: 118px; white-space: nowrap; }
+    .plan-item-ops a,
+    .plan-item-ops button { border:0; background:transparent; padding:0; line-height:1.2; font-size:12px; cursor:pointer; text-decoration:none; white-space:nowrap; }
+    .plan-item-ops .pi-del { color:#ff4d4f; }
+    .plan-item-ops .pi-track { color:#1677ff; }
     .plan-item-ops a:hover { opacity: 0.75; }
     .plan-item-ops .ops-sep { color: #d0d7de; }
     /* 物资选择弹窗表格 */
@@ -2515,8 +2521,8 @@
             '<td style="color:#1f2d3d;"><textarea class="pi-reason" data-idx="' + idx + '" rows="2" placeholder="填写报废原因" style="color:#1f2d3d;">' + escHtml(item.reason || "") + '</textarea></td>' +
             '<td>' +
               '<div class="plan-item-ops">' +
-                '<button type="button" class="pi-del" data-idx="' + idx + '" style="border:0;background:transparent;color:#ff4d4f;font-size:12px;cursor:pointer;padding:0;line-height:1;">删除</button>' +
-                '<button type="button" class="pi-track" data-id="' + escHtml(asset.id) + '" style="border:0;background:transparent;color:#1677ff;font-size:12px;cursor:pointer;padding:0;line-height:1;">物资跟踪</button>' +
+                '<a href="#" class="pi-del" data-idx="' + idx + '">删除</a>' +
+                '<a href="#" class="pi-track" data-id="' + escHtml(asset.id) + '">物资跟踪</a>' +
               '</div>' +
             '</td>';
           body.appendChild(tr);
@@ -2931,12 +2937,15 @@
         document.getElementById("planItemBody").addEventListener("click", function (e) {
           var del = e.target.closest(".pi-del");
           if (del) {
+            e.preventDefault();
             var idx = parseInt(del.getAttribute("data-idx"), 10);
             planItems.splice(idx, 1);
             renderPlanItemTable();
+            return;
           }
           var track = e.target.closest(".pi-track");
           if (track) {
+            e.preventDefault();
             var assetId = track.getAttribute("data-id");
             alert("物资跟踪：正在跳转到物资「" + assetId + "」的流转记录页面（演示功能）");
           }
