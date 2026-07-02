@@ -806,7 +806,7 @@
     .plan-item-ops a:hover { opacity: 0.75; }
     .plan-item-ops .ops-sep { color: #d0d7de; }
     .pi-reason-wrap { display:flex; flex-direction:column; gap:6px; position:relative; padding-right:42px; }
-    .pi-reason-tools { position:absolute; right:6px; top:8px; display:flex; align-items:center; justify-content:flex-end; gap:6px; margin:0; }
+    .pi-reason-tools { position:absolute; right:6px; bottom:8px; display:flex; align-items:center; justify-content:flex-end; gap:6px; margin:0; }
     .pi-attach-btn {
       width: 28px;
       height: 28px;
@@ -2720,30 +2720,30 @@
           var qty = planQtyNumber(item.qty);
           totalOrigin += asset.origin * qty;
           totalNet += asset.net * qty;
-          var tr = document.createElement("tr");
-          tr.innerHTML =
-            '<td style="color:#1f2d3d;">' + escHtml(asset.name) + '</td>' +
-            '<td style="color:#1f2d3d;">' + escHtml(assetProductCode(asset)) + '</td>' +
-            '<td style="word-break:break-all;color:#1f2d3d;">' + escHtml(asset.manufacturer || "-") + '</td>' +
-            '<td style="color:#1f2d3d;">' + escHtml(asset.model || "-") + '</td>' +
-            '<td style="color:#1f2d3d;">' + escHtml(assetTypeCode(asset)) + '</td>' +
-            '<td style="color:#1f2d3d;">' + escHtml(assetCategory(asset)) + '</td>' +
-            '<td style="text-align:center;color:#1f2d3d;">' + escHtml(asset.unit || "台") + '</td>' +
-            '<td><input type="number" min="1" class="pi-qty" data-idx="' + idx + '" value="' + escHtml(planQtyValue(item.qty)) + '" placeholder="请输入数量" style="color:#1f2d3d;" /></td>' +
-            '<td style="text-align:right;color:#1f2d3d;">' + fmtWan(asset.origin * qty) + '</td>' +
-            '<td style="text-align:right;color:#1f2d3d;">' + fmtWan(dep * qty) + '</td>' +
-            '<td style="text-align:right;color:#1f2d3d;">' + fmtWan(asset.net * qty) + '</td>' +
-            '<td style="color:#1f2d3d;">' + (asset.purchaseDate || "-") + '</td>' +
-            '<td style="color:#1f2d3d;">' +
+        var tr = document.createElement("tr");
+        tr.innerHTML =
+            '<td style="width:120px;min-width:120px;max-width:120px;color:#1f2d3d;">' + escHtml(asset.name) + '</td>' +
+            '<td style="width:110px;min-width:110px;max-width:110px;color:#1f2d3d;">' + escHtml(assetProductCode(asset)) + '</td>' +
+            '<td style="width:130px;min-width:130px;max-width:130px;word-break:break-all;color:#1f2d3d;">' + escHtml(asset.manufacturer || "-") + '</td>' +
+            '<td style="width:110px;min-width:110px;max-width:110px;color:#1f2d3d;">' + escHtml(asset.model || "-") + '</td>' +
+            '<td style="width:120px;min-width:120px;max-width:120px;color:#1f2d3d;">' + escHtml(assetTypeCode(asset)) + '</td>' +
+            '<td style="width:90px;min-width:90px;max-width:90px;color:#1f2d3d;">' + escHtml(assetCategory(asset)) + '</td>' +
+            '<td style="width:60px;min-width:60px;max-width:60px;text-align:center;color:#1f2d3d;">' + escHtml(asset.unit || "台") + '</td>' +
+            '<td style="width:74px;min-width:74px;max-width:74px;"><input type="number" min="1" class="pi-qty" data-idx="' + idx + '" value="' + escHtml(planQtyValue(item.qty)) + '" placeholder="请输入数量" style="color:#1f2d3d;" /></td>' +
+            '<td style="width:104px;min-width:104px;max-width:104px;text-align:right;color:#1f2d3d;">' + fmtWan(asset.origin * qty) + '</td>' +
+            '<td style="width:104px;min-width:104px;max-width:104px;text-align:right;color:#1f2d3d;">' + fmtWan(dep * qty) + '</td>' +
+            '<td style="width:104px;min-width:104px;max-width:104px;text-align:right;color:#1f2d3d;">' + fmtWan(asset.net * qty) + '</td>' +
+            '<td style="width:96px;min-width:96px;max-width:96px;color:#1f2d3d;">' + (asset.purchaseDate || "-") + '</td>' +
+            '<td style="width:260px;min-width:260px;max-width:260px;color:#1f2d3d;position:relative;">' +
               '<div class="pi-reason-wrap">' +
-                '<textarea class="pi-reason" data-idx="' + idx + '" rows="2" placeholder="填写报废原因" style="color:#1f2d3d;">' + escHtml(item.reason || "") + '</textarea>' +
+                '<textarea class="pi-reason" data-idx="' + idx + '" rows="2" placeholder="填写报废原因" style="color:#1f2d3d;padding-right:42px;">' + escHtml(item.reason || "") + '</textarea>' +
                 '<div class="pi-reason-tools">' +
                   '<button type="button" class="pi-attach-btn" data-idx="' + idx + '" title="上传附件" aria-label="上传附件"><i class="fa-solid fa-paperclip"></i></button>' +
                 '</div>' +
                 '<div class="pi-reason-files" id="piReasonFiles-' + idx + '">' + renderAttachmentLinks(item.attachments || [], "暂无附件") + '</div>' +
               '</div>' +
             '</td>' +
-            '<td>' +
+            '<td style="width:220px;min-width:220px;max-width:220px;">' +
               '<div class="plan-item-ops">' +
                 '<a href="#" class="pi-del" data-idx="' + idx + '">删除</a>' +
                 '<a href="#" class="pi-track" data-id="' + escHtml(asset.id) + '">物资跟踪</a>' +
