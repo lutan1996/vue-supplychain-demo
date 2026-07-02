@@ -942,38 +942,13 @@
         </div>
       <div class="modal-body" style="display:block;">
         <div id="applyPaperCard"></div>
-        <div class="scrap-online-section" style="font-size:13px;font-weight:600;color:#1f3551;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid #e8eef7;">
-          在线物资列表
-          <span style="float:right;display:flex;gap:8px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;font-size:13px;font-weight:600;color:#1f3551;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid #e8eef7;">
+          <span>拟报废物资明细表</span>
+          <span style="display:flex;gap:8px;">
             <button type="button" id="btnApplyPrint" style="border:none;background:transparent;color:#64748b;cursor:pointer;font-size:13px;" title="打印"><i class="fa-solid fa-print"></i></button>
             <button type="button" id="btnApplyDownload" style="border:none;background:transparent;color:#64748b;cursor:pointer;font-size:13px;" title="下载"><i class="fa-solid fa-download"></i></button>
           </span>
         </div>
-        <div class="scrap-online-section" style="border:1px solid #e8eef7;border-radius:8px;overflow:hidden;margin-bottom:14px;">
-          <div style="max-height:280px;overflow:auto;">
-            <table style="width:100%;border-collapse:collapse;font-size:13px;color:#1f2d3d;table-layout:fixed;">
-              <thead>
-                <tr style="background:#f8fafc;">
-                  <th style="padding:8px 10px;border-bottom:1px solid #e8eef7;text-align:left;color:#1f2d3d;">产品名称</th>
-                  <th style="padding:8px 10px;border-bottom:1px solid #e8eef7;text-align:left;color:#1f2d3d;">产品编码</th>
-                  <th style="padding:8px 10px;border-bottom:1px solid #e8eef7;text-align:left;color:#1f2d3d;">制造商</th>
-                  <th style="padding:8px 10px;border-bottom:1px solid #e8eef7;text-align:left;color:#1f2d3d;">产品型号</th>
-                  <th style="padding:8px 10px;border-bottom:1px solid #e8eef7;text-align:left;color:#1f2d3d;">物资类型编码</th>
-                  <th style="padding:8px 10px;border-bottom:1px solid #e8eef7;text-align:left;color:#1f2d3d;">物资类别</th>
-                  <th style="padding:8px 10px;border-bottom:1px solid #e8eef7;text-align:center;color:#1f2d3d;width:52px;">单位</th>
-                  <th style="padding:8px 10px;border-bottom:1px solid #e8eef7;text-align:right;color:#1f2d3d;width:104px;">资产原值（万元）</th>
-                  <th style="padding:8px 10px;border-bottom:1px solid #e8eef7;text-align:right;color:#1f2d3d;width:104px;">累计折旧（万元）</th>
-                  <th style="padding:8px 10px;border-bottom:1px solid #e8eef7;text-align:right;color:#1f2d3d;width:104px;">净值（万元）</th>
-                  <th style="padding:8px 10px;border-bottom:1px solid #e8eef7;text-align:center;color:#1f2d3d;width:96px;">采购时间</th>
-                  <th style="padding:8px 10px;border-bottom:1px solid #e8eef7;text-align:left;color:#1f2d3d;">拟报废原因</th>
-                </tr>
-              </thead>
-              <tbody id="applyOnlineBody"></tbody>
-            </table>
-          </div>
-          <div id="applyOnlineEmpty" style="text-align:center;color:#8ca0b8;padding:24px;font-size:13px;">暂无在线物资</div>
-        </div>
-        <div class="scrap-apply-detail-section" style="font-size:13px;font-weight:600;color:#1f3551;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid #e8eef7;">拟报废物资明细表</div>
         <div class="scrap-apply-detail-section" style="border:1px solid #e8eef7;border-radius:8px;overflow:hidden;margin-bottom:14px;">
           <div style="max-height:280px;overflow:auto;">
             <table id="applyDetailPlanTable" style="width:100%;border-collapse:collapse;font-size:13px;color:#1f2d3d;table-layout:fixed;">
@@ -998,7 +973,7 @@
               <tbody id="applyDetailBody"></tbody>
             </table>
           </div>
-          <div id="applyDetailEmpty" style="text-align:center;color:#8ca0b8;padding:24px;font-size:13px;">请从上方在线物资列表点击行选择物资</div>
+          <div id="applyDetailEmpty" style="text-align:center;color:#8ca0b8;padding:24px;font-size:13px;">暂无物资明细</div>
         </div>
         <div id="applyDetailSummary" style="font-size:12px;color:#334155;margin-bottom:14px;padding:6px 10px;background:#f8fbff;border:1px solid #e6edf7;border-radius:6px;">
           已选 <b id="applyDetailCount">0</b> 件物资，
@@ -1507,8 +1482,6 @@
         btnOpenApplyModalProgress: document.getElementById("btnOpenApplyModalProgress"),
         btnApplyPrint: document.getElementById("btnApplyPrint"),
         btnApplyDownload: document.getElementById("btnApplyDownload"),
-        applyOnlineBody: document.getElementById("applyOnlineBody"),
-        applyOnlineEmpty: document.getElementById("applyOnlineEmpty"),
         applyDetailBody: document.getElementById("applyDetailBody"),
         applyDetailEmpty: document.getElementById("applyDetailEmpty"),
         applyDetailCount: document.getElementById("applyDetailCount"),
@@ -2024,37 +1997,6 @@
       }
 
       var applyDetailRows = [];
-      var applySelectedAssetId = null;
-
-      function activeMaterials() {
-        return materialLedger.filter(function (m) { return m.status !== "已报废"; });
-      }
-
-      function refreshApplyOnlineTable() {
-        var body = refs.applyOnlineBody;
-        body.innerHTML = "";
-        var rows = activeMaterials();
-        rows.forEach(function (asset) {
-          var fin = financeBook[asset.id] || { originValue: 0, netValue: 0 };
-          var tr = document.createElement("tr");
-          tr.innerHTML =
-            '<td style="padding:8px 10px;border-bottom:1px solid #f0f2f5;">' + escHtml(asset.name) + '</td>' +
-            '<td style="padding:8px 10px;border-bottom:1px solid #f0f2f5;">' + escHtml(assetProductCode(asset)) + '</td>' +
-            '<td style="padding:8px 10px;border-bottom:1px solid #f0f2f5;word-break:break-all;">' + escHtml(asset.manufacturer || "-") + '</td>' +
-            '<td style="padding:8px 10px;border-bottom:1px solid #f0f2f5;">' + escHtml(asset.model || "-") + '</td>' +
-            '<td style="padding:8px 10px;border-bottom:1px solid #f0f2f5;">' + escHtml(assetTypeCode(asset)) + '</td>' +
-            '<td style="padding:8px 10px;border-bottom:1px solid #f0f2f5;">' + escHtml(assetCategory(asset)) + '</td>' +
-            '<td style="padding:8px 10px;border-bottom:1px solid #f0f2f5;text-align:center;">' + escHtml(asset.unit || "台") + '</td>' +
-            '<td style="padding:8px 10px;border-bottom:1px solid #f0f2f5;text-align:right;">' + fmtWan(fin.originValue) + '</td>' +
-            '<td style="padding:8px 10px;border-bottom:1px solid #f0f2f5;text-align:right;">' + fmtWan(fin.originValue - fin.netValue) + '</td>' +
-            '<td style="padding:8px 10px;border-bottom:1px solid #f0f2f5;text-align:right;">' + fmtWan(fin.netValue) + '</td>' +
-            '<td style="padding:8px 10px;border-bottom:1px solid #f0f2f5;text-align:center;">' + escHtml(asset.purchaseDate || "-") + '</td>' +
-            '<td style="padding:8px 10px;border-bottom:1px solid #f0f2f5;"><button type="button" class="btn-add-row" data-asset-id="' + escHtml(asset.id) + '" style="border:none;background:transparent;color:#1f2d3d;padding:0;font-size:13px;cursor:pointer;">加入明细</button></td>';
-          tr.style.cursor = "pointer";
-          body.appendChild(tr);
-        });
-        refs.applyOnlineEmpty.style.display = rows.length ? "none" : "block";
-      }
 
       function refreshApplyDetailTable() {
         var body = refs.applyDetailBody;
@@ -2120,12 +2062,10 @@
             purchaseDate: a.purchaseDate
           };
         });
-        applySelectedAssetId = null;
         var paper = document.getElementById("applyPaperCard");
         if (paper) paper.innerHTML = renderApplyEditorCard(applyFormDefaults()) + '<div id="applyPrintCard" class="scrap-paper-print">' + renderScrapPaperCard(applyFormDefaults(), { readOnly: true, actions: false }) + '</div>';
         syncApplyPrintCard();
         refreshApplyDetailTable();
-        refreshApplyOnlineTable();
         refs.applyModalMask.classList.add("show");
         refs.applyModalMask.setAttribute("aria-hidden", "false");
       }
@@ -2135,27 +2075,6 @@
         refs.applyModalMask.setAttribute("aria-hidden", "true");
       }
 
-      function addToApplyDetail(asset) {
-        var fin = financeBook[asset.id] || { originValue: 0, netValue: 0 };
-        var reason = "";
-        applyDetailRows.push({
-          id: asset.id,
-          code: asset.id,
-          name: asset.name,
-          manufacturer: asset.manufacturer,
-          model: asset.model,
-          typeCode: assetTypeCode(asset),
-          category: assetCategory(asset),
-          unit: asset.unit || "台",
-          origin: fin.originValue,
-          dep: (Number(fin.originValue) || 0) - (Number(fin.netValue) || 0),
-          net: fin.netValue,
-          qty: 1,
-          reason: reason,
-          purchaseDate: asset.purchaseDate || "-"
-        });
-        refreshApplyDetailTable();
-      }
       refs.btnCreate.addEventListener("click", openApplyModal);
       refs.btnCloseModal.addEventListener("click", closeApplyModal);
       refs.btnCancel.addEventListener("click", closeApplyModal);
