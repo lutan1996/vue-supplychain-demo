@@ -457,7 +457,9 @@
         '<div class="warehouse-secondary-inner">' +
         '  <div class="retired-main-block">' +
         '    <div class="warehouse-secondary-row warehouse-secondary-row--pipe retired-sub-pipe retired-sub-row">' +
-        '      <button type="button" class="warehouse-secondary-link" data-action="retired-apply-main" data-label="退役及报废申请">退役及报废申请</button>' +
+        '      <button type="button" class="warehouse-secondary-link" data-action="retired-apply-main" data-label="报废计划提报">报废计划提报</button>' +
+        '      <span class="warehouse-secondary-pipe" aria-hidden="true">|</span>' +
+        '      <button type="button" class="warehouse-secondary-link" data-action="retired-scrap-apply" data-label="报废申请">报废申请</button>' +
         '    </div>' +
         '  </div>' +
         '</div>';
@@ -1408,6 +1410,17 @@
         return "";
       }
 
+      function resolveRetiredScrapLabel(fileName, query) {
+        if (fileName !== "retire-scrap-application.html") return "";
+        var view = "";
+        try {
+          view = (new URLSearchParams(query || "")).get("view") || "";
+        } catch (eView) {}
+        if (view === "plan") return "报废计划提报";
+        if (view === "apply") return "报废申请";
+        return "退役及报废申请";
+      }
+
       function resolveMyTasksLabel(fileName, query) {
         var scene = "";
         try {
@@ -1444,7 +1457,8 @@
       if (file.indexOf("my-tasks") === 0) {
         taskSub = resolveMyTasksLabel(file, location.search);
       }
-      var pageLabel = taskSub || purchaseSub;
+      var retiredSub = resolveRetiredScrapLabel(file, location.search);
+      var pageLabel = taskSub || purchaseSub || retiredSub;
       if (!pageLabel && file === "base-data-material-ledger.html") {
         pageLabel = "物资类型";
       }
@@ -1458,6 +1472,7 @@
       var displayMod = mod;
       if (taskSub) displayMod = "我的任务";
       if (purchaseSub) displayMod = "物资采购";
+      if (retiredSub) displayMod = "物资出库与处置";
       // 库存管理和物资领用显示实物管理
       if (pageLabel === "库存管理" || pageLabel === "物资领用") displayMod = "实物管理";
       if (displayMod === "业务功能") {
@@ -1486,6 +1501,8 @@
             } else {
               segs[1].textContent = "物资采购";
             }
+          } else if (retiredSub) {
+            segs[1].textContent = "物资出库与处置";
           }
           segs[2].textContent = pageLabel;
         } else if (segs.length > 0) {

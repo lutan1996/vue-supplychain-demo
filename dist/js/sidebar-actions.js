@@ -212,7 +212,8 @@
     "warehouse-io-ledger": "warehouse-io-ledger.html",
     "warehouse-stock-ledger": "warehouse-stock-ledger.html",
     // 退役及废旧
-    "retired-apply-main": "retire-scrap-application.html",
+    "retired-apply-main": "retire-scrap-application.html?view=plan",
+    "retired-scrap-apply": "retire-scrap-application.html?view=apply",
     "retired-brand": "retired-prototype-list.html?scene=brand",
     "retired-model": "retired-prototype-list.html?scene=model",
     "retired-line": "retired-prototype-list.html?scene=line",

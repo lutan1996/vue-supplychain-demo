@@ -707,7 +707,7 @@
     /* 报废物资明细表（新增/编辑弹窗） */
     .plan-item-table {
       width: 100%;
-      min-width: 1720px;
+      min-width: 1682px;
       border-collapse: collapse;
       font-size: 12px;
       table-layout: fixed;
@@ -716,8 +716,11 @@
       border: 1px solid #edf1f7;
       padding: 7px 6px;
       text-align: left;
-      vertical-align: middle;
+      vertical-align: top;
       word-break: break-word;
+      white-space: normal;
+      overflow-wrap: anywhere;
+      line-height: 1.35;
     }
     .plan-item-table th {
       background: #f8fafc;
@@ -725,7 +728,6 @@
       position: sticky;
       top: 0;
       z-index: 1;
-      white-space: nowrap;
     }
     .plan-item-table td input[type="number"] {
       width: 100%;
@@ -751,33 +753,60 @@
     }
     .plan-item-table th:last-child,
     .plan-item-table td:last-child {
-      width: 180px;
-      min-width: 180px;
-      max-width: 180px;
-      white-space: nowrap;
+      width: 220px;
+      min-width: 220px;
+      max-width: 220px;
+      white-space: normal;
       overflow: visible;
-      position: sticky;
-      right: 0;
+      position: static;
       background: #fff;
       z-index: 6;
-      box-shadow: -10px 0 12px rgba(255, 255, 255, 0.96);
+      box-shadow: none;
     }
     .plan-item-table th:nth-last-child(2),
     .plan-item-table td:nth-last-child(2) {
-      width: 240px;
-      min-width: 240px;
-      max-width: 240px;
+      width: 260px;
+      min-width: 260px;
+      max-width: 260px;
     }
     .plan-item-table th:last-child { z-index: 7; }
-    .plan-item-ops { display: flex; gap: 8px; align-items: center; justify-content: flex-start; width: 100%; min-width: 152px; white-space: nowrap; position: relative; z-index: 1; }
+    .plan-item-table th:nth-child(1),
+    .plan-item-table td:nth-child(1) { width: 120px !important; min-width: 120px !important; max-width: 120px !important; }
+    .plan-item-table th:nth-child(2),
+    .plan-item-table td:nth-child(2) { width: 110px !important; min-width: 110px !important; max-width: 110px !important; }
+    .plan-item-table th:nth-child(3),
+    .plan-item-table td:nth-child(3) { width: 130px !important; min-width: 130px !important; max-width: 130px !important; }
+    .plan-item-table th:nth-child(4),
+    .plan-item-table td:nth-child(4) { width: 110px !important; min-width: 110px !important; max-width: 110px !important; }
+    .plan-item-table th:nth-child(5),
+    .plan-item-table td:nth-child(5) { width: 120px !important; min-width: 120px !important; max-width: 120px !important; }
+    .plan-item-table th:nth-child(6),
+    .plan-item-table td:nth-child(6) { width: 90px !important; min-width: 90px !important; max-width: 90px !important; }
+    .plan-item-table th:nth-child(7),
+    .plan-item-table td:nth-child(7) { width: 60px !important; min-width: 60px !important; max-width: 60px !important; text-align:center; }
+    .plan-item-table th:nth-child(8),
+    .plan-item-table td:nth-child(8) { width: 74px !important; min-width: 74px !important; max-width: 74px !important; text-align:center; }
+    .plan-item-table th:nth-child(9),
+    .plan-item-table td:nth-child(9),
+    .plan-item-table th:nth-child(10),
+    .plan-item-table td:nth-child(10),
+    .plan-item-table th:nth-child(11),
+    .plan-item-table td:nth-child(11) { width: 104px !important; min-width: 104px !important; max-width: 104px !important; text-align:right; }
+    .plan-item-table th:nth-child(12),
+    .plan-item-table td:nth-child(12) { width: 96px !important; min-width: 96px !important; max-width: 96px !important; }
+    .plan-item-table th:nth-child(13),
+    .plan-item-table td:nth-child(13) { width: 260px !important; min-width: 260px !important; max-width: 260px !important; }
+    .plan-item-table th:nth-child(14),
+    .plan-item-table td:nth-child(14) { width: 220px !important; min-width: 220px !important; max-width: 220px !important; }
+    .plan-item-ops { display: flex; flex-direction: column; gap: 4px; align-items: flex-start; justify-content: flex-start; width: 100%; min-width: 0; white-space: normal; position: relative; z-index: 1; }
     .plan-item-ops a,
     .plan-item-ops button { border:0; background:transparent; padding:0; line-height:1.2; font-size:12px; cursor:pointer; text-decoration:none; white-space:nowrap; }
     .plan-item-ops .pi-del { color:#ff4d4f; }
     .plan-item-ops .pi-track { color:#1677ff; }
     .plan-item-ops a:hover { opacity: 0.75; }
     .plan-item-ops .ops-sep { color: #d0d7de; }
-    .pi-reason-wrap { display:flex; flex-direction:column; gap:6px; }
-    .pi-reason-tools { display:flex; align-items:center; justify-content:flex-end; gap:6px; }
+    .pi-reason-wrap { display:flex; flex-direction:column; gap:6px; position:relative; padding-right:42px; }
+    .pi-reason-tools { position:absolute; right:6px; top:8px; display:flex; align-items:center; justify-content:flex-end; gap:6px; margin:0; }
     .pi-attach-btn {
       width: 28px;
       height: 28px;
@@ -1343,6 +1372,15 @@
   <script>
     (function () {
       var currentUser = "张明";
+      var scrapMode = "";
+      try {
+        scrapMode = (new URLSearchParams(window.location.search).get("view") || "").trim();
+      } catch (eScrapMode) {}
+      var scrapTitleMap = {
+        plan: "报废计划提报",
+        apply: "报废申请"
+      };
+      var scrapPageTitle = scrapTitleMap[scrapMode] || "退役及报废申请";
 
       try {
         var sr = sessionStorage.getItem("demoScrapRole");
@@ -1358,6 +1396,21 @@
         elOff.style.color = "#333";
         elOff.style.borderColor = "#d9d9d9";
       }
+
+      if (scrapMode) {
+        document.title = scrapPageTitle + " - 新能源物资供应链管理系统";
+      }
+      var scrapTitleEl = document.querySelector(".carrier-page-title");
+      if (scrapTitleEl) scrapTitleEl.textContent = scrapPageTitle;
+      var scrapTabs = document.querySelector(".module-hub-tabs");
+      var scrapPlanPanel = document.getElementById("panelScrapPlan");
+      var scrapApplyPanel = document.getElementById("panelScrapApply");
+      if (scrapMode && scrapTabs) scrapTabs.style.display = "none";
+      if (scrapMode && scrapPlanPanel && scrapApplyPanel) {
+        scrapPlanPanel.style.display = scrapMode === "plan" ? "block" : "none";
+        scrapApplyPanel.style.display = scrapMode === "apply" ? "block" : "none";
+      }
+
       document.getElementById("tabScrapPlan").addEventListener("click", function () {
         document.getElementById("panelScrapPlan").style.display = "block";
         document.getElementById("panelScrapApply").style.display = "none";
