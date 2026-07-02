@@ -3688,9 +3688,11 @@
           renderAll();
           return;
         }
-        var op = e.target.getAttribute("data-op");
+        var opBtn = e.target && e.target.closest ? e.target.closest("[data-op]") : null;
+        var op = opBtn && opBtn.getAttribute ? opBtn.getAttribute("data-op") : "";
         if(op){
-          var row = findRowByKey(e.target.getAttribute("data-key") || "");
+          e.preventDefault();
+          var row = findRowByKey(opBtn.getAttribute("data-key") || "");
           if(!row) return;
           if(op==="detail" || op==="name-detail"){ openDetail(row); return; }
           if(op==="edit"){ openActionModal("edit", row); return; }
