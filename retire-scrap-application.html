@@ -203,6 +203,12 @@
     .scrap-apply-textarea[readonly] {
       background: #f8fbff;
     }
+    .scrap-apply-note {
+      margin: 10px 0 0;
+      font-size: 12px;
+      color: #6b7f99;
+      line-height: 1.6;
+    }
     .scrap-apply-split {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -260,6 +266,19 @@
       .scrap-paper-print .scrap-paper-table td {
         border-color: #222 !important;
         color: #111 !important;
+      }
+      #applyDetailPlanTable th:nth-child(5),
+      #applyDetailPlanTable td:nth-child(5) {
+        width: 92px !important;
+        min-width: 92px !important;
+        max-width: 92px !important;
+        white-space: normal !important;
+        word-break: break-all !important;
+        overflow-wrap: anywhere !important;
+      }
+      #applyDetailPlanTable th,
+      #applyDetailPlanTable td {
+        white-space: normal;
       }
     }
     #viewModalMask .view-mini-table,
@@ -611,6 +630,13 @@
     .plan-search .f input, .plan-search .f select { width:100%; height:30px; border:1px solid #dbe6f3; border-radius:6px; padding:0 8px; font-size:12px; background:#fff; color:#334155; }
     .plan-search .f.range { display:grid; grid-template-columns:1fr 14px 1fr; align-items:end; gap:4px; }
     .plan-search .f.range span { text-align:center; color:#94a3b8; font-size:12px; margin-bottom:6px; }
+    .plan-meta { border:1px solid #e6edf7; border-radius:8px; background:#fbfdff; padding:10px 12px; margin-bottom:10px; }
+    .plan-meta-grid { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:8px; }
+    .plan-meta-grid .f label { display:block; font-size:12px; color:#64748b; margin-bottom:4px; }
+    .plan-meta-grid .f input { width:100%; height:30px; border:1px solid #dbe6f3; border-radius:6px; padding:0 8px; font-size:12px; background:#fff; color:#334155; box-sizing:border-box; }
+    .plan-meta-grid .f input[readonly] { background:#f8fbff; }
+    .plan-meta-grid .span-2 { grid-column: span 2; }
+    .plan-meta-grid .span-5 { grid-column: 1 / -1; }
     .btn-green { background:#52c41a; border-color:#52c41a; color:#fff; }
     .btn-green:hover { background:#73d13d; border-color:#73d13d; color:#fff; }
     .btn-warn { background:#fff7e6; border-color:#ffd591; color:#d46b08; }
@@ -641,6 +667,22 @@
     .view-mini-table { width:100%; border-collapse:collapse; font-size:12px; margin-top:8px; }
     .view-mini-table th, .view-mini-table td { border:1px solid #edf1f7; padding:6px; text-align:left; }
     .view-mini-table th { background:#f8fafc; color:#64748b; }
+    #applyDetailPlanTable th,
+    #applyDetailPlanTable td {
+      white-space: normal;
+      overflow-wrap: anywhere;
+      word-break: break-word;
+      line-height: 1.45;
+    }
+    #applyDetailPlanTable th:nth-child(5),
+    #applyDetailPlanTable td:nth-child(5) {
+      width: 92px !important;
+      min-width: 92px !important;
+      max-width: 92px !important;
+      white-space: normal !important;
+      word-break: break-all !important;
+      overflow-wrap: anywhere !important;
+    }
     .scrap-attachment-list { display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
     .scrap-attachment-item {
       display:inline-flex; align-items:center; gap:6px;
@@ -968,6 +1010,7 @@
         </div>
       <div class="modal-body" style="display:block;">
         <div id="applyPaperCard"></div>
+        <div class="scrap-apply-note">提示:《废旧物资报废申请》签字后，由废旧物资鉴定部门进行报废鉴定，并出具鉴定报告，物资归口管理部门依据该申请及鉴定报告执行公司物资报废内部决策流程。</div>
         <div style="display:flex;align-items:center;justify-content:space-between;font-size:13px;font-weight:600;color:#1f3551;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid #e8eef7;">
           <span>拟报废物资明细表</span>
           <span style="display:flex;gap:8px;">
@@ -1086,6 +1129,20 @@
       <div class="modal-body" style="display:block;">
         <div class="apply-tip" style="display:none;margin:0 0 10px;">
           💡 报废计划需在每年10月提交，计划审批通过后方可进行报废申请。只能选择本部门的物资。
+        </div>
+        <div class="plan-meta">
+          <div class="plan-meta-grid">
+            <div class="f"><label>计划编号</label><input id="planNoPreview" readonly value="自动生成" /></div>
+            <div class="f"><label>计划年度</label><input id="planYearPreview" readonly value="2026" /></div>
+            <div class="f"><label>申请部门</label><input id="planDeptPreview" readonly value="设备运维部" /></div>
+            <div class="f"><label>申请人</label><input id="planUserPreview" readonly value="张明" /></div>
+            <div class="f"><label>物资数量</label><input id="planQtyPreview" readonly value="0" /></div>
+            <div class="f"><label>原值合计(元)</label><input id="planOriginPreview" readonly value="¥ 0.00" /></div>
+            <div class="f"><label>净值合计(元)</label><input id="planNetPreview" readonly value="¥ 0.00" /></div>
+            <div class="f"><label>提交日期</label><input id="planDatePreview" readonly value="2026-07-02" /></div>
+            <div class="f"><label>审批状态</label><input id="planStatusPreview" readonly value="待提交" /></div>
+            <div class="f span-5"><label>报废说明</label><input id="planRemarkPreview" readonly value="填写报废计划说明" /></div>
+          </div>
         </div>
         <div class="plan-search" style="display:none;margin-bottom:8px;">
           <div class="f"><label>计划年度</label><select id="planYearInput"></select></div>
@@ -2440,6 +2497,46 @@
           body.appendChild(tr);
         });
       }
+      function refreshPlanMeta() {
+        var yearSel = document.getElementById("planYearInput");
+        var deptInp = document.getElementById("planDeptInput");
+        var userInp = document.getElementById("planUserInput");
+        var dateInp = document.getElementById("planDateInput");
+        var remarkInp = document.getElementById("planRemarkInput");
+        var qtyEl = document.getElementById("planQtyPreview");
+        var originEl = document.getElementById("planOriginPreview");
+        var netEl = document.getElementById("planNetPreview");
+        var noEl = document.getElementById("planNoPreview");
+        var yearEl = document.getElementById("planYearPreview");
+        var deptEl = document.getElementById("planDeptPreview");
+        var userEl = document.getElementById("planUserPreview");
+        var dateEl = document.getElementById("planDatePreview");
+        var statusEl = document.getElementById("planStatusPreview");
+        var remarkEl = document.getElementById("planRemarkPreview");
+        if (!qtyEl || !originEl || !netEl || !noEl) return;
+        var totalQty = 0, totalOrigin = 0, totalNet = 0;
+        planItems.forEach(function (item) {
+          var asset = planAssetLookup(item.id) || planAssets.find(function (a) { return a.id === item.id; });
+          var qty = planQtyNumber(item.qty);
+          totalQty += qty;
+          if (asset) {
+            totalOrigin += (Number(asset.origin) || 0) * qty;
+            totalNet += (Number(asset.net) || 0) * qty;
+          }
+        });
+        var year = (yearSel && yearSel.value) || String(new Date().getFullYear());
+        var date = (dateInp && dateInp.value) || new Date().toISOString().slice(0, 10);
+        noEl.value = planEditingNo || genPlanNo(year);
+        yearEl && (yearEl.value = year);
+        deptEl && (deptEl.value = (deptInp && deptInp.value) || currentDept);
+        userEl && (userEl.value = (userInp && userInp.value) || currentUser);
+        qtyEl.value = String(totalQty);
+        originEl.value = "¥ " + fmtMoney(totalOrigin);
+        netEl.value = "¥ " + fmtMoney(totalNet);
+        dateEl && (dateEl.value = date);
+        statusEl && (statusEl.value = planEditingNo ? "编辑中" : "待提交");
+        remarkEl && (remarkEl.value = (remarkInp && remarkInp.value) || "填写报废计划说明");
+      }
       function genPlanNo(year) {
         var seq = planRecords.filter(function (p) { return p.year === String(year); }).length + 1;
         return "BF-" + year + "-" + String(seq).padStart(3, "0");
@@ -2479,6 +2576,7 @@
           yearSel.value = String(new Date().getFullYear());
         }
         renderPlanItemTable();
+        refreshPlanMeta();
         document.getElementById("planModalMask").classList.add("show");
       }
       function closePlanModal() { document.getElementById("planModalMask").classList.remove("show"); }
@@ -2545,6 +2643,7 @@
         } else {
           tip.innerHTML = '<span style="color:#389e0d;">净值未超过100万元，无需进行资产评估</span>';
         }
+        refreshPlanMeta();
       }
 
       // ═══════════════════════════════════════════════════════════
