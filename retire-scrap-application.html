@@ -2545,8 +2545,8 @@
             '<td style="color:#1f2d3d;"><textarea class="pi-reason" data-idx="' + idx + '" rows="2" placeholder="填写报废原因" style="color:#1f2d3d;">' + escHtml(item.reason || "") + '</textarea></td>' +
             '<td>' +
               '<div class="plan-item-ops">' +
-                '<a href="#" class="pi-del" data-idx="' + idx + '" style="color:#ff4d4f;">删除</a>' +
-                '<a href="#" class="pi-track" data-id="' + escHtml(asset.id) + '" style="color:#1677ff;margin-left:8px;">物资跟踪</a>' +
+                '<button type="button" class="pi-del" data-idx="' + idx + '" style="border:0;background:transparent;color:#ff4d4f;font-size:12px;cursor:pointer;padding:0;line-height:1;">删除</button>' +
+                '<button type="button" class="pi-track" data-id="' + escHtml(asset.id) + '" style="border:0;background:transparent;color:#1677ff;font-size:12px;cursor:pointer;padding:0;line-height:1;">物资跟踪</button>' +
               '</div>' +
             '</td>';
           body.appendChild(tr);
@@ -2739,6 +2739,7 @@
               planItems.push({ id: p.id, qty: "", reason: "" });
             });
             renderPlanItemTable();
+            setTimeout(renderPlanItemTable, 160);
           }
         });
         var mask = document.getElementById("demoPdPickerMask");
@@ -2754,6 +2755,7 @@
         });
         closePlanAssetPick();
         renderPlanItemTable();
+        setTimeout(renderPlanItemTable, 160);
       }
 
       // ── 保存计划 ────────────────────────────────────────────
