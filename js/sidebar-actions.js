@@ -69,18 +69,18 @@
       var content = pick(item, "content", ["content", "opinion", "desc", "text", "note"]);
       var color = colorFor(status);
       return '' +
-        '<div style="display:grid;grid-template-columns:28px minmax(0,1fr);gap:12px;align-items:start;position:relative;">' +
-          '<div style="position:relative;min-height:' + (isLast ? "24px" : "92px") + ';">' +
-            '<span style="position:absolute;left:50%;top:8px;transform:translateX(-50%);width:14px;height:14px;border-radius:50%;background:' + color + ';box-shadow:0 0 0 4px ' + color + '1A;"></span>' +
-            (!isLast ? '<span style="position:absolute;left:50%;top:22px;bottom:-10px;width:2px;background:#d8e1ee;transform:translateX(-50%);"></span>' : '') +
+        '<div style="display:grid;grid-template-columns:20px minmax(0,1fr);gap:10px;align-items:start;position:relative;">' +
+          '<div style="position:relative;min-height:' + (isLast ? "22px" : "82px") + ';">' +
+            '<span style="position:absolute;left:50%;top:6px;transform:translateX(-50%);width:14px;height:14px;border-radius:50%;background:' + color + ';box-shadow:0 0 0 6px ' + color + '18;"></span>' +
+            (!isLast ? '<span style="position:absolute;left:50%;top:18px;bottom:-10px;width:2px;background:#d8e1ee;transform:translateX(-50%);"></span>' : '') +
           '</div>' +
-          '<div style="padding:2px 0 ' + (isLast ? "0" : "26px") + ';min-width:0;">' +
-            '<div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:10px;">' +
-              '<span style="font-size:16px;font-weight:700;color:#1f3551;">' + esc(person || "—") + '</span>' +
-              (time ? '<span style="font-size:14px;color:#64748b;">' + esc(time) + '</span>' : '') +
-              (status ? '<span style="display:inline-flex;align-items:center;justify-content:center;padding:4px 10px;border-radius:5px;font-size:13px;font-weight:700;background:' + color + '22;color:' + color + ';">' + esc(status) + '</span>' : '') +
+          '<div style="padding:0 0 ' + (isLast ? "0" : "22px") + ';min-width:0;">' +
+            '<div style="display:flex;align-items:center;gap:10px;flex-wrap:nowrap;margin-bottom:8px;min-width:0;">' +
+              '<span style="font-size:15px;font-weight:700;color:#1f3551;white-space:nowrap;flex:none;">' + esc(person || "—") + '</span>' +
+              (time ? '<span style="font-size:14px;color:#8b97a8;white-space:nowrap;flex:none;">' + esc(time) + '</span>' : '') +
+              (status ? '<span style="margin-left:auto;display:inline-flex;align-items:center;justify-content:center;padding:5px 12px;border-radius:6px;font-size:13px;font-weight:700;background:' + color + '18;color:' + color + ';white-space:nowrap;flex:none;">' + esc(status) + '</span>' : '') +
             '</div>' +
-            '<div style="font-size:14px;color:#51627a;line-height:1.75;font-weight:500;">' + esc(content || "—") + '</div>' +
+            '<div style="font-size:14px;color:#51627a;line-height:1.8;font-weight:500;padding-right:4px;">' + esc(content || "—") + '</div>' +
           '</div>' +
         '</div>';
     }).join("");
