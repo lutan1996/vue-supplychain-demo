@@ -128,6 +128,139 @@
     .scrap-paper-table .paper-center { text-align: center; }
     .scrap-paper-table .paper-right { text-align: right; }
     .scrap-paper-table .paper-line { min-height: 72px; }
+    .scrap-paper-print { display: none; }
+    .scrap-apply-editor {
+      margin-bottom: 14px;
+      padding: 14px;
+      border: 1px solid #91caff;
+      border-radius: 10px;
+      background: #f4f8ff;
+      overflow: hidden;
+    }
+    .scrap-apply-title {
+      margin: 0 0 12px;
+      font-size: 15px;
+      font-weight: 700;
+      color: #1f3551;
+    }
+    .scrap-apply-table {
+      width: 100%;
+      border-collapse: collapse;
+      table-layout: fixed;
+      background: #f8fbff;
+      border: 1px solid #91caff;
+      color: #1f2d3d;
+    }
+    .scrap-apply-table th,
+    .scrap-apply-table td {
+      border: 1px solid #91caff;
+      padding: 0;
+      vertical-align: middle;
+    }
+    .scrap-apply-table th {
+      width: 19%;
+      background: #eaf3ff;
+      text-align: center;
+      font-size: 13px;
+      font-weight: 700;
+      color: #1f3551;
+      padding: 14px 10px;
+    }
+    .scrap-apply-table td {
+      background: #fdfefe;
+      padding: 10px 12px;
+    }
+    .scrap-apply-table .full-row td {
+      padding: 10px 12px;
+    }
+    .scrap-apply-input,
+    .scrap-apply-textarea {
+      width: 100%;
+      border: 1px solid #91caff;
+      border-radius: 6px;
+      background: #fff;
+      color: #1f2d3d;
+      font-size: 14px;
+      font-family: inherit;
+      box-sizing: border-box;
+      outline: none;
+    }
+    .scrap-apply-input {
+      height: 34px;
+      padding: 0 10px;
+    }
+    .scrap-apply-textarea {
+      min-height: 78px;
+      padding: 8px 10px;
+      resize: vertical;
+      line-height: 1.6;
+    }
+    .scrap-apply-input::placeholder,
+    .scrap-apply-textarea::placeholder {
+      color: #b8c4d4;
+    }
+    .scrap-apply-input[readonly],
+    .scrap-apply-textarea[readonly] {
+      background: #f8fbff;
+    }
+    .scrap-apply-split {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    .scrap-apply-field {
+      display: grid;
+      grid-template-columns: 134px minmax(0, 1fr);
+      gap: 12px;
+      align-items: center;
+    }
+    .scrap-apply-field .field-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: #415a77;
+      text-align: center;
+    }
+    @media print {
+      body > *:not(.modal-mask.show),
+      .modal-mask:not(.show) {
+        display: none !important;
+      }
+      .modal-mask.show {
+        position: static !important;
+        inset: auto !important;
+        background: transparent !important;
+        padding: 0 !important;
+      }
+      .modal-mask.show .modal {
+        width: 100% !important;
+        max-width: none !important;
+        box-shadow: none !important;
+        border-radius: 0 !important;
+        border: none !important;
+      }
+      .scrap-apply-editor,
+      .scrap-online-section,
+      .modal-header,
+      .modal-footer,
+      .scrap-detail-header-actions,
+      .btn-scrap-progress,
+      #btnApplyPrint,
+      #btnApplyDownload,
+      #btnOpenAssetPick {
+        display: none !important;
+      }
+      .scrap-paper-print {
+        display: block !important;
+      }
+      .scrap-paper-print .scrap-paper-shell {
+        border: 1px solid #222 !important;
+      }
+      .scrap-paper-print .scrap-paper-table th,
+      .scrap-paper-print .scrap-paper-table td {
+        border-color: #222 !important;
+        color: #111 !important;
+      }
+    }
     #viewModalMask .view-mini-table,
     #viewModalMask .view-mini-table th,
     #viewModalMask .view-mini-table td,
@@ -295,45 +428,8 @@
       justify-content: flex-end;
     }
 
-    /* 报废申请编辑弹窗：双列表单（壳层见 css/modal-system.css） */
     #applyModalMask .modal {
-      width: min(820px, 96vw);
-    }
-    #applyModalMask .modal-body .field {
-      margin-bottom: 0;
-    }
-    #applyModalMask .modal-body {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px 14px;
-    }
-    #applyModalMask .field.full {
-      grid-column: 1 / -1;
-    }
-    #applyModalMask .field label {
-      display: block;
-      margin: 0 0 6px;
-      font-size: 13px;
-      color: #516a87;
-    }
-    #applyModalMask .field input,
-    #applyModalMask .field select,
-    #applyModalMask .field textarea {
-      width: 100%;
-      height: 34px;
-      border: 1px solid #d9d9d9;
-      border-radius: 6px;
-      padding: 0 10px;
-      font-size: 14px;
-      color: #223a55;
-      background: #fff;
-      font-family: inherit;
-      box-sizing: border-box;
-    }
-    #applyModalMask .field textarea {
-      height: 84px;
-      padding: 8px 10px;
-      resize: vertical;
+      width: min(1100px, 98vw);
     }
     .hint {
       margin-top: 4px;
@@ -833,14 +929,14 @@
         </div>
       <div class="modal-body" style="display:block;">
         <div id="applyPaperCard"></div>
-        <div style="display:none;font-size:13px;font-weight:600;color:#1f3551;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid #e8eef7;">
+        <div class="scrap-online-section" style="font-size:13px;font-weight:600;color:#1f3551;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid #e8eef7;">
           在线物资列表
           <span style="float:right;display:flex;gap:8px;">
             <button type="button" id="btnApplyPrint" style="border:none;background:transparent;color:#64748b;cursor:pointer;font-size:13px;" title="打印"><i class="fa-solid fa-print"></i></button>
             <button type="button" id="btnApplyDownload" style="border:none;background:transparent;color:#64748b;cursor:pointer;font-size:13px;" title="下载"><i class="fa-solid fa-download"></i></button>
           </span>
         </div>
-        <div style="display:none;border:1px solid #e8eef7;border-radius:8px;overflow:hidden;margin-bottom:14px;">
+        <div class="scrap-online-section" style="border:1px solid #e8eef7;border-radius:8px;overflow:hidden;margin-bottom:14px;">
           <div style="max-height:280px;overflow:auto;">
             <table style="width:100%;border-collapse:collapse;font-size:13px;color:#1f2d3d;table-layout:fixed;">
               <thead>
@@ -968,13 +1064,12 @@
     <div class="modal" role="dialog" aria-modal="true" aria-labelledby="planModalTitle" style="width:min(1160px,98vw);">
       <div class="modal-header">
         <h2 class="modal-title" id="planModalTitle">新增报废计划</h2>
-        <div class="scrap-detail-header-actions">
+          <div class="scrap-detail-header-actions">
           <button type="button" class="btn-scrap-progress" id="btnOpenPlanModalProgress">流程进度</button>
         <button class="modal-close" id="btnClosePlanModal" aria-label="关闭">×</button>
         </div>
       </div>
       <div class="modal-body" style="display:block;">
-        <div id="applyPaperCard"></div>
         <div class="apply-tip" style="display:none;margin:0 0 10px;">
           💡 报废计划需在每年10月提交，计划审批通过后方可进行报废申请。只能选择本部门的物资。
         </div>
@@ -988,7 +1083,7 @@
         <!-- 报废物资明细表 -->
         <div style="font-size:13px;font-weight:600;color:#1f3551;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid #e8eef7;">
           拟报废物资明细表
-          <button type="button" id="btnOpenAssetPick" class="btn-sub" style="display:none;float:right;font-size:12px;padding:3px 12px;height:26px;background:#e6f4ff;color:#1677ff;border:1px solid #91caff;border-radius:6px;cursor:pointer;font-weight:normal;">
+          <button type="button" id="btnOpenAssetPick" class="btn-sub" style="float:right;font-size:12px;padding:3px 12px;height:26px;background:#e6f4ff;color:#1677ff;border:1px solid #91caff;border-radius:6px;cursor:pointer;font-weight:normal;">
             <i class="fa-solid fa-plus"></i> 选择报废物资
           </button>
           </div>
@@ -1592,6 +1687,88 @@
           '</div>';
       }
 
+      function applyFormDefaults() {
+        return {
+          dept: currentDept,
+          date: new Date().toISOString().slice(0, 10),
+          nameQty: "",
+          location: "",
+          reason: "",
+          applicant: currentUser,
+          deptOpinion: "",
+          manageOpinion: "",
+          manageHeadOpinion: ""
+        };
+      }
+
+      function readApplyFormValues() {
+        var form = document.getElementById("scrapApplyEditor");
+        var data = applyFormDefaults();
+        if (!form) return data;
+        function val(name) {
+          var el = form.querySelector('[name="' + name + '"]');
+          return el ? String(el.value || "").trim() : "";
+        }
+        data.dept = val("dept") || data.dept;
+        data.date = val("date") || data.date;
+        data.nameQty = val("nameQty");
+        data.location = val("location");
+        data.reason = val("reason");
+        data.applicant = val("applicant") || data.applicant;
+        data.deptOpinion = val("deptOpinion");
+        data.manageOpinion = val("manageOpinion");
+        data.manageHeadOpinion = val("manageHeadOpinion");
+        return data;
+      }
+
+      function renderApplyEditorCard(data) {
+        data = data || applyFormDefaults();
+        return '' +
+          '<div class="scrap-apply-editor">' +
+            '<div class="scrap-apply-title">废旧物资报废申请</div>' +
+            '<table class="scrap-apply-table" role="presentation" id="scrapApplyEditor">' +
+              '<tbody>' +
+                '<tr>' +
+                  '<th>申请部门</th>' +
+                  '<td><input class="scrap-apply-input" name="dept" value="' + escHtml(data.dept || "") + '" placeholder="请输入申请部门" /></td>' +
+                  '<th>申请日期</th>' +
+                  '<td><input class="scrap-apply-input" name="date" type="date" value="' + escHtml(data.date || "") + '" /></td>' +
+                '</tr>' +
+                '<tr class="full-row">' +
+                  '<th>拟报废物资名称及数量</th>' +
+                  '<td colspan="3"><input class="scrap-apply-input" name="nameQty" value="' + escHtml(data.nameQty || "") + '" placeholder="请输入拟报废物资名称及数量" /></td>' +
+                '</tr>' +
+                '<tr class="full-row">' +
+                  '<th>拟报废物资堆放地点</th>' +
+                  '<td colspan="3"><input class="scrap-apply-input" name="location" value="' + escHtml(data.location || "") + '" placeholder="请输入拟报废物资堆放地点" /></td>' +
+                '</tr>' +
+                '<tr class="full-row">' +
+                  '<th>申请报废原因</th>' +
+                  '<td colspan="3"><textarea class="scrap-apply-textarea" name="reason" placeholder="请输入申请报废原因">' + escHtml(data.reason || "") + '</textarea></td>' +
+                '</tr>' +
+                '<tr>' +
+                  '<th>申请人员签字</th>' +
+                  '<td><input class="scrap-apply-input" name="applicant" value="' + escHtml(data.applicant || "") + '" placeholder="请输入申请人员签字" /></td>' +
+                  '<th>申请部门负责人意见及签字</th>' +
+                  '<td><input class="scrap-apply-input" name="deptOpinion" value="' + escHtml(data.deptOpinion || "") + '" placeholder="请输入申请部门负责人意见及签字" /></td>' +
+                '</tr>' +
+                '<tr>' +
+                  '<th>物资归口管理部门专责意见及签字</th>' +
+                  '<td><input class="scrap-apply-input" name="manageOpinion" value="' + escHtml(data.manageOpinion || "") + '" placeholder="请输入物资归口管理部门专责意见及签字" /></td>' +
+                  '<th>物资归口管理部门负责人意见及签字</th>' +
+                  '<td><input class="scrap-apply-input" name="manageHeadOpinion" value="' + escHtml(data.manageHeadOpinion || "") + '" placeholder="请输入物资归口管理部门负责人意见及签字" /></td>' +
+                '</tr>' +
+              '</tbody>' +
+            '</table>' +
+          '</div>';
+      }
+
+      function syncApplyPrintCard() {
+        var printCard = document.getElementById("applyPrintCard");
+        if (!printCard) return;
+        printCard.innerHTML = renderScrapPaperCard(readApplyFormValues(), { readOnly: true, actions: false });
+      }
+
       function renderTimelineRows(rows) {
         if (typeof window.mapDemoRenderVerticalTimeline === "function") {
           return window.mapDemoRenderVerticalTimeline(rows, {
@@ -1954,8 +2131,10 @@
         });
         applySelectedAssetId = null;
         var paper = document.getElementById("applyPaperCard");
-        if (paper) paper.innerHTML = renderScrapPaperCard(scrapPaperDemo, { readOnly: true, actions: true });
+        if (paper) paper.innerHTML = renderApplyEditorCard(applyFormDefaults()) + '<div id="applyPrintCard" class="scrap-paper-print">' + renderScrapPaperCard(applyFormDefaults(), { readOnly: true, actions: false }) + '</div>';
+        syncApplyPrintCard();
         refreshApplyDetailTable();
+        refreshApplyOnlineTable();
         refs.applyModalMask.classList.add("show");
         refs.applyModalMask.setAttribute("aria-hidden", "false");
       }
@@ -2044,6 +2223,26 @@
           }, "apply");
         });
       }
+      var applyPaperHost = document.getElementById("applyPaperCard");
+      if (applyPaperHost) {
+        applyPaperHost.addEventListener("input", syncApplyPrintCard);
+        applyPaperHost.addEventListener("change", syncApplyPrintCard);
+      }
+      if (refs.btnApplyPrint) {
+        refs.btnApplyPrint.addEventListener("click", function (e) {
+          e.preventDefault();
+          syncApplyPrintCard();
+          window.print();
+        });
+      }
+      if (refs.btnApplyDownload) {
+        refs.btnApplyDownload.addEventListener("click", function (e) {
+          e.preventDefault();
+          syncApplyPrintCard();
+          window.print();
+        });
+      }
+      window.addEventListener("beforeprint", syncApplyPrintCard);
       document.addEventListener("click", function (e) {
         var btn = e.target && e.target.closest ? e.target.closest("[data-paper-action]") : null;
         if (!btn) return;

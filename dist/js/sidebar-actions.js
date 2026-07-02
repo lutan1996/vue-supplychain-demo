@@ -12,6 +12,92 @@
     window.addEventListener("touchstart", markHumanNavIntent, true);
   } catch (eNavIntent) {}
 
+  function removeSidebarItemsByText(texts) {
+    try {
+      if (typeof document === "undefined") return;
+      var sidebar = document.querySelector(".sidebar");
+      if (!sidebar) return;
+      var list = sidebar.querySelectorAll(".nav-item, a.nav-item");
+      var needles = (texts || []).map(function (t) { return String(t || "").trim(); }).filter(Boolean);
+      if (!needles.length) return;
+      list.forEach(function (node) {
+        var txt = "";
+        try {
+          txt = String(node.textContent || "").replace(/\s+/g, "").trim();
+        } catch (eTxt) {}
+        var title = String(node.getAttribute("title") || "").replace(/\s+/g, "").trim();
+        var hit = needles.some(function (needle) {
+          return txt === needle || title === needle || txt.indexOf(needle) > -1 || title.indexOf(needle) > -1;
+        });
+        if (hit && node.parentNode) node.parentNode.removeChild(node);
+      });
+    } catch (eHide) {}
+  }
+
+  function renderVerticalTimelineHtml(rows, opts) {
+    rows = Array.isArray(rows) ? rows : [];
+    opts = opts || {};
+    function esc(v) {
+      return String(v == null ? "" : v)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+    }
+    function pick(item, fnName, fallbackKeys) {
+      if (typeof opts[fnName] === "function") return opts[fnName](item);
+      for (var i = 0; i < fallbackKeys.length; i++) {
+        var k = fallbackKeys[i];
+        if (item && item[k] != null && String(item[k]).trim() !== "") return item[k];
+      }
+      return "";
+    }
+    function colorFor(status) {
+      var s = String(status || "");
+      if (typeof opts.colorFor === "function") return opts.colorFor(status);
+      if (/已通过|已完成|通过|报废结束|已发起|已确认|同意/.test(s)) return "#10b981";
+      if (/处理中|进行中/.test(s)) return "#1677ff";
+      if (/待处理|待审批|待确认|待知悉|待登记|待到达|未到达/.test(s)) return "#f59e0b";
+      if (/驳回|拒绝/.test(s)) return "#ef4444";
+      return "#64748b";
+    }
+    return rows.map(function (item, idx) {
+      var isLast = idx === rows.length - 1;
+      var person = pick(item, "person", ["person", "user", "name", "actor", "owner"]);
+      var time = pick(item, "time", ["time", "date", "at"]);
+      var status = pick(item, "status", ["status", "result"]);
+      var content = pick(item, "content", ["content", "opinion", "desc", "text", "note"]);
+      var color = colorFor(status);
+      return '' +
+        '<div style="display:grid;grid-template-columns:28px minmax(0,1fr);gap:12px;align-items:start;position:relative;">' +
+          '<div style="position:relative;min-height:' + (isLast ? "24px" : "92px") + ';">' +
+            '<span style="position:absolute;left:50%;top:8px;transform:translateX(-50%);width:14px;height:14px;border-radius:50%;background:' + color + ';box-shadow:0 0 0 4px ' + color + '1A;"></span>' +
+            (!isLast ? '<span style="position:absolute;left:50%;top:22px;bottom:-10px;width:2px;background:#d8e1ee;transform:translateX(-50%);"></span>' : '') +
+          '</div>' +
+          '<div style="padding:2px 0 ' + (isLast ? "0" : "26px") + ';min-width:0;">' +
+            '<div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:10px;">' +
+              '<span style="font-size:16px;font-weight:700;color:#1f3551;">' + esc(person || "—") + '</span>' +
+              (time ? '<span style="font-size:14px;color:#64748b;">' + esc(time) + '</span>' : '') +
+              (status ? '<span style="display:inline-flex;align-items:center;justify-content:center;padding:4px 10px;border-radius:5px;font-size:13px;font-weight:700;background:' + color + '22;color:' + color + ';">' + esc(status) + '</span>' : '') +
+            '</div>' +
+            '<div style="font-size:14px;color:#51627a;line-height:1.75;font-weight:500;">' + esc(content || "—") + '</div>' +
+          '</div>' +
+        '</div>';
+    }).join("");
+  }
+
+  function runSidebarCleanup() {
+    removeSidebarItemsByText(["仓储管理", "综合业务管理"]);
+  }
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", runSidebarCleanup, { once: true });
+  } else {
+    runSidebarCleanup();
+  }
+  try {
+    global.mapDemoRenderVerticalTimeline = renderVerticalTimelineHtml;
+  } catch (eTimeline) {}
+
   var SIDEBAR_ACTION_HREF = {
     // 我的资产
     "asset-personal": "assets-personal.html",
