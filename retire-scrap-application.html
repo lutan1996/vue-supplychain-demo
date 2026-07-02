@@ -686,9 +686,11 @@
     }
     .plan-item-table th:last-child,
     .plan-item-table td:last-child {
+      width: 150px;
+      min-width: 150px;
       white-space: nowrap;
     }
-    .plan-item-ops { display: flex; gap: 6px; align-items: center; justify-content: center; min-width: 108px; white-space: nowrap; }
+    .plan-item-ops { display: flex; gap: 6px; align-items: center; justify-content: center; width: 100%; min-width: 0; white-space: nowrap; }
     .plan-item-ops a { color: #1677ff; font-size: 12px; cursor: pointer; text-decoration: none; }
     .plan-item-ops a:hover { opacity: 0.75; }
     .plan-item-ops .ops-sep { color: #d0d7de; }
@@ -2739,7 +2741,6 @@
               planItems.push({ id: p.id, qty: "", reason: "" });
             });
             renderPlanItemTable();
-            setTimeout(renderPlanItemTable, 160);
           }
         });
         var mask = document.getElementById("demoPdPickerMask");
@@ -2755,7 +2756,6 @@
         });
         closePlanAssetPick();
         renderPlanItemTable();
-        setTimeout(renderPlanItemTable, 160);
       }
 
       // ── 保存计划 ────────────────────────────────────────────
