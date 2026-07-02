@@ -1885,8 +1885,8 @@
             return "<td>"+esc(v)+"</td>";
           }).join("");
           var opsHtml = (c === "requisition" || c === "flow")
-            ? '<button class="op-btn" data-op="detail" data-key="'+key+'">查看</button>'
-            : '<button class="op-btn" data-op="detail" data-key="'+key+'">查看</button>';
+            ? '<button class="op-btn" data-op="detail" data-key="'+key+'">查看明细</button>'
+            : '<button class="op-btn" data-op="detail" data-key="'+key+'">查看明细</button>';
           return "<tr>"+cells+'<td>'+opsHtml+'</td>'
             +"</tr>";
         }).join("") || '<tr><td colspan="'+(cfg.columns.length+1)+'" style="padding:24px;color:#94a3b8">暂无数据</td></tr>';
@@ -2150,9 +2150,7 @@
           ? [
               { title: "使用人发起外部借用申请", text: "使用人发起外部借用申请", end: false },
               { title: "部门负责人初审", text: "部门负责人初审借用必要性", end: false },
-              { title: "公司负责人审批", text: "公司负责人审批外部借用事项", end: false },
-              { title: "外部借用对象确认借用信息", text: "外部借用对象确认借用信息", end: false },
-              { title: "物资管理部门物资专责登记并留痕", text: "物资管理部门物资专责登记借用台账", end: false },
+              { title: "物资管理部门物资专责登记并留痕", text: "物资管理部门物资专责知悉，登记借用台账并留痕", end: false },
               { title: "外部借用完成", text: "外部借用完成", end: true }
             ]
           : [
@@ -2183,11 +2181,9 @@
       function buildReqProgressApprovalHtml(type) {
         var records = type === "external"
           ? [
-              { user: "当前使用人", time: "2026-06-26 09:30", content: "发起外部借用申请，填写外部单位、借用人、联系方式、借用理由、预计归还日期。", status: "已发起" },
+              { user: "当前使用人", time: "2026-06-26 09:30", content: "发起外部借用申请，填写外部单位、借用人、联系方式、借用说明、预计归还日期。", status: "已发起" },
               { user: "部门负责人", time: "待审批", content: "确认该物资是否可外借，审核借用必要性与风险。", status: "待审批" },
-              { user: "公司负责人", time: "待审批", content: "审批外部借用事项，确认是否同意对外借出。", status: "待审批" },
-              { user: "外部借用人", time: "待确认", content: "确认借用物资、借用期限及交接安排。", status: "待确认" },
-              { user: "物资管理部门物资专责", time: "待登记", content: "登记外部借用台账，留存审批与借用记录。", status: "待登记" },
+              { user: "物资管理部门物资专责", time: "待登记", content: "物资管理部门物资专责知悉，登记借用台账并留痕。", status: "待登记" },
               { user: "系统", time: "待完成", content: "外部借用流程完成。", status: "待完成" }
             ]
           : [
@@ -2315,8 +2311,8 @@
                   '<div><div style="font-size:13px;color:#1f3551;font-weight:600;margin-bottom:6px">联系方式</div><input class="carrier-search" id="reqBorrowContact" placeholder="请输入联系方式" style="width:100%;height:36px;border:1px solid #e9ecef;border-radius:8px;padding:0 10px;box-sizing:border-box;font-family:inherit;font-size:13px" /></div>' +
                   '<div><div style="font-size:13px;color:#1f3551;font-weight:600;margin-bottom:6px">预计归还日期</div><input class="carrier-search" id="reqBorrowDate" placeholder="如 2026-07-15" style="width:100%;height:36px;border:1px solid #e9ecef;border-radius:8px;padding:0 10px;box-sizing:border-box;font-family:inherit;font-size:13px" /></div>' +
                 '</div>' +
-                '<div style="margin-top:12px;font-size:13px;color:#1f3551;font-weight:600;margin-bottom:6px">借用理由</div>' +
-                '<textarea id="reqBorrowReason" class="carrier-search" placeholder="请输入借用理由" style="width:100%;height:82px;border:1px solid #e9ecef;border-radius:8px;padding:8px 10px;box-sizing:border-box;font-family:inherit;font-size:13px;resize:vertical"></textarea>' +
+                '<div style="margin-top:12px;font-size:13px;color:#1f3551;font-weight:600;margin-bottom:6px">借用说明</div>' +
+                '<textarea id="reqBorrowReason" class="carrier-search" placeholder="请输入借用说明" style="width:100%;height:82px;border:1px solid #e9ecef;border-radius:8px;padding:8px 10px;box-sizing:border-box;font-family:inherit;font-size:13px;resize:vertical"></textarea>' +
               '</div>' +
               '<div class="modal-ft"><button type="button" class="btn secondary" data-close-external-borrow="1">取消</button><button type="button" class="btn primary" data-ok-external-borrow="1">确定</button></div>' +
             '</div>' +

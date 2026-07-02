@@ -203,6 +203,12 @@
     .scrap-apply-textarea[readonly] {
       background: #f8fbff;
     }
+    .scrap-apply-note {
+      margin: 10px 0 0;
+      font-size: 12px;
+      color: #6b7f99;
+      line-height: 1.6;
+    }
     .scrap-apply-split {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -240,6 +246,7 @@
       }
       .scrap-apply-editor,
       .scrap-online-section,
+      .scrap-apply-detail-section,
       .modal-header,
       .modal-footer,
       .scrap-detail-header-actions,
@@ -259,6 +266,19 @@
       .scrap-paper-print .scrap-paper-table td {
         border-color: #222 !important;
         color: #111 !important;
+      }
+      #applyDetailPlanTable th:nth-child(5),
+      #applyDetailPlanTable td:nth-child(5) {
+        width: 92px !important;
+        min-width: 92px !important;
+        max-width: 92px !important;
+        white-space: normal !important;
+        word-break: break-all !important;
+        overflow-wrap: anywhere !important;
+      }
+      #applyDetailPlanTable th,
+      #applyDetailPlanTable td {
+        white-space: normal;
       }
     }
     #viewModalMask .view-mini-table,
@@ -610,6 +630,13 @@
     .plan-search .f input, .plan-search .f select { width:100%; height:30px; border:1px solid #dbe6f3; border-radius:6px; padding:0 8px; font-size:12px; background:#fff; color:#334155; }
     .plan-search .f.range { display:grid; grid-template-columns:1fr 14px 1fr; align-items:end; gap:4px; }
     .plan-search .f.range span { text-align:center; color:#94a3b8; font-size:12px; margin-bottom:6px; }
+    .plan-meta { border:1px solid #e6edf7; border-radius:8px; background:#fbfdff; padding:10px 12px; margin-bottom:10px; }
+    .plan-meta-grid { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:8px; }
+    .plan-meta-grid .f label { display:block; font-size:12px; color:#64748b; margin-bottom:4px; }
+    .plan-meta-grid .f input { width:100%; height:30px; border:1px solid #dbe6f3; border-radius:6px; padding:0 8px; font-size:12px; background:#fff; color:#334155; box-sizing:border-box; }
+    .plan-meta-grid .f input[readonly] { background:#f8fbff; }
+    .plan-meta-grid .span-2 { grid-column: span 2; }
+    .plan-meta-grid .span-5 { grid-column: 1 / -1; }
     .btn-green { background:#52c41a; border-color:#52c41a; color:#fff; }
     .btn-green:hover { background:#73d13d; border-color:#73d13d; color:#fff; }
     .btn-warn { background:#fff7e6; border-color:#ffd591; color:#d46b08; }
@@ -640,9 +667,47 @@
     .view-mini-table { width:100%; border-collapse:collapse; font-size:12px; margin-top:8px; }
     .view-mini-table th, .view-mini-table td { border:1px solid #edf1f7; padding:6px; text-align:left; }
     .view-mini-table th { background:#f8fafc; color:#64748b; }
+    #applyDetailPlanTable th,
+    #applyDetailPlanTable td {
+      white-space: normal;
+      overflow-wrap: anywhere;
+      word-break: break-word;
+      line-height: 1.45;
+    }
+    #applyDetailPlanTable th:nth-child(5),
+    #applyDetailPlanTable td:nth-child(5) {
+      width: 92px !important;
+      min-width: 92px !important;
+      max-width: 92px !important;
+      white-space: normal !important;
+      word-break: break-all !important;
+      overflow-wrap: anywhere !important;
+    }
+    .scrap-attachment-list { display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
+    .scrap-attachment-item {
+      display:inline-flex; align-items:center; gap:6px;
+      padding:4px 8px; border:1px solid #dbeafe; border-radius:6px;
+      background:#f8fbff; color:#1677ff; text-decoration:none; font-size:12px;
+      line-height:1.3;
+    }
+    .scrap-attachment-item:hover { opacity:.8; }
+    .scrap-attachment-item i { font-size:12px; }
+    .scrap-apply-nameqty-row { position:relative; display:flex; gap:8px; align-items:center; }
+    .scrap-apply-nameqty-row .scrap-apply-input { padding-right:42px; }
+    .scrap-apply-attach-btn {
+      position:absolute; right:8px; top:50%; transform:translateY(-50%);
+      width:28px; height:28px; border:0; border-radius:6px; background:#e6f4ff;
+      color:#1677ff; display:inline-flex; align-items:center; justify-content:center;
+      cursor:pointer;
+    }
+    .scrap-apply-attach-btn:hover { background:#d6eaff; }
+    .scrap-apply-attach-btn i { font-size:13px; }
+    .scrap-apply-attach-list { margin-top:8px; }
+    .scrap-apply-attach-list .scrap-attachment-item { margin:2px 0; }
     /* 报废物资明细表（新增/编辑弹窗） */
     .plan-item-table {
       width: 100%;
+      min-width: 1720px;
       border-collapse: collapse;
       font-size: 12px;
       table-layout: fixed;
@@ -684,10 +749,50 @@
       box-sizing: border-box;
       line-height: 1.4;
     }
-    .plan-item-ops { display: flex; gap: 6px; align-items: center; justify-content: center; }
-    .plan-item-ops a { color: #1677ff; font-size: 12px; cursor: pointer; text-decoration: none; }
+    .plan-item-table th:last-child,
+    .plan-item-table td:last-child {
+      width: 180px;
+      min-width: 180px;
+      max-width: 180px;
+      white-space: nowrap;
+      overflow: visible;
+      position: sticky;
+      right: 0;
+      background: #fff;
+      z-index: 6;
+      box-shadow: -10px 0 12px rgba(255, 255, 255, 0.96);
+    }
+    .plan-item-table th:nth-last-child(2),
+    .plan-item-table td:nth-last-child(2) {
+      width: 240px;
+      min-width: 240px;
+      max-width: 240px;
+    }
+    .plan-item-table th:last-child { z-index: 7; }
+    .plan-item-ops { display: flex; gap: 8px; align-items: center; justify-content: flex-start; width: 100%; min-width: 152px; white-space: nowrap; position: relative; z-index: 1; }
+    .plan-item-ops a,
+    .plan-item-ops button { border:0; background:transparent; padding:0; line-height:1.2; font-size:12px; cursor:pointer; text-decoration:none; white-space:nowrap; }
+    .plan-item-ops .pi-del { color:#ff4d4f; }
+    .plan-item-ops .pi-track { color:#1677ff; }
     .plan-item-ops a:hover { opacity: 0.75; }
     .plan-item-ops .ops-sep { color: #d0d7de; }
+    .pi-reason-wrap { display:flex; flex-direction:column; gap:6px; }
+    .pi-reason-tools { display:flex; align-items:center; justify-content:flex-end; gap:6px; }
+    .pi-attach-btn {
+      width: 28px;
+      height: 28px;
+      border: 1px solid #91caff;
+      border-radius: 6px;
+      background: #e6f4ff;
+      color: #1677ff;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex: 0 0 auto;
+    }
+    .pi-attach-btn:hover { opacity: 0.85; }
+    .pi-reason-files { font-size: 12px; color: #64748b; line-height: 1.4; }
     /* 物资选择弹窗表格 */
     .pick-asset-table {
       width: 100%;
@@ -879,8 +984,8 @@
                   <th>申请单号</th>
                   <th>申请部门</th>
                   <th>申请日期</th>
-                  <th>拟报废固定资产名称及数量</th>
-                  <th>拟报废固定资产清单</th>
+                  <th>拟报废物资名称及数量</th>
+                  <th>拟报废物资清单</th>
                   <th>拟报废固定资产堆放地点</th>
                   <th>申请报废原因</th>
                   <th>申请人员签字（电子签）</th>
@@ -929,39 +1034,15 @@
         </div>
       <div class="modal-body" style="display:block;">
         <div id="applyPaperCard"></div>
-        <div class="scrap-online-section" style="font-size:13px;font-weight:600;color:#1f3551;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid #e8eef7;">
-          在线物资列表
-          <span style="float:right;display:flex;gap:8px;">
+        <div class="scrap-apply-note">提示:《废旧物资报废申请》签字后，由废旧物资鉴定部门进行报废鉴定，并出具鉴定报告，物资归口管理部门依据该申请及鉴定报告执行公司物资报废内部决策流程。</div>
+        <div style="display:flex;align-items:center;justify-content:space-between;font-size:13px;font-weight:600;color:#1f3551;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid #e8eef7;">
+          <span>拟报废物资明细表</span>
+          <span style="display:flex;gap:8px;">
             <button type="button" id="btnApplyPrint" style="border:none;background:transparent;color:#64748b;cursor:pointer;font-size:13px;" title="打印"><i class="fa-solid fa-print"></i></button>
             <button type="button" id="btnApplyDownload" style="border:none;background:transparent;color:#64748b;cursor:pointer;font-size:13px;" title="下载"><i class="fa-solid fa-download"></i></button>
           </span>
         </div>
-        <div class="scrap-online-section" style="border:1px solid #e8eef7;border-radius:8px;overflow:hidden;margin-bottom:14px;">
-          <div style="max-height:280px;overflow:auto;">
-            <table style="width:100%;border-collapse:collapse;font-size:13px;color:#1f2d3d;table-layout:fixed;">
-              <thead>
-                <tr style="background:#f8fafc;">
-                  <th style="padding:8px 10px;border-bottom:1px solid #e8eef7;text-align:left;color:#1f2d3d;">产品名称</th>
-                  <th style="padding:8px 10px;border-bottom:1px solid #e8eef7;text-align:left;color:#1f2d3d;">产品编码</th>
-                  <th style="padding:8px 10px;border-bottom:1px solid #e8eef7;text-align:left;color:#1f2d3d;">制造商</th>
-                  <th style="padding:8px 10px;border-bottom:1px solid #e8eef7;text-align:left;color:#1f2d3d;">产品型号</th>
-                  <th style="padding:8px 10px;border-bottom:1px solid #e8eef7;text-align:left;color:#1f2d3d;">物资类型编码</th>
-                  <th style="padding:8px 10px;border-bottom:1px solid #e8eef7;text-align:left;color:#1f2d3d;">物资类别</th>
-                  <th style="padding:8px 10px;border-bottom:1px solid #e8eef7;text-align:center;color:#1f2d3d;width:52px;">单位</th>
-                  <th style="padding:8px 10px;border-bottom:1px solid #e8eef7;text-align:right;color:#1f2d3d;width:104px;">资产原值（万元）</th>
-                  <th style="padding:8px 10px;border-bottom:1px solid #e8eef7;text-align:right;color:#1f2d3d;width:104px;">累计折旧（万元）</th>
-                  <th style="padding:8px 10px;border-bottom:1px solid #e8eef7;text-align:right;color:#1f2d3d;width:104px;">净值（万元）</th>
-                  <th style="padding:8px 10px;border-bottom:1px solid #e8eef7;text-align:center;color:#1f2d3d;width:96px;">采购时间</th>
-                  <th style="padding:8px 10px;border-bottom:1px solid #e8eef7;text-align:left;color:#1f2d3d;">拟报废原因</th>
-                </tr>
-              </thead>
-              <tbody id="applyOnlineBody"></tbody>
-            </table>
-          </div>
-          <div id="applyOnlineEmpty" style="text-align:center;color:#8ca0b8;padding:24px;font-size:13px;">暂无在线物资</div>
-        </div>
-        <div style="font-size:13px;font-weight:600;color:#1f3551;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid #e8eef7;">拟报废物资明细表</div>
-        <div style="border:1px solid #e8eef7;border-radius:8px;overflow:hidden;margin-bottom:14px;">
+        <div class="scrap-apply-detail-section" style="border:1px solid #e8eef7;border-radius:8px;overflow:hidden;margin-bottom:14px;">
           <div style="max-height:280px;overflow:auto;">
             <table id="applyDetailPlanTable" style="width:100%;border-collapse:collapse;font-size:13px;color:#1f2d3d;table-layout:fixed;">
               <thead>
@@ -985,7 +1066,7 @@
               <tbody id="applyDetailBody"></tbody>
             </table>
           </div>
-          <div id="applyDetailEmpty" style="text-align:center;color:#8ca0b8;padding:24px;font-size:13px;">请从上方在线物资列表点击行选择物资</div>
+          <div id="applyDetailEmpty" style="text-align:center;color:#8ca0b8;padding:24px;font-size:13px;">暂无物资明细</div>
         </div>
         <div id="applyDetailSummary" style="font-size:12px;color:#334155;margin-bottom:14px;padding:6px 10px;background:#f8fbff;border:1px solid #e6edf7;border-radius:6px;">
           已选 <b id="applyDetailCount">0</b> 件物资，
@@ -1073,6 +1154,20 @@
         <div class="apply-tip" style="display:none;margin:0 0 10px;">
           💡 报废计划需在每年10月提交，计划审批通过后方可进行报废申请。只能选择本部门的物资。
         </div>
+        <div class="plan-meta">
+          <div class="plan-meta-grid">
+            <div class="f"><label>计划编号</label><input id="planNoPreview" readonly value="自动生成" /></div>
+            <div class="f"><label>计划年度</label><input id="planYearPreview" readonly value="2026" /></div>
+            <div class="f"><label>申请部门</label><input id="planDeptPreview" readonly value="设备运维部" /></div>
+            <div class="f"><label>申请人</label><input id="planUserPreview" readonly value="张明" /></div>
+            <div class="f"><label>物资数量</label><input id="planQtyPreview" readonly value="0" /></div>
+            <div class="f"><label>原值合计(元)</label><input id="planOriginPreview" readonly value="¥ 0.00" /></div>
+            <div class="f"><label>净值合计(元)</label><input id="planNetPreview" readonly value="¥ 0.00" /></div>
+            <div class="f"><label>提交日期</label><input id="planDatePreview" readonly value="2026-07-02" /></div>
+            <div class="f"><label>审批状态</label><input id="planStatusPreview" readonly value="待提交" /></div>
+            <div class="f span-5"><label>报废说明</label><input id="planRemarkPreview" readonly value="填写报废计划说明" /></div>
+          </div>
+        </div>
         <div class="plan-search" style="display:none;margin-bottom:8px;">
           <div class="f"><label>计划年度</label><select id="planYearInput"></select></div>
           <div class="f"><label>申请部门</label><input id="planDeptInput" readonly /></div>
@@ -1087,7 +1182,7 @@
             <i class="fa-solid fa-plus"></i> 选择报废物资
           </button>
           </div>
-        <div style="border:1px solid #e8eef7;border-radius:8px;overflow:hidden;margin-bottom:8px;">
+        <div style="border:1px solid #e8eef7;border-radius:8px;overflow:auto;margin-bottom:8px;">
           <div style="max-height:320px;overflow:auto;">
             <table class="plan-item-table" id="planItemTable">
               <thead>
@@ -1104,8 +1199,8 @@
                   <th style="width:104px;">累计折旧（万元）</th>
                   <th style="width:104px;">净值（万元）</th>
                   <th style="width:96px;">采购时间</th>
-                  <th style="min-width:150px;">拟报废原因</th>
-                  <th style="width:90px;">操作</th>
+                  <th style="min-width:240px;width:240px;">拟报废原因</th>
+                  <th style="width:180px;min-width:180px;">操作</th>
                 </tr>
               </thead>
               <tbody id="planItemBody"></tbody>
@@ -1115,6 +1210,7 @@
             暂无物资，请点击右上角「<strong style="color:#1677ff;">选择报废物资</strong>」按钮添加
         </div>
         </div>
+        <input type="file" id="planReasonAttachInput" accept=".xlsx,.xls,.csv,.pdf,.doc,.docx" multiple hidden />
         <div class="plan-summary" id="planItemSummary">
           <span>已选 <b id="planItemCount">0</b> 件物资</span>
           <span>原值合计：<b id="planItemOriginSum">¥ 0.00</b></span>
@@ -1238,12 +1334,12 @@
     </div>
   </div>
 
-  <script src="js/sidebar-actions.js"></script>
+  <script src="js/sidebar-actions.js?v=20260702-timeline-v6"></script>
   <script src="js/subpage-feature-title.js"></script>
   <script src="js/site-footer.js"></script>
   <script src="js/demo-product-catalog-data.js?v=20260701-product-code-seq"></script>
   <script src="js/demo-product-catalog-picker.js?v=20260701-product-code-seq"></script>
-  <script src="js/subpage-clock.js"></script>
+  <script src="js/subpage-clock.js?v=20260702-uifix1"></script>
   <script>
     (function () {
       var currentUser = "张明";
@@ -1494,8 +1590,6 @@
         btnOpenApplyModalProgress: document.getElementById("btnOpenApplyModalProgress"),
         btnApplyPrint: document.getElementById("btnApplyPrint"),
         btnApplyDownload: document.getElementById("btnApplyDownload"),
-        applyOnlineBody: document.getElementById("applyOnlineBody"),
-        applyOnlineEmpty: document.getElementById("applyOnlineEmpty"),
         applyDetailBody: document.getElementById("applyDetailBody"),
         applyDetailEmpty: document.getElementById("applyDetailEmpty"),
         applyDetailCount: document.getElementById("applyDetailCount"),
@@ -1552,6 +1646,7 @@
       var planEditingNo = "";
       var planSubmitNo = "";
       var planItems = [];      // [{id, qty, reason}]
+      var planReasonAttachTarget = "";
       var pickChecked = {};    // {id: true} for asset pick modal
 
       function statusMeta(code) {
@@ -1648,6 +1743,19 @@
           .replace(/"/g, "&quot;");
       }
       function esc(s) { return escHtml(s); }
+      function makeDemoAttachment(name, text) {
+        return { name: name, href: "data:text/plain;charset=utf-8," + encodeURIComponent(text || name) };
+      }
+      function renderAttachmentLinks(items, emptyText) {
+        var list = (items || []).filter(function (x) { return !!x && (typeof x === "string" || x.name || x.href || x.url || x.label); });
+        if (!list.length) return '<span style="color:#94a3b8;">' + escHtml(emptyText || "—") + '</span>';
+        return '<div class="scrap-attachment-list">' + list.map(function (it) {
+          var name = typeof it === "string" ? it : (it.name || it.label || "附件");
+          var href = typeof it === "string" ? it : (it.href || it.url || "#");
+          return '<a class="scrap-attachment-item" href="' + escHtml(href) + '" download="' + escHtml(name) + '">' +
+            '<i class="fa-solid fa-file-arrow-down"></i><span>' + escHtml(name) + '</span></a>';
+        }).join("") + "</div>";
+      }
 
       var scrapPaperDemo = {
         dept: "设备运维部",
@@ -1658,7 +1766,8 @@
         applicant: "张明（电子签）",
         deptOpinion: "同意报废，王磊（电子签）",
         manageOpinion: "建议按流程处置，李娜（电子签）",
-        manageHeadOpinion: "同意，周强（电子签）"
+        manageHeadOpinion: "同意，周强（电子签）",
+        attachments: [makeDemoAttachment("拟报废物资清单.xlsx", "拟报废物资清单：齿轮箱 × 1")]
       };
 
       function renderScrapPaperCard(data, options) {
@@ -1676,6 +1785,7 @@
               '<tbody>' +
                 '<tr><th>申请部门</th><td>' + escHtml(data.dept || "—") + '</td><th>申请日期</th><td class="paper-center">' + escHtml(data.date || "—") + '</td></tr>' +
                 '<tr><th>拟报废物资名称及数量</th><td colspan="3" class="paper-center">' + escHtml(data.nameQty || "—") + '（必要时，请附拟报废物资清单）</td></tr>' +
+                '<tr><th>拟报废物资清单</th><td colspan="3">' + renderAttachmentLinks(data.attachments, "—") + '</td></tr>' +
                 '<tr><th>拟报废物资堆放地点</th><td colspan="3">' + escHtml(data.location || "—") + '</td></tr>' +
                 '<tr><th>申请报废原因</th><td colspan="3" class="paper-line">' + escHtml(data.reason || "—") + '</td></tr>' +
                 '<tr><th>申请人员签字</th><td colspan="3">' + escHtml(data.applicant || "—") + '</td></tr>' +
@@ -1697,7 +1807,8 @@
           applicant: currentUser,
           deptOpinion: "",
           manageOpinion: "",
-          manageHeadOpinion: ""
+          manageHeadOpinion: "",
+          attachments: (window.__scrapApplyAttachments || []).slice()
         };
       }
 
@@ -1718,6 +1829,7 @@
         data.deptOpinion = val("deptOpinion");
         data.manageOpinion = val("manageOpinion");
         data.manageHeadOpinion = val("manageHeadOpinion");
+        data.attachments = (window.__scrapApplyAttachments || []).slice();
         return data;
       }
 
@@ -1736,7 +1848,14 @@
                 '</tr>' +
                 '<tr class="full-row">' +
                   '<th>拟报废物资名称及数量</th>' +
-                  '<td colspan="3"><input class="scrap-apply-input" name="nameQty" value="' + escHtml(data.nameQty || "") + '" placeholder="请输入拟报废物资名称及数量" /></td>' +
+                  '<td colspan="3">' +
+                    '<div class="scrap-apply-nameqty-row">' +
+                      '<input class="scrap-apply-input" name="nameQty" value="' + escHtml(data.nameQty || "") + '" placeholder="请输入拟报废物资名称及数量" />' +
+                      '<button type="button" class="scrap-apply-attach-btn" id="scrapAttachBtn" title="上传附件" aria-label="上传附件"><i class="fa-solid fa-paperclip"></i></button>' +
+                      '<input type="file" id="scrapAttachInput" accept=".xlsx,.xls,.csv,.pdf,.doc,.docx" multiple hidden />' +
+                    '</div>' +
+                    '<div class="scrap-apply-attach-list" id="scrapApplyAttachments">' + renderAttachmentLinks(data.attachments, "暂无附件") + '</div>' +
+                  '</td>' +
                 '</tr>' +
                 '<tr class="full-row">' +
                   '<th>拟报废物资堆放地点</th>' +
@@ -1744,7 +1863,7 @@
                 '</tr>' +
                 '<tr class="full-row">' +
                   '<th>申请报废原因</th>' +
-                  '<td colspan="3"><textarea class="scrap-apply-textarea" name="reason" placeholder="请输入申请报废原因">' + escHtml(data.reason || "") + '</textarea></td>' +
+                  '<td colspan="3"><textarea class="scrap-apply-textarea" name="reason" placeholder="依据xx制度，第xx条，该xx设备.......拟申请报废。">' + escHtml(data.reason || "") + '</textarea></td>' +
                 '</tr>' +
                 '<tr>' +
                   '<th>申请人员签字</th>' +
@@ -1770,32 +1889,10 @@
       }
 
       function renderTimelineRows(rows) {
-        if (typeof window.mapDemoRenderVerticalTimeline === "function") {
-          return window.mapDemoRenderVerticalTimeline(rows, {
-            person: function (r) { return r.user || r.person || r.name || "—"; },
-            time: function (r) { return r.time || r.date || "—"; },
-            status: function (r) { return r.result || r.status || "—"; },
-            content: function (r) { return r.content || r.opinion || r.desc || "—"; }
-          });
+        if (window.mapDemoRenderVerticalTimeline) {
+          return window.mapDemoRenderVerticalTimeline(rows);
         }
-        return rows.map(function (r, idx) {
-          var isLast = idx === rows.length - 1;
-          var color = /已通过|已完成|通过|报废结束/.test(r.result || r.status || "") ? "#10b981" : /处理中|进行中/.test(r.result || r.status || "") ? "#1677ff" : "#f59e0b";
-          return '<div style="display:grid;grid-template-columns:28px minmax(0,1fr);gap:12px;align-items:start;position:relative;">' +
-            '<div style="position:relative;min-height:' + (isLast ? "24px" : "92px") + ';">' +
-              '<span style="position:absolute;left:50%;top:8px;transform:translateX(-50%);width:14px;height:14px;border-radius:50%;background:' + color + ';box-shadow:0 0 0 4px ' + color + '1A;"></span>' +
-              (!isLast ? '<span style="position:absolute;left:50%;top:22px;bottom:-10px;width:2px;background:#d8e1ee;transform:translateX(-50%);"></span>' : '') +
-            '</div>' +
-            '<div style="padding:2px 0 ' + (isLast ? "0" : "26px") + ';min-width:0;">' +
-              '<div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:10px;">' +
-                '<span style="font-size:16px;font-weight:700;color:#1f3551;">' + escHtml(r.user || r.person || r.name || "—") + '</span>' +
-                '<span style="font-size:14px;color:#64748b;">' + escHtml(r.time || "—") + '</span>' +
-                '<span style="display:inline-flex;align-items:center;justify-content:center;padding:4px 10px;border-radius:5px;font-size:13px;font-weight:700;background:' + color + '22;color:' + color + ';">' + escHtml(r.result || r.status || "—") + '</span>' +
-              '</div>' +
-              '<div style="font-size:14px;color:#51627a;line-height:1.75;font-weight:500;">' + escHtml(r.content || r.opinion || r.desc || "—") + '</div>' +
-            '</div>' +
-          '</div>';
-        }).join("");
+        return "";
       }
 
       function planAssetLookup(id) {
@@ -1922,7 +2019,20 @@
 
       function openViewModal(item) {
         activeViewItem = item;
-        var paperHtml = renderScrapPaperCard(scrapPaperDemo, { readOnly: true, actions: true });
+        var paperHtml = renderScrapPaperCard({
+          dept: scrapPaperDemo.dept,
+          date: scrapPaperDemo.date,
+          nameQty: scrapPaperDemo.nameQty,
+          location: scrapPaperDemo.location,
+          reason: scrapPaperDemo.reason,
+          applicant: scrapPaperDemo.applicant,
+          deptOpinion: scrapPaperDemo.deptOpinion,
+          manageOpinion: scrapPaperDemo.manageOpinion,
+          manageHeadOpinion: scrapPaperDemo.manageHeadOpinion,
+          attachments: (item && item.assetListAttachments && item.assetListAttachments.length)
+            ? item.assetListAttachments
+            : scrapPaperDemo.attachments
+        }, { readOnly: true, actions: true });
         var demoRows = demoPlanAssets();
         var tableBody = demoRows.map(function (a) {
           var dep = a.origin - a.net;
@@ -1995,6 +2105,12 @@
         }
         rows.forEach(function (x) {
           var st = statusMeta(x.status);
+          var listHtml = renderAttachmentLinks(
+            x.assetListAttachments && x.assetListAttachments.length
+              ? x.assetListAttachments
+              : [makeDemoAttachment((x.applyNo || "附件") + ".xlsx", x.assetList || x.assetNameQty || x.applyNo || "拟报废物资清单")],
+            "—"
+          );
           var tr = document.createElement("tr");
           tr.setAttribute("data-apply-no", x.applyNo);
           tr.innerHTML =
@@ -2002,7 +2118,7 @@
             "<td>" + (x.applyDept || "-") + "</td>" +
             "<td>" + x.applyDate + "</td>" +
             "<td>" + (x.assetNameQty || "-") + "</td>" +
-            "<td>" + (x.assetList || "-") + "</td>" +
+            "<td>" + listHtml + "</td>" +
             "<td>" + (x.stackLocation || "-") + "</td>" +
             "<td>" + (x.scrapReason || "-") + "</td>" +
             "<td>" + (x.applicantSign || "-") + "</td>" +
@@ -2033,37 +2149,6 @@
       }
 
       var applyDetailRows = [];
-      var applySelectedAssetId = null;
-
-      function activeMaterials() {
-        return materialLedger.filter(function (m) { return m.status !== "已报废"; });
-      }
-
-      function refreshApplyOnlineTable() {
-        var body = refs.applyOnlineBody;
-        body.innerHTML = "";
-        var rows = activeMaterials();
-        rows.forEach(function (asset) {
-          var fin = financeBook[asset.id] || { originValue: 0, netValue: 0 };
-          var tr = document.createElement("tr");
-          tr.innerHTML =
-            '<td style="padding:8px 10px;border-bottom:1px solid #f0f2f5;">' + escHtml(asset.name) + '</td>' +
-            '<td style="padding:8px 10px;border-bottom:1px solid #f0f2f5;">' + escHtml(assetProductCode(asset)) + '</td>' +
-            '<td style="padding:8px 10px;border-bottom:1px solid #f0f2f5;word-break:break-all;">' + escHtml(asset.manufacturer || "-") + '</td>' +
-            '<td style="padding:8px 10px;border-bottom:1px solid #f0f2f5;">' + escHtml(asset.model || "-") + '</td>' +
-            '<td style="padding:8px 10px;border-bottom:1px solid #f0f2f5;">' + escHtml(assetTypeCode(asset)) + '</td>' +
-            '<td style="padding:8px 10px;border-bottom:1px solid #f0f2f5;">' + escHtml(assetCategory(asset)) + '</td>' +
-            '<td style="padding:8px 10px;border-bottom:1px solid #f0f2f5;text-align:center;">' + escHtml(asset.unit || "台") + '</td>' +
-            '<td style="padding:8px 10px;border-bottom:1px solid #f0f2f5;text-align:right;">' + fmtWan(fin.originValue) + '</td>' +
-            '<td style="padding:8px 10px;border-bottom:1px solid #f0f2f5;text-align:right;">' + fmtWan(fin.originValue - fin.netValue) + '</td>' +
-            '<td style="padding:8px 10px;border-bottom:1px solid #f0f2f5;text-align:right;">' + fmtWan(fin.netValue) + '</td>' +
-            '<td style="padding:8px 10px;border-bottom:1px solid #f0f2f5;text-align:center;">' + escHtml(asset.purchaseDate || "-") + '</td>' +
-            '<td style="padding:8px 10px;border-bottom:1px solid #f0f2f5;"><button type="button" class="btn-add-row" data-asset-id="' + escHtml(asset.id) + '" style="border:none;background:#1677ff;color:#fff;border-radius:4px;padding:2px 8px;font-size:12px;cursor:pointer;">加入明细</button></td>';
-          tr.style.cursor = "pointer";
-          body.appendChild(tr);
-        });
-        refs.applyOnlineEmpty.style.display = rows.length ? "none" : "block";
-      }
 
       function refreshApplyDetailTable() {
         var body = refs.applyDetailBody;
@@ -2110,6 +2195,7 @@
       }
 
       function openApplyModal() {
+        window.__scrapApplyAttachments = [];
         applyDetailRows = demoPlanAssets().map(function (a) {
           var dep = a.origin - a.net;
           return {
@@ -2129,12 +2215,10 @@
             purchaseDate: a.purchaseDate
           };
         });
-        applySelectedAssetId = null;
         var paper = document.getElementById("applyPaperCard");
         if (paper) paper.innerHTML = renderApplyEditorCard(applyFormDefaults()) + '<div id="applyPrintCard" class="scrap-paper-print">' + renderScrapPaperCard(applyFormDefaults(), { readOnly: true, actions: false }) + '</div>';
         syncApplyPrintCard();
         refreshApplyDetailTable();
-        refreshApplyOnlineTable();
         refs.applyModalMask.classList.add("show");
         refs.applyModalMask.setAttribute("aria-hidden", "false");
       }
@@ -2144,27 +2228,6 @@
         refs.applyModalMask.setAttribute("aria-hidden", "true");
       }
 
-      function addToApplyDetail(asset) {
-        var fin = financeBook[asset.id] || { originValue: 0, netValue: 0 };
-        var reason = "";
-        applyDetailRows.push({
-          id: asset.id,
-          code: asset.id,
-          name: asset.name,
-          manufacturer: asset.manufacturer,
-          model: asset.model,
-          typeCode: assetTypeCode(asset),
-          category: assetCategory(asset),
-          unit: asset.unit || "台",
-          origin: fin.originValue,
-          dep: (Number(fin.originValue) || 0) - (Number(fin.netValue) || 0),
-          net: fin.netValue,
-          qty: 1,
-          reason: reason,
-          purchaseDate: asset.purchaseDate || "-"
-        });
-        refreshApplyDetailTable();
-      }
       refs.btnCreate.addEventListener("click", openApplyModal);
       refs.btnCloseModal.addEventListener("click", closeApplyModal);
       refs.btnCancel.addEventListener("click", closeApplyModal);
@@ -2256,6 +2319,46 @@
           else alert("Word 下载按钮已触发（演示）");
         }
       });
+      document.addEventListener("click", function (e) {
+        var btn = e.target && e.target.closest ? e.target.closest("#scrapAttachBtn") : null;
+        if (!btn) return;
+        var inp = document.getElementById("scrapAttachInput");
+        if (inp) inp.click();
+      });
+      document.addEventListener("change", function (e) {
+        var inp = e.target && e.target.closest ? e.target.closest("#scrapAttachInput") : null;
+        if (!inp) return;
+        var files = Array.prototype.slice.call(inp.files || []);
+        window.__scrapApplyAttachments = files.map(function (f) {
+          return makeDemoAttachment(f.name || "拟报废物资清单.xlsx", f.name || "拟报废物资清单");
+        });
+        var list = document.getElementById("scrapApplyAttachments");
+        if (list) list.innerHTML = renderAttachmentLinks(window.__scrapApplyAttachments, "暂无附件");
+        syncApplyPrintCard();
+      });
+      document.addEventListener("click", function (e) {
+        var btn = e.target && e.target.closest ? e.target.closest(".pi-attach-btn") : null;
+        if (!btn) return;
+        var inp = document.getElementById("planReasonAttachInput");
+        if (!inp) return;
+        planReasonAttachTarget = btn.getAttribute("data-idx") || "";
+        inp.dataset.idx = planReasonAttachTarget;
+        inp.click();
+      });
+      document.addEventListener("change", function (e) {
+        var inp = e.target && e.target.closest ? e.target.closest("#planReasonAttachInput") : null;
+        if (!inp) return;
+        var idx = Number(inp.dataset.idx);
+        if (isNaN(idx) || !planItems[idx]) return;
+        var files = Array.prototype.slice.call(inp.files || []);
+        planItems[idx].attachments = files.map(function (f) {
+          return makeDemoAttachment(f.name || "拟报废原因附件.xlsx", f.name || "拟报废原因附件");
+        });
+        planReasonAttachTarget = "";
+        inp.value = "";
+        inp.dataset.idx = "";
+        renderPlanItemTable();
+      });
       refs.flowTabs.forEach(function (tab) {
         tab.addEventListener("click", function () {
           var key = tab.getAttribute("data-flow-tab");
@@ -2301,6 +2404,7 @@
           applyDate: date,
           assetNameQty: nameQtyParts.join("；"),
           assetList: assetListParts.join("；"),
+          assetListAttachments: (window.__scrapApplyAttachments || []).slice(),
           stackLocation: ((document.getElementById("stackLocation") || {}).value || "待补充").trim(),
           scrapReason: ((document.getElementById("scrapReason") || {}).value || "").trim(),
           applicantSign: ((document.getElementById("applicantSign") || {}).value || (currentUser + "（电子签）")).trim(),
@@ -2442,13 +2546,53 @@
           body.appendChild(tr);
         });
       }
+      function refreshPlanMeta() {
+        var yearSel = document.getElementById("planYearInput");
+        var deptInp = document.getElementById("planDeptInput");
+        var userInp = document.getElementById("planUserInput");
+        var dateInp = document.getElementById("planDateInput");
+        var remarkInp = document.getElementById("planRemarkInput");
+        var qtyEl = document.getElementById("planQtyPreview");
+        var originEl = document.getElementById("planOriginPreview");
+        var netEl = document.getElementById("planNetPreview");
+        var noEl = document.getElementById("planNoPreview");
+        var yearEl = document.getElementById("planYearPreview");
+        var deptEl = document.getElementById("planDeptPreview");
+        var userEl = document.getElementById("planUserPreview");
+        var dateEl = document.getElementById("planDatePreview");
+        var statusEl = document.getElementById("planStatusPreview");
+        var remarkEl = document.getElementById("planRemarkPreview");
+        if (!qtyEl || !originEl || !netEl || !noEl) return;
+        var totalQty = 0, totalOrigin = 0, totalNet = 0;
+        planItems.forEach(function (item) {
+          var asset = planAssetLookup(item.id) || planAssets.find(function (a) { return a.id === item.id; });
+          var qty = planQtyNumber(item.qty);
+          totalQty += qty;
+          if (asset) {
+            totalOrigin += (Number(asset.origin) || 0) * qty;
+            totalNet += (Number(asset.net) || 0) * qty;
+          }
+        });
+        var year = (yearSel && yearSel.value) || String(new Date().getFullYear());
+        var date = (dateInp && dateInp.value) || new Date().toISOString().slice(0, 10);
+        noEl.value = planEditingNo || genPlanNo(year);
+        yearEl && (yearEl.value = year);
+        deptEl && (deptEl.value = (deptInp && deptInp.value) || currentDept);
+        userEl && (userEl.value = (userInp && userInp.value) || currentUser);
+        qtyEl.value = String(totalQty);
+        originEl.value = "¥ " + fmtMoney(totalOrigin);
+        netEl.value = "¥ " + fmtMoney(totalNet);
+        dateEl && (dateEl.value = date);
+        statusEl && (statusEl.value = planEditingNo ? "编辑中" : "待提交");
+        remarkEl && (remarkEl.value = (remarkInp && remarkInp.value) || "填写报废计划说明");
+      }
       function genPlanNo(year) {
         var seq = planRecords.filter(function (p) { return p.year === String(year); }).length + 1;
         return "BF-" + year + "-" + String(seq).padStart(3, "0");
       }
       function openPlanModal(planNo) {
         planEditingNo = planNo || "";
-        planItems = []; // { id, qty, reason }
+        planItems = []; // { id, qty, reason, attachments }
         var yearSel = document.getElementById("planYearInput");
         if (!yearSel.options.length) {
           var yy = new Date().getFullYear();
@@ -2473,7 +2617,8 @@
               return {
                 id: id,
                 qty: (!isNaN(q) && q >= 1) ? Math.floor(q) : 1,
-                reason: (old.assetReasons && old.assetReasons[id]) ? old.assetReasons[id] : ""
+                reason: (old.assetReasons && old.assetReasons[id]) ? old.assetReasons[id] : "",
+                attachments: (old.assetReasonAttachments && old.assetReasonAttachments[id]) ? old.assetReasonAttachments[id].slice() : []
               };
             });
           }
@@ -2481,9 +2626,18 @@
           yearSel.value = String(new Date().getFullYear());
         }
         renderPlanItemTable();
+        refreshPlanMeta();
         document.getElementById("planModalMask").classList.add("show");
       }
-      function closePlanModal() { document.getElementById("planModalMask").classList.remove("show"); }
+      function closePlanModal() {
+        planReasonAttachTarget = "";
+        var inp = document.getElementById("planReasonAttachInput");
+        if (inp) {
+          inp.value = "";
+          inp.dataset.idx = "";
+        }
+        document.getElementById("planModalMask").classList.remove("show");
+      }
 
       // ── 报废物资明细表渲染 ──────────────────────────────────
       function renderPlanItemTable() {
@@ -2527,11 +2681,19 @@
             '<td style="text-align:right;color:#1f2d3d;">' + fmtWan(dep * qty) + '</td>' +
             '<td style="text-align:right;color:#1f2d3d;">' + fmtWan(asset.net * qty) + '</td>' +
             '<td style="color:#1f2d3d;">' + (asset.purchaseDate || "-") + '</td>' +
-            '<td style="color:#1f2d3d;"><textarea class="pi-reason" data-idx="' + idx + '" rows="2" placeholder="填写报废原因" style="color:#1f2d3d;">' + escHtml(item.reason || "") + '</textarea></td>' +
+            '<td style="color:#1f2d3d;">' +
+              '<div class="pi-reason-wrap">' +
+                '<textarea class="pi-reason" data-idx="' + idx + '" rows="2" placeholder="填写报废原因" style="color:#1f2d3d;">' + escHtml(item.reason || "") + '</textarea>' +
+                '<div class="pi-reason-tools">' +
+                  '<button type="button" class="pi-attach-btn" data-idx="' + idx + '" title="上传附件" aria-label="上传附件"><i class="fa-solid fa-paperclip"></i></button>' +
+                '</div>' +
+                '<div class="pi-reason-files" id="piReasonFiles-' + idx + '">' + renderAttachmentLinks(item.attachments || [], "暂无附件") + '</div>' +
+              '</div>' +
+            '</td>' +
             '<td>' +
               '<div class="plan-item-ops">' +
-                '<a href="#" class="pi-del" data-idx="' + idx + '" style="color:#ff4d4f;">删除</a>' +
-                '<a href="#" class="pi-track" data-id="' + escHtml(asset.id) + '" style="color:#1677ff;margin-left:8px;">物资跟踪</a>' +
+                '<a href="#" class="pi-del" data-idx="' + idx + '">删除</a>' +
+                '<a href="#" class="pi-track" data-id="' + escHtml(asset.id) + '">物资跟踪</a>' +
               '</div>' +
             '</td>';
           body.appendChild(tr);
@@ -2547,6 +2709,7 @@
         } else {
           tip.innerHTML = '<span style="color:#389e0d;">净值未超过100万元，无需进行资产评估</span>';
         }
+        refreshPlanMeta();
       }
 
       // ═══════════════════════════════════════════════════════════
@@ -2721,7 +2884,7 @@
               if (!p || !p.id || existingIds[p.id]) return;
               ensurePlanAssetFromProduct(p);
               existingIds[p.id] = true;
-              planItems.push({ id: p.id, qty: "", reason: "" });
+              planItems.push({ id: p.id, qty: "", reason: "", attachments: [] });
             });
             renderPlanItemTable();
           }
@@ -2734,7 +2897,7 @@
         var ids = Object.keys(PAP.pendingSelected);
         ids.forEach(function (id) {
           if (!planItems.some(function (item) { return item.id === id; })) {
-            planItems.push({ id: id, qty: "", reason: "" });
+            planItems.push({ id: id, qty: "", reason: "", attachments: [] });
           }
         });
         closePlanAssetPick();
@@ -2748,7 +2911,12 @@
         var assetIds = planItems.map(function (item) { return item.id; });
         var assetQty = {};
         var assetReasons = {};
-        planItems.forEach(function (item) { assetQty[item.id] = planQtyValue(item.qty); assetReasons[item.id] = item.reason; });
+        var assetReasonAttachments = {};
+        planItems.forEach(function (item) {
+          assetQty[item.id] = planQtyValue(item.qty);
+          assetReasons[item.id] = item.reason;
+          assetReasonAttachments[item.id] = (item.attachments || []).slice();
+        });
         var item = {
           planNo: planEditingNo || genPlanNo(year),
           year: year,
@@ -2768,6 +2936,7 @@
           assetIds: assetIds,
           assetQty: assetQty,
           assetReasons: assetReasons,
+          assetReasonAttachments: assetReasonAttachments,
           remark: remark
         };
         var idx = planRecords.findIndex(function (p) { return p.planNo === item.planNo; });
@@ -2946,12 +3115,15 @@
         document.getElementById("planItemBody").addEventListener("click", function (e) {
           var del = e.target.closest(".pi-del");
           if (del) {
+            e.preventDefault();
             var idx = parseInt(del.getAttribute("data-idx"), 10);
             planItems.splice(idx, 1);
             renderPlanItemTable();
+            return;
           }
           var track = e.target.closest(".pi-track");
           if (track) {
+            e.preventDefault();
             var assetId = track.getAttribute("data-id");
             alert("物资跟踪：正在跳转到物资「" + assetId + "」的流转记录页面（演示功能）");
           }

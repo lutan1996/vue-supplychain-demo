@@ -376,9 +376,9 @@
     </div>
   </div>
 
-  <script src="js/sidebar-actions.js"></script>
+  <script src="js/sidebar-actions.js?v=20260702-timeline-v6"></script>
   <script src="js/subpage-feature-title.js"></script>
-  <script src="js/subpage-clock.js?v=20260615-v7-use-approval"></script>
+  <script src="js/subpage-clock.js?v=20260702-uifix1"></script>
   <script src="js/cross-dept-handoff-demo.js"></script>
   <script src="js/material-code-scheme.js"></script>
   <script src="js/demo-product-catalog-data.js"></script>
@@ -1885,8 +1885,8 @@
             return "<td>"+esc(v)+"</td>";
           }).join("");
           var opsHtml = (c === "requisition" || c === "flow")
-            ? '<button class="op-btn" data-op="detail" data-key="'+key+'">查看</button>'
-            : '<button class="op-btn" data-op="detail" data-key="'+key+'">查看</button>';
+            ? '<button class="op-btn" data-op="detail" data-key="'+key+'">查看明细</button>'
+            : '<button class="op-btn" data-op="detail" data-key="'+key+'">查看明细</button>';
           return "<tr>"+cells+'<td>'+opsHtml+'</td>'
             +"</tr>";
         }).join("") || '<tr><td colspan="'+(cfg.columns.length+1)+'" style="padding:24px;color:#94a3b8">暂无数据</td></tr>';
@@ -2150,9 +2150,7 @@
           ? [
               { title: "使用人发起外部借用申请", text: "使用人发起外部借用申请", end: false },
               { title: "部门负责人初审", text: "部门负责人初审借用必要性", end: false },
-              { title: "公司负责人审批", text: "公司负责人审批外部借用事项", end: false },
-              { title: "外部借用对象确认借用信息", text: "外部借用对象确认借用信息", end: false },
-              { title: "物资管理部门物资专责登记并留痕", text: "物资管理部门物资专责登记借用台账", end: false },
+              { title: "物资管理部门物资专责登记并留痕", text: "物资管理部门物资专责知悉，登记借用台账并留痕", end: false },
               { title: "外部借用完成", text: "外部借用完成", end: true }
             ]
           : [
@@ -2183,11 +2181,9 @@
       function buildReqProgressApprovalHtml(type) {
         var records = type === "external"
           ? [
-              { user: "当前使用人", time: "2026-06-26 09:30", content: "发起外部借用申请，填写外部单位、借用人、联系方式、借用理由、预计归还日期。", status: "已发起" },
+              { user: "当前使用人", time: "2026-06-26 09:30", content: "发起外部借用申请，填写外部单位、借用人、联系方式、借用说明、预计归还日期。", status: "已发起" },
               { user: "部门负责人", time: "待审批", content: "确认该物资是否可外借，审核借用必要性与风险。", status: "待审批" },
-              { user: "公司负责人", time: "待审批", content: "审批外部借用事项，确认是否同意对外借出。", status: "待审批" },
-              { user: "外部借用人", time: "待确认", content: "确认借用物资、借用期限及交接安排。", status: "待确认" },
-              { user: "物资管理部门物资专责", time: "待登记", content: "登记外部借用台账，留存审批与借用记录。", status: "待登记" },
+              { user: "物资管理部门物资专责", time: "待登记", content: "物资管理部门物资专责知悉，登记借用台账并留痕。", status: "待登记" },
               { user: "系统", time: "待完成", content: "外部借用流程完成。", status: "待完成" }
             ]
           : [
@@ -2197,26 +2193,12 @@
               { user: "物资管理部门物资专责", time: "待知悉", content: "登记变更结果，更新台账留痕。", status: "待知悉" },
               { user: "系统", time: "待完成", content: "物资使用人信息更新完成。", status: "待完成" }
             ];
-        var items = records.map(function(item, idx) {
-          var isLast = idx === records.length - 1;
-          var statusColor = item.status === "已发起" || item.status === "已通过" || item.status === "已完成" ? "#10b981" : 
-                           item.status === "待审批" || item.status === "待确认" || item.status === "待知悉" || item.status === "待登记" ? "#f59e0b" : "#64748b";
-          return '<div class="req-timeline-item" style="display:grid;grid-template-columns:44px minmax(0,1fr);column-gap:6px;align-items:start;position:relative">' +
-            '<div style="position:relative;width:44px;min-height:' + (isLast ? '28px' : '118px') + ';display:flex;justify-content:center;flex-shrink:0">' +
-              '<div style="width:16px;height:16px;border-radius:50%;background:' + statusColor + ';flex-shrink:0;margin-top:8px;position:relative;z-index:1"></div>' +
-              (!isLast ? '<div style="position:absolute;top:24px;bottom:-8px;left:50%;width:1px;background:#d8e1ee;transform:translateX(-50%)"></div>' : '') +
-            '</div>' +
-            '<div style="padding:4px 0 ' + (isLast ? '0' : '34px') + ';min-width:0">' +
-              '<div style="display:flex;align-items:center;gap:18px;flex-wrap:wrap;margin-bottom:18px">' +
-                '<span style="font-weight:700;color:#1f3551;font-size:16px">' + esc(item.user) + '</span>' +
-                '<span style="color:#64748b;font-size:15px">' + esc(item.time) + '</span>' +
-                '<span style="padding:5px 12px;border-radius:5px;font-size:14px;font-weight:700;background:' + statusColor + '22;color:' + statusColor + '">' + esc(item.status) + '</span>' +
-              '</div>' +
-              '<div style="font-size:15px;color:#51627a;line-height:1.75;font-weight:500">' + esc(item.content) + '</div>' +
-            '</div>' +
-          '</div>';
-        }).join("");
-        return '<div style="padding:4px 0">' + items + '</div>';
+        return '<div style="padding:4px 0 0;">' + (window.mapDemoRenderVerticalTimeline ? window.mapDemoRenderVerticalTimeline(records, {
+          person: function (item) { return item.user; },
+          time: function (item) { return item.time; },
+          status: function (item) { return item.status; },
+          content: function (item) { return item.content; }
+        }) : "") + '</div>';
       }
       function openReqProgressModal(type) {
         removeReqFloatingModal("reqBizProgressMask");
@@ -2329,8 +2311,8 @@
                   '<div><div style="font-size:13px;color:#1f3551;font-weight:600;margin-bottom:6px">联系方式</div><input class="carrier-search" id="reqBorrowContact" placeholder="请输入联系方式" style="width:100%;height:36px;border:1px solid #e9ecef;border-radius:8px;padding:0 10px;box-sizing:border-box;font-family:inherit;font-size:13px" /></div>' +
                   '<div><div style="font-size:13px;color:#1f3551;font-weight:600;margin-bottom:6px">预计归还日期</div><input class="carrier-search" id="reqBorrowDate" placeholder="如 2026-07-15" style="width:100%;height:36px;border:1px solid #e9ecef;border-radius:8px;padding:0 10px;box-sizing:border-box;font-family:inherit;font-size:13px" /></div>' +
                 '</div>' +
-                '<div style="margin-top:12px;font-size:13px;color:#1f3551;font-weight:600;margin-bottom:6px">借用理由</div>' +
-                '<textarea id="reqBorrowReason" class="carrier-search" placeholder="请输入借用理由" style="width:100%;height:82px;border:1px solid #e9ecef;border-radius:8px;padding:8px 10px;box-sizing:border-box;font-family:inherit;font-size:13px;resize:vertical"></textarea>' +
+                '<div style="margin-top:12px;font-size:13px;color:#1f3551;font-weight:600;margin-bottom:6px">借用说明</div>' +
+                '<textarea id="reqBorrowReason" class="carrier-search" placeholder="请输入借用说明" style="width:100%;height:82px;border:1px solid #e9ecef;border-radius:8px;padding:8px 10px;box-sizing:border-box;font-family:inherit;font-size:13px;resize:vertical"></textarea>' +
               '</div>' +
               '<div class="modal-ft"><button type="button" class="btn secondary" data-close-external-borrow="1">取消</button><button type="button" class="btn primary" data-ok-external-borrow="1">确定</button></div>' +
             '</div>' +
@@ -2361,11 +2343,8 @@
           var rows = table.querySelectorAll("tbody tr");
           rows.forEach(function (tr) {
             var cells = tr.children || [];
-            // 直接在每行末尾添加操作列，不依赖表头的"操作"列
             var lastCell = cells[cells.length - 1];
             if (!lastCell) return;
-            var txt = String(lastCell.textContent || "").replace(/\s+/g, "");
-            if (txt.indexOf("物资跟踪") >= 0 || txt.indexOf("变更使用人") >= 0) return; // 已有按钮
             // 从前一列获取物资名称和编码
             var productName = "";
             var productCode = "";
@@ -2377,9 +2356,7 @@
             }
             if (!productName) productName = "物资";
             if (!productCode) productCode = "—";
-            var opCell = document.createElement("td");
-            opCell.innerHTML = buildReqDetailOperationHtml(productName, productCode);
-            tr.appendChild(opCell);
+            lastCell.innerHTML = buildReqDetailOperationHtml(productName, productCode);
           });
         });
       }
@@ -2762,7 +2739,9 @@
               var seq = idx + 1;
               var opTd = opts.detailAction === "track"
                 ? buildDetailTrackTd(d)
-                : buildEditDetailDeleteTd(idx, "req-detail-remove");
+                : opts.detailAction === "req"
+                  ? '<td style="padding:8px;border-bottom:1px solid #f0f2f5;text-align:center;white-space:nowrap">' + buildReqDetailOperationHtml(d.productName || d.name || "", d.productCode || "") + '</td>'
+                  : buildEditDetailDeleteTd(idx, "req-detail-remove");
               return (
                 "<tr>" +
                 '<td style="' +
@@ -3047,7 +3026,7 @@
             buildReqMatDetailBlockFromLines(detailLines, "领用物资明细表", {
               showUserCol: true,
               defaultUserName: row.applicant || sourceRow.keeper || "",
-              detailAction: "track"
+              detailAction: "req"
             });
           document.getElementById("detailTitle").textContent = "领用记录 - " + (row.reqNo || "");
           document.getElementById("detailMask").classList.add("show");
@@ -3705,9 +3684,11 @@
           renderAll();
           return;
         }
-        var op = e.target.getAttribute("data-op");
+        var opBtn = e.target && e.target.closest ? e.target.closest("[data-op]") : null;
+        var op = opBtn && opBtn.getAttribute ? opBtn.getAttribute("data-op") : "";
         if(op){
-          var row = findRowByKey(e.target.getAttribute("data-key") || "");
+          e.preventDefault();
+          var row = findRowByKey(opBtn.getAttribute("data-key") || "");
           if(!row) return;
           if(op==="detail" || op==="name-detail"){ openDetail(row); return; }
           if(op==="edit"){ openActionModal("edit", row); return; }
@@ -3720,15 +3701,6 @@
       });
 
       bindReqMatPickerEventsOnce();
-      (function bindLedgerDetailRestoreOnce() {
-        var detailBody = document.getElementById("detailBody");
-        if (!detailBody || detailBody.__ledgerDetailRestoreBound) return;
-        detailBody.__ledgerDetailRestoreBound = true;
-        var observer = new MutationObserver(function () {
-          restoreLedgerDetailOperationButtons();
-        });
-        observer.observe(detailBody, { childList: true, subtree: true });
-      })();
       renderAll();
 })();
   </script>

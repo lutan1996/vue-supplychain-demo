@@ -2409,11 +2409,7 @@
       '<span class="map-flow-arrow">→</span>' +
       '<span class="map-flow-node">部门负责人初审</span>' +
       '<span class="map-flow-arrow">→</span>' +
-      '<span class="map-flow-node">公司负责人审批</span>' +
-      '<span class="map-flow-arrow">→</span>' +
-      '<span class="map-flow-node">外部借用对象确认</span>' +
-      '<span class="map-flow-arrow">→</span>' +
-      '<span class="map-flow-node">物资管理部门登记</span>' +
+      '<span class="map-flow-node">物资管理部门物资专责登记并留痕</span>' +
       '<span class="map-flow-arrow">→</span>' +
       '<span class="map-flow-node end">完成</span>' +
       '</div>';
@@ -2423,7 +2419,7 @@
           '<div class="map-flow-tl-dot" style="background:#10b981"></div><div class="map-flow-tl-line"></div>' +
           '<div class="map-flow-tl-body">' +
             '<div class="map-flow-tl-meta"><span class="map-flow-tl-person">许学良</span><span class="map-flow-tl-time">2026-06-26 09:30</span><span class="map-flow-tl-badge" style="background:#10b98122;color:#10b981">已发起</span></div>' +
-            '<div class="map-flow-tl-content">发起外借，填写外部借用单位、借用人及借用原因</div>' +
+            '<div class="map-flow-tl-content">发起外借，填写外部借用单位、借用人及借用说明</div>' +
           '</div>' +
         '</div>' +
         '<div class="map-flow-tl-item">' +
@@ -2436,22 +2432,8 @@
         '<div class="map-flow-tl-item">' +
           '<div class="map-flow-tl-dot" style="background:#10b981"></div><div class="map-flow-tl-line"></div>' +
           '<div class="map-flow-tl-body">' +
-            '<div class="map-flow-tl-meta"><span class="map-flow-tl-person">王超</span><span class="map-flow-tl-time">2026-06-26 10:20</span><span class="map-flow-tl-badge" style="background:#10b98122;color:#10b981">已通过</span></div>' +
-            '<div class="map-flow-tl-content">完成公司负责人审批，同意本次外部借用</div>' +
-          '</div>' +
-        '</div>' +
-        '<div class="map-flow-tl-item">' +
-          '<div class="map-flow-tl-dot" style="background:#10b981"></div><div class="map-flow-tl-line"></div>' +
-          '<div class="map-flow-tl-body">' +
-            '<div class="map-flow-tl-meta"><span class="map-flow-tl-person">张三</span><span class="map-flow-tl-time">2026-06-26 10:48</span><span class="map-flow-tl-badge" style="background:#10b98122;color:#10b981">已确认</span></div>' +
-            '<div class="map-flow-tl-content">完成外部借用对象确认，确认借用信息与归还时间</div>' +
-          '</div>' +
-        '</div>' +
-        '<div class="map-flow-tl-item">' +
-          '<div class="map-flow-tl-dot" style="background:#10b981"></div><div class="map-flow-tl-line"></div>' +
-          '<div class="map-flow-tl-body">' +
-            '<div class="map-flow-tl-meta"><span class="map-flow-tl-person">宋中波</span><span class="map-flow-tl-time">2026-06-26 11:05</span><span class="map-flow-tl-badge" style="background:#10b98122;color:#10b981">已完成</span></div>' +
-            '<div class="map-flow-tl-content">完成物资管理部门登记，登记外借台账</div>' +
+            '<div class="map-flow-tl-meta"><span class="map-flow-tl-person">宋中波</span><span class="map-flow-tl-time">2026-06-26 10:20</span><span class="map-flow-tl-badge" style="background:#10b98122;color:#10b981">已完成</span></div>' +
+            '<div class="map-flow-tl-content">物资管理部门物资专责知悉，登记借用台账并留痕</div>' +
           '</div>' +
         '</div>' +
         '<div class="map-flow-tl-item map-flow-tl-last">' +
