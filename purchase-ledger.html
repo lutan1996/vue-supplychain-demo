@@ -378,7 +378,7 @@
 
   <script src="js/sidebar-actions.js"></script>
   <script src="js/subpage-feature-title.js"></script>
-  <script src="js/subpage-clock.js?v=20260615-v7-use-approval"></script>
+  <script src="js/subpage-clock.js?v=20260702-uifix1"></script>
   <script src="js/cross-dept-handoff-demo.js"></script>
   <script src="js/material-code-scheme.js"></script>
   <script src="js/demo-product-catalog-data.js"></script>
@@ -2347,11 +2347,8 @@
           var rows = table.querySelectorAll("tbody tr");
           rows.forEach(function (tr) {
             var cells = tr.children || [];
-            // 直接在每行末尾添加操作列，不依赖表头的"操作"列
             var lastCell = cells[cells.length - 1];
             if (!lastCell) return;
-            var txt = String(lastCell.textContent || "").replace(/\s+/g, "");
-            if (txt.indexOf("物资跟踪") >= 0 || txt.indexOf("变更使用人") >= 0) return; // 已有按钮
             // 从前一列获取物资名称和编码
             var productName = "";
             var productCode = "";
@@ -2363,9 +2360,7 @@
             }
             if (!productName) productName = "物资";
             if (!productCode) productCode = "—";
-            var opCell = document.createElement("td");
-            opCell.innerHTML = buildReqDetailOperationHtml(productName, productCode);
-            tr.appendChild(opCell);
+            lastCell.innerHTML = buildReqDetailOperationHtml(productName, productCode);
           });
         });
       }
@@ -2748,7 +2743,9 @@
               var seq = idx + 1;
               var opTd = opts.detailAction === "track"
                 ? buildDetailTrackTd(d)
-                : buildEditDetailDeleteTd(idx, "req-detail-remove");
+                : opts.detailAction === "req"
+                  ? '<td style="padding:8px;border-bottom:1px solid #f0f2f5;text-align:center;white-space:nowrap">' + buildReqDetailOperationHtml(d.productName || d.name || "", d.productCode || "") + '</td>'
+                  : buildEditDetailDeleteTd(idx, "req-detail-remove");
               return (
                 "<tr>" +
                 '<td style="' +
@@ -3033,7 +3030,7 @@
             buildReqMatDetailBlockFromLines(detailLines, "领用物资明细表", {
               showUserCol: true,
               defaultUserName: row.applicant || sourceRow.keeper || "",
-              detailAction: "track"
+              detailAction: "req"
             });
           document.getElementById("detailTitle").textContent = "领用记录 - " + (row.reqNo || "");
           document.getElementById("detailMask").classList.add("show");
