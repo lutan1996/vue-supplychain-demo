@@ -292,34 +292,11 @@
       }
     }
 
-    function ensureProjCompanyInboundNavItem() {
-      var items = sidebar.querySelectorAll(".nav-item");
-      for (var i = 0; i < items.length; i++) {
-        var labelEl = items[i].querySelector(".nav-label");
-        var t = (labelEl ? labelEl.textContent : items[i].textContent || "").replace(/\s+/g, "");
-        if (t === "项目公司入库") return;
-      }
-      var purchaseNav = null;
-      for (var j = 0; j < items.length; j++) {
-        var lbl = items[j].querySelector(".nav-label");
-        var txt = (lbl ? lbl.textContent : items[j].textContent || "").replace(/\s+/g, "");
-        if (txt === "物资采购") { purchaseNav = items[j]; break; }
-      }
-      if (!purchaseNav) return;
-      var next = purchaseNav.nextSibling;
-      var el = document.createElement("div");
-      el.className = "nav-item";
-      el.setAttribute("title", "项目公司入库");
-      el.innerHTML = '<span class="nav-label">项目公司入库</span>';
-      sidebar.insertBefore(el, next);
-    }
-
     // 统一左侧主菜单：首页、我的任务 + 一级业务模块（含实物管理）+ 基础数据管理
     (function ensureFullSidebar() {
       if (sidebar.getAttribute("data-demo-sidebar-master-v8") === "1") {
         ensurePhysicalMgmtNavItem();
         ensureInventoryNavItem();
-        ensureProjCompanyInboundNavItem();
         normalizeRetiredNavLabel();
         return;
       }
@@ -328,7 +305,6 @@
         '<div class="nav-item" title="首页"><span class="nav-label">首页</span></div>' +
         '<div class="nav-item" title="我的任务"><span class="nav-label">我的任务</span></div>' +
         '<div class="nav-item" title="物资采购"><span class="nav-label">物资采购</span></div>' +
-        '<div class="nav-item" title="项目公司入库"><span class="nav-label">项目公司入库</span></div>' +
         '<div class="nav-item" title="实物管理"><span class="nav-label">实物管理</span></div>' +
         '<div class="nav-item" title="销售管理"><span class="nav-label">销售管理</span></div>' +
         '<div class="nav-item" title="盘点管理"><span class="nav-label">盘点管理</span></div>' +
@@ -602,14 +578,7 @@
           '<span class="warehouse-secondary-pipe" aria-hidden="true">|</span>' +
           '<button type="button" class="warehouse-secondary-link" data-action="purchase-contract-mgmt" data-label="合同信息管理">合同信息管理</button>' +
           '<span class="warehouse-secondary-pipe" aria-hidden="true">|</span>' +
-          '<button type="button" class="warehouse-secondary-link" data-action="purchase-summary-report" data-label="采购合同报表管理">采购合同报表管理</button>' +
-          '<span class="warehouse-secondary-sep" aria-hidden="true"></span>' +
-          '<span class="warehouse-secondary-label">项目公司</span>' +
-          '<button type="button" class="warehouse-secondary-link" data-action="proj-company-plan-manage" data-label="项目公司采购信息台帐">项目公司采购信息台帐</button>' +
-          '<span class="warehouse-secondary-pipe" aria-hidden="true">|</span>' +
-          '<button type="button" class="warehouse-secondary-link" data-action="proj-company-contract-mgmt" data-label="项目公司合同信息管理">项目公司合同信息管理</button>' +
-          '<span class="warehouse-secondary-pipe" aria-hidden="true">|</span>' +
-          '<button type="button" class="warehouse-secondary-link" data-action="proj-company-summary-report" data-label="项目公司采购合同报表管理">项目公司采购合同报表管理</button>'
+          '<button type="button" class="warehouse-secondary-link" data-action="purchase-summary-report" data-label="采购合同报表管理">采购合同报表管理</button>'
       },
       assetMgmt: {
         text: '资产管理',
@@ -620,13 +589,6 @@
           '<button type="button" class="warehouse-secondary-link" data-action="asset-dept" data-label="部门资产">部门资产</button>' +
           '<span class="warehouse-secondary-pipe" aria-hidden="true">|</span>' +
           '<button type="button" class="warehouse-secondary-link" data-action="asset-personal" data-label="个人资产">个人资产</button>'
-      },
-      projCompanyInbound: {
-        text: '项目公司入库',
-        panel: secondaryPanel,
-        aclModuleKey: 'purchaseMgmt',
-        rowHtml:
-          '<button type="button" class="warehouse-secondary-link" data-action="proj-company-inventory" data-label="项目公司库存管理">项目公司库存管理</button>'
       },
       physicalMgmt: {
         text: '实物管理',
@@ -639,12 +601,14 @@
         panel: secondaryPanel,
         aclModuleKey: 'purchaseMgmt',
         rowHtml:
-          '<button type="button" class="warehouse-secondary-link" data-action="sales-material-list" data-label="物资列表">物资列表</button>' +
+          '<span class="warehouse-secondary-label" aria-hidden="true" style="display:block;flex-basis:100%;padding:4px 0 2px;color:#d7e6ff;font-weight:700;">内部采购</span>' +
+          '<button type="button" class="warehouse-secondary-link" data-action="sales-material-list" data-label="物资类别">物资类别</button>' +
           '<span class="warehouse-secondary-pipe" aria-hidden="true">|</span>' +
           '<button type="button" class="warehouse-secondary-link" data-action="sales-order-manage" data-label="订单管理">订单管理</button>' +
-          '<span class="warehouse-secondary-pipe" aria-hidden="true">|</span>' +
+          '<span class="warehouse-secondary-break" aria-hidden="true" style="flex-basis:100%;height:0;"></span>' +
+          '<span class="warehouse-secondary-label" aria-hidden="true" style="display:block;flex-basis:100%;padding:4px 0 2px;color:#d7e6ff;font-weight:700;">外部采购</span>' +
           '<button type="button" class="warehouse-secondary-link" data-action="sales-purchase-material" data-label="购入物资">购入物资</button>' +
-          '<span class="warehouse-secondary-pipe" aria-hidden="true">|</span>' +
+          '<span class="warehouse-secondary-break" aria-hidden="true" style="flex-basis:100%;height:0;"></span>' +
           '<button type="button" class="warehouse-secondary-link" data-action="sales-contract-report" data-label="销售合同报表管理">销售合同报表管理</button>'
       },
       inventoryMgmt: {
@@ -842,7 +806,6 @@
       task: "task",
       cockpit: "cockpit",
       purchaseMgmt: "purchaseMgmt",
-      projCompanyInbound: "projCompanyInbound",
       physicalMgmt: "physicalMgmt",
       salesMgmt: "salesMgmt",
       inventoryMgmt: "inventoryMgmt",
@@ -1148,7 +1111,6 @@
       'order-demand-management.html': 'purchaseMgmt',
       'purchase-ledger.html': 'physicalMgmt',
       'proc-quality-accept.html': 'physicalMgmt',
-      'proj-company-inbound.html': 'projCompanyInbound',
       'cargo-ledger.html': 'purchaseMgmt',
       'material-procurement-hub.html': 'purchaseMgmt',
       'return-exchange-management.html': 'purchaseMgmt',
