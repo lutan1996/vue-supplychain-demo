@@ -758,10 +758,11 @@
       max-width: 220px;
       white-space: normal;
       overflow: visible;
-      position: static;
+      position: sticky;
+      right: 0;
       background: #fff;
-      z-index: 6;
-      box-shadow: none;
+      z-index: 8;
+      box-shadow: -1px 0 0 #edf1f7;
     }
     .plan-item-table th:nth-last-child(2),
     .plan-item-table td:nth-last-child(2) {
@@ -769,7 +770,7 @@
       min-width: 260px;
       max-width: 260px;
     }
-    .plan-item-table th:last-child { z-index: 7; }
+    .plan-item-table th:last-child { z-index: 9; }
     .plan-item-table th:nth-child(1),
     .plan-item-table td:nth-child(1) { width: 120px !important; min-width: 120px !important; max-width: 120px !important; }
     .plan-item-table th:nth-child(2),
