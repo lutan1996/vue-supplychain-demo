@@ -3705,15 +3705,6 @@
       });
 
       bindReqMatPickerEventsOnce();
-      (function bindLedgerDetailRestoreOnce() {
-        var detailBody = document.getElementById("detailBody");
-        if (!detailBody || detailBody.__ledgerDetailRestoreBound) return;
-        detailBody.__ledgerDetailRestoreBound = true;
-        var observer = new MutationObserver(function () {
-          restoreLedgerDetailOperationButtons();
-        });
-        observer.observe(detailBody, { childList: true, subtree: true });
-      })();
       renderAll();
 })();
   </script>
