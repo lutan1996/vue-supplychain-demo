@@ -751,24 +751,48 @@
     }
     .plan-item-table th:last-child,
     .plan-item-table td:last-child {
-      width: 150px;
-      min-width: 150px;
-      max-width: 150px;
+      width: 180px;
+      min-width: 180px;
+      max-width: 180px;
       white-space: nowrap;
       overflow: visible;
       position: sticky;
       right: 0;
       background: #fff;
-      z-index: 2;
+      z-index: 6;
+      box-shadow: -10px 0 12px rgba(255, 255, 255, 0.96);
     }
-    .plan-item-table th:last-child { z-index: 3; }
-    .plan-item-ops { display: flex; gap: 8px; align-items: center; justify-content: center; width: 100%; min-width: 118px; white-space: nowrap; }
+    .plan-item-table th:nth-last-child(2),
+    .plan-item-table td:nth-last-child(2) {
+      width: 240px;
+      min-width: 240px;
+      max-width: 240px;
+    }
+    .plan-item-table th:last-child { z-index: 7; }
+    .plan-item-ops { display: flex; gap: 8px; align-items: center; justify-content: flex-start; width: 100%; min-width: 152px; white-space: nowrap; position: relative; z-index: 1; }
     .plan-item-ops a,
     .plan-item-ops button { border:0; background:transparent; padding:0; line-height:1.2; font-size:12px; cursor:pointer; text-decoration:none; white-space:nowrap; }
     .plan-item-ops .pi-del { color:#ff4d4f; }
     .plan-item-ops .pi-track { color:#1677ff; }
     .plan-item-ops a:hover { opacity: 0.75; }
     .plan-item-ops .ops-sep { color: #d0d7de; }
+    .pi-reason-wrap { display:flex; flex-direction:column; gap:6px; }
+    .pi-reason-tools { display:flex; align-items:center; justify-content:flex-end; gap:6px; }
+    .pi-attach-btn {
+      width: 28px;
+      height: 28px;
+      border: 1px solid #91caff;
+      border-radius: 6px;
+      background: #e6f4ff;
+      color: #1677ff;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex: 0 0 auto;
+    }
+    .pi-attach-btn:hover { opacity: 0.85; }
+    .pi-reason-files { font-size: 12px; color: #64748b; line-height: 1.4; }
     /* 物资选择弹窗表格 */
     .pick-asset-table {
       width: 100%;
@@ -1175,8 +1199,8 @@
                   <th style="width:104px;">累计折旧（万元）</th>
                   <th style="width:104px;">净值（万元）</th>
                   <th style="width:96px;">采购时间</th>
-                  <th style="min-width:150px;">拟报废原因</th>
-                  <th style="width:120px;">操作</th>
+                  <th style="min-width:240px;width:240px;">拟报废原因</th>
+                  <th style="width:180px;min-width:180px;">操作</th>
                 </tr>
               </thead>
               <tbody id="planItemBody"></tbody>
@@ -1186,6 +1210,7 @@
             暂无物资，请点击右上角「<strong style="color:#1677ff;">选择报废物资</strong>」按钮添加
         </div>
         </div>
+        <input type="file" id="planReasonAttachInput" accept=".xlsx,.xls,.csv,.pdf,.doc,.docx" multiple hidden />
         <div class="plan-summary" id="planItemSummary">
           <span>已选 <b id="planItemCount">0</b> 件物资</span>
           <span>原值合计：<b id="planItemOriginSum">¥ 0.00</b></span>
@@ -1621,6 +1646,7 @@
       var planEditingNo = "";
       var planSubmitNo = "";
       var planItems = [];      // [{id, qty, reason}]
+      var planReasonAttachTarget = "";
       var pickChecked = {};    // {id: true} for asset pick modal
 
       function statusMeta(code) {
@@ -2310,6 +2336,29 @@
         if (list) list.innerHTML = renderAttachmentLinks(window.__scrapApplyAttachments, "暂无附件");
         syncApplyPrintCard();
       });
+      document.addEventListener("click", function (e) {
+        var btn = e.target && e.target.closest ? e.target.closest(".pi-attach-btn") : null;
+        if (!btn) return;
+        var inp = document.getElementById("planReasonAttachInput");
+        if (!inp) return;
+        planReasonAttachTarget = btn.getAttribute("data-idx") || "";
+        inp.dataset.idx = planReasonAttachTarget;
+        inp.click();
+      });
+      document.addEventListener("change", function (e) {
+        var inp = e.target && e.target.closest ? e.target.closest("#planReasonAttachInput") : null;
+        if (!inp) return;
+        var idx = Number(inp.dataset.idx);
+        if (isNaN(idx) || !planItems[idx]) return;
+        var files = Array.prototype.slice.call(inp.files || []);
+        planItems[idx].attachments = files.map(function (f) {
+          return makeDemoAttachment(f.name || "拟报废原因附件.xlsx", f.name || "拟报废原因附件");
+        });
+        planReasonAttachTarget = "";
+        inp.value = "";
+        inp.dataset.idx = "";
+        renderPlanItemTable();
+      });
       refs.flowTabs.forEach(function (tab) {
         tab.addEventListener("click", function () {
           var key = tab.getAttribute("data-flow-tab");
@@ -2543,7 +2592,7 @@
       }
       function openPlanModal(planNo) {
         planEditingNo = planNo || "";
-        planItems = []; // { id, qty, reason }
+        planItems = []; // { id, qty, reason, attachments }
         var yearSel = document.getElementById("planYearInput");
         if (!yearSel.options.length) {
           var yy = new Date().getFullYear();
@@ -2568,7 +2617,8 @@
               return {
                 id: id,
                 qty: (!isNaN(q) && q >= 1) ? Math.floor(q) : 1,
-                reason: (old.assetReasons && old.assetReasons[id]) ? old.assetReasons[id] : ""
+                reason: (old.assetReasons && old.assetReasons[id]) ? old.assetReasons[id] : "",
+                attachments: (old.assetReasonAttachments && old.assetReasonAttachments[id]) ? old.assetReasonAttachments[id].slice() : []
               };
             });
           }
@@ -2579,7 +2629,15 @@
         refreshPlanMeta();
         document.getElementById("planModalMask").classList.add("show");
       }
-      function closePlanModal() { document.getElementById("planModalMask").classList.remove("show"); }
+      function closePlanModal() {
+        planReasonAttachTarget = "";
+        var inp = document.getElementById("planReasonAttachInput");
+        if (inp) {
+          inp.value = "";
+          inp.dataset.idx = "";
+        }
+        document.getElementById("planModalMask").classList.remove("show");
+      }
 
       // ── 报废物资明细表渲染 ──────────────────────────────────
       function renderPlanItemTable() {
@@ -2623,7 +2681,15 @@
             '<td style="text-align:right;color:#1f2d3d;">' + fmtWan(dep * qty) + '</td>' +
             '<td style="text-align:right;color:#1f2d3d;">' + fmtWan(asset.net * qty) + '</td>' +
             '<td style="color:#1f2d3d;">' + (asset.purchaseDate || "-") + '</td>' +
-            '<td style="color:#1f2d3d;"><textarea class="pi-reason" data-idx="' + idx + '" rows="2" placeholder="填写报废原因" style="color:#1f2d3d;">' + escHtml(item.reason || "") + '</textarea></td>' +
+            '<td style="color:#1f2d3d;">' +
+              '<div class="pi-reason-wrap">' +
+                '<textarea class="pi-reason" data-idx="' + idx + '" rows="2" placeholder="填写报废原因" style="color:#1f2d3d;">' + escHtml(item.reason || "") + '</textarea>' +
+                '<div class="pi-reason-tools">' +
+                  '<button type="button" class="pi-attach-btn" data-idx="' + idx + '" title="上传附件" aria-label="上传附件"><i class="fa-solid fa-paperclip"></i></button>' +
+                '</div>' +
+                '<div class="pi-reason-files" id="piReasonFiles-' + idx + '">' + renderAttachmentLinks(item.attachments || [], "暂无附件") + '</div>' +
+              '</div>' +
+            '</td>' +
             '<td>' +
               '<div class="plan-item-ops">' +
                 '<a href="#" class="pi-del" data-idx="' + idx + '">删除</a>' +
@@ -2818,7 +2884,7 @@
               if (!p || !p.id || existingIds[p.id]) return;
               ensurePlanAssetFromProduct(p);
               existingIds[p.id] = true;
-              planItems.push({ id: p.id, qty: "", reason: "" });
+              planItems.push({ id: p.id, qty: "", reason: "", attachments: [] });
             });
             renderPlanItemTable();
           }
@@ -2831,7 +2897,7 @@
         var ids = Object.keys(PAP.pendingSelected);
         ids.forEach(function (id) {
           if (!planItems.some(function (item) { return item.id === id; })) {
-            planItems.push({ id: id, qty: "", reason: "" });
+            planItems.push({ id: id, qty: "", reason: "", attachments: [] });
           }
         });
         closePlanAssetPick();
@@ -2845,7 +2911,12 @@
         var assetIds = planItems.map(function (item) { return item.id; });
         var assetQty = {};
         var assetReasons = {};
-        planItems.forEach(function (item) { assetQty[item.id] = planQtyValue(item.qty); assetReasons[item.id] = item.reason; });
+        var assetReasonAttachments = {};
+        planItems.forEach(function (item) {
+          assetQty[item.id] = planQtyValue(item.qty);
+          assetReasons[item.id] = item.reason;
+          assetReasonAttachments[item.id] = (item.attachments || []).slice();
+        });
         var item = {
           planNo: planEditingNo || genPlanNo(year),
           year: year,
@@ -2865,6 +2936,7 @@
           assetIds: assetIds,
           assetQty: assetQty,
           assetReasons: assetReasons,
+          assetReasonAttachments: assetReasonAttachments,
           remark: remark
         };
         var idx = planRecords.findIndex(function (p) { return p.planNo === item.planNo; });
