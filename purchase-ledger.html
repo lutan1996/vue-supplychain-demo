@@ -1933,8 +1933,8 @@
             return "<td>"+esc(v)+"</td>";
           }).join("");
           var opsHtml = (c === "requisition" || c === "flow")
-            ? '<button class="op-btn" data-op="detail" data-key="'+key+'">查看明细</button>'
-            : '<button class="op-btn" data-op="detail" data-key="'+key+'">查看明细</button>';
+            ? '<button class="op-btn" data-op="detail" data-key="'+key+'">查看</button>'
+            : '<button class="op-btn" data-op="detail" data-key="'+key+'">查看</button>';
           return "<tr>"+cells+'<td>'+opsHtml+'</td>'
             +"</tr>";
         }).join("") || '<tr><td colspan="'+(cfg.columns.length+1)+'" style="padding:24px;color:#94a3b8">暂无数据</td></tr>';
@@ -2168,7 +2168,8 @@
           '<div id="reqTrackBox" style="display:none;margin-top:10px;border:1px solid #e9edf4;border-radius:8px;background:#fff;padding:10px 12px"></div>'
         );
       }
-      function buildReqDetailOperationHtml(productName, productCode) {
+      function buildReqDetailOperationHtml(productName, productCode, mode) {
+        var trackOnly = mode === "track";
         return (
           '<span class="req-op-wrap">' +
           '<a href="#" class="req-track-link" data-track-name="' +
@@ -2176,16 +2177,18 @@
           '" data-track-code="' +
           esc(productCode) +
           '" style="color:#1677ff;text-decoration:none">物资跟踪</a>' +
-          '<a href="#" class="req-user-change-link" data-product-name="' +
-          esc(productName) +
-          '" data-product-code="' +
-          esc(productCode) +
-          '" onclick="return window.__openReqUserChangeFromLink(this)" style="color:#1677ff;text-decoration:none">变更使用人</a>' +
-          '<a href="#" class="req-external-borrow-link" data-product-name="' +
-          esc(productName) +
-          '" data-product-code="' +
-          esc(productCode) +
-          '" onclick="return window.__openReqExternalBorrowFromLink(this)" style="color:#1677ff;text-decoration:none">外部借用</a>' +
+          (trackOnly
+            ? ""
+            : '<a href="#" class="req-user-change-link" data-product-name="' +
+              esc(productName) +
+              '" data-product-code="' +
+              esc(productCode) +
+              '" onclick="return window.__openReqUserChangeFromLink(this)" style="color:#1677ff;text-decoration:none">变更使用人</a>' +
+              '<a href="#" class="req-external-borrow-link" data-product-name="' +
+              esc(productName) +
+              '" data-product-code="' +
+              esc(productCode) +
+              '" onclick="return window.__openReqExternalBorrowFromLink(this)" style="color:#1677ff;text-decoration:none">外部借用</a>') +
           "</span>"
         );
       }
@@ -2788,7 +2791,7 @@
               var opTd = opts.detailAction === "track"
                 ? buildDetailTrackTd(d)
                 : opts.detailAction === "req"
-                  ? '<td style="padding:8px;border-bottom:1px solid #f0f2f5;text-align:center;white-space:nowrap">' + buildReqDetailOperationHtml(d.productName || d.name || "", d.productCode || "") + '</td>'
+                  ? '<td style="padding:8px;border-bottom:1px solid #f0f2f5;text-align:center;white-space:nowrap">' + buildReqDetailOperationHtml(d.productName || d.name || "", d.productCode || "", "track") + '</td>'
                   : buildEditDetailDeleteTd(idx, "req-detail-remove");
               return (
                 "<tr>" +
