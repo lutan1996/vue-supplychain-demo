@@ -963,7 +963,6 @@
               <table class="carrier-table" id="planTable">
                 <thead>
                   <tr>
-                    <th style="width:42px;"><input type="checkbox" id="planCheckAll" /></th>
                     <th style="width:52px;">序号</th>
                     <th>计划编号</th>
                     <th style="width:74px;">计划年度</th>
@@ -2576,14 +2575,13 @@
         var rows = planRowsByFilter();
         body.innerHTML = "";
         if (!rows.length) {
-          body.innerHTML = '<tr><td colspan="13" style="text-align:center;color:#8ca0b8;padding:20px;">暂无计划数据</td></tr>';
+          body.innerHTML = '<tr><td colspan="12" style="text-align:center;color:#8ca0b8;padding:20px;">暂无计划数据</td></tr>';
           return;
         }
         rows.forEach(function (p, idx) {
           var st = planStatusMeta(p.status);
           var tr = document.createElement("tr");
           tr.innerHTML =
-            '<td><input type="checkbox" class="plan-row-check" data-no="' + p.planNo + '"/></td>' +
             "<td>" + (idx + 1) + "</td>" +
             "<td>" + p.planNo + "</td>" +
             "<td>" + p.year + "</td>" +
