@@ -1341,7 +1341,7 @@
               finishTime:status==="已办结" ? ("2026-05-"+String((i%20)+1).padStart(2,"0")+" 18:00") : "—",
               reason:fromDept+"→"+toDept+" 内部调配"
             };
-          })
+          }).slice(0, -2)
         }
       };
 
