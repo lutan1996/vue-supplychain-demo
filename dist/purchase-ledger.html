@@ -1410,7 +1410,7 @@
         var c = esc(code || "");
         var rows = {
           ledger: [
-            { color:"#2563eb", title:"2026.4.20 入库：" + n + "（" + c + "）", sub:"入库人：张三  存放 经营发展中心仓库001库位" },
+            { color:"#2563eb", title:"2026.4.20 入库：" + n + "（" + c + "）", sub:"存放山西风电中心仓库001货位" },
             { color:"#10b981", title:"2026.5.10 被电控所领用", sub:"领用人：王新  存放山东风电中心仓库001货位" },
             { color:"#10b981", title:"2026.5.10 流转至机械所", sub:"接收人：张三  存放 山西风电中心仓库03货位" },
             { color:"#6366f1", title:"2026.5.12 使用人变更（王新 → 张三）", sub:"使用人：张三  存放 山西风电中心仓库03货位" },
@@ -1418,25 +1418,31 @@
             { color:"#f59e0b", title:"2026.5.18 外部借用（李四 → 张宇）", sub:"借用人：张宇  外部单位：四川航空研究所  联系方式：159000000" }
           ],
           requisition: [
-            { color:"#2563eb", title:"2026.4.20 入库：" + n + "（" + c + "）", sub:"入库人：张三  存放 经营发展中心仓库001库位" },
-            { color:"#10b981", title:"2026.5.10 被电控所领用", sub:"领用人：王新  存放山东风电中心仓库001货位" }
+            { color:"#2563eb", title:"2026.4.20 入库：" + n + "（" + c + "）", sub:"存放山西风电中心仓库001货位" },
+            { color:"#10b981", title:"2026.5.10 被电控所领用", sub:"领用人：王新  存放山东风电中心仓库001货位" },
+            { color:"#10b981", title:"2026.5.10 流转至机械所", sub:"接收人：张三  存放 山西风电中心仓库03货位" },
+            { color:"#6366f1", title:"2026.5.12 使用人变更（王新 → 张三）", sub:"使用人：张三  存放 山西风电中心仓库03货位" },
+            { color:"#f59e0b", title:"2026.5.18 使用人变更（张三 → 李四）", sub:"使用人：李四  存放 山西风电中心仓库03货位" },
+            { color:"#f59e0b", title:"2026.5.18 外部借用（李四 → 张宇）", sub:"借用人：张宇  外部单位：四川航空研究所  联系方式：159000000" }
           ],
           flow: [
-            { color:"#2563eb", title:"2026.4.20 入库：" + n + "（" + c + "）", sub:"入库人：张三  存放 经营发展中心仓库001库位" },
+            { color:"#2563eb", title:"2026.4.20 入库：" + n + "（" + c + "）", sub:"存放山西风电中心仓库001货位" },
             { color:"#10b981", title:"2026.5.10 被电控所领用", sub:"领用人：王新  存放山东风电中心仓库001货位" },
-            { color:"#10b981", title:"2026.5.10 流转至机械所", sub:"接收人：张三  存放 山西风电中心仓库03货位" }
+            { color:"#10b981", title:"2026.5.10 流转至机械所", sub:"接收人：张三  存放 山西风电中心仓库03货位" },
+            { color:"#6366f1", title:"2026.5.12 使用人变更（王新 → 张三）", sub:"使用人：张三  存放 山西风电中心仓库03货位" },
+            { color:"#f59e0b", title:"2026.5.18 使用人变更（张三 → 李四）", sub:"使用人：李四  存放 山西风电中心仓库03货位" }
           ]
         };
         var items = rows[scope] || rows.ledger;
         return '<div style="padding:8px 4px 0">'
-          + '<div style="font-size:20px;line-height:1.2;font-weight:700;color:#1f3551;margin:0 0 18px">物资跟踪</div>'
-          + '<div style="position:relative;padding-left:24px">'
+          + '<div style="font-size:18px;line-height:1.2;font-weight:700;color:#1f3551;margin:0 0 14px">物资跟踪</div>'
+          + '<div style="position:relative;padding-left:20px">'
           + '<div style="position:absolute;left:8px;top:0;bottom:0;width:1px;background:#d8e0ea"></div>'
           + items.map(function(it){
-              return '<div style="position:relative;padding:0 0 22px 22px">'
-                + '<span style="position:absolute;left:0;top:7px;width:16px;height:16px;border-radius:999px;background:' + it.color + ';box-shadow:0 0 0 5px rgba(37,99,235,.08)"></span>'
-                + '<div style="font-size:19px;line-height:1.35;font-weight:600;color:#111827;white-space:normal;word-break:break-word">' + it.title + '</div>'
-                + '<div style="margin-top:8px;font-size:16px;line-height:1.5;color:#6b7280;white-space:normal;word-break:break-word">' + it.sub + '</div>'
+              return '<div style="position:relative;padding:0 0 18px 24px">'
+                + '<span style="position:absolute;left:0;top:8px;width:18px;height:18px;border-radius:999px;background:' + it.color + ';box-shadow:0 0 0 4px rgba(37,99,235,.08)"></span>'
+                + '<div style="font-size:20px;line-height:1.35;font-weight:700;color:#111827;white-space:normal;word-break:break-word">' + it.title + '</div>'
+                + '<div style="margin-top:7px;font-size:15px;line-height:1.5;color:#6b7280;white-space:normal;word-break:break-word">' + it.sub + '</div>'
                 + '</div>';
             }).join("")
           + '</div>'
