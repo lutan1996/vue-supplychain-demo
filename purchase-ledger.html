@@ -1434,15 +1434,19 @@
           ]
         };
         var items = rows[scope] || rows.ledger;
-        return '<div style="padding:8px 4px 0">'
-          + '<div style="font-size:18px;line-height:1.2;font-weight:700;color:#1f3551;margin:0 0 14px">物资跟踪</div>'
-          + '<div style="position:relative;padding-left:20px">'
-          + '<div style="position:absolute;left:8px;top:0;bottom:0;width:1px;background:#d8e0ea"></div>'
+        return '<div style="padding:8px 12px 0">'
+          + '<div style="font-size:24px;line-height:1.2;font-weight:700;color:#1f2f4a;margin:0 0 18px">物资跟踪</div>'
+          + '<div style="position:relative;padding-left:36px">'
+          + '<div style="position:absolute;left:18px;top:4px;bottom:0;width:2px;background:#dfe6f1"></div>'
           + items.map(function(it){
-              return '<div style="position:relative;padding:0 0 18px 24px">'
-                + '<span style="position:absolute;left:0;top:8px;width:18px;height:18px;border-radius:999px;background:' + it.color + ';box-shadow:0 0 0 4px rgba(37,99,235,.08)"></span>'
-                + '<div style="font-size:20px;line-height:1.35;font-weight:700;color:#111827;white-space:normal;word-break:break-word">' + it.title + '</div>'
-                + '<div style="margin-top:7px;font-size:15px;line-height:1.5;color:#6b7280;white-space:normal;word-break:break-word">' + it.sub + '</div>'
+              return '<div style="position:relative;padding:0 0 24px 0">'
+                + '<span style="position:absolute;left:-26px;top:7px;width:16px;height:16px;border-radius:999px;background:' + it.color + ';box-shadow:0 0 0 6px rgba(37,99,235,.08)"></span>'
+                + '<div style="font-size:22px;line-height:1.45;font-weight:700;color:#111827;white-space:normal;word-break:break-word">'
+                + it.title
+                + '</div>'
+                + '<div style="margin-top:8px;font-size:16px;line-height:1.55;color:#6b7280;white-space:normal;word-break:break-word">'
+                + it.sub
+                + '</div>'
                 + '</div>';
             }).join("")
           + '</div>'
