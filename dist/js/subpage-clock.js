@@ -2043,12 +2043,14 @@
     }
     function table(rows) {
       if (global.mapDemoRenderVerticalTimeline) {
-        return global.mapDemoRenderVerticalTimeline(rows, {
-          personKey: "person",
-          timeKey: "time",
-          statusKey: "result",
-          contentKey: "content"
-        });
+        try {
+          return global.mapDemoRenderVerticalTimeline(rows, {
+            personKey: "person",
+            timeKey: "time",
+            statusKey: "result",
+            contentKey: "content"
+          });
+        } catch (e) {}
       }
       return rows.map(function (item) {
         var sc = item.result === "已提交" || item.result === "已通过" || item.result === "已完成" || item.result === "已结束" || item.result === "已处理" ? "#10b981" :
@@ -2449,7 +2451,7 @@
       }
       var mask = ensureUnifiedProgressModal();
       if (!mask) return false;
-      patchProgressModalForPage(mask);
+      try { patchProgressModalForPage(mask); } catch (e) {}
       mask.classList.add("show");
       return true;
     } catch (e) {
@@ -2463,7 +2465,7 @@
     document.addEventListener(
       "click",
       function (e) {
-        var t = e.target && e.target.closest ? e.target.closest("button, a") : null;
+        var t = e.target && e.target.closest ? e.target.closest("button, a, [role='button']") : null;
         if (!t) return;
         var text = (t.textContent || "").replace(/\s+/g, "");
         var act = (t.getAttribute("data-act") || "").toLowerCase();
@@ -2474,10 +2476,14 @@
           act === "progresss";
         if (!isProgress) return;
         if (t.id === "salesCartFlowBtn" || (t.closest && t.closest("#salesModalMask"))) return;
-        if (t.id === "procModalFlow" && typeof window.openInventoryTodoProgress === "function") {
+        if (
+          t.id === "procModalFlow" &&
+          typeof window.openInventoryTodoProgress === "function" &&
+          (window.__inventoryTodoCurrentMap || window.__inventoryTodoLastMap)
+        ) {
           e.preventDefault();
           e.stopPropagation();
-          window.openInventoryTodoProgress(window.__inventoryTodoCurrentMap || window.__inventoryTodoLastMap || {});
+          window.openInventoryTodoProgress(window.__inventoryTodoCurrentMap || window.__inventoryTodoLastMap);
           return;
         }
         var reqProgressType = t.getAttribute("data-open-req-progress");
@@ -2490,7 +2496,8 @@
         e.preventDefault();
         e.stopPropagation();
         var mask = ensureUnifiedProgressModal();
-        patchProgressModalForPage(mask);
+        if (!mask) return;
+        try { patchProgressModalForPage(mask); } catch (err) {}
         mask.classList.add("show");
       },
       true
