@@ -1405,16 +1405,29 @@
         }).join("");
       }
 
-      function buildMaterialTrackBoxHtml(name, code){
+      function buildMaterialTrackBoxHtml(scope, name, code){
         var n = esc(name || "");
         var c = esc(code || "");
-        var items = [
-          { color:"#2563eb", title:"2026.4.20 入库：" + n + "（" + c + "）", sub:"存放山东风电中心仓库001货位" },
-          { color:"#10b981", title:"2026.5.10 被电控所领用", sub:"领用人：王新  存放山东风电中心仓库001货位" },
-          { color:"#10b981", title:"2026.5.10 流转至机械所", sub:"接收人：张三  存放 山西风电中心仓库03货位" },
-          { color:"#6366f1", title:"2026.5.12 使用人变更（王新 → 张三）", sub:"使用人：张三  存放 山西风电中心仓库03货位" },
-          { color:"#f59e0b", title:"2026.5.18 使用人变更（张三 → 李四）", sub:"使用人：李四  存放 山西风电中心仓库03货位" }
-        ];
+        var rows = {
+          ledger: [
+            { color:"#2563eb", title:"2026.4.20 入库：" + n + "（" + c + "）", sub:"入库人：张三  存放 经营发展中心仓库001库位" },
+            { color:"#10b981", title:"2026.5.10 被电控所领用", sub:"领用人：王新  存放山东风电中心仓库001货位" },
+            { color:"#10b981", title:"2026.5.10 流转至机械所", sub:"接收人：张三  存放 山西风电中心仓库03货位" },
+            { color:"#6366f1", title:"2026.5.12 使用人变更（王新 → 张三）", sub:"使用人：张三  存放 山西风电中心仓库03货位" },
+            { color:"#f59e0b", title:"2026.5.18 使用人变更（张三 → 李四）", sub:"使用人：李四  存放 山西风电中心仓库03货位" },
+            { color:"#f59e0b", title:"2026.5.18 外部借用（李四 → 张宇）", sub:"借用人：张宇  外部单位：四川航空研究所  联系方式：159000000" }
+          ],
+          requisition: [
+            { color:"#2563eb", title:"2026.4.20 入库：" + n + "（" + c + "）", sub:"入库人：张三  存放 经营发展中心仓库001库位" },
+            { color:"#10b981", title:"2026.5.10 被电控所领用", sub:"领用人：王新  存放山东风电中心仓库001货位" }
+          ],
+          flow: [
+            { color:"#2563eb", title:"2026.4.20 入库：" + n + "（" + c + "）", sub:"入库人：张三  存放 经营发展中心仓库001库位" },
+            { color:"#10b981", title:"2026.5.10 被电控所领用", sub:"领用人：王新  存放山东风电中心仓库001货位" },
+            { color:"#10b981", title:"2026.5.10 流转至机械所", sub:"接收人：张三  存放 山西风电中心仓库03货位" }
+          ]
+        };
+        var items = rows[scope] || rows.ledger;
         return '<div style="padding:8px 4px 0">'
           + '<div style="font-size:20px;line-height:1.2;font-weight:700;color:#1f3551;margin:0 0 18px">物资跟踪</div>'
           + '<div style="position:relative;padding-left:24px">'
@@ -3470,7 +3483,7 @@
             var tbox = document.getElementById("trfTrackBox");
             if (tbox) {
               tbox.style.display = "";
-              tbox.innerHTML = buildMaterialTrackBoxHtml(n, c);
+              tbox.innerHTML = buildMaterialTrackBoxHtml("flow", n, c);
             }
             return;
           }
@@ -3484,7 +3497,7 @@
           if (!box && inAction) box = document.getElementById("reqTrackBox");
           if (box) {
             box.style.display = "";
-            box.innerHTML = buildMaterialTrackBoxHtml(n, c);
+            box.innerHTML = buildMaterialTrackBoxHtml(state.current === "requisition" ? "requisition" : "ledger", n, c);
           }
           return;
         }
@@ -3511,7 +3524,7 @@
           var tbox = document.getElementById("trfTrackBox");
           if (tbox) {
             tbox.style.display = "";
-            tbox.innerHTML = buildMaterialTrackBoxHtml(tn, tc);
+            tbox.innerHTML = buildMaterialTrackBoxHtml("flow", tn, tc);
           }
           return;
         }
