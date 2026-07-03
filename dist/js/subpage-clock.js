@@ -287,8 +287,8 @@
         var labelEl = item.querySelector(".nav-label");
         var text = (labelEl ? labelEl.textContent : item.textContent || "").replace(/\s+/g, "");
         if (text !== "物资出库与处置") continue;
-        item.setAttribute("title", "退役及废旧管理");
-        if (labelEl) labelEl.textContent = "退役及废旧管理";
+        item.setAttribute("title", "报废计划与报废申请");
+        if (labelEl) labelEl.textContent = "报废计划与报废申请";
       }
     }
 
@@ -311,7 +311,7 @@
         '<div class="nav-item" title="资产管理"><span class="nav-label">资产管理</span></div>' +
         '<div class="nav-item" title="物流管理"><span class="nav-label">物流管理</span></div>' +
         '<div class="nav-item" title="仓储管理"><span class="nav-label">仓储管理</span></div>' +
-        '<div class="nav-item" title="退役及废旧管理"><span class="nav-label">退役及废旧管理</span></div>' +
+        '<div class="nav-item" title="报废计划与报废申请"><span class="nav-label">报废计划与报废申请</span></div>' +
         '<div class="nav-item" title="综合业务管理"><span class="nav-label">综合业务管理</span></div>' +
         '<div class="nav-item" title="基础数据管理"><span class="nav-label">基础数据管理</span></div>';
       normalizeRetiredNavLabel();
@@ -348,7 +348,7 @@
           '<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M1 16h11.5V8.5H5V7h11.5v5h2.5l3.5 4.5"/><circle cx="6.5" cy="17.5" r="1.75"/><circle cx="16.5" cy="17.5" r="1.75"/></svg>',
         '仓储管理':
           '<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M3 21h18V10.5L12 6 3 10.5V21z"/><path d="M9 21v-7h6v7"/></svg>',
-        '退役及废旧管理':
+        '报废计划与报废申请':
           '<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M21 12a9 9 0 0 0-9-9 9.5 9.5 0 0 0-7 3"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.5 9.5 0 0 0 7-3"/><path d="M16 16h5v5"/></svg>',
         '绩效考核':
           '<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><rect x="6" y="3" width="12" height="18" rx="1.5"/><path d="M9 8h6M9 12h6M9 16h5"/></svg>',
@@ -450,7 +450,7 @@
       retiredPanel = document.createElement('aside');
       retiredPanel.id = 'retiredSecondaryPanel';
       retiredPanel.className = 'warehouse-secondary-panel retired-secondary-panel';
-      retiredPanel.setAttribute('aria-label', '退役及废旧管理子菜单');
+      retiredPanel.setAttribute('aria-label', '报废计划与报废申请子菜单');
       retiredPanel.setAttribute('aria-hidden', 'true');
       retiredPanel.hidden = true;
         retiredPanel.innerHTML =
@@ -512,7 +512,7 @@
       return false;
     }
 
-    /* 蓝框仅列独立入口用例。废旧物资鉴定审批、设备评估、报废计划、净值计算等按功能列表融入退役及报废申请、价值管理、资产台账等页面流程，不单独占子菜单。 */
+    /* 蓝框仅列独立入口用例。废旧物资鉴定审批、设备评估、报废计划、净值计算等按功能列表融入报废计划与报废申请、价值管理、资产台账等页面流程，不单独占子菜单。 */
     var modules = {
       homeTop: {
         text: "首页",
@@ -659,7 +659,7 @@
           '<button type="button" class="warehouse-secondary-link" data-action="warehouse" data-label="仓库管理">仓库管理</button>'
       },
       retired: {
-        text: '退役及废旧管理',
+        text: '报废计划与报废申请',
         panel: retiredPanel
       },
       performance: {
@@ -1275,7 +1275,7 @@
     if (f === "purchase-plan-approval-handle.html") return "我的任务";
     if (f.indexOf("my-tasks") === 0) return "我的任务";
     if (f.indexOf("scrap-identification") >= 0 || f.indexOf("retire") === 0 || f.indexOf("retired-") === 0 || f === "big-small-reuse.html" || f === "goods-transfer-out.html")
-      return "物资出库与处置";
+      return "报废计划与报废申请";
     if (f === "inventory-task-management.html" || f === "inventory-difference-handling.html") return "盘点管理";
     if (f.indexOf("assets-") === 0 || f.indexOf("asset-") === 0 || f === "equipment-evaluation.html") return "我的资产";
     if (f.indexOf("carrier-") === 0 || f.indexOf("logistics-") === 0) return "物流管理";
@@ -1418,7 +1418,7 @@
         } catch (eView) {}
         if (view === "plan") return "报废计划提报";
         if (view === "apply") return "报废申请";
-        return "退役及报废申请";
+        return "报废计划提报";
       }
 
       function resolveMyTasksLabel(fileName, query) {
@@ -1472,7 +1472,7 @@
       var displayMod = mod;
       if (taskSub) displayMod = "我的任务";
       if (purchaseSub) displayMod = "物资采购";
-      if (retiredSub) displayMod = "物资出库与处置";
+      if (retiredSub) displayMod = "报废计划与报废申请";
       // 库存管理和物资领用显示实物管理
       if (pageLabel === "库存管理" || pageLabel === "物资领用") displayMod = "实物管理";
       if (displayMod === "业务功能") {
@@ -1502,7 +1502,7 @@
               segs[1].textContent = "物资采购";
             }
           } else if (retiredSub) {
-            segs[1].textContent = "物资出库与处置";
+            segs[1].textContent = "报废计划与报废申请";
           }
           segs[2].textContent = pageLabel;
         } else if (segs.length > 0) {

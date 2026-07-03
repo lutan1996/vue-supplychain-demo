@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>退役及报废申请 - 新能源物资供应链管理系统</title>
+  <title>报废计划提报 - 新能源物资供应链管理系统</title>
     <link rel="stylesheet" href="css/vendor/fa-all.min.css" />
   <link rel="stylesheet" href="css/subpage-base.css" />
   <link rel="stylesheet" href="css/carrier-management.css" />
@@ -932,7 +932,7 @@
         <div class="nav-item"><span class="nav-label">采购管理</span></div>
         <a class="nav-item" href="carrier-management.html"><span class="nav-label">物流管理</span></a>
         <div class="nav-item"><span class="nav-label">物资采购</span></div>
-        <div class="nav-item nav-item--module-active"><span class="nav-label">物资出库与处置</span></div>
+        <div class="nav-item nav-item--module-active"><span class="nav-label">报废计划与报废申请</span></div>
         <div class="nav-item"><span class="nav-label">绩效考核</span></div>
         <div class="nav-item"><span class="nav-label">公告管理</span></div>
         <div class="nav-item"><span class="nav-label">数据管理</span></div>
@@ -943,9 +943,9 @@
 
       <main class="main-scroll">
         <div class="carrier-main-inner">
-          <h1 class="carrier-page-title">退役及报废申请</h1>
+          <h1 class="carrier-page-title">报废计划提报</h1>
 
-          <div class="module-hub-tabs" style="display:flex;gap:6px;margin-bottom:12px;">
+          <div class="module-hub-tabs" style="display:none;gap:6px;margin-bottom:12px;">
             <button type="button" class="is-active" id="tabScrapPlan" style="padding:6px 14px;border:1px solid #1890ff;background:#1890ff;color:#fff;border-radius:4px;cursor:pointer;">报废计划列表</button>
             <button type="button" id="tabScrapApply" style="padding:6px 14px;border:1px solid #d9d9d9;background:#fff;color:#333;border-radius:4px;cursor:pointer;">报废申请列表</button>
           </div>
@@ -1056,7 +1056,7 @@
   <div class="modal-mask" id="applyModalMask" aria-hidden="true">
     <div class="modal" role="dialog" aria-modal="true" aria-labelledby="applyModalTitle" style="width:min(1100px,98vw);">
       <div class="modal-header">
-        <h2 class="modal-title" id="applyModalTitle">新增退役及报废申请</h2>
+        <h2 class="modal-title" id="applyModalTitle">新增报废申请</h2>
         <div class="scrap-detail-header-actions">
           <button type="button" class="btn-scrap-progress" id="btnOpenApplyModalProgress">流程进度</button>
         <button class="modal-close" id="btnCloseModal" aria-label="关闭">×</button>
@@ -1364,12 +1364,12 @@
     </div>
   </div>
 
-  <script src="js/sidebar-actions.js?v=20260702-timeline-v6"></script>
+  <script src="js/sidebar-actions.js?v=20260703-timeline-v8"></script>
   <script src="js/subpage-feature-title.js"></script>
   <script src="js/site-footer.js"></script>
   <script src="js/demo-product-catalog-data.js?v=20260701-product-code-seq"></script>
   <script src="js/demo-product-catalog-picker.js?v=20260701-product-code-seq"></script>
-  <script src="js/subpage-clock.js?v=20260702-uifix1"></script>
+  <script src="js/subpage-clock.js?v=20260703-uifix3"></script>
   <script>
     (function () {
       var currentUser = "张明";
@@ -1377,11 +1377,12 @@
       try {
         scrapMode = (new URLSearchParams(window.location.search).get("view") || "").trim();
       } catch (eScrapMode) {}
+      if (!scrapMode) scrapMode = "plan";
       var scrapTitleMap = {
         plan: "报废计划提报",
         apply: "报废申请"
       };
-      var scrapPageTitle = scrapTitleMap[scrapMode] || "退役及报废申请";
+      var scrapPageTitle = scrapTitleMap[scrapMode] || "报废计划提报";
 
       try {
         var sr = sessionStorage.getItem("demoScrapRole");
