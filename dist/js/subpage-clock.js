@@ -2042,7 +2042,15 @@
       return html + "</div>";
     }
     function table(rows) {
-      return rows.map(function (item, i) {
+      if (global.mapDemoRenderVerticalTimeline) {
+        return global.mapDemoRenderVerticalTimeline(rows, {
+          personKey: "person",
+          timeKey: "time",
+          statusKey: "result",
+          contentKey: "content"
+        });
+      }
+      return rows.map(function (item) {
         var sc = item.result === "已提交" || item.result === "已通过" || item.result === "已完成" || item.result === "已结束" || item.result === "已处理" ? "#10b981" :
                  item.result === "处理中" || item.result === "审批中" || item.result === "进行中" ? "#1677ff" :
                  item.result === "待处理" || item.result === "待审批" || item.result === "待确认" || item.result === "待知悉" || item.result === "待登记" || item.result === "驳回" || item.result === "拒绝" ? "#f59e0b" : "#64748b";
