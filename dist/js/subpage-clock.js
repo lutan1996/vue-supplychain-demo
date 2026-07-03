@@ -3906,6 +3906,16 @@
           return (th.textContent || "").trim();
         }) : [];
         var stPool = statusPoolByFile();
+        var hasFlowNoCol = heads.some(function (h) {
+          return String(h || "").replace(/\s+/g, "").indexOf("流转单号") >= 0;
+        });
+
+        if (hasFlowNoCol) {
+          Array.prototype.forEach.call(tbody.querySelectorAll("tr.map-fill-10"), function (tr) {
+            tr.parentNode && tr.parentNode.removeChild(tr);
+          });
+          return;
+        }
 
         // 强制表体列数与表头一致，清除“操作列后多出一列”的脏数据
         if (headRow) {
