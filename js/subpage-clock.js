@@ -2444,11 +2444,6 @@
 
   function openUnifiedProgressModalGlobal() {
     try {
-      var todoMap = window.__inventoryTodoCurrentMap || window.__inventoryTodoLastMap;
-      if (todoMap && typeof window.openInventoryTodoProgress === "function") {
-        window.openInventoryTodoProgress(todoMap);
-        return true;
-      }
       var mask = ensureUnifiedProgressModal();
       if (!mask) return false;
       try { patchProgressModalForPage(mask); } catch (e) {}
@@ -2477,16 +2472,6 @@
           act === "progresss";
         if (!isProgress) return;
         if (t.id === "salesCartFlowBtn" || (t.closest && t.closest("#salesModalMask"))) return;
-        if (
-          t.id === "procModalFlow" &&
-          typeof window.openInventoryTodoProgress === "function" &&
-          (window.__inventoryTodoCurrentMap || window.__inventoryTodoLastMap)
-        ) {
-          e.preventDefault();
-          e.stopPropagation();
-          window.openInventoryTodoProgress(window.__inventoryTodoCurrentMap || window.__inventoryTodoLastMap);
-          return;
-        }
         var reqProgressType = t.getAttribute("data-open-req-progress");
         if (reqProgressType && typeof window.openReqProgressModal === "function") {
           e.preventDefault();
@@ -2496,10 +2481,17 @@
         }
         e.preventDefault();
         e.stopPropagation();
-        var mask = ensureUnifiedProgressModal();
-        if (!mask) return;
-        try { patchProgressModalForPage(mask); } catch (err) {}
-        mask.classList.add("show");
+        if (typeof window.openUnifiedProgressModal === "function") {
+          window.openUnifiedProgressModal();
+          return;
+        }
+        if (typeof window.ensureUnifiedProgressModal === "function") {
+          var mask = window.ensureUnifiedProgressModal();
+          if (!mask) return;
+          try { patchProgressModalForPage(mask); } catch (err) {}
+          mask.classList.add("show");
+        }
+        return;
       },
       false
     );

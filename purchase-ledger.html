@@ -1932,8 +1932,8 @@
             }
             return "<td>"+esc(v)+"</td>";
           }).join("");
-          var opsHtml = (c === "requisition" || c === "flow")
-            ? '<button class="op-btn" data-op="detail" data-key="'+key+'">查看</button>'
+          var opsHtml = (c === "ledger")
+            ? '<button class="op-btn" data-op="detail" data-key="'+key+'">查看明细</button>'
             : '<button class="op-btn" data-op="detail" data-key="'+key+'">查看</button>';
           return "<tr>"+cells+'<td>'+opsHtml+'</td>'
             +"</tr>";
@@ -3546,31 +3546,26 @@
           return;
         }
         if(e.target.id==="detailProgressInline"){
-          if (typeof window.openUnifiedProgressModal === "function" && window.openUnifiedProgressModal()) return;
-          alert("流程进度（演示）");
+          if (typeof window.openUnifiedProgressModal === "function") window.openUnifiedProgressModal();
           return;
         }
         if(e.target.id==="detailProgressTop"){
-          if (typeof window.openUnifiedProgressModal === "function" && window.openUnifiedProgressModal()) return;
-          alert("流程进度（演示）");
+          if (typeof window.openUnifiedProgressModal === "function") window.openUnifiedProgressModal();
           return;
         }
         if(e.target.id==="reqProgressInline"){
-          if (typeof window.openUnifiedProgressModal === "function" && window.openUnifiedProgressModal()) return;
-          alert("流程进度（演示）");
+          if (typeof window.openUnifiedProgressModal === "function") window.openUnifiedProgressModal();
           return;
         }
         if(e.target.id==="detailClose" || e.target.id==="detailX"){ closeDetail(); return; }
         if(e.target.id==="detailMask" && e.target===document.getElementById("detailMask")){ closeDetail(); return; }
         if(e.target.id==="actionCancel" || e.target.id==="actionX"){ closeActionModal(); return; }
         if(e.target.id==="actionProgress"){
-          if (typeof window.openUnifiedProgressModal === "function" && window.openUnifiedProgressModal()) return;
-          alert("流程进度（演示）");
+          if (typeof window.openUnifiedProgressModal === "function") window.openUnifiedProgressModal();
           return;
         }
         if(e.target.id==="actionProgressTop"){
-          if (typeof window.openUnifiedProgressModal === "function" && window.openUnifiedProgressModal()) return;
-          alert("流程进度（演示）");
+          if (typeof window.openUnifiedProgressModal === "function") window.openUnifiedProgressModal();
           return;
         }
         if(e.target.id==="actionMask" && e.target===document.getElementById("actionMask")){ closeActionModal(); return; }
