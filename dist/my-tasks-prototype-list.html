@@ -1373,7 +1373,12 @@
         if (fl) {
           fl.onclick = function (e) {
             e.preventDefault();
-            alert("流程进度（演示）");
+            if (typeof window.openUnifiedProgressModal === "function") {
+              window.openUnifiedProgressModal();
+            } else if (typeof window.ensureUnifiedProgressModal === "function") {
+              var mask = window.ensureUnifiedProgressModal();
+              if (mask) mask.classList.add("show");
+            }
           };
         }
         var csel = mt$("qaFldContractSel");
@@ -2113,18 +2118,6 @@
       var procXBtn = mt$("procModalX");
       if (procCloseBtn) procCloseBtn.onclick = closeInventoryTodoModal;
       if (procXBtn) procXBtn.onclick = closeInventoryTodoModal;
-      (function overrideUnifiedInventoryProgress() {
-        var oldUnifiedProgress = window.openUnifiedProgressModal;
-        window.openUnifiedProgressModal = function () {
-          var currentMap = window.__inventoryTodoCurrentMap || inventoryTodoRows._currentMap || arguments[0];
-          if (currentMap && inventoryTodoIsProcess(currentMap)) {
-            openInventoryTodoProgress(currentMap);
-            return true;
-          }
-          if (typeof oldUnifiedProgress === "function") return oldUnifiedProgress.apply(this, arguments);
-          return false;
-        };
-      })();
       var reminderGo = mt$("inventoryTaskReminderGo");
       var reminderClose = mt$("inventoryTaskReminderClose");
       var reminderDismiss = mt$("inventoryTaskReminderDismiss");
@@ -2379,7 +2372,12 @@
             }
             if (e.target.closest('a[title="流程跟踪"]')) {
               e.preventDefault();
-              alert("流程跟踪（演示）");
+              if (typeof window.openUnifiedProgressModal === "function") {
+                window.openUnifiedProgressModal();
+              } else if (typeof window.ensureUnifiedProgressModal === "function") {
+                var mask = window.ensureUnifiedProgressModal();
+                if (mask) mask.classList.add("show");
+              }
               return;
             }
             var act = e.target.closest(".mt-action");
