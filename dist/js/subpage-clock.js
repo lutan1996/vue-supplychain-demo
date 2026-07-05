@@ -1861,6 +1861,16 @@
     var host = root && root.querySelectorAll ? root : document;
     var tables = host.querySelectorAll("table");
     tables.forEach(function (table) {
+      if (table.id === "planItemTable" || table.id === "applyDetailPlanTable") return;
+      if (
+        table.closest &&
+        (table.closest(".modal-mask") ||
+          table.closest(".wh-modal-mask") ||
+          table.closest("[role='dialog']"))
+      ) {
+        return;
+      }
+      if (table.classList && table.classList.contains("plan-item-table")) return;
       if (
         file === "purchase-ledger.html" &&
         table.closest &&
@@ -1955,6 +1965,7 @@
     var host = root && root.querySelectorAll ? root : document;
     var tables = host.querySelectorAll("table");
     tables.forEach(function (table) {
+      if (table.id === "planItemTable" || table.id === "applyDetailPlanTable") return;
       if (
         table.closest &&
         (table.closest(".modal-mask") ||
@@ -2009,6 +2020,10 @@
         }
 
         tds[opIndex].querySelectorAll("button, a").forEach(function (btn) {
+          if (btn.getAttribute && btn.getAttribute("data-map-keep-op") === "1") {
+            btn.style.display = "";
+            return;
+          }
           if (btn.getAttribute && btn.getAttribute("data-track-action") === "material-track") {
             btn.style.display = "";
             return;
@@ -2117,13 +2132,23 @@
     }
     function table(rows) {
       var root = typeof window !== "undefined" ? window : typeof globalThis !== "undefined" ? globalThis : {};
+      if (root.mapDemoRenderMapFlowTimeline) {
+        try {
+          return root.mapDemoRenderMapFlowTimeline(rows, {
+            person: function (x) { return x.person; },
+            time: function (x) { return x.time; },
+            status: function (x) { return x.result; },
+            content: function (x) { return x.content; }
+          });
+        } catch (eMapFlow) {}
+      }
       if (root.mapDemoRenderVerticalTimeline) {
         try {
           return root.mapDemoRenderVerticalTimeline(rows, {
-            personKey: "person",
-            timeKey: "time",
-            statusKey: "result",
-            contentKey: "content"
+            person: function (x) { return x.person; },
+            time: function (x) { return x.time; },
+            status: function (x) { return x.result; },
+            content: function (x) { return x.content; }
           });
         } catch (e) {}
       }
@@ -2160,13 +2185,13 @@
       '    <div class="map-flow-pane" data-pane="info">' +
       '      <div class="map-flow-info">' +
       table([
-        { person: "业务部门", time: "—", content: "梳理次年拟报废物资范围。", result: "已通过" },
-        { person: "业务部门", time: "—", content: "提交报废计划、拟报废物资明细及报废说明。", result: "已通过" },
-        { person: "业务部门负责人", time: "—", content: "确认报废计划内容完整并同意提交后续审批。", result: "已通过" },
-        { person: "财务部负责人", time: "—", content: "审核资产原值、累计折旧、净值及账务处理口径。", result: "处理中" },
-        { person: "物资管理部门专责", time: "—", content: "汇总拟报废物资清单并确认处置路径。", result: "待处理" },
-        { person: "财务部负责人", time: "—", content: "复核财务处理口径并完成终审。", result: "待处理" },
-        { person: "物资管理部门专责", time: "—", content: "归档报废计划、审批记录及资产清单。", result: "待处理" }
+        { person: "业务部门业务员张明", time: "2026-07-01 09:00", content: "梳理次年拟报废物资范围。", result: "已通过" },
+        { person: "业务部门业务员张明", time: "2026-07-01 09:18", content: "提交报废计划、拟报废物资明细及报废说明。", result: "已通过" },
+        { person: "业务部门负责人李仁堂", time: "2026-07-01 10:05", content: "确认报废计划内容完整并同意提交后续审批。", result: "已通过" },
+        { person: "财务部负责人孙睿", time: "2026-07-01 11:26", content: "审核资产原值、累计折旧、净值及账务处理口径。", result: "处理中" },
+        { person: "物资管理部门专责宋中波", time: "2026-07-01 10:42", content: "汇总拟报废物资清单并确认处置路径。", result: "待处理" },
+        { person: "财务部负责人孙睿", time: "2026-07-01 11:48", content: "复核财务处理口径并完成终审。", result: "待处理" },
+        { person: "物资管理部门专责宋中波", time: "2026-07-01 12:05", content: "归档报废计划、审批记录及资产清单。", result: "待处理" }
       ]) +
       "      </div>" +
       "    </div>" +
@@ -2534,12 +2559,22 @@
 
   function installUnifiedProgressTrigger() {
     var file = (location.pathname || "").split("/").pop();
-    if (file === "purchase-plan-approval-handle.html") return;
+    var skipFiles = {
+      "purchase-plan-approval-handle.html": 1,
+      "inventory-task-management.html": 1,
+      "inventory-difference-handling.html": 1,
+      "retire-scrap-application.html": 1,
+      "my-tasks-prototype-list.html": 1
+    };
+    if (skipFiles[file]) return;
     document.addEventListener(
       "click",
       function (e) {
         var t = e.target && e.target.closest ? e.target.closest("button, a, [role='button']") : null;
         if (!t) return;
+        if (t.hasAttribute("data-map-skip-unified-progress")) return;
+        if (t.classList && (t.classList.contains("inv-head-action") || t.classList.contains("btn-scrap-progress"))) return;
+        if (t.id === "procModalFlow" || t.id === "qaAcceptBtnFlow") return;
         var text = (t.textContent || "").replace(/\s+/g, "");
         var act = (t.getAttribute("data-act") || "").toLowerCase();
         var isProgress =

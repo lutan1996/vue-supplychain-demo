@@ -1368,7 +1368,7 @@
   <script src="js/site-footer.js"></script>
   <script src="js/demo-product-catalog-data.js?v=20260701-product-code-seq"></script>
   <script src="js/demo-product-catalog-picker.js?v=20260701-product-code-seq"></script>
-  <script src="js/subpage-clock.js?v=20260705-inv-scrap-flow"></script>
+  <script src="js/subpage-clock.js?v=20260705-flow-fix2"></script>
   <script>
     (function () {
       var currentUser = "张明";
@@ -2763,8 +2763,8 @@
             '</td>' +
             '<td style="width:220px;min-width:220px;max-width:220px;">' +
               '<div class="plan-item-ops">' +
-                '<a href="#" class="pi-del" data-idx="' + idx + '">删除</a>' +
-                '<a href="#" class="pi-track" data-id="' + escHtml(asset.id) + '">物资跟踪</a>' +
+                '<a href="#" class="pi-del" data-map-keep-op="1" data-idx="' + idx + '">删除</a>' +
+                '<a href="#" class="pi-track" data-map-keep-op="1" data-id="' + escHtml(asset.id) + '">物资跟踪</a>' +
               '</div>' +
             '</td>';
           body.appendChild(tr);
