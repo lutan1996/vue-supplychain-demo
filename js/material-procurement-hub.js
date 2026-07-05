@@ -103,6 +103,17 @@
     if (!fb) return;
     fb.hidden = !v;
     fb.setAttribute("aria-hidden", v ? "false" : "true");
+    if (v) {
+      fb.onclick = function(e) {
+        e.stopPropagation();
+        e.preventDefault();
+        if (typeof window.openUnifiedProgressModal === "function") {
+          window.openUnifiedProgressModal();
+        }
+      };
+    } else {
+      fb.onclick = null;
+    }
   }
 
   function setFoot(html) {
