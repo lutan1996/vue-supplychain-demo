@@ -750,7 +750,7 @@
   <script src="js/sidebar-actions.js?v=20260702-timeline-v6"></script>
   <script src="js/subpage-feature-title.js"></script>
   <script src="js/site-footer.js"></script>
-  <script src="js/subpage-clock.js"></script>
+  <script src="js/subpage-clock.js?v=20260705-my-tasks-flow"></script>
   <script src="js/cross-dept-handoff-demo.js"></script>
   <script>
     (function () {
@@ -1401,15 +1401,25 @@
         document.body.style.overflow = "";
       }
       var trackBtn = document.getElementById("pphBtnTrack");
+      var openUnifiedProgressModalBuiltin = window.openUnifiedProgressModal;
+      function openRequisitionLedgerProgress() {
+        window.__mapProgressFlowScope = "purchase-ledger-requisition";
+        if (typeof openUnifiedProgressModalBuiltin === "function") {
+          return openUnifiedProgressModalBuiltin();
+        }
+        return false;
+      }
       trackBtn.addEventListener("click", function (e) {
         if (e) {
           e.preventDefault();
           e.stopPropagation();
           if (typeof e.stopImmediatePropagation === "function") e.stopImmediatePropagation();
         }
+        if (taskName.indexOf("领用申请") >= 0 && openRequisitionLedgerProgress()) return;
         openTrackModal();
       }, true);
       window.openUnifiedProgressModal = function () {
+        if (taskName.indexOf("领用申请") >= 0 && openRequisitionLedgerProgress()) return true;
         openTrackModal();
         return true;
       };

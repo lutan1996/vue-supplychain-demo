@@ -1368,7 +1368,7 @@
   <script src="js/site-footer.js"></script>
   <script src="js/demo-product-catalog-data.js?v=20260701-product-code-seq"></script>
   <script src="js/demo-product-catalog-picker.js?v=20260701-product-code-seq"></script>
-  <script src="js/subpage-clock.js?v=20260703-uifix3"></script>
+  <script src="js/subpage-clock.js?v=20260705-inv-scrap-flow"></script>
   <script>
     (function () {
       var currentUser = "张明";
@@ -1759,21 +1759,31 @@
         var t2 = baseDate + " 09:18:30";
         var t3 = baseDate + " 10:05:18";
         var t4 = baseDate + " 10:42:06";
-        var t5 = pending ? "-" : baseDate + " 11:26:40";
-        var t6 = pending ? "-" : baseDate + " 11:48:15";
+        var t5 = baseDate + " 11:26:40";
+        var t6 = baseDate + " 11:48:15";
         return [
-          { node: "业务部门开始提报次年报废计划", user: applicant, time: t1, content: applicant + "于" + t1 + "执行业务部门开始提报次年报废计划，梳理" + dept + "次年拟报废物资范围，处理结果为已通过。", result: "已通过" },
-          { node: "业务部门提交报废计划", user: applicant, time: t2, content: applicant + "于" + t2 + "执行业务部门提交报废计划，提交报废计划、拟报废物资明细及报废说明，处理结果为已通过。", result: "已通过" },
-          { node: "业务部门负责人审批", user: "李仁堂", time: t3, content: rejected ? "李仁堂于" + t3 + "执行业务部门负责人审批，要求补充资产状态及报废依据，处理结果为驳回。" : "李仁堂于" + t3 + "执行业务部门负责人审批，确认报废计划内容完整并同意提交后续审批，处理结果为已通过。", result: rejected ? "驳回" : "已通过" },
-          { node: "物资管理部门的物资专责汇总且物资管理部门负责人审批", user: "宋中波", time: t4, content: rejected ? "宋中波于" + t4 + "执行物资管理部门的物资专责汇总且物资管理部门负责人审批，复核未通过并退回业务部门补正，处理结果为驳回。" : "宋中波于" + t4 + "执行物资管理部门的物资专责汇总且物资管理部门负责人审批，汇总拟报废物资清单并确认处置路径，处理结果为已通过。", result: rejected ? "驳回" : "已通过" },
-          { node: "财务部负责人审批", user: "孙睿", time: t5, content: pending ? "孙睿待执行财务部负责人审批，待审核资产原值、累计折旧、净值及账务处理口径，处理结果为待处理。" : "孙睿于" + t5 + "执行财务部负责人审批，审核资产原值、累计折旧、净值及账务处理口径，处理结果为已通过。", result: pending ? "待处理" : "已通过" },
-          { node: "物资管理部门物资专责存档，报废结束", user: "宋中波", time: t6, content: pending ? "宋中波待执行物资管理部门物资专责存档，报废结束，待审批完成后归档报废计划、审批记录及资产清单，处理结果为未到达。" : "宋中波于" + t6 + "执行物资管理部门物资专责存档，报废结束，归档报废计划、审批记录及资产清单，处理结果为报废结束。", result: pending ? "未到达" : "报废结束" }
+          { node: "业务部门开始提报次年报废计划", user: "业务部门业务员" + applicant, time: t1, content: applicant + "于" + t1 + "执行业务部门开始提报次年报废计划，梳理" + dept + "次年拟报废物资范围，处理结果为已通过。", result: "已通过" },
+          { node: "业务部门提交报废计划", user: "业务部门业务员" + applicant, time: t2, content: applicant + "于" + t2 + "执行业务部门提交报废计划，提交报废计划、拟报废物资明细及报废说明，处理结果为已通过。", result: "已通过" },
+          { node: "业务部门负责人审批", user: "业务部门负责人李仁堂", time: t3, content: rejected ? "李仁堂于" + t3 + "执行业务部门负责人审批，要求补充资产状态及报废依据，处理结果为驳回。" : "李仁堂于" + t3 + "执行业务部门负责人审批，确认报废计划内容完整并同意提交后续审批，处理结果为已通过。", result: rejected ? "驳回" : "已通过" },
+          { node: "物资管理部门的物资专责汇总且物资管理部门负责人审批", user: "物资管理部门专责宋中波", time: t4, content: rejected ? "宋中波于" + t4 + "执行物资管理部门的物资专责汇总且物资管理部门负责人审批，复核未通过并退回业务部门补正，处理结果为驳回。" : "宋中波于" + t4 + "执行物资管理部门的物资专责汇总且物资管理部门负责人审批，汇总拟报废物资清单并确认处置路径，处理结果为已通过。", result: rejected ? "驳回" : "已通过" },
+          { node: "财务部负责人审批", user: "财务部负责人孙睿", time: t5, content: pending ? "孙睿待执行财务部负责人审批，待审核资产原值、累计折旧、净值及账务处理口径，处理结果为待处理。" : "孙睿于" + t5 + "执行财务部负责人审批，审核资产原值、累计折旧、净值及账务处理口径，处理结果为已通过。", result: pending ? "待处理" : "已通过" },
+          { node: "物资管理部门物资专责存档，报废结束", user: "物资管理部门专责宋中波", time: t6, content: pending ? "宋中波待执行物资管理部门物资专责存档，报废结束，待审批完成后归档报废计划、审批记录及资产清单，处理结果为未到达。" : "宋中波于" + t6 + "执行物资管理部门物资专责存档，报废结束，归档报废计划、审批记录及资产清单，处理结果为报废结束。", result: pending ? "未到达" : "报废结束" }
         ];
       }
 
       function renderProgressInfo(item, type) {
         var rows = progressRows(item, type);
-        refs.progressInfoBody.innerHTML = '<div style="padding:4px 0 0;">' + renderTimelineRows(rows) + '</div>';
+        refs.progressInfoBody.innerHTML =
+          '<div class="map-flow-info">' +
+          (window.mapDemoRenderMapFlowTimeline
+            ? window.mapDemoRenderMapFlowTimeline(rows, {
+              person: function (r) { return r.user || r.person; },
+              time: function (r) { return r.time; },
+              status: function (r) { return r.result; },
+              content: function (r) { return r.content; }
+            })
+            : "") +
+          "</div>";
       }
 
       function setFlowTooltips(item, type) {
@@ -1943,6 +1953,14 @@
       }
 
       function renderTimelineRows(rows) {
+        if (window.mapDemoRenderMapFlowTimeline) {
+          return window.mapDemoRenderMapFlowTimeline(rows, {
+            person: function (r) { return r.user || r.person; },
+            time: function (r) { return r.time; },
+            status: function (r) { return r.result; },
+            content: function (r) { return r.content; }
+          });
+        }
         if (window.mapDemoRenderVerticalTimeline) {
           return window.mapDemoRenderVerticalTimeline(rows);
         }

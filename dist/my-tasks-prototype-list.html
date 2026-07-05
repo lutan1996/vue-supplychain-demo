@@ -968,7 +968,7 @@
   <script src="js/subpage-feature-title.js"></script>
   <script src="js/demo-list-form-modal.js"></script>
   <script src="js/site-footer.js"></script>
-  <script src="js/subpage-clock.js"></script>
+  <script src="js/subpage-clock.js?v=20260705-inv-scrap-flow"></script>
   <script src="js/cross-dept-handoff-demo.js"></script>
   <script src="js/material-code-scheme.js"></script>
   <script src="js/demo-two-col-dd.js"></script>
@@ -1029,7 +1029,7 @@
           title: "我的待办",
           fields: ["任务名称", "流程定义名称", "流程定义KEY", "", ""],
           cols: ["", "序号", "流程定义名称", "流程定义KEY", "任务名称", "办理人", "流程状态", "创建时间", "操作"],
-          total: 24,
+          total: 19,
           page: "10条/页",
           pageBtns: ["1", "2", "3"],
           rows: [
@@ -1047,12 +1047,7 @@
             ["", "4", "库存管理审批", "kcglsp", "库存管理审批", "业务部门专责", "待审批", "2024-12-09 11:06:33", "handle"],
             ["", "5", "库存管理审批", "kcglsp", "库存管理审批", "业务部门专责", "待审批", "2024-12-09 11:12:30", "handle"],
             ["", "6", "领用申请审批", "lysqsp", "领用申请审批", "业务部门专责", "待审批", "2024-12-09 11:17:23", "handle"],
-            ["", "7", "库存管理审批", "kcglsp", "库存管理审批", "业务部门专责", "待审批", "2024-12-09 11:20:06", "handle"],
-            ["", "8", "订单需求管理审批", "ddxqglsp", "订单需求管理审批", "业务部门专责", "待审批", "2024-12-09 11:24:38", "handle"],
-            ["", "9", "录入销售合同单号", "xshtsp", "录入销售合同单号", "业务部门专责", "待审批", "2024-12-09 11:28:42", "handle"],
-            ["", "10", "录入物流单号", "fhglsp", "录入物流单号", "业务部门专责", "待审批", "2024-12-09 11:31:36", "handle"],
-            ["", "11", "货物质量验收审批", "hwzlyspsp", "货物质量验收审批", "业务部门专责", "待审批", "2024-12-09 11:35:00", "handle"],
-            ["", "12", "退换货管理审批", "thhglsp", "退换货管理审批", "业务部门专责", "待审批", "2024-12-09 11:42:11", "handle"]
+            ["", "7", "库存管理审批", "kcglsp", "库存管理审批", "业务部门专责", "待审批", "2024-12-09 11:20:06", "handle"]
           ]
         },
         done: {
@@ -1373,7 +1368,8 @@
         if (fl) {
           fl.onclick = function (e) {
             e.preventDefault();
-            alert("流程进度（演示）");
+            window.__mapProgressFlowScope = "m10-inbound-initiate";
+            if (typeof window.openUnifiedProgressModal === "function") window.openUnifiedProgressModal();
           };
         }
         var csel = mt$("qaFldContractSel");
@@ -1569,13 +1565,19 @@
       function inventoryTodoProgressApprovals(map, isCompany) {
         var steps = inventoryTodoProgressSteps(map, isCompany);
         var active = inventoryTodoProgressIndex(map, isCompany);
+        var parsePerson = window.parseFlowPersonFromText || function () { return ""; };
         return steps.map(function (step, i) {
           var result = i < active ? "已通过" : (i === active ? "处理中" : "待处理");
           if (i === steps.length - 1 && active >= steps.length - 1) result = "已完成";
+          var time =
+            i <= active
+              ? "2026-06-" + String(24 + Math.min(i, 6)).padStart(2, "0") + " 09:" + String(10 + i * 5).padStart(2, "0")
+              : "2026-07-05 09:" + String(10 + i * 3).padStart(2, "0");
+          var person = parsePerson(step.opinion) || step.person || "—";
           return {
             node: step.node,
-            person: step.person,
-            time: i <= active ? "2026-06-" + String(24 + Math.min(i, 6)).padStart(2, "0") + " 09:" + String(10 + i * 5).padStart(2, "0") : "-",
+            person: person,
+            time: time,
             opinion: step.opinion,
             result: result
           };
@@ -1764,12 +1766,19 @@
             var isEnd = idx === arr.length - 1;
             return progressStep(text, idx, isEnd);
           }).join("");
-        var infoHtml = '<div style="padding:4px 0 0;">' + (window.mapDemoRenderVerticalTimeline ? window.mapDemoRenderVerticalTimeline(approvals, {
-          person: function (step) { return step.person; },
-          time: function (step) { return step.time; },
-          status: function (step) { return step.result; },
-          content: function (step) { return step.opinion; }
-        }) : "") + '</div>';
+        var infoHtml = isScrap
+          ? '<div style="padding:4px 0 0;">' + (window.mapDemoRenderVerticalTimeline ? window.mapDemoRenderVerticalTimeline(approvals, {
+            person: function (step) { return step.person; },
+            time: function (step) { return step.time; },
+            status: function (step) { return step.result; },
+            content: function (step) { return step.opinion; }
+          }) : "") + "</div>"
+          : '<div class="map-flow-info">' + (window.mapDemoRenderMapFlowTimeline ? window.mapDemoRenderMapFlowTimeline(approvals, {
+            person: function (step) { return step.person; },
+            time: function (step) { return step.time; },
+            status: function (step) { return step.result; },
+            content: function (step) { return step.opinion; }
+          }) : "") + "</div>";
         var old = document.getElementById("inventoryTodoProgressMask");
         if (old && old.parentNode) old.parentNode.removeChild(old);
         var html =

@@ -1956,6 +1956,15 @@
     var tables = host.querySelectorAll("table");
     tables.forEach(function (table) {
       if (
+        table.closest &&
+        (table.closest(".modal-mask") ||
+          table.closest(".wh-modal-mask") ||
+          table.closest("[role='dialog']"))
+      ) {
+        return;
+      }
+      if (table.classList && table.classList.contains("plan-item-table")) return;
+      if (
         file === "purchase-ledger.html" &&
         table.closest &&
         table.closest("#detailMask")
@@ -2014,6 +2023,73 @@
         });
       });
     });
+  }
+
+  function parseFlowPersonFromText(text) {
+    var t = String(text || "");
+    if (!t) return "";
+    if (t.indexOf("系统") === 0) return "系统";
+    if (t.indexOf("所有参与盘点人员") === 0) {
+      var names = t.match(/所有参与盘点人员([^，。；按]+)/);
+      return "盘点参与人员" + (names && names[1] ? String(names[1]).split("、")[0] : "宋中波");
+    }
+    var m = t.match(
+      /^(部门物资专责|物资管理部门物资专责|物资管理部门负责人|物资管理部门专责|财务负责人|财务部负责人|业务部门负责人|部门负责人|盘点参与人员)([^\s，。；]+)/
+    );
+    if (m) return m[1] + String(m[2] || "").split("、")[0];
+    return "";
+  }
+
+  function mapFlowTimelineColor(status) {
+    var s = String(status || "");
+    if (/已通过|已完成|通过|已结束|已处理|同意|报废结束/.test(s)) return "#10b981";
+    if (/处理中|进行中|审批中/.test(s)) return "#1677ff";
+    if (/待处理|待审批|待确认|待知悉|未到达/.test(s)) return "#f59e0b";
+    if (/驳回|拒绝/.test(s)) return "#ef4444";
+    return "#64748b";
+  }
+
+  function mapDemoRenderMapFlowTimeline(rows, opts) {
+    opts = opts || {};
+    if (!rows || !rows.length) return "";
+    function esc(v) {
+      return String(v == null ? "" : v).replace(/[&<>"']/g, function (s) {
+        return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[s];
+      });
+    }
+    function pick(item, fnName, keys) {
+      if (typeof opts[fnName] === "function") return opts[fnName](item);
+      for (var i = 0; i < keys.length; i++) {
+        var k = keys[i];
+        if (item && item[k] != null && String(item[k]).trim() !== "") return item[k];
+      }
+      return "";
+    }
+    var html = '<div class="map-flow-timeline" style="padding:4px 0">';
+    rows.forEach(function (item, idx) {
+      var isLast = idx === rows.length - 1;
+      var person = pick(item, "person", ["person", "user", "name", "actor"]);
+      var time = pick(item, "time", ["time", "date", "at"]);
+      var status = pick(item, "status", ["status", "result"]);
+      var content = pick(item, "content", ["content", "opinion", "desc", "text", "note"]);
+      var color = mapFlowTimelineColor(status);
+      html +=
+        '<div class="map-flow-tl-item' + (isLast ? " map-flow-tl-last" : "") + '">' +
+          '<div class="map-flow-tl-dot" style="background:' + color + '"></div>' +
+          (isLast ? "" : '<div class="map-flow-tl-line"></div>') +
+          '<div class="map-flow-tl-body">' +
+            '<div class="map-flow-tl-meta">' +
+              (person ? '<span class="map-flow-tl-person">' + esc(person) + "</span>" : "") +
+              (time ? '<span class="map-flow-tl-time">' + esc(time) + "</span>" : "") +
+              (status
+                ? '<span class="map-flow-tl-badge" style="background:' + color + "22;color:" + color + '">' + esc(status) + "</span>"
+                : "") +
+            "</div>" +
+            (content ? '<div class="map-flow-tl-content">' + esc(content) + "</div>" : "") +
+          "</div>" +
+        "</div>";
+    });
+    return html + "</div>";
   }
 
   function ensureUnifiedProgressModal() {
@@ -2119,9 +2195,12 @@
   function isM10InventoryInboundFlowScope() {
     var file = (location.pathname || "").split("/").pop();
     if (file === "warehouse-stock-ledger.html" || file === "receipt-inbound.html") return true;
-    if (file !== "material-procurement-hub.html") return false;
     var scope = window.__mapProgressFlowScope || "";
-    return scope === "m10-ledger-detail" || scope === "m10-inbound-detail" || scope === "m10-inbound-initiate";
+    var validScope =
+      scope === "m10-ledger-detail" || scope === "m10-inbound-detail" || scope === "m10-inbound-initiate";
+    if (file === "my-tasks-prototype-list.html" && validScope) return true;
+    if (file !== "material-procurement-hub.html") return false;
+    return validScope;
   }
 
   function patchInventoryInboundProgressFlow(mask) {
@@ -2185,7 +2264,12 @@
 
   function isPurchaseLedgerFlowScope(scope) {
     var file = (location.pathname || "").split("/").pop();
-    return file === "purchase-ledger.html" && window.__mapProgressFlowScope === scope;
+    if (window.__mapProgressFlowScope !== scope) return false;
+    return (
+      file === "purchase-ledger.html" ||
+      file === "purchase-plan-approval-handle.html" ||
+      file === "my-tasks-prototype-list.html"
+    );
   }
 
   function setUnifiedProgressModalTitle(mask, title) {
@@ -3995,6 +4079,8 @@
   try {
     window.ensureUnifiedProgressModal = ensureUnifiedProgressModal;
     window.openUnifiedProgressModal = openUnifiedProgressModalGlobal;
+    window.mapDemoRenderMapFlowTimeline = mapDemoRenderMapFlowTimeline;
+    window.parseFlowPersonFromText = parseFlowPersonFromText;
   } catch (eExposeProgress) {}
 
   tickClock();

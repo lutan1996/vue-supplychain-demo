@@ -621,7 +621,7 @@
   <script src="js/sidebar-actions.js?v=20260702-timeline-v6"></script>
   <script src="js/subpage-feature-title.js"></script>
   <script src="js/site-footer.js"></script>
-  <script src="js/subpage-clock.js?v=20260702-uifix1"></script>
+  <script src="js/subpage-clock.js?v=20260705-inv-scrap-flow"></script>
   <script>
     (function () {
       var query = new URLSearchParams(window.location.search);
@@ -1011,11 +1011,16 @@
       function approvalRowsFor(row) {
         var steps = flowStepsFor(row);
         var active = flowIndex(row);
+        var parsePerson = window.parseFlowPersonFromText || function () { return ""; };
         return steps.map(function (step, i) {
           var result = i < active ? "已通过" : (i === active ? "处理中" : "待处理");
           if (i === steps.length - 1 && row.status === "已完成") result = "已完成";
-          var time = i <= active ? "2026-06-" + String(24 + Math.min(i, 6)).padStart(2, "0") + " 09:" + String(10 + i * 5).padStart(2, "0") : "-";
-          return { node: step.name, person: step.person, time: time, result: result, opinion: step.text };
+          var time =
+            i <= active
+              ? "2026-06-" + String(24 + Math.min(i, 6)).padStart(2, "0") + " 09:" + String(10 + i * 5).padStart(2, "0")
+              : "2026-07-05 09:" + String(10 + i * 3).padStart(2, "0");
+          var person = parsePerson(step.text) || step.person || "—";
+          return { node: step.name, person: person, time: time, result: result, opinion: step.text };
         });
       }
       function flowChartText(step) {
@@ -1583,12 +1588,17 @@
             return '<div class="inv-step' + cls + '"><strong>' + text + '</strong></div>' + (i < arr.length - 1 ? '<span class="inv-arrow">→</span>' : "");
           }).join("");
         }
-        document.getElementById("approvalInfoBody").innerHTML = '<div style="padding:4px 0 0;">' + (window.mapDemoRenderVerticalTimeline ? window.mapDemoRenderVerticalTimeline(approvalRowsFor(state.current), {
-          person: function (x) { return x.person; },
-          time: function (x) { return x.time; },
-          status: function (x) { return x.result; },
-          content: function (x) { return x.opinion; }
-        }) : "") + '</div>';
+        document.getElementById("approvalInfoBody").innerHTML =
+          '<div class="map-flow-info">' +
+          (window.mapDemoRenderMapFlowTimeline
+            ? window.mapDemoRenderMapFlowTimeline(approvalRowsFor(state.current), {
+              person: function (x) { return x.person; },
+              time: function (x) { return x.time; },
+              status: function (x) { return x.result; },
+              content: function (x) { return x.opinion; }
+            })
+            : "") +
+          "</div>";
         document.getElementById("flowNote").textContent = state.current.no + "，当前状态：" + state.current.status + "；当前流程严格按" + (isCompany ? "公司物资盘点" : "部门物资盘点") + "执行。";
         switchApprovalTab("flow");
         open(document.getElementById("flowMask"));
