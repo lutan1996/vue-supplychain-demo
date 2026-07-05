@@ -2201,9 +2201,9 @@
     if (!track) return;
     track.innerHTML =
       '<div class="map-flow-row">' +
-      '<span class="map-flow-node">电控所物资专责成明锴发起领用流程，从公司库中选取物资清单</span>' +
+      '<span class="map-flow-node">电控所物资专责发起领用流程，从公司库中选取物资清单</span>' +
       '<span class="map-flow-arrow">→</span>' +
-      '<span class="map-flow-node">电控所负责人陈亮审批，通过</span>' +
+      '<span class="map-flow-node">电控所负责人审批，通过</span>' +
       '<span class="map-flow-arrow">→</span>' +
       '<span class="map-flow-node">物资管理部门专责核对清单，无误</span>' +
       '<span class="map-flow-arrow">→</span>' +
@@ -2261,13 +2261,13 @@
       '<div class="map-flow-row">' +
       '<span class="map-flow-node">电控所发起申请，将机械所物资转入本部门</span>' +
       '<span class="map-flow-arrow">→</span>' +
-      '<span class="map-flow-node">电控所负责人陈亮审批，通过</span>' +
+      '<span class="map-flow-node">电控所负责人审批，通过</span>' +
       '<span class="map-flow-arrow">→</span>' +
-      '<span class="map-flow-node">机械研究所物资专责许学良审批，通过</span>' +
+      '<span class="map-flow-node">机械研究所物资专责审批，通过</span>' +
       '<span class="map-flow-arrow">→</span>' +
-      '<span class="map-flow-node">机械研究所负责人李仁堂审批，通过</span>' +
+      '<span class="map-flow-node">机械研究所负责人审批，通过</span>' +
       '<span class="map-flow-arrow">→</span>' +
-      '<span class="map-flow-node">物资管理部门物资专责宋中波确认</span>' +
+      '<span class="map-flow-node">物资管理部门物资专责确认</span>' +
       '</div>' +
       '<div class="map-flow-row" style="margin-top:18px">' +
       '<span class="map-flow-node end">公司内部流转结束</span>' +
