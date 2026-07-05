@@ -799,13 +799,22 @@
     .plan-item-table td:nth-child(13) { width: 260px !important; min-width: 260px !important; max-width: 260px !important; }
     .plan-item-table th:nth-child(14),
     .plan-item-table td:nth-child(14) { width: 220px !important; min-width: 220px !important; max-width: 220px !important; }
-    .plan-item-ops { display: flex; flex-direction: column; gap: 4px; align-items: flex-start; justify-content: flex-start; width: 100%; min-width: 0; white-space: normal; position: relative; z-index: 1; }
+    .plan-item-ops { display: flex; flex-direction: row; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: flex-start; width: 100%; min-width: 0; white-space: nowrap; position: relative; z-index: 1; }
     .plan-item-ops a,
     .plan-item-ops button { border:0; background:transparent; padding:0; line-height:1.2; font-size:12px; cursor:pointer; text-decoration:none; white-space:nowrap; }
     .plan-item-ops .pi-del { color:#ff4d4f; }
     .plan-item-ops .pi-track { color:#1677ff; }
     .plan-item-ops a:hover { opacity: 0.75; }
     .plan-item-ops .ops-sep { color: #d0d7de; }
+    .scrap-material-track-panel {
+      margin-top: 12px;
+      padding: 12px 14px 4px;
+      border: 1px solid #e8eef7;
+      border-radius: 8px;
+      background: #fafbfd;
+    }
+    .plan-detail-track-link { color: #1677ff; text-decoration: none; font-size: 13px; white-space: nowrap; }
+    .plan-detail-track-link:hover { opacity: 0.85; }
     .pi-reason-wrap { display:flex; flex-direction:column; gap:6px; position:relative; padding-right:42px; }
     .pi-reason-tools { position:absolute; right:6px; bottom:8px; display:flex; align-items:center; justify-content:flex-end; gap:6px; margin:0; }
     .pi-attach-btn {
@@ -1241,6 +1250,7 @@
             暂无物资，请点击右上角「<strong style="color:#1677ff;">选择报废物资</strong>」按钮添加
         </div>
         </div>
+        <div id="planItemTrackBox" class="scrap-material-track-panel" style="display:none" hidden></div>
         <input type="file" id="planReasonAttachInput" accept=".xlsx,.xls,.csv,.pdf,.doc,.docx" multiple hidden />
         <div class="plan-summary" id="planItemSummary">
           <span>已选 <b id="planItemCount">0</b> 件物资</span>
@@ -1337,12 +1347,13 @@
                 <th>产品名称</th><th>产品编码</th><th>制造商</th><th>产品型号</th>
                 <th>物资类型编码</th><th>物资类别</th><th style="width:52px;">单位</th><th style="width:56px;">数量</th>
                 <th>资产原值（万元）</th><th>累计折旧（万元）</th><th>净值（万元）</th>
-                <th>采购时间</th><th>拟报废原因</th>
+                <th>采购时间</th><th>拟报废原因</th><th style="width:88px;">操作</th>
               </tr>
             </thead>
           <tbody id="planDetailAssetBody"></tbody>
         </table>
         </div>
+        <div id="planDetailTrackBox" class="scrap-material-track-panel" style="display:none" hidden></div>
       <div class="modal-footer">
         <button class="btn" id="btnPlanDetailClose">关闭</button>
       </div>
@@ -2048,6 +2059,61 @@
         return asset.category || asset.assetCategory || asset.type || "-";
       }
 
+      function scrapTrackDisplayName(asset) {
+        var name = (asset && asset.name) || "物资";
+        var model = asset && asset.model && asset.model !== "—" ? String(asset.model) : "";
+        return model ? name + " (" + model + ")" : name;
+      }
+
+      function scrapTrackDisplayCode(asset) {
+        if (!asset) return "-";
+        if (asset.model && asset.model !== "—") return String(asset.model);
+        return assetProductCode(asset);
+      }
+
+      function buildScrapMaterialTrackBoxHtml(name, code) {
+        var n = escHtml(name || "");
+        var c = escHtml(code || "");
+        var items = [
+          { color: "#2563eb", title: "2026.4.20 入库：" + n + " (" + c + ")", sub: "入库人：曹娟  存放工程技术公司仓库001货位" },
+          { color: "#10b981", title: "2026.5.10 被电控所领用", sub: "领用人：王新  存放山东风电中心仓库001货位" },
+          { color: "#10b981", title: "2026.5.10 流转至机械所", sub: "接收人：张三  存放 山西风电中心仓库03货位" },
+          { color: "#6366f1", title: "2026.5.12 使用人变更（王新 → 张三）", sub: "使用人：张三  存放 山西风电中心仓库03货位" },
+          { color: "#f59e0b", title: "2026.5.18 使用人变更（张三 → 李四）", sub: "使用人：李四  存放 山西风电中心仓库03货位" },
+          { color: "#f59e0b", title: "2026.5.18 外部借用（李四 → 张宇）", sub: "借用人：张宇  外部单位：四川航空研究所  联系方式：159000000" }
+        ];
+        return '<div style="padding:8px 12px 0">'
+          + '<div style="font-size:24px;line-height:1.2;font-weight:700;color:#1f2f4a;margin:0 0 18px">物资跟踪</div>'
+          + '<div style="position:relative;padding-left:36px">'
+          + '<div style="position:absolute;left:18px;top:4px;bottom:0;width:2px;background:#dfe6f1"></div>'
+          + items.map(function (it) {
+            return '<div style="position:relative;padding:0 0 24px 0">'
+              + '<span style="position:absolute;left:-26px;top:7px;width:16px;height:16px;border-radius:999px;background:' + it.color + ';box-shadow:0 0 0 6px rgba(37,99,235,.08)"></span>'
+              + '<div style="font-size:22px;line-height:1.45;font-weight:700;color:#111827;white-space:normal;word-break:break-word">' + it.title + '</div>'
+              + '<div style="margin-top:8px;font-size:16px;line-height:1.55;color:#6b7280;white-space:normal;word-break:break-word">' + it.sub + '</div>'
+              + '</div>';
+          }).join("")
+          + '</div>'
+          + '</div>';
+      }
+
+      function hideScrapMaterialTrackPanel(boxId) {
+        var box = document.getElementById(boxId);
+        if (!box) return;
+        box.style.display = "none";
+        box.hidden = true;
+        box.innerHTML = "";
+      }
+
+      function showScrapMaterialTrackPanel(boxId, asset) {
+        var box = document.getElementById(boxId);
+        if (!box || !asset) return;
+        box.innerHTML = buildScrapMaterialTrackBoxHtml(scrapTrackDisplayName(asset), scrapTrackDisplayCode(asset));
+        box.style.display = "block";
+        box.hidden = false;
+        try { box.scrollIntoView({ behavior: "smooth", block: "nearest" }); } catch (eScroll) {}
+      }
+
       function buildScrapAssetRows(item) {
         var rows = [];
         var loc = (item.stackLocation || "—").trim() || "—";
@@ -2704,6 +2770,7 @@
       }
       function closePlanModal() {
         planReasonAttachTarget = "";
+        hideScrapMaterialTrackPanel("planItemTrackBox");
         var inp = document.getElementById("planReasonAttachInput");
         if (inp) {
           inp.value = "";
@@ -2717,6 +2784,7 @@
         var body = document.getElementById("planItemBody");
         var empty = document.getElementById("planItemEmpty");
         if (!body) return;
+        hideScrapMaterialTrackPanel("planItemTrackBox");
         body.innerHTML = "";
         var totalOrigin = 0, totalNet = 0;
         planItems.forEach(function (item, idx) {
@@ -2766,6 +2834,7 @@
             '<td style="width:220px;min-width:220px;max-width:220px;">' +
               '<div class="plan-item-ops">' +
                 '<a href="#" class="pi-del" data-map-keep-op="1" data-idx="' + idx + '">删除</a>' +
+                '<span class="ops-sep">|</span>' +
                 '<a href="#" class="pi-track" data-map-keep-op="1" data-id="' + escHtml(asset.id) + '">物资跟踪</a>' +
               '</div>' +
             '</td>';
@@ -3024,6 +3093,7 @@
         var item = planRecords.find(function (p) { return p.planNo === planNo; });
         if (!item) return;
         activePlanItem = item;
+        hideScrapMaterialTrackPanel("planDetailTrackBox");
         document.getElementById("planDetailGrid").innerHTML =
           '<div class="view-item"><b>计划编号：</b>' + item.planNo + '</div><div class="view-item"><b>计划年度：</b>' + item.year + '</div>' +
           '<div class="view-item"><b>申请部门：</b>' + item.dept + '</div><div class="view-item"><b>申请人：</b>' + item.applicant + '</div>' +
@@ -3063,12 +3133,14 @@
             "<td style=\"text-align:right;\">" + fmtWan(a.net * pq) + "</td>" +
             "<td>" + (a.purchaseDate || "-") + "</td>" +
             "<td>" + escHtml(reason) + "</td>" +
+            '<td style="text-align:center;"><a href="#" class="plan-detail-track-link" data-map-keep-op="1" data-asset-id="' + escHtml(a.id) + '">物资跟踪</a></td>' +
             "</tr>";
         }).join("");
         document.getElementById("planDetailMask").classList.add("show");
       }
       function closePlanDetail() {
         document.getElementById("planDetailMask").classList.remove("show");
+        hideScrapMaterialTrackPanel("planDetailTrackBox");
         activePlanItem = null;
       }
       function openPlanSubmit(planNo) {
@@ -3198,8 +3270,23 @@
           if (track) {
             e.preventDefault();
             var assetId = track.getAttribute("data-id");
-            alert("物资跟踪：正在跳转到物资「" + assetId + "」的流转记录页面（演示功能）");
+            var asset = planAssetLookup(assetId) || planAssets.find(function (a) { return a.id === assetId; });
+            if (asset) showScrapMaterialTrackPanel("planItemTrackBox", asset);
+            return;
           }
+        });
+
+        document.getElementById("planDetailAssetBody").addEventListener("click", function (e) {
+          var trackLink = e.target.closest(".plan-detail-track-link");
+          if (!trackLink) return;
+          e.preventDefault();
+          var assetId = trackLink.getAttribute("data-asset-id");
+          var asset = planAssetLookup(assetId);
+          if (!asset && activePlanItem && activePlanItem.assetIds) {
+            asset = (activePlanItem.assetIds || []).map(function (id) { return planAssetLookup(id); }).filter(Boolean)[0];
+          }
+          if (!asset) asset = demoPlanAssets().find(function (a) { return a.id === assetId; });
+          if (asset) showScrapMaterialTrackPanel("planDetailTrackBox", asset);
         });
 
         document.getElementById("btnPlanSaveDraft").addEventListener("click", function () { savePlan("draft"); });
