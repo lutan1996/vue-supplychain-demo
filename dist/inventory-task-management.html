@@ -618,10 +618,10 @@
     </div>
   </div>
 
-  <script src="js/sidebar-actions.js"></script>
+  <script src="js/sidebar-actions.js?v=20260702-timeline-v6"></script>
   <script src="js/subpage-feature-title.js"></script>
   <script src="js/site-footer.js"></script>
-  <script src="js/subpage-clock.js?v=20260622-inventory-detail-buttons-v2"></script>
+  <script src="js/subpage-clock.js?v=20260702-uifix1"></script>
   <script>
     (function () {
       var query = new URLSearchParams(window.location.search);
@@ -1583,28 +1583,12 @@
             return '<div class="inv-step' + cls + '"><strong>' + text + '</strong></div>' + (i < arr.length - 1 ? '<span class="inv-arrow">→</span>' : "");
           }).join("");
         }
-        document.getElementById("approvalInfoBody").innerHTML = (function() {
-          var rows = approvalRowsFor(state.current);
-          return rows.map(function(x, i) {
-            var isLast = i === rows.length - 1;
-            var resultColor = x.result === "已完成" || x.result === "已通过" ? "#10b981" : 
-                             x.result === "处理中" ? "#1677ff" : "#f59e0b";
-            return '<div class="inv-timeline-item" style="display:grid;grid-template-columns:44px minmax(0,1fr);column-gap:6px;align-items:start;position:relative">' +
-              '<div style="position:relative;width:44px;min-height:' + (isLast ? '28px' : '118px') + ';display:flex;justify-content:center;flex-shrink:0">' +
-                '<div style="width:16px;height:16px;border-radius:50%;background:' + resultColor + ';flex-shrink:0;margin-top:8px;position:relative;z-index:1"></div>' +
-                (!isLast ? '<div style="position:absolute;top:24px;bottom:-8px;left:50%;width:1px;background:#d8e1ee;transform:translateX(-50%)"></div>' : '') +
-              '</div>' +
-              '<div style="padding:4px 0 ' + (isLast ? '0' : '34px') + ';min-width:0">' +
-                '<div style="display:flex;align-items:center;gap:18px;flex-wrap:wrap;margin-bottom:18px">' +
-                  '<span style="font-weight:700;color:#1f3551;font-size:16px">' + x.person + '</span>' +
-                  '<span style="color:#64748b;font-size:15px">' + x.time + '</span>' +
-                  '<span style="padding:5px 12px;border-radius:5px;font-size:14px;font-weight:700;background:' + resultColor + '22;color:' + resultColor + '">' + x.result + '</span>' +
-                '</div>' +
-                '<div style="font-size:15px;color:#51627a;line-height:1.75;font-weight:500">' + x.opinion + '</div>' +
-              '</div>' +
-            '</div>';
-          }).join("");
-        })();
+        document.getElementById("approvalInfoBody").innerHTML = '<div style="padding:4px 0 0;">' + (window.mapDemoRenderVerticalTimeline ? window.mapDemoRenderVerticalTimeline(approvalRowsFor(state.current), {
+          person: function (x) { return x.person; },
+          time: function (x) { return x.time; },
+          status: function (x) { return x.result; },
+          content: function (x) { return x.opinion; }
+        }) : "") + '</div>';
         document.getElementById("flowNote").textContent = state.current.no + "，当前状态：" + state.current.status + "；当前流程严格按" + (isCompany ? "公司物资盘点" : "部门物资盘点") + "执行。";
         switchApprovalTab("flow");
         open(document.getElementById("flowMask"));

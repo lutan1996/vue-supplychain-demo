@@ -29,6 +29,9 @@ jobs:
       - name: Setup Pages
         uses: actions/configure-pages@v4
 
+      - name: Sync static assets into dist
+        run: node scripts/postbuild.js
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:

@@ -2484,10 +2484,13 @@
           window.openUnifiedProgressModal();
           return;
         }
-        var mask = ensureUnifiedProgressModal();
-        if (!mask) return;
-        try { patchProgressModalForPage(mask); } catch (err) {}
-        mask.classList.add("show");
+        if (typeof window.ensureUnifiedProgressModal === "function") {
+          var mask = window.ensureUnifiedProgressModal();
+          if (!mask) return;
+          try { patchProgressModalForPage(mask); } catch (err) {}
+          mask.classList.add("show");
+        }
+        return;
       },
       true
     );
