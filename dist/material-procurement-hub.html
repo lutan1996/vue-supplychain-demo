@@ -390,7 +390,13 @@
     .proc-modal-body textarea { min-height: 72px; resize: vertical; }
     /* 库存管理（m10）· 审批单全屏：高度随表单收缩，底栏紧贴表单；超长时在 .qa-accept-wrap 内滚动（避免 body 滚动导致合同编号等原生下拉向上错位） */
     .proc-modal-mask.qa-accept-mode .proc-modal-head {
-      display: none !important;
+      display: flex !important;
+      justify-content: flex-end;
+      padding: 8px 16px;
+      border-bottom: 1px solid #e8e8e8;
+    }
+    .proc-modal-mask.qa-accept-mode .proc-modal-head #procModalTitle {
+      display: none;
     }
     .proc-modal-mask.qa-accept-mode .proc-modal-box.fullscreen {
       display: flex;
