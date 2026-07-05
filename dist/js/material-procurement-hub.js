@@ -103,30 +103,6 @@
     if (!fb) return;
     fb.hidden = !v;
     fb.setAttribute("aria-hidden", v ? "false" : "true");
-    if (v) {
-      fb.style.border = "2px solid red";
-      fb.style.background = "yellow";
-      fb.style.padding = "8px 16px";
-      fb.style.zIndex = "9999";
-      fb.style.position = "relative";
-      fb.onclick = function(e) {
-        e.stopPropagation();
-        e.preventDefault();
-        if (typeof window.openUnifiedProgressModal === "function") {
-          window.openUnifiedProgressModal();
-        } else if (typeof window.ensureUnifiedProgressModal === "function") {
-          var mask = window.ensureUnifiedProgressModal();
-          if (mask) mask.classList.add("show");
-        }
-      };
-    } else {
-      fb.style.border = "";
-      fb.style.background = "";
-      fb.style.padding = "";
-      fb.style.zIndex = "";
-      fb.style.position = "";
-      fb.onclick = null;
-    }
   }
 
   function setFoot(html) {
