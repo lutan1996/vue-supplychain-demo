@@ -2333,32 +2333,40 @@
   }
 
   function buildMaterialTraceTimelineHtml(trackCode, materialName) {
-    var code = cleanText(trackCode || "A0100100001");
+    var code = cleanText(trackCode || "B00000001");
     var name = cleanText(materialName || "智能风机控制器");
-    var lineDot = function (active) {
-      return (
-        '<span style="display:inline-block;width:12px;height:12px;border-radius:999px;vertical-align:middle;background:' +
-        (active ? "#21a366" : "#d7dbe2") +
-        ';"></span>'
-      );
-    };
-    function row(dot, title, time) {
-      return (
-        '<div style="display:flex;gap:12px;align-items:flex-start;margin-bottom:14px;">' +
-        '<div style="width:16px;display:flex;justify-content:center;line-height:1;padding-top:4px;">' +
-        dot +
-        "</div>" +
-        '<div style="flex:1;min-width:0;">' +
-        '<div style="font-size:18px;color:#1f2937;line-height:1.4;">' + escHtml(title) + "</div>" +
-        '<div style="margin-top:2px;color:#6b7280;font-size:15px;">' + escHtml(time) + "</div>" +
-        "</div>" +
-        "</div>"
-      );
-    }
+    var items = [
+      {
+        color: "#2563eb",
+        title: "2026.4.20 入库：" + name + " (" + code + ")",
+        sub: "入库人：曹娟  存放工程技术公司仓库001货位"
+      },
+      {
+        color: "#10b981",
+        title: "2026.5.10 被电控所领用",
+        sub: "领用人：王新 存放山东风电中心仓库001货位"
+      }
+    ];
     return (
-      '<div style="padding:4px 2px 2px;">' +
-      row(lineDot(false), name + "（" + code + "）完成入库", "2026-04-20 09:30 · 山东风电中心仓库001货位") +
-      row(lineDot(true), name + "被电控所领用", "2026-05-10 14:20 · 领用单号 LY-2026-0510") +
+      '<div style="position:relative;padding-left:36px">' +
+      '<div style="position:absolute;left:18px;top:4px;bottom:0;width:2px;background:#dfe6f1"></div>' +
+      items
+        .map(function (it) {
+          return (
+            '<div style="position:relative;padding:0 0 24px 0">' +
+            '<span style="position:absolute;left:-26px;top:7px;width:16px;height:16px;border-radius:999px;background:' +
+            it.color +
+            ';box-shadow:0 0 0 6px rgba(37,99,235,.08)"></span>' +
+            '<div style="font-size:18px;line-height:1.45;font-weight:700;color:#111827;white-space:normal;word-break:break-word">' +
+            escHtml(it.title) +
+            "</div>" +
+            '<div style="margin-top:8px;font-size:14px;line-height:1.55;color:#6b7280;white-space:normal;word-break:break-word">' +
+            escHtml(it.sub) +
+            "</div>" +
+            "</div>"
+          );
+        })
+        .join("") +
       "</div>"
     );
   }
