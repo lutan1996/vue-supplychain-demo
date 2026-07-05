@@ -104,7 +104,7 @@
     fb.hidden = !v;
     fb.setAttribute("aria-hidden", v ? "false" : "true");
     if (v) {
-      fb.addEventListener("click", function(e) {
+      fb.onclick = function(e) {
         e.stopPropagation();
         e.preventDefault();
         if (typeof window.openUnifiedProgressModal === "function") {
@@ -113,7 +113,13 @@
           var mask = window.ensureUnifiedProgressModal();
           if (mask) mask.classList.add("show");
         }
-      });
+      };
+      fb.style.zIndex = "100";
+      fb.style.position = "relative";
+    } else {
+      fb.onclick = null;
+      fb.style.zIndex = "";
+      fb.style.position = "";
     }
   }
 
