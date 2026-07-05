@@ -310,9 +310,7 @@
         '<div class="nav-item" title="盘点管理"><span class="nav-label">盘点管理</span></div>' +
         '<div class="nav-item" title="资产管理"><span class="nav-label">资产管理</span></div>' +
         '<div class="nav-item" title="物流管理"><span class="nav-label">物流管理</span></div>' +
-        '<div class="nav-item" title="仓储管理"><span class="nav-label">仓储管理</span></div>' +
         '<div class="nav-item" title="报废计划与报废申请"><span class="nav-label">报废计划与报废申请</span></div>' +
-        '<div class="nav-item" title="综合业务管理"><span class="nav-label">综合业务管理</span></div>' +
         '<div class="nav-item" title="基础数据管理"><span class="nav-label">基础数据管理</span></div>';
       normalizeRetiredNavLabel();
     })();
@@ -3590,6 +3588,19 @@
             openGlobalActionFallback("导入");
             return;
           }
+          }
+        }
+
+        var progressBtn = e.target && e.target.closest ? e.target.closest("[data-map-open-progress='1']") : null;
+        if (progressBtn) {
+          return;
+        }
+        var textBtn = e.target && e.target.closest ? e.target.closest("button, a, [role='button']") : null;
+        if (textBtn) {
+          var text = (textBtn.textContent || "").replace(/\s+/g, "");
+          var act = (textBtn.getAttribute("data-act") || "").toLowerCase();
+          if (text.indexOf("流程进度") >= 0 || text.indexOf("查看进度") >= 0 || act === "progress" || act === "progresss") {
+            return;
           }
         }
 
