@@ -107,14 +107,11 @@
       fb.onclick = function(e) {
         e.stopPropagation();
         e.preventDefault();
-        if (typeof window.ensureUnifiedProgressModal === "function") {
+        if (typeof window.openUnifiedProgressModal === "function") {
+          window.openUnifiedProgressModal();
+        } else if (typeof window.ensureUnifiedProgressModal === "function") {
           var mask = window.ensureUnifiedProgressModal();
-          if (mask) {
-            if (typeof window.patchProgressModalForPage === "function") {
-              try { window.patchProgressModalForPage(mask); } catch (err) {}
-            }
-            mask.classList.add("show");
-          }
+          if (mask) mask.classList.add("show");
         }
       };
     } else {
