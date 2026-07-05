@@ -103,20 +103,6 @@
     if (!fb) return;
     fb.hidden = !v;
     fb.setAttribute("aria-hidden", v ? "false" : "true");
-    if (v) {
-      fb.onclick = function(e) {
-        e.stopPropagation();
-        e.preventDefault();
-        if (typeof window.openUnifiedProgressModal === "function") {
-          window.openUnifiedProgressModal();
-        } else if (typeof window.ensureUnifiedProgressModal === "function") {
-          var mask = window.ensureUnifiedProgressModal();
-          if (mask) mask.classList.add("show");
-        }
-      };
-    } else {
-      fb.onclick = null;
-    }
   }
 
   function setFoot(html) {
