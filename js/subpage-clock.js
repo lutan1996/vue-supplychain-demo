@@ -2146,45 +2146,40 @@
     if (info) {
       info.innerHTML = '<div class="map-flow-timeline" style="padding:4px 0">' +
         '<div class="map-flow-tl-item">' +
-          '<div class="map-flow-tl-dot" style="background:#10b981"></div>' +
-          '<div class="map-flow-tl-line"></div>' +
+          '<div class="map-flow-tl-dot" style="background:#10b981"></div><div class="map-flow-tl-line"></div>' +
           '<div class="map-flow-tl-body">' +
-            '<div class="map-flow-tl-meta"><span class="map-flow-tl-person">电控所物资专责成明锴</span><span class="map-flow-tl-time">2026-03-20 09:12</span><span class="map-flow-tl-badge" style="background:#10b98122;color:#10b981">已通过</span></div>' +
-            '<div class="map-flow-tl-content">录入设备清单，提交申请入库（附件：风机采购合同）</div>' +
+            '<div class="map-flow-tl-meta"><span class="map-flow-tl-person">电控所物资专责成明锴</span><span class="map-flow-tl-time">2026-04-20 09:12</span><span class="map-flow-tl-badge" style="background:#10b98122;color:#10b981">已通过</span></div>' +
+            '<div class="map-flow-tl-content">录入设备清单，提交申请入库</div>' +
           '</div>' +
         '</div>' +
         '<div class="map-flow-tl-item">' +
-          '<div class="map-flow-tl-dot" style="background:#10b981"></div>' +
-          '<div class="map-flow-tl-line"></div>' +
+          '<div class="map-flow-tl-dot" style="background:#10b981"></div><div class="map-flow-tl-line"></div>' +
           '<div class="map-flow-tl-body">' +
-            '<div class="map-flow-tl-meta"><span class="map-flow-tl-person">电控所负责人陈亮</span><span class="map-flow-tl-time">2026-03-20 10:03</span><span class="map-flow-tl-badge" style="background:#10b98122;color:#10b981">已通过</span></div>' +
-            '<div class="map-flow-tl-content">审批：同意入库，审核物资符合采购要求</div>' +
+            '<div class="map-flow-tl-meta"><span class="map-flow-tl-person">电控所负责人陈亮</span><span class="map-flow-tl-time">2026-04-20 10:03</span><span class="map-flow-tl-badge" style="background:#10b98122;color:#10b981">已通过</span></div>' +
+            '<div class="map-flow-tl-content">审批：同意入库（审核物资是否符合采购的要求）</div>' +
           '</div>' +
         '</div>' +
         '<div class="map-flow-tl-item">' +
-          '<div class="map-flow-tl-dot" style="background:#10b981"></div>' +
-          '<div class="map-flow-tl-line"></div>' +
+          '<div class="map-flow-tl-dot" style="background:#10b981"></div><div class="map-flow-tl-line"></div>' +
           '<div class="map-flow-tl-body">' +
-            '<div class="map-flow-tl-meta"><span class="map-flow-tl-person">物资管理部门专责宋中波</span><span class="map-flow-tl-time">2026-03-20 10:28</span><span class="map-flow-tl-badge" style="background:#10b98122;color:#10b981">已通过</span></div>' +
+            '<div class="map-flow-tl-meta"><span class="map-flow-tl-person">物资管理部门专责宋中波</span><span class="map-flow-tl-time">2026-04-20 10:28</span><span class="map-flow-tl-badge" style="background:#10b98122;color:#10b981">已通过</span></div>' +
             '<div class="map-flow-tl-content">审核分类：同意入库</div>' +
           '</div>' +
         '</div>' +
         '<div class="map-flow-tl-item">' +
-          '<div class="map-flow-tl-dot" style="background:#10b981"></div>' +
-          '<div class="map-flow-tl-line"></div>' +
+          '<div class="map-flow-tl-dot" style="background:#10b981"></div><div class="map-flow-tl-line"></div>' +
           '<div class="map-flow-tl-body">' +
-            '<div class="map-flow-tl-meta"><span class="map-flow-tl-person">物资管理部门负责人王超</span><span class="map-flow-tl-time">2026-03-20 10:48</span><span class="map-flow-tl-badge" style="background:#10b98122;color:#10b981">已完成</span></div>' +
+            '<div class="map-flow-tl-meta"><span class="map-flow-tl-person">物资管理部门负责人王超</span><span class="map-flow-tl-time">2026-04-20 10:48</span><span class="map-flow-tl-badge" style="background:#10b98122;color:#10b981">已完成</span></div>' +
             '<div class="map-flow-tl-content">审批：同意</div>' +
           '</div>' +
         '</div>' +
         '<div class="map-flow-tl-item map-flow-tl-last">' +
           '<div class="map-flow-tl-dot" style="background:#10b981"></div>' +
           '<div class="map-flow-tl-body">' +
-            '<div class="map-flow-tl-meta"><span class="map-flow-tl-person">系统</span><span class="map-flow-tl-time">2026-03-20 11:05</span><span class="map-flow-tl-badge" style="background:#10b98122;color:#10b981">已完成</span></div>' +
+            '<div class="map-flow-tl-meta"><span class="map-flow-tl-person">系统</span><span class="map-flow-tl-time">2026-04-20 11:05</span><span class="map-flow-tl-badge" style="background:#10b98122;color:#10b981">已完成</span></div>' +
             '<div class="map-flow-tl-content">入公司库结束</div>' +
           '</div>' +
-        '</div>' +
-        '</div>';
+        '</div></div>';
     }
   }
 
