@@ -3605,6 +3605,10 @@
 
         var btn = e.target && e.target.closest ? e.target.closest("button,a,[data-a],[data-act],[data-op]") : null;
         if (btn) {
+          if (btn.getAttribute && btn.getAttribute("data-map-open-progress") === "1") return;
+          var btnText = (btn.textContent || "").replace(/\s+/g, "");
+          var btnAct = (btn.getAttribute("data-act") || "").toLowerCase();
+          if (btnText.indexOf("流程进度") >= 0 || btnText.indexOf("查看进度") >= 0 || btnAct === "progress" || btnAct === "progresss") return;
           if (btn.closest && btn.closest(".warehouse-secondary-panel,.secondary-panel,.sidebar")) return;
           window.__mapLastActionBtn = btn;
           ctx.action = (btn.getAttribute("data-a") || btn.getAttribute("data-act") || btn.getAttribute("data-op") || "").toLowerCase();
