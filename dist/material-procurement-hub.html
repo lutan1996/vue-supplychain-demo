@@ -1832,7 +1832,7 @@
     <div class="proc-modal-box" role="dialog" aria-modal="true" aria-labelledby="procModalTitle">
       <div class="proc-modal-head">
         <span id="procModalTitle">提示</span>
-        <button type="button" id="procModalFlow" class="proc-modal-flow-btn" data-map-open-progress="1" hidden aria-hidden="true">
+        <button type="button" id="procModalFlow" class="proc-modal-flow-btn" data-map-open-progress="1" hidden aria-hidden="true" onclick="if(typeof window.openUnifiedProgressModal==='function'){window.openUnifiedProgressModal();}else if(typeof window.ensureUnifiedProgressModal==='function'){var m=window.ensureUnifiedProgressModal();if(m)m.classList.add('show');}">
           流程进度
         </button>
         <button type="button" class="proc-btn" id="procModalX" aria-label="关闭">×</button>
