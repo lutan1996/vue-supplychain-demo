@@ -104,11 +104,6 @@
     fb.hidden = !v;
     fb.setAttribute("aria-hidden", v ? "false" : "true");
     if (v) {
-      fb.style.border = "2px solid red";
-      fb.style.background = "yellow";
-      fb.style.padding = "8px 16px";
-      fb.style.zIndex = "9999";
-      fb.style.position = "relative";
       fb.onclick = function(e) {
         e.stopPropagation();
         e.preventDefault();
@@ -120,11 +115,6 @@
         }
       };
     } else {
-      fb.style.border = "";
-      fb.style.background = "";
-      fb.style.padding = "";
-      fb.style.zIndex = "";
-      fb.style.position = "";
       fb.onclick = null;
     }
   }

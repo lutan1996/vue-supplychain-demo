@@ -2040,9 +2040,10 @@
       return html + "</div>";
     }
     function table(rows) {
-      if (global.mapDemoRenderVerticalTimeline) {
+      var root = typeof window !== "undefined" ? window : typeof globalThis !== "undefined" ? globalThis : {};
+      if (root.mapDemoRenderVerticalTimeline) {
         try {
-          return global.mapDemoRenderVerticalTimeline(rows, {
+          return root.mapDemoRenderVerticalTimeline(rows, {
             personKey: "person",
             timeKey: "time",
             statusKey: "result",
