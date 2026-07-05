@@ -104,6 +104,10 @@
     fb.hidden = !v;
     fb.setAttribute("aria-hidden", v ? "false" : "true");
     if (v) {
+      fb.onclick = null;
+      var newBtn = fb.cloneNode(true);
+      fb.parentNode.replaceChild(newBtn, fb);
+      fb = newBtn;
       fb.onclick = function(e) {
         e.stopPropagation();
         e.preventDefault();
@@ -114,12 +118,16 @@
           if (mask) mask.classList.add("show");
         }
       };
-      fb.style.zIndex = "100";
+      fb.style.zIndex = "1000";
       fb.style.position = "relative";
+      fb.style.pointerEvents = "auto";
+      fb.style.display = "block";
     } else {
       fb.onclick = null;
       fb.style.zIndex = "";
       fb.style.position = "";
+      fb.style.pointerEvents = "";
+      fb.style.display = "";
     }
   }
 
