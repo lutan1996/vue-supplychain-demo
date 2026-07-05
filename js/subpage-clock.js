@@ -2458,7 +2458,6 @@
     document.addEventListener(
       "click",
       function (e) {
-        if (e.defaultPrevented) return;
         var t = e.target && e.target.closest ? e.target.closest("button, a, [role='button']") : null;
         if (!t) return;
         var text = (t.textContent || "").replace(/\s+/g, "");
