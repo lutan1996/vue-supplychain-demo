@@ -2466,7 +2466,8 @@
           text.indexOf("查看进度") >= 0 ||
           text.indexOf("流程进度") >= 0 ||
           act === "progress" ||
-          act === "progresss";
+          act === "progresss" ||
+          t.hasAttribute("data-map-open-progress");
         if (!isProgress) return;
         if (t.id === "salesCartFlowBtn" || (t.closest && t.closest("#salesModalMask"))) return;
         var reqProgressType = t.getAttribute("data-open-req-progress");
@@ -2487,7 +2488,7 @@
         try { patchProgressModalForPage(mask); } catch (err) {}
         mask.classList.add("show");
       },
-      false
+      true
     );
   }
 
