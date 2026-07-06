@@ -2287,23 +2287,8 @@
     }
   }
 
-  function currentDemoPageFile() {
-    var file = (location.pathname || "").split("/").pop() || "";
-    var q = file.indexOf("?");
-    if (q >= 0) file = file.slice(0, q);
-    var h = file.indexOf("#");
-    if (h >= 0) file = file.slice(0, h);
-    return file;
-  }
-
   function isPurchaseLedgerFlowScope(scope) {
-    if (window.__mapProgressFlowScope !== scope) return false;
-    var file = currentDemoPageFile();
-    return (
-      file === "purchase-ledger.html" ||
-      file === "purchase-plan-approval-handle.html" ||
-      file === "my-tasks-prototype-list.html"
-    );
+    return window.__mapProgressFlowScope === scope;
   }
 
   function setUnifiedProgressModalTitle(mask, title) {
