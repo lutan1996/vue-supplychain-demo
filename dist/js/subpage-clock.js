@@ -2287,9 +2287,18 @@
     }
   }
 
+  function currentDemoPageFile() {
+    var file = (location.pathname || "").split("/").pop() || "";
+    var q = file.indexOf("?");
+    if (q >= 0) file = file.slice(0, q);
+    var h = file.indexOf("#");
+    if (h >= 0) file = file.slice(0, h);
+    return file;
+  }
+
   function isPurchaseLedgerFlowScope(scope) {
-    var file = (location.pathname || "").split("/").pop();
     if (window.__mapProgressFlowScope !== scope) return false;
+    var file = currentDemoPageFile();
     return (
       file === "purchase-ledger.html" ||
       file === "purchase-plan-approval-handle.html" ||
@@ -2310,7 +2319,7 @@
     if (!track) return;
     track.innerHTML =
       '<div class="map-flow-row">' +
-      '<span class="map-flow-node">电控所物资专责发起领用流程，从公司库中选取物资清单</span>' +
+      '<span class="map-flow-node">电控所任何人发起领用流程，从公司库中选取物资清单</span>' +
       '<span class="map-flow-arrow">→</span>' +
       '<span class="map-flow-node">电控所负责人审批，通过</span>' +
       '<span class="map-flow-arrow">→</span>' +
@@ -2326,7 +2335,7 @@
         '<div class="map-flow-tl-item">' +
           '<div class="map-flow-tl-dot" style="background:#10b981"></div><div class="map-flow-tl-line"></div>' +
           '<div class="map-flow-tl-body">' +
-            '<div class="map-flow-tl-meta"><span class="map-flow-tl-person">电控所物资专责成明锴</span><span class="map-flow-tl-time">2026-05-10 09:12</span><span class="map-flow-tl-badge" style="background:#10b98122;color:#10b981">已通过</span></div>' +
+            '<div class="map-flow-tl-meta"><span class="map-flow-tl-person">张明</span><span class="map-flow-tl-time">2026-05-10 09:12</span><span class="map-flow-tl-badge" style="background:#10b98122;color:#10b981">已通过</span></div>' +
             '<div class="map-flow-tl-content">发起领用流程，从公司库中选取物资清单</div>' +
           '</div>' +
         '</div>' +
@@ -2368,7 +2377,7 @@
     if (!track) return;
     track.innerHTML =
       '<div class="map-flow-row">' +
-      '<span class="map-flow-node">电控所发起申请，将机械所物资转入本部门</span>' +
+      '<span class="map-flow-node">电控所任何人发起申请，将机械所物资转入本部门</span>' +
       '<span class="map-flow-arrow">→</span>' +
       '<span class="map-flow-node">电控所负责人审批，通过</span>' +
       '<span class="map-flow-arrow">→</span>' +
@@ -2387,7 +2396,7 @@
         '<div class="map-flow-tl-item">' +
           '<div class="map-flow-tl-dot" style="background:#10b981"></div><div class="map-flow-tl-line"></div>' +
           '<div class="map-flow-tl-body">' +
-            '<div class="map-flow-tl-meta"><span class="map-flow-tl-person">电控所</span><span class="map-flow-tl-time">2026-05-10 09:12</span><span class="map-flow-tl-badge" style="background:#10b98122;color:#10b981">已通过</span></div>' +
+            '<div class="map-flow-tl-meta"><span class="map-flow-tl-person">电控所于伟</span><span class="map-flow-tl-time">2026-05-10 09:12</span><span class="map-flow-tl-badge" style="background:#10b98122;color:#10b981">已通过</span></div>' +
             '<div class="map-flow-tl-content">发起申请：将机械所物资转入本部门</div>' +
           '</div>' +
         '</div>' +
