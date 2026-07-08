@@ -190,6 +190,8 @@
     "sales-contract-report": "sales-contract-report.html?v=20260616-fix-v6",
     "inventory-task-manage": "inventory-task-management.html",
     "inventory-company-task-manage": "inventory-task-management.html?scope=company",
+    "inventory-proj-company-task-manage": "inventory-task-management.html?scope=proj-company",
+    "inventory-station-task-manage": "inventory-task-management.html?scope=station",
     "inventory-difference-handle": "inventory-difference-handling.html",
     // 物流
     "logistics-carrier": "carrier-management.html",
