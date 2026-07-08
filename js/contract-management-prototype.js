@@ -227,6 +227,29 @@
       .replace(/"/g, "&quot;");
   }
 
+  function getOwningCompanyLabel() {
+    var engLabel = "工程技术公司";
+    var defaultProj = "龙源山西分公司";
+    try {
+      var kind = (sessionStorage.getItem("demoLoginOrgKind") || "").trim();
+      var company = (sessionStorage.getItem("demoLoginCompanyName") || "").trim();
+      if (kind === "project") return company || defaultProj;
+      if (kind === "eng") return engLabel;
+      var pageSub = "";
+      try {
+        pageSub = (new URLSearchParams(location.search || "").get("pageSub") || "").trim();
+        if (!pageSub) pageSub = (sessionStorage.getItem("pageSub") || "").trim();
+      } catch (ePageSub) {}
+      if (pageSub.indexOf("项目公司") >= 0) return company || defaultProj;
+    } catch (eKind) {}
+    return engLabel;
+  }
+
+  function syncCmOwningCompanyField() {
+    var el = document.getElementById("mOwningCompany");
+    if (el) el.value = getOwningCompanyLabel();
+  }
+
   function findLedgerRowBySpNo(no) {
     var n = String(no || "").trim();
     if (!n) return null;
@@ -783,6 +806,7 @@
           "<td>" + escapeHtml(purchaseListMergedCell(root)) + "</td>" +
           "<td>" + escapeHtml(purchaseListExecCell(root)) + "</td>" +
           "<td>" + escapeHtml(root.signed) + "</td>" +
+          "<td>" + escapeHtml(getOwningCompanyLabel()) + "</td>" +
           "<td>" + escapeHtml(root.dept) + "</td>" +
           "<td>" + escapeHtml(root.supplier) + "</td>" +
           "<td>" + escapeHtml(root.name) + "</td>" +
@@ -811,6 +835,7 @@
               "<td class='cm-indent'>" + escapeHtml(purchaseListMergedCell(ch)) + "</td>" +
               "<td class='cm-indent'>" + escapeHtml(purchaseListExecCell(ch)) + "</td>" +
               "<td>" + escapeHtml(ch.signed) + "</td>" +
+              "<td>" + escapeHtml(getOwningCompanyLabel()) + "</td>" +
               "<td>" + escapeHtml(ch.dept) + "</td>" +
               "<td>" + escapeHtml(ch.supplier) + "</td>" +
               "<td>" + escapeHtml(ch.name) + "</td>" +
@@ -833,7 +858,7 @@
       }
     });
 
-    tb.innerHTML = lines.join("") || "<tr><td colspan='17' class='cm-empty'>暂无数据</td></tr>";
+    tb.innerHTML = lines.join("") || "<tr><td colspan='18' class='cm-empty'>暂无数据</td></tr>";
     if (CTX.inlineEdit) applyContractInlineEditors();
   }
 
@@ -937,7 +962,7 @@
       ? "<div style='margin:8px 0'><button type='button' class='carrier-btn-add cm-btn-op' data-mat-add='" + row.id + "'>添加物资行</button></div>"
       : "";
     return (
-      "<tr class='cm-tr-material'><td colspan='24'>" +
+      "<tr class='cm-tr-material'><td colspan='25'>" +
       "<div style='padding:8px 12px;background:#fbfdff;border:1px dashed #d9e6f2;border-radius:8px'>" +
       "<div style='font-weight:600;color:#1f3551;margin-bottom:6px'>合同物资明细</div>" +
       addBtn +
@@ -1093,7 +1118,7 @@
     if (thead) {
       thead.innerHTML =
         t === "purchase"
-          ? "<tr><th rowspan='2' style='width:44px'></th><th colspan='10'>基础信息</th><th colspan='5'>签订信息</th><th rowspan='2' style='min-width:280px'>操作</th></tr><tr><th>框架协议号/常规合同编号</th><th>执行合同编号</th><th>签订时间</th><th>归属部门</th><th>供应商名称</th><th>合同名称</th><th>经办人</th><th>采购标包编号</th><th>采购标的类别</th><th>法务系统MDM编码</th><th>合同金额（万元） " + hint("框架协议，如有采购标包编号，则等于:采购流程-中标/成交金额。且可手动修改并备注修改原因。框架协议下的执行合同，与框架协议具有父子关系，且之和小等于框架协议。常规合同，如有采购标包编号，则等于:采购流程-中标/成交金额。且可手动修改并备注修改原因。") + "</th><th>付款方式</th><th>付款比例%</th><th>合同有效期</th><th>质保期</th></tr>"
+          ? "<tr><th rowspan='2' style='width:44px'></th><th colspan='11'>基础信息</th><th colspan='5'>签订信息</th><th rowspan='2' style='min-width:280px'>操作</th></tr><tr><th>框架协议号/常规合同编号</th><th>执行合同编号</th><th>签订时间</th><th>所属公司</th><th>归属部门</th><th>供应商名称</th><th>合同名称</th><th>经办人</th><th>采购标包编号</th><th>采购标的类别</th><th>法务系统MDM编码</th><th>合同金额（万元） " + hint("框架协议，如有采购标包编号，则等于:采购流程-中标/成交金额。且可手动修改并备注修改原因。框架协议下的执行合同，与框架协议具有父子关系，且之和小等于框架协议。常规合同，如有采购标包编号，则等于:采购流程-中标/成交金额。且可手动修改并备注修改原因。") + "</th><th>付款方式</th><th>付款比例%</th><th>合同有效期</th><th>质保期</th></tr>"
           : "<tr><th style='width:44px'></th><th>合同编号（XS-开头）</th><th>合同名称</th><th>合同类型</th><th>客户名称</th><th>相对方</th><th>签订时间</th><th>合同金额</th><th>已收款金额</th><th>剩余金额</th><th>付款方式</th><th>付款比例</th><th>合同有效期</th><th>质保期</th><th>收款时间</th><th>收款金额</th><th>收款进度</th><th>阶段号</th><th>物资名称</th><th>产品型号</th><th>销售数量</th><th>销售单价（含税）</th><th>税率</th><th>销售总价（含税）</th><th>关联订单号</th><th>备注</th><th style='min-width:220px'>操作</th></tr>";
     }
     refreshTable();
@@ -1299,6 +1324,7 @@
       "<div><label for='mCode'><span id='mCodeLabelText'>框架协议编码</span><span id='mCodeHintSlot'></span></label><input id='mCode' class='carrier-search' placeholder='请输入合同编码' /></div>" +
       "<div id='mExecCodeWrap' style='display:none'><label>执行合同编码 " + hint("与框架协议具有父子关系") + "</label><input id='mExecCode' class='carrier-search' placeholder='如：ZX-2026-001' /></div>" +
       "<div id='mDateWrap'><label>签订时间</label><input id='mDate' type='date' class='carrier-search' /></div>" +
+      "<div><label>所属公司</label><input id='mOwningCompany' class='carrier-search' readonly /></div>" +
       "<div><label>归属部门</label><select class='carrier-select' id='mDept'>" +
       "<option value=''>请选择归属部门</option>" +
       "<option>龙源电力集团股份有限公司本部</option>" +
@@ -1406,6 +1432,7 @@
       "<div class='carrier-table-wrap' style='max-height:220px;overflow-x:auto;overflow-y:auto'><table class='carrier-table' style='min-width:1200px'><thead><tr><th>产品名称</th><th>产品编码</th><th>产品型号</th><th>物资类别</th><th>物资类型名称</th><th>物资类型编码</th><th>采购单价(含税)</th><th>采购数量</th><th>税率%</th><th>备注</th><th>操作</th></tr></thead><tbody id='mMatBody'></tbody></table></div></div>";
 
     document.getElementById("cmModalEditBody").innerHTML = h;
+    syncCmOwningCompanyField();
     function cmBlankFinInRowHtml() {
       return (
         "<tr><td><input type='number' class='carrier-search' data-k='inAmt' step='0.01' placeholder='小等于合同总金额'/></td>" +
@@ -1869,6 +1896,7 @@
       syncMContractCodeLabel();
       syncAmtHint();
       syncMAmountLabelsAndExec();
+      syncCmOwningCompanyField();
     }
 
     function hydrateEditFormFromRow() {
@@ -1901,6 +1929,7 @@
         if (el) el.value = v == null ? "" : String(v);
       }
       setVal("mDate", row.signed);
+      syncCmOwningCompanyField();
       setVal("mDept", row.dept);
       var supDisp = String(row.supplier || "").trim();
       var rowHasSp = !!(String(row.spNo || "").trim());

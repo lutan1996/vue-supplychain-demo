@@ -1022,6 +1022,7 @@
               <thead>
                 <tr>
                   <th>申请单号</th>
+                  <th style="width:118px;">关联计划编号</th>
                   <th>申请部门</th>
                   <th>申请日期</th>
                   <th>拟报废物资名称及数量</th>
@@ -1073,6 +1074,26 @@
       </div>
         </div>
       <div class="modal-body" style="display:block;">
+        <div class="scrap-apply-note" style="margin-bottom:10px;">💡 报废计划审批通过后方可发起申请。请先关联本部门已批计划，再从计划内勾选拟报废物资。</div>
+        <div class="plan-meta" id="applyPlanMeta">
+          <div class="plan-meta-grid">
+            <div class="f span-2">
+              <label>关联报废计划 <span style="color:#cf1322;">*</span></label>
+              <select id="applyPlanSelect" style="width:100%;height:30px;border:1px solid #dbe6f3;border-radius:6px;padding:0 8px;font-size:12px;background:#fff;color:#334155;box-sizing:border-box;">
+                <option value="">请选择关联报废计划</option>
+              </select>
+            </div>
+            <div class="f"><label>计划年度</label><input id="applyPlanYearPreview" readonly value="—" /></div>
+            <div class="f"><label>计划部门</label><input id="applyPlanDeptPreview" readonly value="设备运维部" /></div>
+            <div class="f"><label>计划说明</label><input id="applyPlanRemarkPreview" readonly value="—" /></div>
+            <div class="f span-5" style="display:flex;align-items:flex-end;gap:8px;">
+              <button type="button" id="btnPickApplyPlanAssets" class="btn-sub" disabled style="font-size:12px;padding:4px 14px;height:30px;background:#e6f4ff;color:#1677ff;border:1px solid #91caff;border-radius:6px;cursor:pointer;font-weight:normal;white-space:nowrap;">
+                <i class="fa-solid fa-list-check"></i> 从计划选择物资
+              </button>
+              <span id="applyPlanPickHint" style="font-size:12px;color:#8ca0b8;line-height:30px;">选择计划后可勾选计划内剩余可申物资</span>
+            </div>
+          </div>
+        </div>
         <div id="applyPaperCard"></div>
         <div class="scrap-apply-note">提示:《废旧物资报废申请》签字后，由废旧物资鉴定部门进行报废鉴定，并出具鉴定报告，物资归口管理部门依据该申请及鉴定报告执行公司物资报废内部决策流程。</div>
         <div style="display:flex;align-items:center;justify-content:space-between;font-size:13px;font-weight:600;color:#1f3551;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid #e8eef7;">
@@ -1108,12 +1129,13 @@
           </div>
           <div id="applyDetailEmpty" style="text-align:center;color:#8ca0b8;padding:24px;font-size:13px;">暂无物资明细</div>
         </div>
-        <div id="applyDetailSummary" style="font-size:12px;color:#334155;margin-bottom:14px;padding:6px 10px;background:#f8fbff;border:1px solid #e6edf7;border-radius:6px;">
+          <div id="applyDetailSummary" style="font-size:12px;color:#334155;margin-bottom:14px;padding:6px 10px;background:#f8fbff;border:1px solid #e6edf7;border-radius:6px;">
           已选 <b id="applyDetailCount">0</b> 件物资，
           原值合计：<b id="applyDetailOriginSum">¥ 0.00</b>，
           折旧合计：<b id="applyDetailDepSum">¥ 0.00</b>，
           净值合计：<b id="applyDetailNetSum">¥ 0.00</b>
         </div>
+        <div id="applyDetailTrackBox" class="scrap-material-track-panel" style="display:none" hidden></div>
         </div>
       <div class="modal-footer">
         <button class="btn" id="btnCancel">取消</button>
@@ -1381,7 +1403,7 @@
   <script src="js/site-footer.js"></script>
   <script src="js/demo-product-catalog-data.js?v=20260701-product-code-seq"></script>
   <script src="js/demo-product-catalog-picker.js?v=20260701-product-code-seq"></script>
-  <script src="js/subpage-clock.js?v=20260705-flow-fix2"></script>
+  <script src="js/subpage-clock.js?v=20260708-sales-v1"></script>
   <script>
     (function () {
       var currentUser = "张明";
@@ -1517,6 +1539,7 @@
         },
         {
           applyNo: "TY20260312004",
+          planNo: "BF-2025-016",
           applyDept: "设备运维部",
           applyDate: "2026-03-12",
           assetNameQty: "主控柜 x 1",
@@ -1531,7 +1554,8 @@
           archiveRecord: "已存档，归档编号 BF-2026-003-AR，陈洁（电子签）",
           status: "approved",
           originValue: 210000,
-          netValue: 0
+          netValue: 0,
+          applyItems: [{ id: "GD-2022-064", qty: 1 }]
         },
         {
           applyNo: "TY20260308005",
@@ -2239,7 +2263,7 @@
       function render(rows) {
         refs.tbody.innerHTML = "";
         if (!rows.length) {
-          refs.tbody.innerHTML = '<tr><td colspan="15" style="text-align:center;color:#8ca0b8;padding:24px;">暂无数据</td></tr>';
+          refs.tbody.innerHTML = '<tr><td colspan="16" style="text-align:center;color:#8ca0b8;padding:24px;">暂无数据</td></tr>';
           refs.total.textContent = "共 0 条";
           return;
         }
@@ -2255,6 +2279,7 @@
           tr.setAttribute("data-apply-no", x.applyNo);
           tr.innerHTML =
             "<td>" + x.applyNo + "</td>" +
+            "<td>" + (x.planNo ? ('<a href="#" class="apply-plan-link" data-plan-no="' + escHtml(x.planNo) + '" style="color:#1677ff;">' + escHtml(x.planNo) + "</a>") : "—") + "</td>" +
             "<td>" + (x.applyDept || "-") + "</td>" +
             "<td>" + x.applyDate + "</td>" +
             "<td>" + (x.assetNameQty || "-") + "</td>" +
@@ -2289,9 +2314,151 @@
       }
 
       var applyDetailRows = [];
+      var applyLinkedPlanNo = "";
+
+      function getApprovedPlansForDept(dept) {
+        return planRecords.filter(function (p) {
+          return p.status === "approved" && p.dept === (dept || currentDept);
+        });
+      }
+
+      function applyLinkedPlan() {
+        if (!applyLinkedPlanNo) return null;
+        return planRecords.find(function (p) { return p.planNo === applyLinkedPlanNo; }) || null;
+      }
+
+      function getPlanAssetAppliedQty(planNo, assetId) {
+        var used = 0;
+        applications.forEach(function (app) {
+          if (app.planNo !== planNo || app.status === "rejected") return;
+          (app.applyItems || []).forEach(function (row) {
+            if (row.id === assetId) used += Number(row.qty) || 0;
+          });
+        });
+        return used;
+      }
+
+      function getPlanAssetRemainingQty(plan, assetId) {
+        if (!plan) return 0;
+        var planQty = (plan.assetQty && plan.assetQty[assetId]) || 1;
+        return Math.max(0, planQty - getPlanAssetAppliedQty(plan.planNo, assetId));
+      }
+
+      function refreshApplyPlanMeta() {
+        var plan = applyLinkedPlan();
+        var yearEl = document.getElementById("applyPlanYearPreview");
+        var deptEl = document.getElementById("applyPlanDeptPreview");
+        var remarkEl = document.getElementById("applyPlanRemarkPreview");
+        var pickBtn = document.getElementById("btnPickApplyPlanAssets");
+        var hintEl = document.getElementById("applyPlanPickHint");
+        if (yearEl) yearEl.value = plan ? plan.year : "—";
+        if (deptEl) deptEl.value = plan ? plan.dept : currentDept;
+        if (remarkEl) remarkEl.value = plan ? (plan.remark || "—") : "—";
+        if (pickBtn) pickBtn.disabled = !plan;
+        if (hintEl) {
+          if (!plan) hintEl.textContent = "选择计划后可勾选计划内剩余可申物资";
+          else {
+            var remain = (plan.assetIds || []).filter(function (id) { return getPlanAssetRemainingQty(plan, id) > 0; }).length;
+            hintEl.textContent = remain ? ("计划内剩余 " + remain + " 项物资可申请") : "该计划内物资已全部申请完毕";
+          }
+        }
+      }
+
+      function populateApplyPlanSelect() {
+        var sel = document.getElementById("applyPlanSelect");
+        if (!sel) return;
+        var plans = getApprovedPlansForDept(currentDept);
+        sel.innerHTML = '<option value="">请选择关联报废计划</option>' +
+          plans.map(function (p) {
+            var remain = (p.assetIds || []).filter(function (id) { return getPlanAssetRemainingQty(p, id) > 0; }).length;
+            var label = p.planNo + "（" + p.year + "年 · 剩余" + remain + "项可申）";
+            return '<option value="' + escHtml(p.planNo) + '">' + escHtml(label) + "</option>";
+          }).join("");
+        sel.value = applyLinkedPlanNo || "";
+        refreshApplyPlanMeta();
+      }
+
+      function onApplyPlanChange() {
+        var sel = document.getElementById("applyPlanSelect");
+        applyLinkedPlanNo = sel ? String(sel.value || "").trim() : "";
+        applyDetailRows = [];
+        hideScrapMaterialTrackPanel("applyDetailTrackBox");
+        refreshApplyPlanMeta();
+        refreshApplyDetailTable();
+      }
+
+      function applyRowFromAsset(asset, plan, qty) {
+        var dep = (Number(asset.origin) || 0) - (Number(asset.net) || 0);
+        var reason = (plan && plan.assetReasons && plan.assetReasons[asset.id]) || "";
+        var maxQty = plan ? getPlanAssetRemainingQty(plan, asset.id) : 1;
+        return {
+          id: asset.id,
+          code: asset.productCode || asset.id,
+          name: asset.name,
+          manufacturer: asset.manufacturer,
+          model: asset.model,
+          typeCode: assetTypeCode(asset),
+          category: assetCategory(asset),
+          unit: asset.unit || "台",
+          origin: asset.origin,
+          dep: dep,
+          net: asset.net,
+          qty: qty || Math.min(1, maxQty),
+          maxQty: maxQty,
+          reason: reason,
+          purchaseDate: asset.purchaseDate
+        };
+      }
+
+      function openApplyPlanAssetPick() {
+        var plan = applyLinkedPlan();
+        if (!plan) {
+          alert("请先选择已审批通过的报废计划。");
+          return;
+        }
+        var remainCount = (plan.assetIds || []).filter(function (id) { return getPlanAssetRemainingQty(plan, id) > 0; }).length;
+        if (!remainCount) {
+          alert("该计划内物资已全部申请完毕，请选择其他计划。");
+          return;
+        }
+        PAP.pickMode = "apply";
+        PAP.treeNodeId = "";
+        PAP.search = "";
+        PAP.page = 1;
+        PAP.pendingSelected = {};
+        applyDetailRows.forEach(function (r) { PAP.pendingSelected[r.id] = true; });
+        var titleEl = document.getElementById("planAssetPickTitle");
+        if (titleEl) titleEl.textContent = "从计划选择物资（" + plan.planNo + "）";
+        var searchEl = document.getElementById("planAssetPickSearch");
+        if (searchEl) searchEl.value = "";
+        papRenderTree();
+        papRenderTable();
+        var mask = document.getElementById("planAssetPickMask");
+        if (mask) {
+          mask.classList.add("show");
+          mask.setAttribute("aria-hidden", "false");
+        }
+      }
+
+      function confirmApplyPickItems() {
+        var plan = applyLinkedPlan();
+        if (!plan) return;
+        Object.keys(PAP.pendingSelected || {}).forEach(function (id) {
+          if (applyDetailRows.some(function (r) { return r.id === id; })) return;
+          var asset = savePlanAssetLookup(planAssetLookup(id) || planAssets.find(function (a) { return a.id === id; }) || null);
+          if (!asset) return;
+          var remain = getPlanAssetRemainingQty(plan, id);
+          if (remain <= 0) return;
+          applyDetailRows.push(applyRowFromAsset(asset, plan, Math.min(1, remain)));
+        });
+        closePlanAssetPick();
+        refreshApplyDetailTable();
+      }
 
       function refreshApplyDetailTable() {
         var body = refs.applyDetailBody;
+        if (!body) return;
+        hideScrapMaterialTrackPanel("applyDetailTrackBox");
         body.innerHTML = "";
         var total = 0, oSum = 0, dSum = 0, nSum = 0;
         applyDetailRows.forEach(function (row, idx) {
@@ -2314,10 +2481,27 @@
             '<td style="padding:8px 10px;border-bottom:1px solid #f0f2f5;text-align:right;">' + fmtWan(nSumForRow(row)) + '</td>' +
             '<td style="padding:8px 10px;border-bottom:1px solid #f0f2f5;text-align:center;">' + escHtml(row.purchaseDate || "-") + '</td>' +
             '<td style="padding:8px 10px;border-bottom:1px solid #f0f2f5;"><textarea class="ap-reason" data-idx="' + idx + '" rows="2" placeholder="填写报废原因" style="width:100%;height:40px;border:1px solid #d7e1ee;border-radius:6px;padding:4px 8px;resize:vertical;">' + escHtml(row.reason || "") + '</textarea></td>' +
-            '<td style="padding:8px 10px;border-bottom:1px solid #f0f2f5;text-align:center;"><a href="#" class="ap-del" data-idx="' + idx + '" style="color:#cf1322;font-size:12px;">移除</a></td>';
+            '<td style="padding:8px 10px;border-bottom:1px solid #f0f2f5;text-align:center;">' +
+              '<div class="plan-item-ops" style="justify-content:center;">' +
+                '<a href="#" class="ap-del" data-idx="' + idx + '" style="color:#cf1322;font-size:12px;">移除</a>' +
+                '<span class="ops-sep">|</span>' +
+                '<a href="#" class="ap-track" data-map-keep-op="1" data-id="' + escHtml(row.id) + '" style="font-size:12px;">物资跟踪</a>' +
+              '</div>' +
+            '</td>';
           body.appendChild(tr);
         });
         refs.applyDetailEmpty.style.display = applyDetailRows.length ? "none" : "block";
+        updateApplyDetailSummary();
+      }
+
+      function updateApplyDetailSummary() {
+        var oSum = 0, dSum = 0, nSum = 0, total = 0;
+        applyDetailRows.forEach(function (row) {
+          total += Number(row.qty) || 0;
+          oSum += (Number(row.origin) || 0) * (Number(row.qty) || 1);
+          dSum += (Number(row.dep) || 0) * (Number(row.qty) || 1);
+          nSum += (Number(row.net) || 0) * (Number(row.qty) || 1);
+        });
         refs.applyDetailCount.textContent = String(total);
         refs.applyDetailOriginSum.textContent = "¥ " + fmtMoney(oSum);
         refs.applyDetailDepSum.textContent = "¥ " + fmtMoney(dSum);
@@ -2336,25 +2520,9 @@
 
       function openApplyModal() {
         window.__scrapApplyAttachments = [];
-        applyDetailRows = demoPlanAssets().map(function (a) {
-          var dep = a.origin - a.net;
-          return {
-            id: a.id,
-            code: a.productCode,
-            name: a.name,
-            manufacturer: a.manufacturer,
-            model: a.model,
-            typeCode: a.typeCode,
-            category: a.category,
-            unit: a.unit || "台",
-            origin: a.origin,
-            dep: dep,
-            net: a.net,
-            qty: 1,
-            reason: "设备老化，故障频发，拟报废处理。",
-            purchaseDate: a.purchaseDate
-          };
-        });
+        applyLinkedPlanNo = "";
+        applyDetailRows = [];
+        populateApplyPlanSelect();
         var paper = document.getElementById("applyPaperCard");
         if (paper) paper.innerHTML = renderApplyEditorCard(applyFormDefaults()) + '<div id="applyPrintCard" class="scrap-paper-print">' + renderScrapPaperCard(applyFormDefaults(), { readOnly: true, actions: false }) + '</div>';
         syncApplyPrintCard();
@@ -2364,11 +2532,55 @@
       }
 
       function closeApplyModal() {
+        applyLinkedPlanNo = "";
+        hideScrapMaterialTrackPanel("applyDetailTrackBox");
         refs.applyModalMask.classList.remove("show");
         refs.applyModalMask.setAttribute("aria-hidden", "true");
       }
 
       refs.btnCreate.addEventListener("click", openApplyModal);
+      var applyPlanSelectEl = document.getElementById("applyPlanSelect");
+      if (applyPlanSelectEl) applyPlanSelectEl.addEventListener("change", onApplyPlanChange);
+      var btnPickApplyPlanAssets = document.getElementById("btnPickApplyPlanAssets");
+      if (btnPickApplyPlanAssets) btnPickApplyPlanAssets.addEventListener("click", openApplyPlanAssetPick);
+      if (refs.applyDetailBody) {
+        refs.applyDetailBody.addEventListener("click", function (e) {
+          var del = e.target.closest(".ap-del");
+          if (del) {
+            e.preventDefault();
+            var idx = parseInt(del.getAttribute("data-idx"), 10);
+            if (!isNaN(idx)) {
+              applyDetailRows.splice(idx, 1);
+              refreshApplyDetailTable();
+            }
+            return;
+          }
+          var track = e.target.closest(".ap-track");
+          if (track) {
+            e.preventDefault();
+            var assetId = track.getAttribute("data-id");
+            var asset = savePlanAssetLookup(planAssetLookup(assetId) || planAssets.find(function (a) { return a.id === assetId; }) || null);
+            if (asset) showScrapMaterialTrackPanel("applyDetailTrackBox", asset);
+          }
+        });
+        refs.applyDetailBody.addEventListener("change", function (e) {
+          var qtyInp = e.target.closest(".ap-qty");
+          if (qtyInp) {
+            var idx = parseInt(qtyInp.getAttribute("data-idx"), 10);
+            if (!isNaN(idx) && applyDetailRows[idx]) {
+              applyDetailRows[idx].qty = qtyInp.value;
+              updateApplyDetailSummary();
+            }
+          }
+        });
+        refs.applyDetailBody.addEventListener("input", function (e) {
+          var reasonInp = e.target.closest(".ap-reason");
+          if (reasonInp) {
+            var idx2 = parseInt(reasonInp.getAttribute("data-idx"), 10);
+            if (!isNaN(idx2) && applyDetailRows[idx2]) applyDetailRows[idx2].reason = reasonInp.value;
+          }
+        });
+      }
       refs.btnCloseModal.addEventListener("click", closeApplyModal);
       refs.btnCancel.addEventListener("click", closeApplyModal);
       refs.applyModalMask.addEventListener("click", function (e) {
@@ -2526,8 +2738,22 @@
         });
       });
       refs.btnSubmit.addEventListener("click", function () {
+        if (!applyLinkedPlanNo) {
+          alert("请先选择关联的报废计划。");
+          return;
+        }
         if (!applyDetailRows.length) {
-          alert("请至少添加一条报废物资。");
+          alert("请从计划中选择至少一条报废物资。");
+          return;
+        }
+        var plan = applyLinkedPlan();
+        var qtyInvalid = applyDetailRows.some(function (r) {
+          var qty = Number(r.qty) || 0;
+          var maxQty = plan ? getPlanAssetRemainingQty(plan, r.id) : (r.maxQty || 999);
+          return qty < 1 || qty > maxQty;
+        });
+        if (qtyInvalid) {
+          alert("物资数量超出计划剩余可申请数量，请核对后重试。");
           return;
         }
         var date = (document.getElementById("applyDate") || {}).value || new Date().toISOString().slice(0, 10);
@@ -2540,6 +2766,7 @@
         });
         applications.unshift({
           applyNo: genApplyNo(),
+          planNo: applyLinkedPlanNo,
           applyDept: ((document.getElementById("applyDept") || {}).value || "设备运维部").trim(),
           applyDate: date,
           assetNameQty: nameQtyParts.join("；"),
@@ -2563,6 +2790,13 @@
       });
 
       refs.tbody.addEventListener("click", function (e) {
+        var planLink = e.target.closest(".apply-plan-link");
+        if (planLink) {
+          e.preventDefault();
+          var planNo = planLink.getAttribute("data-plan-no");
+          if (planNo) openPlanDetail(planNo);
+          return;
+        }
         var a = e.target.closest("a[data-action]");
         if (!a) return;
         e.preventDefault();
@@ -2862,7 +3096,8 @@
         search: "",
         page: 1,
         pageSize: 20,
-        pendingSelected: {}
+        pendingSelected: {},
+        pickMode: "plan"
       };
 
       // 物资分类树数据（与planAssets.type对应）
@@ -2900,8 +3135,20 @@
       function papFilteredRows() {
         var q = String(PAP.search || "").trim().toLowerCase();
         var typeFilter = PAP.treeNodeId && PAP.treeNodeId !== "all" ? PAP.treeNodeId : "";
+        var plan = PAP.pickMode === "apply" ? applyLinkedPlan() : null;
+        var allowedIds = null;
+        if (plan) {
+          allowedIds = {};
+          (plan.assetIds || []).forEach(function (id) {
+            if (getPlanAssetRemainingQty(plan, id) > 0) allowedIds[id] = true;
+          });
+        }
         return planAssets.filter(function (a) {
-          if (a.dept !== currentDept) return false;
+          if (plan) {
+            if (!allowedIds[a.id]) return false;
+          } else if (a.dept !== currentDept) {
+            return false;
+          }
           if (typeFilter && a.type !== typeFilter) return false;
           if (!q) return true;
           return a.id.toLowerCase().indexOf(q) >= 0 || a.name.toLowerCase().indexOf(q) >= 0 || (a.manufacturer || "").toLowerCase().indexOf(q) >= 0;
@@ -3034,8 +3281,21 @@
         var mask = document.getElementById("demoPdPickerMask");
         if (mask) mask.style.zIndex = "10060";
       }
-      function closePlanAssetPick() { document.getElementById("planAssetPickMask").classList.remove("show"); }
+      function closePlanAssetPick() {
+        var mask = document.getElementById("planAssetPickMask");
+        if (mask) {
+          mask.classList.remove("show");
+          mask.setAttribute("aria-hidden", "true");
+        }
+        PAP.pickMode = "plan";
+        var titleEl = document.getElementById("planAssetPickTitle");
+        if (titleEl) titleEl.textContent = "选择报废物资";
+      }
       function confirmPickItems() {
+        if (PAP.pickMode === "apply") {
+          confirmApplyPickItems();
+          return;
+        }
         var ids = Object.keys(PAP.pendingSelected);
         ids.forEach(function (id) {
           if (!planItems.some(function (item) { return item.id === id; })) {

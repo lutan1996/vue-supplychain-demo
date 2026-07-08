@@ -6,6 +6,7 @@
   <title>采购合同报表管理</title>
   <link rel="stylesheet" href="css/subpage-base.css" />
   <link rel="stylesheet" href="css/source-navbar-header.css" />
+  <link rel="stylesheet" href="css/role-hint-banner.css" />
   <style>
     .subpage-panel{padding:10px 12px 12px;background:#f5f6f8}
     .ps-toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:8px}
@@ -78,7 +79,7 @@
         <div class="subpage-panel">
           <div style="margin-bottom:10px;padding:10px 12px;background:#fff;border:1px solid #dde3ea;border-radius:6px;">
             <div style="font-size:16px;font-weight:600;color:#1f3551;">采购合同报表管理</div>
-            <div style="margin-top:4px;font-size:12px;color:#64748b;">按采购合同维度统计执行情况，供物资采购模块查看合同履约与执行进度。</div>
+            <div class="role-hint-banner role-hint-banner--inline" id="psSceneHint">当前登录主体：工程技术公司。以下统计图与报表列表仅展示本公司采购合同数据。</div>
           </div>
           <div class="ps-tabs"><button type="button" class="ps-tab is-active" data-ps-tab="charts">统计图</button><button type="button" class="ps-tab" data-ps-tab="list">报表列表</button></div>
           <section class="ps-pane is-active" data-ps-pane="charts">
@@ -139,23 +140,90 @@
     </div>
   </div>
   <script src="js/sidebar-actions.js"></script><script src="js/subpage-feature-title.js"></script><script src="js/site-footer.js"></script>
-<script src="js/subpage-clock.js?v=20260616-contract-report-fix-v2"></script>
+<script src="js/subpage-clock.js?v=20260708-sales-v1"></script>
+  <script>
+    (function removeLegacyGrayDesc() {
+      function sweep() {
+        var legacy = document.getElementById("psPageDesc");
+        if (legacy) legacy.remove();
+        var panel = document.querySelector(".subpage-panel");
+        if (!panel) return;
+        panel.querySelectorAll("div").forEach(function (el) {
+          if (el.id === "psSceneHint") return;
+          var txt = String(el.textContent || "").replace(/\s+/g, "");
+          if (!txt) return;
+          if (txt.indexOf("合并展示工程技术公司与项目公司采购合同报表") < 0) return;
+          var st = el.getAttribute("style") || "";
+          if (st.indexOf("64748b") >= 0 || el.classList.contains("role-hint-banner")) {
+            if (!el.classList.contains("role-hint-banner")) el.remove();
+          }
+        });
+      }
+      sweep();
+      document.addEventListener("DOMContentLoaded", sweep);
+      setTimeout(sweep, 0);
+      setTimeout(sweep, 120);
+    })();
+  </script>
   <script>
     const reportRows = [
-      { orderNo:"ORD2026001", planNo:"CGJH-2026-001", dept:"经营发展中心", contractNo:"CG-KJ-2026-301", execNo:"CG-ZX-2026-001", contractName:"联合动力齿轮箱年度框架协议", supplier:"联合动力", progress:"41%", totalAmount:380.00, executedAmount:156.00, remainingAmount:224.00, signDate:"2026-01-20", term:"2026-01-20 ~ 2026-12-31", status:"部分执行", contractType:"框架协议" },
-      { orderNo:"ORD2026002", planNo:"CGJH-2026-002", dept:"经营发展中心", contractNo:"CG-KJ-2026-302", execNo:"CG-ZX-2026-002", contractName:"东方电气发电机组采购框架协议", supplier:"东方电气", progress:"33%", totalAmount:260.00, executedAmount:86.00, remainingAmount:174.00, signDate:"2026-02-05", term:"2026-02-05 ~ 2026-11-30", status:"部分执行", contractType:"框架协议" },
-      { orderNo:"ORD2026003", planNo:"CGJH-2026-003", dept:"设备管理部", contractNo:"CG-KJ-2026-303", execNo:"CG-ZX-2026-003", contractName:"金风科技塔筒组件框架协议", supplier:"金风科技", progress:"29%", totalAmount:520.00, executedAmount:152.00, remainingAmount:368.00, signDate:"2026-01-28", term:"2026-01-28 ~ 2026-12-31", status:"部分执行", contractType:"框架协议" },
-      { orderNo:"ORD2026004", planNo:"CGJH-2026-004", dept:"设备管理部", contractNo:"CG-CG-2026-304", execNo:"CG-ZX-2026-004", contractName:"明阳智能主轴总成常规合同", supplier:"明阳智能", progress:"0%", totalAmount:118.00, executedAmount:0, remainingAmount:118.00, signDate:"2026-03-02", term:"2026-03-02 ~ 2026-08-31", status:"未执行", contractType:"常规合同" },
-      { orderNo:"ORD2026005", planNo:"CGJH-2026-005", dept:"生产运维部", contractNo:"CG-CG-2026-305", execNo:"CG-ZX-2026-005", contractName:"联合动力液压站常规合同", supplier:"联合动力", progress:"63%", totalAmount:96.00, executedAmount:60.00, remainingAmount:36.00, signDate:"2026-02-18", term:"2026-02-18 ~ 2026-09-30", status:"部分执行", contractType:"常规合同" },
-      { orderNo:"ORD2026006", planNo:"CGJH-2026-006", dept:"生产运维部", contractNo:"CG-CG-2026-306", execNo:"CG-ZX-2026-006", contractName:"远景能源变流柜采购合同", supplier:"远景能源", progress:"31%", totalAmount:144.00, executedAmount:45.00, remainingAmount:99.00, signDate:"2026-03-12", term:"2026-03-12 ~ 2026-10-31", status:"部分执行", contractType:"常规合同" },
-      { orderNo:"ORD2026007", planNo:"CGJH-2026-007", dept:"经营发展中心", contractNo:"CG-KJ-2026-307", execNo:"CG-ZX-2026-007", contractName:"运达股份叶片组件框架协议", supplier:"运达股份", progress:"100%", totalAmount:72.00, executedAmount:72.00, remainingAmount:0, signDate:"2026-01-15", term:"2026-01-15 ~ 2026-07-31", status:"已执行", contractType:"框架协议" },
-      { orderNo:"ORD2026008", planNo:"CGJH-2026-008", dept:"设备管理部", contractNo:"CG-KJ-2026-308", execNo:"CG-ZX-2026-008", contractName:"三一重能偏航系统框架协议", supplier:"三一重能", progress:"12%", totalAmount:208.00, executedAmount:25.00, remainingAmount:183.00, signDate:"2026-02-22", term:"2026-02-22 ~ 2026-12-15", status:"部分执行", contractType:"框架协议" },
-      { orderNo:"ORD2026009", planNo:"CGJH-2026-009", dept:"生产运维部", contractNo:"CG-CG-2026-309", execNo:"CG-ZX-2026-009", contractName:"海装风电变桨系统采购合同", supplier:"海装风电", progress:"18%", totalAmount:126.00, executedAmount:22.00, remainingAmount:104.00, signDate:"2026-03-08", term:"2026-03-08 ~ 2026-09-15", status:"部分执行", contractType:"常规合同" },
-      { orderNo:"ORD2026010", planNo:"CGJH-2026-010", dept:"经营发展中心", contractNo:"CG-KJ-2026-310", execNo:"CG-ZX-2026-010", contractName:"上海电气法兰连接件框架协议", supplier:"上海电气", progress:"80%", totalAmount:88.00, executedAmount:70.00, remainingAmount:18.00, signDate:"2026-01-30", term:"2026-01-30 ~ 2026-10-31", status:"部分执行", contractType:"框架协议" }
+      { orderNo:"ORD2026001", planNo:"CGJH-2026-001", dept:"经营发展中心", owningCompany:"工程技术公司", contractNo:"CG-KJ-2026-301", execNo:"CG-ZX-2026-001", contractName:"联合动力齿轮箱年度框架协议", supplier:"联合动力", progress:"41%", totalAmount:380.00, executedAmount:156.00, remainingAmount:224.00, signDate:"2026-01-20", term:"2026-01-20 ~ 2026-12-31", status:"部分执行", contractType:"框架协议" },
+      { orderNo:"ORD2026002", planNo:"CGJH-2026-002", dept:"经营发展中心", owningCompany:"工程技术公司", contractNo:"CG-KJ-2026-302", execNo:"CG-ZX-2026-002", contractName:"东方电气发电机组采购框架协议", supplier:"东方电气", progress:"33%", totalAmount:260.00, executedAmount:86.00, remainingAmount:174.00, signDate:"2026-02-05", term:"2026-02-05 ~ 2026-11-30", status:"部分执行", contractType:"框架协议" },
+      { orderNo:"ORD2026003", planNo:"CGJH-2026-003", dept:"设备管理部", owningCompany:"工程技术公司", contractNo:"CG-KJ-2026-303", execNo:"CG-ZX-2026-003", contractName:"金风科技塔筒组件框架协议", supplier:"金风科技", progress:"29%", totalAmount:520.00, executedAmount:152.00, remainingAmount:368.00, signDate:"2026-01-28", term:"2026-01-28 ~ 2026-12-31", status:"部分执行", contractType:"框架协议" },
+      { orderNo:"ORD2026004", planNo:"CGJH-2026-004", dept:"设备管理部", owningCompany:"工程技术公司", contractNo:"CG-CG-2026-304", execNo:"CG-ZX-2026-004", contractName:"明阳智能主轴总成常规合同", supplier:"明阳智能", progress:"0%", totalAmount:118.00, executedAmount:0, remainingAmount:118.00, signDate:"2026-03-02", term:"2026-03-02 ~ 2026-08-31", status:"未执行", contractType:"常规合同" },
+      { orderNo:"ORD2026005", planNo:"CGJH-2026-005", dept:"生产运维部", owningCompany:"工程技术公司", contractNo:"CG-CG-2026-305", execNo:"CG-ZX-2026-005", contractName:"联合动力液压站常规合同", supplier:"联合动力", progress:"63%", totalAmount:96.00, executedAmount:60.00, remainingAmount:36.00, signDate:"2026-02-18", term:"2026-02-18 ~ 2026-09-30", status:"部分执行", contractType:"常规合同" },
+      { orderNo:"ORD2026006", planNo:"CGJH-2026-006", dept:"生产运维部", owningCompany:"工程技术公司", contractNo:"CG-CG-2026-306", execNo:"CG-ZX-2026-006", contractName:"远景能源变流柜采购合同", supplier:"远景能源", progress:"31%", totalAmount:144.00, executedAmount:45.00, remainingAmount:99.00, signDate:"2026-03-12", term:"2026-03-12 ~ 2026-10-31", status:"部分执行", contractType:"常规合同" },
+      { orderNo:"ORD2026007", planNo:"CGJH-2026-007", dept:"经营发展中心", owningCompany:"工程技术公司", contractNo:"CG-KJ-2026-307", execNo:"CG-ZX-2026-007", contractName:"运达股份叶片组件框架协议", supplier:"运达股份", progress:"100%", totalAmount:72.00, executedAmount:72.00, remainingAmount:0, signDate:"2026-01-15", term:"2026-01-15 ~ 2026-07-31", status:"已执行", contractType:"框架协议" },
+      { orderNo:"ORD2026008", planNo:"CGJH-2026-008", dept:"设备管理部", owningCompany:"工程技术公司", contractNo:"CG-KJ-2026-308", execNo:"CG-ZX-2026-008", contractName:"三一重能偏航系统框架协议", supplier:"三一重能", progress:"12%", totalAmount:208.00, executedAmount:25.00, remainingAmount:183.00, signDate:"2026-02-22", term:"2026-02-22 ~ 2026-12-15", status:"部分执行", contractType:"框架协议" },
+      { orderNo:"ORD2026009", planNo:"CGJH-2026-009", dept:"生产运维部", owningCompany:"工程技术公司", contractNo:"CG-CG-2026-309", execNo:"CG-ZX-2026-009", contractName:"海装风电变桨系统采购合同", supplier:"海装风电", progress:"18%", totalAmount:126.00, executedAmount:22.00, remainingAmount:104.00, signDate:"2026-03-08", term:"2026-03-08 ~ 2026-09-15", status:"部分执行", contractType:"常规合同" },
+      { orderNo:"ORD2026010", planNo:"CGJH-2026-010", dept:"经营发展中心", owningCompany:"工程技术公司", contractNo:"CG-KJ-2026-310", execNo:"CG-ZX-2026-010", contractName:"上海电气法兰连接件框架协议", supplier:"上海电气", progress:"80%", totalAmount:88.00, executedAmount:70.00, remainingAmount:18.00, signDate:"2026-01-30", term:"2026-01-30 ~ 2026-10-31", status:"部分执行", contractType:"框架协议" },
+      { orderNo:"ORD2026101", planNo:"XMJH-2026-001", dept:"物资管理部", owningCompany:"龙源山西分公司", contractNo:"XM-KJ-2026-101", execNo:"XM-ZX-2026-101", contractName:"山西片区电缆采购框架协议", supplier:"亨通光电", progress:"46%", totalAmount:168.00, executedAmount:77.00, remainingAmount:91.00, signDate:"2026-02-10", term:"2026-02-10 ~ 2026-12-31", status:"部分执行", contractType:"框架协议" },
+      { orderNo:"ORD2026102", planNo:"XMJH-2026-002", dept:"物资管理部", owningCompany:"龙源山西分公司", contractNo:"XM-CG-2026-102", execNo:"XM-ZX-2026-102", contractName:"大同风电场备品备件采购合同", supplier:"远景能源", progress:"22%", totalAmount:92.00, executedAmount:20.00, remainingAmount:72.00, signDate:"2026-03-05", term:"2026-03-05 ~ 2026-10-31", status:"部分执行", contractType:"常规合同" },
+      { orderNo:"ORD2026103", planNo:"XMJH-2026-003", dept:"项目公司支持部", owningCompany:"龙源山西分公司", contractNo:"XM-CG-2026-103", execNo:"XM-ZX-2026-103", contractName:"忻州片区检修物资采购合同", supplier:"金风科技", progress:"0%", totalAmount:54.00, executedAmount:0, remainingAmount:54.00, signDate:"2026-03-18", term:"2026-03-18 ~ 2026-09-30", status:"未执行", contractType:"常规合同" },
+      { orderNo:"ORD2026104", planNo:"XMJH-2026-004", dept:"物资管理部", owningCompany:"龙源山西分公司", contractNo:"XM-KJ-2026-104", execNo:"XM-ZX-2026-104", contractName:"山西片区安全工器具框架协议", supplier:"中材科技", progress:"100%", totalAmount:36.00, executedAmount:36.00, remainingAmount:0, signDate:"2026-01-25", term:"2026-01-25 ~ 2026-08-31", status:"已执行", contractType:"框架协议" }
     ];
+
+    function getOwningCompanyLabel() {
+      var engLabel = "工程技术公司";
+      var defaultProj = "龙源山西分公司";
+      try {
+        var kind = (sessionStorage.getItem("demoLoginOrgKind") || "").trim();
+        var company = (sessionStorage.getItem("demoLoginCompanyName") || "").trim();
+        if (kind === "project") return company || defaultProj;
+        if (kind === "eng") return engLabel;
+        var pageSub = "";
+        try {
+          pageSub = (new URLSearchParams(location.search || "").get("pageSub") || "").trim();
+          if (!pageSub) pageSub = (sessionStorage.getItem("pageSub") || "").trim();
+        } catch (ePageSub) {}
+        if (pageSub.indexOf("项目公司") >= 0) return company || defaultProj;
+      } catch (eKind) {}
+      return engLabel;
+    }
+
+    function applySceneFilter(rows) {
+      var company = getOwningCompanyLabel();
+      return rows.filter(function (r) {
+        return (r.owningCompany || "工程技术公司") === company;
+      });
+    }
+
+    function updateSceneHint() {
+      var el = document.getElementById("psSceneHint");
+      if (!el) return;
+      var company = getOwningCompanyLabel();
+      el.textContent =
+        "当前登录主体：" +
+        company +
+        "。以下统计图与报表列表仅展示本公司采购合同数据。";
+    }
 
     function renderRows(rows){
       const tbody = document.getElementById("reportBody");
+      if (!rows.length) {
+        tbody.innerHTML = '<tr><td colspan="13" style="padding:24px;color:#8c8c8c;">暂无本公司采购合同报表数据</td></tr>';
+        return;
+      }
       function renderStatusTag(status){
         var txt = String(status || "");
         var cls = "ps-acc-tag ps-acc-pending";
@@ -277,8 +345,14 @@
         return '<div class="ps-top-item"><span>'+x.name+'</span><span class="ps-top-track"><span class="ps-top-bar" style="width:'+w+'%"></span></span><b>'+x.val+'</b></div>';
       }).join("");
     }
-    renderRows(reportRows);
-    renderAnalytics(reportRows);
+    function refreshAll() {
+      var rows = applySceneFilter(reportRows);
+      updateSceneHint();
+      renderRows(rows);
+      renderAnalytics(rows);
+    }
+
+    refreshAll();
 
     document.querySelectorAll("[data-ps-tab]").forEach(function(btn){
       btn.addEventListener("click", function(){
@@ -293,19 +367,25 @@
     });
 
     document.getElementById("btnQuery").addEventListener("click", function () {
-      alert("已按筛选条件更新报表（演示）");
+      refreshAll();
     });
     document.getElementById("btnReset").addEventListener("click", function () {
       document.getElementById("year").selectedIndex = 0;
       document.getElementById("supplier").selectedIndex = 0;
       document.getElementById("cat").selectedIndex = 0;
-      alert("已重置筛选条件（演示）");
+      refreshAll();
     });
     document.getElementById("btnExport").addEventListener("click", function () {
       alert("已导出采购合同报表 Excel（演示）");
     });
     (function () {
       var label = new URLSearchParams(location.search || "").get("pageSub") || "";
+      if (!label) {
+        try {
+          var stored = sessionStorage.getItem("pageSub") || "";
+          if (stored === "项目公司采购合同报表管理") label = stored;
+        } catch (eStorage) {}
+      }
       if (!label) return;
       var segs = document.querySelectorAll(".subpage-breadcrumb a, .subpage-breadcrumb span:not(.sep)");
       if (segs.length) segs[segs.length - 1].textContent = label;

@@ -8,19 +8,39 @@
   <link rel="stylesheet" href="css/subpage-base.css" />
   <link rel="stylesheet" href="css/carrier-management.css" />
   <link rel="stylesheet" href="css/source-navbar-header.css" />
-  <link rel="stylesheet" href="css/sales-management.css?v=20260617-purchased-filter-actions-v1" />
+  <link rel="stylesheet" href="css/sales-management.css?v=20260707-unified-v1" />
 </head>
 <body class="page-source-navbar page-subpage sales-page" data-sales-page="purchased">
 <div class="page-bg" aria-hidden="true"></div><div class="app">
 <header class="header"><div class="header-left"><button type="button" class="header-hamburger" aria-label="菜单"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button><a class="header-logo" href="#"><img src="assets/logo-chenergy.png" alt="" width="220" height="40"/></a><div class="header-source-brand"><p>新能源供应链管理系统</p></div></div><div class="header-right"><span class="clock" id="clock"></span><div class="user-avatar">用</div></div></header>
 <div class="layout"><aside class="sidebar" aria-label="主导航"><div class="nav-item"><span class="nav-label">销售管理</span></div></aside>
 <main class="main-scroll"><div class="carrier-main-inner"><div class="sales-shell">
-  <div class="sales-head"><div><h1>购入物资</h1><p class="sales-subtitle">按物资类型统计各省公司、场站已购入物资，支持查看明细与物资跟踪。</p></div></div>
+  <div class="sales-head"><div><h1>购入物资</h1><p class="sales-subtitle">汇总项目公司全部购入台账（内部采购经订单收货、外部自采经实物入库），可按采购来源筛选查看明细与物资跟踪。</p></div></div>
   <div class="sales-body">
-    <div class="sales-toolbar"><div class="sales-filter-row"><input class="sales-input" id="salesPurchasedTypeKeyword" placeholder="物资类型编码/名称" /><input class="sales-input" id="salesPurchasedAmountMin" type="number" min="0" placeholder="物资总价下限" /><input class="sales-input" id="salesPurchasedAmountMax" type="number" min="0" placeholder="物资总价上限" /><input class="sales-input" id="salesPurchasedQtyMin" type="number" min="0" placeholder="购入数量下限" /><input class="sales-input" id="salesPurchasedQtyMax" type="number" min="0" placeholder="购入数量上限" /><span class="sales-filter-actions"><button class="sales-btn sales-btn-primary" id="salesPurchasedQuery">查询</button><button class="sales-btn" id="salesPurchasedReset">重置</button></span></div></div>
-    <div class="sales-table-wrap"><table class="sales-table"><thead><tr><th>序号</th><th>物资类型编码</th><th>物资类型名称</th><th>物资总价</th><th>购入总数量</th><th>操作</th></tr></thead><tbody id="salesPurchasedBody"></tbody></table></div>
+    <div class="sales-toolbar"><div class="sales-filter-row">
+      <select class="sales-select" id="salesPurchasedSourceFilter" aria-label="采购来源">
+        <option value="all">全部采购来源</option>
+        <option value="internal">内部采购（工程技术公司发货）</option>
+        <option value="external">外部自采（供应商发货）</option>
+      </select>
+      <input class="sales-input" id="salesPurchasedTypeKeyword" placeholder="物资类型编码/名称" />
+      <input class="sales-input" id="salesPurchasedAmountMin" type="number" min="0" placeholder="物资总价下限" />
+      <input class="sales-input" id="salesPurchasedAmountMax" type="number" min="0" placeholder="物资总价上限" />
+      <input class="sales-input" id="salesPurchasedQtyMin" type="number" min="0" placeholder="购入数量下限" />
+      <input class="sales-input" id="salesPurchasedQtyMax" type="number" min="0" placeholder="购入数量上限" />
+      <span class="sales-filter-actions"><button class="sales-btn sales-btn-primary" id="salesPurchasedQuery">查询</button><button class="sales-btn" id="salesPurchasedReset">重置</button></span>
+      <div class="role-hint-banner role-hint-banner--compact" style="flex:1 1 100%;margin-top:4px">筛选「采购来源」：仅项目公司物资专责可区分内部采购与外部自采。</div>
+    </div></div>
+    <div class="sales-table-wrap"><table class="sales-table"><thead><tr><th>序号</th><th>采购来源</th><th>物资类型编码</th><th>物资类型名称</th><th>物资总价</th><th>购入总数量</th><th>操作</th></tr></thead><tbody id="salesPurchasedBody"></tbody></table></div>
   </div>
 </div></div></main></div></div>
-<script src="js/sidebar-actions.js"></script><script src="js/subpage-feature-title.js"></script><script src="js/site-footer.js"></script><script src="js/map-demo-toast.js"></script><script src="js/subpage-clock.js?v=20260617-sales-native-actions-v2"></script><script src="js/sales-management.js?v=20260618-purchased-code-title-v2"></script>
+<script src="js/sidebar-actions.js"></script>
+<script src="js/subpage-feature-title.js"></script>
+<script src="js/site-footer.js"></script>
+<script src="js/map-demo-toast.js"></script>
+<script src="js/subpage-clock.js?v=20260708-sales-v1"></script>
+<script src="js/material-code-scheme.js"></script>
+<script src="js/demo-product-catalog-data.js"></script>
+<script src="js/sales-management.js?v=20260707-role-annot-v2"></script>
 </body>
 </html>

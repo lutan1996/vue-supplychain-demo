@@ -1,0 +1,765 @@
+.proc-modal-mask {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 1200;
+  background: rgba(0, 0, 0, 0.45);
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  box-sizing: border-box;
+}
+.proc-modal-mask.is-open { display: flex; }
+.proc-modal-box {
+  background: #fff;
+  border-radius: 10px;
+  max-width: 920px;
+  width: 100%;
+  max-height: 90vh;
+  overflow: auto;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.12);
+}
+/* 入库/库存详情弹窗（非全屏审批单）：加宽以展示物资列表回显 */
+.proc-modal-mask:not(.qa-accept-mode) .proc-modal-box {
+  max-width: min(1280px, 96vw);
+  width: min(1280px, 96vw);
+}
+.proc-modal-box.fullscreen {
+  width: 96vw;
+  max-width: none;
+  height: 88vh;
+  max-height: 88vh;
+  border-radius: 10px;
+}
+.proc-modal-head {
+  padding: 14px 18px;
+  border-bottom: 1px solid #edf2f8;
+  font-size: 16px;
+  font-weight: 600;
+  color: #1f3551;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+/* 标题过长时省略，避免把「流程进度」与关闭挤出可视区 */
+.proc-modal-head #procModalTitle {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.proc-modal-head .proc-modal-head-action,
+.proc-modal-head #procModalFlow,
+.proc-modal-head #procModalX {
+  flex-shrink: 0;
+}
+/* 顶栏常驻「流程进度」（由 JS 控制 hidden），不依赖动态插入，避免缓存/布局导致看不见 */
+#procModalFlow.proc-modal-flow-btn {
+  border: none;
+  background: transparent;
+  color: #1677ff;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1;
+  padding: 0;
+  min-height: auto;
+  height: auto;
+  box-shadow: none;
+  cursor: pointer;
+  margin-left: auto;
+}
+.proc-modal-body { padding: 16px 18px; font-size: 13px; color: #3e536c; }
+.proc-modal-foot {
+  padding: 12px 18px;
+  border-top: 1px solid #edf2f8;
+  text-align: right;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: flex-end;
+}
+.proc-modal-body .field-row {
+  display: grid;
+  grid-template-columns: 120px 1fr;
+  gap: 8px 12px;
+  margin-bottom: 10px;
+  align-items: center;
+}
+.proc-modal-body label { color: #516a87; }
+.proc-modal-body input[type="text"],
+.proc-modal-body input[type="date"],
+.proc-modal-body input[type="number"],
+.proc-modal-body select,
+.proc-modal-body textarea {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  border: 1px solid #d9d9d9;
+  border-radius: 4px;
+  padding: 6px 10px;
+  font-size: 13px;
+}
+.proc-modal-body textarea { min-height: 72px; resize: vertical; }
+/* 库存管理（m10）· 审批单全屏：高度随表单收缩，底栏紧贴表单；超长时在 .qa-accept-wrap 内滚动（避免 body 滚动导致合同编号等原生下拉向上错位） */
+.proc-modal-mask.qa-accept-mode .proc-modal-head {
+  display: flex !important;
+  justify-content: flex-end;
+  padding: 8px 16px;
+  border-bottom: 1px solid #e8e8e8;
+}
+.proc-modal-mask.qa-accept-mode .proc-modal-head #procModalTitle {
+  display: none;
+}
+.proc-modal-mask.qa-accept-mode .proc-modal-box.fullscreen {
+  display: flex;
+  flex-direction: column;
+  height: auto;
+  max-height: 88vh;
+  overflow: hidden;
+}
+.proc-modal-mask.qa-accept-mode .proc-modal-body {
+  flex: 0 1 auto;
+  min-height: 0;
+  padding: 0;
+  overflow: visible;
+  max-height: none;
+}
+.proc-modal-mask.qa-accept-mode .proc-modal-foot {
+  display: flex !important;
+  flex-shrink: 0;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 10px 16px;
+  border-top: 1px solid #e8eef5;
+  background: #fafbfd;
+}
+.proc-modal-mask.qa-accept-mode .proc-modal-box {
+  max-width: min(1020px, 96vw);
+  width: 100%;
+}
+.qa-accept-wrap {
+  padding: 12px 16px 14px;
+  background: #f5f7fa;
+  box-sizing: border-box;
+}
+/* 滚动放在 wrap 上，避免 #procModalBody 滚动导致原生 <select> 下拉向上错位 */
+.proc-modal-mask.qa-accept-mode .qa-accept-wrap {
+  max-height: calc(88vh - 56px);
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.qa-accept-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+.qa-accept-toolbar-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+.qa-accept-btn-primary {
+  min-height: 32px;
+  padding: 0 18px;
+  font-size: 13px;
+  border-radius: 4px;
+  border: 1px solid #1890ff;
+  background: #1890ff;
+  color: #fff;
+  cursor: pointer;
+  font-family: inherit;
+}
+.qa-accept-btn-primary:hover {
+  background: #40a9ff;
+  border-color: #40a9ff;
+}
+.qa-accept-link-flow {
+  border: none;
+  background: transparent;
+  padding: 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: #1677ff;
+  cursor: pointer;
+  font-family: inherit;
+  text-decoration: none;
+}
+.qa-accept-link-flow:hover {
+  color: #4096ff;
+  text-decoration: underline;
+}
+.proc-m10-table-wrap {
+  overflow-x: hidden;
+}
+.proc-m10-subtabs {
+  display: flex;
+  gap: 8px;
+  padding: 4px 2px 14px;
+  border-bottom: 1px solid #e8eef5;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.proc-m10-subtab {
+  border: 1px solid #d9d9d9;
+  background: #fff;
+  border-radius: 999px;
+  padding: 6px 18px;
+  font-size: 13px;
+  cursor: pointer;
+  color: #1f3551;
+  font-family: inherit;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+.proc-m10-subtab:hover {
+  border-color: #91caff;
+  color: #1677ff;
+}
+.proc-m10-subtab.is-active {
+  background: #1677ff;
+  border-color: #1677ff;
+  color: #fff;
+}
+.proc-m10-pane {
+  display: none;
+}
+.proc-m10-pane.is-active {
+  display: block;
+}
+.m10-contract-th {
+  white-space: nowrap;
+  position: relative;
+}
+.m10-help-wrap {
+  display: inline-block;
+  position: relative;
+  vertical-align: middle;
+  margin-left: 4px;
+}
+.m10-contract-help {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 1px solid #2f9bff;
+  color: #1677ff;
+  background: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+  font-family: inherit;
+  flex-shrink: 0;
+}
+.m10-help-tip {
+  position: absolute;
+  top: -10px;
+  left: 22px;
+  display: none;
+  min-width: 210px;
+  max-width: 260px;
+  background: rgba(0, 0, 0, 0.82);
+  color: #fff;
+  border-radius: 6px;
+  padding: 8px 10px;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.45;
+  z-index: 20;
+  text-align: left;
+}
+.m10-help-tip::before {
+  content: "";
+  position: absolute;
+  left: -6px;
+  top: 11px;
+  border-width: 6px;
+  border-style: solid;
+  border-color: transparent rgba(0, 0, 0, 0.82) transparent transparent;
+}
+.m10-help-wrap.is-open .m10-help-tip {
+  display: block;
+}
+/* 物资类别「?」：悬停黑底说明（fixed，避免表格滚动区域裁切） */
+.m10-category-floating-tip {
+  display: none;
+  position: fixed;
+  z-index: 3000;
+  min-width: 268px;
+  max-width: 360px;
+  background: rgba(0, 0, 0, 0.88);
+  color: #fff;
+  border-radius: 8px;
+  padding: 10px 12px 12px;
+  font-size: 12px;
+  line-height: 1.55;
+  font-weight: 500;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.28);
+  pointer-events: none;
+  text-align: left;
+}
+.m10-category-floating-tip__title {
+  font-weight: 700;
+  font-size: 13px;
+  margin-bottom: 8px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+.m10-category-floating-tip__row {
+  margin-top: 8px;
+}
+.m10-category-floating-tip__k {
+  display: block;
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 11px;
+  margin-bottom: 2px;
+  font-weight: 600;
+}
+.m10-contract-code {
+  font-size: 13px;
+  line-height: 1.25;
+  font-weight: 600;
+  color: #1f3551;
+  letter-spacing: 0.01em;
+  word-break: break-all;
+  cursor: pointer;
+  display: inline-block;
+}
+.m10-contract-exec-cell .m10-exec-list {
+  display: none;
+  line-height: 1.5;
+  color: #1f3551;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.m10-ledger-row.is-open .m10-contract-exec-cell .m10-exec-list {
+  display: block;
+}
+.m10-contract-exec-cell .m10-exec-empty {
+  color: #8c8c8c;
+}
+.m10-ledger-row.is-open .m10-contract-exec-cell .m10-exec-empty {
+  display: none;
+}
+/* 库存台账操作列：确保「详情」链接不被裁切或继承为不可见 */
+#proc-m10-ledger-table tbody td.proc-ops-cell {
+  overflow: visible !important;
+}
+#proc-m10-ledger-table tbody td.proc-ops-cell a.js-op {
+  display: inline !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  color: #1677ff !important;
+}
+/* 实物入库列表：操作列「查看」纵向对齐同一条线 */
+#proc-m10-inbound-table thead th:last-child,
+#proc-m10-inbound-table tbody td.proc-ops-cell {
+  width: 72px;
+  min-width: 72px;
+  max-width: 72px;
+  text-align: left;
+  padding-left: 12px;
+  vertical-align: middle;
+  box-sizing: border-box;
+}
+#proc-m10-inbound-table tbody td.proc-ops-cell .proc-ops-row {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 4px;
+  width: 100%;
+}
+#proc-m10-inbound-table tbody td.proc-ops-cell .proc-ops-row a.js-op[data-op="验收查看详情"] {
+  flex: 0 0 28px;
+  text-align: left;
+}
+.qa-accept-toolbar-title {
+  flex: 1;
+  text-align: center;
+  font-size: 20px;
+  font-weight: 600;
+  color: #1f3551;
+  letter-spacing: 0.02em;
+  min-width: 200px;
+}
+.qa-accept-legend {
+  margin: 0 0 10px;
+  padding: 0 2px;
+  font-size: 12px;
+  color: #8c8c8c;
+  line-height: 1.5;
+}
+.qa-accept-legend .qa-legend-dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #bfbfbf;
+  margin: 0 4px 0 0;
+  vertical-align: middle;
+}
+.qa-accept-btn-close {
+  min-height: 32px;
+  width: 36px;
+  padding: 0;
+  line-height: 1;
+  font-size: 22px;
+  font-weight: 400;
+  border-radius: 6px;
+  border: 1px solid #d9d9d9;
+  background: #fff;
+  color: rgba(0, 0, 0, 0.55);
+  cursor: pointer;
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  flex-shrink: 0;
+}
+.qa-accept-btn-close:hover {
+  color: #1677ff;
+  border-color: #91caff;
+  background: #f0f7ff;
+}
+.qa-accept-form-shell {
+  background: #fff;
+  border: 1px solid #e8eef5;
+  border-radius: 4px;
+  overflow: visible;
+}
+.qa-accept-grid {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+  font-size: 13px;
+}
+.qa-accept-grid td {
+  border: 1px solid #e8eef5;
+  padding: 0;
+  vertical-align: middle;
+}
+.qa-accept-grid .qa-lab {
+  width: 17%;
+  background: #f5f7fa;
+  color: #3f5366;
+  padding: 10px 12px;
+  text-align: right;
+  font-weight: 500;
+  box-sizing: border-box;
+  position: relative;
+}
+.qa-accept-grid .qa-lab .req {
+  color: #ff4d4f;
+  margin-right: 2px;
+}
+.qa-accept-grid .qa-lab .qa-dot-hint {
+  position: absolute;
+  left: 50%;
+  top: 6px;
+  transform: translateX(-50%);
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #ff4d4f;
+}
+.qa-accept-grid tr:nth-child(2) .qa-lab {
+  padding-top: 18px;
+}
+.qa-accept-grid .qa-val {
+  width: 33%;
+  padding: 6px 10px;
+  background: #fff;
+  box-sizing: border-box;
+}
+.qa-accept-grid .qa-val-empty {
+  background: #fafafa;
+}
+.qa-accept-grid .qa-inp:not(.qa-inp--auto):not(textarea) {
+  width: 100%;
+  height: 32px;
+  border: 1px solid #d9d9d9;
+  border-radius: 4px;
+  padding: 0 10px;
+  font-size: 13px;
+  color: #262626;
+  box-sizing: border-box;
+  background: #fff;
+  outline: none;
+}
+.qa-accept-grid .qa-inp--auto,
+.qa-accept-grid .qa-inp[readonly].qa-inp--auto {
+  background: #ebebeb !important;
+  border-color: #d9d9d9;
+  color: #8c8c8c !important;
+  cursor: not-allowed;
+}
+.qa-accept-grid .qa-lab .qa-auto-mark {
+  display: inline-block;
+  margin-left: 4px;
+  color: #bfbfbf;
+  font-size: 12px;
+  line-height: 1;
+  vertical-align: middle;
+  cursor: default;
+}
+.qa-accept-grid select.qa-select {
+  width: 100%;
+  height: 32px;
+  border: 1px solid #d9d9d9;
+  border-radius: 4px;
+  padding: 0 8px;
+  font-size: 13px;
+  color: #262626;
+  background: #fff;
+  box-sizing: border-box;
+  outline: none;
+  cursor: pointer;
+}
+.qa-accept-grid select.qa-select:focus {
+  border-color: #1890ff;
+  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.12);
+}
+/* 合同编号：自定义下拉，始终在按钮下方展开（避免原生 <select> 在滚动容器内向上弹出） */
+.qa-contract-dd {
+  position: relative;
+  width: 100%;
+}
+.qa-contract-dd__btn {
+  display: block;
+  width: 100%;
+  height: 32px;
+  line-height: 30px;
+  text-align: left;
+  font-family: inherit;
+  font-size: 13px;
+  color: #262626;
+  cursor: pointer;
+  box-sizing: border-box;
+  border: 1px solid #d9d9d9;
+  border-radius: 4px;
+  padding: 0 8px;
+  background: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.qa-contract-dd__btn:focus {
+  border-color: #1890ff;
+  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.12);
+  outline: none;
+}
+.qa-contract-dd__panel {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(100% + 2px);
+  z-index: 50;
+  margin: 0;
+  padding: 4px 0;
+  list-style: none;
+  background: #fff;
+  border: 1px solid #d9d9d9;
+  border-radius: 4px;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+  max-height: 220px;
+  overflow-y: auto;
+  box-sizing: border-box;
+}
+.qa-contract-dd__opt {
+  display: block;
+  width: 100%;
+  margin: 0;
+  padding: 8px 12px;
+  border: none;
+  background: transparent;
+  text-align: left;
+  font-size: 13px;
+  color: #262626;
+  font-family: inherit;
+  cursor: pointer;
+  box-sizing: border-box;
+}
+.qa-contract-dd__opt:hover {
+  background: #f5f5f5;
+}
+/* 执行合同编号：多选下拉（框架协议下多条执行号） */
+.qa-exec-dd {
+  position: relative;
+  width: 100%;
+}
+.qa-exec-dd__btn {
+  width: 100%;
+}
+.qa-exec-dd__panel {
+  top: calc(100% + 2px);
+}
+.qa-exec-dd__row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  margin: 0;
+  cursor: pointer;
+  font-size: 13px;
+  color: #262626;
+  box-sizing: border-box;
+}
+.qa-exec-dd__row:hover {
+  background: #f5f5f5;
+}
+.qa-exec-dd__chk {
+  flex-shrink: 0;
+  width: 14px;
+  height: 14px;
+  margin: 0;
+  cursor: pointer;
+}
+/* 选择合同：表格下拉 + 按名称/编号搜索 */
+.qa-cname-dd {
+  position: relative;
+  width: 100%;
+}
+.qa-cname-dd__btn {
+  width: 100%;
+}
+.qa-cname-dd__panel {
+  top: calc(100% + 2px);
+  padding: 0;
+  min-width: min(100%, 360px);
+}
+.qa-cname-dd__search {
+  padding: 8px 10px;
+  border-bottom: 1px solid #e8eef5;
+  background: #fafbfd;
+}
+.qa-cname-dd__search-inp {
+  width: 100%;
+  height: 30px;
+  box-sizing: border-box;
+  border: 1px solid #d9d9d9;
+  border-radius: 4px;
+  padding: 0 8px;
+  font-size: 13px;
+  font-family: inherit;
+  outline: none;
+}
+.qa-cname-dd__search-inp:focus {
+  border-color: #1890ff;
+  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.12);
+}
+.qa-cname-dd__table-wrap {
+  max-height: 220px;
+  overflow: auto;
+}
+.qa-cname-dd__table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.qa-cname-dd__table th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: #f5f7fa;
+  color: #64748b;
+  font-weight: 600;
+  text-align: left;
+  padding: 8px 10px;
+  border-bottom: 1px solid #e8eef5;
+}
+.qa-cname-dd__table td {
+  padding: 8px 10px;
+  border-bottom: 1px solid #f0f2f5;
+  color: #262626;
+}
+.qa-cname-dd__tr {
+  cursor: pointer;
+}
+.qa-cname-dd__tr:hover {
+  background: #f0f7ff;
+}
+.qa-cname-dd__tr--ph td {
+  color: #94a3b8;
+  font-size: 12px;
+}
+/* 入库类型：自定义下拉 + 问号黑色说明 */
+.qa-inbound-type-dd {
+  position: relative;
+  width: 100%;
+}
+.qa-inbound-type-dd__panel {
+  padding: 0;
+  top: calc(100% + 2px);
+  overflow: visible;
+  max-height: none;
+}
+.qa-inbound-type-dd__opt--full {
+  display: block;
+  width: 100%;
+  margin: 0;
+  padding: 8px 12px;
+  border: none;
+  border-bottom: 1px solid #f0f2f5;
+  background: #fff;
+  text-align: left;
+  font-size: 13px;
+  color: #262626;
+  font-family: inherit;
+  cursor: pointer;
+  box-sizing: border-box;
+}
+.qa-inbound-type-dd__opt--full:hover {
+  background: #f5f5f5;
+}
+.qa-inbound-type-dd__row {
+  display: flex;
+  align-items: stretch;
+  border-bottom: 1px solid #f0f2f5;
+  background: #fff;
+}
+.qa-inbound-type-dd__row:last-child {
+  border-bottom: none;
+}
+.qa-inbound-type-dd__opt {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  padding: 8px 6px 8px 12px;
+  border: none;
+  background: transparent;
+  text-align: left;
+  font-size: 13px;
+  color: #262626;
+  font-family: inherit;
+  cursor: pointer;
+  box-sizing: border-box;
+}
+.qa-inbound-type-dd__opt:hover {
+  background: #f0f7ff;
+}
+.qa-inbound-type-dd__help {
+  flex-shrink: 0;
+  width: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  cursor: default;
+  align-self: stretch;
+}
+.qa-inbound-type-dd__qm {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 1px solid #bfbfbf;

@@ -39,6 +39,24 @@
       .replace(/"/g, "&quot;");
   }
 
+  function getOwningCompanyLabel() {
+    var engLabel = "工程技术公司";
+    var defaultProj = "龙源山西分公司";
+    try {
+      var kind = (sessionStorage.getItem("demoLoginOrgKind") || "").trim();
+      var company = (sessionStorage.getItem("demoLoginCompanyName") || "").trim();
+      if (kind === "project") return company || defaultProj;
+      if (kind === "eng") return engLabel;
+      var pageSub = "";
+      try {
+        pageSub = (new URLSearchParams(location.search || "").get("pageSub") || "").trim();
+        if (!pageSub) pageSub = (sessionStorage.getItem("pageSub") || "").trim();
+      } catch (ePageSub) {}
+      if (pageSub.indexOf("项目公司") >= 0) return company || defaultProj;
+    } catch (eKind) {}
+    return engLabel;
+  }
+
   function demoResultToast(msg) {
     try {
       if (typeof window.mapDemoToast === "function") {
@@ -587,7 +605,7 @@
     var rows = applySearch(CTX.list);
     if (!rows.length) {
       tbody.innerHTML =
-        '<tr><td class="ppm-empty" colspan="37">暂无数据（可切换演示角色或调整筛选条件）</td></tr>';
+        '<tr><td class="ppm-empty" colspan="38">暂无数据（可切换演示角色或调整筛选条件）</td></tr>';
       return;
     }
     tbody.innerHTML = rows
@@ -598,6 +616,9 @@
           '<td><input type="checkbox" class="ppm-row-chk" data-id="' + escapeHtml(row.id) + '"></td>' +
           '<td class="cell-num">' +
           (idx + 1) +
+          "</td>" +
+          "<td>" +
+          escapeHtml(getOwningCompanyLabel()) +
           "</td>" +
           "<td>" +
           escapeHtml(row.projectName) +
@@ -791,44 +812,45 @@
       var row = findRow(tr.getAttribute("data-row-id"));
       if (!row) return;
       var tds = tr.querySelectorAll("td");
-      if (tds.length < 37) return;
+      if (tds.length < 38) return;
       var el;
 
-      el = makeTextInput(row.projectName); putEditor(tds[1], el); bindInlineInput(el, row, "projectName");
-      el = makeSelect(row.method, ["招标", "询价", "单一来源"]); putEditor(tds[2], el); bindInlineInput(el, row, "method");
-      el = makeSelect(row.targetType, ["物资", "服务", "工程"]); putEditor(tds[3], el); bindInlineInput(el, row, "targetType");
-      el = makeTextInput(row.bizDept); putEditor(tds[4], el); bindInlineInput(el, row, "bizDept");
-      el = makeTextInput(row.handler); putEditor(tds[5], el); bindInlineInput(el, row, "handler");
-      el = makeSelect(row.isFrame || "否", ["是", "否"]); putEditor(tds[6], el); bindInlineInput(el, row, "isFrame");
-      el = makeSelect(row.projectType || "生产", ["生产", "综合", "基建"]); putEditor(tds[7], el); bindInlineInput(el, row, "projectType");
-      el = makeNumberInput(row.budget); putEditor(tds[8], el); bindInlineInput(el, row, "budget", function (v) { return parseFloat(v) || 0; });
-      el = makeSelect(row.isLimit || "否", ["是", "否"]); putEditor(tds[9], el); bindInlineInput(el, row, "isLimit");
-      el = makeSelect(row.isSci || "否", ["是", "否"]); putEditor(tds[10], el); bindInlineInput(el, row, "isSci");
-      el = makeTextInput(row.sciName || ""); putEditor(tds[11], el); bindInlineInput(el, row, "sciName");
-      el = makeTextInput(row.wbs || ""); putEditor(tds[12], el); bindInlineInput(el, row, "wbs");
-      el = makeSelect(row.isXiAn || "否", ["是", "否"]); putEditor(tds[13], el); bindInlineInput(el, row, "isXiAn");
-      el = makeDateInput(row.oaApprove || ""); putEditor(tds[14], el); bindInlineInput(el, row, "oaApprove");
-      el = makeDateInput(row.oaMinutes || ""); putEditor(tds[15], el); bindInlineInput(el, row, "oaMinutes");
-      el = makeTextInput(row.committeeNo || ""); putEditor(tds[16], el); bindInlineInput(el, row, "committeeNo");
-      el = makeDateInput(row.srmDate || ""); putEditor(tds[17], el); bindInlineInput(el, row, "srmDate");
-      el = makeSelect(pickFlowProgressValue(row.flowProgress), getFlowProgressOptions()); putEditor(tds[18], el); bindInlineInput(el, row, "flowProgress");
-      el = makeDateInput(row.publishDate || ""); putEditor(tds[19], el); bindInlineInput(el, row, "publishDate");
-      el = makeTextInput(row.publishUrl || ""); putEditor(tds[20], el); bindInlineInput(el, row, "publishUrl");
-      el = makeTextInput(row.basis || ""); putEditor(tds[21], el); bindInlineInput(el, row, "basis");
-      el = makeTextInput(row.pkgNo || ""); putEditor(tds[22], el); bindInlineInput(el, row, "pkgNo");
-      el = makeTextInput(row.procCode || ""); putEditor(tds[23], el); bindInlineInput(el, row, "procCode");
-      el = makeDateInput(row.openDate || ""); putEditor(tds[24], el); bindInlineInput(el, row, "openDate");
-      el = makeDateInput(row.awardDate || ""); putEditor(tds[25], el); bindInlineInput(el, row, "awardDate");
-      el = makeDateInput(row.publicDate || ""); putEditor(tds[26], el); bindInlineInput(el, row, "publicDate");
-      el = makeDateInput(row.noticeDate || ""); putEditor(tds[27], el); bindInlineInput(el, row, "noticeDate");
-      el = makeNumberInput(row.dealAmount || 0); putEditor(tds[28], el); bindInlineInput(el, row, "dealAmount", function (v) { return parseFloat(v) || 0; });
-      el = makeTextInput(row.supplier || ""); putEditor(tds[29], el); bindInlineInput(el, row, "supplier");
-      el = makeSelect(row.isAnnual || "否", ["是", "否"]); putEditor(tds[30], el); bindInlineInput(el, row, "isAnnual");
-      el = makeDateInput(row.stampDate || ""); putEditor(tds[31], el); bindInlineInput(el, row, "stampDate");
-      tds[32].textContent = calcKpi(row).k1s;
-      tds[33].textContent = calcKpi(row).k2s;
-      el = makeTextInput(row.kpiRemark || ""); putEditor(tds[34], el); bindInlineInput(el, row, "kpiRemark");
-      el = makeTextInput(row.remark || ""); putEditor(tds[35], el); bindInlineInput(el, row, "remark");
+      tds[2].textContent = getOwningCompanyLabel();
+      el = makeTextInput(row.projectName); putEditor(tds[3], el); bindInlineInput(el, row, "projectName");
+      el = makeSelect(row.method, ["招标", "询价", "单一来源"]); putEditor(tds[4], el); bindInlineInput(el, row, "method");
+      el = makeSelect(row.targetType, ["物资", "服务", "工程"]); putEditor(tds[5], el); bindInlineInput(el, row, "targetType");
+      el = makeTextInput(row.bizDept); putEditor(tds[6], el); bindInlineInput(el, row, "bizDept");
+      el = makeTextInput(row.handler); putEditor(tds[7], el); bindInlineInput(el, row, "handler");
+      el = makeSelect(row.isFrame || "否", ["是", "否"]); putEditor(tds[8], el); bindInlineInput(el, row, "isFrame");
+      el = makeSelect(row.projectType || "生产", ["生产", "综合", "基建"]); putEditor(tds[9], el); bindInlineInput(el, row, "projectType");
+      el = makeNumberInput(row.budget); putEditor(tds[10], el); bindInlineInput(el, row, "budget", function (v) { return parseFloat(v) || 0; });
+      el = makeSelect(row.isLimit || "否", ["是", "否"]); putEditor(tds[11], el); bindInlineInput(el, row, "isLimit");
+      el = makeSelect(row.isSci || "否", ["是", "否"]); putEditor(tds[12], el); bindInlineInput(el, row, "isSci");
+      el = makeTextInput(row.sciName || ""); putEditor(tds[13], el); bindInlineInput(el, row, "sciName");
+      el = makeTextInput(row.wbs || ""); putEditor(tds[14], el); bindInlineInput(el, row, "wbs");
+      el = makeSelect(row.isXiAn || "否", ["是", "否"]); putEditor(tds[15], el); bindInlineInput(el, row, "isXiAn");
+      el = makeDateInput(row.oaApprove || ""); putEditor(tds[16], el); bindInlineInput(el, row, "oaApprove");
+      el = makeDateInput(row.oaMinutes || ""); putEditor(tds[17], el); bindInlineInput(el, row, "oaMinutes");
+      el = makeTextInput(row.committeeNo || ""); putEditor(tds[18], el); bindInlineInput(el, row, "committeeNo");
+      el = makeDateInput(row.srmDate || ""); putEditor(tds[19], el); bindInlineInput(el, row, "srmDate");
+      el = makeSelect(pickFlowProgressValue(row.flowProgress), getFlowProgressOptions()); putEditor(tds[20], el); bindInlineInput(el, row, "flowProgress");
+      el = makeDateInput(row.publishDate || ""); putEditor(tds[21], el); bindInlineInput(el, row, "publishDate");
+      el = makeTextInput(row.publishUrl || ""); putEditor(tds[22], el); bindInlineInput(el, row, "publishUrl");
+      el = makeTextInput(row.basis || ""); putEditor(tds[23], el); bindInlineInput(el, row, "basis");
+      el = makeTextInput(row.pkgNo || ""); putEditor(tds[24], el); bindInlineInput(el, row, "pkgNo");
+      el = makeTextInput(row.procCode || ""); putEditor(tds[25], el); bindInlineInput(el, row, "procCode");
+      el = makeDateInput(row.openDate || ""); putEditor(tds[26], el); bindInlineInput(el, row, "openDate");
+      el = makeDateInput(row.awardDate || ""); putEditor(tds[27], el); bindInlineInput(el, row, "awardDate");
+      el = makeDateInput(row.publicDate || ""); putEditor(tds[28], el); bindInlineInput(el, row, "publicDate");
+      el = makeDateInput(row.noticeDate || ""); putEditor(tds[29], el); bindInlineInput(el, row, "noticeDate");
+      el = makeNumberInput(row.dealAmount || 0); putEditor(tds[30], el); bindInlineInput(el, row, "dealAmount", function (v) { return parseFloat(v) || 0; });
+      el = makeTextInput(row.supplier || ""); putEditor(tds[31], el); bindInlineInput(el, row, "supplier");
+      el = makeSelect(row.isAnnual || "否", ["是", "否"]); putEditor(tds[32], el); bindInlineInput(el, row, "isAnnual");
+      el = makeDateInput(row.stampDate || ""); putEditor(tds[33], el); bindInlineInput(el, row, "stampDate");
+      tds[34].textContent = calcKpi(row).k1s;
+      tds[35].textContent = calcKpi(row).k2s;
+      el = makeTextInput(row.kpiRemark || ""); putEditor(tds[36], el); bindInlineInput(el, row, "kpiRemark");
+      el = makeTextInput(row.remark || ""); putEditor(tds[37], el); bindInlineInput(el, row, "remark");
     });
   }
 
@@ -957,6 +979,9 @@
       '<div class="ppm-form">' +
       '<div class="ppm-form-seg">项目基础信息</div>' +
       '<div class="ppm-form-grid ppm-form-grid-2">' +
+      '<div class="ppm-form-full"><label>所属公司</label><input id="ppmOwningCompany" class="carrier-search" readonly value="' +
+      escapeHtml(getOwningCompanyLabel()) +
+      '" /></div>' +
       "<div><label>项目名称 " +
       (readOnly ? "" : '<span class="ppm-req">*</span>') +
       "</label><input id=\"ppmProjName\" class=\"carrier-search\" placeholder=\"请输入项目名称\" value=\"" +
@@ -1159,6 +1184,8 @@
   }
 
   function syncSelectsFromRow(row) {
+    var oc = document.getElementById("ppmOwningCompany");
+    if (oc) oc.value = getOwningCompanyLabel();
     var m = document.getElementById("ppmMethod");
     if (m) m.value = row.method;
     var tt = document.getElementById("ppmTargetType");
@@ -1298,6 +1325,7 @@
     var body = document.getElementById("ppmModalEditBody");
     if (!body) return;
     var textByFieldId = {
+      ppmOwningCompany: "所属公司",
       ppmProjName: "项目名称",
       ppmMethod: "采购方式",
       ppmTargetType: "采购标的类别",
@@ -1397,6 +1425,17 @@
   }
 
   function renderProgress(row) {
+    var stepsHost = document.getElementById("ppmProgressSteps");
+    if (stepsHost && stepsHost.parentNode) {
+      var meta = document.getElementById("ppmProgressOwning");
+      if (!meta) {
+        meta = document.createElement("p");
+        meta.id = "ppmProgressOwning";
+        meta.style.cssText = "font-size:13px;margin:0 0 8px;color:#1f3551";
+        stepsHost.parentNode.insertBefore(meta, stepsHost);
+      }
+      meta.innerHTML = "<strong>所属公司：</strong>" + escapeHtml(getOwningCompanyLabel());
+    }
     var idx = Math.min(row.flowIndex, STEPS.length);
     if (row.flowStatus === "已通过") idx = STEPS.length;
     var stepsEl = document.getElementById("ppmProgressSteps");
@@ -1462,6 +1501,9 @@
     if (det) {
       det.innerHTML =
         '<table class="carrier-table" style="font-size:12px"><tbody>' +
+        "<tr><th>所属公司</th><td colspan=\"3\">" +
+        escapeHtml(getOwningCompanyLabel()) +
+        "</td></tr>" +
         "<tr><th>项目名称</th><td>" +
         escapeHtml(row.projectName) +
         "</td><th>预算（万元）</th><td>" +

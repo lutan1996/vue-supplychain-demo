@@ -1234,12 +1234,12 @@ body.map-demo-hide-shell-topbar .shell .main > .topbar{display:none !important;}
     var demoSceneHintByFile = {};
     var demoTabHintByFile = {};
     actionToFile["retired-apply-main"] = "retire-scrap-application.html?v=20260701-scrap-tip";
-    actionToFile["proj-company-plan-manage"] = "purchase-plan-management.html?pageSub=项目公司采购信息台帐";
-    actionToFile["proj-company-contract-mgmt"] = "contract-management.html?pageSub=项目公司合同信息管理";
-    actionToFile["proj-company-summary-report"] = "purchase-summary-report.html?pageSub=项目公司采购合同报表管理";
-    labelToFile["项目公司采购信息台帐"] = "purchase-plan-management.html?pageSub=项目公司采购信息台帐";
-    labelToFile["项目公司合同信息管理"] = "contract-management.html?pageSub=项目公司合同信息管理";
-    labelToFile["项目公司采购合同报表管理"] = "purchase-summary-report.html?pageSub=项目公司采购合同报表管理";
+    actionToFile["proj-company-plan-manage"] = "purchase-plan-management.html";
+    actionToFile["proj-company-contract-mgmt"] = "contract-management.html";
+    actionToFile["proj-company-summary-report"] = "purchase-summary-report.html";
+    labelToFile["项目公司采购信息台帐"] = "purchase-plan-management.html";
+    labelToFile["项目公司合同信息管理"] = "contract-management.html";
+    labelToFile["项目公司采购合同报表管理"] = "purchase-summary-report.html";
     labelToFile["退役及报废申请"] = "retire-scrap-application.html?v=20260701-scrap-tip";
 
     function normalizeLabel(s) {
@@ -1529,6 +1529,12 @@ body.map-demo-hide-shell-topbar .shell .main > .topbar{display:none !important;}
       (doc.head || doc.documentElement).appendChild(st);
     }
 
+    var ROLE_ANNOT_DEMO_FILES = {};
+
+    function clearDemoIframeRoleAnnotation() {}
+
+    function ensureDemoIframeRoleAnnotation() {}
+
     /* 采购信息台帐 & 合同信息管理：表格拉宽，支持左右滑动 */
     function injectDemoShellWideTableScroll(doc, win) {
       if (!doc) return;
@@ -1596,6 +1602,7 @@ body.map-demo-hide-shell-topbar .shell .main > .topbar{display:none !important;}
       injectDemoShellPpmHintTipFix(doc);
       injectDemoShellCmHintTipFix(doc);
       injectDemoShellWideTableScroll(doc, frame.contentWindow);
+      ensureDemoIframeRoleAnnotation(doc, frame.contentWindow);
       try {
         setTimeout(function () {
           try {
@@ -1603,6 +1610,7 @@ body.map-demo-hide-shell-topbar .shell .main > .topbar{display:none !important;}
             injectDemoShellPpmHintTipFix(d);
             injectDemoShellCmHintTipFix(d);
             injectDemoShellWideTableScroll(d, frame.contentWindow);
+            ensureDemoIframeRoleAnnotation(d, frame.contentWindow);
           } catch (e2) {}
         }, 0);
         setTimeout(function () {
@@ -1611,6 +1619,7 @@ body.map-demo-hide-shell-topbar .shell .main > .topbar{display:none !important;}
             injectDemoShellPpmHintTipFix(d2);
             injectDemoShellCmHintTipFix(d2);
             injectDemoShellWideTableScroll(d2, frame.contentWindow);
+            ensureDemoIframeRoleAnnotation(d2, frame.contentWindow);
           } catch (e3) {}
         }, 120);
       } catch (eInjDefer) {}
@@ -1699,9 +1708,23 @@ body.map-demo-hide-shell-topbar .shell .main > .topbar{display:none !important;}
     /* 必须为 true：Blob URL 的 iframe 与 file:// 父页不同源，子页无法可靠调用 parent.__demoOpenPage / postMessage，蓝框子功能会全部失效。srcdoc 与父页同源，侧栏跳转才能工作。 */
     var demoUseSrcdocOnly = true;
     var demoLoadingSafetyTimer = null;
+    var demoPageVersion = "20260708-sales-v1";
+
+    function demoAppendVersionBeforeHash(href) {
+      if (!href) return href;
+      var s = String(href);
+      if (/^about:|^data:|^blob:/i.test(s)) return href;
+      if (/[?&]v=/.test(s.split("#")[0])) return href;
+      var hashIndex = s.indexOf("#");
+      var head = hashIndex >= 0 ? s.slice(0, hashIndex) : s;
+      var tail = hashIndex >= 0 ? s.slice(hashIndex) : "";
+      head += (head.indexOf("?") >= 0 ? "&" : "?") + "v=" + demoPageVersion;
+      return head + tail;
+    }
 
     function switchTo(index, optFullHref) {
       if (index < 0 || index >= pagesList.length) return;
+      clearDemoIframeRoleAnnotation(frame.contentDocument, frame.contentWindow);
       var prevIndex = currentIndex;
       var item = pagesList[index];
       currentIndex = index;
@@ -1728,6 +1751,7 @@ body.map-demo-hide-shell-topbar .shell .main > .topbar{display:none !important;}
           optFullHref && String(optFullHref).trim()
             ? String(optFullHref).trim()
             : item.file;
+        extSrc = demoAppendVersionBeforeHash(extSrc);
         try {
           frame.removeAttribute("srcdoc");
         } catch (eSk0) {}

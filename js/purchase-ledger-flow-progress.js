@@ -64,6 +64,10 @@
       '<span class="map-flow-arrow">→</span>' +
       '<span class="map-flow-node">电控所负责人审批，通过</span>' +
       '<span class="map-flow-arrow">→</span>' +
+      '<span class="map-flow-node">物资管理部门物资专责阅知</span>' +
+      '<span class="map-flow-arrow">→</span>' +
+      '<span class="map-flow-node">物资管理部门专责核对清单，无误</span>' +
+      '<span class="map-flow-arrow">→</span>' +
       '<span class="map-flow-node">机械研究所物资专责审批，通过</span>' +
       '<span class="map-flow-arrow">→</span>' +
       '<span class="map-flow-node">机械研究所负责人审批，通过</span>' +
@@ -88,6 +92,18 @@
         '<div class="map-flow-tl-body">' +
         '<div class="map-flow-tl-meta"><span class="map-flow-tl-person">电控所负责人陈亮</span><span class="map-flow-tl-time">2026-05-10 10:03</span><span class="map-flow-tl-badge" style="background:#10b98122;color:#10b981">已通过</span></div>' +
         '<div class="map-flow-tl-content">审批：通过</div>' +
+        "</div></div>" +
+        '<div class="map-flow-tl-item">' +
+        '<div class="map-flow-tl-dot" style="background:#10b981"></div><div class="map-flow-tl-line"></div>' +
+        '<div class="map-flow-tl-body">' +
+        '<div class="map-flow-tl-meta"><span class="map-flow-tl-person">物资管理部门物资专责宋中波</span><span class="map-flow-tl-time">2026-05-10 10:15</span><span class="map-flow-tl-badge" style="background:#10b98122;color:#10b981">已阅知</span></div>' +
+        '<div class="map-flow-tl-content">阅知：已知悉</div>' +
+        "</div></div>" +
+        '<div class="map-flow-tl-item">' +
+        '<div class="map-flow-tl-dot" style="background:#10b981"></div><div class="map-flow-tl-line"></div>' +
+        '<div class="map-flow-tl-body">' +
+        '<div class="map-flow-tl-meta"><span class="map-flow-tl-person">物资管理部门专责宋中波</span><span class="map-flow-tl-time">2026-05-10 10:22</span><span class="map-flow-tl-badge" style="background:#10b98122;color:#10b981">已通过</span></div>' +
+        '<div class="map-flow-tl-content">核对清单：无误</div>' +
         "</div></div>" +
         '<div class="map-flow-tl-item">' +
         '<div class="map-flow-tl-dot" style="background:#10b981"></div><div class="map-flow-tl-line"></div>' +

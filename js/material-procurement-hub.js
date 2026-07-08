@@ -57,18 +57,46 @@
   }
 
   /** 入库记录表列索引（0 起算，不含勾选列） */
-  var M10_INBOUND_COL = {
-    acceptNo: 0,
-    contractNo: 1,
-    executionNo: 2,
-    supplier: 3,
-    productName: 4,
-    inboundType: 5,
-    status: 6,
-    inboundTime: 7,
-    inboundBy: 8,
-    remark: 9
-  };
+  function isProjCompanyInboundPage() {
+    try {
+      var file = (location.pathname || "").split("/").pop() || "";
+      return file.indexOf("proj-company-inbound") === 0;
+    } catch (e0) {
+      return false;
+    }
+  }
+
+  function m10InboundColMap() {
+    if (isProjCompanyInboundPage()) {
+      return {
+        acceptNo: 0,
+        contractNo: 1,
+        executionNo: 2,
+        supplier: 3,
+        productName: 4,
+        purchaseType: 5,
+        inboundType: 6,
+        status: 7,
+        inboundTime: 8,
+        inboundBy: 9,
+        remark: 10
+      };
+    }
+    return {
+      acceptNo: 0,
+      contractNo: 1,
+      executionNo: 2,
+      supplier: 3,
+      productName: 4,
+      inboundType: 5,
+      status: 6,
+      inboundTime: 7,
+      inboundBy: 8,
+      remark: 9
+    };
+  }
+
+  var M10_INBOUND_COL = m10InboundColMap();
   var M10_INBOUND_STATUS_TD = M10_INBOUND_COL.status;
   var M10_INBOUND_DETAIL_OMIT = {
     物资名称: 1,
@@ -362,6 +390,68 @@
           recvTime: "2026-04-29 10:12",
           receiver: "宋波",
           keeper: "宋波"
+        }
+      ]
+    },
+    XMHT2026001: {
+      contractMode: "normal_only",
+      contractName: "河北龙源场站备件直采合同",
+      frameworkNo: "",
+      executionNo: "",
+      executionNos: [],
+      normalNo: "XM-CG-2026-001",
+      material: "工业级交换机",
+      supplier: "联合动力",
+      spec: "V2.0",
+      recvTime: "2026-06-18 10:30",
+      receiver: "张明",
+      keeper: "张明",
+      logisticsNo: "WL-XM-20260618",
+      warehouse: "麒麟山风电场库房",
+      materialLines: [
+        {
+          name: "工业级交换机",
+          typeCode: "A0200100001",
+          spec: "V2.0",
+          category: "销售类",
+          unitPrice: "2030.00",
+          qty: "10",
+          tax: "13",
+          remark: "项目公司自采",
+          recvTime: "2026-06-18 10:30",
+          receiver: "张明",
+          keeper: "张明"
+        }
+      ]
+    },
+    XMHT2026002: {
+      contractMode: "framework_exec",
+      contractName: "甘肃龙源通讯设备框架合同",
+      frameworkNo: "XM-KJ-2026-002",
+      executionNo: "XM-ZX-2026-002-01",
+      executionNos: ["XM-ZX-2026-002-01", "XM-ZX-2026-002-02"],
+      normalNo: "",
+      material: "通讯管理机",
+      supplier: "远景能源",
+      spec: "CMU-V3",
+      recvTime: "2026-06-20 14:00",
+      receiver: "王宁",
+      keeper: "王宁",
+      logisticsNo: "WL-XM-20260620",
+      warehouse: "酒泉场站库房",
+      materialLines: [
+        {
+          name: "通讯管理机",
+          typeCode: "A0200100002",
+          spec: "CMU-V3",
+          category: "销售类",
+          unitPrice: "2050.00",
+          qty: "8",
+          tax: "13",
+          remark: "项目公司自采",
+          recvTime: "2026-06-20 14:00",
+          receiver: "王宁",
+          keeper: "王宁"
         }
       ]
     }
@@ -1176,6 +1266,13 @@
       toast("请选择入库类型");
       return false;
     }
+    if (isProjCompanyInboundPage()) {
+      var pt = $("qaFldPurchaseType");
+      if (pt && !String(pt.value || "").trim()) {
+        toast("请选择采购类型");
+        return false;
+      }
+    }
     return true;
   }
 
@@ -1229,6 +1326,16 @@
         '<td class="qa-lab">常规合同编号</td>' +
         '<td class="qa-val" colspan="3"><textarea class="qa-inp qa-inp--auto" id="qaFldNormalContractNo" readonly tabindex="-1" rows="1"></textarea></td>' +
         "</tr>" +
+        (isProjCompanyInboundPage()
+          ? "<tr>" +
+            '<td class="qa-lab"><span class="req">*</span>采购类型</td>' +
+            '<td class="qa-val" colspan="3">' +
+            '<select class="qa-inp" id="qaFldPurchaseType" aria-label="采购类型">' +
+            '<option value="">请选择采购类型</option>' +
+            '<option value="内部采购">内部采购</option>' +
+            '<option value="外部采购">外部采购</option>' +
+            "</select></td></tr>"
+          : "") +
         "<tr>" +
         '<td class="qa-lab"><span class="req">*</span>入库类型</td>' +
         '<td class="qa-val">' +
@@ -1306,6 +1413,8 @@
     if (block) block.classList.toggle("qa-mat-lines-block--readonly", !!readonly);
     var pickBtn = $("qaBtnPickMaterial");
     if (pickBtn) pickBtn.style.display = readonly ? "none" : "";
+    var purchaseType = $("qaFldPurchaseType");
+    if (purchaseType) purchaseType.disabled = !!readonly;
     var tbody = $("qaMatLinesTbody");
     if (!tbody) return;
     tbody.querySelectorAll("input, select, textarea, div.qa-inp--auto, button.qa-line-del").forEach(function (el) {
@@ -2493,6 +2602,15 @@
     var typeLabel = cell(M10_INBOUND_COL.inboundType) || "采购入库";
     if (inboundType) inboundType.value = typeLabel;
     if (inboundTypeBtn) inboundTypeBtn.textContent = typeLabel;
+    if (isProjCompanyInboundPage()) {
+      var purchaseType = $("qaFldPurchaseType");
+      if (purchaseType) {
+        purchaseType.value =
+          m10InboundTrAttr(tr, "data-m10-purchase-type", "") ||
+          (M10_INBOUND_COL.purchaseType != null ? cell(M10_INBOUND_COL.purchaseType) : "") ||
+          "外部采购";
+      }
+    }
     var remark = $("qaFldRemark");
     if (remark) remark.value = cell(M10_INBOUND_COL.remark) || "各级审批已完成，发起人补录入库（演示）";
     var d = m10InboundLineDataFromTr(tr);
@@ -4107,6 +4225,9 @@
       openReturnInitiator: function () {
         openQaInboundReturnInitiatorModal();
       }
+    };
+    window.M10InboundUi = {
+      refreshOps: renderM10Ops
     };
   } catch (eM10Export) {}
 

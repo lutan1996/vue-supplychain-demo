@@ -9,6 +9,7 @@
   <link rel="stylesheet" href="css/carrier-management.css" />
   <link rel="stylesheet" href="css/source-navbar-header.css" />
   <link rel="stylesheet" href="css/warehouse-modal.css?v=20260618-detail-input-v3" />
+  <link rel="stylesheet" href="css/role-hint-banner.css?v=20260707-hint-banner-v1" />
   <style>
     body.page-inventory-task .main-scroll { background: #f5f7fa; }
     .inv-wrap { padding: 12px 16px 20px; }
@@ -117,7 +118,6 @@
       outline: none;
     }
     .inv-task-select-input:focus { border-color: #91caff; box-shadow: 0 0 0 2px rgba(22, 119, 255, .08); }
-    .inv-task-field-note { display: block; margin-top: 4px; color: #8c8c8c; font-size: 12px; line-height: 1.5; }
     .inv-task-select-menu {
       position: absolute;
       left: 0;
@@ -197,7 +197,6 @@
     .inv-material-query-actions { display: flex; align-items: flex-start; gap: 10px; flex-wrap: wrap; }
     .inv-material-query-action { display: flex; flex-direction: column; align-items: flex-start; }
     .inv-material-query-field .inv-btn { min-width: 96px; height: 36px; }
-    .inv-material-query-note { margin-top: 6px; color: #98a1b2; font-size: 12px; line-height: 1.6; }
     .inv-assign-list { border: 1px solid #e9ecef; border-radius: 8px; overflow: hidden; background: #fff; }
     .inv-assign-item { display: flex; align-items: center; gap: 8px; min-height: 34px; padding: 0 10px; border-bottom: 1px solid #f0f2f5; color: #262626; font-size: 13px; cursor: pointer; }
     .inv-assign-item:last-child { border-bottom: 0; }
@@ -477,9 +476,9 @@
               <div class="inv-material-query-action">
                 <button type="button" class="inv-btn primary" id="btnMaterialQuery">查询</button>
               </div>
-              <div class="inv-material-query-action">
+              <div class="inv-material-query-action" id="materialAssignAction">
                 <button type="button" class="inv-btn" id="btnMaterialAssign">分配盘点人员</button>
-                <div class="inv-material-query-note">物资管理部门负责人，业务部门负责人，财务部门负责人角色登陆可见</div>
+                <div class="inv-material-query-note role-hint-banner role-hint-banner--compact">「分配盘点人员」按钮：仅物资管理部门负责人、业务部门负责人、财务部门负责人可见。</div>
               </div>
             </div>
           </div>
@@ -621,7 +620,7 @@
   <script src="js/sidebar-actions.js?v=20260702-timeline-v6"></script>
   <script src="js/subpage-feature-title.js"></script>
   <script src="js/site-footer.js"></script>
-  <script src="js/subpage-clock.js?v=20260705-flow-fix2"></script>
+  <script src="js/subpage-clock.js?v=20260708-sales-v1"></script>
   <script>
     (function () {
       var query = new URLSearchParams(window.location.search);
@@ -885,7 +884,7 @@
         });
         html += '</select></div></div>';
         var note = inventoryMetaNote(label);
-        if (note) html += '<em class="inv-task-field-note">' + note + '</em>';
+        if (note) html += '<div class="inv-task-field-note role-hint-banner role-hint-banner--compact">' + note + '</div>';
         html += '</div>';
         return html;
       }
@@ -1415,6 +1414,8 @@
         var summaryWidths = [150, 120, 150, 150, 120, 110, 200, 100, 100, 140, 110];
         var detailWidths = [72, 118, 104, 118, 132, 124, 124, 112, 112, 132, 110, 96, 104, 96, 118, 150, 124, 92, 78, 112, 112, 170, 176];
         if (infoGrid) infoGrid.innerHTML = inventoryTaskMetaHtml(state.current || currentTaskForAction(), "start");
+        var assignNote = document.querySelector("#materialAssignAction .inv-material-query-note");
+        if (assignNote) assignNote.hidden = !isCompany;
         if (title) title.textContent = isSummary ? "盘点物资汇总表" : (isCompany ? "盘点物资明细表（已入库未出库）" : "盘点物资明细表");
         if (back) back.hidden = isSummary;
         if (cols) {

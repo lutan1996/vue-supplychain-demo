@@ -1,0 +1,169 @@
+/* 全模块：角色说明漂浮标签（鼠标移入显示、移出消失） */
+.proc-section-hint {
+  display: inline-block;
+  position: relative;
+  font-size: 12px;
+  color: #434343;
+  margin: 0 0 12px;
+  line-height: 1.45;
+  padding: 6px 10px 6px 8px;
+  background: #fff2f0;
+  border-left: 3px solid #ff4d4f;
+  border-radius: 2px;
+  box-shadow: 0 2px 10px rgba(255, 77, 79, 0.16);
+  user-select: none;
+  max-width: min(720px, 96vw);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.18s ease, visibility 0.18s ease, box-shadow 0.15s ease, transform 0.18s ease;
+}
+
+.carrier-page-title:hover + .proc-section-hint,
+.proc-section-hint:hover {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  box-shadow: 0 4px 14px rgba(255, 77, 79, 0.28);
+}
+
+.proc-section-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1f3551;
+  margin: 16px 0 4px;
+  cursor: default;
+}
+
+.proc-field-block,
+.proc-btn-block,
+.proc-op-block {
+  position: relative;
+  vertical-align: top;
+}
+
+.proc-field-block {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-bottom: 2px;
+  padding-top: 6px;
+  padding-right: 4px;
+}
+
+.proc-btn-block {
+  display: inline-block;
+  margin-right: 10px;
+  margin-top: 6px;
+  margin-bottom: 2px;
+}
+
+.proc-op-block {
+  display: inline-block;
+  margin-right: 8px;
+  margin-top: 8px;
+  margin-bottom: 4px;
+  min-width: 48px;
+}
+
+/* 漂浮标签：默认隐藏，悬停宿主区域时显示 */
+.proc-role-hint,
+.proc-field-hint,
+.proc-section-title-hint,
+.sales-role-hint,
+.asset-hint {
+  position: absolute;
+  right: 0;
+  top: 0;
+  transform: translate(8%, -42%);
+  z-index: 24;
+  display: inline-block;
+  max-width: 196px;
+  padding: 3px 8px 3px 6px;
+  font-size: 11px;
+  line-height: 1.35;
+  font-weight: 400;
+  color: #434343;
+  background: #fff2f0;
+  border-left: 3px solid #ff4d4f;
+  border-radius: 2px;
+  box-shadow: 0 2px 10px rgba(255, 77, 79, 0.18);
+  user-select: none;
+  white-space: normal;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.18s ease, visibility 0.18s ease, transform 0.18s ease, box-shadow 0.15s ease;
+}
+
+.proc-section-title-hint {
+  position: relative;
+  transform: none;
+  display: inline-block;
+  margin: 0 0 10px;
+  max-width: min(640px, 92vw);
+}
+
+.proc-field-block:hover .proc-field-hint,
+.proc-btn-block:hover .proc-role-hint,
+.proc-btn-block:hover .sales-role-hint,
+.proc-op-block:hover .proc-role-hint,
+.proc-op-block:hover .sales-role-hint,
+.proc-section-title:hover + .proc-section-title-hint,
+.proc-section-title-hint:hover {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  box-shadow: 0 4px 14px rgba(255, 77, 79, 0.28);
+}
+
+/* 表格操作列：标签浮在按钮下方，便于移入阅读 */
+.proc-op-block .proc-role-hint,
+.proc-op-block .sales-role-hint {
+  top: 100%;
+  bottom: auto;
+  left: 0;
+  right: auto;
+  transform: translate(0, 4px);
+  max-width: 160px;
+}
+
+.proc-op-block:hover .proc-role-hint,
+.proc-op-block:hover .sales-role-hint {
+  transform: translate(0, 4px);
+}
+
+/* 门户资产区说明 */
+p.asset-hint {
+  position: relative;
+  transform: none;
+  display: inline-block;
+  margin: 0 0 8px;
+  max-width: min(480px, 90vw);
+}
+
+.biz-pane--assets:hover .asset-hint,
+.asset-hint:hover {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  box-shadow: 0 4px 14px rgba(255, 77, 79, 0.28);
+}
+
+/* 销售页：悬停对应控件块时显示 */
+.proc-m10-toolbar-btns .proc-btn-block:hover .proc-role-hint,
+.carrier-toolbar .proc-field-block:hover .proc-field-hint,
+.carrier-toolbar .proc-btn-block:hover .proc-role-hint {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  box-shadow: 0 4px 14px rgba(255, 77, 79, 0.28);
+}
+
+/* 报表页工具栏 */
+.ps-left .proc-btn-block:hover .proc-role-hint {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  box-shadow: 0 4px 14px rgba(255, 77, 79, 0.28);
+}

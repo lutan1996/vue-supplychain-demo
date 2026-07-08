@@ -176,11 +176,16 @@
     return "XSORD-2026-" + String(max + 1).padStart(3, "0");
   }
 
+  function purchasedMapKey(summary) {
+    if (!summary) return "";
+    return (summary.procurementScope || "internal") + ":" + summary.typeCode;
+  }
+
   function rebuildPurchasedMap() {
     purchasedMap = {};
     purchasedSummaries.forEach(function (item) {
       patchPurchasedSummary(item);
-      purchasedMap[item.typeCode] = item;
+      purchasedMap[purchasedMapKey(item)] = item;
     });
   }
 
@@ -329,6 +334,16 @@
     return '<button type="button" class="sales-action-link" data-action="' + esc(action) + '" data-id="' + esc(id || "") + '">' + esc(title) + "</button>";
   }
 
+  function opWithRole(title, action, id) {
+    var btn = iconBtn("", title, action, id);
+    if (title !== "收货确认") return btn;
+    return (
+      '<span class="sales-op-block">' +
+      btn +
+      '<span class="role-hint-banner sales-role-hint">可见角色：项目公司物资专责</span></span>'
+    );
+  }
+
   function qtyStepperHtml(value, key, attrName, stepAttrName) {
     var attr = attrName || "data-qty-key";
     var stepAttr = stepAttrName || "data-qty-step";
@@ -449,8 +464,13 @@
       if ((!row.manufacturer || row.manufacturer === "—") && meta.manufacturer) row.manufacturer = meta.manufacturer;
       if (!row.company || row.company === "—") row.company = "河北龙源";
       if (!row.station || row.station === "—") row.station = summary.mainStation || "麒麟山风电场";
-      if (!row.orderNo || row.orderNo === "—") row.orderNo = "XSORD-2026-001";
-      if (!row.contractNo || row.contractNo === "—") row.contractNo = "XSHT-2026-001";
+      if (!row.orderNo || row.orderNo === "—") {
+        if ((summary.procurementScope || "internal") !== "external") row.orderNo = "XSORD-2026-001";
+      }
+      if (!row.contractNo || row.contractNo === "—") {
+        if ((summary.procurementScope || "internal") === "external") row.contractNo = "XM-CG-2026-001";
+        else row.contractNo = "XSHT-2026-001";
+      }
       if (row.qty == null || row.qty === "" || row.qty === "—") row.qty = 1;
       if (!row.receiveDate || row.receiveDate === "—") row.receiveDate = summary.latestReceiveDate || "2026-06-15";
       if (!row.location || row.location === "—") row.location = (summary.mainStation || "麒麟山风电场") + "库房";
@@ -970,7 +990,7 @@
       '<div class="sales-field"><label>场站名称</label><input id="salesOrderStation" readonly value="忻州风电场"></div>' +
       '<div class="sales-field"><label>物资所属部门</label><input id="salesOrderDept" readonly value="电控所"></div>' +
       '<div class="sales-field"><label>下单日期</label><input id="salesOrderDate" type="date" value="2026-06-17"></div>' +
-      '<div class="sales-field"><label>发货路径</label><select id="salesOrderRoute"><option>工程技术公司发货</option><option>供应商直发</option></select></div>' +
+      '<div class="sales-field"><label>发货路径</label><input id="salesOrderRoute" readonly value="工程技术公司发货"></div>' +
       '<div class="sales-field"><label>当前处理人</label><input value="电控所负责人"></div>' +
       '<div class="sales-field"><label>销售合同编号</label><input readonly value="—"></div>' +
       '<div class="sales-field"><label>物流单号</label><input readonly value="—"></div>' +
@@ -997,7 +1017,7 @@
       station: formValue("#salesOrderStation", "忻州风电场"),
       owningDept: formValue("#salesOrderDept", "电控所"),
       orderDate: formValue("#salesOrderDate", todayIso()),
-      route: formValue("#salesOrderRoute", "工程技术公司发货"),
+      route: "工程技术公司发货",
       totalQty: totalQty,
       totalAmount: totalAmount,
       status: "待确认",
@@ -1039,7 +1059,10 @@
   }
 
   function mergePurchasedSummary(list, summary) {
-    var idx = list.findIndex(function (row) { return row.typeCode === summary.typeCode; });
+    var scope = summary.procurementScope || "internal";
+    var idx = list.findIndex(function (row) {
+      return row.typeCode === summary.typeCode && (row.procurementScope || "internal") === scope;
+    });
     if (idx < 0) {
       list.push(summary);
       return;
@@ -1068,6 +1091,7 @@
         grouped[key] = {
           typeCode: key,
           typeName: material.typeName,
+          procurementScope: "internal",
           productKinds: 0,
           totalQty: 0,
           totalAmount: 0,
@@ -1402,13 +1426,51 @@
       order.shipDate = formValue("#salesShipDate", todayIso());
       order.status = "已发货";
       order.handler = formValue("#salesShipPerson", order.handler || "机械所发货专责");
-      order.receiveDate = order.receiveDate && order.receiveDate !== "—" ? order.receiveDate : order.shipDate;
+      order.receiveDate = "—";
+      saveStoredOrder(order);
+      refreshOrderMap();
+      if (renderOrdersTable) renderOrdersTable();
+      closeModal();
+      toast("订单已发货，待项目公司确认收货");
+    });
+  }
+
+  function openReceiveOrder(order) {
+    order = patchOrderMaterials(order);
+    openModal(
+      "确认收货 - " + order.orderNo,
+      '<table class="sales-detail-table"><tbody>' +
+      '<tr><th>订单编号</th><td>' + esc(order.orderNo) + '</td><th>下单公司</th><td>' + esc(order.company) + '</td></tr>' +
+      '<tr><th>场站名称</th><td>' + esc(order.station) + '</td><th>物流单号</th><td>' + esc(order.waybillNo) + '</td></tr>' +
+      '<tr><th>发货日期</th><td>' + esc(order.shipDate) + '</td><th>销售合同编号</th><td>' + esc(order.contractNo) + '</td></tr>' +
+      '</tbody></table><div class="sales-section-title">订单物资明细表</div>' + orderMaterialsTableHtml(order, false) +
+      '<div class="sales-form-grid sales-form-grid--spaced">' +
+      '<div class="sales-field"><label>收货日期</label><input id="salesReceiveDate" type="date" value="' + esc(todayIso()) + '"></div>' +
+      '<div class="sales-field"><label>收货人</label><input id="salesReceivePerson" value="' + esc(order.requester || "张明") + '" placeholder="请输入收货人"></div>' +
+      '<div class="sales-field sales-field--full"><label>收货备注</label><textarea id="salesReceiveRemark" placeholder="线下验收完成后填写收货说明"></textarea></div>' +
+      '</div>',
+      '<button class="sales-btn" data-close>取消</button><button class="sales-btn sales-btn-primary" id="salesReceiveConfirm">确认收货</button>',
+      "wide"
+    );
+    setModalHeadAction("流程进度", openSalesFlowModal);
+    var ok = document.getElementById("salesReceiveConfirm");
+    if (ok) ok.addEventListener("click", function () {
+      var receiveDate = formValue("#salesReceiveDate", todayIso());
+      var receiver = formValue("#salesReceivePerson", order.requester || "");
+      if (!receiver) {
+        toast("请填写收货人");
+        return;
+      }
+      order.receiveDate = receiveDate;
+      order.requester = receiver;
+      order.status = "已完成";
+      order.handler = "—";
       saveStoredOrder(order);
       refreshOrderMap();
       syncPurchasedFromOrder(order);
       if (renderOrdersTable) renderOrdersTable();
       closeModal();
-      toast("订单已发货，购入物资和物资跟踪已同步");
+      toast("收货已确认，已纳入购入物资台账");
     });
   }
 
@@ -1438,7 +1500,7 @@
       '<div class="sales-field"><label>场站名称</label><input id="salesOrderStation" value="忻州风电场"></div>' +
       '<div class="sales-field"><label>物资所属部门</label><input id="salesOrderDept" value="电控所"></div>' +
       '<div class="sales-field"><label>下单日期</label><input id="salesOrderDate" type="date" value="2026-06-17"></div>' +
-      '<div class="sales-field"><label>发货路径</label><select id="salesOrderRoute"><option>工程技术公司发货</option><option>供应商直发</option></select></div>' +
+      '<div class="sales-field"><label>发货路径</label><input id="salesOrderRoute" readonly value="工程技术公司发货"></div>' +
       '<div class="sales-field"><label>当前处理人</label><input value="电控所负责人"></div>' +
       '<div class="sales-field"><label>销售合同编号</label><input readonly value="—"></div>' +
       '<div class="sales-field"><label>物流单号</label><input readonly value="—"></div>' +
@@ -1799,10 +1861,11 @@
 
     function render() {
       tbody.innerHTML = orders.map(function (order) {
-        var ops = iconBtn("view", "查看", "view-order", order.orderNo);
-        if (order.status === "待确认") ops += iconBtn("check", "确认/审核", "approve-order", order.orderNo);
-        if (order.status === "待签订合同") ops += iconBtn("upload", "签订合同", "upload-contract", order.orderNo);
-        if (order.status === "待发货") ops += iconBtn("truck", "发货", "ship-order", order.orderNo);
+        var ops = opWithRole("查看", "view-order", order.orderNo);
+        if (order.status === "待确认") ops += opWithRole("确认/审核", "approve-order", order.orderNo);
+        if (order.status === "待签订合同") ops += opWithRole("签订合同", "upload-contract", order.orderNo);
+        if (order.status === "待发货") ops += opWithRole("发货", "ship-order", order.orderNo);
+        if (order.status === "已发货") ops += opWithRole("收货确认", "receive-order", order.orderNo);
         return "<tr>" +
           "<td>" + esc(order.orderNo) + "</td>" +
           "<td>" + esc(order.requester) + "</td>" +
@@ -1846,6 +1909,7 @@
       if (action === "approve-order") openOrderApproval(order);
       if (action === "upload-contract") openUploadContract(order);
       if (action === "ship-order") openShipOrder(order);
+      if (action === "receive-order") openReceiveOrder(order);
       if (action === "track-order") openOrderFirstTrack(order.orderNo);
     });
 
@@ -1854,6 +1918,7 @@
 
   var purchasedSummaries = [
     {
+      procurementScope: "internal",
       typeCode: "A020010000",
       typeName: "工业控制与通讯设备",
       productKinds: 2,
@@ -1868,6 +1933,7 @@
       ]
     },
     {
+      procurementScope: "internal",
       typeCode: "A010020000",
       typeName: "风机叶片",
       productKinds: 2,
@@ -1879,6 +1945,35 @@
       details: [
         { id: "pur2-d1", productName: "叶片", materialCode: "A0100200001", productCode: "B00000005", spec: "SW64-2.0", manufacturer: "中材科技", company: "河北龙源", station: "麒麟山风电场", orderNo: "XSORD-2026-004", contractNo: "XSHT-2026-004", qty: 3, amount: 270000.00, receiveDate: "2026-06-13", location: "麒麟山风电场露天区", usageStatus: "库存中" },
         { id: "pur2-d2", productName: "备用叶片", materialCode: "A0100200002", productCode: "B00000018", spec: "SW70-3.0", manufacturer: "中材科技", company: "河北龙源", station: "麒麟山风电场", orderNo: "XSORD-2026-006", contractNo: "XSHT-2026-006", qty: 2, amount: 180000.00, receiveDate: "2026-06-11", location: "麒麟山风电场备件区", usageStatus: "库存中" }
+      ]
+    },
+    {
+      procurementScope: "external",
+      typeCode: "A020010000",
+      typeName: "工业控制与通讯设备",
+      productKinds: 2,
+      totalQty: 18,
+      totalAmount: 38580.00,
+      orderCount: 0,
+      latestReceiveDate: "2026-06-18",
+      mainStation: "麒麟山风电场",
+      details: [
+        { id: "ext1-d1", productName: "工业级交换机", materialCode: "A0200100001", productCode: "B00000006", spec: "V2.0", manufacturer: "联合动力", company: "河北龙源", station: "麒麟山风电场", orderNo: "—", contractNo: "XM-CG-2026-001", inboundNo: "RK-XM-20260618-01", qty: 10, amount: 20300.00, receiveDate: "2026-06-18", location: "麒麟山风电场库房 / A区", usageStatus: "库存中" },
+        { id: "ext1-d2", productName: "通讯管理机", materialCode: "A0200100002", productCode: "B00000016", spec: "CMU-V3", manufacturer: "远景能源", company: "甘肃龙源", station: "酒泉场站", orderNo: "—", contractNo: "XM-ZX-2026-002-01", inboundNo: "RK-XM-20260620-01", qty: 8, amount: 18280.00, receiveDate: "2026-06-20", location: "酒泉场站库房 / B区", usageStatus: "待入库" }
+      ]
+    },
+    {
+      procurementScope: "external",
+      typeCode: "A010020000",
+      typeName: "风机叶片",
+      productKinds: 1,
+      totalQty: 3,
+      totalAmount: 270000.00,
+      orderCount: 0,
+      latestReceiveDate: "2026-06-12",
+      mainStation: "麒麟山风电场",
+      details: [
+        { id: "ext2-d1", productName: "叶片", materialCode: "A0100200001", productCode: "B00000005", spec: "SW64-2.0", manufacturer: "中材科技", company: "河北龙源", station: "麒麟山风电场", orderNo: "—", contractNo: "XM-CG-2026-003", inboundNo: "RK-XM-20260612-02", qty: 3, amount: 270000.00, receiveDate: "2026-06-12", location: "麒麟山风电场备件区", usageStatus: "入库中" }
       ]
     }
   ];
@@ -1907,7 +2002,7 @@
           "<td>" + esc(textOrDash(row.receiveDate)) + "</td>" +
           "<td>" + esc(textOrDash(row.location)) + "</td>" +
           "<td>" + tag(row.usageStatus) + "</td>" +
-          "<td>" + (withTrack ? '<button type="button" class="sales-inline-link" data-modal-action="purchased-track" data-type="' + esc(summary.typeCode) + '" data-item="' + esc(row.id) + '">物资跟踪</button>' : "—") + "</td>" +
+          "<td>" + (withTrack ? '<button type="button" class="sales-inline-link" data-modal-action="purchased-track" data-type="' + esc(purchasedMapKey(summary)) + '" data-item="' + esc(row.id) + '">物资跟踪</button>' : "—") + "</td>" +
           "</tr>";
       }).join("") : '<tr><td colspan="15" class="sales-empty">暂无购入物资明细数据</td></tr>') +
       "</tbody></table></div>";
@@ -1918,6 +2013,8 @@
     return '<div class="sales-section-title">购入物资明细表</div>' + purchasedDetailsTableHtml(summary, true) +
       '<div id="salesPurchasedTrackPanel"></div>' +
       '<div class="sales-form-grid sales-form-grid--spaced">' +
+      '<div class="sales-field"><label>采购来源</label><input readonly value="' + esc(procurementScopeLabel(summary.procurementScope || "internal")) + '"></div>' +
+      '<div class="sales-field"><label>到货路径</label><input readonly value="' + esc(deliveryPathLabel(summary.procurementScope || "internal")) + '"></div>' +
       '<div class="sales-field"><label>物资类型编码</label><input readonly value="' + esc(summary.typeCode) + '"></div>' +
       '<div class="sales-field"><label>物资类型名称</label><input readonly value="' + esc(summary.typeName) + '"></div>' +
       '<div class="sales-field"><label>购入总数量</label><input readonly value="' + esc(summary.totalQty) + '"></div>' +
@@ -1941,30 +2038,49 @@
     setModalHeadAction("流程进度", openSalesFlowModal);
   }
 
+  function procurementScopeLabel(scope) {
+    return scope === "external" ? "外部自采" : "内部采购";
+  }
+
+  function deliveryPathLabel(scope) {
+    return scope === "external" ? "供应商发货" : "工程技术公司发货";
+  }
+
+  function summariesForSourceFilter(source) {
+    if (!source || source === "all") return purchasedSummaries.slice();
+    return purchasedSummaries.filter(function (summary) {
+      return (summary.procurementScope || "internal") === source;
+    });
+  }
+
   function initPurchased() {
     var tbody = document.getElementById("salesPurchasedBody");
-    var filtered = purchasedSummaries.slice();
+    var sourceFilterEl = document.getElementById("salesPurchasedSourceFilter");
+    var filtered = summariesForSourceFilter(sourceFilterEl ? sourceFilterEl.value : "all").slice();
 
     function render() {
       if (!filtered.length) {
-        tbody.innerHTML = '<tr><td colspan="6" class="sales-empty">暂无匹配购入物资数据</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="7" class="sales-empty">暂无匹配购入物资数据</td></tr>';
         return;
       }
       tbody.innerHTML = filtered.map(function (summary, idx) {
+        var scope = summary.procurementScope || "internal";
         return "<tr>" +
           "<td>" + (idx + 1) + "</td>" +
+          "<td>" + esc(procurementScopeLabel(scope)) + "</td>" +
           "<td>" + esc(summary.typeCode) + "</td>" +
           "<td>" + esc(summary.typeName) + "</td>" +
           "<td>" + money(summary.totalAmount) + "</td>" +
           "<td>" + esc(summary.totalQty) + "</td>" +
-          '<td><span class="sales-op-row">' + iconBtn("view", "查看", "view-purchased", summary.typeCode) + "</span></td>" +
+          '<td><span class="sales-op-row">' + iconBtn("view", "查看", "view-purchased", purchasedMapKey(summary)) + "</span></td>" +
           "</tr>";
       }).join("");
     }
 
     render();
 
-    document.getElementById("salesPurchasedQuery").addEventListener("click", function () {
+    function applyFilters() {
+      var source = sourceFilterEl ? sourceFilterEl.value : "all";
       var typeKeyword = String(document.getElementById("salesPurchasedTypeKeyword").value || "").trim().toLowerCase();
       var amountMin = toNumber(document.getElementById("salesPurchasedAmountMin").value);
       var amountMaxText = document.getElementById("salesPurchasedAmountMax").value;
@@ -1972,7 +2088,7 @@
       var qtyMin = toNumber(document.getElementById("salesPurchasedQtyMin").value);
       var qtyMaxText = document.getElementById("salesPurchasedQtyMax").value;
       var qtyMax = qtyMaxText === "" ? null : toNumber(qtyMaxText);
-      filtered = purchasedSummaries.filter(function (summary) {
+      filtered = summariesForSourceFilter(source).filter(function (summary) {
         var typeText = (summary.typeCode + summary.typeName).toLowerCase();
         if (typeKeyword && typeText.indexOf(typeKeyword) < 0) return false;
         if (amountMin && toNumber(summary.totalAmount) < amountMin) return false;
@@ -1982,18 +2098,26 @@
         return true;
       });
       render();
+    }
+
+    document.getElementById("salesPurchasedQuery").addEventListener("click", function () {
+      applyFilters();
       toast("已按条件查询购入物资");
     });
     document.getElementById("salesPurchasedReset").addEventListener("click", function () {
+      if (sourceFilterEl) sourceFilterEl.value = "all";
       document.getElementById("salesPurchasedTypeKeyword").value = "";
       document.getElementById("salesPurchasedAmountMin").value = "";
       document.getElementById("salesPurchasedAmountMax").value = "";
       document.getElementById("salesPurchasedQtyMin").value = "";
       document.getElementById("salesPurchasedQtyMax").value = "";
-      filtered = purchasedSummaries.slice();
+      filtered = summariesForSourceFilter("all").slice();
       render();
       toast("已重置筛选条件");
     });
+    if (sourceFilterEl) {
+      sourceFilterEl.addEventListener("change", applyFilters);
+    }
 
     tbody.addEventListener("click", function (e) {
       var btn = e.target.closest("[data-action]");

@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>项目公司实物入库 - 新能源物资供应链管理系统</title>
+  <link rel="stylesheet" href="css/vendor/fa-all.min.css" />
+  <link rel="stylesheet" href="css/subpage-base.css" />
+  <link rel="stylesheet" href="css/carrier-management.css" />
+  <link rel="stylesheet" href="css/source-navbar-header.css" />
+  <link rel="stylesheet" href="css/sales-management.css?v=20260707-unified-v1" />
+  <link rel="stylesheet" href="css/sales-pci-inbound-hub.css?v=20260707-unified-v1" />
+</head>
+<body class="page-source-navbar page-subpage sales-page" data-sales-page="proj-inbound">
+<div class="page-bg" aria-hidden="true"></div><div class="app">
+<header class="header"><div class="header-left"><button type="button" class="header-hamburger" aria-label="菜单"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button><a class="header-logo" href="#"><img src="assets/logo-chenergy.png" alt="" width="220" height="40"/></a><div class="header-source-brand"><p>新能源供应链管理系统</p></div></div><div class="header-right"><span class="clock" id="clock"></span><div class="user-avatar">用</div></div></header>
+<div class="layout"><aside class="sidebar" aria-label="主导航"><div class="nav-item"><span class="nav-label">销售管理</span></div></aside>
+<main class="main-scroll"><div class="carrier-main-inner"><div class="sales-shell">
+  <div class="sales-head"><div><h1>项目公司实物入库</h1><p class="sales-subtitle">办理项目公司自采物资入库，关联采购合同后登记入库明细。</p></div></div>
+  <div class="sales-body">
+    <div class="role-hint-banner role-hint-banner--inline">「新增入库」等操作：仅项目公司物资专责可见。</div>
+    <div class="sales-pci-inbound-card proc-card">
+      <div class="carrier-toolbar">
+        <div class="proc-m10-toolbar-btns" style="display:flex;flex-wrap:wrap;gap:8px;align-items:center">
+          <button type="button" class="carrier-btn-add js-op" data-op="新增">新增入库</button>
+        </div>
+        <div class="carrier-toolbar-right proc-toolbar-row" style="margin-left:0;width:100%;justify-content:flex-start;margin-top:8px;align-items:flex-end;flex-wrap:wrap;gap:8px">
+          <input class="carrier-search" type="search" placeholder="入库单号" aria-label="入库单号" />
+          <input class="carrier-search" type="search" placeholder="合同编号/产品名称" aria-label="合同编号/产品名称" />
+          <select class="carrier-select" aria-label="验收状态"><option>全部状态</option><option>待验收</option><option>验收中</option><option>已验收</option><option>已入库</option></select>
+          <button type="button" class="carrier-btn-add js-op" data-op="查询质量验收">筛选/搜索</button>
+          <button type="button" class="carrier-btn-add js-op" data-op="重置筛选">重置</button>
+        </div>
+      </div>
+      <div class="carrier-table-wrap proc-m10-table-wrap">
+        <table class="carrier-table" id="proc-m10-inbound-table">
+          <thead>
+            <tr>
+              <th>入库单号</th>
+              <th>框架协议号/常规合同编号</th>
+              <th>执行合同编号</th>
+              <th>供应商名称</th>
+              <th>产品名称</th>
+              <th>入库类型</th>
+              <th>验收状态</th>
+              <th>入库时间</th>
+              <th>入库人</th>
+              <th>备注</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody id="proc-m10-inbound-tbody">
+            <tr data-m10-spec="V2.0" data-m10-ship-qty="10" data-m10-recv-qty="10" data-m10-warehouse="麒麟山风电场库房 / A区" data-m10-keeper="张明" data-m10-receiver="张明" data-m10-mat-type="销售类" data-m10-type-code="A0200100001" data-m10-logistics="WL-XM-20260618" data-m10-recv-time="2026-06-18 10:30" data-m10-primary-name="工业级交换机" data-m10-products="工业级交换机">
+              <td>RK-XM-20260618-01</td>
+              <td>XM-CG-2026-001</td>
+              <td></td>
+              <td>联合动力</td>
+              <td>工业级交换机</td>
+              <td>采购入库</td>
+              <td><span class="tag-soft tag-done">已入库</span></td>
+              <td>2026-06-18 10:30</td>
+              <td>张明</td>
+              <td>河北龙源场站直采</td>
+              <td class="proc-ops-cell"><span class="proc-ops-row" data-m10-op></span></td>
+            </tr>
+            <tr data-m10-spec="CMU-V3" data-m10-ship-qty="8" data-m10-recv-qty="0" data-m10-warehouse="酒泉场站库房 / B区" data-m10-keeper="王宁" data-m10-receiver="王宁" data-m10-mat-type="销售类" data-m10-type-code="A0200100002" data-m10-logistics="WL-XM-20260620" data-m10-recv-time="2026-06-20 14:00" data-m10-primary-name="通讯管理机" data-m10-products="通讯管理机">
+              <td>RK-XM-20260620-01</td>
+              <td>XM-KJ-2026-002</td>
+              <td>XM-ZX-2026-002-01</td>
+              <td>远景能源</td>
+              <td>通讯管理机</td>
+              <td>采购入库</td>
+              <td><span class="tag-soft tag-pending">待入库</span></td>
+              <td>2026-06-20 14:00</td>
+              <td>王宁</td>
+              <td>甘肃龙源框架合同第1批</td>
+              <td class="proc-ops-cell"><span class="proc-ops-row" data-m10-op></span></td>
+            </tr>
+            <tr data-m10-flow-return="1" data-m10-spec="SW64-2.0" data-m10-ship-qty="3" data-m10-recv-qty="3" data-m10-warehouse="麒麟山风电场备件区" data-m10-keeper="李芳" data-m10-receiver="李芳" data-m10-mat-type="销售类" data-m10-type-code="A0100200001" data-m10-logistics="WL-XM-20260612" data-m10-recv-time="2026-06-12 09:15" data-m10-primary-name="叶片" data-m10-products="叶片">
+              <td>RK-XM-20260612-02</td>
+              <td>XM-CG-2026-003</td>
+              <td></td>
+              <td>中材科技</td>
+              <td>叶片</td>
+              <td>采购入库</td>
+              <td><span class="tag-soft tag-pending">入库中</span></td>
+              <td>2026-06-12 09:15</td>
+              <td>李芳</td>
+              <td>流程回到发起人补录</td>
+              <td class="proc-ops-cell"><span class="proc-ops-row" data-m10-op></span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div></div></main></div></div>
+
+<div id="procModalMask" class="proc-modal-mask" aria-hidden="true">
+  <div class="proc-modal-box" role="dialog" aria-modal="true" aria-labelledby="procModalTitle">
+    <div class="proc-modal-head">
+      <span id="procModalTitle">提示</span>
+      <button type="button" id="procModalFlow" class="proc-modal-flow-btn" data-map-open-progress="1" hidden aria-hidden="true">流程进度</button>
+      <button type="button" class="proc-btn" id="procModalX" aria-label="关闭">×</button>
+    </div>
+    <div class="proc-modal-body" id="procModalBody"></div>
+    <div class="proc-modal-foot" id="procModalFoot">
+      <button type="button" class="proc-btn" id="procModalClose">取消</button>
+    </div>
+  </div>
+</div>
+
+<script src="js/sidebar-actions.js"></script>
+<script src="js/subpage-feature-title.js"></script>
+<script src="js/site-footer.js"></script>
+<script src="js/map-demo-toast.js"></script>
+<script src="js/subpage-clock.js?v=20260708-sales-v1"></script>
+<script src="js/material-code-scheme.js"></script>
+<script src="js/demo-two-col-dd.js"></script>
+<script src="js/demo-product-catalog-data.js"></script>
+<script src="js/demo-product-catalog-picker.js"></script>
+<script src="js/material-procurement-hub.js?v=20260706-pci-contracts-v1"></script>
+<script src="js/sales-proj-inbound-page.js?v=20260707-unified-v1"></script>
+</body>
+</html>

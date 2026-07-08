@@ -72,6 +72,18 @@
 .sales-page[data-sales-page="purchased"] .sales-table th:nth-child(3),.sales-page[data-sales-page="purchased"] .sales-table td:nth-child(3){min-width:220px;max-width:280px;text-align:left}
 .sales-page[data-sales-page="purchased"] .sales-table th:last-child,.sales-page[data-sales-page="purchased"] .sales-table td:last-child{min-width:110px;width:110px;max-width:110px}
 .sales-page[data-sales-page="purchased"] .sales-op-row{gap:6px}
+.sales-pci-tabs{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px;padding-bottom:2px;border-bottom:1px solid #edf1f6}
+.sales-pci-tab{border:1px solid #dbe6f3;background:#fff;color:#334155;border-radius:16px;padding:5px 14px;font-size:12px;cursor:pointer;line-height:1.4}
+.sales-pci-tab.is-active{color:#1677ff;border-color:#91caff;background:#e6f4ff;font-weight:600}
+.sales-pci-pane{display:none}
+.sales-pci-pane.is-active{display:block}
+.sales-pci-inbound-card{border:1px solid #e7ecf3;border-radius:4px;background:#fff;padding:10px 12px}
+.sales-role-hint{display:block}
+.sales-op-block{display:inline}
+.sales-op-block{display:inline-flex;flex-direction:column;align-items:center;justify-content:flex-start;vertical-align:top;min-width:52px}
+.sales-op-block .sales-action-link{white-space:nowrap}
+.sales-page[data-sales-page="orders"] .sales-table th:last-child,.sales-page[data-sales-page="orders"] .sales-table td:last-child{min-width:220px;width:auto;max-width:none;vertical-align:middle}
+.sales-page[data-sales-page="orders"] .sales-op-row{gap:10px;flex-wrap:wrap;justify-content:center;align-items:flex-start}
 .sales-page[data-sales-page="report"] .sales-table{min-width:1440px}
 .sales-page[data-sales-page="report"] .sales-table th:nth-child(1),.sales-page[data-sales-page="report"] .sales-table td:nth-child(1){min-width:220px;max-width:280px;text-align:left}
 .sales-page[data-sales-page="report"] .sales-table th:nth-child(3),.sales-page[data-sales-page="report"] .sales-table td:nth-child(3){min-width:260px;max-width:320px;text-align:left}

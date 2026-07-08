@@ -96,6 +96,10 @@
       position:fixed;inset:0;background:rgba(0,0,0,.36);display:none;align-items:center;justify-content:center;z-index:3000
     }
     .modal-mask.show{display:flex}
+    #detailMask.show,
+    #actionMask.show {
+      z-index: 50100 !important;
+    }
     .modal{
       width:min(980px,96vw);max-height:90vh;overflow:auto;background:#fff;border-radius:12px;border:1px solid var(--border);
       box-shadow:0 16px 40px rgba(0,0,0,.18);
@@ -103,6 +107,11 @@
     .modal-hd{display:flex;justify-content:space-between;align-items:center;padding:12px 14px;border-bottom:1px solid var(--border);font-weight:700;color:#1f2937}
     .modal-bd{padding:12px 14px;font-size:13px;color:#374151}
     .modal-ft{padding:10px 14px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:8px}
+    /* 弹窗内角色说明（浅蓝提示条） */
+    .req-modal-bd--annot {
+      position: relative;
+      padding-bottom: 8px;
+    }
     .x-btn{border:none;background:transparent;cursor:pointer;font-size:18px;color:#6b7280}
     .x-btn:hover{color:#111827}
     .detail-body{display:block}
@@ -302,17 +311,17 @@
 
   <div class="modal-mask" id="detailMask" aria-hidden="true">
     <div class="modal">
-      <div class="modal-hd"><span id="detailTitle">详情</span><div style="display:flex;align-items:center;gap:8px"><button class="btn secondary" id="detailProgressTop" style="display:none;height:28px;padding:0 10px">流程进度</button><button class="x-btn" id="detailX" aria-label="关闭">×</button></div></div>
+      <div class="modal-hd"><span id="detailTitle">详情</span><div style="display:flex;align-items:center;gap:8px"><button type="button" class="btn secondary" id="detailProgressTop" data-map-skip-unified-progress="1" style="display:none;height:28px;padding:0 10px">流程进度</button><button class="x-btn" id="detailX" aria-label="关闭">×</button></div></div>
       <div class="modal-bd"><div class="detail-body" id="detailBody"></div></div>
       <div class="modal-ft"><button class="btn" id="detailClose">取消</button></div>
       </div>
   </div>
   <div class="modal-mask" id="actionMask" aria-hidden="true">
     <div class="modal">
-      <div class="modal-hd"><span id="actionTitle">操作</span><div style="display:flex;align-items:center;gap:8px"><button class="btn secondary" id="actionProgressTop" style="display:none;height:28px;padding:0 10px">流程进度</button><button class="x-btn" id="actionX" aria-label="关闭">×</button></div></div>
+      <div class="modal-hd"><span id="actionTitle">操作</span><div style="display:flex;align-items:center;gap:8px"><button type="button" class="btn secondary" id="actionProgressTop" data-map-skip-unified-progress="1" style="display:none;height:28px;padding:0 10px">流程进度</button><button class="x-btn" id="actionX" aria-label="关闭">×</button></div></div>
       <div class="modal-bd" id="actionBody"></div>
       <div class="modal-ft" id="actionFoot">
-        <button class="btn secondary" id="actionProgress" style="display:none">流程进度</button>
+        <button type="button" class="btn secondary" id="actionProgress" data-map-skip-unified-progress="1" style="display:none">流程进度</button>
         <button class="btn" id="actionCancel">取消</button>
         <button class="btn primary" id="actionOk">确定</button>
       </div>
@@ -378,8 +387,8 @@
 
   <script src="js/sidebar-actions.js?v=20260702-timeline-v6"></script>
   <script src="js/subpage-feature-title.js"></script>
-  <script src="js/subpage-clock.js?v=20260706-ledger-flow-anyone"></script>
-  <script src="js/purchase-ledger-flow-progress.js?v=20260706-ledger-flow-anyone"></script>
+  <script src="js/subpage-clock.js?v=20260708-sales-v1"></script>
+  <script src="js/purchase-ledger-flow-progress.js?v=20260707-trf-flow-read4"></script>
   <script src="js/cross-dept-handoff-demo.js"></script>
   <script src="js/material-code-scheme.js"></script>
   <script src="js/demo-product-catalog-data.js"></script>
@@ -492,6 +501,163 @@
       function setPurchaseLedgerProgressScope(scope) {
         window.__mapProgressFlowScope = scope || "";
       }
+      var detailCtx = { type: "" };
+      var actionCtx = { mode: "", row: null };
+      function isTransferProgressContext() {
+        if (window.__mapProgressFlowScope === "purchase-ledger-transfer") return true;
+        if (detailCtx.type === "transfer") return true;
+        if (actionCtx.mode === "transfer") return true;
+        var actionTitle = document.getElementById("actionTitle");
+        if (actionTitle && String(actionTitle.textContent || "").indexOf("内部流转") >= 0) return true;
+        var detailTitle = document.getElementById("detailTitle");
+        if (detailTitle && String(detailTitle.textContent || "").indexOf("流转记录") >= 0) return true;
+        return false;
+      }
+      function patchTransferFlowProgressInline(mask) {
+        if (!mask || !isTransferProgressContext()) return;
+        var track = mask.querySelector(".map-flow-track");
+        var info = mask.querySelector(".map-flow-info");
+        if (!track) return;
+        track.innerHTML =
+          '<div class="map-flow-row">' +
+          '<span class="map-flow-node">电控所任何人发起申请，将机械所物资转入本部门</span>' +
+          '<span class="map-flow-arrow">→</span>' +
+          '<span class="map-flow-node">电控所负责人审批，通过</span>' +
+          '<span class="map-flow-arrow">→</span>' +
+          '<span class="map-flow-node">物资管理部门物资专责阅知</span>' +
+          '<span class="map-flow-arrow">→</span>' +
+          '<span class="map-flow-node">物资管理部门专责核对清单，无误</span>' +
+          '<span class="map-flow-arrow">→</span>' +
+          '<span class="map-flow-node">机械研究所物资专责审批，通过</span>' +
+          '<span class="map-flow-arrow">→</span>' +
+          '<span class="map-flow-node">机械研究所负责人审批，通过</span>' +
+          '<span class="map-flow-arrow">→</span>' +
+          '<span class="map-flow-node">物资管理部门物资专责确认</span>' +
+          '</div>' +
+          '<div class="map-flow-row" style="margin-top:18px">' +
+          '<span class="map-flow-node end">公司内部流转结束</span>' +
+          '<span class="map-flow-dot end"></span>' +
+          '</div>';
+        if (info) {
+          info.innerHTML =
+            '<div class="map-flow-timeline" style="padding:4px 0">' +
+            '<div class="map-flow-tl-item">' +
+            '<div class="map-flow-tl-dot" style="background:#10b981"></div><div class="map-flow-tl-line"></div>' +
+            '<div class="map-flow-tl-body">' +
+            '<div class="map-flow-tl-meta"><span class="map-flow-tl-person">电控所于伟</span><span class="map-flow-tl-time">2026-05-10 09:12</span><span class="map-flow-tl-badge" style="background:#10b98122;color:#10b981">已通过</span></div>' +
+            '<div class="map-flow-tl-content">发起申请：将机械所物资转入本部门</div>' +
+            '</div></div>' +
+            '<div class="map-flow-tl-item">' +
+            '<div class="map-flow-tl-dot" style="background:#10b981"></div><div class="map-flow-tl-line"></div>' +
+            '<div class="map-flow-tl-body">' +
+            '<div class="map-flow-tl-meta"><span class="map-flow-tl-person">电控所负责人陈亮</span><span class="map-flow-tl-time">2026-05-10 10:03</span><span class="map-flow-tl-badge" style="background:#10b98122;color:#10b981">已通过</span></div>' +
+            '<div class="map-flow-tl-content">审批：通过</div>' +
+            '</div></div>' +
+            '<div class="map-flow-tl-item">' +
+            '<div class="map-flow-tl-dot" style="background:#10b981"></div><div class="map-flow-tl-line"></div>' +
+            '<div class="map-flow-tl-body">' +
+            '<div class="map-flow-tl-meta"><span class="map-flow-tl-person">物资管理部门物资专责宋中波</span><span class="map-flow-tl-time">2026-05-10 10:15</span><span class="map-flow-tl-badge" style="background:#10b98122;color:#10b981">已阅知</span></div>' +
+            '<div class="map-flow-tl-content">阅知：已知悉</div>' +
+            '</div></div>' +
+            '<div class="map-flow-tl-item">' +
+            '<div class="map-flow-tl-dot" style="background:#10b981"></div><div class="map-flow-tl-line"></div>' +
+            '<div class="map-flow-tl-body">' +
+            '<div class="map-flow-tl-meta"><span class="map-flow-tl-person">物资管理部门专责宋中波</span><span class="map-flow-tl-time">2026-05-10 10:22</span><span class="map-flow-tl-badge" style="background:#10b98122;color:#10b981">已通过</span></div>' +
+            '<div class="map-flow-tl-content">核对清单：无误</div>' +
+            '</div></div>' +
+            '<div class="map-flow-tl-item">' +
+            '<div class="map-flow-tl-dot" style="background:#10b981"></div><div class="map-flow-tl-line"></div>' +
+            '<div class="map-flow-tl-body">' +
+            '<div class="map-flow-tl-meta"><span class="map-flow-tl-person">机械研究所物资专责许学良</span><span class="map-flow-tl-time">2026-05-10 10:28</span><span class="map-flow-tl-badge" style="background:#10b98122;color:#10b981">已通过</span></div>' +
+            '<div class="map-flow-tl-content">审批：通过</div>' +
+            '</div></div>' +
+            '<div class="map-flow-tl-item">' +
+            '<div class="map-flow-tl-dot" style="background:#10b981"></div><div class="map-flow-tl-line"></div>' +
+            '<div class="map-flow-tl-body">' +
+            '<div class="map-flow-tl-meta"><span class="map-flow-tl-person">机械研究所负责人李仁堂</span><span class="map-flow-tl-time">2026-05-10 10:48</span><span class="map-flow-tl-badge" style="background:#10b98122;color:#10b981">已通过</span></div>' +
+            '<div class="map-flow-tl-content">审批：通过</div>' +
+            '</div></div>' +
+            '<div class="map-flow-tl-item">' +
+            '<div class="map-flow-tl-dot" style="background:#10b981"></div><div class="map-flow-tl-line"></div>' +
+            '<div class="map-flow-tl-body">' +
+            '<div class="map-flow-tl-meta"><span class="map-flow-tl-person">物资管理部门专责宋中波</span><span class="map-flow-tl-time">2026-05-10 11:05</span><span class="map-flow-tl-badge" style="background:#10b98122;color:#10b981">已完成</span></div>' +
+            '<div class="map-flow-tl-content">确认：已确认</div>' +
+            '</div></div>' +
+            '<div class="map-flow-tl-item map-flow-tl-last">' +
+            '<div class="map-flow-tl-dot" style="background:#10b981"></div>' +
+            '<div class="map-flow-tl-body">' +
+            '<div class="map-flow-tl-meta"><span class="map-flow-tl-person">系统</span><span class="map-flow-tl-time">2026-05-10 11:30</span><span class="map-flow-tl-badge" style="background:#10b98122;color:#10b981">已完成</span></div>' +
+            '<div class="map-flow-tl-content">公司内部流转结束</div>' +
+            '</div></div></div>';
+        }
+      }
+      function applyTransferProgressPatch(mask) {
+        if (!mask) mask = document.getElementById("mapUnifiedProgressModal");
+        if (!mask) return;
+        if (isTransferProgressContext()) {
+          setPurchaseLedgerProgressScope("purchase-ledger-transfer");
+          patchTransferFlowProgressInline(mask);
+        }
+      }
+      function openLedgerProgressModal(scope) {
+        if (scope) {
+          setPurchaseLedgerProgressScope(scope);
+        } else if (detailCtx.type === "transfer" || isTransferProgressContext()) {
+          setPurchaseLedgerProgressScope("purchase-ledger-transfer");
+        } else if (detailCtx.type === "requisition") {
+          setPurchaseLedgerProgressScope("purchase-ledger-requisition");
+        } else {
+          ensureActionProgressScope();
+        }
+        if (typeof window.ensureUnifiedProgressModal === "function") {
+          window.ensureUnifiedProgressModal();
+        }
+        if (typeof window.openUnifiedProgressModal === "function") {
+          window.openUnifiedProgressModal();
+        }
+        var mask = document.getElementById("mapUnifiedProgressModal");
+        applyTransferProgressPatch(mask);
+        if (mask) mask.classList.add("show");
+        requestAnimationFrame(function () {
+          applyTransferProgressPatch(document.getElementById("mapUnifiedProgressModal"));
+        });
+      }
+      function ensureActionProgressScope() {
+        if (actionCtx.mode === "requisition") {
+          setPurchaseLedgerProgressScope("purchase-ledger-requisition");
+        } else if (actionCtx.mode === "transfer") {
+          setPurchaseLedgerProgressScope("purchase-ledger-transfer");
+        }
+      }
+      function openActionProgressModal() {
+        openLedgerProgressModal();
+      }
+      (function overrideUnifiedProgressForTransfer() {
+        var builtin = window.openUnifiedProgressModal;
+        window.openUnifiedProgressModal = function () {
+          if (isTransferProgressContext()) {
+            setPurchaseLedgerProgressScope("purchase-ledger-transfer");
+          }
+          var ok = typeof builtin === "function" ? builtin.apply(this, arguments) : false;
+          applyTransferProgressPatch(document.getElementById("mapUnifiedProgressModal"));
+          requestAnimationFrame(function () {
+            applyTransferProgressPatch(document.getElementById("mapUnifiedProgressModal"));
+          });
+          return ok !== false;
+        };
+      })();
+      document.addEventListener(
+        "click",
+        function (e) {
+          var t = e.target;
+          if (!t) return;
+          if (t.id !== "actionProgressTop" && t.id !== "actionProgress" && t.id !== "detailProgressTop" && t.id !== "detailProgressInline") return;
+          e.preventDefault();
+          if (typeof e.stopImmediatePropagation === "function") e.stopImmediatePropagation();
+          openLedgerProgressModal();
+        },
+        true
+      );
       function ledgerDetailProductCode(baseCode, idx) {
         if (MCS && /^B\d{8}$/i.test(String(baseCode || ""))) {
           return MCS.instanceCodeWithOffset(baseCode, idx - 1);
@@ -1189,7 +1355,7 @@
 
       var tabs = {
         ledger: {
-          name: "物资统计",
+          name: "物资台帐",
           search: [["name","物资类型名称"],["dept","领用部门"]],
           columns: [
             ["name","物资类型名称"],
@@ -1250,7 +1416,7 @@
           })
         },
         requisition: {
-          name: "领用记录",
+          name: "物资领用",
           search: [["reqNo","领用单号"],["name","选择物资"]],
           columns: [
             ["reqNo","领用单号"],
@@ -1294,7 +1460,7 @@
           })
         },
         flow: {
-          name: "流转记录",
+          name: "内部流转",
           search: [["flowNo","流转单号"],["materialCode","物资类型编码"]],
           columns: [
             ["flowNo","流转单号"],
@@ -2246,6 +2412,10 @@
           content: function (item) { return item.content; }
         }) : "") + '</div>';
       }
+      function reqModalHintPanelHtml(title, text) {
+        void title;
+        return '<div class="role-hint-banner role-hint-banner--inline" role="note">' + esc(text) + "</div>";
+      }
       function openReqProgressModal(type) {
         removeReqFloatingModal("reqBizProgressMask");
         var title = type === "external" ? "审批记录 - 外部借用" : "审批记录 - 变更使用人";
@@ -2298,9 +2468,8 @@
           '<div class="modal-mask show" id="reqUserChangeModalMask" style="z-index:12010">' +
             '<div class="modal" style="width:min(620px,94vw);max-height:84vh;overflow:auto">' +
               '<div class="modal-hd"><span>变更使用人</span><div style="display:flex;align-items:center;gap:14px"><button type="button" data-open-req-progress="internal" style="border:none;background:none;color:#1677ff;font-size:15px;font-weight:700;cursor:pointer">流程进度</button><button type="button" class="x-btn" data-close-user-change="1">×</button></div></div>' +
-              '<div class="modal-bd">' +
+              '<div class="modal-bd req-modal-bd--annot">' +
                 '<div style="font-size:12px;color:#64748b;margin-bottom:8px">物资：' + esc(productName || "-") + '（' + esc(productCode || "-") + '）</div>' +
-                '<div style="margin-bottom:10px;padding:10px 12px;border:1px solid #d9e7ff;border-radius:10px;background:#f5f9ff;color:#5b6f8c;font-size:12px;line-height:1.7">本部门内部变更使用，仅限同一部门内调整；如需跨部门流转，请走物资流转流程。</div>' +
                 '<div style="font-size:13px;color:#1f3551;font-weight:600;margin-bottom:6px">接收使用人</div>' +
                 '<input class="carrier-search req-user-search" placeholder="输入姓名搜索" autocomplete="off" style="width:100%;height:36px;border:1px solid #e9ecef;border-radius:8px;padding:0 10px;box-sizing:border-box;font-family:inherit;font-size:13px;margin-bottom:8px" />' +
                 '<div class="req-user-options" style="border:1px solid #e9ecef;border-radius:8px;overflow:hidden;background:#fff">' +
@@ -2310,6 +2479,7 @@
                 '</div>' +
                 '<div style="margin-top:12px;font-size:13px;color:#1f3551;font-weight:600;margin-bottom:6px">变更原因</div>' +
                 '<textarea id="reqUserChangeReason" class="carrier-search" placeholder="请输入变更原因" style="width:100%;height:82px;border:1px solid #e9ecef;border-radius:8px;padding:8px 10px;box-sizing:border-box;font-family:inherit;font-size:13px;resize:vertical"></textarea>' +
+                reqModalHintPanelHtml("变更说明", "本部门内部变更使用，仅限同一部门内调整；如需跨部门流转，请走物资流转流程。") +
               '</div>' +
               '<div class="modal-ft"><button type="button" class="btn secondary" data-close-user-change="1">取消</button><button type="button" class="btn primary" data-ok-user-change="1">确定</button></div>' +
             '</div>' +
@@ -2328,6 +2498,11 @@
         }
         if (modalMask) {
           modalMask.addEventListener("click", function (ev) {
+            if (ev.target.closest && ev.target.closest(".req-modal-annot-panel__close")) {
+              var hintPanel = ev.target.closest(".req-modal-annot-panel");
+              if (hintPanel) hintPanel.remove();
+              return;
+            }
             if (ev.target === modalMask || (ev.target && ev.target.getAttribute("data-close-user-change") === "1")) {
               removeReqFloatingModal("reqUserChangeModalMask");
               return;
@@ -2348,9 +2523,8 @@
           '<div class="modal-mask show" id="reqExternalBorrowModalMask" style="z-index:12010">' +
             '<div class="modal" style="width:min(640px,94vw);max-height:84vh;overflow:auto">' +
               '<div class="modal-hd"><span>外部借用</span><div style="display:flex;align-items:center;gap:14px"><button type="button" data-open-req-progress="external" style="border:none;background:none;color:#1677ff;font-size:15px;font-weight:700;cursor:pointer">流程进度</button><button type="button" class="x-btn" data-close-external-borrow="1">×</button></div></div>' +
-              '<div class="modal-bd">' +
+              '<div class="modal-bd req-modal-bd--annot">' +
                 '<div style="font-size:12px;color:#64748b;margin-bottom:8px">物资：' + esc(productName || "-") + '（' + esc(productCode || "-") + '）</div>' +
-                '<div style="margin-bottom:12px;padding:10px 12px;border:1px solid #d9e7ff;border-radius:10px;background:#f5f9ff;color:#5b6f8c;font-size:12px;line-height:1.7">外部借用需发起审批，经公司主管同意后办理借用交接，并由经营发展中心留痕登记。</div>' +
                 '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px 14px">' +
                   '<div><div style="font-size:13px;color:#1f3551;font-weight:600;margin-bottom:6px">外部单位</div><input class="carrier-search" id="reqBorrowOrg" placeholder="请输入外部单位名称" style="width:100%;height:36px;border:1px solid #e9ecef;border-radius:8px;padding:0 10px;box-sizing:border-box;font-family:inherit;font-size:13px" /></div>' +
                   '<div><div style="font-size:13px;color:#1f3551;font-weight:600;margin-bottom:6px">借用人姓名</div><input class="carrier-search" id="reqBorrowUser" placeholder="请输入借用人姓名" style="width:100%;height:36px;border:1px solid #e9ecef;border-radius:8px;padding:0 10px;box-sizing:border-box;font-family:inherit;font-size:13px" /></div>' +
@@ -2359,6 +2533,7 @@
                 '</div>' +
                 '<div style="margin-top:12px;font-size:13px;color:#1f3551;font-weight:600;margin-bottom:6px">借用说明</div>' +
                 '<textarea id="reqBorrowReason" class="carrier-search" placeholder="请输入借用说明" style="width:100%;height:82px;border:1px solid #e9ecef;border-radius:8px;padding:8px 10px;box-sizing:border-box;font-family:inherit;font-size:13px;resize:vertical"></textarea>' +
+                reqModalHintPanelHtml("借用须知", "外部借用需发起审批，经公司主管同意后办理借用交接，并由经营发展中心留痕登记。") +
               '</div>' +
               '<div class="modal-ft"><button type="button" class="btn secondary" data-close-external-borrow="1">取消</button><button type="button" class="btn primary" data-ok-external-borrow="1">确定</button></div>' +
             '</div>' +
@@ -2367,6 +2542,11 @@
         var modalMask = document.getElementById("reqExternalBorrowModalMask");
         if (modalMask) {
           modalMask.addEventListener("click", function (ev) {
+            if (ev.target.closest && ev.target.closest(".req-modal-annot-panel__close")) {
+              var hintPanel = ev.target.closest(".req-modal-annot-panel");
+              if (hintPanel) hintPanel.remove();
+              return;
+            }
             if (ev.target === modalMask || (ev.target && ev.target.getAttribute("data-close-external-borrow") === "1")) {
               removeReqFloatingModal("reqExternalBorrowModalMask");
               return;
@@ -2381,6 +2561,7 @@
           });
         }
       }
+      function toggleRoleAnnotForModal() {}
       function restoreLedgerDetailOperationButtons() {
         var title = document.getElementById("detailTitle");
         if (!title || String(title.textContent || "").replace(/\s+/g, "").indexOf("物资详情-") !== 0) return;
@@ -2398,7 +2579,7 @@
             for (var ci = 0; ci < cells.length - 1; ci++) {
               var cellTxt = String(cells[ci].textContent || "").trim();
               if (cellTxt && !productName && ci === 1) productName = cellTxt;
-              if (cellTxt && !productCode && ci === 2) productCode = cellTxt;
+              if (cellTxt && !productCode && ci === 3) productCode = cellTxt;
             }
             if (!productName) productName = "物资";
             if (!productCode) productCode = "—";
@@ -2902,8 +3083,10 @@
         var body = document.getElementById("detailBody");
         var detailProgressTopEl = document.getElementById("detailProgressTop");
         if (detailProgressTopEl) detailProgressTopEl.style.display = "none";
+        detailCtx.type = "";
         setPurchaseLedgerProgressScope("");
         if (row && row.flowNo) {
+          detailCtx.type = "transfer";
           if (detailProgressTopEl) detailProgressTopEl.style.display = "";
           setPurchaseLedgerProgressScope("purchase-ledger-transfer");
           var flowCols = (tabs.flow && tabs.flow.columns) || [];
@@ -2964,9 +3147,11 @@
           body.innerHTML = flowHead + flowDetailTable;
           document.getElementById("detailTitle").textContent = "流转记录 - " + (row.flowNo || "");
           document.getElementById("detailMask").classList.add("show");
+          toggleRoleAnnotForModal(true);
           return;
         }
         if (row && row.reqNo) {
+          detailCtx.type = "requisition";
           if (detailProgressTopEl) detailProgressTopEl.style.display = "";
           setPurchaseLedgerProgressScope("purchase-ledger-requisition");
           var ledgerRows = (tabs.ledger && tabs.ledger.rows) || [];
@@ -3076,6 +3261,7 @@
             });
           document.getElementById("detailTitle").textContent = "领用记录 - " + (row.reqNo || "");
           document.getElementById("detailMask").classList.add("show");
+          toggleRoleAnnotForModal(true);
           return;
         }
         var ledgerCols = (tabs.ledger && tabs.ledger.columns) || [];
@@ -3090,15 +3276,17 @@
         body.innerHTML = head + detailTable;
         document.getElementById("detailTitle").textContent = "物资详情 - " + (row.name || "未命名物资");
         document.getElementById("detailMask").classList.add("show");
+        toggleRoleAnnotForModal(true);
         restoreLedgerDetailOperationButtons();
       }
       function closeDetail(){
         document.getElementById("detailMask").classList.remove("show");
+        toggleRoleAnnotForModal(false);
         var detailProgressTopEl = document.getElementById("detailProgressTop");
         if (detailProgressTopEl) detailProgressTopEl.style.display = "none";
+        detailCtx.type = "";
         setPurchaseLedgerProgressScope("");
       }
-      var actionCtx = { mode:"", row:null };
       function openActionModal(mode, row){
         actionCtx.mode = mode;
         actionCtx.row = row || null;
@@ -3542,12 +3730,8 @@
           alert("当前页面已移除多选列，请在操作列逐条删除。");
           return;
         }
-        if(e.target.id==="detailProgressInline"){
-          if (typeof window.openUnifiedProgressModal === "function") window.openUnifiedProgressModal();
-          return;
-        }
-        if(e.target.id==="detailProgressTop"){
-          if (typeof window.openUnifiedProgressModal === "function") window.openUnifiedProgressModal();
+        if(e.target.id==="detailProgressInline" || e.target.id==="detailProgressTop"){
+          openLedgerProgressModal();
           return;
         }
         if(e.target.id==="reqProgressInline"){
@@ -3557,12 +3741,8 @@
         if(e.target.id==="detailClose" || e.target.id==="detailX"){ closeDetail(); return; }
         if(e.target.id==="detailMask" && e.target===document.getElementById("detailMask")){ closeDetail(); return; }
         if(e.target.id==="actionCancel" || e.target.id==="actionX"){ closeActionModal(); return; }
-        if(e.target.id==="actionProgress"){
-          if (typeof window.openUnifiedProgressModal === "function") window.openUnifiedProgressModal();
-          return;
-        }
-        if(e.target.id==="actionProgressTop"){
-          if (typeof window.openUnifiedProgressModal === "function") window.openUnifiedProgressModal();
+        if(e.target.id==="actionProgress" || e.target.id==="actionProgressTop"){
+          openActionProgressModal();
           return;
         }
         if(e.target.id==="actionMask" && e.target===document.getElementById("actionMask")){ closeActionModal(); return; }
@@ -3732,7 +3912,52 @@
 
       bindReqMatPickerEventsOnce();
       renderAll();
+
+      var detailMaskEl = document.getElementById("detailMask");
+      if (detailMaskEl) {
+        detailMaskEl.addEventListener(
+          "click",
+          function (e) {
+            var trackLink = e.target && e.target.closest ? e.target.closest(".req-track-link") : null;
+            if (trackLink) {
+              e.preventDefault();
+              e.stopPropagation();
+              var n = trackLink.getAttribute("data-track-name") || "";
+              var c = trackLink.getAttribute("data-track-code") || "";
+              var box = document.getElementById("reqTrackBox");
+              if (box) {
+                box.style.display = "";
+                box.innerHTML = buildMaterialTrackBoxHtml("ledger", n, c);
+              }
+              return;
+            }
+            var userChangeLink =
+              e.target && e.target.closest ? e.target.closest(".req-user-change-link") : null;
+            if (userChangeLink) {
+              e.preventDefault();
+              e.stopPropagation();
+              openReqUserChangeModal(
+                userChangeLink.getAttribute("data-product-name") || "",
+                userChangeLink.getAttribute("data-product-code") || ""
+              );
+              return;
+            }
+            var borrowLink =
+              e.target && e.target.closest ? e.target.closest(".req-external-borrow-link") : null;
+            if (borrowLink) {
+              e.preventDefault();
+              e.stopPropagation();
+              openReqExternalBorrowModal(
+                borrowLink.getAttribute("data-product-name") || "",
+                borrowLink.getAttribute("data-product-code") || ""
+              );
+            }
+          },
+          true
+        );
+      }
 })();
   </script>
+  <script src="js/site-footer.js"></script>
 </body>
 </html>

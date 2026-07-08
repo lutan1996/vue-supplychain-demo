@@ -403,9 +403,13 @@
     }
 
     var PHYSICAL_MGMT_ROW_HTML =
+      '<span class="warehouse-secondary-label" aria-hidden="true" style="display:block;flex-basis:100%;padding:4px 0 2px;color:#d7e6ff;font-weight:700;">(新能源) 技术服务类企业科技公司</span>' +
       '<button type="button" class="warehouse-secondary-link" data-action="purchase-quality-accept" data-label="库存管理">库存管理</button>' +
-      '<span class="warehouse-secondary-sep" aria-hidden="true">|</span>' +
-      '<button type="button" class="warehouse-secondary-link" data-action="material-ledger" data-label="物资领用">物资领用</button>';
+      '<span class="warehouse-secondary-pipe" aria-hidden="true">|</span>' +
+      '<button type="button" class="warehouse-secondary-link" data-action="material-ledger" data-label="物资领用">物资领用</button>' +
+      '<span class="warehouse-secondary-break" aria-hidden="true" style="flex-basis:100%;height:0;"></span>' +
+      '<span class="warehouse-secondary-label" aria-hidden="true" style="display:block;flex-basis:100%;padding:4px 0 2px;color:#d7e6ff;font-weight:700;">(新能源) 发电企业项目公司</span>' +
+      '<button type="button" class="warehouse-secondary-link" data-action="proj-company-inventory" data-label="项目公司库存管理">项目公司库存管理</button>';
 
     // 驾驶舱同款：模块点击弹出蓝色框（二级功能）
     var secondaryPanel = document.getElementById('warehouseSecondaryPanel');
@@ -574,11 +578,19 @@
         text: '物资采购',
         panel: secondaryPanel,
         rowHtml:
-          '<button type="button" class="warehouse-secondary-link" data-action="purchase-plan-manage" data-label="采购信息台帐">采购信息台帐</button>' +
+          '<span class="warehouse-secondary-label" aria-hidden="true" style="display:block;flex-basis:100%;padding:4px 0 2px;color:#d7e6ff;font-weight:700;">采购与合同</span>' +
+          '<button type="button" class="warehouse-secondary-link" data-action="purchase-plan-manage" data-label="采购信息管理">采购信息管理</button>' +
           '<span class="warehouse-secondary-pipe" aria-hidden="true">|</span>' +
           '<button type="button" class="warehouse-secondary-link" data-action="purchase-contract-mgmt" data-label="合同信息管理">合同信息管理</button>' +
           '<span class="warehouse-secondary-pipe" aria-hidden="true">|</span>' +
-          '<button type="button" class="warehouse-secondary-link" data-action="purchase-summary-report" data-label="采购合同报表管理">采购合同报表管理</button>'
+          '<button type="button" class="warehouse-secondary-link" data-action="purchase-summary-report" data-label="采购合同报表管理">采购合同报表管理</button>' +
+          '<span class="warehouse-secondary-break" aria-hidden="true" style="flex-basis:100%;height:0;"></span>' +
+          '<span class="warehouse-secondary-label" aria-hidden="true" style="display:block;flex-basis:100%;padding:4px 0 2px;color:#d7e6ff;font-weight:700;">内部采购</span>' +
+          '<button type="button" class="warehouse-secondary-link" data-action="sales-material-list" data-label="物资列表">物资列表</button>' +
+          '<span class="warehouse-secondary-pipe" aria-hidden="true">|</span>' +
+          '<button type="button" class="warehouse-secondary-link" data-action="sales-order-manage" data-label="订单管理">订单管理</button>' +
+          '<span class="warehouse-secondary-break" aria-hidden="true" style="flex-basis:100%;height:0;"></span>' +
+          '<span class="warehouse-secondary-label" aria-hidden="true" style="display:block;flex-basis:100%;padding:4px 0 2px;color:#d7e6ff;font-weight:700;">外部采购</span>'
       },
       assetMgmt: {
         text: '资产管理',
@@ -601,15 +613,9 @@
         panel: secondaryPanel,
         aclModuleKey: 'purchaseMgmt',
         rowHtml:
-          '<button type="button" class="warehouse-secondary-link" data-action="sales-contract-report" data-label="销售合同报表管理">销售合同报表管理</button>' +
-          '<span class="warehouse-secondary-break" aria-hidden="true" style="flex-basis:100%;height:0;"></span>' +
-          '<span class="warehouse-secondary-label" aria-hidden="true" style="display:block;flex-basis:100%;padding:4px 0 2px;color:#d7e6ff;font-weight:700;">内部采购</span>' +
           '<button type="button" class="warehouse-secondary-link" data-action="sales-material-list" data-label="物资列表">物资列表</button>' +
-          '<span class="warehouse-secondary-pipe" aria-hidden="true">|</span>' +
           '<button type="button" class="warehouse-secondary-link" data-action="sales-order-manage" data-label="订单管理">订单管理</button>' +
-          '<span class="warehouse-secondary-break" aria-hidden="true" style="flex-basis:100%;height:0;"></span>' +
-          '<span class="warehouse-secondary-label" aria-hidden="true" style="display:block;flex-basis:100%;padding:4px 0 2px;color:#d7e6ff;font-weight:700;">外部采购</span>' +
-          '<button type="button" class="warehouse-secondary-link" data-action="sales-purchase-material" data-label="购入物资">购入物资</button>'
+          '<button type="button" class="warehouse-secondary-link" data-action="sales-contract-report" data-label="销售合同报表管理">销售合同报表管理</button>'
       },
       inventoryMgmt: {
         text: '盘点管理',
@@ -1086,6 +1092,7 @@
       'sales-material-list.html': 'salesMgmt',
       'sales-order-management.html': 'salesMgmt',
       'sales-purchased-materials.html': 'salesMgmt',
+      'sales-proj-company-inbound.html': 'salesMgmt',
       'sales-contract-report.html': 'salesMgmt',
       'inventory-task-management.html': 'inventoryMgmt',
       'inventory-difference-handling.html': 'inventoryMgmt',
@@ -1111,6 +1118,7 @@
       'order-demand-management.html': 'purchaseMgmt',
       'purchase-ledger.html': 'physicalMgmt',
       'proc-quality-accept.html': 'physicalMgmt',
+      'proj-company-inbound.html': 'physicalMgmt',
       'cargo-ledger.html': 'purchaseMgmt',
       'material-procurement-hub.html': 'purchaseMgmt',
       'return-exchange-management.html': 'purchaseMgmt',
@@ -1387,13 +1395,14 @@
         if (fileName === "sales-material-list.html") return "物资列表";
         if (fileName === "sales-order-management.html") return "订单管理";
         if (fileName === "sales-purchased-materials.html") return "购入物资";
+        if (fileName === "sales-proj-company-inbound.html") return "项目公司实物入库";
         if (fileName === "sales-contract-report.html") return "销售合同报表管理";
         if (fileName === "contract-management.html") return "合同信息管理";
         if (fileName === "purchase-material-info-management.html") return "物资采购信息管理";
         if (fileName === "purchase-plan-management.html") return "采购信息台帐";
         if (fileName === "purchase-summary-report.html") return "采购合同报表管理";
         if (fileName === "proc-acceptance-inbound.html") return "公司层面入库";
-        if (fileName === "proj-company-inbound.html") return "项目公司入库";
+        if (fileName === "proj-company-inbound.html") return "项目公司库存管理";
         if (fileName === "proc-use-approval.html") return "领用申请";
         if (fileName === "proc-sales-contract.html") return "销售合同管理";
         if (fileName === "proc-shipment.html") return "发货管理";
@@ -1471,8 +1480,8 @@
       if (taskSub) displayMod = "我的任务";
       if (purchaseSub) displayMod = "物资采购";
       if (retiredSub) displayMod = "报废计划与报废申请";
-      // 库存管理和物资领用显示实物管理
-      if (pageLabel === "库存管理" || pageLabel === "物资领用") displayMod = "实物管理";
+      // 库存管理 / 物资领用 / 项目公司库存管理 显示实物管理
+      if (pageLabel === "库存管理" || pageLabel === "物资领用" || pageLabel === "项目公司库存管理") displayMod = "实物管理";
       if (displayMod === "业务功能") {
         var purchaseLike = [
           "物资领用",
@@ -1484,7 +1493,7 @@
           "库存管理",
           "采购数据台账"
         ];
-        if (purchaseLike.indexOf(pageLabel) >= 0 && pageLabel !== "库存管理" && pageLabel !== "物资领用") displayMod = "物资采购";
+        if (purchaseLike.indexOf(pageLabel) >= 0 && pageLabel !== "库存管理" && pageLabel !== "物资领用" && pageLabel !== "项目公司库存管理") displayMod = "物资采购";
       }
 
       if (existingNav) {
@@ -1493,8 +1502,8 @@
           if (taskSub) {
             segs[1].textContent = "我的任务";
           } else if (purchaseSub) {
-            // 库存管理和物资领用显示实物管理，其他显示物资采购
-            if (pageLabel === "库存管理" || pageLabel === "物资领用") {
+            // 库存管理 / 物资领用 / 项目公司库存管理 显示实物管理，其他显示物资采购
+            if (pageLabel === "库存管理" || pageLabel === "物资领用" || pageLabel === "项目公司库存管理") {
               segs[1].textContent = "实物管理";
             } else {
               segs[1].textContent = "物资采购";
@@ -2366,6 +2375,10 @@
       '<span class="map-flow-arrow">→</span>' +
       '<span class="map-flow-node">电控所负责人审批，通过</span>' +
       '<span class="map-flow-arrow">→</span>' +
+      '<span class="map-flow-node">物资管理部门物资专责阅知</span>' +
+      '<span class="map-flow-arrow">→</span>' +
+      '<span class="map-flow-node">物资管理部门专责核对清单，无误</span>' +
+      '<span class="map-flow-arrow">→</span>' +
       '<span class="map-flow-node">机械研究所物资专责审批，通过</span>' +
       '<span class="map-flow-arrow">→</span>' +
       '<span class="map-flow-node">机械研究所负责人审批，通过</span>' +
@@ -2390,6 +2403,20 @@
           '<div class="map-flow-tl-body">' +
             '<div class="map-flow-tl-meta"><span class="map-flow-tl-person">电控所负责人陈亮</span><span class="map-flow-tl-time">2026-05-10 10:03</span><span class="map-flow-tl-badge" style="background:#10b98122;color:#10b981">已通过</span></div>' +
             '<div class="map-flow-tl-content">审批：通过</div>' +
+          '</div>' +
+        '</div>' +
+        '<div class="map-flow-tl-item">' +
+          '<div class="map-flow-tl-dot" style="background:#10b981"></div><div class="map-flow-tl-line"></div>' +
+          '<div class="map-flow-tl-body">' +
+            '<div class="map-flow-tl-meta"><span class="map-flow-tl-person">物资管理部门物资专责宋中波</span><span class="map-flow-tl-time">2026-05-10 10:15</span><span class="map-flow-tl-badge" style="background:#10b98122;color:#10b981">已阅知</span></div>' +
+            '<div class="map-flow-tl-content">阅知：已知悉</div>' +
+          '</div>' +
+        '</div>' +
+        '<div class="map-flow-tl-item">' +
+          '<div class="map-flow-tl-dot" style="background:#10b981"></div><div class="map-flow-tl-line"></div>' +
+          '<div class="map-flow-tl-body">' +
+            '<div class="map-flow-tl-meta"><span class="map-flow-tl-person">物资管理部门专责宋中波</span><span class="map-flow-tl-time">2026-05-10 10:22</span><span class="map-flow-tl-badge" style="background:#10b98122;color:#10b981">已通过</span></div>' +
+            '<div class="map-flow-tl-content">核对清单：无误</div>' +
           '</div>' +
         '</div>' +
         '<div class="map-flow-tl-item">' +
@@ -2555,6 +2582,7 @@
     var file = (location.pathname || "").split("/").pop();
     var skipFiles = {
       "purchase-plan-approval-handle.html": 1,
+      "purchase-ledger.html": 1,
       "inventory-task-management.html": 1,
       "inventory-difference-handling.html": 1,
       "retire-scrap-application.html": 1,

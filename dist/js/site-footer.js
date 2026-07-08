@@ -91,12 +91,29 @@
 
   /* 未引用 sidebar-actions 的页面：补全「保存草稿 / 提交 / 删除确认」演示交互（与 sidebar 内联块互斥） */
   try {
-    if (window.__mapDemoUnifiedFormActionsV1) return;
-    var cur = document.currentScript && document.currentScript.src;
-    var base = cur ? cur.replace(/[^/]+$/, "") : "js/";
-    var s = document.createElement("script");
-    s.src = base + "demo-unified-form-actions.js";
-    s.async = false;
-    (document.head || document.documentElement).appendChild(s);
+    if (!window.__mapDemoUnifiedFormActionsV1) {
+      var cur = document.currentScript && document.currentScript.src;
+      var base = cur ? cur.replace(/[^/]+$/, "") : "js/";
+      var s = document.createElement("script");
+      s.src = base + "demo-unified-form-actions.js";
+      s.async = false;
+      (document.head || document.documentElement).appendChild(s);
+    }
   } catch (eU) {}
+
+  /* 全站角色可见说明（浅蓝提示条） */
+  function loadRoleHintBannerCss() {
+    if (document.getElementById("role-hint-banner-css")) return;
+    var cur2 = document.currentScript && document.currentScript.src;
+    var cssBase = cur2 ? cur2.replace(/[^/]+$/, "").replace(/js\/?$/, "css/") : "css/";
+    var link = document.createElement("link");
+    link.id = "role-hint-banner-css";
+    link.rel = "stylesheet";
+    link.href = cssBase + "role-hint-banner.css?v=20260707-hint-banner-v1";
+    (document.head || document.documentElement).appendChild(link);
+  }
+
+  try {
+    loadRoleHintBannerCss();
+  } catch (eHint) {}
 })();

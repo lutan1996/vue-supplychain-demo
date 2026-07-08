@@ -460,9 +460,9 @@ body.map-demo-hide-shell-topbar .shell .main > .topbar{display:none !important;}
     actionToFile["sales-contract-report"] = "sales-contract-report.html";
     actionToFile["inventory-company-task-manage"] = "inventory-task-management.html?scope=company";
     actionToFile["retired-apply-main"] = "retire-scrap-application.html?v=20260701-product-code-seq";
-    actionToFile["proj-company-plan-manage"] = "purchase-plan-management.html?pageSub=项目公司采购信息台帐";
-    actionToFile["proj-company-contract-mgmt"] = "contract-management.html?v=20260701-product-code-seq&pageSub=项目公司合同信息管理";
-    actionToFile["proj-company-summary-report"] = "purchase-summary-report.html?pageSub=项目公司采购合同报表管理";
+    actionToFile["proj-company-plan-manage"] = "purchase-plan-management.html";
+    actionToFile["proj-company-contract-mgmt"] = "contract-management.html";
+    actionToFile["proj-company-summary-report"] = "purchase-summary-report.html";
     labelToFile["采购合同报表管理"] = "purchase-summary-report.html";
     labelToFile["销售合同报表管理"] = "sales-contract-report.html";
     labelToFile["物资列表"] = "sales-material-list.html";
@@ -471,9 +471,9 @@ body.map-demo-hide-shell-topbar .shell .main > .topbar{display:none !important;}
     labelToFile["公司物资盘点"] = "inventory-task-management.html?scope=company";
     labelToFile["报废计划与报废申请"] = "retire-scrap-application.html?v=20260703-scrap-menu-v2";
     labelToFile["退役及报废申请"] = "retire-scrap-application.html?v=20260703-scrap-menu-v2";
-    labelToFile["项目公司采购信息台帐"] = "purchase-plan-management.html?pageSub=项目公司采购信息台帐";
-    labelToFile["项目公司合同信息管理"] = "contract-management.html?v=20260701-product-code-seq&pageSub=项目公司合同信息管理";
-    labelToFile["项目公司采购合同报表管理"] = "purchase-summary-report.html?pageSub=项目公司采购合同报表管理";
+    labelToFile["项目公司采购信息台帐"] = "purchase-plan-management.html";
+    labelToFile["项目公司合同信息管理"] = "contract-management.html";
+    labelToFile["项目公司采购合同报表管理"] = "purchase-summary-report.html";
     var demoSceneHintByFile = {};
     var demoTabHintByFile = {};
 
@@ -814,7 +814,7 @@ body.map-demo-hide-shell-topbar .shell .main > .topbar{display:none !important;}
     /* 必须为 true：Blob URL 的 iframe 与 file:// 父页不同源，子页无法可靠调用 parent.__demoOpenPage / postMessage，蓝框子功能会全部失效。srcdoc 与父页同源，侧栏跳转才能工作。 */
     var demoUseSrcdocOnly = true;
     var demoLoadingSafetyTimer = null;
-    var demoPageVersion = "20260706-ledger-flow-anyone";
+    var demoPageVersion = "20260708-sales-v1";
 
     function demoAppendVersionBeforeHash(href) {
       if (!href) return href;
