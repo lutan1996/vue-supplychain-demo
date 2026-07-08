@@ -814,6 +814,7 @@
       homeTop: "cockpit",
       taskTodoTop: "task",
       asset: "asset",
+      assetMgmt: "asset",
       task: "task",
       cockpit: "cockpit",
       purchaseMgmt: "purchaseMgmt",
@@ -1094,8 +1095,8 @@
       'procurement-application.html': 'purchaseMgmt',
       'purchase-management-hub.html': 'purchaseMgmt',
       'purchase-material-info-management.html': 'purchaseMgmt',
-      'sales-material-list.html': 'salesMgmt',
-      'sales-order-management.html': 'salesMgmt',
+      'sales-material-list.html': 'purchaseMgmt',
+      'sales-order-management.html': 'purchaseMgmt',
       'sales-purchased-materials.html': 'salesMgmt',
       'sales-proj-company-inbound.html': 'salesMgmt',
       'sales-contract-report.html': 'salesMgmt',
@@ -1163,12 +1164,14 @@
       'data-contract-fixed.html': 'dataNav',
       'data-supplier-fixed.html': 'dataNav',
       'data-prototype-list.html': 'dataNav',
-      'assets-personal.html': 'asset',
-      'assets-department.html': 'asset',
-      'assets-company.html': 'asset',
-      'asset-transfer-management.html': 'asset',
-      'asset-nature-change-management.html': 'asset',
-      'asset-inventory-management.html': 'asset'
+      'assets-personal.html': 'assetMgmt',
+      'assets-department.html': 'assetMgmt',
+      'assets-company.html': 'assetMgmt',
+      'asset-transfer-management.html': 'assetMgmt',
+      'asset-nature-change-management.html': 'assetMgmt',
+      'asset-inventory-management.html': 'assetMgmt',
+      'asset-ledger.html': 'assetMgmt',
+      'asset-value-management.html': 'assetMgmt'
     };
     var currentModule = byPath[path];
     var isMyTasksPage = path && String(path).indexOf("my-tasks") === 0;
@@ -1285,10 +1288,13 @@
     var f = file.toLowerCase();
     if (f === "purchase-plan-approval-handle.html") return "我的任务";
     if (f.indexOf("my-tasks") === 0) return "我的任务";
-    if (f.indexOf("scrap-identification") >= 0 || f.indexOf("retire") === 0 || f.indexOf("retired-") === 0 || f === "big-small-reuse.html" || f === "goods-transfer-out.html")
+    if (f.indexOf("scrap-identification") >= 0 || f.indexOf("retire") === 0 || f.indexOf("retired-") === 0 || f === "big-small-reuse.html" || f === "goods-transfer-out.html" || f === "equipment-evaluation.html")
       return "报废计划与报废申请";
     if (f === "inventory-task-management.html" || f === "inventory-difference-handling.html") return "盘点管理";
-    if (f.indexOf("assets-") === 0 || f.indexOf("asset-") === 0 || f === "equipment-evaluation.html") return "我的资产";
+    if (f === "purchase-ledger.html" || f === "proc-quality-accept.html" || f === "proj-company-inbound.html") return "实物管理";
+    if (f === "sales-material-list.html" || f === "sales-order-management.html") return "物资采购";
+    if (f.indexOf("sales-") === 0) return "销售管理";
+    if (f.indexOf("assets-") === 0 || f.indexOf("asset-") === 0) return "资产管理";
     if (f.indexOf("carrier-") === 0 || f.indexOf("logistics-") === 0) return "物流管理";
     if (
       f === "warehouse.html" ||
@@ -1399,9 +1405,6 @@
         if (fileName === "order-demand-management.html") return "订单需求管理";
         if (fileName === "sales-material-list.html") return "物资列表";
         if (fileName === "sales-order-management.html") return "订单管理";
-        if (fileName === "sales-purchased-materials.html") return "购入物资";
-        if (fileName === "sales-proj-company-inbound.html") return "项目公司实物入库";
-        if (fileName === "sales-contract-report.html") return "销售合同报表管理";
         if (fileName === "contract-management.html") return "合同信息管理";
         if (fileName === "purchase-material-info-management.html") return "物资采购信息管理";
         if (fileName === "purchase-plan-management.html") return "采购信息台帐";
@@ -1420,6 +1423,37 @@
           if (!tab || tab === "apply") return "物资领用";
         }
         return "";
+      }
+
+      function resolveSalesMgmtLabel(fileName) {
+        if (fileName === "sales-contract-report.html") return "销售合同报表管理";
+        if (fileName === "sales-purchased-materials.html") return "购入物资";
+        if (fileName === "sales-proj-company-inbound.html") return "项目公司实物入库";
+        return "";
+      }
+
+      function resolveAssetMgmtLabel(fileName) {
+        if (fileName === "assets-personal.html") return "个人资产";
+        if (fileName === "assets-department.html") return "部门资产";
+        if (fileName === "assets-company.html") return "公司资产";
+        if (fileName === "asset-transfer-management.html") return "资产交接";
+        if (fileName === "asset-nature-change-management.html") return "资产性质转变";
+        if (fileName === "asset-inventory-management.html") return "盘点管理";
+        if (fileName === "asset-ledger.html") return "资产台账";
+        if (fileName === "asset-value-management.html") return "价值管理";
+        return "";
+      }
+
+      function resolveInventoryMgmtLabel(fileName, query) {
+        if (fileName === "inventory-difference-handling.html") return "差异处理";
+        if (fileName !== "inventory-task-management.html") return "";
+        var scope = "";
+        try {
+          scope = (new URLSearchParams(query || "")).get("scope") || "";
+        } catch (eScope) {}
+        if (scope === "company" || scope === "proj-company") return "公司物资盘点";
+        if (scope === "station") return "场站物资盘点";
+        return "部门物资盘点";
       }
 
       function resolveRetiredScrapLabel(fileName, query) {
@@ -1462,7 +1496,26 @@
       }
 
       var purchaseSub = "";
-      if (mod === "物资采购" || mod === "采购管理") {
+      var purchaseLikeFiles = {
+        "procurement-application.html": 1,
+        "material-procurement-hub.html": 1,
+        "order-demand-management.html": 1,
+        "contract-management.html": 1,
+        "purchase-material-info-management.html": 1,
+        "purchase-plan-management.html": 1,
+        "purchase-summary-report.html": 1,
+        "purchase-ledger.html": 1,
+        "proc-acceptance-inbound.html": 1,
+        "proc-use-approval.html": 1,
+        "proc-sales-contract.html": 1,
+        "proc-shipment.html": 1,
+        "proc-quality-accept.html": 1,
+        "proj-company-inbound.html": 1,
+        "return-exchange-management.html": 1,
+        "sales-material-list.html": 1,
+        "sales-order-management.html": 1
+      };
+      if (mod === "物资采购" || mod === "采购管理" || purchaseLikeFiles[file]) {
         purchaseSub = resolvePurchaseMgmtLabel(file, location.search);
       }
       var taskSub = "";
@@ -1470,7 +1523,10 @@
         taskSub = resolveMyTasksLabel(file, location.search);
       }
       var retiredSub = resolveRetiredScrapLabel(file, location.search);
-      var pageLabel = taskSub || purchaseSub || retiredSub;
+      var salesSub = resolveSalesMgmtLabel(file);
+      var assetSub = resolveAssetMgmtLabel(file);
+      var inventorySub = resolveInventoryMgmtLabel(file, location.search);
+      var pageLabel = taskSub || purchaseSub || retiredSub || salesSub || assetSub || inventorySub;
       if (!pageLabel && file === "base-data-material-ledger.html") {
         pageLabel = "物资类型";
       }
@@ -1483,8 +1539,13 @@
 
       var displayMod = mod;
       if (taskSub) displayMod = "我的任务";
-      if (purchaseSub) displayMod = "物资采购";
-      if (retiredSub) displayMod = "报废计划与报废申请";
+      else if (purchaseSub) {
+        if (pageLabel === "库存管理" || pageLabel === "物资领用" || pageLabel === "项目公司库存管理") displayMod = "实物管理";
+        else displayMod = "物资采购";
+      } else if (retiredSub) displayMod = "报废计划与报废申请";
+      else if (salesSub) displayMod = "销售管理";
+      else if (assetSub) displayMod = "资产管理";
+      else if (inventorySub) displayMod = "盘点管理";
       // 库存管理 / 物资领用 / 项目公司库存管理 显示实物管理
       if (pageLabel === "库存管理" || pageLabel === "物资领用" || pageLabel === "项目公司库存管理") displayMod = "实物管理";
       if (displayMod === "业务功能") {
@@ -1507,7 +1568,6 @@
           if (taskSub) {
             segs[1].textContent = "我的任务";
           } else if (purchaseSub) {
-            // 库存管理 / 物资领用 / 项目公司库存管理 显示实物管理，其他显示物资采购
             if (pageLabel === "库存管理" || pageLabel === "物资领用" || pageLabel === "项目公司库存管理") {
               segs[1].textContent = "实物管理";
             } else {
@@ -1515,6 +1575,12 @@
             }
           } else if (retiredSub) {
             segs[1].textContent = "报废计划与报废申请";
+          } else if (salesSub) {
+            segs[1].textContent = "销售管理";
+          } else if (assetSub) {
+            segs[1].textContent = "资产管理";
+          } else if (inventorySub) {
+            segs[1].textContent = "盘点管理";
           }
           segs[2].textContent = pageLabel;
         } else if (segs.length > 0) {
