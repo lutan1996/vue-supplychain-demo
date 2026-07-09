@@ -699,106 +699,103 @@
                     <h2 class="panel-title panel-title--bar" id="core-title">核心功能模块</h2>
               </div>
               <div class="panel-body">
-                <div class="module-grid">
-                      <div class="module-card">
-                    <h4>我的任务</h4>
-                    <div class="module-links">
-                          <a href="my-tasks-prototype-list.html?scene=initiated">我发起的</a>
-                          <a href="my-tasks-prototype-list.html?scene=todo">我的待办</a>
-                          <a href="my-tasks-prototype-list.html?scene=done">我的已办</a>
-                          <a href="my-tasks-prototype-list.html?scene=cc">我的抄送</a>
+                <div class="module-list">
+                  <div class="module-row">
+                    <div class="module-row-title">我的任务</div>
+                    <div class="module-row-body">
+                      <a href="my-tasks-prototype-list.html?scene=initiated">我发起的</a>
+                      <a href="my-tasks-prototype-list.html?scene=todo">我的待办</a>
+                      <a href="my-tasks-prototype-list.html?scene=done">我的已办</a>
+                      <a href="my-tasks-prototype-list.html?scene=cc">我的抄送</a>
                     </div>
+                  </div>
+                  <div class="module-row">
+                    <div class="module-row-title">物资采购</div>
+                    <div class="module-row-body module-row-body--groups">
+                      <div class="module-row-group">
+                        <span class="module-section-label">采购与合同</span>
+                        <a href="purchase-plan-management.html">采购信息管理</a>
+                        <a href="contract-management.html">合同信息管理</a>
+                        <a href="purchase-summary-report.html">采购合同报表管理</a>
                       </div>
-                      <div class="module-card">
-                    <h4>物资采购</h4>
-                    <div class="module-links module-links--rows">
-                      <div class="module-section-label">采购与合同</div>
-                      <div class="module-links-row">
-                          <a href="purchase-plan-management.html">采购信息管理</a>
-                          <a href="contract-management.html">合同信息管理</a>
-                          <a href="purchase-summary-report.html">采购合同报表管理</a>
-                      </div>
-                      <div class="module-section-label">内部采购</div>
-                      <div class="module-links-row">
-                          <a href="sales-material-list.html">物资列表</a>
-                          <a href="sales-order-management.html">订单管理</a>
-                      </div>
-                    </div>
-                      </div>
-                      <div class="module-card">
-                    <h4>实物管理</h4>
-                    <div class="module-links module-links--rows">
-                      <div class="module-section-label">(新能源) 技术服务类企业科技公司</div>
-                      <div class="module-links-row">
-                          <a href="proc-quality-accept.html">库存管理</a>
-                          <a href="purchase-ledger.html">物资领用</a>
-                      </div>
-                      <div class="module-section-label">(新能源) 发电企业项目公司</div>
-                      <div class="module-links-row">
-                          <a href="proj-company-inbound.html">项目公司库存管理</a>
+                      <div class="module-row-group">
+                        <span class="module-section-label">内部采购</span>
+                        <a href="sales-material-list.html">物资列表</a>
+                        <a href="sales-order-management.html">订单管理</a>
                       </div>
                     </div>
+                  </div>
+                  <div class="module-row">
+                    <div class="module-row-title">实物管理</div>
+                    <div class="module-row-body module-row-body--groups">
+                      <div class="module-row-group">
+                        <span class="module-section-label">技术服务类企业</span>
+                        <a href="proc-quality-accept.html">库存管理</a>
+                        <a href="purchase-ledger.html">物资领用</a>
                       </div>
-                      <div class="module-card">
-                    <h4>销售管理</h4>
-                    <div class="module-links">
-                          <a href="sales-material-list.html">物资列表</a>
-                          <a href="sales-order-management.html">订单管理</a>
-                          <a href="sales-contract-report.html">销售合同报表管理</a>
-                    </div>
-                      </div>
-                      <div class="module-card">
-                    <h4>盘点管理</h4>
-                    <div class="module-links module-links--rows">
-                      <div class="module-section-label">(新能源) 技术服务类企业科技公司</div>
-                      <div class="module-links-row">
-                          <a href="inventory-task-management.html">部门物资盘点</a>
-                          <a href="inventory-task-management.html?scope=company">公司物资盘点</a>
-                      </div>
-                      <div class="module-section-label">(新能源) 发电企业项目公司</div>
-                      <div class="module-links-row">
-                          <a href="inventory-task-management.html?scope=proj-company">公司物资盘点</a>
-                          <a href="inventory-task-management.html?scope=station">场站物资盘点</a>
+                      <div class="module-row-group">
+                        <span class="module-section-label">发电企业项目公司</span>
+                        <a href="proj-company-inbound.html">项目公司库存管理</a>
                       </div>
                     </div>
+                  </div>
+                  <div class="module-row">
+                    <div class="module-row-title">销售管理</div>
+                    <div class="module-row-body">
+                      <a href="sales-material-list.html">物资列表</a>
+                      <a href="sales-order-management.html">订单管理</a>
+                      <a href="sales-contract-report.html">销售合同报表管理</a>
+                    </div>
+                  </div>
+                  <div class="module-row">
+                    <div class="module-row-title">盘点管理</div>
+                    <div class="module-row-body module-row-body--groups">
+                      <div class="module-row-group">
+                        <span class="module-section-label">技术服务类企业</span>
+                        <a href="inventory-task-management.html">部门物资盘点</a>
+                        <a href="inventory-task-management.html?scope=company">公司物资盘点</a>
                       </div>
-                      <div class="module-card">
-                    <h4>资产管理</h4>
-                    <div class="module-links module-links--rows">
-                      <div class="module-section-label">(新能源) 技术服务类企业科技公司</div>
-                      <div class="module-links-row">
-                          <a href="assets-company.html">公司资产</a>
-                          <a href="assets-department.html">部门资产</a>
-                          <a href="assets-personal.html">个人资产</a>
+                      <div class="module-row-group">
+                        <span class="module-section-label">发电企业项目公司</span>
+                        <a href="inventory-task-management.html?scope=proj-company">公司物资盘点</a>
+                        <a href="inventory-task-management.html?scope=station">场站物资盘点</a>
                       </div>
                     </div>
-                      </div>
-                      <div class="module-card">
-                    <h4>物流管理</h4>
-                    <div class="module-links">
-                          <a href="carrier-management.html">承运商管理</a>
-                          <a href="logistics-contract.html">物流合同</a>
-                          <a href="logistics-tracking.html">物流跟踪</a>
-                          <a href="logistics-payment.html">物流付款</a>
-                          <a href="logistics-ledger.html">物流台账</a>
+                  </div>
+                  <div class="module-row">
+                    <div class="module-row-title">资产管理</div>
+                    <div class="module-row-body">
+                      <a href="assets-company.html">公司资产</a>
+                      <a href="assets-department.html">部门资产</a>
+                      <a href="assets-personal.html">个人资产</a>
                     </div>
-                      </div>
-                      <div class="module-card">
-                    <h4>报废计划与报废申请</h4>
-                    <div class="module-links">
-                          <a href="retire-scrap-application.html?view=plan">报废计划提报</a>
-                          <a href="retire-scrap-application.html?view=apply">报废申请</a>
+                  </div>
+                  <div class="module-row">
+                    <div class="module-row-title">物流管理</div>
+                    <div class="module-row-body">
+                      <a href="carrier-management.html">承运商管理</a>
+                      <a href="logistics-contract.html">物流合同</a>
+                      <a href="logistics-tracking.html">物流跟踪</a>
+                      <a href="logistics-payment.html">物流付款</a>
+                      <a href="logistics-ledger.html">物流台账</a>
                     </div>
-                      </div>
-                      <div class="module-card">
-                    <h4>基础数据管理</h4>
-                        <div class="module-links">
-                            <a href="base-data-material-ledger.html?tab=supplier">供应商数据</a>
-                            <a href="base-data-material-ledger.html?tab=manufacturer">制造商数据</a>
-                            <a href="base-data-material-ledger.html?tab=product">物资类型</a>
-                            <a href="data-code-fixed.html">产品目录</a>
+                  </div>
+                  <div class="module-row">
+                    <div class="module-row-title">报废计划与报废申请</div>
+                    <div class="module-row-body">
+                      <a href="retire-scrap-application.html?view=plan">报废计划提报</a>
+                      <a href="retire-scrap-application.html?view=apply">报废申请</a>
                     </div>
-                      </div>
+                  </div>
+                  <div class="module-row">
+                    <div class="module-row-title">基础数据管理</div>
+                    <div class="module-row-body">
+                      <a href="base-data-material-ledger.html?tab=supplier">供应商数据</a>
+                      <a href="base-data-material-ledger.html?tab=manufacturer">制造商数据</a>
+                      <a href="base-data-material-ledger.html?tab=product">物资类型</a>
+                      <a href="data-code-fixed.html">产品目录</a>
+                    </div>
+                  </div>
                 </div>
               </div>
             </section>

@@ -569,14 +569,93 @@ button.biz-process-link:hover {
   flex-direction: column;
   overflow: visible;
 }
+/* 核心功能：紧凑列表行，按内容自适应高度，一屏展示全部模块 */
+.module-hub .panel-head {
+  padding: 4px 8px;
+  background: #fff;
+  border-bottom: 1px solid rgba(24, 144, 255, 0.12);
+}
+.module-hub .panel-title--bar {
+  font-size: 12px;
+}
+.module-hub .panel-title--bar::before {
+  height: 12px;
+}
 .module-hub .panel-body {
-  padding: 6px;
+  padding: 4px 6px 6px;
   overflow: visible;
   flex: 0 0 auto;
 }
-.module-hub .panel-head {
+.module-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.module-row {
+  display: grid;
+  grid-template-columns: 92px minmax(0, 1fr);
+  gap: 4px 6px;
+  align-items: start;
+  padding: 2px 4px;
+  border: 1px solid rgba(24, 144, 255, 0.16);
+  border-radius: 3px;
+  background: #fafcff;
+}
+.module-row-title {
+  font-size: 9px;
+  font-weight: 600;
+  color: #003a8c;
+  line-height: 1.25;
+  padding: 3px 0;
+  word-break: break-all;
+}
+.module-row-body {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+  align-items: center;
+  min-width: 0;
+  padding: 1px 0;
+}
+.module-row-body--groups {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 1px;
+}
+.module-row-group {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2px;
+  min-width: 0;
+}
+.module-row-group .module-section-label {
+  flex: 0 0 auto;
+  padding: 0 2px 0 0;
+  margin: 0;
+  white-space: nowrap;
+}
+.module-row-body a,
+.module-list a {
+  font-size: 9px;
+  line-height: 1.2;
+  padding: 1px 4px;
+  border-radius: 2px;
+  border: 1px solid rgba(24, 144, 255, 0.32);
   background: #fff;
-  border-bottom: 1px solid rgba(24, 144, 255, 0.12);
+  color: #1677ff;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.module-row-body a:hover,
+.module-list a:hover {
+  background: #e6f4ff;
+}
+.module-section-label {
+  font-size: 8px;
+  font-weight: 600;
+  color: #62788f;
+  line-height: 1.2;
 }
 .module-grid {
   display: grid;
@@ -632,18 +711,11 @@ button.biz-process-link:hover {
   gap: 3px;
   align-items: center;
 }
-.module-section-label {
-  flex-basis: 100%;
-  font-size: 9px;
-  font-weight: 600;
-  color: #62788f;
-  line-height: 1.2;
-  padding: 1px 0 0;
+.module-hub .panel-head {
+  background: #fff;
+  border-bottom: 1px solid rgba(24, 144, 255, 0.12);
 }
-.module-links-row + .module-section-label {
-  margin-top: 2px;
-}
-.module-link-with-icon {
+.module-grid {
   display: inline-flex;
   align-items: center;
   gap: 4px;
