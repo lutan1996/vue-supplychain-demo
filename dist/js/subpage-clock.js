@@ -421,8 +421,8 @@
 
     var INVENTORY_MGMT_ROW_HTML =
       '<span class="warehouse-secondary-label" aria-hidden="true" style="display:block;flex-basis:100%;padding:4px 0 2px;color:#d7e6ff;font-weight:700;">(新能源) 技术服务类企业</span>' +
-      '<button type="button" class="warehouse-secondary-link" data-action="inventory-task-manage" data-label="部门物资盘点">部门物资盘点</button>' +
       '<button type="button" class="warehouse-secondary-link" data-action="inventory-company-task-manage" data-label="公司物资盘点">公司物资盘点</button>' +
+      '<button type="button" class="warehouse-secondary-link" data-action="inventory-task-manage" data-label="部门物资盘点">部门物资盘点</button>' +
       '<span class="warehouse-secondary-break" aria-hidden="true" style="flex-basis:100%;height:0;"></span>' +
       '<span class="warehouse-secondary-label" aria-hidden="true" style="display:block;flex-basis:100%;padding:4px 0 2px;color:#d7e6ff;font-weight:700;">(新能源) 发电企业</span>' +
       '<button type="button" class="warehouse-secondary-link" data-action="inventory-proj-company-task-manage" data-label="公司物资盘点">公司物资盘点</button>' +
