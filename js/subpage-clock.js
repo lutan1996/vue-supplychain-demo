@@ -403,28 +403,28 @@
     }
 
     var PHYSICAL_MGMT_ROW_HTML =
-      '<span class="warehouse-secondary-label" aria-hidden="true" style="display:block;flex-basis:100%;padding:4px 0 2px;color:#d7e6ff;font-weight:700;">(新能源) 技术服务类企业科技公司</span>' +
+      '<span class="warehouse-secondary-label" aria-hidden="true" style="display:block;flex-basis:100%;padding:4px 0 2px;color:#d7e6ff;font-weight:700;">(新能源) 技术服务类企业</span>' +
       '<button type="button" class="warehouse-secondary-link" data-action="purchase-quality-accept" data-label="库存管理">库存管理</button>' +
       '<span class="warehouse-secondary-pipe" aria-hidden="true">|</span>' +
       '<button type="button" class="warehouse-secondary-link" data-action="material-ledger" data-label="物资领用">物资领用</button>' +
       '<span class="warehouse-secondary-break" aria-hidden="true" style="flex-basis:100%;height:0;"></span>' +
-      '<span class="warehouse-secondary-label" aria-hidden="true" style="display:block;flex-basis:100%;padding:4px 0 2px;color:#d7e6ff;font-weight:700;">(新能源) 发电企业项目公司</span>' +
+      '<span class="warehouse-secondary-label" aria-hidden="true" style="display:block;flex-basis:100%;padding:4px 0 2px;color:#d7e6ff;font-weight:700;">(新能源) 发电企业</span>' +
       '<button type="button" class="warehouse-secondary-link" data-action="proj-company-inventory" data-label="项目公司库存管理">项目公司库存管理</button>';
 
     var ASSET_MGMT_ROW_HTML =
-      '<span class="warehouse-secondary-label" aria-hidden="true" style="display:block;flex-basis:100%;padding:4px 0 2px;color:#d7e6ff;font-weight:700;">(新能源) 技术服务类企业科技公司</span>' +
+      '<span class="warehouse-secondary-label" aria-hidden="true" style="display:block;flex-basis:100%;padding:4px 0 2px;color:#d7e6ff;font-weight:700;">(新能源) 技术服务类企业</span>' +
       '<button type="button" class="warehouse-secondary-link" data-action="asset-company" data-label="公司资产">公司资产</button>' +
       '<button type="button" class="warehouse-secondary-link" data-action="asset-dept" data-label="部门资产">部门资产</button>' +
       '<button type="button" class="warehouse-secondary-link" data-action="asset-personal" data-label="个人资产">个人资产</button>' +
       '<span class="warehouse-secondary-break" aria-hidden="true" style="flex-basis:100%;height:0;"></span>' +
-      '<span class="warehouse-secondary-label" aria-hidden="true" style="display:block;flex-basis:100%;padding:4px 0 2px;color:#d7e6ff;font-weight:700;">(新能源) 发电企业项目公司</span>';
+      '<span class="warehouse-secondary-label" aria-hidden="true" style="display:block;flex-basis:100%;padding:4px 0 2px;color:#d7e6ff;font-weight:700;">(新能源) 发电企业</span>';
 
     var INVENTORY_MGMT_ROW_HTML =
-      '<span class="warehouse-secondary-label" aria-hidden="true" style="display:block;flex-basis:100%;padding:4px 0 2px;color:#d7e6ff;font-weight:700;">(新能源) 技术服务类企业科技公司</span>' +
+      '<span class="warehouse-secondary-label" aria-hidden="true" style="display:block;flex-basis:100%;padding:4px 0 2px;color:#d7e6ff;font-weight:700;">(新能源) 技术服务类企业</span>' +
       '<button type="button" class="warehouse-secondary-link" data-action="inventory-task-manage" data-label="部门物资盘点">部门物资盘点</button>' +
       '<button type="button" class="warehouse-secondary-link" data-action="inventory-company-task-manage" data-label="公司物资盘点">公司物资盘点</button>' +
       '<span class="warehouse-secondary-break" aria-hidden="true" style="flex-basis:100%;height:0;"></span>' +
-      '<span class="warehouse-secondary-label" aria-hidden="true" style="display:block;flex-basis:100%;padding:4px 0 2px;color:#d7e6ff;font-weight:700;">(新能源) 发电企业项目公司</span>' +
+      '<span class="warehouse-secondary-label" aria-hidden="true" style="display:block;flex-basis:100%;padding:4px 0 2px;color:#d7e6ff;font-weight:700;">(新能源) 发电企业</span>' +
       '<button type="button" class="warehouse-secondary-link" data-action="inventory-proj-company-task-manage" data-label="公司物资盘点">公司物资盘点</button>' +
       '<button type="button" class="warehouse-secondary-link" data-action="inventory-station-task-manage" data-label="场站物资盘点">场站物资盘点</button>';
 
