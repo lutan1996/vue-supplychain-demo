@@ -8,15 +8,17 @@
   <link rel="stylesheet" href="css/subpage-base.css" />
   <link rel="stylesheet" href="css/carrier-management.css" />
   <link rel="stylesheet" href="css/source-navbar-header.css" />
-  <link rel="stylesheet" href="css/sales-management.css?v=20260617-sales-report-card-v1" />
+  <link rel="stylesheet" href="css/sales-management.css?v=20260709-hint-v1" />
+  <link rel="stylesheet" href="css/role-hint-banner.css?v=20260709-hint-v1" />
 </head>
 <body class="page-source-navbar page-subpage sales-page" data-sales-page="report">
 <div class="page-bg" aria-hidden="true"></div><div class="app">
 <header class="header"><div class="header-left"><button type="button" class="header-hamburger" aria-label="菜单"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button><a class="header-logo" href="#"><img src="assets/logo-chenergy.png" alt="" width="220" height="40"/></a><div class="header-source-brand"><p>新能源供应链管理系统</p></div></div><div class="header-right"><span class="clock" id="clock"></span><div class="user-avatar">用</div></div></header>
 <div class="layout"><aside class="sidebar" aria-label="主导航"><div class="nav-item"><span class="nav-label">销售管理</span></div></aside>
 <main class="main-scroll"><div class="carrier-main-inner"><div class="sales-shell">
-  <div class="sales-head"><div><h1>销售合同报表管理</h1><p class="sales-subtitle">按销售合同维度统计执行情况，支持通过订单编号关联查看合同履约明细。</p></div></div>
+  <div class="sales-head"><div><h1>销售合同报表管理</h1></div></div>
   <div class="sales-body">
+    <div class="role-hint-banner role-hint-banner--inline">按销售合同维度统计执行情况，支持通过订单编号关联查看合同履约明细。</div>
     <section class="sales-report-card"><div class="sales-report-card-title">销售合同执行概览</div><div class="sales-amount-chart-grid" id="salesAmountCharts"></div></section>
     <div class="sales-toolbar"><div class="sales-filter-row"><select class="sales-select"><option>2026</option><option>2025</option><option>2024</option></select><input class="sales-input" placeholder="订单编号" /><input class="sales-input" placeholder="销售合同编号" /><input class="sales-input" placeholder="合同名称" /><select class="sales-select"><option>全部供应商</option><option>联合动力</option><option>远景能源</option><option>中材科技</option></select><select class="sales-select"><option>全部状态</option><option>未执行</option><option>部分执行</option><option>已执行</option></select><button class="sales-btn sales-btn-primary" id="salesReportQuery">查询</button><button class="sales-btn" id="salesReportExport">导出Excel</button></div></div>
     <div class="role-hint-banner role-hint-banner--inline">下方合同执行列表：仅项目公司物资专责、部门负责人可见。</div>

@@ -8,15 +8,18 @@
   <link rel="stylesheet" href="css/subpage-base.css" />
   <link rel="stylesheet" href="css/carrier-management.css" />
   <link rel="stylesheet" href="css/source-navbar-header.css" />
-  <link rel="stylesheet" href="css/sales-management.css?v=20260617-sales-refine-v1" />
+  <link rel="stylesheet" href="css/sales-management.css?v=20260709-hint-v1" />
+  <link rel="stylesheet" href="css/role-hint-banner.css?v=20260709-hint-v1" />
 </head>
 <body class="page-source-navbar page-subpage sales-page" data-sales-page="material-list">
 <div class="page-bg" aria-hidden="true"></div><div class="app">
 <header class="header"><div class="header-left"><button type="button" class="header-hamburger" aria-label="菜单"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button><a class="header-logo" href="#"><img src="assets/logo-chenergy.png" alt="" width="220" height="40"/></a><div class="header-source-brand"><p>新能源供应链管理系统</p></div></div><div class="header-right"><span class="clock" id="clock"></span><div class="user-avatar">用</div></div></header>
 <div class="layout"><aside class="sidebar" aria-label="主导航"><div class="nav-item"><span class="nav-label">销售管理</span></div></aside>
 <main class="main-scroll"><div class="carrier-main-inner"><div class="sales-shell">
-  <div class="sales-head"><div><h1>物资列表</h1><p class="sales-subtitle">选择销售类物资，加购后可统一下单，也可单项直接下单。</p></div><button type="button" class="sales-btn sales-btn-primary sales-cart-btn" id="salesCartBtn" aria-label="购物车" title="购物车"><svg class="sales-cart-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6h15l-2 8H8L6 3H3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="9" cy="20" r="1.6" fill="currentColor"/><circle cx="18" cy="20" r="1.6" fill="currentColor"/></svg></button></div>
-  <div class="sales-body"><div class="sales-grid-page">
+  <div class="sales-head"><div><h1>物资列表</h1></div><button type="button" class="sales-btn sales-btn-primary sales-cart-btn" id="salesCartBtn" aria-label="购物车" title="购物车"><svg class="sales-cart-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6h15l-2 8H8L6 3H3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="9" cy="20" r="1.6" fill="currentColor"/><circle cx="18" cy="20" r="1.6" fill="currentColor"/></svg></button></div>
+  <div class="sales-body">
+    <div class="role-hint-banner role-hint-banner--inline">选择销售类物资，加购后可统一下单，也可单项直接下单。</div>
+    <div class="sales-grid-page">
     <section class="sales-tree-panel"><div class="sales-tree-title">物资目录</div><div class="sales-tree-search"><input type="search" id="salesTreeSearch" placeholder="搜索编码或名称" /></div><div class="sales-tree" id="salesTree"></div></section>
     <section class="sales-product-panel">
       <div class="role-hint-banner role-hint-banner--inline">物资目录与加购下单：仅项目公司物资专责可见。</div>
@@ -25,6 +28,6 @@
     </section>
   </div></div>
 </div></div></main></div></div>
-<script src="js/sidebar-actions.js"></script><script src="js/subpage-feature-title.js"></script><script src="js/site-footer.js"></script><script src="js/map-demo-toast.js"></script><script src="js/subpage-clock.js?v=20260708-asset-inv-v1"></script><script src="js/material-code-scheme.js"></script><script src="js/demo-product-catalog-data.js?v=20260616-material-name-fix-v5"></script><script src="js/sales-management.js?v=20260707-role-annot-v2"></script>
+<script src="js/sidebar-actions.js"></script><script src="js/subpage-feature-title.js"></script><script src="js/site-footer.js"></script><script src="js/map-demo-toast.js"></script><script src="js/subpage-clock.js?v=20260708-breadcrumb-v1"></script><script src="js/material-code-scheme.js"></script><script src="js/demo-product-catalog-data.js?v=20260616-material-name-fix-v5"></script><script src="js/sales-management.js?v=20260707-role-annot-v2"></script>
 </body>
 </html>

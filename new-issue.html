@@ -7,6 +7,7 @@
   <link rel="stylesheet" href="css/vendor/fa-all.min.css" />
   <link rel="stylesheet" href="css/subpage-base.css" />
   <link rel="stylesheet" href="css/source-navbar-header.css" />
+  <link rel="stylesheet" href="css/role-hint-banner.css?v=20260709-hint-v1" />
   <style>
     .ni-wrap { padding: 12px 16px 20px; max-width: 1120px; margin: 0 auto; }
     .ni-hint {
@@ -14,7 +15,6 @@
       border-radius: 10px; padding: 10px 12px; font-size: 13px; margin: 10px 0 14px;
     }
     .ni-title { font-size: 20px; color: #1f3551; margin: 0 0 8px; font-weight: 700; }
-    .ni-subtitle { color: #516a87; font-size: 14px; margin: 0 0 14px; }
     .ni-grid {
       display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px;
     }
@@ -146,7 +146,7 @@
 
           <h1 class="carrier-page-title">表单中心</h1>
           <div class="ni-hint">该页面提示此 重要约束】：演示原型仅本地写入数据，不接入真实后端审批。</div>
-          <div class="ni-subtitle">下方显示可发起的事项类型（不同角色显示的卡片会不同）。</div>
+          <div class="role-hint-banner role-hint-banner--inline">下方显示可发起的事项类型（不同角色显示的卡片会不同）。</div>
 
           <div class="ni-grid" id="niCardGrid"></div>
         </div>
@@ -173,7 +173,7 @@
   </div>
 
   <script src="js/map-demo-toast.js"></script>
-  <script src="js/subpage-clock.js?v=20260708-asset-inv-v1"></script>
+  <script src="js/subpage-clock.js?v=20260708-breadcrumb-v1"></script>
   <script>
     (function () {
       var CARD_KEY = "map_new_issue_cards_v1";

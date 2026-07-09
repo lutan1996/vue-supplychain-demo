@@ -8,6 +8,7 @@
   <link rel="stylesheet" href="css/subpage-base.css" />
   <link rel="stylesheet" href="css/carrier-management.css" />
 <link rel="stylesheet" href="css/source-navbar-header.css" />
+  <link rel="stylesheet" href="css/role-hint-banner.css?v=20260709-hint-v1" />
   <link rel="stylesheet" href="css/module-hub.css" />
   <link rel="stylesheet" href="css/warehouse-modal.css?v=20260618-detail-input-v3" />
   <style>
@@ -101,7 +102,7 @@
       <main class="main-scroll">
         <div class="carrier-main-inner">
           <h1 class="carrier-page-title">扫码领用</h1>
-          <p style="font-size:13px;color:#62788f;margin:0 0 10px;">在线领用单 + 电子签名（演示数据写死；今年不实现硬件扫码）</p>
+          <div class="role-hint-banner role-hint-banner--inline">在线领用单 + 电子签名（演示数据写死；今年不实现硬件扫码）</div>
 
           <div id="panelApply" class="module-hub-panel is-visible">
             <h2 style="font-size:17px;margin:0 0 12px;color:#1f3551;">物资领用申请</h2>
@@ -261,7 +262,7 @@
   <script src="js/subpage-feature-title.js"></script>
   <script src="js/warehouse-submenu.js"></script>
   <script src="js/site-footer.js"></script>
-  <script src="js/subpage-clock.js?v=20260708-asset-inv-v1"></script>
+  <script src="js/subpage-clock.js?v=20260708-breadcrumb-v1"></script>
   <script>
     (function () {
       var stockMats = [

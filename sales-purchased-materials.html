@@ -8,15 +8,17 @@
   <link rel="stylesheet" href="css/subpage-base.css" />
   <link rel="stylesheet" href="css/carrier-management.css" />
   <link rel="stylesheet" href="css/source-navbar-header.css" />
-  <link rel="stylesheet" href="css/sales-management.css?v=20260707-unified-v1" />
+  <link rel="stylesheet" href="css/sales-management.css?v=20260709-hint-v1" />
+  <link rel="stylesheet" href="css/role-hint-banner.css?v=20260709-hint-v1" />
 </head>
 <body class="page-source-navbar page-subpage sales-page" data-sales-page="purchased">
 <div class="page-bg" aria-hidden="true"></div><div class="app">
 <header class="header"><div class="header-left"><button type="button" class="header-hamburger" aria-label="菜单"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button><a class="header-logo" href="#"><img src="assets/logo-chenergy.png" alt="" width="220" height="40"/></a><div class="header-source-brand"><p>新能源供应链管理系统</p></div></div><div class="header-right"><span class="clock" id="clock"></span><div class="user-avatar">用</div></div></header>
 <div class="layout"><aside class="sidebar" aria-label="主导航"><div class="nav-item"><span class="nav-label">销售管理</span></div></aside>
 <main class="main-scroll"><div class="carrier-main-inner"><div class="sales-shell">
-  <div class="sales-head"><div><h1>购入物资</h1><p class="sales-subtitle">汇总项目公司全部购入台账（内部采购经订单收货、外部自采经实物入库），可按采购来源筛选查看明细与物资跟踪。</p></div></div>
+  <div class="sales-head"><div><h1>购入物资</h1></div></div>
   <div class="sales-body">
+    <div class="role-hint-banner role-hint-banner--inline">汇总项目公司全部购入台账（内部采购经订单收货、外部自采经实物入库），可按采购来源筛选查看明细与物资跟踪。</div>
     <div class="sales-toolbar"><div class="sales-filter-row">
       <select class="sales-select" id="salesPurchasedSourceFilter" aria-label="采购来源">
         <option value="all">全部采购来源</option>
@@ -38,7 +40,7 @@
 <script src="js/subpage-feature-title.js"></script>
 <script src="js/site-footer.js"></script>
 <script src="js/map-demo-toast.js"></script>
-<script src="js/subpage-clock.js?v=20260708-asset-inv-v1"></script>
+<script src="js/subpage-clock.js?v=20260708-breadcrumb-v1"></script>
 <script src="js/material-code-scheme.js"></script>
 <script src="js/demo-product-catalog-data.js"></script>
 <script src="js/sales-management.js?v=20260707-role-annot-v2"></script>
