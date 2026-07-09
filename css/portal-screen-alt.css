@@ -570,9 +570,9 @@ button.biz-process-link:hover {
   overflow: visible;
 }
 .module-hub .panel-body {
-  padding: 8px;
+  padding: 6px;
   overflow: visible;
-  flex: 1 1 auto;
+  flex: 0 0 auto;
 }
 .module-hub .panel-head {
   background: #fff;
@@ -582,10 +582,11 @@ button.biz-process-link:hover {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   grid-auto-rows: auto;
-  gap: 6px;
+  gap: 4px;
+  align-items: start;
   min-height: min-content;
 }
-@media (min-width: 1200px) {
+@media (min-width: 1100px) {
   .module-grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
@@ -593,6 +594,8 @@ button.biz-process-link:hover {
 .module-card {
   display: flex;
   flex-direction: column;
+  align-self: start;
+  height: auto;
   min-height: 0;
   border: 1px solid rgba(24, 144, 255, 0.2);
   border-radius: 4px;
@@ -601,7 +604,7 @@ button.biz-process-link:hover {
 }
 .module-card h4 {
   margin: 0;
-  padding: 4px 7px;
+  padding: 3px 6px;
   font-size: 10px;
   font-weight: 600;
   color: #003a8c;
@@ -610,24 +613,35 @@ button.biz-process-link:hover {
   flex: 0 0 auto;
 }
 .module-links {
-  flex: 1 1 auto;
-  padding: 5px 5px 6px;
+  flex: 0 0 auto;
+  padding: 4px 4px 5px;
   display: flex;
   flex-wrap: wrap;
-  gap: 3px;
+  gap: 2px;
   align-content: flex-start;
 }
 /* 综合业务 / 数据管理：按行分组 */
 .module-links--rows {
   flex-direction: column;
   flex-wrap: nowrap;
-  gap: 5px;
+  gap: 2px;
 }
 .module-links-row {
   display: flex;
   flex-wrap: wrap;
-  gap: 4px;
+  gap: 3px;
   align-items: center;
+}
+.module-section-label {
+  flex-basis: 100%;
+  font-size: 9px;
+  font-weight: 600;
+  color: #62788f;
+  line-height: 1.2;
+  padding: 1px 0 0;
+}
+.module-links-row + .module-section-label {
+  margin-top: 2px;
 }
 .module-link-with-icon {
   display: inline-flex;
@@ -641,9 +655,9 @@ button.biz-process-link:hover {
   color: #1677ff;
 }
 .module-links a {
-  font-size: 10px;
-  line-height: 1.25;
-  padding: 3px 6px;
+  font-size: 9px;
+  line-height: 1.2;
+  padding: 2px 5px;
   border-radius: 3px;
   border: 1px solid rgba(24, 144, 255, 0.35);
   background: #fff;
