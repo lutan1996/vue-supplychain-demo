@@ -94,10 +94,12 @@
     .bd-pc-icon-btn{width:24px;height:24px;border:none;border-radius:4px;background:transparent;color:#4f95cf;font-size:14px;line-height:1;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;padding:0;position:relative}
     .bd-pc-icon-btn:hover:not(:disabled){color:#1677ff;background:#eef4ff}
     .bd-pc-icon-btn:disabled{opacity:.4;cursor:not-allowed}
-    .bd-pc-icon-btn::after{content:attr(data-tip);position:absolute;left:50%;bottom:calc(100% + 8px);transform:translateX(-50%);display:none;white-space:nowrap;background:rgba(31,41,55,.94);color:#fff;border-radius:4px;padding:4px 7px;font-size:12px;font-weight:400;line-height:1.2;z-index:20;pointer-events:none}
-    .bd-pc-icon-btn::before{content:"";position:absolute;left:50%;bottom:calc(100% + 3px);transform:translateX(-50%);display:none;border:5px solid transparent;border-top-color:rgba(31,41,55,.94);z-index:20;pointer-events:none}
-    .bd-pc-icon-btn:hover::after,.bd-pc-icon-btn:hover::before{display:block}
-    .bd-pc-tree-body{flex:1;overflow:auto;padding:8px 6px 12px}
+    .bd-pc-icon-btn::after,.bd-pc-icon-btn::before{display:none!important}
+    .bd-pc-tree-body{flex:1;overflow:auto;padding:8px 6px 28px}
+    .bd-pc-node-row{position:relative}
+    .bd-pc-node-row:hover,.bd-pc-node-row.is-active{z-index:40}
+    .bd-pc-float-tip{position:fixed;left:0;top:0;transform:translateX(-50%);display:none;padding:4px 7px;border-radius:4px;background:rgba(31,41,55,.94);color:#fff;font-size:12px;line-height:1.2;white-space:nowrap;z-index:9999;pointer-events:none;box-shadow:0 4px 12px rgba(15,23,42,.18)}
+    .bd-pc-float-tip.is-show{display:block}
     .bd-pc-node{user-select:none}
     .bd-pc-node-row{display:flex;align-items:center;gap:4px;padding:5px 6px;border-radius:4px;cursor:pointer;font-size:13px;color:#334155;line-height:1.4}
     .bd-pc-node-row:hover{background:#eef4ff}
@@ -113,9 +115,7 @@
     .bd-pc-row-action.danger:hover:not(:disabled){color:#1677ff;background:#eef4ff}
     .bd-pc-row-action svg{display:block;pointer-events:none}
     .bd-pc-row-action:disabled{opacity:.4;cursor:not-allowed;background:#f5f5f5}
-    .bd-pc-row-action::after{content:attr(data-tip);position:absolute;left:50%;bottom:calc(100% + 8px);transform:translateX(-50%);display:none;white-space:nowrap;background:rgba(31,41,55,.94);color:#fff;border-radius:4px;padding:4px 7px;font-size:12px;font-weight:400;line-height:1.2;z-index:10;pointer-events:none}
-    .bd-pc-row-action::before{content:"";position:absolute;left:50%;bottom:calc(100% + 3px);transform:translateX(-50%);display:none;border:5px solid transparent;border-top-color:rgba(31,41,55,.94);z-index:10;pointer-events:none}
-    .bd-pc-row-action:hover::after,.bd-pc-row-action:hover::before{display:block}
+    .bd-pc-row-action::after,.bd-pc-row-action::before{display:none!important}
     .bd-pc-count{color:#8b9ab0;font-size:12px;font-weight:400;margin-left:2px}
     .bd-pc-node-row.is-active .bd-pc-count{color:#5b8fd9}
     .bd-pc-children{margin-left:18px;display:none}
@@ -283,7 +283,7 @@
                   </div>
                   <div class="bd-pc-form-item">
                     <label><span class="req">*</span>编码末位</label>
-                    <input type="text" id="pcAddSuffix" maxlength="3" placeholder="小类填3位数字，如 001" />
+                    <input type="text" id="pcAddSuffix" maxlength="4" placeholder="大类/中类填3位如001，小类填4位如0001" />
                   </div>
                 </div>
                 <div class="bd-pc-modal-ft">
@@ -365,7 +365,7 @@
   <script src="js/sidebar-actions.js"></script>
   <script src="js/demo-manufacturer-data.js"></script>
   <script src="js/site-footer.js"></script>
-  <script src="js/subpage-clock.js?v=20260708-asset-inv-v1"></script>
+  <script src="js/subpage-clock.js?v=20260708-breadcrumb-v1"></script>
   <script src="js/subpage-feature-title.js"></script>
   <script>
     (function () {
@@ -499,31 +499,31 @@
       var pcDeleteNodeId = null;
       var productTreeData = [
         {
-          id: "a01", codePart: "A01", label: "A01大型成套设备", open: true, matCount: 0, children: [
-            { id: "a01-01", codePart: "01", label: "01风力发电机组", open: true, matCount: 0, children: [
-              { id: "a01-01-001", codePart: "001", label: "001风力发电机组整机", matCount: 2, category: "生产类", name: "风力发电机组整机", def: "指风电机组整机，包含机舱、叶片、塔筒等整套机组设备。", code: "A0100100001", unit: "台", status: true },
-              { id: "a01-01-002", codePart: "002", label: "002机舱", matCount: 0, category: "生产类", name: "机舱", def: "不包含叶片、轮毂、塔筒。", code: "A0100100002", unit: "台", status: true }
+          id: "a01", codePart: "001", label: "001大型成套设备", open: true, matCount: 0, children: [
+            { id: "a01-01", codePart: "001", label: "001风力发电机组", open: true, matCount: 0, children: [
+              { id: "a01-01-001", codePart: "0001", label: "0001风力发电机组整机", matCount: 2, category: "生产类", name: "风力发电机组整机", def: "指风电机组整机，包含机舱、叶片、塔筒等整套机组设备。", code: "A0100100001", unit: "台", status: true },
+              { id: "a01-01-002", codePart: "0002", label: "0002机舱", matCount: 0, category: "生产类", name: "机舱", def: "不包含叶片、轮毂、塔筒。", code: "A0100100002", unit: "台", status: true }
             ]},
-            { id: "a01-02", codePart: "02", label: "02叶片", open: true, matCount: 0, children: [
-              { id: "a01-02-001", codePart: "001", label: "001叶片", matCount: 0, category: "生产类", name: "叶片", def: "", code: "A0100200001", unit: "台", status: true }
+            { id: "a01-02", codePart: "002", label: "002叶片", open: true, matCount: 0, children: [
+              { id: "a01-02-001", codePart: "0001", label: "0001叶片", matCount: 0, category: "生产类", name: "叶片", def: "", code: "A0100200001", unit: "台", status: true }
             ]},
-            { id: "a01-03", codePart: "03", label: "03变桨轴承", open: true, matCount: 0, children: [
-              { id: "a01-03-001", codePart: "001", label: "001变桨轴承", matCount: 0, category: "生产类", name: "变桨轴承", def: "又叫叶根轴承", code: "A0100300001", unit: "台", status: true }
+            { id: "a01-03", codePart: "003", label: "003变桨轴承", open: true, matCount: 0, children: [
+              { id: "a01-03-001", codePart: "0001", label: "0001变桨轴承", matCount: 0, category: "生产类", name: "变桨轴承", def: "又叫叶根轴承", code: "A0100300001", unit: "台", status: true }
             ]},
-            { id: "a01-04", codePart: "04", label: "04主轴总成", open: true, matCount: 0, children: [
-              { id: "a01-04-001", codePart: "001", label: "001主轴总成", matCount: 0, category: "生产类", name: "主轴总成", def: "", code: "A0100400001", unit: "台", status: true }
+            { id: "a01-04", codePart: "004", label: "004主轴总成", open: true, matCount: 0, children: [
+              { id: "a01-04-001", codePart: "0001", label: "0001主轴总成", matCount: 0, category: "生产类", name: "主轴总成", def: "", code: "A0100400001", unit: "台", status: true }
             ]},
-            { id: "a01-05", codePart: "05", label: "05主齿轮箱", open: false, matCount: 0, children: [
-              { id: "a01-05-001", codePart: "001", label: "001主齿轮箱本体", matCount: 0, category: "生产类", name: "主齿轮箱本体", def: "", code: "A0100500001", unit: "台", status: true }
+            { id: "a01-05", codePart: "005", label: "005主齿轮箱", open: false, matCount: 0, children: [
+              { id: "a01-05-001", codePart: "0001", label: "0001主齿轮箱本体", matCount: 0, category: "生产类", name: "主齿轮箱本体", def: "", code: "A0100500001", unit: "台", status: true }
             ]},
-            { id: "a01-06", codePart: "06", label: "06发电机", open: false, matCount: 0, children: [
-              { id: "a01-06-001", codePart: "001", label: "001发电机", matCount: 0, category: "生产类", name: "发电机", def: "", code: "A0100600001", unit: "台", status: true }
+            { id: "a01-06", codePart: "006", label: "006发电机", open: false, matCount: 0, children: [
+              { id: "a01-06-001", codePart: "0001", label: "0001发电机", matCount: 0, category: "生产类", name: "发电机", def: "", code: "A0100600001", unit: "台", status: true }
             ]}
           ]
         },
-        { id: "a02", codePart: "A02", label: "A02小型设备", matCount: 0, children: [] },
-        { id: "a03", codePart: "A03", label: "A03工器具", matCount: 0, children: [] },
-        { id: "a04", codePart: "A04", label: "A04消防安防设备", matCount: 0, children: [] }
+        { id: "a02", codePart: "002", label: "002小型设备", matCount: 0, children: [] },
+        { id: "a03", codePart: "003", label: "003工器具", matCount: 0, children: [] },
+        { id: "a04", codePart: "004", label: "004消防安防设备", matCount: 0, children: [] }
       ];
       function pcFindNode(list, id, parent) {
         for (var i = 0; i < list.length; i++) {
@@ -540,7 +540,7 @@
         return !(n.children && n.children.length);
       }
       function pcIsSmallClassLeaf(n) {
-        return pcIsLeaf(n) && /^\d{3}$/.test(String(n.codePart || ""));
+        return pcIsLeaf(n) && /^\d{4}$/.test(String(n.codePart || ""));
       }
       function pcTreeLabel(codePart, name) {
         return String(codePart || "") + String(name || "").trim();
@@ -611,17 +611,16 @@
       function pcNextCodePart(parentNode, depth) {
         var children = parentNode.children || [];
         var used = {};
-        var len = depth === 1 ? 2 : 3;
+        var pad = depth === 1 ? 3 : 4;
+        var max = depth === 1 ? 999 : 9999;
         children.forEach(function (c) {
           if (c.codePart) used[String(c.codePart)] = true;
         });
-        for (var i = 1; i <= (depth === 1 ? 99 : 999); i++) {
-          var seg = depth === 1
-            ? (i < 10 ? "0" : "") + String(i)
-            : String(i).padStart(3, "0");
+        for (var i = 1; i <= max; i++) {
+          var seg = String(i).padStart(pad, "0");
           if (!used[seg]) return seg;
         }
-        return depth === 1 ? "99" : "999";
+        return depth === 1 ? "999" : "9999";
       }
       function pcNodeUsed(n) {
         return pcMatCount(n) > 0;
@@ -793,14 +792,16 @@
         if (!el || !pcAddParentId) return;
         var suffix = (document.getElementById("pcAddSuffix").value || "").replace(/\D/g, "");
         if (pcAddParentId === "__root__") {
-          el.textContent = suffix ? ("A" + suffix.padStart(2, "0").slice(-2)) : "A__";
+          el.textContent = suffix
+            ? pcBuildACode([{ codePart: suffix.padStart(3, "0").slice(-3) }], "001")
+            : "A___________";
           return;
         }
         var chain = pcAncestorChain(pcAddParentId);
         if (chain.length === 1) {
-          el.textContent = pcBuildACode(chain, suffix ? suffix.slice(0, 2) : "");
+          el.textContent = pcBuildACode(chain, suffix ? suffix.padStart(3, "0").slice(-3) : "");
         } else if (chain.length === 2) {
-          el.textContent = pcBuildACode(chain.concat([{ codePart: suffix.padStart(3, "0").slice(-3) }]));
+          el.textContent = pcBuildACode(chain.concat([{ codePart: suffix.padStart(4, "0").slice(-4) }]));
         } else {
           el.textContent = "—";
         }
@@ -819,6 +820,7 @@
         }
         document.getElementById("pcAddName").value = "";
         document.getElementById("pcAddSuffix").value = "";
+        pcSyncAddSuffixLimit();
         pcUpdateAddCodePreview();
         document.getElementById("pcAddMask").classList.add("show");
         document.getElementById("pcAddMask").setAttribute("aria-hidden", "false");
@@ -885,8 +887,8 @@
         var codePart = "";
         var code = "";
         if (pcAddParentId === "__root__") {
-          if (suffixRaw.length < 2) { toast("大类编码请填写2位数字"); return; }
-          codePart = "A" + suffixRaw.padStart(2, "0").slice(-2);
+          if (suffixRaw.length < 1) { toast("大类编码请填写3位数字"); return; }
+          codePart = suffixRaw.padStart(3, "0").slice(-3);
           productTreeData.push({
             id: nid,
             codePart: codePart,
@@ -908,12 +910,12 @@
         if (!pHit.node.children) pHit.node.children = [];
         var depth = chain.length;
         if (depth === 1) {
-          if (suffixRaw.length < 2) { toast("中类编码请填写2位数字"); return; }
-          codePart = suffixRaw.padStart(2, "0").slice(-2);
+          if (suffixRaw.length < 1) { toast("中类编码请填写3位数字"); return; }
+          codePart = suffixRaw.padStart(3, "0").slice(-3);
           code = pcBuildACode(chain, codePart);
         } else if (depth === 2) {
-          if (suffixRaw.length < 3) { toast("小类编码请填写3位数字"); return; }
-          codePart = suffixRaw.padStart(3, "0").slice(-3);
+          if (suffixRaw.length < 1) { toast("小类编码请填写4位数字"); return; }
+          codePart = suffixRaw.padStart(4, "0").slice(-4);
           code = pcBuildACode(chain.concat([{ codePart: codePart }]));
         } else {
           toast("仅支持在大类或中类下新增子节点");
@@ -970,9 +972,68 @@
       function pcRequestDeleteNode(nodeId) {
         pcOpenDeleteModal(nodeId);
       }
+      function pcEnsureFloatTip() {
+        var tip = document.getElementById("pcFloatTip");
+        if (tip) return tip;
+        tip = document.createElement("div");
+        tip.id = "pcFloatTip";
+        tip.className = "bd-pc-float-tip";
+        tip.setAttribute("role", "tooltip");
+        document.body.appendChild(tip);
+        return tip;
+      }
+      function pcShowFloatTip(btn) {
+        var tip = pcEnsureFloatTip();
+        var text = btn && btn.getAttribute("data-tip");
+        if (!text) {
+          tip.classList.remove("is-show");
+          return;
+        }
+        tip.textContent = text;
+        var r = btn.getBoundingClientRect();
+        tip.style.left = (r.left + r.width / 2) + "px";
+        tip.style.top = (r.bottom + 8) + "px";
+        tip.classList.add("is-show");
+      }
+      function pcHideFloatTip() {
+        var tip = document.getElementById("pcFloatTip");
+        if (tip) tip.classList.remove("is-show");
+      }
+      function pcBindFloatTips() {
+        var zone = document.querySelector(".bd-pc-tree");
+        if (!zone || zone.getAttribute("data-pc-tip-bound") === "1") return;
+        zone.setAttribute("data-pc-tip-bound", "1");
+        zone.addEventListener("mouseover", function (e) {
+          var btn = e.target && e.target.closest ? e.target.closest(".bd-pc-row-action, .bd-pc-icon-btn") : null;
+          if (!btn || !btn.getAttribute("data-tip")) return;
+          pcShowFloatTip(btn);
+        });
+        zone.addEventListener("mouseout", function (e) {
+          var btn = e.target && e.target.closest ? e.target.closest(".bd-pc-row-action, .bd-pc-icon-btn") : null;
+          if (!btn) return;
+          var rel = e.relatedTarget;
+          if (rel && btn.contains(rel)) return;
+          if (rel && rel.closest && rel.closest(".bd-pc-row-action, .bd-pc-icon-btn")) return;
+          pcHideFloatTip();
+        });
+      }
+      function pcSyncAddSuffixLimit() {
+        var input = document.getElementById("pcAddSuffix");
+        if (!input) return;
+        var maxLen = 3;
+        if (pcAddParentId === "__root__") maxLen = 3;
+        else if (pcAddParentId) {
+          var chain = pcAncestorChain(pcAddParentId);
+          maxLen = chain.length === 2 ? 4 : 3;
+        }
+        input.maxLength = maxLen;
+        input.placeholder = maxLen === 4 ? "小类填4位数字，如 0001" : "大类/中类填3位数字，如 001";
+        input.value = String(input.value || "").replace(/\D/g, "").slice(0, maxLen);
+      }
       function pcInitProductCatalog() {
         pcRenderTree();
         pcApplyForm();
+        pcBindFloatTips();
 
         pcTreeRoot.addEventListener("click", function (e) {
           var target = e.target && e.target.nodeType === 1 ? e.target : e.target.parentElement;
@@ -1038,7 +1099,13 @@
           if (e.target.id === "pcDeleteMask") pcCloseDeleteModal();
         });
         document.getElementById("pcAddSuffix").addEventListener("input", function () {
-          this.value = this.value.replace(/\D/g, "").slice(0, 3);
+          var maxLen = 3;
+          if (pcAddParentId === "__root__") maxLen = 3;
+          else if (pcAddParentId) {
+            var chain = pcAncestorChain(pcAddParentId);
+            maxLen = chain.length === 2 ? 4 : 3;
+          }
+          this.value = this.value.replace(/\D/g, "").slice(0, maxLen);
           pcUpdateAddCodePreview();
         });
 

@@ -587,35 +587,43 @@ button.biz-process-link:hover {
   flex: 0 0 auto;
 }
 .module-list {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 4px;
+  align-items: start;
+}
+@media (min-width: 1200px) {
+  .module-list {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+.module-row {
   display: flex;
   flex-direction: column;
   gap: 2px;
-}
-.module-row {
-  display: grid;
-  grid-template-columns: 92px minmax(0, 1fr);
-  gap: 4px 6px;
-  align-items: start;
-  padding: 2px 4px;
+  align-items: stretch;
+  padding: 3px 4px;
   border: 1px solid rgba(24, 144, 255, 0.16);
   border-radius: 3px;
   background: #fafcff;
+  min-height: 0;
 }
 .module-row-title {
   font-size: 9px;
   font-weight: 600;
   color: #003a8c;
   line-height: 1.25;
-  padding: 3px 0;
+  padding: 0 0 2px;
+  border-bottom: 1px solid rgba(24, 144, 255, 0.1);
   word-break: break-all;
 }
 .module-row-body {
   display: flex;
   flex-wrap: wrap;
   gap: 2px;
-  align-items: center;
+  align-items: flex-start;
   min-width: 0;
-  padding: 1px 0;
+  padding: 1px 0 0;
 }
 .module-row-body--groups {
   flex-direction: column;
