@@ -110,9 +110,19 @@
       action === "material-ledger" ||
       action === "purchase-ledger" ||
       action === "purchase-quality-accept" ||
-      action === "prod-spare-inventory"
+      action === "prod-spare-inventory" ||
+      action === "prod-spare-storage" ||
+      action === "prod-spare-type-detail"
     ) {
       return "physicalMgmt";
+    }
+    if (
+      action === "bd-warehouse-mgmt" ||
+      action === "bd-warehouse-area" ||
+      action === "bd-warehouse-shelf" ||
+      action === "bd-warehouse-orientation"
+    ) {
+      return "data";
     }
     if (action === "cargo-ledger") return "purchaseMgmt";
     if (/^(asset-)/.test(action)) return "asset";
@@ -405,6 +415,8 @@
 
     var PHYSICAL_MGMT_ROW_HTML =
       '<button type="button" class="warehouse-secondary-link" data-action="prod-spare-inventory" data-label="生产物资库存管理">生产物资库存管理</button>' +
+      '<span class="warehouse-secondary-pipe" aria-hidden="true">|</span>' +
+      '<button type="button" class="warehouse-secondary-link" data-action="prod-spare-storage" data-label="备件存储">备件存储</button>' +
       '<span class="warehouse-secondary-break" aria-hidden="true" style="flex-basis:100%;height:0;"></span>' +
       '<span class="warehouse-secondary-label" aria-hidden="true" style="display:block;flex-basis:100%;padding:4px 0 2px;color:#d7e6ff;font-weight:700;">(新能源) 技术服务类企业</span>' +
       '<button type="button" class="warehouse-secondary-link" data-action="purchase-quality-accept" data-label="库存管理">库存管理</button>' +
@@ -722,7 +734,16 @@
           '<span class="warehouse-secondary-pipe" aria-hidden="true">|</span>' +
           '<button type="button" class="warehouse-secondary-link" data-action="data-product" data-label="物资类型">物资类型</button>' +
           '<span class="warehouse-secondary-pipe" aria-hidden="true">|</span>' +
-          '<button type="button" class="warehouse-secondary-link" data-action="data-code" data-label="产品目录">产品目录</button>'
+          '<button type="button" class="warehouse-secondary-link" data-action="data-code" data-label="产品目录">产品目录</button>' +
+          '<span class="warehouse-secondary-break" aria-hidden="true" style="flex-basis:100%;height:0;"></span>' +
+          '<span class="warehouse-secondary-label" aria-hidden="true" style="display:block;flex-basis:100%;padding:4px 0 2px;color:#d7e6ff;font-weight:700;">仓储管理</span>' +
+          '<button type="button" class="warehouse-secondary-link" data-action="bd-warehouse-mgmt" data-label="仓库管理">仓库管理</button>' +
+          '<span class="warehouse-secondary-pipe" aria-hidden="true">|</span>' +
+          '<button type="button" class="warehouse-secondary-link" data-action="bd-warehouse-area" data-label="库区管理">库区管理</button>' +
+          '<span class="warehouse-secondary-pipe" aria-hidden="true">|</span>' +
+          '<button type="button" class="warehouse-secondary-link" data-action="bd-warehouse-shelf" data-label="货架管理">货架管理</button>' +
+          '<span class="warehouse-secondary-pipe" aria-hidden="true">|</span>' +
+          '<button type="button" class="warehouse-secondary-link" data-action="bd-warehouse-orientation" data-label="货架方位">货架方位</button>'
       },
       data: {
         text: '数据管理',
@@ -734,7 +755,16 @@
           '<span class="warehouse-secondary-pipe" aria-hidden="true">|</span>' +
           '<button type="button" class="warehouse-secondary-link" data-action="data-product" data-label="物资类型">物资类型</button>' +
           '<span class="warehouse-secondary-pipe" aria-hidden="true">|</span>' +
-          '<button type="button" class="warehouse-secondary-link" data-action="data-code" data-label="产品目录">产品目录</button>'
+          '<button type="button" class="warehouse-secondary-link" data-action="data-code" data-label="产品目录">产品目录</button>' +
+          '<span class="warehouse-secondary-break" aria-hidden="true" style="flex-basis:100%;height:0;"></span>' +
+          '<span class="warehouse-secondary-label" aria-hidden="true" style="display:block;flex-basis:100%;padding:4px 0 2px;color:#d7e6ff;font-weight:700;">仓储管理</span>' +
+          '<button type="button" class="warehouse-secondary-link" data-action="bd-warehouse-mgmt" data-label="仓库管理">仓库管理</button>' +
+          '<span class="warehouse-secondary-pipe" aria-hidden="true">|</span>' +
+          '<button type="button" class="warehouse-secondary-link" data-action="bd-warehouse-area" data-label="库区管理">库区管理</button>' +
+          '<span class="warehouse-secondary-pipe" aria-hidden="true">|</span>' +
+          '<button type="button" class="warehouse-secondary-link" data-action="bd-warehouse-shelf" data-label="货架管理">货架管理</button>' +
+          '<span class="warehouse-secondary-pipe" aria-hidden="true">|</span>' +
+          '<button type="button" class="warehouse-secondary-link" data-action="bd-warehouse-orientation" data-label="货架方位">货架方位</button>'
       },
       devtools: {
         text: '开发工具',
@@ -1167,6 +1197,13 @@
       'data-contract-fixed.html': 'dataNav',
       'data-supplier-fixed.html': 'dataNav',
       'data-prototype-list.html': 'dataNav',
+      'bd-warehouse-mgmt.html': 'dataNav',
+      'bd-warehouse-area.html': 'dataNav',
+      'bd-warehouse-shelf.html': 'dataNav',
+      'bd-warehouse-orientation.html': 'dataNav',
+      'prod-spare-inventory-ledger-0714.html': 'physicalMgmt',
+      'prod-spare-storage-0714.html': 'physicalMgmt',
+      'prod-spare-type-detail-0714.html': 'physicalMgmt',
       'assets-personal.html': 'assetMgmt',
       'assets-department.html': 'assetMgmt',
       'assets-company.html': 'assetMgmt',
@@ -1330,8 +1367,9 @@
       f === "return-exchange-management.html"
     )
       return "物资采购";
-    if (f.indexOf("base-data") === 0 || f.indexOf("data-code") === 0 || f.indexOf("data-contract") === 0 || f.indexOf("data-supplier") === 0 || f.indexOf("data-base") === 0 || f.indexOf("data-prototype") === 0)
-      return "数据管理";
+    if (f.indexOf("base-data") === 0 || f.indexOf("data-code") === 0 || f.indexOf("data-contract") === 0 || f.indexOf("data-supplier") === 0 || f.indexOf("data-base") === 0 || f.indexOf("data-prototype") === 0 || f.indexOf("bd-warehouse-") === 0)
+      return "基础数据管理";
+    if (f.indexOf("prod-spare-") === 0) return "实物管理";
     if (f.indexOf("notice-") === 0 || f.indexOf("notice-hub") === 0 || f.indexOf("notice-prototype") === 0) return "公告管理";
     if (f.indexOf("performance-hub") === 0) return "绩效考核";
     if (f === "repair-domestic-hub.html") return "综合业务管理";
@@ -1554,6 +1592,26 @@
       if (file === "prod-spare-inventory-ledger-0714.html") {
         pageLabel = "生产物资库存管理";
         displayMod = "实物管理";
+      }
+      if (file === "prod-spare-storage-0714.html") {
+        pageLabel = "备件存储";
+        displayMod = "实物管理";
+      }
+      if (file === "prod-spare-type-detail-0714.html") {
+        pageLabel = "备件类型";
+        displayMod = "实物管理";
+      }
+      if (
+        file === "bd-warehouse-mgmt.html" ||
+        file === "bd-warehouse-area.html" ||
+        file === "bd-warehouse-shelf.html" ||
+        file === "bd-warehouse-orientation.html"
+      ) {
+        displayMod = "基础数据管理";
+        if (file === "bd-warehouse-mgmt.html") pageLabel = "仓库管理";
+        if (file === "bd-warehouse-area.html") pageLabel = "库区管理";
+        if (file === "bd-warehouse-shelf.html") pageLabel = "货架管理";
+        if (file === "bd-warehouse-orientation.html") pageLabel = "货架方位";
       }
       if (displayMod === "业务功能") {
         var purchaseLike = [

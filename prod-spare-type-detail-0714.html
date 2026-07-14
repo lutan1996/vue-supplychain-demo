@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>备件类型详情 - 生产物资库存管理</title>
+  <link rel="stylesheet" href="css/vendor/fa-all.min.css" />
+  <link rel="stylesheet" href="css/subpage-base.css" />
+  <link rel="stylesheet" href="css/source-navbar-header.css" />
+  <style>
+    body.page-subpage .main-scroll{background:#f0f3f8}
+    .td-page{padding:12px 16px 24px}
+    .td-back{color:#1677ff;text-decoration:none;font-size:13px}
+    .td-banner{margin-top:10px;height:72px;border-radius:8px;background:linear-gradient(90deg,#e6f7ff,#f0f5ff 50%,#f9f0ff);border:1px solid #e8edf4}
+    .td-title{margin:14px 0 10px;font-size:18px;font-weight:700;color:#1f2d3d}
+    .td-kpi{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:12px}
+    .td-kpi .c{background:#fff;border:1px solid #e8edf4;border-radius:8px;padding:12px}
+    .td-kpi .k{font-size:12px;color:#8c9bb0}
+    .td-kpi .v{font-size:22px;font-weight:700;color:#1677ff;margin-top:4px}
+    .td-ai{display:flex;gap:8px;align-items:center;margin-bottom:12px}
+    .td-ai input{flex:1;height:34px;border:1px solid #d9e2ec;border-radius:4px;padding:0 12px;font-size:13px}
+    .td-ai button{height:34px;padding:0 16px;border:0;border-radius:4px;background:#1677ff;color:#fff;cursor:pointer;font-size:13px}
+    .td-box{background:#fff;border:1px solid #e8edf4;border-radius:8px;min-height:280px;padding:14px}
+    .td-box table{width:100%;border-collapse:collapse;font-size:12px}
+    .td-box th,.td-box td{padding:9px 10px;border-bottom:1px solid #eef2f7;text-align:left}
+    .td-box thead th{background:#f7f9fc;color:#5a6b82}
+    .td-side{display:flex;gap:12px}
+    .td-tree{width:240px;background:#fff;border:1px solid #e8edf4;border-radius:8px;padding:8px 0;align-self:flex-start}
+    .td-tree .n{padding:7px 12px;font-size:12px;color:#334155;cursor:pointer}
+    .td-tree .n:hover,.td-tree .n.on{background:#e6f4ff;color:#1677ff}
+    .td-tree .n2{padding-left:24px}
+    .td-main{flex:1;min-width:0}
+  </style>
+</head>
+<body class="page-source-navbar page-subpage page-logistics">
+  <div class="page-bg" aria-hidden="true"></div>
+  <div class="app">
+    <header class="header">
+      <div class="header-left">
+        <button type="button" class="header-hamburger" aria-label="菜单"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+        <a class="header-logo" href="index-portal-screen-alt.html"><img src="assets/logo-chenergy.png" alt="" width="220" height="40" /></a>
+        <div class="header-source-brand"><p>新能源供应链管理系统</p></div>
+      </div>
+      <div class="header-right"><span class="clock" id="clock"></span><div class="user-avatar">用</div></div>
+    </header>
+    <div class="layout">
+      <aside class="sidebar" aria-label="主导航">
+        <div class="nav-item" title="我的资产"><span class="nav-label">我的资产</span></div>
+        <div class="nav-item" title="我的任务"><span class="nav-label">我的任务</span></div>
+        <a class="nav-item" href="index-portal-screen-alt.html" title="首页"><span class="nav-label">首页</span></a>
+        <a class="nav-item" href="cockpit.html" title="驾驶舱"><span class="nav-label">驾驶舱</span></a>
+        <div class="nav-item" title="采购管理"><span class="nav-label">采购管理</span></div>
+        <a class="nav-item" href="carrier-management.html" title="物流管理"><span class="nav-label">物流管理</span></a>
+        <div class="nav-item" title="仓储管理"><span class="nav-label">仓储管理</span></div>
+        <div class="nav-item" title="物资采购"><span class="nav-label">物资采购</span></div>
+        <div class="nav-item" title="物资出库与处置"><span class="nav-label">物资出库与处置</span></div>
+        <div class="nav-item" title="绩效考核"><span class="nav-label">绩效考核</span></div>
+        <div class="nav-item" title="公告管理"><span class="nav-label">公告管理</span></div>
+        <div class="nav-item" title="综合业务管理"><span class="nav-label">综合业务管理</span></div>
+        <div class="nav-item" title="基础数据管理"><span class="nav-label">基础数据管理</span></div>
+        <div class="nav-item" title="开发工具"><span class="nav-label">开发工具</span></div>
+        <div class="nav-item" title="设置"><span class="nav-label">设置</span></div>
+        <div class="nav-item" title="系统管理"><span class="nav-label">系统管理</span></div>
+      </aside>
+      <main class="main-scroll">
+        <div class="td-page">
+          <a class="td-back" href="prod-spare-storage-0714.html?tab=items">‹ 备件类型</a>
+          <div class="td-banner"></div>
+          <div class="td-title" id="typeTitle">风电备件区</div>
+          <div class="td-kpi">
+            <div class="c"><div class="k">库存总量</div><div class="v">1,286<small style="font-size:12px;color:#8c9bb0"> 件</small></div></div>
+            <div class="c"><div class="k">物资类型</div><div class="v">86<small style="font-size:12px;color:#8c9bb0"> 种</small></div></div>
+            <div class="c"><div class="k">库存金额</div><div class="v">2,650<small style="font-size:12px;color:#8c9bb0"> 万</small></div></div>
+            <div class="c"><div class="k">低库存品种</div><div class="v" style="color:#cf1322">9</div></div>
+          </div>
+          <div class="td-ai"><input id="aiQ" placeholder="例如：本库区变流器有哪些型号？缺口最大的是哪类？" /><button type="button" id="btnAi">AI 查询</button></div>
+          <div class="td-side">
+            <aside class="td-tree" id="matTree">
+              <div class="n on">风机设备</div>
+              <div class="n n2">变流器</div>
+              <div class="n n2">主轴轴承</div>
+              <div class="n n2">偏航减速机</div>
+              <div class="n">输变电设备</div>
+              <div class="n n2">开关柜备件</div>
+            </aside>
+            <div class="td-main">
+              <div class="td-box">
+                <table>
+                  <thead><tr><th>产品编码</th><th>产品名称</th><th>规格型号</th><th>货架/层位</th><th>数量</th><th>金额(元)</th><th>状态</th></tr></thead>
+                  <tbody id="tbody">
+                    <tr><td>B00001234</td><td>变桨轴承</td><td>BP-2.0MW</td><td>1号货架 / 1层1位</td><td>4</td><td>2,720,000</td><td>正常</td></tr>
+                    <tr><td>B00000016</td><td>主轴轴承</td><td>BR-120</td><td>1号货架 / 2层3位</td><td>6</td><td>1,860,000</td><td>正常</td></tr>
+                    <tr><td>B00000018</td><td>IGBT 模块</td><td>FF450R</td><td>2号货架 / 1层2位</td><td>2</td><td>372,000</td><td>偏低</td></tr>
+                    <tr><td>B00001888</td><td>变频器模块</td><td>VF-800</td><td>2号货架 / 3层1位</td><td>1</td><td>122,500</td><td>偏低</td></tr>
+                  </tbody>
+                </table>
+                <div id="aiAns" style="display:none;margin-top:12px;padding:10px 12px;background:#f6ffed;border:1px solid #b7eb8f;border-radius:6px;font-size:12px;color:#389e0d"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+  <script src="js/sidebar-actions.js"></script>
+  <script src="js/site-footer.js"></script>
+  <script src="js/subpage-clock.js?v=20260714-whcfg-v1"></script>
+  <script>
+    try{
+      var t=(new URLSearchParams(location.search)).get('type');
+      if(t) document.getElementById('typeTitle').textContent=t;
+    }catch(e){}
+    document.getElementById('btnAi').onclick=function(){
+      var q=document.getElementById('aiQ').value.trim()||'本库区概况';
+      var box=document.getElementById('aiAns');
+      box.style.display='block';
+      box.textContent='AI 查询结果（演示）：针对「'+q+'」——当前库区共 86 种物资、金额约 2,650 万；偏低品种 9 个，建议优先对 IGBT/变频器做调拨补货。';
+    };
+  </script>
+</body>
+</html>
