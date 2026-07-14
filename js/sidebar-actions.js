@@ -142,6 +142,7 @@
     "purchase-pay": "material-procurement-hub.html?tab=m8",
     "purchase-return-exchange": "return-exchange-management.html",
     "purchase-quality-accept": "material-procurement-hub.html?tab=m10",
+    "prod-spare-inventory": "prod-spare-inventory-ledger-0714.html",
     "purchase-material-info-manage": "purchase-material-info-management.html",
     "purchase-supplier": "material-procurement-hub.html?tab=m5",
     "purchase-order": "order-demand-management.html",

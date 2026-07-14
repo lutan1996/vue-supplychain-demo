@@ -196,6 +196,7 @@ export function useDemoShell() {
     'purchase-plan-manage': 'purchase-plan-management.html',
     'purchase-plan-table': 'purchase-plan-table.html',
     'purchase-quality-accept': 'material-procurement-hub.html?tab=m10',
+    'prod-spare-inventory': 'prod-spare-inventory-ledger-0714.html',
     'purchase-reapply': 'purchase-pm-repurchase.html',
     'purchase-receipt': 'proc-acceptance-inbound.html',
     'purchase-result-notice-nonbid': 'purchase-pm-notice-nonbid.html',

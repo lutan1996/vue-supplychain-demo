@@ -109,7 +109,8 @@
     if (
       action === "material-ledger" ||
       action === "purchase-ledger" ||
-      action === "purchase-quality-accept"
+      action === "purchase-quality-accept" ||
+      action === "prod-spare-inventory"
     ) {
       return "physicalMgmt";
     }
@@ -403,7 +404,7 @@
     }
 
     var PHYSICAL_MGMT_ROW_HTML =
-      '<button type="button" class="warehouse-secondary-link" data-action="purchase-quality-accept" data-label="生产物资库存管理">生产物资库存管理</button>' +
+      '<button type="button" class="warehouse-secondary-link" data-action="prod-spare-inventory" data-label="生产物资库存管理">生产物资库存管理</button>' +
       '<span class="warehouse-secondary-break" aria-hidden="true" style="flex-basis:100%;height:0;"></span>' +
       '<span class="warehouse-secondary-label" aria-hidden="true" style="display:block;flex-basis:100%;padding:4px 0 2px;color:#d7e6ff;font-weight:700;">(新能源) 技术服务类企业</span>' +
       '<button type="button" class="warehouse-secondary-link" data-action="purchase-quality-accept" data-label="库存管理">库存管理</button>' +

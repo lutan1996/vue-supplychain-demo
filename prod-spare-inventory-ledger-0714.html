@@ -1,0 +1,1855 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>生产物资库存台账 - 新能源物资供应链管理系统</title>
+  <link rel="stylesheet" href="css/vendor/fa-all.min.css" />
+  <link rel="stylesheet" href="css/subpage-base.css" />
+  <link rel="stylesheet" href="css/carrier-management.css" />
+  <link rel="stylesheet" href="css/source-navbar-header.css" />
+  <style>
+    :root {
+      --primary: #1677ff;
+      --primary-soft: #e6f4ff;
+      --primary-deep: #0958d9;
+      --ok: #52c41a;
+      --ok-soft: #f6ffed;
+      --warn: #fa8c16;
+      --warn-soft: #fff7e6;
+      --danger: #f5222d;
+      --danger-soft: #fff1f0;
+      --text: #1f2d3d;
+      --muted: #8c9bb0;
+      --border: #e8edf4;
+      --bg: #f0f3f8;
+      --surface: #ffffff;
+      --rail: #0b1f3a;
+    }
+    * { box-sizing: border-box; }
+    .scheme-banner {
+      background: linear-gradient(90deg, #0b1f3a, #1677ff 55%, #36cfc9);
+      color: #fff;
+      padding: 8px 16px;
+      display: flex;
+      align-items: baseline;
+      gap: 14px;
+      margin: 0 0 0;
+    }
+    .scheme-banner .tag {
+      background: rgba(255,255,255,.2);
+      padding: 2px 10px;
+      border-radius: 3px;
+      font-weight: 700;
+      font-size: 13px;
+    }
+    .scheme-banner .desc { font-size: 12px; opacity: .93; }
+    .ledger-page {
+      display: flex;
+      flex-direction: column;
+      min-height: calc(100vh - 56px);
+      background: var(--bg);
+      color: var(--text);
+      font-size: 13px;
+    }
+    .shell {
+      display: grid;
+      grid-template-columns: 248px minmax(0, 1fr);
+      flex: 1;
+      min-height: 680px;
+    }
+
+    /* ===== Left: org + material tree ===== */
+    .left {
+      background: #fff;
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+    }
+    .org-pick {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border);
+      background: linear-gradient(180deg, #f8fbff, #fff);
+    }
+    .org-pick label {
+      display: block;
+      font-size: 11px;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+    .org-select {
+      position: relative;
+    }
+    .org-select-btn {
+      width: 100%;
+      height: 34px;
+      border: 1px solid #c9d7ea;
+      border-radius: 4px;
+      background: #fff;
+      padding: 0 28px 0 10px;
+      text-align: left;
+      cursor: pointer;
+      color: var(--text);
+      position: relative;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .org-select-btn::after {
+      content: "";
+      position: absolute;
+      right: 10px; top: 50%;
+      width: 0; height: 0;
+      border-left: 4px solid transparent;
+      border-right: 4px solid transparent;
+      border-top: 5px solid #64748b;
+      transform: translateY(-40%);
+    }
+    .org-dropdown {
+      display: none;
+      position: absolute;
+      left: 0; right: 0; top: 38px;
+      background: #0b1f3a;
+      color: #dbe7f5;
+      border-radius: 6px;
+      box-shadow: 0 12px 28px rgba(11,31,58,.35);
+      z-index: 30;
+      max-height: 360px;
+      overflow: auto;
+      padding: 6px 0;
+    }
+    .org-dropdown.open { display: block; }
+    .org-node {
+      padding: 7px 12px;
+      cursor: pointer;
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: #dbe7f5;
+      user-select: none;
+    }
+    .org-node:hover { background: rgba(22,119,255,.28); color: #fff; }
+    .org-node.active { background: #1677ff; color: #fff; }
+    .org-node .arrow {
+      width: 12px;
+      color: #7ea2c9;
+      font-size: 10px;
+      flex: 0 0 auto;
+      text-align: center;
+      line-height: 1;
+    }
+    .org-node.l2 { padding-left: 22px; }
+    .org-node.l3 { padding-left: 42px; color: #c5d5e8; }
+    .org-node.l3:hover, .org-node.l3.active { color: #fff; }
+    .org-company > .org-stations { display: none; }
+    .org-company.open > .org-stations { display: block; }
+    .org-company.open > .org-node.l2 .arrow { transform: none; }
+    .org-company.open > .org-node.l2 .arrow::before { content: "▼"; }
+    .org-company:not(.open) > .org-node.l2 .arrow::before { content: "›"; }
+    .org-company > .org-node.l2 .arrow { font-size: 0; }
+    .org-company > .org-node.l2 .arrow::before {
+      font-size: 10px;
+      color: #7ea2c9;
+    }
+    .org-root > .org-children { display: none; }
+    .org-root.open > .org-children { display: block; }
+    .org-root.open > .org-node.group .arrow { transform: none; }
+    .org-root.open > .org-node.group .arrow::before { content: "▼"; }
+    .org-root:not(.open) > .org-node.group .arrow::before { content: "›"; }
+    .org-root > .org-node.group .arrow { font-size: 0; }
+    .org-root > .org-node.group .arrow::before {
+      font-size: 10px;
+      color: #7ea2c9;
+    }
+
+    .mat-hd {
+      padding: 10px 12px 6px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .mat-hd h3 { font-size: 13px; font-weight: 700; }
+    .mat-hd .hint { font-size: 11px; color: var(--muted); }
+    .mat-search {
+      margin: 0 12px 8px;
+    }
+    .mat-search input {
+      width: 100%;
+      height: 30px;
+      border: 1px solid #d7e0ec;
+      border-radius: 4px;
+      padding: 0 10px;
+      font-size: 12px;
+    }
+    .mat-tree {
+      flex: 1;
+      overflow: auto;
+      padding: 0 8px 12px;
+    }
+    .type-item, .prod-item {
+      border-radius: 4px;
+      cursor: pointer;
+      user-select: none;
+    }
+    .type-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 7px 8px;
+      gap: 6px;
+    }
+    .type-item:hover .type-row, .type-item.active > .type-row {
+      background: var(--primary-soft);
+      color: var(--primary-deep);
+    }
+    .type-row .name {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      min-width: 0;
+      font-weight: 600;
+    }
+    .type-row .caret {
+      width: 12px;
+      color: var(--muted);
+      font-size: 10px;
+      transition: transform .15s;
+    }
+    .type-item.open > .type-row .caret { transform: rotate(90deg); color: var(--primary); }
+    .type-row .cnt {
+      font-size: 11px;
+      color: var(--muted);
+      font-weight: 500;
+      flex: 0 0 auto;
+    }
+    .type-item.active > .type-row .cnt { color: var(--primary); font-weight: 700; }
+    .prod-list { display: none; padding: 0 0 4px 18px; }
+    .type-item.open > .prod-list { display: block; }
+    .prod-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 5px 8px;
+      margin-bottom: 1px;
+      font-size: 12px;
+      color: #334155;
+    }
+    .prod-item:hover, .prod-item.active {
+      background: #f0f7ff;
+      color: var(--primary);
+    }
+    .prod-item .pcnt { color: var(--muted); font-size: 11px; }
+
+    /* ===== Center ===== */
+    .center {
+      overflow: auto;
+      padding: 12px 14px 18px;
+      min-width: 0;
+    }
+    .page-hd {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+      gap: 10px;
+    }
+    .page-hd h1 { font-size: 17px; font-weight: 700; }
+    .page-hd .scope {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+    .page-hd .ops { display: flex; gap: 6px; flex-wrap: wrap; }
+    .btn {
+      height: 30px;
+      border-radius: 4px;
+      border: 1px solid #cbd5e1;
+      background: #fff;
+      padding: 0 12px;
+      font-size: 12px;
+      cursor: pointer;
+      color: #334155;
+    }
+    .btn.pri { background: var(--primary); border-color: var(--primary); color: #fff; }
+    .btn.ok { background: #52c41a; border-color: #52c41a; color: #fff; }
+    .btn.ghost:hover { border-color: var(--primary); color: var(--primary); }
+    .table-toolbar .ops { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+
+    /* KPI row — Ant Design Pro style + ice/wave bottom */
+    .kpi-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    .kpi {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px 14px 0;
+      position: relative;
+      overflow: hidden;
+      min-height: 118px;
+    }
+    .kpi .title {
+      font-size: 12px;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .kpi .title .i {
+      width: 14px; height: 14px;
+      border-radius: 50%;
+      border: 1px solid #c9d4e3;
+      color: #8c9bb0;
+      font-size: 10px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: help;
+    }
+    .kpi .val {
+      font-size: 26px;
+      font-weight: 700;
+      margin: 6px 0 2px;
+      letter-spacing: -.5px;
+      line-height: 1.15;
+    }
+    .kpi .val small { font-size: 13px; font-weight: 500; color: var(--muted); margin-left: 2px; }
+    .kpi .trend {
+      font-size: 12px;
+      margin-bottom: 8px;
+    }
+    .kpi .trend.up { color: var(--danger); }
+    .kpi .trend.down { color: var(--ok); }
+    .kpi .trend.flat { color: var(--muted); }
+    .kpi .spark {
+      height: 36px;
+      margin: 0 -14px;
+      display: block;
+    }
+    .kpi .ice {
+      height: 28px;
+      margin: 0 -14px;
+      background:
+        radial-gradient(120% 80% at 10% 120%, rgba(22,119,255,.22), transparent 55%),
+        radial-gradient(100% 90% at 55% 130%, rgba(54,207,201,.28), transparent 50%),
+        radial-gradient(90% 70% at 90% 120%, rgba(22,119,255,.18), transparent 45%),
+        linear-gradient(180deg, transparent, rgba(230,244,255,.65));
+      clip-path: polygon(0 70%, 8% 55%, 18% 62%, 28% 40%, 40% 52%, 52% 28%, 64% 48%, 76% 34%, 88% 50%, 100% 42%, 100% 100%, 0 100%);
+    }
+
+    /* Charts row */
+    .chart-row {
+      display: grid;
+      grid-template-columns: 1.4fr 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    .card {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px 14px;
+      min-height: 210px;
+    }
+    .card-hd {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+    .card-hd h3 { font-size: 13px; font-weight: 700; }
+    .card-hd .tabs { display: flex; gap: 2px; background: #f5f7fb; border-radius: 4px; padding: 2px; }
+    .card-hd .tabs button {
+      border: 0;
+      background: transparent;
+      padding: 3px 10px;
+      border-radius: 3px;
+      font-size: 12px;
+      color: var(--muted);
+      cursor: pointer;
+    }
+    .card-hd .tabs button.on {
+      background: #fff;
+      color: var(--primary);
+      box-shadow: 0 1px 2px rgba(15,23,42,.08);
+    }
+    .bar-chart {
+      display: flex;
+      align-items: flex-end;
+      gap: 8px;
+      height: 140px;
+      padding: 8px 4px 0;
+      border-bottom: 1px solid #eef2f7;
+    }
+    .bar-chart .col {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      height: 100%;
+      justify-content: flex-end;
+    }
+    .bar-chart .bar {
+      width: 70%;
+      max-width: 36px;
+      border-radius: 4px 4px 0 0;
+      background: linear-gradient(180deg, #69b1ff, #1677ff);
+      position: relative;
+    }
+    .bar-chart .bar::after {
+      content: attr(data-v);
+      position: absolute;
+      top: -16px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 10px;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+    .bar-chart .lab { font-size: 11px; color: var(--muted); }
+
+    .dist-body {
+      display: grid;
+      grid-template-columns: 120px 1fr;
+      gap: 10px;
+      align-items: center;
+      height: 160px;
+    }
+    .donut {
+      width: 110px; height: 110px;
+      border-radius: 50%;
+      background: conic-gradient(
+        #1677ff 0 34%,
+        #36cfc9 34% 58%,
+        #95de64 58% 74%,
+        #ffc53d 74% 88%,
+        #ff85c0 88% 100%
+      );
+      position: relative;
+      margin: 0 auto;
+    }
+    .donut::after {
+      content: "";
+      position: absolute;
+      inset: 28px;
+      background: #fff;
+      border-radius: 50%;
+    }
+    .donut-center {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 1;
+      pointer-events: none;
+    }
+    .donut-center b { font-size: 16px; line-height: 1.1; }
+    .donut-center span { font-size: 10px; color: var(--muted); }
+    .legend { font-size: 12px; }
+    .legend .row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 4px 0;
+    }
+    .legend .dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      display: inline-block; margin-right: 6px;
+    }
+
+    .trend-body { height: 160px; position: relative; }
+    .trend-body svg { width: 100%; height: 140px; display: block; }
+    .trend-meta {
+      display: flex;
+      gap: 14px;
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+    .trend-meta i {
+      display: inline-block;
+      width: 10px; height: 3px;
+      border-radius: 2px;
+      margin-right: 4px;
+      vertical-align: middle;
+    }
+
+    /* Filters + product quick chips */
+    .filters {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 12px;
+      margin-bottom: 8px;
+    }
+    .filter-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+    .filters input, .filters select {
+      height: 30px;
+      border: 1px solid #cbd5e1;
+      border-radius: 4px;
+      padding: 0 10px;
+      font-size: 12px;
+      background: #fff;
+    }
+    .filters input { width: 180px; }
+    .product-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 8px;
+      padding-top: 8px;
+      border-top: 1px dashed #e5ebf3;
+    }
+    .product-chips .label {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 24px;
+      margin-right: 2px;
+    }
+    .chip {
+      height: 24px;
+      border-radius: 12px;
+      border: 1px solid #d6e0ee;
+      background: #f8fafc;
+      padding: 0 10px;
+      font-size: 12px;
+      cursor: pointer;
+      color: #475569;
+    }
+    .chip:hover { border-color: #91caff; color: var(--primary); }
+    .chip.on {
+      background: var(--primary-soft);
+      border-color: #91caff;
+      color: var(--primary-deep);
+      font-weight: 600;
+    }
+
+    /* Detail table */
+    .table-wrap {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .btn.ok { background: #52c41a; border-color: #52c41a; color: #fff; }
+    .btn.ok:hover { background: #73d13d; border-color: #73d13d; }
+    .table-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 12px;
+      border-bottom: 1px solid var(--border);
+      background: #fafbfd;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .table-toolbar .meta { color: var(--muted); font-size: 12px; white-space: nowrap; }
+    .table-toolbar .ops {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .table-scroll {
+      overflow: auto;
+      max-height: 380px;
+    }
+    /* 覆盖 subpage-base 的 table-layout:fixed，避免列被压扁后 nowrap 文字重叠 */
+    .page-subpage .ledger-page .table-wrap {
+      overflow: hidden;
+    }
+    .page-subpage .ledger-page .table-scroll {
+      overflow: auto !important;
+      -webkit-overflow-scrolling: touch;
+    }
+    .page-subpage .ledger-page .ledger-detail-table {
+      width: max-content !important;
+      min-width: 1620px !important;
+      table-layout: auto !important;
+      border-collapse: separate !important;
+      border-spacing: 0;
+    }
+    .page-subpage .ledger-page .ledger-detail-table thead th,
+    .page-subpage .ledger-page .ledger-detail-table tbody td {
+      padding: 9px 12px !important;
+      border-bottom: 1px solid #eef2f7;
+      text-align: left;
+      white-space: nowrap !important;
+      word-break: normal !important;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      vertical-align: middle !important;
+      background-clip: padding-box;
+      box-sizing: border-box;
+      max-width: none !important;
+    }
+    .page-subpage .ledger-page .ledger-detail-table thead th {
+      background: #f7f9fc !important;
+      color: #5a6b82;
+      font-weight: 600;
+      font-size: 12px;
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      line-height: 1.35;
+    }
+    .page-subpage .ledger-page .ledger-detail-table thead th .sub {
+      display: block;
+      font-weight: 500;
+      color: #8c9bb0;
+      font-size: 11px;
+      margin-top: 2px;
+      white-space: nowrap;
+    }
+    .page-subpage .ledger-page .ledger-detail-table tbody td.num {
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+    .page-subpage .ledger-page .ledger-detail-table tbody td.code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: #334155;
+    }
+    .page-subpage .ledger-page .ledger-detail-table tbody tr:hover td {
+      background: #f8fbff;
+    }
+    .page-subpage .ledger-page .ledger-detail-table col.c-idx { width: 56px; min-width: 56px; }
+    .page-subpage .ledger-page .ledger-detail-table col.c-date { width: 110px; min-width: 110px; }
+    .page-subpage .ledger-page .ledger-detail-table col.c-factory { width: 220px; min-width: 220px; }
+    .page-subpage .ledger-page .ledger-detail-table col.c-loc { width: 200px; min-width: 200px; }
+    .page-subpage .ledger-page .ledger-detail-table col.c-code { width: 120px; min-width: 120px; }
+    .page-subpage .ledger-page .ledger-detail-table col.c-name { width: 120px; min-width: 120px; }
+    .page-subpage .ledger-page .ledger-detail-table col.c-type { width: 110px; min-width: 110px; }
+    .page-subpage .ledger-page .ledger-detail-table col.c-model { width: 120px; min-width: 120px; }
+    .page-subpage .ledger-page .ledger-detail-table col.c-qty { width: 100px; min-width: 100px; }
+    .page-subpage .ledger-page .ledger-detail-table col.c-amt { width: 120px; min-width: 120px; }
+    .page-subpage .ledger-page .ledger-detail-table col.c-safe { width: 88px; min-width: 88px; }
+    .page-subpage .ledger-page .ledger-detail-table col.c-st { width: 110px; min-width: 110px; }
+    .page-subpage .ledger-page .ledger-detail-table col.c-op { width: 180px; min-width: 180px; }
+    .page-subpage .ledger-page .ledger-detail-table th:nth-child(13),
+    .page-subpage .ledger-page .ledger-detail-table td:nth-child(13),
+    .page-subpage .ledger-page .ledger-detail-table th.op,
+    .page-subpage .ledger-page .ledger-detail-table td.op {
+      min-width: 180px !important;
+      width: 180px;
+      overflow: visible !important;
+      text-overflow: clip !important;
+      white-space: nowrap !important;
+    }
+    .page-subpage .ledger-page .ledger-detail-table th:nth-child(1),
+    .page-subpage .ledger-page .ledger-detail-table td:nth-child(1) { min-width: 56px; }
+    .page-subpage .ledger-page .ledger-detail-table th:nth-child(2),
+    .page-subpage .ledger-page .ledger-detail-table td:nth-child(2),
+    .page-subpage .ledger-page .ledger-detail-table th:nth-child(3),
+    .page-subpage .ledger-page .ledger-detail-table td:nth-child(3) { min-width: 110px; }
+    .page-subpage .ledger-page .ledger-detail-table th:nth-child(4),
+    .page-subpage .ledger-page .ledger-detail-table td:nth-child(4) { min-width: 220px; }
+    .page-subpage .ledger-page .ledger-detail-table th:nth-child(5),
+    .page-subpage .ledger-page .ledger-detail-table td:nth-child(5) { min-width: 200px; }
+    .page-subpage .ledger-page .ledger-detail-table th:nth-child(6),
+    .page-subpage .ledger-page .ledger-detail-table td:nth-child(6) { min-width: 120px; }
+    .page-subpage .ledger-page .ledger-detail-table th:nth-child(7),
+    .page-subpage .ledger-page .ledger-detail-table td:nth-child(7) { min-width: 120px; }
+    .tag-pill {
+      display: inline-block;
+      padding: 1px 8px;
+      border-radius: 10px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+    .tag-pill.ok { background: var(--ok-soft); color: #389e0d; }
+    .tag-pill.warn { background: var(--warn-soft); color: #d46b08; }
+    .tag-pill.danger { background: var(--danger-soft); color: #cf1322; }
+    .pager {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 12px;
+      color: var(--muted);
+      font-size: 12px;
+      gap: 12px;
+    }
+    .pager > span:first-child {
+      white-space: normal;
+      line-height: 1.4;
+    }
+
+    /* KPI + 组织库存汇总（列表+占比条，不再重复饼图） */
+    .summary-band {
+      display: grid;
+      grid-template-columns: minmax(0, 1.05fr) minmax(380px, 460px);
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    .summary-band .kpi-row {
+      margin-bottom: 0;
+      grid-template-columns: 1fr 1fr;
+    }
+    .factory-list {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      min-height: 236px;
+      max-height: 260px;
+    }
+    .factory-list-hd {
+      padding: 8px 12px;
+      border-bottom: 1px solid var(--border);
+      font-size: 13px;
+      font-weight: 700;
+      background: #fafbfd;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+    .factory-list-hd .cnt {
+      font-size: 11px;
+      color: var(--muted);
+      font-weight: 500;
+    }
+    .factory-list-body {
+      overflow: auto;
+      flex: 1;
+      min-height: 0;
+      padding: 0;
+    }
+    .factory-list table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 420px;
+      table-layout: fixed;
+    }
+    .factory-list th, .factory-list td {
+      padding: 7px 10px;
+      border-bottom: 1px solid #eef2f7;
+      font-size: 12px;
+      vertical-align: middle;
+    }
+    .factory-list th {
+      background: #f7f9fc;
+      color: #5a6b82;
+      font-weight: 600;
+      position: sticky;
+      top: 0;
+      z-index: 1;
+      white-space: nowrap;
+      overflow: visible;
+      text-overflow: clip;
+    }
+    .factory-list td {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .factory-list td.num { text-align: right; font-variant-numeric: tabular-nums; font-weight: 600; }
+    .factory-list td.pct { text-align: right; color: #64748b; font-variant-numeric: tabular-nums; white-space: nowrap; }
+    .factory-list tr:hover td { background: #f8fbff; cursor: pointer; }
+    .factory-list tr.is-active td { background: var(--primary-soft); color: var(--primary-deep); }
+    .factory-list .bar-mini {
+      display: block;
+      height: 4px;
+      border-radius: 2px;
+      background: #e8edf4;
+      margin-top: 4px;
+      overflow: hidden;
+    }
+    .factory-list .bar-mini i {
+      display: block;
+      height: 100%;
+      background: linear-gradient(90deg, #69b1ff, #1677ff);
+      border-radius: 2px;
+    }
+    .ledger-detail-table td.op,
+    .page-subpage .ledger-page .ledger-detail-table td.op {
+      color: #1677ff;
+      font-size: 12px;
+      line-height: 1.4;
+    }
+    .ledger-detail-table .op a,
+    .page-subpage .ledger-page .ledger-detail-table .op a {
+      display: inline !important;
+      visibility: visible !important;
+      opacity: 1 !important;
+      color: #1677ff !important;
+      text-decoration: none;
+      margin-right: 8px;
+      white-space: nowrap;
+      font-size: 12px;
+      line-height: 1.4;
+    }
+    .ledger-detail-table .op a:hover { text-decoration: underline; }
+    .ledger-detail-table .op a.danger,
+    .page-subpage .ledger-page .ledger-detail-table .op a.danger { color: #cf1322 !important; }
+    .ledger-detail-table .op a.warn,
+    .page-subpage .ledger-page .ledger-detail-table .op a.warn { color: #d46b08 !important; }
+    .btn.warn-entry {
+      background: #fff1f0;
+      border-color: #ffa39e;
+      color: #cf1322;
+      position: relative;
+    }
+    .btn.warn-entry .badge {
+      position: absolute;
+      top: -6px; right: -6px;
+      min-width: 16px; height: 16px;
+      border-radius: 8px;
+      background: #f5222d;
+      color: #fff;
+      font-size: 10px;
+      line-height: 16px;
+      padding: 0 4px;
+      font-weight: 700;
+    }
+
+    /* ===== 预警抽屉：从右往左滑出 ===== */
+    .alert-mask {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, .35);
+      z-index: 1000;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity .2s ease, visibility .2s ease;
+    }
+    .alert-mask.open { opacity: 1; visibility: visible; }
+    .rail {
+      position: fixed;
+      top: 0; right: 0;
+      width: 360px;
+      max-width: 92vw;
+      height: 100vh;
+      background: #fff;
+      border-left: 1px solid var(--border);
+      box-shadow: -8px 0 28px rgba(15, 23, 42, .18);
+      overflow: auto;
+      padding: 0 10px 16px;
+      z-index: 1001;
+      transform: translateX(100%);
+      transition: transform .28s ease;
+    }
+    .rail.open { transform: translateX(0); }
+    .rail-hd {
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      background: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 4px 10px;
+      margin-bottom: 4px;
+      border-bottom: 1px solid var(--border);
+    }
+    .rail-hd h2 { font-size: 15px; font-weight: 700; }
+    .rail-close {
+      width: 28px; height: 28px;
+      border: 1px solid #d9e0ea;
+      border-radius: 4px;
+      background: #fff;
+      cursor: pointer;
+      font-size: 16px;
+      line-height: 1;
+      color: #64748b;
+    }
+    .rail-close:hover { color: #cf1322; border-color: #ffa39e; background: #fff1f0; }
+    .rail-sec {
+      background: #fafbfd;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px;
+      margin-bottom: 10px;
+    }
+    .rail-sec h3 {
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .rail-sec h3 .cnt {
+      background: var(--danger-soft);
+      color: var(--danger);
+      font-size: 11px;
+      padding: 1px 8px;
+      border-radius: 10px;
+    }
+    .rail-sec h3 .cnt.g {
+      background: var(--ok-soft);
+      color: #389e0d;
+    }
+    .alert-item {
+      background: #fff;
+      border: 1px solid #fecdd3;
+      border-left: 3px solid var(--danger);
+      border-radius: 6px;
+      padding: 8px 10px;
+      margin-bottom: 8px;
+    }
+    .alert-item.warn {
+      border-color: #ffd8a8;
+      border-left-color: var(--warn);
+    }
+    .alert-item .t { font-weight: 700; color: #9f1239; margin-bottom: 2px; }
+    .alert-item.warn .t { color: #b45309; }
+    .alert-item .d { font-size: 12px; color: #64748b; margin-bottom: 6px; }
+    .alert-item .act { display: flex; gap: 6px; }
+    .alert-item .act button {
+      height: 24px;
+      border-radius: 3px;
+      border: 1px solid #cbd5e1;
+      background: #fff;
+      padding: 0 8px;
+      font-size: 11px;
+      cursor: pointer;
+    }
+    .alert-item .act button.pri {
+      background: var(--danger);
+      border-color: var(--danger);
+      color: #fff;
+    }
+    .alert-item.warn .act button.pri {
+      background: var(--warn);
+      border-color: var(--warn);
+    }
+    .suggest {
+      background: #fff;
+      border: 1px solid #b7eb8f;
+      border-radius: 6px;
+      padding: 8px 10px;
+      margin-bottom: 8px;
+    }
+    .suggest .t { font-weight: 700; margin-bottom: 2px; }
+    .suggest .d { font-size: 12px; color: #64748b; }
+    .suggest .meta { font-size: 11px; color: #389e0d; margin: 4px 0 6px; }
+    .suggest button {
+      width: 100%;
+      height: 28px;
+      border: 1px solid #95de64;
+      background: var(--ok-soft);
+      color: #389e0d;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .timeline { list-style: none; }
+    .timeline li {
+      display: grid;
+      grid-template-columns: 42px 1fr;
+      gap: 8px;
+      padding: 6px 0;
+      border-bottom: 1px dashed #e8edf4;
+      font-size: 12px;
+    }
+    .timeline li:last-child { border-bottom: 0; }
+    .timeline .tm { color: var(--muted); }
+
+    .map-note {
+      margin-top: 8px;
+      padding: 8px 10px;
+      background: #f8fafc;
+      border-radius: 6px;
+      font-size: 11px;
+      color: #64748b;
+      line-height: 1.55;
+    }
+    .map-note b { color: #334155; }
+
+    @media (max-width: 1280px) {
+      .shell { grid-template-columns: 220px minmax(0,1fr); }
+      .summary-band { grid-template-columns: 1fr; }
+      .kpi-row, .chart-row { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body class="page-source-navbar page-subpage page-logistics">
+  <div class="page-bg" aria-hidden="true"></div>
+  <div class="app">
+    <header class="header">
+      <div class="header-left">
+        <button type="button" class="header-hamburger" aria-label="菜单" title="菜单">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+        </button>
+        <a class="header-logo" href="index-portal-screen-alt.html" aria-label="国家能源集团">
+          <img src="assets/logo-chenergy.png" alt="国家能源集团 CHN ENERGY" width="220" height="40" />
+        </a>
+        <div class="header-source-brand"><p>新能源供应链管理系统</p></div>
+      </div>
+      <div class="header-right">
+        <span class="clock" id="clock"></span>
+        <div class="user-avatar" title="用户">用</div>
+      </div>
+    </header>
+
+    <div class="layout">
+      <aside class="sidebar" aria-label="主导航">
+        <div class="nav-item" title="我的资产"><span class="nav-label">我的资产</span></div>
+        <div class="nav-item" title="我的任务"><span class="nav-label">我的任务</span></div>
+        <a class="nav-item" href="index-portal-screen-alt.html" title="首页"><span class="nav-label">首页</span></a>
+        <a class="nav-item" href="cockpit.html" title="驾驶舱"><span class="nav-label">驾驶舱</span></a>
+        <div class="nav-item" title="采购管理"><span class="nav-label">采购管理</span></div>
+        <a class="nav-item" href="carrier-management.html" title="物流管理"><span class="nav-label">物流管理</span></a>
+        <div class="nav-item nav-item--module-active" title="仓储管理"><span class="nav-label">仓储管理</span></div>
+        <div class="nav-item" title="物资采购"><span class="nav-label">物资采购</span></div>
+        <div class="nav-item" title="物资出库与处置"><span class="nav-label">物资出库与处置</span></div>
+        <div class="nav-item" title="绩效考核"><span class="nav-label">绩效考核</span></div>
+        <div class="nav-item" title="公告管理"><span class="nav-label">公告管理</span></div>
+        <div class="nav-item" title="综合业务管理"><span class="nav-label">综合业务管理</span></div>
+        <div class="nav-item" title="数据管理"><span class="nav-label">数据管理</span></div>
+        <div class="nav-item" title="开发工具"><span class="nav-label">开发工具</span></div>
+        <div class="nav-item" title="设置"><span class="nav-label">设置</span></div>
+        <div class="nav-item" title="系统管理"><span class="nav-label">系统管理</span></div>
+      </aside>
+
+      <main class="main-scroll">
+        <div class="ledger-page">
+  <div class="shell">
+    <!-- LEFT -->
+    <aside class="left">
+      <div class="org-pick">
+        <label>组织范围</label>
+        <div class="org-select">
+          <button type="button" class="org-select-btn" id="orgBtn">龙源电力（全部）</button>
+          <div class="org-dropdown" id="orgDropdown">
+            <div class="org-root open" id="orgRoot">
+              <div class="org-node group active" data-name="龙源电力" data-level="group"><span class="arrow"></span>龙源电力</div>
+              <div class="org-children">
+                <div class="org-company open">
+                  <div class="org-node l2" data-name="河北龙源" data-level="company"><span class="arrow"></span>河北龙源</div>
+                  <div class="org-stations">
+                    <div class="org-node l3" data-name="麒麟山风电场" data-level="station">麒麟山风电场</div>
+                    <div class="org-node l3" data-name="康保风电场" data-level="station">康保风电场</div>
+                  </div>
+                </div>
+                <div class="org-company open">
+                  <div class="org-node l2" data-name="天津龙源" data-level="company"><span class="arrow"></span>天津龙源</div>
+                  <div class="org-stations">
+                    <div class="org-node l3" data-name="大神堂风电场" data-level="station">大神堂风电场</div>
+                  </div>
+                </div>
+                <div class="org-company open">
+                  <div class="org-node l2" data-name="蒙东龙源" data-level="company"><span class="arrow"></span>蒙东龙源</div>
+                  <div class="org-stations">
+                    <div class="org-node l3" data-name="齐心营风电场" data-level="station">齐心营风电场</div>
+                  </div>
+                </div>
+                <div class="org-company open">
+                  <div class="org-node l2" data-name="安徽龙源" data-level="company"><span class="arrow"></span>安徽龙源</div>
+                  <div class="org-stations">
+                    <div class="org-node l3" data-name="来安风电场" data-level="station">来安风电场</div>
+                  </div>
+                </div>
+                <div class="org-company open">
+                  <div class="org-node l2" data-name="海上龙源" data-level="company"><span class="arrow"></span>海上龙源</div>
+                  <div class="org-stations">
+                    <div class="org-node l3" data-name="射阳海上风电场" data-level="station">射阳海上风电场</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mat-hd">
+        <h3>物资类型</h3>
+      </div>
+      <div class="mat-search">
+        <input id="matKw" type="search" placeholder="搜索物资类型 / 产品名称" />
+      </div>
+      <div class="mat-tree" id="matTree"></div>
+    </aside>
+
+    <!-- CENTER -->
+    <div class="center">
+      <div class="page-hd">
+        <div>
+          <h1>生产物资库存台账</h1>
+        </div>
+        <div class="ops">
+          <button class="btn warn-entry" type="button" id="btnOpenAlert">预警<span class="badge">6</span></button>
+          <button class="btn pri" type="button">查询</button>
+        </div>
+      </div>
+
+      <!-- KPI + 工厂描述列表（对齐关键部件台账） -->
+      <div class="summary-band">
+        <div class="kpi-row">
+          <div class="kpi">
+            <div class="title">库存总量 <span class="i" title="当前组织范围内在库生产物资件数（含备件）">i</span></div>
+            <div class="val">12,846<small>件</small></div>
+            <div class="trend down">较上月 ↓ 3.2%</div>
+            <div class="ice"></div>
+          </div>
+          <div class="kpi">
+            <div class="title">库存金额 <span class="i" title="按含税采购成本估算">i</span></div>
+            <div class="val">8,652<small>万</small></div>
+            <div class="trend up">较上月 ↑ 1.8%</div>
+            <svg class="spark" viewBox="0 0 200 36" preserveAspectRatio="none">
+              <defs>
+                <linearGradient id="g1" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#1677ff" stop-opacity=".35"/>
+                  <stop offset="100%" stop-color="#1677ff" stop-opacity="0"/>
+                </linearGradient>
+              </defs>
+              <path d="M0,28 L20,24 L40,26 L60,18 L80,20 L100,12 L120,16 L140,10 L160,14 L180,8 L200,11 L200,36 L0,36 Z" fill="url(#g1)"/>
+              <path d="M0,28 L20,24 L40,26 L60,18 L80,20 L100,12 L120,16 L140,10 L160,14 L180,8 L200,11" fill="none" stroke="#1677ff" stroke-width="2"/>
+            </svg>
+          </div>
+          <div class="kpi">
+            <div class="title">低库存品种 <span class="i" title="可用库存 &lt; 安全库存">i</span></div>
+            <div class="val" style="color:#f5222d">37<small>种</small></div>
+            <div class="trend up">较上期 ↑ 5 种</div>
+            <svg class="spark" viewBox="0 0 200 36" preserveAspectRatio="none">
+              <rect x="8" y="18" width="10" height="14" fill="#ffadd2"/>
+              <rect x="28" y="14" width="10" height="18" fill="#ff85c0"/>
+              <rect x="48" y="10" width="10" height="22" fill="#f759ab"/>
+              <rect x="68" y="16" width="10" height="16" fill="#ff85c0"/>
+              <rect x="88" y="8" width="10" height="24" fill="#eb2f96"/>
+              <rect x="108" y="12" width="10" height="20" fill="#f759ab"/>
+              <rect x="128" y="6" width="10" height="26" fill="#c41d7f"/>
+              <rect x="148" y="11" width="10" height="21" fill="#eb2f96"/>
+              <rect x="168" y="4" width="10" height="28" fill="#c41d7f"/>
+              <rect x="188" y="9" width="10" height="23" fill="#eb2f96"/>
+            </svg>
+          </div>
+          <div class="kpi">
+            <div class="title">周转天数 <span class="i" title="参考菜鸟仓配：库存停留天数">i</span></div>
+            <div class="val">37<small>天</small></div>
+            <div class="trend down">较上期 ↓ 降低</div>
+            <div class="ice" style="clip-path: polygon(0 78%, 12% 60%, 24% 70%, 36% 48%, 48% 58%, 60% 36%, 72% 54%, 84% 42%, 100% 50%, 100% 100%, 0 100%);"></div>
+          </div>
+        </div>
+        <div class="factory-list" id="orgSummaryPanel">
+          <div class="factory-list-hd">
+            <span id="orgSummaryTitle">项目公司库存汇总</span>
+            <span class="cnt" id="orgSummaryCnt">共 0 项</span>
+          </div>
+          <div class="factory-list-body">
+            <table>
+              <colgroup>
+                <col style="width:38%" />
+                <col style="width:20%" />
+                <col style="width:16%" />
+                <col style="width:26%" />
+              </colgroup>
+              <thead>
+                <tr>
+                  <th id="orgColName">工厂描述</th>
+                  <th style="text-align:right">库存数量</th>
+                  <th style="text-align:right">占比</th>
+                  <th style="text-align:right">库存金额</th>
+                </tr>
+              </thead>
+              <tbody id="factoryListBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Charts -->
+      <div class="chart-row">
+        <div class="card">
+          <div class="card-hd">
+            <h3 id="distTitle">组织库存分布</h3>
+            <div class="tabs">
+              <button type="button" class="on" data-mode="qty">数量</button>
+              <button type="button" data-mode="amt">金额</button>
+            </div>
+          </div>
+          <div class="bar-chart" id="orgBars">
+            <div class="col"><div class="bar" style="height:78%" data-v="3,210"></div><div class="lab">河北</div></div>
+            <div class="col"><div class="bar" style="height:62%" data-v="2,540"></div><div class="lab">蒙东</div></div>
+            <div class="col"><div class="bar" style="height:54%" data-v="2,180"></div><div class="lab">天津</div></div>
+            <div class="col"><div class="bar" style="height:48%" data-v="1,920"></div><div class="lab">安徽</div></div>
+            <div class="col"><div class="bar" style="height:40%" data-v="1,560"></div><div class="lab">海上</div></div>
+            <div class="col"><div class="bar" style="height:28%" data-v="1,130"></div><div class="lab">浙江</div></div>
+            <div class="col"><div class="bar" style="height:18%" data-v="306"></div><div class="lab">其他</div></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-hd"><h3>物资类型占比</h3></div>
+          <div class="dist-body">
+            <div class="donut" style="position:relative;">
+              <div class="donut-center"><b>12,846</b><span>件合计</span></div>
+            </div>
+            <div class="legend" id="typeLegend">
+              <div class="row"><span><i class="dot" style="background:#1677ff"></i>叶片</span><b>22%</b></div>
+              <div class="row"><span><i class="dot" style="background:#36cfc9"></i>齿轮箱</span><b>18%</b></div>
+              <div class="row"><span><i class="dot" style="background:#95de64"></i>变桨</span><b>16%</b></div>
+              <div class="row"><span><i class="dot" style="background:#ffc53d"></i>偏航</span><b>14%</b></div>
+              <div class="row"><span><i class="dot" style="background:#ff85c0"></i>其他</span><b>30%</b></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-hd"><h3>近 7 日出入库趋势</h3></div>
+          <div class="trend-body">
+            <svg viewBox="0 0 320 140" preserveAspectRatio="none">
+              <defs>
+                <linearGradient id="ain" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#1677ff" stop-opacity=".25"/>
+                  <stop offset="100%" stop-color="#1677ff" stop-opacity="0"/>
+                </linearGradient>
+              </defs>
+              <path d="M0,90 C40,80 60,100 80,70 C100,45 120,55 160,40 C200,28 220,50 240,35 C270,18 300,30 320,22 L320,140 L0,140 Z" fill="url(#ain)"/>
+              <path d="M0,90 C40,80 60,100 80,70 C100,45 120,55 160,40 C200,28 220,50 240,35 C270,18 300,30 320,22" fill="none" stroke="#1677ff" stroke-width="2.5"/>
+              <path d="M0,110 C50,100 70,115 110,95 C150,78 180,100 220,88 C260,76 290,92 320,80" fill="none" stroke="#36cfc9" stroke-width="2" stroke-dasharray="4 3"/>
+              <circle cx="160" cy="40" r="4" fill="#1677ff"/>
+            </svg>
+            <div class="trend-meta">
+              <span><i style="background:#1677ff"></i>入库</span>
+              <span><i style="background:#36cfc9"></i>出库</span>
+              <span>峰值日 07-11 · 入库 326 件</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Filters -->
+      <div class="filters">
+        <div class="filter-row">
+          <select id="periodSel">
+            <option>账期 2026-07</option>
+            <option>账期 2026-06</option>
+            <option>账期 2026-05</option>
+          </select>
+          <input id="kw" type="search" placeholder="产品名称 / 产品编码 / 场站" />
+          <select id="statusSel">
+            <option value="">库存状态：全部</option>
+            <option>正常</option>
+            <option>零库存</option>
+            <option>呆滞</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Detail table -->
+      <div class="table-wrap">
+        <div class="table-toolbar">
+          <div class="ops">
+            <button class="btn pri" type="button" id="btnQuery">查询</button>
+            <button class="btn ghost" type="button" id="btnReset">重置</button>
+            <button class="btn ok" type="button" id="btnImport">导入</button>
+            <button class="btn ghost" type="button" id="btnExport">导出 Excel</button>
+            <button class="btn ghost" type="button" id="btnPrint">打印台帐</button>
+            <button class="btn ghost" type="button" id="btnTransferApply">发起调拨申请</button>
+          </div>
+          <div class="meta">共 <b id="rowCount">0</b> 条 · 第 1/1 页</div>
+        </div>
+        <div class="table-scroll">
+          <table class="ledger-detail-table pd-table--wide">
+            <colgroup>
+              <col class="c-idx" />
+              <col class="c-date" />
+              <col class="c-date" />
+              <col class="c-factory" />
+              <col class="c-loc" />
+              <col class="c-code" />
+              <col class="c-name" />
+              <col class="c-type" />
+              <col class="c-model" />
+              <col class="c-qty" />
+              <col class="c-amt" />
+              <col class="c-st" />
+              <col class="c-op" />
+            </colgroup>
+            <thead>
+              <tr>
+                <th>序号</th>
+                <th>起始时间</th>
+                <th>终止时间</th>
+                <th>工厂描述</th>
+                <th>库存地点描述</th>
+                <th>产品编码</th>
+                <th>产品名称</th>
+                <th>物资类型</th>
+                <th>规格型号</th>
+                <th>期末库存数量</th>
+                <th>期末库存金额</th>
+                <th>库存状态</th>
+                <th class="op">操作</th>
+              </tr>
+            </thead>
+            <tbody id="tbody"></tbody>
+          </table>
+        </div>
+        <div class="pager">
+          <span></span>
+          <span>上一页 · 1 · 下一页</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- 预警抽屉：从右往左滑出，可 ✕ 关闭 -->
+  <div class="alert-mask" id="alertMask"></div>
+  <aside class="rail" id="alertDrawer" aria-hidden="true">
+    <div class="rail-hd">
+      <h2>库存预警</h2>
+      <button type="button" class="rail-close" id="btnCloseAlert" aria-label="关闭">✕</button>
+    </div>
+    <div class="rail-sec">
+      <h3>待处理预警 <span class="cnt" id="alertCnt">6</span></h3>
+      <div class="alert-item">
+        <div class="t">零库存 · 叶片密封套</div>
+        <div class="d">康保风电场 · 安全库存 8 · 在途 0 · 产品 B00000042</div>
+        <div class="act">
+          <button class="pri" type="button">立即调拨</button>
+          <button type="button">建采购单</button>
+        </div>
+      </div>
+      <div class="alert-item">
+        <div class="t">关键偏低 · IGBT 模块</div>
+        <div class="d">麒麟山风电场 · 可用 2 / 安全 6 · B00000018</div>
+        <div class="act">
+          <button class="pri" type="button">从射阳调入</button>
+          <button type="button">忽略今日</button>
+        </div>
+      </div>
+      <div class="alert-item warn">
+        <div class="t">呆滞超 180 天 · 刹车片</div>
+        <div class="d">来安风电场 · 24 件占压约 1.9 万 · B00000057</div>
+        <div class="act">
+          <button class="pri" type="button">发起调出</button>
+          <button type="button">标记核查</button>
+        </div>
+      </div>
+      <div class="alert-item warn">
+        <div class="t">超期在途 · 主轴轴承</div>
+        <div class="d">齐心营 · 采购单 CG-2026-031 · 预计延误 3 天</div>
+        <div class="act">
+          <button class="pri" type="button">催交</button>
+          <button type="button">改签</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="rail-sec">
+      <h3>可调拨建议 <span class="cnt g">5</span></h3>
+      <div class="suggest">
+        <div class="t">射阳海上仓 → 康保</div>
+        <div class="d">叶片密封套 B00000042 · 建议调拨 4 件</div>
+        <div class="meta">匹配度 96% · 预计到场 2 天 · 可省紧急采购</div>
+        <button type="button">一键生成调拨单</button>
+      </div>
+      <div class="suggest">
+        <div class="t">张北共享仓 → 麒麟山</div>
+        <div class="d">IGBT 模块 B00000018 · 建议调拨 3 件</div>
+        <div class="meta">匹配度 93% · 陆运 1 天 · 可省 ¥18.6 万</div>
+        <button type="button">一键生成调拨单</button>
+      </div>
+      <div class="suggest">
+        <div class="t">来安 → 大神堂</div>
+        <div class="d">变桨电池组 B00000031 · 建议调拨 2 套</div>
+        <div class="meta">匹配度 88% · 消化呆滞库存</div>
+        <button type="button">一键生成调拨单</button>
+      </div>
+    </div>
+
+    <div class="rail-sec">
+      <h3>今日作业动态</h3>
+      <ul class="timeline">
+        <li><div class="tm">09:42</div><div>麒麟山仓完成滤芯入库 20 件</div></li>
+        <li><div class="tm">09:15</div><div>射阳→康保 IGBT 调拨单已提交</div></li>
+        <li><div class="tm">08:50</div><div>系统识别新增低库存预警 3 条</div></li>
+        <li><div class="tm">08:20</div><div>共享仓发布余量：断路器触头 10 件可借</div></li>
+      </ul>
+    </div>
+  </aside>
+
+  <script src="js/sidebar-actions.js"></script>
+  <script src="js/subpage-feature-title.js"></script>
+  <script src="js/site-footer.js"></script>
+  <script src="js/subpage-clock.js"></script>
+  <script>
+    /* 物资类型 → 产品（名称+数量），编码对齐本系统 B+8位 */
+    var MAT_TREE = [
+      {
+        type: "叶片", cnt: 1286,
+        products: [
+          { name: "叶片", code: "B00000005", model: "SW64-2.0", cnt: 420 },
+          { name: "备用叶片", code: "B00000018", model: "SW70-3.0", cnt: 186 },
+          { name: "叶片密封套", code: "B00000042", model: "YM-TF-01", cnt: 680 }
+        ]
+      },
+      {
+        type: "齿轮箱", cnt: 980,
+        products: [
+          { name: "齿轮箱", code: "B00000012", model: "GW-GX-3.2MW", cnt: 56 },
+          { name: "齿轮箱滤芯", code: "B00001235", model: "GX-LX-90", cnt: 624 },
+          { name: "润滑油滤网", code: "B00001237", model: "LY-50", cnt: 300 }
+        ]
+      },
+      {
+        type: "变桨", cnt: 860,
+        products: [
+          { name: "变桨轴承", code: "B00001234", model: "BP-2.0MW", cnt: 48 },
+          { name: "变桨电池组", code: "B00000031", model: "BP-BAT-48V", cnt: 212 },
+          { name: "变桨密封圈", code: "B00000033", model: "BP-MF-20", cnt: 600 }
+        ]
+      },
+      {
+        type: "偏航", cnt: 620,
+        products: [
+          { name: "偏航电机", code: "B00002119", model: "PY-DJ-55", cnt: 72 },
+          { name: "偏航减速机", code: "B00000028", model: "PY-JS-3.0", cnt: 548 }
+        ]
+      },
+      {
+        type: "主轴", cnt: 410,
+        products: [
+          { name: "主轴轴承", code: "B00000016", model: "BR-120", cnt: 94 },
+          { name: "主轴温度传感器", code: "B00000045", model: "PT100", cnt: 316 }
+        ]
+      },
+      {
+        type: "电机 / 变流", cnt: 740,
+        products: [
+          { name: "变频器模块", code: "B00001888", model: "VF-800", cnt: 120 },
+          { name: "IGBT 模块", code: "B00000018", model: "FF450R", cnt: 210 },
+          { name: "逆变器风扇", code: "B00000051", model: "INV-FAN-120", cnt: 410 }
+        ]
+      },
+      {
+        type: "液压", cnt: 520,
+        products: [
+          { name: "液压站密封包", code: "B00003102", model: "YY-MFB-6", cnt: 286 },
+          { name: "液压泵", code: "B00000055", model: "YY-B-80", cnt: 234 }
+        ]
+      },
+      {
+        type: "滤芯 / 传感器", cnt: 1180,
+        products: [
+          { name: "塔筒振动传感器", code: "B00001236", model: "TS-300", cnt: 380 },
+          { name: "空气滤芯", code: "B00000060", model: "AF-200", cnt: 800 }
+        ]
+      }
+    ];
+
+    var ROWS = [
+      { start: "2026-07-01", end: "2026-07-31", company: "河北龙源风电有限公司", loc: "麒麟山风电场 / 备件仓A", code: "B00000005", name: "叶片", type: "叶片", model: "SW64-2.0", qty: 12, amount: 1080000, safe: 6, status: "正常" },
+      { start: "2026-07-01", end: "2026-07-31", company: "河北龙源风电有限公司", loc: "康保风电场 / 主仓", code: "B00000042", name: "叶片密封套", type: "叶片", model: "YM-TF-01", qty: 0, amount: 0, safe: 8, status: "零库存" },
+      { start: "2026-07-01", end: "2026-07-31", company: "河北龙源风电有限公司", loc: "麒麟山风电场 / 电控区", code: "B00000018", name: "IGBT 模块", type: "电机 / 变流", model: "FF450R", qty: 2, amount: 372000, safe: 6, status: "正常" },
+      { start: "2026-07-01", end: "2026-07-31", company: "天津龙源电力有限公司", loc: "大神堂风电场 / 机械仓", code: "B00001234", name: "变桨轴承", type: "变桨", model: "BP-2.0MW", qty: 4, amount: 2720000, safe: 2, status: "正常" },
+      { start: "2026-07-01", end: "2026-07-31", company: "蒙东龙源新能源有限公司", loc: "齐心营风电场 / 主仓", code: "B00000016", name: "主轴轴承", type: "主轴", model: "BR-120", qty: 6, amount: 780000, safe: 4, status: "正常" },
+      { start: "2026-07-01", end: "2026-07-31", company: "龙源（来安）新能源有限公司", loc: "来安风电场 / 备件区", code: "B00000057", name: "刹车片", type: "液压", model: "BK-200", qty: 24, amount: 19200, safe: 10, status: "呆滞" },
+      { start: "2026-07-01", end: "2026-07-31", company: "龙源（来安）新能源有限公司", loc: "来安风电场 / 电控仓", code: "B00000031", name: "变桨电池组", type: "变桨", model: "BP-BAT-48V", qty: 18, amount: 216000, safe: 8, status: "正常" },
+      { start: "2026-07-01", end: "2026-07-31", company: "海上龙源风力发电有限公司", loc: "射阳海上风电场 / 共享仓", code: "B00001235", name: "齿轮箱滤芯", type: "齿轮箱", model: "GX-LX-90", qty: 86, amount: 619200, safe: 40, status: "正常" },
+      { start: "2026-07-01", end: "2026-07-31", company: "河北龙源风电有限公司", loc: "麒麟山风电场 / 备件仓B", code: "B00002119", name: "偏航电机", type: "偏航", model: "PY-DJ-55", qty: 3, amount: 1560000, safe: 2, status: "正常" },
+      { start: "2026-07-01", end: "2026-07-31", company: "蒙东龙源新能源有限公司", loc: "齐心营风电场 / 电控柜", code: "B00001888", name: "变频器模块", type: "电机 / 变流", model: "VF-800", qty: 1, amount: 122500, safe: 3, status: "正常" },
+      { start: "2026-07-01", end: "2026-07-31", company: "天津龙源电力有限公司", loc: "大神堂风电场 / 传感器柜", code: "B00001236", name: "塔筒振动传感器", type: "滤芯 / 传感器", model: "TS-300", qty: 15, amount: 3150000, safe: 8, status: "正常" },
+      { start: "2026-07-01", end: "2026-07-31", company: "海上龙源风力发电有限公司", loc: "射阳海上风电场 / 共享仓", code: "B00000051", name: "逆变器风扇", type: "电机 / 变流", model: "INV-FAN-120", qty: 48, amount: 96000, safe: 20, status: "正常" }
+    ];
+
+    var state = {
+      org: "龙源电力",
+      orgLevel: "group",
+      type: "",
+      product: "",
+      kw: ""
+    };
+
+    /* 组织库存汇总：集团→项目公司；项目公司→风电场（对齐讨论 + 关键部件台账工厂清单） */
+    var ORG_PIE_COLORS = ["#1677ff", "#36cfc9", "#95de64", "#ffc53d", "#ff85c0", "#9254de", "#69b1ff"];
+    var ORG_SUMMARY = {
+      group: [
+        { key: "河北龙源", name: "河北龙源风电有限公司", qty: 3210, amount: 21680000 },
+        { key: "蒙东龙源", name: "蒙东龙源新能源有限公司", qty: 2540, amount: 16840000 },
+        { key: "天津龙源", name: "天津龙源电力有限公司", qty: 2180, amount: 15260000 },
+        { key: "安徽龙源", name: "龙源（来安）新能源有限公司", qty: 1920, amount: 12480000 },
+        { key: "海上龙源", name: "海上龙源风力发电有限公司", qty: 1560, amount: 11220000 },
+        { key: "其他", name: "其他项目公司合计", qty: 1436, amount: 9040000 }
+      ],
+      company: {
+        "河北龙源": [
+          { key: "麒麟山风电场", name: "麒麟山风电场", qty: 1850, amount: 12860000 },
+          { key: "康保风电场", name: "康保风电场", qty: 1360, amount: 8820000 }
+        ],
+        "天津龙源": [
+          { key: "大神堂风电场", name: "大神堂风电场", qty: 2180, amount: 15260000 }
+        ],
+        "蒙东龙源": [
+          { key: "齐心营风电场", name: "齐心营风电场", qty: 2540, amount: 16840000 }
+        ],
+        "安徽龙源": [
+          { key: "来安风电场", name: "来安风电场", qty: 1920, amount: 12480000 }
+        ],
+        "海上龙源": [
+          { key: "射阳海上风电场", name: "射阳海上风电场", qty: 1560, amount: 11220000 }
+        ]
+      }
+    };
+
+    function money(n) {
+      return n.toLocaleString("zh-CN", { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+    }
+
+    function moneyWan(n) {
+      if (n >= 10000) return (n / 10000).toFixed(n >= 100000 ? 0 : 1) + "万";
+      return money(n);
+    }
+
+    function getOrgRows() {
+      var org = state.org;
+      if (org === "龙源电力") {
+        return { title: "项目公司库存汇总", col: "工厂描述", level: "company", rows: ORG_SUMMARY.group.slice() };
+      }
+      if (ORG_SUMMARY.company[org]) {
+        return { title: org + " · 下场站库存", col: "场站", level: "station", rows: ORG_SUMMARY.company[org].slice() };
+      }
+      /* 选到具体场站：只展示当前场站一行 */
+      var found = null;
+      Object.keys(ORG_SUMMARY.company).forEach(function (ck) {
+        ORG_SUMMARY.company[ck].forEach(function (s) {
+          if (s.key === org) found = s;
+        });
+      });
+      if (found) {
+        return { title: "当前场站库存", col: "场站", level: "station", rows: [found] };
+      }
+      return { title: "项目公司库存汇总", col: "工厂描述", level: "company", rows: ORG_SUMMARY.group.slice() };
+    }
+
+    function renderOrgSummary() {
+      var meta = getOrgRows();
+      var rows = meta.rows;
+      var totalQty = rows.reduce(function (s, r) { return s + r.qty; }, 0) || 1;
+      var titleEl = document.getElementById("orgSummaryTitle");
+      var cntEl = document.getElementById("orgSummaryCnt");
+      var colEl = document.getElementById("orgColName");
+      var body = document.getElementById("factoryListBody");
+      if (titleEl) titleEl.textContent = meta.title;
+      if (cntEl) cntEl.textContent = "共 " + rows.length + " 项";
+      if (colEl) colEl.textContent = meta.col;
+
+      var html = "";
+      rows.forEach(function (r, i) {
+        var pct = ((r.qty / totalQty) * 100);
+        var active = state.org === r.key ? " is-active" : "";
+        html += '<tr class="' + active.trim() + '" data-org="' + r.key + '" data-level="' + meta.level + '">' +
+          "<td title=\"" + r.name + "\">" + r.name +
+          '<span class="bar-mini"><i style="width:' + pct.toFixed(1) + "%;background:" + ORG_PIE_COLORS[i % ORG_PIE_COLORS.length] + '"></i></span></td>' +
+          '<td class="num">' + money(r.qty) + "</td>" +
+          '<td class="pct">' + pct.toFixed(1) + "%</td>" +
+          '<td class="num">' + moneyWan(r.amount) + "</td>" +
+          "</tr>";
+      });
+      if (body) body.innerHTML = html || '<tr><td colspan="4" style="text-align:center;color:#8c9bb0;padding:16px">暂无汇总数据</td></tr>';
+    }
+
+    function statusTag(s) {
+      if (s === "正常") return '<span class="tag-pill ok">正常</span>';
+      if (s === "零库存") return '<span class="tag-pill danger">' + s + '</span>';
+      return '<span class="tag-pill warn">' + s + '</span>';
+    }
+
+    function renderTree() {
+      var kw = (document.getElementById("matKw").value || "").trim();
+      var html = "";
+      MAT_TREE.forEach(function (t, idx) {
+        var matchedProds = t.products.filter(function (p) {
+          if (!kw) return true;
+          return (t.type + p.name + p.code).indexOf(kw) >= 0;
+        });
+        if (kw && !matchedProds.length && t.type.indexOf(kw) < 0) return;
+        var prods = kw ? matchedProds : t.products;
+        var open = state.type === t.type || (!!kw && matchedProds.length);
+        var active = state.type === t.type && !state.product;
+        html += '<div class="type-item' + (open ? " open" : "") + (active ? " active" : "") + '" data-type="' + t.type + '">';
+        html += '<div class="type-row"><span class="name"><span class="caret">▶</span>' + t.type + '</span><span class="cnt">(' + t.cnt + ')</span></div>';
+        html += '<div class="prod-list">';
+        prods.forEach(function (p) {
+          var pa = state.product === p.code;
+          html += '<div class="prod-item' + (pa ? " active" : "") + '" data-type="' + t.type + '" data-code="' + p.code + '" data-name="' + p.name + '">';
+          html += '<span>' + p.name + '</span><span class="pcnt">(' + p.cnt + ')</span></div>';
+        });
+        html += "</div></div>";
+      });
+      document.getElementById("matTree").innerHTML = html || '<div style="padding:12px;color:#8c9bb0">无匹配物资类型</div>';
+    }
+
+    function filteredRows() {
+      return ROWS.filter(function (r) {
+        if (state.type && r.type !== state.type) return false;
+        if (state.product && r.code !== state.product) return false;
+        if (state.org && state.org !== "龙源电力") {
+          if (r.company.indexOf(state.org.replace("龙源", "")) < 0 && r.company.indexOf(state.org) < 0 && r.loc.indexOf(state.org) < 0) {
+            // soft match by company / station keywords
+            var key = state.org;
+            if (r.company.indexOf(key) < 0 && r.loc.indexOf(key) < 0) {
+              // allow partial regional names
+              if (!(key.indexOf("河北") >= 0 && r.company.indexOf("河北") >= 0) &&
+                  !(key.indexOf("天津") >= 0 && r.company.indexOf("天津") >= 0) &&
+                  !(key.indexOf("蒙东") >= 0 && r.company.indexOf("蒙东") >= 0) &&
+                  !(key.indexOf("来安") >= 0 && r.company.indexOf("来安") >= 0) &&
+                  !(key.indexOf("海上") >= 0 && r.company.indexOf("海上") >= 0) &&
+                  !(key.indexOf("麒麟山") >= 0 && r.loc.indexOf("麒麟山") >= 0) &&
+                  !(key.indexOf("康保") >= 0 && r.loc.indexOf("康保") >= 0) &&
+                  !(key.indexOf("大神堂") >= 0 && r.loc.indexOf("大神堂") >= 0) &&
+                  !(key.indexOf("齐心营") >= 0 && r.loc.indexOf("齐心营") >= 0) &&
+                  !(key.indexOf("射阳") >= 0 && r.loc.indexOf("射阳") >= 0)) {
+                return false;
+              }
+            }
+          }
+        }
+        var kw = state.kw;
+        if (kw) {
+          var blob = r.company + r.loc + r.code + r.name + r.type + r.model;
+          if (blob.indexOf(kw) < 0) return false;
+        }
+        var st = document.getElementById("statusSel").value;
+        if (st && r.status !== st) return false;
+        return true;
+      });
+    }
+
+    function rowOps(r) {
+      var html = '<td class="op">' +
+        '<a href="#" data-op="详情">详情</a>';
+      if (r.status === "呆滞") {
+        html += '<a class="warn" href="#" data-op="处置">处置</a>';
+      } else {
+        html += '<a href="#" data-op="调拨">调拨</a>';
+      }
+      if (r.status === "零库存") {
+        html += '<a class="danger" href="#" data-op="补货">补货</a>';
+      }
+      html += "</td>";
+      return html;
+    }
+
+    function renderTable() {
+      var rows = filteredRows();
+      document.getElementById("rowCount").textContent = String(rows.length);
+      var html = "";
+      rows.forEach(function (r, i) {
+        html += "<tr>" +
+          "<td>" + (i + 1) + "</td>" +
+          "<td>" + r.start + "</td>" +
+          "<td>" + r.end + "</td>" +
+          "<td>" + r.company + "</td>" +
+          "<td>" + r.loc + "</td>" +
+          '<td class="code">' + r.code + "</td>" +
+          "<td>" + r.name + "</td>" +
+          "<td>" + r.type + "</td>" +
+          "<td>" + r.model + "</td>" +
+          '<td class="num">' + r.qty + "</td>" +
+          '<td class="num">' + money(r.amount) + "</td>" +
+          "<td>" + statusTag(r.status) + "</td>" +
+          rowOps(r) +
+          "</tr>";
+      });
+      document.getElementById("tbody").innerHTML = html || '<tr><td colspan="13" style="text-align:center;color:#8c9bb0;padding:24px">当前筛选无数据</td></tr>';
+    }
+
+    function updatePath() {
+      var distTitle = document.getElementById("distTitle");
+      if (!distTitle) return;
+      distTitle.textContent =
+        state.org === "龙源电力" ? "各项目公司库存分布" :
+        (state.org.indexOf("场") >= 0 ? "当前场站库存概览" : "下场站库存分布");
+    }
+
+    function refresh() {
+      renderTree();
+      renderOrgSummary();
+      renderTable();
+      updatePath();
+    }
+
+    document.getElementById("tbody").addEventListener("click", function (e) {
+      var a = e.target.closest("a[data-op]");
+      if (!a) return;
+      e.preventDefault();
+      var op = a.getAttribute("data-op");
+      if (op === "调拨" || op === "补货" || op === "处置") {
+        openAlertDrawer();
+      }
+    });
+    var btnTransferApply = document.getElementById("btnTransferApply");
+    if (btnTransferApply) {
+      btnTransferApply.addEventListener("click", function () { openAlertDrawer(); });
+    }
+
+    /* 预警抽屉：从右往左滑出 */
+    function openAlertDrawer() {
+      document.getElementById("alertMask").classList.add("open");
+      document.getElementById("alertDrawer").classList.add("open");
+      document.getElementById("alertDrawer").setAttribute("aria-hidden", "false");
+    }
+    function closeAlertDrawer() {
+      document.getElementById("alertMask").classList.remove("open");
+      document.getElementById("alertDrawer").classList.remove("open");
+      document.getElementById("alertDrawer").setAttribute("aria-hidden", "true");
+    }
+    document.getElementById("btnOpenAlert").addEventListener("click", openAlertDrawer);
+    document.getElementById("btnCloseAlert").addEventListener("click", closeAlertDrawer);
+    document.getElementById("alertMask").addEventListener("click", closeAlertDrawer);
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape") closeAlertDrawer();
+    });
+
+    /* 组织汇总列表点击 → 下钻 / 筛选明细 */
+    document.getElementById("factoryListBody").addEventListener("click", function (e) {
+      var tr = e.target.closest("tr[data-org]");
+      if (!tr) return;
+      var key = tr.getAttribute("data-org");
+      var level = tr.getAttribute("data-level") || "company";
+      if (key === "其他") {
+        state.org = "龙源电力";
+        state.orgLevel = "group";
+        document.getElementById("orgBtn").textContent = "龙源电力（全部）";
+      } else {
+        state.org = key;
+        state.orgLevel = level;
+        document.getElementById("orgBtn").textContent = key;
+      }
+      document.querySelectorAll("#orgDropdown .org-node").forEach(function (x) {
+        x.classList.toggle("active", x.getAttribute("data-name") === state.org);
+      });
+      document.querySelectorAll("#orgDropdown .org-company").forEach(function (c) {
+        var n = c.querySelector(".org-node.l2");
+        if (n && n.getAttribute("data-name") === state.org) c.classList.add("open");
+      });
+      document.getElementById("orgRoot").classList.add("open");
+      refresh();
+    });
+
+    /* events */
+    document.getElementById("orgBtn").addEventListener("click", function (e) {
+      e.stopPropagation();
+      document.getElementById("orgDropdown").classList.toggle("open");
+    });
+    document.getElementById("orgDropdown").addEventListener("click", function (e) {
+      e.stopPropagation();
+      var arrow = e.target.closest(".arrow");
+      var n = e.target.closest(".org-node");
+      if (!n) return;
+
+      /* 点箭头：只展开/收起，不改选中 */
+      if (arrow) {
+        if (n.classList.contains("group")) {
+          document.getElementById("orgRoot").classList.toggle("open");
+        } else if (n.classList.contains("l2")) {
+          var company = n.closest(".org-company");
+          if (company) company.classList.toggle("open");
+        }
+        return;
+      }
+
+      /* 点公司名：选中并展开其下场站 */
+      if (n.classList.contains("l2")) {
+        var c = n.closest(".org-company");
+        if (c && !c.classList.contains("open")) c.classList.add("open");
+        document.getElementById("orgRoot").classList.add("open");
+      }
+      if (n.classList.contains("group")) {
+        document.getElementById("orgRoot").classList.add("open");
+      }
+      if (n.classList.contains("l3")) {
+        var p = n.closest(".org-company");
+        if (p) p.classList.add("open");
+        document.getElementById("orgRoot").classList.add("open");
+      }
+
+      this.querySelectorAll(".org-node").forEach(function (x) { x.classList.remove("active"); });
+      n.classList.add("active");
+      state.org = n.getAttribute("data-name");
+      var level = n.getAttribute("data-level");
+      state.orgLevel = level || "group";
+      document.getElementById("orgBtn").textContent = state.org + (level === "group" ? "（全部）" : "");
+      this.classList.remove("open");
+      refresh();
+    });
+    document.addEventListener("click", function () {
+      document.getElementById("orgDropdown").classList.remove("open");
+    });
+
+    document.getElementById("matTree").addEventListener("click", function (e) {
+      var prod = e.target.closest(".prod-item");
+      if (prod) {
+        state.type = prod.getAttribute("data-type");
+        state.product = prod.getAttribute("data-code");
+        refresh();
+        return;
+      }
+      var type = e.target.closest(".type-item");
+      if (!type) return;
+      var name = type.getAttribute("data-type");
+      if (state.type === name && !state.product) {
+        // toggle collapse only
+        type.classList.toggle("open");
+        return;
+      }
+      state.type = name;
+      state.product = "";
+      refresh();
+    });
+
+    document.getElementById("matKw").addEventListener("input", function () {
+      renderTree();
+    });
+    document.getElementById("btnQuery").addEventListener("click", function () {
+      state.kw = (document.getElementById("kw").value || "").trim();
+      renderTable();
+    });
+    document.getElementById("btnReset").addEventListener("click", function () {
+      state.type = "";
+      state.product = "";
+      state.kw = "";
+      state.org = "龙源电力";
+      document.getElementById("kw").value = "";
+      document.getElementById("statusSel").value = "";
+      document.getElementById("matKw").value = "";
+      document.getElementById("orgBtn").textContent = "龙源电力（全部）";
+      document.getElementById("orgRoot").classList.add("open");
+      document.querySelectorAll("#orgDropdown .org-company").forEach(function (c) { c.classList.add("open"); });
+      document.querySelectorAll("#orgDropdown .org-node").forEach(function (x) { x.classList.remove("active"); });
+      var rootNode = document.querySelector("#orgDropdown .org-node.group");
+      if (rootNode) rootNode.classList.add("active");
+      refresh();
+    });
+    document.getElementById("kw").addEventListener("keydown", function (e) {
+      if (e.key === "Enter") {
+        state.kw = this.value.trim();
+        renderTable();
+      }
+    });
+    document.querySelector(".card-hd .tabs").addEventListener("click", function (e) {
+      var b = e.target.closest("button");
+      if (!b) return;
+      this.querySelectorAll("button").forEach(function (x) { x.classList.remove("on"); });
+      b.classList.add("on");
+    });
+
+    refresh();
+  </script>
+</body>
+</html>
