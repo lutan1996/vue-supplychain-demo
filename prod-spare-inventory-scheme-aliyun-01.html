@@ -1,0 +1,1042 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>方案阿里云 · 生产物资库存管理（备件台账）</title>
+  <style>
+    :root {
+      --primary: #1890ff;
+      --primary-hover: #40a9ff;
+      --primary-dark: #096dd9;
+      --primary-soft: #e6f7ff;
+      --border: #e8e8e8;
+      --border-input: #d9d9d9;
+      --text: #262626;
+      --muted: #8c8c8c;
+      --secondary: #595959;
+      --bg: #f0f2f5;
+      --surface: #ffffff;
+      --warn: #fa8c16;
+      --danger: #f5222d;
+      --ok: #52c41a;
+      --link: #1890ff;
+      --table-head: #fafafa;
+      --hover-row: #fafafa;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      font-size: 13px;
+      min-height: 100vh;
+    }
+    a { color: var(--link); text-decoration: none; cursor: pointer; }
+    a:hover { color: var(--primary-hover); }
+
+    /* —— 方案说明条 —— */
+    .scheme-banner {
+      background: linear-gradient(90deg, #003a8c, #096dd9 45%, #1890ff);
+      color: #fff;
+      padding: 12px 20px;
+      border-bottom: 3px solid #0050b3;
+    }
+    .scheme-banner .row1 {
+      display: flex;
+      align-items: baseline;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 6px;
+    }
+    .scheme-banner .tag {
+      background: rgba(255,255,255,.22);
+      padding: 2px 10px;
+      border-radius: 2px;
+      font-weight: 700;
+      font-size: 14px;
+    }
+    .scheme-banner .desc { font-size: 13px; opacity: .95; }
+    .scheme-banner .meta {
+      font-size: 12px;
+      line-height: 1.7;
+      opacity: .92;
+    }
+    .scheme-banner .meta a { color: #ffe58f; }
+    .scheme-banner .meta code {
+      background: rgba(0,0,0,.18);
+      padding: 0 5px;
+      border-radius: 2px;
+      font-size: 11px;
+    }
+    .scheme-banner .checks {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 8px;
+    }
+    .scheme-banner .checks span {
+      background: rgba(0,0,0,.2);
+      border: 1px solid rgba(255,255,255,.28);
+      padding: 1px 8px;
+      border-radius: 10px;
+      font-size: 11px;
+    }
+
+    /* —— 顶栏 —— */
+    .app-header {
+      height: 48px;
+      background: #001529;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 20px;
+      color: rgba(255,255,255,.85);
+    }
+    .app-header .brand {
+      font-weight: 600;
+      font-size: 14px;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .app-header .brand .logo {
+      width: 28px; height: 28px;
+      background: var(--primary);
+      border-radius: 2px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .app-header .brand em {
+      font-style: normal;
+      color: rgba(255,255,255,.65);
+      font-weight: 400;
+      margin-left: 4px;
+    }
+    .app-header .right {
+      font-size: 12px;
+      display: flex;
+      gap: 18px;
+      align-items: center;
+      color: rgba(255,255,255,.65);
+    }
+    .app-header .avatar {
+      width: 28px; height: 28px; border-radius: 50%;
+      background: var(--primary);
+      color: #fff;
+      display: inline-flex; align-items: center; justify-content: center;
+      font-weight: 600; font-size: 12px;
+    }
+
+    /* —— 视图 Tab（对标按商品/按仓库） —— */
+    .view-tabs {
+      display: flex;
+      gap: 0;
+      background: #fff;
+      border-bottom: 1px solid var(--border);
+      padding: 0 16px;
+    }
+    .view-tabs button {
+      border: none;
+      background: transparent;
+      padding: 12px 18px;
+      font-size: 14px;
+      color: var(--secondary);
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -1px;
+      position: relative;
+    }
+    .view-tabs button:hover { color: var(--primary); }
+    .view-tabs button.active {
+      color: var(--primary);
+      font-weight: 600;
+      border-bottom-color: var(--primary);
+    }
+
+    /* —— 主布局 —— */
+    .layout {
+      display: flex;
+      height: calc(100vh - 48px - 98px - 45px);
+      min-height: 620px;
+    }
+
+    /* 左侧组织树（对标仓库列表） */
+    .org-tree {
+      width: 220px;
+      flex-shrink: 0;
+      background: #fff;
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+    }
+    .org-tree-hd {
+      padding: 12px;
+      border-bottom: 1px solid var(--border);
+      font-weight: 600;
+      font-size: 13px;
+      color: var(--text);
+    }
+    .org-tree-hd input {
+      width: 100%;
+      margin-top: 8px;
+      height: 28px;
+      border: 1px solid var(--border-input);
+      border-radius: 2px;
+      padding: 0 8px;
+      font-size: 12px;
+      outline: none;
+    }
+    .org-tree-hd input:focus { border-color: var(--primary); box-shadow: 0 0 0 2px rgba(24,144,255,.15); }
+    .org-tree-body { flex: 1; overflow: auto; padding: 6px 0; }
+    .tree-node {
+      padding: 7px 12px;
+      cursor: pointer;
+      line-height: 1.4;
+      user-select: none;
+      color: var(--text);
+      font-size: 13px;
+      border-left: 3px solid transparent;
+    }
+    .tree-node:hover { background: #f5f5f5; }
+    .tree-node.is-active {
+      background: var(--primary-soft);
+      color: var(--primary);
+      font-weight: 600;
+      border-left-color: var(--primary);
+    }
+    .tree-node .indent-1 { padding-left: 14px; display: block; }
+    .tree-node .indent-2 { padding-left: 28px; display: block; }
+    .tree-node .cnt { color: var(--muted); font-weight: 400; font-size: 12px; margin-left: 4px; }
+
+    .main {
+      flex: 1;
+      min-width: 0;
+      overflow: auto;
+      padding: 12px 16px 20px;
+    }
+
+    .page-title {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .page-title .crumb { font-size: 12px; color: var(--muted); font-weight: 400; }
+
+    /* 轻量 KPI —— 干净台账气质，不做重运营侧栏 */
+    .kpis {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+    .kpi {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 2px;
+      padding: 10px 14px;
+    }
+    .kpi .k { color: var(--muted); font-size: 12px; }
+    .kpi .v {
+      font-size: 22px;
+      font-weight: 600;
+      margin: 4px 0 2px;
+      letter-spacing: -.5px;
+      font-variant-numeric: tabular-nums;
+    }
+    .kpi .v.warn { color: var(--warn); }
+    .kpi .v.danger { color: var(--danger); }
+    .kpi .sub { color: var(--muted); font-size: 11px; }
+
+    /* 筛选区 —— 对标查询/重置 */
+    .filters {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 2px;
+      padding: 12px 14px 4px;
+      margin-bottom: 8px;
+    }
+    .filters-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 0 16px;
+    }
+    .filter-item {
+      display: flex;
+      align-items: center;
+      margin-bottom: 12px;
+      gap: 8px;
+    }
+    .filter-item label {
+      flex-shrink: 0;
+      width: 72px;
+      text-align: right;
+      color: var(--secondary);
+      font-size: 13px;
+    }
+    .filter-item input,
+    .filter-item select {
+      flex: 1;
+      min-width: 0;
+      height: 28px;
+      border: 1px solid var(--border-input);
+      border-radius: 2px;
+      padding: 0 8px;
+      font-size: 13px;
+      outline: none;
+      background: #fff;
+    }
+    .filter-item input:focus,
+    .filter-item select:focus { border-color: var(--primary); box-shadow: 0 0 0 2px rgba(24,144,255,.15); }
+    .filter-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      padding-bottom: 12px;
+      border-top: 1px dashed #f0f0f0;
+      padding-top: 8px;
+      margin-top: 0;
+    }
+
+    .toolbar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+      flex-wrap: wrap;
+    }
+    .toolbar .hint {
+      margin-left: auto;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .btn {
+      height: 28px;
+      padding: 0 14px;
+      border: 1px solid var(--border-input);
+      background: #fff;
+      border-radius: 2px;
+      cursor: pointer;
+      font-size: 13px;
+      color: var(--secondary);
+      line-height: 26px;
+      display: inline-flex;
+      align-items: center;
+    }
+    .btn:hover { border-color: var(--primary); color: var(--primary); }
+    .btn.pri {
+      background: var(--primary);
+      color: #fff;
+      border-color: var(--primary);
+    }
+    .btn.pri:hover { background: var(--primary-hover); color: #fff; border-color: var(--primary-hover); }
+    .btn.ghost {
+      color: var(--primary);
+      border-color: var(--primary);
+    }
+
+    /* 状态筛选 Tab（对标待提货状态表达） */
+    .status-tabs {
+      display: flex;
+      gap: 0;
+      margin-bottom: 8px;
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 2px;
+      padding: 0 4px;
+    }
+    .status-tabs button {
+      border: none;
+      background: transparent;
+      padding: 8px 14px;
+      font-size: 13px;
+      color: var(--secondary);
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -1px;
+    }
+    .status-tabs button:hover { color: var(--primary); }
+    .status-tabs button.active {
+      color: var(--primary);
+      font-weight: 600;
+      border-bottom-color: var(--primary);
+    }
+    .status-tabs .num {
+      color: var(--muted);
+      font-weight: 400;
+      margin-left: 2px;
+    }
+    .status-tabs .num.danger { color: var(--danger); }
+
+    /* 密表 */
+    .table-card {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+    table { width: 100%; border-collapse: collapse; }
+    th, td {
+      padding: 10px 12px;
+      border-bottom: 1px solid #f0f0f0;
+      text-align: left;
+      white-space: nowrap;
+      font-size: 13px;
+      vertical-align: middle;
+    }
+    th {
+      background: var(--table-head);
+      color: var(--secondary);
+      font-weight: 600;
+      border-bottom: 1px solid var(--border);
+    }
+    td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+    tr:hover td { background: var(--hover-row); }
+    .thumb {
+      width: 40px; height: 40px;
+      border: 1px solid #f0f0f0;
+      border-radius: 2px;
+      background: #fafafa;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      color: var(--muted);
+      overflow: hidden;
+    }
+    .thumb svg { width: 24px; height: 24px; opacity: .45; }
+    .name-cell .n { font-weight: 500; color: var(--text); }
+    .name-cell .s { font-size: 12px; color: var(--muted); margin-top: 2px; }
+    .stock-zero { color: var(--danger); font-weight: 600; }
+    .stock-low { color: var(--danger); font-weight: 600; }
+    .status-txt { font-size: 13px; }
+    .status-txt.ok { color: var(--ok); }
+    .status-txt.low { color: var(--danger); }
+    .status-txt.zero { color: var(--danger); font-weight: 600; }
+    .status-txt.idle { color: var(--danger); }
+    .borrow-hint {
+      font-size: 12px;
+      color: var(--secondary);
+      line-height: 1.5;
+    }
+    .borrow-hint .has { color: var(--ok); }
+    .borrow-hint .need { color: var(--danger); }
+    .op a { margin-right: 10px; }
+    .op a:last-child { margin-right: 0; }
+
+    .pagination {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 12px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+    .page-btns button {
+      min-width: 28px;
+      height: 28px;
+      border: 1px solid var(--border-input);
+      background: #fff;
+      margin-left: 4px;
+      border-radius: 2px;
+      cursor: pointer;
+      font-size: 13px;
+      color: var(--secondary);
+    }
+    .page-btns .cur {
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+    .page-btns button:hover { border-color: var(--primary); color: var(--primary); }
+
+    /* 弹窗 —— 对标「设置库存」 */
+    .mask {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.45);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+    }
+    .mask.show { display: flex; }
+    .modal {
+      background: #fff;
+      border-radius: 2px;
+      width: 640px;
+      max-width: 92vw;
+      box-shadow: 0 4px 12px rgba(0,0,0,.15);
+      overflow: hidden;
+    }
+    .modal-hd {
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--border);
+      font-size: 16px;
+      font-weight: 600;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .modal-hd .close {
+      border: none;
+      background: none;
+      font-size: 18px;
+      color: var(--muted);
+      cursor: pointer;
+      line-height: 1;
+      padding: 4px;
+    }
+    .modal-hd .close:hover { color: var(--text); }
+    .modal-bd { padding: 16px 20px; }
+    .modal-part {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 14px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    .modal-part .info .n { font-weight: 600; font-size: 14px; }
+    .modal-part .info .c { color: var(--muted); font-size: 12px; margin-top: 2px; }
+    .modal-bd table th, .modal-bd table td { padding: 8px 10px; font-size: 13px; }
+    .modal-bd input.qty {
+      width: 88px;
+      height: 28px;
+      border: 1px solid var(--border-input);
+      border-radius: 2px;
+      padding: 0 8px;
+      text-align: right;
+      font-size: 13px;
+      outline: none;
+    }
+    .modal-bd input.qty:focus { border-color: var(--primary); }
+    .modal-ft {
+      padding: 10px 20px 16px;
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      top: 64px;
+      transform: translateX(-50%);
+      background: #fff;
+      border: 1px solid #b7eb8f;
+      box-shadow: 0 4px 12px rgba(0,0,0,.1);
+      padding: 8px 16px;
+      border-radius: 2px;
+      display: none;
+      z-index: 200;
+      color: #389e0d;
+      font-size: 13px;
+    }
+    .toast.show { display: block; }
+
+    .panel-by-site { display: none; }
+    body.view-site .panel-by-part { display: none; }
+    body.view-site .panel-by-site { display: block; }
+    body.view-site .org-tree { display: flex; }
+    body.view-part .org-tree-label::after { content: none; }
+
+    @media (max-width: 1200px) {
+      .kpis { grid-template-columns: repeat(3, 1fr); }
+      .filters-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+  </style>
+</head>
+<body class="view-part">
+  <div class="scheme-banner">
+    <div class="row1">
+      <span class="tag">方案 · 阿里云</span>
+      <span class="desc">生产物资库存管理 · 生产备件台账（发电 / 项目公司 / 场站）</span>
+    </div>
+    <div class="meta">
+      参考：阿里云「智能用户增长」文档界面 ·
+      <a href="https://help.aliyun.com/zh/document_detail/404809.html" target="_blank" rel="noopener">https://help.aliyun.com/zh/document_detail/404809.html</a>
+      · 重点参考「库存管理」真实后台（按商品/按仓库、左仓列表、密表、设置库存弹窗），非营销页
+    </div>
+    <div class="checks">
+      <span>✓ 左组织树（公司/场站）</span>
+      <span>✓ 轻量 KPI</span>
+      <span>✓ 筛选 + 台账表</span>
+      <span>✓ 导入 / 导出</span>
+      <span>✓ 按备件 / 按场站 Tab</span>
+      <span>✓ 调整库存弹窗</span>
+      <span>✓ 红字状态（零库存/偏低/呆滞）</span>
+      <span>✓ 跨公司借用提示</span>
+      <span>✓ 正式管控感</span>
+    </div>
+  </div>
+
+  <header class="app-header">
+    <div class="brand">
+      <span class="logo">备</span>
+      生产物资库存管理
+      <em>备件台账</em>
+    </div>
+    <div class="right">
+      <span>组织：华电示范集团</span>
+      <span>账期：2026-07</span>
+      <span class="avatar">管</span>
+    </div>
+  </header>
+
+  <nav class="view-tabs" id="viewTabs">
+    <button type="button" class="active" data-view="part">按备件查看</button>
+    <button type="button" data-view="site">按场站查看</button>
+  </nav>
+
+  <div class="layout">
+    <aside class="org-tree" id="orgTreePanel">
+      <div class="org-tree-hd">
+        <span class="org-tree-label">组织 / 场站</span>
+        <input type="search" placeholder="输入场站名称" id="orgSearch" />
+      </div>
+      <div class="org-tree-body" id="orgTree">
+        <div class="tree-node is-active" data-name="全部组织">华电示范集团 <span class="cnt">(8)</span></div>
+        <div class="tree-node" data-name="华东新能源"><span class="indent-1">▶ 华东新能源公司 <span class="cnt">(3)</span></span></div>
+        <div class="tree-node" data-name="响水风电场"><span class="indent-2">响水风电场</span></div>
+        <div class="tree-node" data-name="盐城光伏站"><span class="indent-2">盐城光伏站</span></div>
+        <div class="tree-node" data-name="如东海上升压站"><span class="indent-2">如东海上升压站</span></div>
+        <div class="tree-node" data-name="华北发电"><span class="indent-1">▶ 华北发电公司 <span class="cnt">(3)</span></span></div>
+        <div class="tree-node" data-name="张家口风电场"><span class="indent-2">张家口风电场</span></div>
+        <div class="tree-node" data-name="大同光伏站"><span class="indent-2">大同光伏站</span></div>
+        <div class="tree-node" data-name="天津热电备件库"><span class="indent-2">天津热电备件库</span></div>
+        <div class="tree-node" data-name="西南水电"><span class="indent-1">▶ 西南水电公司 <span class="cnt">(2)</span></span></div>
+        <div class="tree-node" data-name="金沙江电站"><span class="indent-2">金沙江电站</span></div>
+        <div class="tree-node" data-name="雅砻江备件仓"><span class="indent-2">雅砻江备件仓</span></div>
+      </div>
+    </aside>
+
+    <main class="main">
+      <div class="page-title">
+        生产备件库存台账
+        <span class="crumb" id="crumb">当前位置：华电示范集团 / 全部场站</span>
+      </div>
+
+      <div class="kpis">
+        <div class="kpi"><div class="k">备件 SKU</div><div class="v">1,086</div><div class="sub">在管物资品类</div></div>
+        <div class="kpi"><div class="k">账面金额</div><div class="v">¥ 2.46 亿</div><div class="sub">含税成本</div></div>
+        <div class="kpi"><div class="k">库存偏低</div><div class="v warn">28</div><div class="sub">低于安全库存</div></div>
+        <div class="kpi"><div class="k">零库存</div><div class="v danger">7</div><div class="sub">影响检修计划</div></div>
+        <div class="kpi"><div class="k">呆滞 &gt;180 天</div><div class="v warn">41</div><div class="sub">建议调剂处置</div></div>
+      </div>
+
+      <div class="filters">
+        <div class="filters-grid">
+          <div class="filter-item">
+            <label>备件名称</label>
+            <input type="text" id="qName" placeholder="请输入备件名称" />
+          </div>
+          <div class="filter-item">
+            <label>备件编码</label>
+            <input type="text" id="qCode" placeholder="请输入备件编码" />
+          </div>
+          <div class="filter-item">
+            <label>物资分类</label>
+            <select id="qCat">
+              <option value="">全部</option>
+              <option>电气一次</option>
+              <option>电气二次</option>
+              <option>机械润滑</option>
+              <option>叶片风机</option>
+              <option>安防消防</option>
+            </select>
+          </div>
+          <div class="filter-item">
+            <label>库存状态</label>
+            <select id="qSt">
+              <option value="">全部</option>
+              <option>正常</option>
+              <option>偏低</option>
+              <option>零库存</option>
+              <option>呆滞</option>
+            </select>
+          </div>
+        </div>
+        <div class="filter-actions">
+          <button type="button" class="btn pri" id="btnQuery">查询</button>
+          <button type="button" class="btn" id="btnReset">重置</button>
+        </div>
+      </div>
+
+      <div class="toolbar">
+        <button type="button" class="btn ghost" id="btnImport">导入台账</button>
+        <button type="button" class="btn ghost" id="btnExport">导出 Excel</button>
+        <button type="button" class="btn" id="btnBorrow">发起跨公司借用</button>
+        <span class="hint">共 <b id="rowCount">8</b> 条 · 支持跨公司调剂借用</span>
+      </div>
+
+      <div class="status-tabs" id="statusTabs">
+        <button type="button" class="active" data-st="all">全部 <span class="num">(8)</span></button>
+        <button type="button" data-st="ok">正常 <span class="num">(3)</span></button>
+        <button type="button" data-st="low">偏低 <span class="num danger">(2)</span></button>
+        <button type="button" data-st="zero">零库存 <span class="num danger">(2)</span></button>
+        <button type="button" data-st="idle">呆滞 <span class="num danger">(1)</span></button>
+      </div>
+
+      <!-- 按备件查看 -->
+      <div class="table-card panel-by-part" id="tablePart">
+        <table>
+          <thead>
+            <tr>
+              <th style="width:56px">图片</th>
+              <th>备件名称</th>
+              <th>备件编码</th>
+              <th>所属场站</th>
+              <th class="num">库存数</th>
+              <th>状态</th>
+              <th>跨公司借用提示</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody id="tbodyPart">
+            <tr data-st="ok">
+              <td><div class="thumb" title="轴承"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/></svg></div></td>
+              <td class="name-cell"><div class="n">主轴轴承总成</div><div class="s">规格：SKF-240/500 · 电气一次</div></td>
+              <td>SP-BRG-240500</td>
+              <td>响水风电场</td>
+              <td class="num">12.00</td>
+              <td><span class="status-txt ok">正常</span></td>
+              <td class="borrow-hint">有货：张家口 / 金沙江</td>
+              <td class="op"><a href="#" data-adj="主轴轴承总成|SP-BRG-240500">调整库存</a><a href="#">流水</a></td>
+            </tr>
+            <tr data-st="low">
+              <td><div class="thumb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="4" y="6" width="16" height="12" rx="1"/><path d="M8 10h8M8 14h5"/></svg></div></td>
+              <td class="name-cell"><div class="n">IGBT 功率模块</div><div class="s">规格：FF450R17ME4 · 电气二次</div></td>
+              <td>SP-IGBT-450R17</td>
+              <td>盐城光伏站</td>
+              <td class="num stock-low">3.00</td>
+              <td><span class="status-txt low">偏低</span></td>
+              <td class="borrow-hint"><span class="has">有货：天津热电备件库</span> · <span class="need">缺货：大同光伏站</span></td>
+              <td class="op"><a href="#" data-adj="IGBT 功率模块|SP-IGBT-450R17">调整库存</a><a href="#">借用</a></td>
+            </tr>
+            <tr data-st="zero">
+              <td><div class="thumb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 3l8 4.5v9L12 21l-8-4.5v-9L12 3z"/><path d="M12 12l8-4.5M12 12v9M12 12L4 7.5"/></svg></div></td>
+              <td class="name-cell"><div class="n">叶片变桨电机</div><div class="s">规格：PM-180 · 叶片风机</div></td>
+              <td>SP-PM-180</td>
+              <td>如东海上升压站</td>
+              <td class="num stock-zero">0.00</td>
+              <td><span class="status-txt zero">零库存</span></td>
+              <td class="borrow-hint"><span class="has">有货：响水风电场(2)</span> · <span class="need">缺货：本场站</span></td>
+              <td class="op"><a href="#" data-adj="叶片变桨电机|SP-PM-180">调整库存</a><a href="#">借用</a></td>
+            </tr>
+            <tr data-st="ok">
+              <td><div class="thumb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 8h12v10H6z"/><path d="M9 8V6h6v2"/></svg></div></td>
+              <td class="name-cell"><div class="n">液压油滤芯</div><div class="s">规格：HF-6600 · 机械润滑</div></td>
+              <td>SP-HF-6600</td>
+              <td>张家口风电场</td>
+              <td class="num">86.00</td>
+              <td><span class="status-txt ok">正常</span></td>
+              <td class="borrow-hint">多场站充足，可外借</td>
+              <td class="op"><a href="#" data-adj="液压油滤芯|SP-HF-6600">调整库存</a><a href="#">流水</a></td>
+            </tr>
+            <tr data-st="idle">
+              <td><div class="thumb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="8"/><path d="M12 8v5l3 2"/></svg></div></td>
+              <td class="name-cell"><div class="n">旧型保护继电器</div><div class="s">规格：RLY-98A · 电气二次</div></td>
+              <td>SP-RLY-98A</td>
+              <td>天津热电备件库</td>
+              <td class="num">24.00</td>
+              <td><span class="status-txt idle">呆滞</span></td>
+              <td class="borrow-hint">库龄 312 天 · 建议集团内调剂</td>
+              <td class="op"><a href="#" data-adj="旧型保护继电器|SP-RLY-98A">调整库存</a><a href="#">处置</a></td>
+            </tr>
+            <tr data-st="low">
+              <td><div class="thumb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 18V6h4l2 4h8v8H4z"/></svg></div></td>
+              <td class="name-cell"><div class="n">消防气体灭火瓶</div><div class="s">规格：FM200-40L · 安防消防</div></td>
+              <td>SP-FM-40L</td>
+              <td>大同光伏站</td>
+              <td class="num stock-low">2.00</td>
+              <td><span class="status-txt low">偏低</span></td>
+              <td class="borrow-hint"><span class="has">有货：金沙江电站(6)</span></td>
+              <td class="op"><a href="#" data-adj="消防气体灭火瓶|SP-FM-40L">调整库存</a><a href="#">借用</a></td>
+            </tr>
+            <tr data-st="ok">
+              <td><div class="thumb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="5" y="5" width="14" height="14" rx="2"/><path d="M9 12h6"/></svg></div></td>
+              <td class="name-cell"><div class="n">升压站断路器触头</div><div class="s">规格：CB-252kV · 电气一次</div></td>
+              <td>SP-CB-252</td>
+              <td>金沙江电站</td>
+              <td class="num">8.00</td>
+              <td><span class="status-txt ok">正常</span></td>
+              <td class="borrow-hint">有货：雅砻江备件仓</td>
+              <td class="op"><a href="#" data-adj="升压站断路器触头|SP-CB-252">调整库存</a><a href="#">流水</a></td>
+            </tr>
+            <tr data-st="zero">
+              <td><div class="thumb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M7 7h10v10H7z"/><path d="M7 11h10M11 7v10"/></svg></div></td>
+              <td class="name-cell"><div class="n">逆变器直流熔断器</div><div class="s">规格：FUSE-1000V · 电气二次</div></td>
+              <td>SP-FUSE-1K</td>
+              <td>雅砻江备件仓</td>
+              <td class="num stock-zero">0.00</td>
+              <td><span class="status-txt zero">零库存</span></td>
+              <td class="borrow-hint"><span class="need">缺货：雅砻江</span> · <span class="has">有货：盐城光伏站(40)</span></td>
+              <td class="op"><a href="#" data-adj="逆变器直流熔断器|SP-FUSE-1K">调整库存</a><a href="#">借用</a></td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="pagination">
+          <span>共 8 条</span>
+          <span>15 条/页</span>
+          <div class="page-btns">
+            <button type="button">‹</button>
+            <button type="button" class="cur">1</button>
+            <button type="button">›</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 按场站查看（对标按仓库：左选场站 + 右表） -->
+      <div class="table-card panel-by-site" id="tableSite">
+        <table>
+          <thead>
+            <tr>
+              <th style="width:56px">图片</th>
+              <th>备件名称</th>
+              <th>备件编码</th>
+              <th>场站名称</th>
+              <th class="num">场站库存</th>
+              <th>状态</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody id="tbodySite">
+            <tr>
+              <td><div class="thumb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/></svg></div></td>
+              <td>主轴轴承总成</td>
+              <td>SP-BRG-240500</td>
+              <td id="siteColName">响水风电场</td>
+              <td class="num">12.00</td>
+              <td><span class="status-txt ok">正常</span></td>
+              <td class="op"><a href="#" data-adj="主轴轴承总成|SP-BRG-240500">调整库存</a></td>
+            </tr>
+            <tr>
+              <td><div class="thumb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 3l8 4.5v9L12 21l-8-4.5v-9L12 3z"/></svg></div></td>
+              <td>叶片变桨电机</td>
+              <td>SP-PM-180</td>
+              <td>响水风电场</td>
+              <td class="num">2.00</td>
+              <td><span class="status-txt ok">正常</span></td>
+              <td class="op"><a href="#" data-adj="叶片变桨电机|SP-PM-180">调整库存</a></td>
+            </tr>
+            <tr>
+              <td><div class="thumb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 8h12v10H6z"/></svg></div></td>
+              <td>液压油滤芯</td>
+              <td>SP-HF-6600</td>
+              <td>响水风电场</td>
+              <td class="num stock-low">5.00</td>
+              <td><span class="status-txt low">偏低</span></td>
+              <td class="op"><a href="#" data-adj="液压油滤芯|SP-HF-6600">调整库存</a></td>
+            </tr>
+            <tr>
+              <td><div class="thumb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="5" y="5" width="14" height="14" rx="2"/></svg></div></td>
+              <td>齿轮箱润滑油</td>
+              <td>SP-OIL-GB320</td>
+              <td>响水风电场</td>
+              <td class="num stock-zero">0.00</td>
+              <td><span class="status-txt zero">零库存</span></td>
+              <td class="op"><a href="#" data-adj="齿轮箱润滑油|SP-OIL-GB320">调整库存</a></td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="pagination">
+          <span>共 4 条</span>
+          <span>15 条/页</span>
+          <div class="page-btns">
+            <button type="button">‹</button>
+            <button type="button" class="cur">1</button>
+            <button type="button">›</button>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- 调整库存弹窗（对标设置库存） -->
+  <div class="mask" id="adjMask" role="dialog" aria-modal="true">
+    <div class="modal">
+      <div class="modal-hd">
+        <span>调整库存</span>
+        <button type="button" class="close" id="adjClose" aria-label="关闭">×</button>
+      </div>
+      <div class="modal-bd">
+        <div class="modal-part">
+          <div class="thumb" style="width:48px;height:48px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/></svg></div>
+          <div class="info">
+            <div class="n" id="adjName">主轴轴承总成</div>
+            <div class="c" id="adjCode">编码：SP-BRG-240500</div>
+          </div>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>组织类型</th>
+              <th>场站 / 仓库</th>
+              <th class="num">库存数</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>场站库</td>
+              <td>响水风电场</td>
+              <td class="num"><input class="qty" type="number" value="12" min="0" step="1" /></td>
+              <td><a href="#">修改</a></td>
+            </tr>
+            <tr>
+              <td>场站库</td>
+              <td>张家口风电场</td>
+              <td class="num"><input class="qty" type="number" value="4" min="0" step="1" /></td>
+              <td><a href="#">修改</a></td>
+            </tr>
+            <tr>
+              <td>区域仓</td>
+              <td>天津热电备件库</td>
+              <td class="num"><input class="qty" type="number" value="6" min="0" step="1" /></td>
+              <td><a href="#">修改</a></td>
+            </tr>
+            <tr>
+              <td>场站库</td>
+              <td>金沙江电站</td>
+              <td class="num"><input class="qty" type="number" value="2" min="0" step="1" /></td>
+              <td><a href="#">修改</a></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="modal-ft">
+        <button type="button" class="btn" id="adjCancel">取消</button>
+        <button type="button" class="btn pri" id="adjSave">确定</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    (function () {
+      var toastEl = document.getElementById("toast");
+      var toastTimer;
+      function toast(msg) {
+        toastEl.textContent = msg;
+        toastEl.classList.add("show");
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(function () { toastEl.classList.remove("show"); }, 1800);
+      }
+
+      /* 顶栏 Tab：按备件 / 按场站 */
+      var viewTabs = document.getElementById("viewTabs");
+      viewTabs.addEventListener("click", function (e) {
+        var btn = e.target.closest("button[data-view]");
+        if (!btn) return;
+        viewTabs.querySelectorAll("button").forEach(function (b) { b.classList.remove("active"); });
+        btn.classList.add("active");
+        var view = btn.getAttribute("data-view");
+        document.body.classList.toggle("view-site", view === "site");
+        document.body.classList.toggle("view-part", view === "part");
+        toast(view === "site" ? "已切换：按场站查看（对标按仓库）" : "已切换：按备件查看（对标按商品）");
+      });
+
+      /* 组织树选中 */
+      var orgTree = document.getElementById("orgTree");
+      var crumb = document.getElementById("crumb");
+      orgTree.addEventListener("click", function (e) {
+        var node = e.target.closest(".tree-node");
+        if (!node) return;
+        orgTree.querySelectorAll(".tree-node").forEach(function (n) { n.classList.remove("is-active"); });
+        node.classList.add("is-active");
+        var name = node.getAttribute("data-name") || node.textContent.trim();
+        crumb.textContent = "当前位置：华电示范集团 / " + name;
+        document.querySelectorAll("#tbodySite td:nth-child(4)").forEach(function (td) {
+          if (name !== "全部组织" && name !== "华东新能源" && name !== "华北发电" && name !== "西南水电") {
+            td.textContent = name;
+          }
+        });
+        toast("已选组织：" + name);
+      });
+
+      document.getElementById("orgSearch").addEventListener("input", function () {
+        var q = this.value.trim();
+        orgTree.querySelectorAll(".tree-node").forEach(function (n) {
+          var text = n.textContent || "";
+          n.style.display = !q || text.indexOf(q) !== -1 ? "" : "none";
+        });
+      });
+
+      /* 状态 Tab 筛选 */
+      var statusTabs = document.getElementById("statusTabs");
+      var tbodyPart = document.getElementById("tbodyPart");
+      statusTabs.addEventListener("click", function (e) {
+        var btn = e.target.closest("button[data-st]");
+        if (!btn) return;
+        statusTabs.querySelectorAll("button").forEach(function (b) { b.classList.remove("active"); });
+        btn.classList.add("active");
+        var st = btn.getAttribute("data-st");
+        var visible = 0;
+        tbodyPart.querySelectorAll("tr").forEach(function (tr) {
+          var show = st === "all" || tr.getAttribute("data-st") === st;
+          tr.style.display = show ? "" : "none";
+          if (show) visible++;
+        });
+        document.getElementById("rowCount").textContent = String(visible);
+      });
+
+      /* 查询 / 重置 */
+      document.getElementById("btnQuery").addEventListener("click", function () {
+        toast("已按条件查询（演示）");
+      });
+      document.getElementById("btnReset").addEventListener("click", function () {
+        document.getElementById("qName").value = "";
+        document.getElementById("qCode").value = "";
+        document.getElementById("qCat").value = "";
+        document.getElementById("qSt").value = "";
+        toast("筛选条件已重置");
+      });
+      document.getElementById("btnImport").addEventListener("click", function () {
+        toast("打开导入台账（演示）");
+      });
+      document.getElementById("btnExport").addEventListener("click", function () {
+        toast("正在导出 Excel（演示）");
+      });
+      document.getElementById("btnBorrow").addEventListener("click", function () {
+        toast("打开跨公司借用申请（演示）");
+      });
+
+      /* 调整库存弹窗 */
+      var mask = document.getElementById("adjMask");
+      function openAdj(name, code) {
+        document.getElementById("adjName").textContent = name;
+        document.getElementById("adjCode").textContent = "编码：" + code;
+        mask.classList.add("show");
+      }
+      function closeAdj() { mask.classList.remove("show"); }
+
+      document.addEventListener("click", function (e) {
+        var link = e.target.closest("a[data-adj]");
+        if (!link) return;
+        e.preventDefault();
+        var parts = (link.getAttribute("data-adj") || "").split("|");
+        openAdj(parts[0] || "备件", parts[1] || "-");
+      });
+      document.getElementById("adjClose").addEventListener("click", closeAdj);
+      document.getElementById("adjCancel").addEventListener("click", closeAdj);
+      mask.addEventListener("click", function (e) {
+        if (e.target === mask) closeAdj();
+      });
+      document.getElementById("adjSave").addEventListener("click", function () {
+        closeAdj();
+        toast("库存已更新（演示）");
+      });
+    })();
+  </script>
+</body>
+</html>

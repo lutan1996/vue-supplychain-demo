@@ -1,0 +1,1665 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>生产物资库存管理（生产备件）· 方案菜鸟</title>
+  <style>
+    :root {
+      --cn-navy: #0b1f44;
+      --cn-navy-deep: #071530;
+      --cn-blue: #2b6de5;
+      --cn-blue-soft: #e8f0fe;
+      --cn-cyan: #1ec8ff;
+      --cn-green: #12b886;
+      --cn-red: #e03131;
+      --cn-warn: #f08c00;
+      --text: #1a2332;
+      --muted: #6b7a90;
+      --border: #e4eaf3;
+      --bg: #eef2f7;
+      --side: #f4f6fa;
+      --surface: #ffffff;
+      --shadow: 0 1px 3px rgba(11, 31, 68, .06), 0 4px 12px rgba(11, 31, 68, .04);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: "PingFang SC", "Hiragino Sans GB", "Source Han Sans SC", "Noto Sans SC", "Microsoft YaHei", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      font-size: 13px;
+      min-height: 100vh;
+    }
+    button, input, select { font-family: inherit; }
+    a { color: var(--cn-blue); text-decoration: none; cursor: pointer; }
+    a:hover { text-decoration: underline; }
+
+    /* —— 方案说明条 —— */
+    .scheme-banner {
+      background: linear-gradient(90deg, #071530, #0b1f44 40%, #1a4a9e 78%, #12b886);
+      color: #fff;
+      padding: 12px 20px;
+      border-bottom: 3px solid #12b886;
+    }
+    .scheme-banner .row1 {
+      display: flex;
+      align-items: baseline;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 6px;
+    }
+    .scheme-banner .tag {
+      background: rgba(255,255,255,.2);
+      padding: 2px 10px;
+      border-radius: 2px;
+      font-weight: 700;
+      font-size: 14px;
+    }
+    .scheme-banner .desc { font-size: 13px; opacity: .95; }
+    .scheme-banner .meta {
+      font-size: 12px;
+      line-height: 1.7;
+      opacity: .92;
+      max-width: 1100px;
+    }
+    .scheme-banner .checks {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 8px;
+    }
+    .scheme-banner .checks span {
+      background: rgba(0,0,0,.22);
+      border: 1px solid rgba(255,255,255,.28);
+      padding: 1px 8px;
+      border-radius: 10px;
+      font-size: 11px;
+    }
+
+    /* —— 顶栏（对标菜鸟控制中心深蓝顶栏） —— */
+    .topbar {
+      height: 50px;
+      background: var(--cn-navy);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 18px;
+      color: rgba(255,255,255,.88);
+    }
+    .topbar .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 600;
+      font-size: 14px;
+      color: #fff;
+    }
+    .topbar .logo {
+      width: 30px; height: 30px;
+      border-radius: 4px;
+      background: linear-gradient(135deg, #2b6de5, #12b886);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: -.5px;
+    }
+    .topbar .brand em {
+      font-style: normal;
+      font-weight: 400;
+      color: rgba(255,255,255,.55);
+      margin-left: 2px;
+    }
+    .topbar .nav {
+      display: flex;
+      gap: 4px;
+      height: 100%;
+    }
+    .topbar .nav a {
+      color: rgba(255,255,255,.72);
+      padding: 0 14px;
+      height: 100%;
+      display: inline-flex;
+      align-items: center;
+      font-size: 13px;
+      border-bottom: 3px solid transparent;
+      text-decoration: none;
+    }
+    .topbar .nav a:hover { color: #fff; }
+    .topbar .nav a.on {
+      color: #fff;
+      border-bottom-color: #12b886;
+    }
+    .topbar .right {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      font-size: 12px;
+      color: rgba(255,255,255,.65);
+    }
+    .mode-toggle {
+      display: inline-flex;
+      border: 1px solid rgba(255,255,255,.25);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    .mode-toggle button {
+      border: none;
+      background: transparent;
+      color: rgba(255,255,255,.7);
+      padding: 4px 10px;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .mode-toggle button.on {
+      background: rgba(30, 200, 255, .2);
+      color: #fff;
+    }
+    .avatar {
+      width: 28px; height: 28px; border-radius: 50%;
+      background: var(--cn-blue);
+      color: #fff;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+    }
+
+    /* —— 壳层 —— */
+    .shell {
+      display: grid;
+      grid-template-columns: 200px minmax(0, 1fr);
+      min-height: calc(100vh - 50px - 92px);
+    }
+    body.screen-mode .shell { display: none; }
+    body.screen-mode .scheme-banner { display: none; }
+
+    /* 左侧导航 + 组织树 */
+    .sidebar {
+      background: var(--side);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+    }
+    .side-nav {
+      padding: 10px 0 6px;
+      border-bottom: 1px solid var(--border);
+    }
+    .side-nav .item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 9px 16px;
+      cursor: pointer;
+      color: #44546a;
+      font-size: 13px;
+      border-left: 3px solid transparent;
+    }
+    .side-nav .item:hover { background: #eaf0f8; color: var(--cn-blue); }
+    .side-nav .item.on {
+      background: #fff;
+      color: var(--cn-blue);
+      font-weight: 600;
+      border-left-color: var(--cn-blue);
+    }
+    .side-nav .ico {
+      width: 16px; height: 16px;
+      opacity: .75;
+      flex-shrink: 0;
+    }
+    .org-block { flex: 1; display: flex; flex-direction: column; min-height: 0; }
+    .org-hd {
+      padding: 12px 14px 6px;
+      font-weight: 600;
+      font-size: 12px;
+      color: var(--muted);
+      letter-spacing: .02em;
+    }
+    .org-search {
+      margin: 0 12px 8px;
+    }
+    .org-search input {
+      width: 100%;
+      height: 30px;
+      border: 1px solid #d5dee9;
+      border-radius: 4px;
+      padding: 0 10px;
+      font-size: 12px;
+      outline: none;
+      background: #fff;
+    }
+    .org-search input:focus { border-color: var(--cn-blue); box-shadow: 0 0 0 2px rgba(43,109,229,.15); }
+    .org-tree { flex: 1; overflow: auto; padding: 0 8px 14px; }
+    .onode {
+      padding: 7px 10px;
+      border-radius: 4px;
+      cursor: pointer;
+      color: #334155;
+      line-height: 1.35;
+      user-select: none;
+    }
+    .onode:hover { background: #e8eef8; }
+    .onode.active {
+      background: var(--cn-blue-soft);
+      color: var(--cn-blue);
+      font-weight: 600;
+    }
+    .onode.l2 { padding-left: 22px; font-size: 12px; }
+    .onode.l3 { padding-left: 36px; font-size: 12px; color: #64748b; }
+    .onode.l3.active { color: var(--cn-blue); }
+
+    /* 主区 */
+    .main {
+      min-width: 0;
+      overflow: auto;
+      padding: 14px 18px 24px;
+      background: var(--bg);
+    }
+    .page-hd {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .page-hd h1 {
+      font-size: 18px;
+      font-weight: 700;
+      color: #0f1c2e;
+      letter-spacing: -.02em;
+    }
+    .page-hd .crumb {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+    .page-hd .ops { display: flex; gap: 8px; flex-wrap: wrap; }
+
+    .btn {
+      height: 30px;
+      padding: 0 14px;
+      border: 1px solid #cdd7e5;
+      background: #fff;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 13px;
+      color: #44546a;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .btn:hover { border-color: var(--cn-blue); color: var(--cn-blue); }
+    .btn.pri {
+      background: var(--cn-blue);
+      border-color: var(--cn-blue);
+      color: #fff;
+    }
+    .btn.pri:hover { background: #1f5ccc; color: #fff; }
+    .btn.ghost {
+      color: var(--cn-blue);
+      border-color: var(--cn-blue);
+      background: #fff;
+    }
+
+    /* 主 Tabs */
+    .main-tabs {
+      display: flex;
+      gap: 0;
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 6px 6px 0 0;
+      padding: 0 8px;
+      margin-bottom: 0;
+    }
+    .main-tabs button {
+      border: none;
+      background: transparent;
+      padding: 11px 18px;
+      font-size: 13px;
+      color: #64748b;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -1px;
+    }
+    .main-tabs button:hover { color: var(--cn-blue); }
+    .main-tabs button.on {
+      color: var(--cn-blue);
+      font-weight: 600;
+      border-bottom-color: var(--cn-blue);
+    }
+    .tab-panel { display: none; }
+    .tab-panel.on { display: block; }
+
+    /* KPI 卡片网格（对标控制中心总览卡） */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+    .kpi-grid.row2 {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+    .kpi {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 14px 16px 10px;
+      box-shadow: var(--shadow);
+      position: relative;
+      overflow: hidden;
+      min-height: 148px;
+    }
+    .kpi::after {
+      content: "";
+      position: absolute;
+      right: -20px; bottom: -20px;
+      width: 90px; height: 90px;
+      background: radial-gradient(circle, rgba(43,109,229,.08), transparent 70%);
+      pointer-events: none;
+    }
+    .kpi .k {
+      font-size: 12px;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .kpi .k .tip {
+      width: 14px; height: 14px;
+      border-radius: 50%;
+      border: 1px solid #c5d0e0;
+      color: #94a3b8;
+      font-size: 10px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: help;
+    }
+    .kpi .v {
+      font-size: 28px;
+      font-weight: 700;
+      margin: 8px 0 4px;
+      letter-spacing: -.03em;
+      font-variant-numeric: tabular-nums;
+      color: #0f1c2e;
+      line-height: 1.1;
+    }
+    .kpi .v small {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--muted);
+      margin-left: 4px;
+    }
+    .kpi .v.danger { color: var(--cn-red); }
+    .kpi .v.warn { color: var(--cn-warn); }
+    .kpi .trend {
+      font-size: 12px;
+      margin-bottom: 8px;
+    }
+    .kpi .trend.up { color: var(--cn-red); }
+    .kpi .trend.down { color: var(--cn-green); }
+    .kpi .trend.flat { color: var(--muted); }
+    .kpi .note {
+      font-size: 11px;
+      color: #7a8ba3;
+      line-height: 1.55;
+      margin-bottom: 6px;
+      min-height: 34px;
+    }
+    .kpi .spark {
+      width: 100%;
+      height: 36px;
+      display: block;
+    }
+
+    /* 借用可见 / 区域分布 */
+    .split-row {
+      display: grid;
+      grid-template-columns: 1.2fr 1fr;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+    .card {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+    .card-hd {
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-weight: 600;
+      font-size: 13px;
+    }
+    .card-hd .sub { font-weight: 400; color: var(--muted); font-size: 12px; }
+    .card-bd { padding: 12px 14px; }
+
+    .bar-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+      font-size: 12px;
+    }
+    .bar-row .lab { width: 72px; color: #475569; flex-shrink: 0; }
+    .bar-track {
+      flex: 1;
+      height: 10px;
+      background: #eef2f7;
+      border-radius: 5px;
+      overflow: hidden;
+    }
+    .bar-fill {
+      height: 100%;
+      border-radius: 5px;
+      background: linear-gradient(90deg, #2b6de5, #1ec8ff);
+    }
+    .bar-row .num {
+      width: 56px;
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+      color: #334155;
+      font-weight: 600;
+    }
+
+    .borrow-list { list-style: none; }
+    .borrow-list li {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px;
+      padding: 9px 0;
+      border-bottom: 1px dashed #e8edf4;
+      align-items: start;
+    }
+    .borrow-list li:last-child { border-bottom: 0; }
+    .borrow-list .t { font-weight: 600; margin-bottom: 2px; }
+    .borrow-list .d { font-size: 12px; color: var(--muted); line-height: 1.45; }
+    .borrow-list .tag {
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 10px;
+      white-space: nowrap;
+    }
+    .borrow-list .tag.has { background: #e6fcf5; color: #087f5b; }
+    .borrow-list .tag.need { background: #fff5f5; color: #c92a2a; }
+
+    /* 筛选 + 表格 */
+    .filters {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-top: none;
+      border-radius: 0;
+      padding: 12px 14px 4px;
+    }
+    .filters-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 0 14px;
+    }
+    .filter-item {
+      display: flex;
+      align-items: center;
+      margin-bottom: 10px;
+      gap: 8px;
+    }
+    .filter-item label {
+      flex-shrink: 0;
+      width: 64px;
+      text-align: right;
+      color: #64748b;
+      font-size: 12px;
+    }
+    .filter-item input,
+    .filter-item select {
+      flex: 1;
+      min-width: 0;
+      height: 30px;
+      border: 1px solid #d5dee9;
+      border-radius: 4px;
+      padding: 0 8px;
+      font-size: 12px;
+      outline: none;
+      background: #fff;
+    }
+    .filter-item input:focus,
+    .filter-item select:focus {
+      border-color: var(--cn-blue);
+      box-shadow: 0 0 0 2px rgba(43,109,229,.15);
+    }
+    .filter-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      padding: 4px 0 12px;
+      border-top: 1px dashed #edf1f6;
+      margin-top: 2px;
+      padding-top: 10px;
+    }
+
+    .table-panel {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-top: none;
+      border-radius: 0 0 6px 6px;
+      padding: 0 0 8px;
+    }
+    .table-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--border);
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .table-toolbar .meta { color: var(--muted); font-size: 12px; }
+    .table-toolbar .meta b { color: var(--text); }
+    .status-pills {
+      display: flex;
+      gap: 4px;
+      flex-wrap: wrap;
+      margin-left: 12px;
+    }
+    .status-pills button {
+      border: 1px solid #d5dee9;
+      background: #fff;
+      padding: 3px 10px;
+      border-radius: 12px;
+      font-size: 12px;
+      cursor: pointer;
+      color: #64748b;
+    }
+    .status-pills button.on {
+      background: var(--cn-blue-soft);
+      border-color: #a8c4f5;
+      color: var(--cn-blue);
+      font-weight: 600;
+    }
+    .table-scroll { overflow: auto; max-height: 420px; }
+    table.ledger {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+    }
+    table.ledger th {
+      background: #f7f9fc;
+      color: #64748b;
+      font-weight: 600;
+      text-align: left;
+      padding: 9px 12px;
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+      position: sticky;
+      top: 0;
+      z-index: 1;
+    }
+    table.ledger td {
+      padding: 9px 12px;
+      border-bottom: 1px solid #f0f3f8;
+      color: #334155;
+      vertical-align: middle;
+    }
+    table.ledger tr:hover td { background: #f8fafc; }
+    table.ledger .num { text-align: right; font-variant-numeric: tabular-nums; }
+    table.ledger .code { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; font-size: 11px; color: #64748b; }
+    .pill {
+      display: inline-block;
+      padding: 1px 8px;
+      border-radius: 10px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+    .pill.ok { background: #e6fcf5; color: #087f5b; }
+    .pill.low { background: #fff4e6; color: #d9480f; }
+    .pill.zero { background: #fff5f5; color: #c92a2a; }
+    .pill.idle { background: #f3f0ff; color: #5f3dc4; }
+    .hint-cell { font-size: 11px; line-height: 1.45; max-width: 220px; }
+    .hint-cell .has { color: #087f5b; }
+    .hint-cell .need { color: #c92a2a; }
+    .op a { margin-right: 8px; font-size: 12px; }
+    .pagination {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 12px;
+      padding: 8px 14px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+    .pagination .page-btns { display: flex; gap: 4px; }
+    .pagination button {
+      width: 28px; height: 28px;
+      border: 1px solid #d5dee9;
+      background: #fff;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 12px;
+    }
+    .pagination button.cur {
+      background: var(--cn-blue);
+      border-color: var(--cn-blue);
+      color: #fff;
+    }
+
+    /* ================= 深色大屏预览 ================= */
+    .screen {
+      display: none;
+      min-height: calc(100vh - 50px);
+      background:
+        radial-gradient(ellipse at 20% 10%, rgba(30,200,255,.12), transparent 45%),
+        radial-gradient(ellipse at 80% 80%, rgba(43,109,229,.18), transparent 40%),
+        linear-gradient(180deg, #061228 0%, #0a1f3d 50%, #071530 100%);
+      color: #d6e6ff;
+      padding: 16px 20px 28px;
+      position: relative;
+      overflow: hidden;
+    }
+    body.screen-mode .screen { display: block; }
+    .screen::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(30,200,255,.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(30,200,255,.03) 1px, transparent 1px);
+      background-size: 48px 48px;
+      pointer-events: none;
+    }
+    .screen-inner { position: relative; z-index: 1; max-width: 1400px; margin: 0 auto; }
+    .screen-title {
+      text-align: center;
+      margin-bottom: 16px;
+    }
+    .screen-title h2 {
+      font-size: 22px;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: .08em;
+      text-shadow: 0 0 24px rgba(30,200,255,.35);
+    }
+    .screen-title p {
+      font-size: 11px;
+      color: rgba(30,200,255,.65);
+      letter-spacing: .22em;
+      margin-top: 4px;
+    }
+    .screen-kpis {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+    .sk {
+      background: rgba(8, 28, 58, .72);
+      border: 1px solid rgba(30,200,255,.28);
+      border-radius: 4px;
+      padding: 12px 14px;
+      box-shadow: inset 0 0 0 1px rgba(30,200,255,.06), 0 0 20px rgba(30,200,255,.06);
+      position: relative;
+    }
+    .sk::before, .sk::after {
+      content: "";
+      position: absolute;
+      width: 8px; height: 8px;
+      border: 1px solid var(--cn-cyan);
+    }
+    .sk::before { top: -1px; left: -1px; border-right: 0; border-bottom: 0; }
+    .sk::after { bottom: -1px; right: -1px; border-left: 0; border-top: 0; }
+    .sk .k { font-size: 11px; color: rgba(190,220,255,.75); }
+    .sk .v {
+      font-size: 24px;
+      font-weight: 700;
+      color: #fff;
+      margin-top: 6px;
+      font-variant-numeric: tabular-nums;
+      text-shadow: 0 0 12px rgba(30,200,255,.35);
+    }
+    .sk .v small { font-size: 12px; font-weight: 500; color: rgba(190,220,255,.6); margin-left: 2px; }
+    .sk .sub { font-size: 11px; color: var(--cn-cyan); margin-top: 4px; }
+
+    .screen-mid {
+      display: grid;
+      grid-template-columns: 1.1fr 1fr;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+    .spanel {
+      background: rgba(8, 28, 58, .65);
+      border: 1px solid rgba(30,200,255,.25);
+      border-radius: 4px;
+      padding: 12px 14px 14px;
+      min-height: 220px;
+    }
+    .spanel h3 {
+      font-size: 13px;
+      color: #fff;
+      font-weight: 600;
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .spanel h3::before {
+      content: "";
+      width: 8px; height: 8px;
+      background: var(--cn-cyan);
+      transform: rotate(45deg);
+      box-shadow: 0 0 8px var(--cn-cyan);
+    }
+    .spanel .en {
+      font-size: 10px;
+      color: rgba(30,200,255,.55);
+      letter-spacing: .16em;
+      margin-bottom: 12px;
+      margin-left: 16px;
+    }
+    .trend-svg { width: 100%; height: 120px; display: block; }
+
+    .funnel {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .funnel-row {
+      display: grid;
+      grid-template-columns: 88px 1fr 110px;
+      align-items: center;
+      gap: 10px;
+      font-size: 12px;
+    }
+    .funnel-row .lab { color: rgba(200,220,255,.85); }
+    .funnel-bar {
+      height: 22px;
+      background: linear-gradient(90deg, rgba(43,109,229,.9), rgba(30,200,255,.7));
+      border-radius: 2px;
+      box-shadow: 0 0 12px rgba(30,200,255,.25);
+      display: flex;
+      align-items: center;
+      padding-left: 8px;
+      color: #fff;
+      font-size: 11px;
+      font-weight: 600;
+      min-width: 40px;
+    }
+    .funnel-row .pct { text-align: right; color: var(--cn-cyan); font-variant-numeric: tabular-nums; }
+
+    .bubbles {
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      height: 140px;
+      padding: 10px 0;
+    }
+    .bubble {
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 30%, rgba(120,220,255,.55), rgba(43,109,229,.35) 55%, rgba(8,28,58,.2));
+      border: 1px solid rgba(30,200,255,.45);
+      box-shadow: 0 0 24px rgba(30,200,255,.25);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      color: #fff;
+    }
+    .bubble .bv { font-size: 18px; font-weight: 700; }
+    .bubble .bk { font-size: 11px; color: rgba(200,230,255,.8); margin-top: 2px; }
+    .b1 { width: 100px; height: 100px; }
+    .b2 { width: 130px; height: 130px; }
+    .b3 { width: 88px; height: 88px; }
+
+    .region-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+    }
+    .region {
+      background: rgba(12, 36, 72, .8);
+      border: 1px solid rgba(30,200,255,.2);
+      border-radius: 4px;
+      padding: 10px;
+      text-align: center;
+    }
+    .region .n { font-size: 12px; color: rgba(200,220,255,.8); }
+    .region .v { font-size: 18px; font-weight: 700; color: #fff; margin: 4px 0; }
+    .region .s { font-size: 11px; color: var(--cn-cyan); }
+
+    .milestone {
+      margin-top: 4px;
+      padding: 8px 4px 4px;
+    }
+    .ms-track {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      position: relative;
+      padding-top: 8px;
+    }
+    .ms-track::before {
+      content: "";
+      position: absolute;
+      left: 4%; right: 4%;
+      top: 18px;
+      height: 2px;
+      background: linear-gradient(90deg, #12b886, rgba(30,200,255,.5) 55%, rgba(100,120,150,.4));
+    }
+    .ms {
+      position: relative;
+      z-index: 1;
+      text-align: center;
+      width: 11%;
+    }
+    .ms .dot {
+      width: 16px; height: 16px;
+      border-radius: 50%;
+      margin: 0 auto 8px;
+      border: 2px solid rgba(100,120,150,.6);
+      background: #071530;
+    }
+    .ms.done .dot {
+      background: #12b886;
+      border-color: #12b886;
+      box-shadow: 0 0 10px rgba(18,184,134,.5);
+    }
+    .ms.cur .dot {
+      background: var(--cn-cyan);
+      border-color: var(--cn-cyan);
+      box-shadow: 0 0 12px rgba(30,200,255,.6);
+    }
+    .ms .ml { font-size: 11px; color: rgba(200,220,255,.85); }
+    .ms .md { font-size: 10px; color: rgba(150,180,210,.7); margin-top: 2px; }
+
+    .toast {
+      position: fixed;
+      right: 24px;
+      bottom: 24px;
+      background: #0b1f44;
+      color: #fff;
+      padding: 10px 16px;
+      border-radius: 6px;
+      font-size: 13px;
+      box-shadow: 0 8px 24px rgba(0,0,0,.25);
+      opacity: 0;
+      transform: translateY(8px);
+      transition: .25s;
+      z-index: 99;
+      pointer-events: none;
+    }
+    .toast.show { opacity: 1; transform: none; }
+
+    @media (max-width: 1200px) {
+      .kpi-grid, .kpi-grid.row2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .split-row, .screen-mid { grid-template-columns: 1fr; }
+      .screen-kpis { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      .topbar .nav { display: none; }
+      .filters-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+    @media (max-width: 860px) {
+      .shell { grid-template-columns: 1fr; }
+      .sidebar { max-height: 280px; }
+      .kpi-grid, .kpi-grid.row2 { grid-template-columns: 1fr; }
+      .screen-kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+  </style>
+</head>
+<body>
+  <div class="scheme-banner">
+    <div class="row1">
+      <span class="tag">方案菜鸟 · 数字供应链控制中心风格</span>
+      <span class="desc">生产物资库存管理（生产备件）</span>
+    </div>
+    <div class="meta">
+      参考菜鸟「数字供应链控制中心」公开界面的样式与信息架构：深蓝顶栏 + 浅侧栏导航 + KPI 卡片网格（大数字 / 环比 / 迷你趋势）+ 台账明细；可切换「深色大屏预览」吸收有货率类指标、流程漏斗、区域分布与里程碑时间轴。
+      <b>诚实说明：本页是样式与信息架构映射的方案草图，不是菜鸟同一后台的功能复刻。</b>
+    </div>
+    <div class="checks">
+      <span>✓ 左组织/场站</span>
+      <span>✓ KPI 控制台</span>
+      <span>✓ 筛选 + 台账</span>
+      <span>✓ 导入/导出</span>
+      <span>✓ 跨站有货/缺货可见</span>
+      <span>✓ 深色大屏预览</span>
+    </div>
+  </div>
+
+  <header class="topbar">
+    <div class="brand">
+      <span class="logo">备</span>
+      <span>生产物资库存管理<em>· 生产备件控制中心</em></span>
+    </div>
+    <nav class="nav" aria-label="顶栏模块">
+      <a href="#" class="on">决策总览</a>
+      <a href="#">库存台账</a>
+      <a href="#">跨站调拨</a>
+      <a href="#">预警中心</a>
+    </nav>
+    <div class="right">
+      <div class="mode-toggle" role="group" aria-label="视图切换">
+        <button type="button" class="on" id="btnLight" data-mode="light">浅色控制台</button>
+        <button type="button" id="btnScreen" data-mode="screen">深色大屏预览</button>
+      </div>
+      <span>账期 2026-07</span>
+      <span class="avatar" title="仓管员">仓</span>
+    </div>
+  </header>
+
+  <!-- ========== 浅色控制台 ========== -->
+  <div class="shell" id="consoleShell">
+    <aside class="sidebar">
+      <div class="side-nav">
+        <div class="item on" data-tab="overview">
+          <svg class="ico" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="5" height="5" rx="1"/><rect x="9" y="2" width="5" height="5" rx="1"/><rect x="2" y="9" width="5" height="5" rx="1"/><rect x="9" y="9" width="5" height="5" rx="1"/></svg>
+          备件总览
+        </div>
+        <div class="item" data-tab="ledger">
+          <svg class="ico" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 3h10v10H3z"/><path d="M5 6h6M5 8.5h6M5 11h4"/></svg>
+          正式台账
+        </div>
+        <div class="item" data-tab="borrow">
+          <svg class="ico" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 8h10M8 3l5 5-5 5"/></svg>
+          跨站可见性
+        </div>
+      </div>
+      <div class="org-block">
+        <div class="org-hd">组织 / 场站</div>
+        <div class="org-search">
+          <input type="search" id="orgKw" placeholder="搜索公司 / 场站" />
+        </div>
+        <div class="org-tree" id="orgTree">
+          <div class="onode active" data-org="龙源电力">龙源电力（全部）</div>
+          <div class="onode l2" data-org="河北龙源">河北龙源</div>
+          <div class="onode l3" data-org="麒麟山风电场">麒麟山风电场</div>
+          <div class="onode l3" data-org="康保风电场">康保风电场</div>
+          <div class="onode l2" data-org="天津龙源">天津龙源</div>
+          <div class="onode l3" data-org="大神堂风电场">大神堂风电场</div>
+          <div class="onode l2" data-org="蒙东龙源">蒙东龙源</div>
+          <div class="onode l3" data-org="齐心营风电场">齐心营风电场</div>
+          <div class="onode l2" data-org="安徽龙源">安徽龙源</div>
+          <div class="onode l3" data-org="来安风电场">来安风电场</div>
+          <div class="onode l2" data-org="海上龙源">海上龙源</div>
+          <div class="onode l3" data-org="射阳海上风电场">射阳海上风电场</div>
+        </div>
+      </div>
+    </aside>
+
+    <main class="main">
+      <div class="page-hd">
+        <div>
+          <h1 id="pageTitle">生产物资库存管理（生产备件）</h1>
+          <div class="crumb">仓储管理 / 生产备件 · 当前范围：<span id="orgLabel">龙源电力（全部）</span></div>
+        </div>
+        <div class="ops">
+          <button class="btn" type="button" id="btnImport">导入</button>
+          <button class="btn" type="button" id="btnExport">导出</button>
+          <button class="btn ghost" type="button" id="btnWarn">低库存预警 · 37</button>
+          <button class="btn pri" type="button" id="btnQueryTop">查询</button>
+        </div>
+      </div>
+
+      <div class="main-tabs" role="tablist">
+        <button type="button" class="on" data-panel="overview">总览</button>
+        <button type="button" data-panel="ledger">备件台账</button>
+        <button type="button" data-panel="borrow">跨公司借用可见</button>
+      </div>
+
+      <!-- 总览 -->
+      <div class="tab-panel on" id="panel-overview">
+        <div style="background:#fff;border:1px solid var(--border);border-top:0;border-radius:0 0 6px 6px;padding:12px;">
+          <div class="kpi-grid">
+            <div class="kpi">
+              <div class="k">库存金额 <span class="tip" title="按含税采购成本估算">i</span></div>
+              <div class="v">8,652<small>万</small></div>
+              <div class="trend up">环比 ↑ 1.8%</div>
+              <div class="note">较上月增加约 153 万，主要为海上场站齿轮箱滤芯集中入库。</div>
+              <svg class="spark" viewBox="0 0 200 36" preserveAspectRatio="none">
+                <defs>
+                  <linearGradient id="sg1" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="#2b6de5" stop-opacity=".35"/>
+                    <stop offset="100%" stop-color="#2b6de5" stop-opacity="0"/>
+                  </linearGradient>
+                </defs>
+                <path d="M0,28 L20,24 L40,26 L60,18 L80,20 L100,12 L120,16 L140,10 L160,14 L180,8 L200,11 L200,36 L0,36 Z" fill="url(#sg1)"/>
+                <path d="M0,28 L20,24 L40,26 L60,18 L80,20 L100,12 L120,16 L140,10 L160,14 L180,8 L200,11" fill="none" stroke="#2b6de5" stroke-width="2"/>
+              </svg>
+            </div>
+            <div class="kpi">
+              <div class="k">在库 SKU <span class="tip" title="生产备件品类数">i</span></div>
+              <div class="v">1,284<small>种</small></div>
+              <div class="trend flat">环比 · 持平</div>
+              <div class="note">覆盖叶片、齿轮箱、变桨、偏航、电控等 8 大类型。</div>
+              <svg class="spark" viewBox="0 0 200 36" preserveAspectRatio="none">
+                <path d="M0,20 L25,18 L50,19 L75,16 L100,17 L125,15 L150,16 L175,14 L200,15" fill="none" stroke="#12b886" stroke-width="2"/>
+              </svg>
+            </div>
+            <div class="kpi">
+              <div class="k">低库存预警 <span class="tip" title="可用库存 &lt; 安全库存">i</span></div>
+              <div class="v danger">37<small>种</small></div>
+              <div class="trend up">较上期 ↑ 5 种</div>
+              <div class="note">其中 IGBT、变频器模块等关键电控件建议优先跨站调拨。</div>
+              <svg class="spark" viewBox="0 0 200 36" preserveAspectRatio="none">
+                <rect x="8" y="18" width="10" height="14" fill="#ffc9c9"/><rect x="28" y="14" width="10" height="18" fill="#ffa8a8"/>
+                <rect x="48" y="10" width="10" height="22" fill="#ff8787"/><rect x="68" y="16" width="10" height="16" fill="#ffa8a8"/>
+                <rect x="88" y="8" width="10" height="24" fill="#fa5252"/><rect x="108" y="12" width="10" height="20" fill="#ff8787"/>
+                <rect x="128" y="6" width="10" height="26" fill="#e03131"/><rect x="148" y="11" width="10" height="21" fill="#fa5252"/>
+                <rect x="168" y="4" width="10" height="28" fill="#c92a2a"/><rect x="188" y="9" width="10" height="23" fill="#fa5252"/>
+              </svg>
+            </div>
+          </div>
+          <div class="kpi-grid row2">
+            <div class="kpi">
+              <div class="k">呆滞库存 <span class="tip" title="库龄超过 180 天且近 90 天无出库">i</span></div>
+              <div class="v warn">12<small>种</small></div>
+              <div class="trend down">环比 ↓ 2 种</div>
+              <div class="note">刹车片等液压件呆滞金额约 1.9 万，建议集团内调剂消化。</div>
+              <svg class="spark" viewBox="0 0 200 36" preserveAspectRatio="none">
+                <path d="M0,10 L40,12 L80,14 L120,18 L160,22 L200,26" fill="none" stroke="#f08c00" stroke-width="2"/>
+              </svg>
+            </div>
+            <div class="kpi">
+              <div class="k">周转天数 <span class="tip" title="映射控制中心「月周转天数」口径">i</span></div>
+              <div class="v">37<small>天</small></div>
+              <div class="trend down">环比 ↓ 0.6 天</div>
+              <div class="note">周转改善约释放备件资金占用 ~86 万（示意测算）。</div>
+              <svg class="spark" viewBox="0 0 200 36" preserveAspectRatio="none">
+                <defs>
+                  <linearGradient id="sg2" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="#1ec8ff" stop-opacity=".3"/>
+                    <stop offset="100%" stop-color="#1ec8ff" stop-opacity="0"/>
+                  </linearGradient>
+                </defs>
+                <path d="M0,14 L30,16 L60,12 L90,18 L120,14 L150,20 L180,16 L200,18 L200,36 L0,36 Z" fill="url(#sg2)"/>
+                <path d="M0,14 L30,16 L60,12 L90,18 L120,14 L150,20 L180,16 L200,18" fill="none" stroke="#1ec8ff" stroke-width="2"/>
+              </svg>
+            </div>
+            <div class="kpi">
+              <div class="k">跨站可调拨匹配 <span class="tip" title="哪有 / 哪缺配对条数">i</span></div>
+              <div class="v">28<small>对</small></div>
+              <div class="trend flat">当日新增 6 对</div>
+              <div class="note">映射控制中心「供应网络 / 有货可见」能力，支撑少采购降资金占用。</div>
+              <svg class="spark" viewBox="0 0 200 36" preserveAspectRatio="none">
+                <circle cx="40" cy="20" r="8" fill="rgba(43,109,229,.35)" stroke="#2b6de5"/>
+                <circle cx="100" cy="16" r="12" fill="rgba(30,200,255,.3)" stroke="#1ec8ff"/>
+                <circle cx="160" cy="22" r="7" fill="rgba(18,184,134,.3)" stroke="#12b886"/>
+              </svg>
+            </div>
+          </div>
+
+          <div class="split-row">
+            <div class="card">
+              <div class="card-hd">组织库存分布 <span class="sub">对标控制中心区域视图</span></div>
+              <div class="card-bd">
+                <div class="bar-row"><span class="lab">河北龙源</span><div class="bar-track"><div class="bar-fill" style="width:78%"></div></div><span class="num">3,210</span></div>
+                <div class="bar-row"><span class="lab">蒙东龙源</span><div class="bar-track"><div class="bar-fill" style="width:62%"></div></div><span class="num">2,540</span></div>
+                <div class="bar-row"><span class="lab">天津龙源</span><div class="bar-track"><div class="bar-fill" style="width:54%"></div></div><span class="num">2,180</span></div>
+                <div class="bar-row"><span class="lab">安徽龙源</span><div class="bar-track"><div class="bar-fill" style="width:48%"></div></div><span class="num">1,920</span></div>
+                <div class="bar-row"><span class="lab">海上龙源</span><div class="bar-track"><div class="bar-fill" style="width:40%"></div></div><span class="num">1,560</span></div>
+                <div class="bar-row"><span class="lab">其他合计</span><div class="bar-track"><div class="bar-fill" style="width:28%"></div></div><span class="num">1,436</span></div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-hd">跨站「有货 / 缺货」快览 <span class="sub">支撑借用决策</span></div>
+              <div class="card-bd">
+                <ul class="borrow-list">
+                  <li>
+                    <div>
+                      <div class="t">IGBT 模块 · B00000018</div>
+                      <div class="d">麒麟山可用 2（&lt; 安全 6）· 射阳共享仓有货 11</div>
+                    </div>
+                    <span class="tag has">可调拨</span>
+                  </li>
+                  <li>
+                    <div>
+                      <div class="t">变频器模块 · B00001888</div>
+                      <div class="d">齐心营仅 1 · 大神堂有货 5</div>
+                    </div>
+                    <span class="tag has">可调拨</span>
+                  </li>
+                  <li>
+                    <div>
+                      <div class="t">叶片密封套 · B00000042</div>
+                      <div class="d">康保零库存 · 麒麟山亦紧张，建议紧急采购</div>
+                    </div>
+                    <span class="tag need">双缺</span>
+                  </li>
+                  <li>
+                    <div>
+                      <div class="t">刹车片 · B00000057</div>
+                      <div class="d">来安呆滞 24 件 · 河北/蒙东可消化</div>
+                    </div>
+                    <span class="tag has">可外借</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 台账 -->
+      <div class="tab-panel" id="panel-ledger">
+        <div class="filters">
+          <div class="filters-grid">
+            <div class="filter-item">
+              <label>账期</label>
+              <select id="periodSel">
+                <option>2026-07</option>
+                <option>2026-06</option>
+                <option>2026-05</option>
+              </select>
+            </div>
+            <div class="filter-item">
+              <label>关键字</label>
+              <input id="kw" type="search" placeholder="产品名称 / 编码 / 场站" />
+            </div>
+            <div class="filter-item">
+              <label>物资类型</label>
+              <select id="typeSel">
+                <option value="">全部</option>
+                <option>叶片</option>
+                <option>齿轮箱</option>
+                <option>变桨</option>
+                <option>偏航</option>
+                <option>电机 / 变流</option>
+                <option>液压</option>
+                <option>主轴</option>
+                <option>滤芯 / 传感器</option>
+              </select>
+            </div>
+            <div class="filter-item">
+              <label>库存状态</label>
+              <select id="statusSel">
+                <option value="">全部</option>
+                <option>正常</option>
+                <option>低于安全库存</option>
+                <option>零库存</option>
+                <option>呆滞</option>
+              </select>
+            </div>
+          </div>
+          <div class="filter-actions">
+            <button class="btn pri" type="button" id="btnQuery">查询</button>
+            <button class="btn" type="button" id="btnReset">重置</button>
+          </div>
+        </div>
+        <div class="table-panel">
+          <div class="table-toolbar">
+            <div style="display:flex;align-items:center;flex-wrap:wrap;gap:4px;">
+              <span class="meta">正式台账 · 共 <b id="rowCount">0</b> 条</span>
+              <div class="status-pills" id="statusPills">
+                <button type="button" class="on" data-st="">全部</button>
+                <button type="button" data-st="正常">正常</button>
+                <button type="button" data-st="低于安全库存">低库存</button>
+                <button type="button" data-st="零库存">零库存</button>
+                <button type="button" data-st="呆滞">呆滞</button>
+              </div>
+            </div>
+            <div class="ops">
+              <button class="btn" type="button" id="btnImport2">导入</button>
+              <button class="btn" type="button" id="btnExport2">导出</button>
+            </div>
+          </div>
+          <div class="table-scroll">
+            <table class="ledger">
+              <thead>
+                <tr>
+                  <th>序号</th>
+                  <th>账期</th>
+                  <th>工厂描述</th>
+                  <th>库存地点</th>
+                  <th>产品编码</th>
+                  <th>产品名称</th>
+                  <th>物资类型</th>
+                  <th>规格型号</th>
+                  <th class="num">期末数量</th>
+                  <th class="num">期末金额</th>
+                  <th>状态</th>
+                  <th>跨站可见（有/缺）</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody id="tbody"></tbody>
+            </table>
+          </div>
+          <div class="pagination">
+            <span id="pageMeta">共 0 条</span>
+            <div class="page-btns">
+              <button type="button">‹</button>
+              <button type="button" class="cur">1</button>
+              <button type="button">›</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 跨公司借用 -->
+      <div class="tab-panel" id="panel-borrow">
+        <div style="background:#fff;border:1px solid var(--border);border-top:0;border-radius:0 0 6px 6px;padding:14px;">
+          <div class="card" style="box-shadow:none;margin-bottom:12px;">
+            <div class="card-hd">借用配对看板 · 哪有 / 哪缺</div>
+            <div class="card-bd" style="padding:0;">
+              <div class="table-scroll" style="max-height:none;">
+                <table class="ledger">
+                  <thead>
+                    <tr>
+                      <th>备件</th>
+                      <th>编码</th>
+                      <th>缺货场站</th>
+                      <th>缺口</th>
+                      <th>有货场站</th>
+                      <th>可外借量</th>
+                      <th>建议动作</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>IGBT 模块</td>
+                      <td class="code">B00000018</td>
+                      <td>麒麟山风电场</td>
+                      <td class="num" style="color:#c92a2a">−4</td>
+                      <td>射阳海上 · 共享仓</td>
+                      <td class="num" style="color:#087f5b">11</td>
+                      <td><a href="#">发起跨公司借用</a></td>
+                    </tr>
+                    <tr>
+                      <td>变频器模块</td>
+                      <td class="code">B00001888</td>
+                      <td>齐心营风电场</td>
+                      <td class="num" style="color:#c92a2a">−2</td>
+                      <td>大神堂风电场</td>
+                      <td class="num" style="color:#087f5b">5</td>
+                      <td><a href="#">发起跨公司借用</a></td>
+                    </tr>
+                    <tr>
+                      <td>叶片密封套</td>
+                      <td class="code">B00000042</td>
+                      <td>康保风电场</td>
+                      <td class="num" style="color:#c92a2a">−8</td>
+                      <td>—</td>
+                      <td class="num">0</td>
+                      <td><a href="#">转紧急采购</a></td>
+                    </tr>
+                    <tr>
+                      <td>刹车片</td>
+                      <td class="code">B00000057</td>
+                      <td>无（呆滞消化）</td>
+                      <td class="num">—</td>
+                      <td>来安风电场</td>
+                      <td class="num" style="color:#087f5b">24</td>
+                      <td><a href="#">推送可外借</a></td>
+                    </tr>
+                    <tr>
+                      <td>逆变器风扇</td>
+                      <td class="code">B00000051</td>
+                      <td>麒麟山电控区</td>
+                      <td class="num" style="color:#c92a2a">−6</td>
+                      <td>射阳海上 · 共享仓</td>
+                      <td class="num" style="color:#087f5b">48</td>
+                      <td><a href="#">发起跨公司借用</a></td>
+                    </tr>
+                    <tr>
+                      <td>变桨轴承</td>
+                      <td class="code">B00001234</td>
+                      <td>齐心营风电场</td>
+                      <td class="num" style="color:#c92a2a">−1</td>
+                      <td>大神堂风电场</td>
+                      <td class="num" style="color:#087f5b">2</td>
+                      <td><a href="#">发起跨公司借用</a></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+          <p style="font-size:12px;color:var(--muted);line-height:1.6;">
+            说明：对标菜鸟控制中心「有货率 / 供应网络」思路，把备件在各公司·场站的有缺关系摊开，供计划员与仓管做跨公司借用决策，减少重复采购与资金占用。本表为演示假数据。
+          </p>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- ========== 深色大屏预览 ========== -->
+  <section class="screen" id="screenView" aria-label="深色大屏预览">
+    <div class="screen-inner">
+      <div class="screen-title">
+        <h2>生产备件库存控制中心</h2>
+        <p>SPARE PARTS CONTROL SCREEN · 2026-07-14</p>
+      </div>
+      <div class="screen-kpis">
+        <div class="sk">
+          <div class="k">库存金额</div>
+          <div class="v">8,652<small>万</small></div>
+          <div class="sub">↑ 1.8% 环比</div>
+        </div>
+        <div class="sk">
+          <div class="k">在库 SKU</div>
+          <div class="v">1,284</div>
+          <div class="sub">8 大类型覆盖</div>
+        </div>
+        <div class="sk">
+          <div class="k">有货率</div>
+          <div class="v">94.2<small>%</small></div>
+          <div class="sub">对标控制中心有货率</div>
+        </div>
+        <div class="sk">
+          <div class="k">库存新鲜度</div>
+          <div class="v">86.4<small>%</small></div>
+          <div class="sub">库龄 ≤180 天占比</div>
+        </div>
+        <div class="sk">
+          <div class="k">低库存预警</div>
+          <div class="v">37</div>
+          <div class="sub">待处理 / 今日 +5</div>
+        </div>
+        <div class="sk">
+          <div class="k">跨站匹配</div>
+          <div class="v">28</div>
+          <div class="sub">供应网络配对</div>
+        </div>
+      </div>
+
+      <div class="screen-mid">
+        <div class="spanel">
+          <h3>近 7 日出入库趋势</h3>
+          <div class="en">INBOUND / OUTBOUND TREND</div>
+          <svg class="trend-svg" viewBox="0 0 480 120" preserveAspectRatio="none">
+            <defs>
+              <linearGradient id="ain" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#1ec8ff" stop-opacity=".45"/>
+                <stop offset="100%" stop-color="#1ec8ff" stop-opacity="0"/>
+              </linearGradient>
+            </defs>
+            <path d="M0,78 C40,70 70,88 110,58 C150,32 190,48 240,36 C290,24 330,44 380,30 C420,20 450,28 480,18 L480,120 L0,120 Z" fill="url(#ain)"/>
+            <path d="M0,78 C40,70 70,88 110,58 C150,32 190,48 240,36 C290,24 330,44 380,30 C420,20 450,28 480,18" fill="none" stroke="#1ec8ff" stroke-width="2.5"/>
+            <path d="M0,95 C50,88 90,100 140,82 C200,60 250,78 310,70 C370,60 420,74 480,64" fill="none" stroke="#12b886" stroke-width="2" stroke-dasharray="5 4"/>
+            <circle cx="240" cy="36" r="4" fill="#1ec8ff" stroke="#fff" stroke-width="1"/>
+            <text x="248" y="30" fill="#1ec8ff" font-size="11">入库峰值 326</text>
+          </svg>
+        </div>
+        <div class="spanel">
+          <h3>备件流转漏斗</h3>
+          <div class="en">SPARE FLOW FUNNEL</div>
+          <div class="funnel">
+            <div class="funnel-row">
+              <span class="lab">1 · 需求提报</span>
+              <div class="funnel-bar" style="width:100%">1,284</div>
+              <span class="pct">100%</span>
+            </div>
+            <div class="funnel-row">
+              <span class="lab">2 · 库存满足</span>
+              <div class="funnel-bar" style="width:94%">1,208</div>
+              <span class="pct">94.2%</span>
+            </div>
+            <div class="funnel-row">
+              <span class="lab">3 · 跨站调拨</span>
+              <div class="funnel-bar" style="width:62%">796</div>
+              <span class="pct">62.0%</span>
+            </div>
+            <div class="funnel-row">
+              <span class="lab">4 · 领用签收</span>
+              <div class="funnel-bar" style="width:41%">526</div>
+              <span class="pct">41.0%</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="screen-mid">
+        <div class="spanel">
+          <h3>区域库存分布</h3>
+          <div class="en">REGIONAL DISTRIBUTION</div>
+          <div class="region-grid">
+            <div class="region"><div class="n">河北</div><div class="v">3,210</div><div class="s">健康</div></div>
+            <div class="region"><div class="n">蒙东</div><div class="v">2,540</div><div class="s">关注</div></div>
+            <div class="region"><div class="n">天津</div><div class="v">2,180</div><div class="s">健康</div></div>
+            <div class="region"><div class="n">安徽</div><div class="v">1,920</div><div class="s">呆滞消化</div></div>
+            <div class="region"><div class="n">海上</div><div class="v">1,560</div><div class="s">共享仓强</div></div>
+            <div class="region"><div class="n">浙江</div><div class="v">1,130</div><div class="s">健康</div></div>
+            <div class="region"><div class="n">其他</div><div class="v">306</div><div class="s">—</div></div>
+            <div class="region"><div class="n">合计</div><div class="v">12,846</div><div class="s">件</div></div>
+          </div>
+        </div>
+        <div class="spanel">
+          <h3>供应网络 · 跨站可调拨</h3>
+          <div class="en">SUPPLY NETWORK</div>
+          <div class="bubbles">
+            <div class="bubble b1"><div class="bv">7.3%</div><div class="bk">跨区调拨率</div></div>
+            <div class="bubble b2"><div class="bv">28</div><div class="bk">当日匹配对</div></div>
+            <div class="bubble b3"><div class="bv">94%</div><div class="bk">有货率</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="spanel">
+        <h3>备件保障里程碑</h3>
+        <div class="en">MILESTONE TIMELINE</div>
+        <div class="milestone">
+          <div class="ms-track">
+            <div class="ms done"><div class="dot"></div><div class="ml">台账上线</div><div class="md">03-01</div></div>
+            <div class="ms done"><div class="dot"></div><div class="ml">SKU 清册</div><div class="md">03-28</div></div>
+            <div class="ms done"><div class="dot"></div><div class="ml">跨站可视</div><div class="md">05-12</div></div>
+            <div class="ms cur"><div class="dot"></div><div class="ml">有货率 94%</div><div class="md">07-14</div></div>
+            <div class="ms"><div class="dot"></div><div class="ml">周转 &lt;30天</div><div class="md">目标</div></div>
+            <div class="ms"><div class="dot"></div><div class="ml">呆滞清零</div><div class="md">目标</div></div>
+            <div class="ms"><div class="dot"></div><div class="ml">资金释放 5%</div><div class="md">目标</div></div>
+            <div class="ms"><div class="dot"></div><div class="ml">集团统仓</div><div class="md">规划</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+  (function () {
+    var ROWS = [
+      { period: "2026-07", company: "河北龙源风电有限公司", loc: "麒麟山风电场 / 备件仓A", code: "B00000005", name: "叶片", type: "叶片", model: "SW64-2.0", qty: 12, amount: 1080000, status: "正常", hint: '<span class="has">有货：麒麟山</span>' },
+      { period: "2026-07", company: "河北龙源风电有限公司", loc: "康保风电场 / 主仓", code: "B00000042", name: "叶片密封套", type: "叶片", model: "YM-TF-01", qty: 0, amount: 0, status: "零库存", hint: '<span class="need">缺货：康保</span> · 他站紧张' },
+      { period: "2026-07", company: "河北龙源风电有限公司", loc: "麒麟山风电场 / 电控区", code: "B00000018", name: "IGBT 模块", type: "电机 / 变流", model: "FF450R", qty: 2, amount: 372000, status: "低于安全库存", hint: '<span class="has">有货：射阳 11</span> · <span class="need">缺货：本站</span>' },
+      { period: "2026-07", company: "天津龙源电力有限公司", loc: "大神堂风电场 / 机械仓", code: "B00001234", name: "变桨轴承", type: "变桨", model: "BP-2.0MW", qty: 4, amount: 2720000, status: "正常", hint: '<span class="has">可外借：大神堂</span>' },
+      { period: "2026-07", company: "蒙东龙源新能源有限公司", loc: "齐心营风电场 / 主仓", code: "B00000016", name: "主轴轴承", type: "主轴", model: "BR-120", qty: 6, amount: 780000, status: "正常", hint: '<span class="has">有货：齐心营</span>' },
+      { period: "2026-07", company: "龙源（来安）新能源有限公司", loc: "来安风电场 / 备件区", code: "B00000057", name: "刹车片", type: "液压", model: "BK-200", qty: 24, amount: 19200, status: "呆滞", hint: '库龄 210 天 · 建议外借消化' },
+      { period: "2026-07", company: "龙源（来安）新能源有限公司", loc: "来安风电场 / 电控仓", code: "B00000031", name: "变桨电池组", type: "变桨", model: "BP-BAT-48V", qty: 18, amount: 216000, status: "正常", hint: '<span class="has">有货：来安</span>' },
+      { period: "2026-07", company: "海上龙源风力发电有限公司", loc: "射阳海上风电场 / 共享仓", code: "B00001235", name: "齿轮箱滤芯", type: "齿轮箱", model: "GX-LX-90", qty: 86, amount: 619200, status: "正常", hint: '<span class="has">共享仓充足，可外借</span>' },
+      { period: "2026-07", company: "河北龙源风电有限公司", loc: "麒麟山风电场 / 备件仓B", code: "B00002119", name: "偏航电机", type: "偏航", model: "PY-DJ-55", qty: 3, amount: 1560000, status: "正常", hint: '<span class="has">有货：麒麟山</span>' },
+      { period: "2026-07", company: "蒙东龙源新能源有限公司", loc: "齐心营风电场 / 电控柜", code: "B00001888", name: "变频器模块", type: "电机 / 变流", model: "VF-800", qty: 1, amount: 122500, status: "低于安全库存", hint: '<span class="has">有货：大神堂 5</span> · <span class="need">缺货：齐心营</span>' },
+      { period: "2026-07", company: "天津龙源电力有限公司", loc: "大神堂风电场 / 传感器柜", code: "B00001236", name: "塔筒振动传感器", type: "滤芯 / 传感器", model: "TS-300", qty: 15, amount: 3150000, status: "正常", hint: '<span class="has">有货：大神堂</span>' },
+      { period: "2026-07", company: "海上龙源风力发电有限公司", loc: "射阳海上风电场 / 共享仓", code: "B00000051", name: "逆变器风扇", type: "电机 / 变流", model: "INV-FAN-120", qty: 48, amount: 96000, status: "正常", hint: '<span class="has">可外借：射阳 48</span>' }
+    ];
+
+    var state = { org: "龙源电力", statusPill: "" };
+
+    function money(n) {
+      return n.toLocaleString("zh-CN");
+    }
+    function statusPill(s) {
+      if (s === "正常") return '<span class="pill ok">正常</span>';
+      if (s === "零库存") return '<span class="pill zero">零库存</span>';
+      if (s === "低于安全库存") return '<span class="pill low">低于安全库存</span>';
+      return '<span class="pill idle">呆滞</span>';
+    }
+    function toast(msg) {
+      var el = document.getElementById("toast");
+      el.textContent = msg;
+      el.classList.add("show");
+      clearTimeout(toast._t);
+      toast._t = setTimeout(function () { el.classList.remove("show"); }, 1800);
+    }
+    function matchOrg(r, org) {
+      if (!org || org === "龙源电力") return true;
+      var blob = r.company + r.loc;
+      return blob.indexOf(org) >= 0 ||
+        (org.indexOf("河北") >= 0 && blob.indexOf("河北") >= 0) ||
+        (org.indexOf("天津") >= 0 && blob.indexOf("天津") >= 0) ||
+        (org.indexOf("蒙东") >= 0 && blob.indexOf("蒙东") >= 0) ||
+        (org.indexOf("安徽") >= 0 && blob.indexOf("来安") >= 0) ||
+        (org.indexOf("海上") >= 0 && blob.indexOf("海上") >= 0) ||
+        (org.indexOf("麒麟山") >= 0 && blob.indexOf("麒麟山") >= 0) ||
+        (org.indexOf("康保") >= 0 && blob.indexOf("康保") >= 0) ||
+        (org.indexOf("大神堂") >= 0 && blob.indexOf("大神堂") >= 0) ||
+        (org.indexOf("齐心营") >= 0 && blob.indexOf("齐心营") >= 0) ||
+        (org.indexOf("来安") >= 0 && blob.indexOf("来安") >= 0) ||
+        (org.indexOf("射阳") >= 0 && blob.indexOf("射阳") >= 0);
+    }
+    function filtered() {
+      var kw = (document.getElementById("kw").value || "").trim();
+      var type = document.getElementById("typeSel").value;
+      var st = document.getElementById("statusSel").value || state.statusPill;
+      return ROWS.filter(function (r) {
+        if (!matchOrg(r, state.org)) return false;
+        if (type && r.type !== type) return false;
+        if (st && r.status !== st) return false;
+        if (kw) {
+          var blob = r.company + r.loc + r.code + r.name + r.type + r.model;
+          if (blob.indexOf(kw) < 0) return false;
+        }
+        return true;
+      });
+    }
+    function renderTable() {
+      var rows = filtered();
+      document.getElementById("rowCount").textContent = String(rows.length);
+      document.getElementById("pageMeta").textContent = "共 " + rows.length + " 条";
+      var html = "";
+      rows.forEach(function (r, i) {
+        html += "<tr>" +
+          "<td>" + (i + 1) + "</td>" +
+          "<td>" + r.period + "</td>" +
+          "<td>" + r.company + "</td>" +
+          "<td>" + r.loc + "</td>" +
+          '<td class="code">' + r.code + "</td>" +
+          "<td>" + r.name + "</td>" +
+          "<td>" + r.type + "</td>" +
+          "<td>" + r.model + "</td>" +
+          '<td class="num">' + r.qty + "</td>" +
+          '<td class="num">' + money(r.amount) + "</td>" +
+          "<td>" + statusPill(r.status) + "</td>" +
+          '<td class="hint-cell">' + r.hint + "</td>" +
+          '<td class="op"><a href="#" data-act="borrow">借用</a><a href="#" data-act="flow">流水</a></td>' +
+          "</tr>";
+      });
+      document.getElementById("tbody").innerHTML = html || '<tr><td colspan="13" style="text-align:center;color:#94a3b8;padding:28px">无匹配台账</td></tr>';
+    }
+
+    /* 视图切换：浅色 / 深色大屏 */
+    function setMode(mode) {
+      document.body.classList.toggle("screen-mode", mode === "screen");
+      document.getElementById("btnLight").classList.toggle("on", mode === "light");
+      document.getElementById("btnScreen").classList.toggle("on", mode === "screen");
+    }
+    document.getElementById("btnLight").addEventListener("click", function () { setMode("light"); });
+    document.getElementById("btnScreen").addEventListener("click", function () { setMode("screen"); });
+
+    /* 组织树 */
+    document.getElementById("orgTree").addEventListener("click", function (e) {
+      var n = e.target.closest(".onode");
+      if (!n) return;
+      document.querySelectorAll(".onode").forEach(function (x) { x.classList.remove("active"); });
+      n.classList.add("active");
+      state.org = n.getAttribute("data-org") || "龙源电力";
+      document.getElementById("orgLabel").textContent = state.org === "龙源电力" ? "龙源电力（全部）" : state.org;
+      renderTable();
+      toast("已切换组织范围：" + state.org);
+    });
+    document.getElementById("orgKw").addEventListener("input", function () {
+      var q = (this.value || "").trim();
+      document.querySelectorAll(".onode").forEach(function (n) {
+        var t = n.textContent || "";
+        n.style.display = !q || t.indexOf(q) >= 0 ? "" : "none";
+      });
+    });
+
+    /* 主 Tab / 侧栏联动 */
+    function showPanel(name) {
+      document.querySelectorAll(".tab-panel").forEach(function (p) { p.classList.remove("on"); });
+      document.querySelectorAll(".main-tabs button").forEach(function (b) {
+        b.classList.toggle("on", b.getAttribute("data-panel") === name);
+      });
+      document.querySelectorAll(".side-nav .item").forEach(function (b) {
+        b.classList.toggle("on", b.getAttribute("data-tab") === name);
+      });
+      var panel = document.getElementById("panel-" + name);
+      if (panel) panel.classList.add("on");
+    }
+    document.querySelectorAll(".main-tabs button").forEach(function (b) {
+      b.addEventListener("click", function () { showPanel(b.getAttribute("data-panel")); });
+    });
+    document.querySelectorAll(".side-nav .item").forEach(function (b) {
+      b.addEventListener("click", function () { showPanel(b.getAttribute("data-tab")); });
+    });
+
+    /* 状态 pill */
+    document.getElementById("statusPills").addEventListener("click", function (e) {
+      var btn = e.target.closest("button");
+      if (!btn) return;
+      document.querySelectorAll("#statusPills button").forEach(function (x) { x.classList.remove("on"); });
+      btn.classList.add("on");
+      state.statusPill = btn.getAttribute("data-st") || "";
+      document.getElementById("statusSel").value = state.statusPill;
+      renderTable();
+    });
+
+    document.getElementById("btnQuery").addEventListener("click", function () {
+      state.statusPill = document.getElementById("statusSel").value;
+      document.querySelectorAll("#statusPills button").forEach(function (x) {
+        x.classList.toggle("on", (x.getAttribute("data-st") || "") === state.statusPill);
+      });
+      renderTable();
+      toast("已按当前筛选刷新台账");
+    });
+    document.getElementById("btnQueryTop").addEventListener("click", function () {
+      showPanel("ledger");
+      renderTable();
+      toast("已进入台账并刷新");
+    });
+    document.getElementById("btnReset").addEventListener("click", function () {
+      document.getElementById("kw").value = "";
+      document.getElementById("typeSel").value = "";
+      document.getElementById("statusSel").value = "";
+      state.statusPill = "";
+      document.querySelectorAll("#statusPills button").forEach(function (x) {
+        x.classList.toggle("on", (x.getAttribute("data-st") || "") === "");
+      });
+      renderTable();
+      toast("已重置筛选");
+    });
+
+    ["btnImport", "btnImport2"].forEach(function (id) {
+      document.getElementById(id).addEventListener("click", function () { toast("演示：打开导入生产备件台账"); });
+    });
+    ["btnExport", "btnExport2"].forEach(function (id) {
+      document.getElementById(id).addEventListener("click", function () { toast("演示：导出当前范围台账 Excel"); });
+    });
+    document.getElementById("btnWarn").addEventListener("click", function () {
+      showPanel("ledger");
+      document.getElementById("statusSel").value = "低于安全库存";
+      state.statusPill = "低于安全库存";
+      document.querySelectorAll("#statusPills button").forEach(function (x) {
+        x.classList.toggle("on", x.getAttribute("data-st") === "低于安全库存");
+      });
+      renderTable();
+      toast("已筛选低库存预警明细");
+    });
+
+    document.getElementById("tbody").addEventListener("click", function (e) {
+      var a = e.target.closest("a");
+      if (!a) return;
+      e.preventDefault();
+      var act = a.getAttribute("data-act");
+      toast(act === "borrow" ? "演示：打开跨公司借用申请" : "演示：查看出入库流水");
+    });
+
+    renderTable();
+  })();
+  </script>
+</body>
+</html>

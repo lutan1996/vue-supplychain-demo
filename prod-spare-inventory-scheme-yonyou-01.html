@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>方案用友 · 生产物资库存管理（正式台账）</title>
+  <style>
+    :root {
+      --yy-blue: #e60012;
+      --primary: #1890ff;
+      --primary-dark: #096dd9;
+      --primary-soft: #e6f7ff;
+      --yy-navy: #003a8c;
+      --border: #e8e8e8;
+      --text: #262626;
+      --muted: #8c8c8c;
+      --bg: #f0f2f5;
+      --warn: #fa8c16;
+      --danger: #f5222d;
+      --ok: #52c41a;
+      --link: #1890ff;
+      --surface: #ffffff;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", "Helvetica Neue", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      font-size: 13px;
+      min-height: 100vh;
+    }
+    .scheme-banner {
+      background: linear-gradient(90deg, #003a8c, #096dd9 50%, #1890ff);
+      color: #fff;
+      padding: 12px 20px;
+      border-bottom: 3px solid #0050b3;
+    }
+    .scheme-banner .row1 {
+      display: flex;
+      align-items: baseline;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 6px;
+    }
+    .scheme-banner .tag {
+      background: rgba(255,255,255,.22);
+      padding: 2px 10px;
+      border-radius: 3px;
+      font-weight: 700;
+      font-size: 14px;
+    }
+    .scheme-banner .desc { font-size: 13px; opacity: .95; }
+    .scheme-banner .meta {
+      font-size: 12px;
+      line-height: 1.7;
+      opacity: .92;
+    }
+    .scheme-banner .meta a { color: #ffe58f; }
+    .scheme-banner .checks {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 8px;
+    }
+    .scheme-banner .checks span {
+      background: rgba(0,0,0,.2);
+      border: 1px solid rgba(255,255,255,.28);
+      padding: 1px 8px;
+      border-radius: 10px;
+      font-size: 11px;
+    }
+    .app-header {
+      height: 48px;
+      background: #fff;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 20px;
+    }
+    .app-header .brand { font-weight: 600; font-size: 14px; color: var(--yy-navy); }
+    .app-header .brand em {
+      font-style: normal;
+      color: var(--primary);
+      margin-left: 8px;
+      font-weight: 500;
+    }
+    .app-header .right { color: var(--muted); font-size: 12px; display: flex; gap: 16px; align-items: center; }
+    .app-header .avatar {
+      width: 28px; height: 28px; border-radius: 50%;
+      background: var(--primary-soft); color: var(--primary);
+      display: inline-flex; align-items: center; justify-content: center;
+      font-weight: 600; font-size: 12px;
+    }
+    .cap-tabs {
+      display: flex;
+      gap: 0;
+      background: #fff;
+      border-bottom: 1px solid var(--border);
+      padding: 0 16px;
+    }
+    .cap-tabs button {
+      border: none;
+      background: transparent;
+      padding: 10px 16px;
+      font-size: 13px;
+      color: #595959;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -1px;
+    }
+    .cap-tabs button.active {
+      color: var(--primary);
+      font-weight: 600;
+      border-bottom-color: var(--primary);
+    }
+    .layout {
+      display: flex;
+      height: calc(100vh - 48px - 92px - 40px);
+      min-height: 620px;
+    }
+    .org-tree {
+      width: 228px;
+      flex-shrink: 0;
+      background: #fff;
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+    }
+    .org-tree-hd {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border);
+      font-weight: 600;
+      color: var(--yy-navy);
+    }
+    .org-tree-hd input {
+      width: 100%;
+      margin-top: 8px;
+      height: 28px;
+      border: 1px solid #d9d9d9;
+      border-radius: 2px;
+      padding: 0 8px;
+      font-size: 12px;
+    }
+    .org-tree-body { flex: 1; overflow: auto; padding: 8px 6px; }
+    .tree-node {
+      padding: 6px 8px;
+      border-radius: 2px;
+      cursor: pointer;
+      line-height: 1.4;
+      user-select: none;
+    }
+    .tree-node:hover { background: var(--primary-soft); }
+    .tree-node.is-active { background: var(--primary-soft); color: var(--primary-dark); font-weight: 600; }
+    .tree-node .indent-1 { padding-left: 16px; display: block; }
+    .tree-node .indent-2 { padding-left: 32px; display: block; }
+    .tree-node .cnt { color: var(--muted); font-weight: 400; font-size: 12px; margin-left: 4px; }
+    .main {
+      flex: 1;
+      min-width: 0;
+      overflow: auto;
+      padding: 12px 14px 18px;
+    }
+    .side-panel {
+      width: 268px;
+      flex-shrink: 0;
+      background: #fff;
+      border-left: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .side-panel .hd {
+      padding: 10px 12px;
+      font-weight: 600;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: var(--yy-navy);
+    }
+    .side-panel .hd .badge {
+      background: var(--danger);
+      color: #fff;
+      font-size: 11px;
+      padding: 0 6px;
+      border-radius: 10px;
+      font-weight: 500;
+    }
+    .side-body { flex: 1; overflow: auto; padding: 10px; }
+    .alert-card {
+      border: 1px solid #ffa39e;
+      background: #fff1f0;
+      border-radius: 2px;
+      padding: 10px;
+      margin-bottom: 8px;
+    }
+    .alert-card.warn {
+      border-color: #ffd591;
+      background: #fff7e6;
+    }
+    .alert-card .t { font-weight: 600; margin-bottom: 4px; font-size: 12px; }
+    .alert-card .d { color: #595959; font-size: 12px; line-height: 1.5; margin-bottom: 8px; }
+    .alert-card .acts { display: flex; gap: 6px; }
+    .alert-card button {
+      border: 1px solid #91d5ff;
+      background: #fff;
+      color: var(--primary);
+      font-size: 12px;
+      padding: 3px 8px;
+      border-radius: 2px;
+      cursor: pointer;
+    }
+    .alert-card.warn button { border-color: #ffd591; color: var(--warn); }
+    .page-title {
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--yy-navy);
+    }
+    .page-title .crumb { font-size: 12px; color: var(--muted); font-weight: 400; }
+    .tip {
+      background: #e6f7ff;
+      border: 1px solid #91d5ff;
+      color: #0050b3;
+      border-radius: 2px;
+      padding: 8px 10px;
+      font-size: 12px;
+      margin-bottom: 10px;
+      line-height: 1.6;
+    }
+    .kpis {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+    .kpi {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 2px;
+      padding: 10px 12px;
+      position: relative;
+      overflow: hidden;
+    }
+    .kpi::before {
+      content: "";
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 3px;
+      background: var(--primary);
+    }
+    .kpi .k { color: var(--muted); font-size: 12px; }
+    .kpi .v { font-size: 22px; font-weight: 700; margin: 4px 0 2px; letter-spacing: -.5px; color: var(--yy-navy); }
+    .kpi .v.warn { color: var(--warn); }
+    .kpi .v.danger { color: var(--danger); }
+    .kpi .sub { color: var(--muted); font-size: 11px; }
+    .filters {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 2px;
+      padding: 10px 12px;
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+    .filters label { display: block; color: var(--muted); font-size: 12px; margin-bottom: 4px; }
+    .filters input, .filters select {
+      width: 100%;
+      height: 28px;
+      border: 1px solid #d9d9d9;
+      border-radius: 2px;
+      padding: 0 8px;
+      font-size: 12px;
+    }
+    .toolbar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+      flex-wrap: wrap;
+    }
+    .btn {
+      height: 30px;
+      padding: 0 12px;
+      border: 1px solid #d9d9d9;
+      background: #fff;
+      border-radius: 2px;
+      cursor: pointer;
+      font-size: 13px;
+      color: #595959;
+    }
+    .btn:hover { border-color: var(--primary); color: var(--primary); }
+    .btn.pri { background: var(--primary); color: #fff; border-color: var(--primary); }
+    .btn.pri:hover { background: var(--primary-dark); color: #fff; }
+    .btn.ok { color: var(--ok); border-color: #b7eb8f; background: #f6ffed; }
+    .btn.ghost { color: var(--primary); border-color: #91d5ff; }
+    .table-card {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+    table { width: 100%; border-collapse: collapse; }
+    th, td {
+      padding: 8px 10px;
+      border-bottom: 1px solid #f0f0f0;
+      text-align: left;
+      white-space: nowrap;
+      font-size: 12px;
+    }
+    th { background: #fafafa; color: #595959; font-weight: 600; border-bottom: 1px solid #e8e8e8; }
+    td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+    tr:hover td { background: #f5faff; }
+    .status {
+      display: inline-block;
+      padding: 1px 6px;
+      border-radius: 2px;
+      font-size: 11px;
+    }
+    .status-ok { background: #f6ffed; color: #389e0d; border: 1px solid #b7eb8f; }
+    .status-low { background: #fff7e6; color: #d48806; border: 1px solid #ffd591; }
+    .status-zero { background: #fff1f0; color: #cf1322; border: 1px solid #ffa39e; }
+    .status-idle { background: #f5f5f5; color: #8c8c8c; border: 1px solid #d9d9d9; }
+    .op a { color: var(--link); margin-right: 8px; text-decoration: none; }
+    .op a:hover { text-decoration: underline; }
+    .pagination {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 12px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+    .page-btns button {
+      min-width: 28px;
+      height: 28px;
+      border: 1px solid #d9d9d9;
+      background: #fff;
+      margin-left: 4px;
+      border-radius: 2px;
+      cursor: pointer;
+    }
+    .page-btns .cur { border-color: var(--primary); color: var(--primary); }
+    .toast {
+      position: fixed; right: 20px; bottom: 20px;
+      background: #fff; border: 1px solid #91d5ff;
+      box-shadow: 0 4px 12px rgba(0,0,0,.12);
+      padding: 10px 14px; border-radius: 2px;
+      display: none; z-index: 99; color: #0050b3; font-size: 13px;
+    }
+    .toast.show { display: block; }
+    @media (max-width: 1200px) {
+      .kpis { grid-template-columns: repeat(3, 1fr); }
+      .filters { grid-template-columns: repeat(3, 1fr); }
+      .side-panel { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="scheme-banner">
+    <div class="row1">
+      <span class="tag">方案 · 用友</span>
+      <span class="desc">生产物资库存管理 · 正式台账风格（组织树 + KPI + 筛选表 + 导入导出 + 预警）</span>
+    </div>
+    <div class="meta">
+      视觉参考：<a href="https://www.yonyou.com/" target="_blank" rel="noopener">https://www.yonyou.com/</a>
+      · 截图来源：项目内 <code>.tmp-url-screenshots/10-yonyou-trial.png</code>
+      · 桌面副本：<code>~/Desktop/用友-参考页.png</code>
+    </div>
+    <div class="checks">
+      <span>✓ 左组织树</span>
+      <span>✓ KPI 指标卡</span>
+      <span>✓ 多条件筛选表</span>
+      <span>✓ 导入 / 导出</span>
+      <span>✓ 库存预警</span>
+      <span>✓ 用友蓝正式台账</span>
+    </div>
+  </div>
+
+  <header class="app-header">
+    <div class="brand">YonBIP 供应链 <em>生产物资库存台账</em></div>
+    <div class="right">
+      <span>账套：演示制造集团</span>
+      <span>期间：2026-07</span>
+      <span class="avatar">管</span>
+    </div>
+  </header>
+
+  <nav class="cap-tabs">
+    <button type="button" class="active">库存台账</button>
+    <button type="button">收发存汇总</button>
+    <button type="button">安全库存</button>
+    <button type="button">出入库单</button>
+    <button type="button">盘点任务</button>
+  </nav>
+
+  <div class="layout">
+    <aside class="org-tree">
+      <div class="org-tree-hd">
+        组织 / 仓库
+        <input type="search" placeholder="搜索组织、仓库…" id="orgSearch" />
+      </div>
+      <div class="org-tree-body" id="orgTree">
+        <div class="tree-node is-active" data-name="全部组织">▼ 演示制造集团 <span class="cnt">(6)</span></div>
+        <div class="tree-node" data-name="华东制造"><span class="indent-1">▶ 华东制造事业部 <span class="cnt">(3)</span></span></div>
+        <div class="tree-node" data-name="上海总仓"><span class="indent-2">上海总仓</span></div>
+        <div class="tree-node" data-name="苏州线边仓"><span class="indent-2">苏州线边仓</span></div>
+        <div class="tree-node" data-name="昆山备件库"><span class="indent-2">昆山备件库</span></div>
+        <div class="tree-node" data-name="华北制造"><span class="indent-1">▶ 华北制造事业部 <span class="cnt">(2)</span></span></div>
+        <div class="tree-node" data-name="天津中心仓"><span class="indent-2">天津中心仓</span></div>
+        <div class="tree-node" data-name="北京维修仓"><span class="indent-2">北京维修仓</span></div>
+        <div class="tree-node" data-name="西南制造"><span class="indent-1">▶ 西南制造事业部 <span class="cnt">(1)</span></span></div>
+        <div class="tree-node" data-name="成都区域仓"><span class="indent-2">成都区域仓</span></div>
+      </div>
+    </aside>
+
+    <main class="main">
+      <div class="page-title">
+        生产物资库存台账
+        <span class="crumb" id="crumb">当前位置：演示制造集团 / 全部仓库</span>
+      </div>
+      <div class="tip">
+        正式台账模式：以组织+仓库维度汇总现存量、可用量、在途与锁定；支持安全库存阈值比对与批量导入导出。风格对齐用友 YonBIP 管理端（蓝主色、直角卡片、表格台账）。
+      </div>
+
+      <div class="kpis">
+        <div class="kpi"><div class="k">SKU 数</div><div class="v">1,286</div><div class="sub">较上月 +42</div></div>
+        <div class="kpi"><div class="k">账面库存金额</div><div class="v">¥ 8,642 万</div><div class="sub">含税成本</div></div>
+        <div class="kpi"><div class="k">低于安全库存</div><div class="v warn">37</div><div class="sub">需补货</div></div>
+        <div class="kpi"><div class="k">零库存 / 断料</div><div class="v danger">9</div><div class="sub">影响在制工单</div></div>
+        <div class="kpi"><div class="k">呆滞 >90 天</div><div class="v warn">58</div><div class="sub">建议处置</div></div>
+      </div>
+
+      <div class="filters">
+        <div>
+          <label>物料编码 / 名称</label>
+          <input type="text" id="qMat" placeholder="编码 / 名称关键字" />
+        </div>
+        <div>
+          <label>物料分类</label>
+          <select id="qCat">
+            <option value="">全部</option>
+            <option>原材料</option>
+            <option>半成品</option>
+            <option>产成品</option>
+            <option>备品备件</option>
+            <option>辅料耗材</option>
+          </select>
+        </div>
+        <div>
+          <label>仓库</label>
+          <select id="qWh">
+            <option value="">当前组织全部</option>
+            <option>上海总仓</option>
+            <option>苏州线边仓</option>
+            <option>昆山备件库</option>
+            <option>天津中心仓</option>
+          </select>
+        </div>
+        <div>
+          <label>库存状态</label>
+          <select id="qSt">
+            <option value="">全部</option>
+            <option>正常</option>
+            <option>低库存</option>
+            <option>零库存</option>
+            <option>呆滞</option>
+          </select>
+        </div>
+        <div>
+          <label>批次 / 序列号</label>
+          <input type="text" id="qLot" placeholder="批次号" />
+        </div>
+        <div>
+          <label>更新日期</label>
+          <input type="date" id="qDate" value="2026-07-13" />
+        </div>
+      </div>
+
+      <div class="toolbar">
+        <button type="button" class="btn pri" id="btnQuery">查询</button>
+        <button type="button" class="btn" id="btnReset">重置</button>
+        <button type="button" class="btn ghost" id="btnImport">导入台账</button>
+        <button type="button" class="btn ghost" id="btnExport">导出 Excel</button>
+        <button type="button" class="btn ok" id="btnAlert">生成补货建议</button>
+        <span style="margin-left:auto;color:#8c8c8c;font-size:12px;">共 <b id="rowCount">8</b> 条 · 勾选后可批量调拨</span>
+      </div>
+
+      <div class="table-card">
+        <table>
+          <thead>
+            <tr>
+              <th style="width:36px"><input type="checkbox" id="chkAll" /></th>
+              <th>物料编码</th>
+              <th>物料名称</th>
+              <th>规格型号</th>
+              <th>仓库</th>
+              <th>单位</th>
+              <th class="num">现存量</th>
+              <th class="num">可用量</th>
+              <th class="num">安全库存</th>
+              <th class="num">在途</th>
+              <th>状态</th>
+              <th>最近异动</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody id="tbody">
+            <tr>
+              <td><input type="checkbox" /></td>
+              <td>RM-AL-6061</td>
+              <td>铝合金型材</td>
+              <td>6061-T6 Φ40</td>
+              <td>上海总仓</td>
+              <td>kg</td>
+              <td class="num">12,480</td>
+              <td class="num">11,920</td>
+              <td class="num">8,000</td>
+              <td class="num">2,000</td>
+              <td><span class="status status-ok">正常</span></td>
+              <td>2026-07-12</td>
+              <td class="op"><a href="#">详情</a><a href="#">流水</a></td>
+            </tr>
+            <tr>
+              <td><input type="checkbox" /></td>
+              <td>SP-BNG-220</td>
+              <td>轴承座组件</td>
+              <td>BNG-220A</td>
+              <td>昆山备件库</td>
+              <td>套</td>
+              <td class="num">18</td>
+              <td class="num">12</td>
+              <td class="num">40</td>
+              <td class="num">20</td>
+              <td><span class="status status-low">低库存</span></td>
+              <td>2026-07-11</td>
+              <td class="op"><a href="#">详情</a><a href="#">补货</a></td>
+            </tr>
+            <tr>
+              <td><input type="checkbox" /></td>
+              <td>RM-STL-Q235</td>
+              <td>冷轧钢板</td>
+              <td>Q235 1.2×1220</td>
+              <td>苏州线边仓</td>
+              <td>张</td>
+              <td class="num">0</td>
+              <td class="num">0</td>
+              <td class="num">120</td>
+              <td class="num">80</td>
+              <td><span class="status status-zero">零库存</span></td>
+              <td>2026-07-10</td>
+              <td class="op"><a href="#">详情</a><a href="#">紧急采购</a></td>
+            </tr>
+            <tr>
+              <td><input type="checkbox" /></td>
+              <td>FG-DRV-V3</td>
+              <td>驱动总成</td>
+              <td>DRV-V3.2</td>
+              <td>上海总仓</td>
+              <td>台</td>
+              <td class="num">326</td>
+              <td class="num">298</td>
+              <td class="num">150</td>
+              <td class="num">40</td>
+              <td><span class="status status-ok">正常</span></td>
+              <td>2026-07-13</td>
+              <td class="op"><a href="#">详情</a><a href="#">流水</a></td>
+            </tr>
+            <tr>
+              <td><input type="checkbox" /></td>
+              <td>AUX-OIL-46</td>
+              <td>液压油</td>
+              <td>L-HM46</td>
+              <td>天津中心仓</td>
+              <td>桶</td>
+              <td class="num">86</td>
+              <td class="num">86</td>
+              <td class="num">50</td>
+              <td class="num">0</td>
+              <td><span class="status status-idle">呆滞</span></td>
+              <td>2026-03-02</td>
+              <td class="op"><a href="#">详情</a><a href="#">处置</a></td>
+            </tr>
+            <tr>
+              <td><input type="checkbox" /></td>
+              <td>SP-SEAL-OR</td>
+              <td>密封圈套件</td>
+              <td>OR-Φ28×3.5</td>
+              <td>北京维修仓</td>
+              <td>盒</td>
+              <td class="num">24</td>
+              <td class="num">20</td>
+              <td class="num">60</td>
+              <td class="num">0</td>
+              <td><span class="status status-low">低库存</span></td>
+              <td>2026-07-09</td>
+              <td class="op"><a href="#">详情</a><a href="#">补货</a></td>
+            </tr>
+            <tr>
+              <td><input type="checkbox" /></td>
+              <td>SF-PCB-MAIN</td>
+              <td>主控板半成品</td>
+              <td>PCB-M4 Rev.B</td>
+              <td>苏州线边仓</td>
+              <td>块</td>
+              <td class="num">540</td>
+              <td class="num">480</td>
+              <td class="num">300</td>
+              <td class="num">100</td>
+              <td><span class="status status-ok">正常</span></td>
+              <td>2026-07-12</td>
+              <td class="op"><a href="#">详情</a><a href="#">流水</a></td>
+            </tr>
+            <tr>
+              <td><input type="checkbox" /></td>
+              <td>SP-MOT-750</td>
+              <td>伺服电机</td>
+              <td>750W 绝对式</td>
+              <td>成都区域仓</td>
+              <td>台</td>
+              <td class="num">3</td>
+              <td class="num">1</td>
+              <td class="num">10</td>
+              <td class="num">5</td>
+              <td><span class="status status-low">低库存</span></td>
+              <td>2026-07-08</td>
+              <td class="op"><a href="#">详情</a><a href="#">补货</a></td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="pagination">
+          <span>显示 1–8 / 共 1,286 条</span>
+          <div class="page-btns">
+            <button type="button">‹</button>
+            <button type="button" class="cur">1</button>
+            <button type="button">2</button>
+            <button type="button">3</button>
+            <button type="button">›</button>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <aside class="side-panel">
+      <div class="hd">库存预警 <span class="badge">6</span></div>
+      <div class="side-body">
+        <div class="alert-card">
+          <div class="t">断料 · RM-STL-Q235</div>
+          <div class="d">苏州线边仓现存量 0，影响工单 WO-260713-08 / 09。建议紧急采购 120 张。</div>
+          <div class="acts"><button type="button">生成请购</button><button type="button">忽略</button></div>
+        </div>
+        <div class="alert-card warn">
+          <div class="t">低库存 · SP-BNG-220</div>
+          <div class="d">昆山备件库可用量 12 &lt; 安全库存 40，在途 20，缺口 8。</div>
+          <div class="acts"><button type="button">补货建议</button><button type="button">调拨</button></div>
+        </div>
+        <div class="alert-card warn">
+          <div class="t">低库存 · SP-SEAL-OR</div>
+          <div class="d">北京维修仓可用量 20 &lt; 安全库存 60，无在途。</div>
+          <div class="acts"><button type="button">补货建议</button></div>
+        </div>
+        <div class="alert-card warn">
+          <div class="t">呆滞 · AUX-OIL-46</div>
+          <div class="d">天津中心仓超过 90 天无出库，账面 86 桶，建议调拨或处置。</div>
+          <div class="acts"><button type="button">发起处置</button></div>
+        </div>
+        <div class="alert-card">
+          <div class="t">低库存 · SP-MOT-750</div>
+          <div class="d">成都区域仓可用量 1，安全库存 10，在途 5。</div>
+          <div class="acts"><button type="button">催在途</button><button type="button">补货</button></div>
+        </div>
+        <div class="alert-card warn">
+          <div class="t">批次临期提醒</div>
+          <div class="d">辅料耗材有 4 个批次将于 30 日内到期，请核查质检状态。</div>
+          <div class="acts"><button type="button">查看批次</button></div>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    (function () {
+      var toast = document.getElementById('toast');
+      function show(msg) {
+        toast.textContent = msg;
+        toast.classList.add('show');
+        clearTimeout(show._t);
+        show._t = setTimeout(function () { toast.classList.remove('show'); }, 1800);
+      }
+
+      document.querySelectorAll('.cap-tabs button').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          document.querySelectorAll('.cap-tabs button').forEach(function (b) { b.classList.remove('active'); });
+          btn.classList.add('active');
+          show('已切换：' + btn.textContent);
+        });
+      });
+
+      var crumb = document.getElementById('crumb');
+      document.querySelectorAll('.tree-node').forEach(function (node) {
+        node.addEventListener('click', function () {
+          document.querySelectorAll('.tree-node').forEach(function (n) { n.classList.remove('is-active'); });
+          node.classList.add('is-active');
+          var name = node.getAttribute('data-name') || node.textContent.trim();
+          crumb.textContent = '当前位置：' + name;
+          show('已切换组织 / 仓库：' + name);
+        });
+      });
+
+      document.getElementById('orgSearch').addEventListener('input', function (e) {
+        var q = e.target.value.trim().toLowerCase();
+        document.querySelectorAll('.tree-node').forEach(function (n) {
+          var t = (n.getAttribute('data-name') || n.textContent).toLowerCase();
+          n.style.display = !q || t.indexOf(q) >= 0 ? '' : 'none';
+        });
+      });
+
+      document.getElementById('chkAll').addEventListener('change', function (e) {
+        document.querySelectorAll('#tbody input[type=checkbox]').forEach(function (c) {
+          c.checked = e.target.checked;
+        });
+      });
+
+      document.getElementById('btnQuery').addEventListener('click', function () {
+        show('已按条件查询台账（演示）');
+      });
+      document.getElementById('btnReset').addEventListener('click', function () {
+        document.getElementById('qMat').value = '';
+        document.getElementById('qCat').value = '';
+        document.getElementById('qWh').value = '';
+        document.getElementById('qSt').value = '';
+        document.getElementById('qLot').value = '';
+        show('筛选条件已重置');
+      });
+      document.getElementById('btnImport').addEventListener('click', function () {
+        show('打开导入向导：支持 Excel / CSV 台账导入（演示）');
+      });
+      document.getElementById('btnExport').addEventListener('click', function () {
+        show('正在导出当前筛选结果为 Excel（演示）');
+      });
+      document.getElementById('btnAlert').addEventListener('click', function () {
+        show('已根据安全库存缺口生成补货建议单（演示）');
+      });
+
+      document.querySelectorAll('.side-body button').forEach(function (b) {
+        b.addEventListener('click', function () { show('预警动作：' + b.textContent); });
+      });
+    })();
+  </script>
+</body>
+</html>

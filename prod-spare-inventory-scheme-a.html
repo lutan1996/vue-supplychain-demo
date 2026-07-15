@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>方案A · 生产物资库存管理（管控台账强化型）</title>
+  <style>
+    :root {
+      --primary: #1677ff;
+      --primary-soft: #e6f4ff;
+      --border: #e8edf4;
+      --text: #1f3551;
+      --muted: #8b9ab0;
+      --bg: #f0f3f8;
+      --warn: #d46b08;
+      --danger: #cf1322;
+      --ok: #389e0d;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      font-size: 13px;
+      min-height: 100vh;
+    }
+    .scheme-banner {
+      background: linear-gradient(90deg, #0b3d91, #1677ff);
+      color: #fff;
+      padding: 10px 20px;
+      display: flex;
+      align-items: baseline;
+      gap: 14px;
+      border-bottom: 3px solid #0958d9;
+    }
+    .scheme-banner .tag {
+      background: rgba(255,255,255,.2);
+      padding: 2px 10px;
+      border-radius: 3px;
+      font-weight: 700;
+      font-size: 14px;
+      letter-spacing: .5px;
+    }
+    .scheme-banner .desc { font-size: 13px; opacity: .92; }
+    .app-header {
+      height: 48px;
+      background: #fff;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 20px;
+    }
+    .app-header .brand { font-weight: 600; color: var(--text); font-size: 14px; }
+    .app-header .brand span { color: var(--primary); margin-left: 8px; font-weight: 500; }
+    .layout {
+      display: flex;
+      height: calc(100vh - 48px - 44px);
+      min-height: 640px;
+    }
+    .org-tree {
+      width: 240px;
+      flex-shrink: 0;
+      background: #fff;
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+    }
+    .org-tree-hd {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border);
+      font-weight: 600;
+      font-size: 13px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .org-tree-hd input {
+      width: 100%;
+      margin-top: 8px;
+      height: 28px;
+      border: 1px solid #d9e0ea;
+      border-radius: 4px;
+      padding: 0 8px;
+      font-size: 12px;
+    }
+    .org-tree-body { flex: 1; overflow: auto; padding: 8px 6px; }
+    .tree-node {
+      padding: 6px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      color: #334155;
+      line-height: 1.4;
+      user-select: none;
+    }
+    .tree-node:hover { background: #f0f5ff; }
+    .tree-node.is-active { background: var(--primary-soft); color: var(--primary); font-weight: 600; }
+    .tree-node .indent-1 { padding-left: 16px; display: block; }
+    .tree-node .indent-2 { padding-left: 32px; display: block; }
+    .tree-node .cnt { color: var(--muted); font-weight: 400; font-size: 12px; margin-left: 4px; }
+    .main {
+      flex: 1;
+      min-width: 0;
+      overflow: auto;
+      padding: 12px 16px 20px;
+    }
+    .page-title {
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .page-title .crumb { font-size: 12px; color: var(--muted); font-weight: 400; }
+    .kpis {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+    .kpi {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 10px 12px;
+      min-height: 68px;
+    }
+    .kpi .k { font-size: 12px; color: var(--muted); margin-bottom: 6px; }
+    .kpi .v { font-size: 22px; font-weight: 700; color: var(--primary); line-height: 1.1; }
+    .kpi .v.warn { color: var(--warn); }
+    .kpi .v.danger { color: var(--danger); }
+    .kpi .sub { font-size: 11px; color: var(--muted); margin-top: 4px; }
+    .filters {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 10px 12px;
+      margin-bottom: 8px;
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      gap: 8px;
+    }
+    .filters label { display: block; font-size: 12px; color: #5b6b7f; margin-bottom: 4px; }
+    .filters input, .filters select {
+      width: 100%;
+      height: 28px;
+      border: 1px solid #d9e0ea;
+      border-radius: 4px;
+      padding: 0 8px;
+      font-size: 12px;
+      color: #334155;
+      background: #fff;
+    }
+    .toolbar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+    .btn {
+      height: 28px;
+      border: 1px solid #d9e0ea;
+      border-radius: 4px;
+      background: #fff;
+      color: #334155;
+      font-size: 12px;
+      padding: 0 12px;
+      cursor: pointer;
+    }
+    .btn:hover { border-color: var(--primary); color: var(--primary); }
+    .btn.pri { background: var(--primary); border-color: var(--primary); color: #fff; }
+    .btn.pri:hover { background: #0958d9; color: #fff; }
+    .btn.ok { background: #52c41a; border-color: #52c41a; color: #fff; }
+    .btn.ghost-blue { color: var(--primary); border-color: #91caff; background: #f0f7ff; }
+    .table-card {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+    }
+    thead th {
+      background: #f5f7fa;
+      border-bottom: 1px solid var(--border);
+      padding: 8px 10px;
+      text-align: left;
+      font-weight: 600;
+      color: #334155;
+      white-space: nowrap;
+    }
+    tbody td {
+      border-bottom: 1px solid #f0f3f8;
+      padding: 7px 10px;
+      color: #334155;
+      white-space: nowrap;
+    }
+    tbody tr:hover { background: #fafcff; }
+    .num { font-variant-numeric: tabular-nums; text-align: right; }
+    .status {
+      display: inline-block;
+      padding: 1px 6px;
+      border-radius: 2px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+    .status-ok { background: #f6ffed; color: var(--ok); border: 1px solid #b7eb8f; }
+    .status-low { background: #fff7e6; color: var(--warn); border: 1px solid #ffd591; }
+    .status-idle { background: #fff1f0; color: var(--danger); border: 1px solid #ffa39e; }
+    .status-zero { background: #f5f5f5; color: #8c8c8c; border: 1px solid #d9d9d9; }
+    .op a { color: var(--primary); text-decoration: none; margin-right: 8px; }
+    .op a:hover { text-decoration: underline; }
+    .pagination {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 12px;
+      border-top: 1px solid var(--border);
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .page-btns { display: flex; gap: 4px; }
+    .page-btns button {
+      min-width: 28px;
+      height: 26px;
+      border: 1px solid #d9e0ea;
+      background: #fff;
+      border-radius: 3px;
+      cursor: pointer;
+      font-size: 12px;
+    }
+    .page-btns button.cur { background: var(--primary); color: #fff; border-color: var(--primary); }
+    .tip {
+      border: 1px dashed #91caff;
+      background: #e6f4ff;
+      color: #0958d9;
+      border-radius: 4px;
+      padding: 8px 10px;
+      font-size: 12px;
+      margin-bottom: 10px;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+  <div class="scheme-banner">
+    <span class="tag">方案 A</span>
+    <span class="desc">管控台账强化型 — 对标综合计划关键部件台账：左组织树 + 顶 KPI + 密表格 + 导入导出，偏系统内正式管控感</span>
+  </div>
+
+  <div class="app-header">
+    <div class="brand">新能源供应链管理系统 <span>生产物资库存管理</span></div>
+    <div style="color:#8b9ab0;font-size:12px;">草图预览 · 假数据</div>
+  </div>
+
+  <div class="layout">
+    <aside class="org-tree">
+      <div class="org-tree-hd">
+        <div>
+          <div>组织范围</div>
+          <input type="search" placeholder="搜索公司/场站" />
+        </div>
+      </div>
+      <div class="org-tree-body" id="orgTree">
+        <div class="tree-node is-active" data-name="集团全部">▾ 国家能源集团 <span class="cnt">(1,286)</span></div>
+        <div class="tree-node" data-name="华北分公司"><span class="indent-1">▾ 华北新能源分公司 <span class="cnt">(412)</span></span></div>
+        <div class="tree-node" data-name="张北风电场"><span class="indent-2">· 张北风电场 <span class="cnt">(128)</span></span></div>
+        <div class="tree-node" data-name="康保风电场"><span class="indent-2">· 康保风电场 <span class="cnt">(96)</span></span></div>
+        <div class="tree-node" data-name="尚义光伏电站"><span class="indent-2">· 尚义光伏电站 <span class="cnt">(84)</span></span></div>
+        <div class="tree-node" data-name="华东分公司"><span class="indent-1">▾ 华东新能源分公司 <span class="cnt">(368)</span></span></div>
+        <div class="tree-node" data-name="如东海上风电"><span class="indent-2">· 如东海上风电场 <span class="cnt">(156)</span></span></div>
+        <div class="tree-node" data-name="滨海风电场"><span class="indent-2">· 滨海风电场 <span class="cnt">(112)</span></span></div>
+        <div class="tree-node" data-name="西北分公司"><span class="indent-1">▾ 西北新能源分公司 <span class="cnt">(506)</span></span></div>
+        <div class="tree-node" data-name="格尔木光伏"><span class="indent-2">· 格尔木光伏电站 <span class="cnt">(210)</span></span></div>
+        <div class="tree-node" data-name="酒泉风电基地"><span class="indent-2">· 酒泉风电基地 <span class="cnt">(188)</span></span></div>
+      </div>
+    </aside>
+
+    <main class="main">
+      <div class="page-title">
+        生产物资库存管理
+        <span class="crumb">仓储管理 / 生产备件台账</span>
+      </div>
+
+      <div class="tip">
+        当前范围：<strong id="scopeName">集团全部</strong>。本页为发电/项目公司/场站<strong>生产备件</strong>台账（非办公物资、非销售库存）。
+        价值链路：库存清晰 → 跨公司借用 → 少采购 → 降资金占用。
+      </div>
+
+      <div class="kpis">
+        <div class="kpi"><div class="k">备件 SKU</div><div class="v">1,286</div><div class="sub">覆盖 6 类关键部件</div></div>
+        <div class="kpi"><div class="k">库存总量（件）</div><div class="v">48,620</div><div class="sub">较上月 +2.1%</div></div>
+        <div class="kpi"><div class="k">库存金额（万元）</div><div class="v">12,680</div><div class="sub">含在途 860</div></div>
+        <div class="kpi"><div class="k">低库存预警</div><div class="v warn">37</div><div class="sub">需补货/调拨</div></div>
+        <div class="kpi"><div class="k">呆滞备件</div><div class="v danger">19</div><div class="sub">超 180 天未动</div></div>
+      </div>
+
+      <div class="filters">
+        <div>
+          <label>备件编码 / 名称</label>
+          <input type="search" placeholder="支持模糊查询" />
+        </div>
+        <div>
+          <label>备件类别</label>
+          <select>
+            <option>全部类别</option>
+            <option>风机叶片</option>
+            <option>齿轮箱</option>
+            <option>变流器</option>
+            <option>变频器</option>
+            <option>电缆/开关</option>
+            <option>光伏逆变器</option>
+          </select>
+        </div>
+        <div>
+          <label>库存状态</label>
+          <select>
+            <option>全部</option>
+            <option>正常</option>
+            <option>偏低</option>
+            <option>零库存</option>
+            <option>呆滞</option>
+          </select>
+        </div>
+        <div>
+          <label>存放仓库</label>
+          <select>
+            <option>全部仓库</option>
+            <option>场站备件仓</option>
+            <option>区域中心仓</option>
+            <option>公司共享仓</option>
+          </select>
+        </div>
+        <div>
+          <label>关键等级</label>
+          <select>
+            <option>全部</option>
+            <option>A 关键</option>
+            <option>B 重要</option>
+            <option>C 一般</option>
+          </select>
+        </div>
+        <div>
+          <label>品牌 / 型号</label>
+          <input placeholder="如 金风 GW155" />
+        </div>
+      </div>
+
+      <div class="toolbar">
+        <button class="btn pri" type="button">查询</button>
+        <button class="btn" type="button">重置</button>
+        <button class="btn ok" type="button">导入</button>
+        <button class="btn ghost-blue" type="button">导出 Excel</button>
+        <button class="btn" type="button">打印台账</button>
+        <button class="btn" type="button">发起调拨申请</button>
+        <span style="margin-left:auto;color:#8b9ab0;font-size:12px;">共 1,286 条 · 第 1/129 页</span>
+      </div>
+
+      <div class="table-card">
+        <table>
+          <thead>
+            <tr>
+              <th style="width:40px;">序号</th>
+              <th>备件编码</th>
+              <th>备件名称</th>
+              <th>规格型号</th>
+              <th>类别</th>
+              <th>关键等级</th>
+              <th class="num">库存数</th>
+              <th class="num">安全库存</th>
+              <th class="num">金额(元)</th>
+              <th>所属组织</th>
+              <th>存放仓</th>
+              <th>状态</th>
+              <th>最后出入库</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>1</td>
+              <td>SP-BJ-00128</td>
+              <td>变桨轴承密封圈</td>
+              <td>Φ1200 / NBR</td>
+              <td>风机叶片</td>
+              <td>A</td>
+              <td class="num">6</td>
+              <td class="num">8</td>
+              <td class="num">48,600</td>
+              <td>张北风电场</td>
+              <td>场站备件仓</td>
+              <td><span class="status status-low">偏低</span></td>
+              <td>2026-07-02</td>
+              <td class="op"><a href="#">详情</a><a href="#">调拨</a></td>
+            </tr>
+            <tr>
+              <td>2</td>
+              <td>SP-CL-00402</td>
+              <td>齿轮箱润滑油滤芯</td>
+              <td>HX-80 / ISO VG320</td>
+              <td>齿轮箱</td>
+              <td>A</td>
+              <td class="num">42</td>
+              <td class="num">20</td>
+              <td class="num">31,500</td>
+              <td>如东海上风电</td>
+              <td>区域中心仓</td>
+              <td><span class="status status-ok">正常</span></td>
+              <td>2026-07-10</td>
+              <td class="op"><a href="#">详情</a><a href="#">调拨</a></td>
+            </tr>
+            <tr>
+              <td>3</td>
+              <td>SP-BL-00087</td>
+              <td>变流器 IGBT 模块</td>
+              <td>Infineon FF450R</td>
+              <td>变流器</td>
+              <td>A</td>
+              <td class="num">2</td>
+              <td class="num">4</td>
+              <td class="num">186,000</td>
+              <td>康保风电场</td>
+              <td>场站备件仓</td>
+              <td><span class="status status-low">偏低</span></td>
+              <td>2026-06-18</td>
+              <td class="op"><a href="#">详情</a><a href="#">调拨</a></td>
+            </tr>
+            <tr>
+              <td>4</td>
+              <td>SP-PV-01156</td>
+              <td>组串式逆变器风扇组件</td>
+              <td>Huawei SUN2000</td>
+              <td>光伏逆变器</td>
+              <td>B</td>
+              <td class="num">0</td>
+              <td class="num">6</td>
+              <td class="num">0</td>
+              <td>格尔木光伏</td>
+              <td>场站备件仓</td>
+              <td><span class="status status-zero">零库存</span></td>
+              <td>2026-05-22</td>
+              <td class="op"><a href="#">详情</a><a href="#">补货</a></td>
+            </tr>
+            <tr>
+              <td>5</td>
+              <td>SP-DL-00821</td>
+              <td>35kV 真空断路器触头</td>
+              <td>ZN63A-12</td>
+              <td>电缆/开关</td>
+              <td>B</td>
+              <td class="num">18</td>
+              <td class="num">5</td>
+              <td class="num">72,000</td>
+              <td>酒泉风电基地</td>
+              <td>公司共享仓</td>
+              <td><span class="status status-ok">正常</span></td>
+              <td>2026-07-08</td>
+              <td class="op"><a href="#">详情</a><a href="#">调拨</a></td>
+            </tr>
+            <tr>
+              <td>6</td>
+              <td>SP-YB-00334</td>
+              <td>偏航电机刹车片</td>
+              <td>GW155-4.5</td>
+              <td>变频器</td>
+              <td>C</td>
+              <td class="num">24</td>
+              <td class="num">8</td>
+              <td class="num">19,200</td>
+              <td>滨海风电场</td>
+              <td>场站备件仓</td>
+              <td><span class="status status-idle">呆滞</span></td>
+              <td>2025-11-03</td>
+              <td class="op"><a href="#">详情</a><a href="#">处置</a></td>
+            </tr>
+            <tr>
+              <td>7</td>
+              <td>SP-CL-00510</td>
+              <td>主轴轴承温度传感器</td>
+              <td>PT100 / Class A</td>
+              <td>齿轮箱</td>
+              <td>B</td>
+              <td class="num">15</td>
+              <td class="num">10</td>
+              <td class="num">22,500</td>
+              <td>张北风电场</td>
+              <td>区域中心仓</td>
+              <td><span class="status status-ok">正常</span></td>
+              <td>2026-07-11</td>
+              <td class="op"><a href="#">详情</a><a href="#">调拨</a></td>
+            </tr>
+            <tr>
+              <td>8</td>
+              <td>SP-BJ-00201</td>
+              <td>叶片雷电接闪器</td>
+              <td>Type III / Cu</td>
+              <td>风机叶片</td>
+              <td>A</td>
+              <td class="num">9</td>
+              <td class="num">12</td>
+              <td class="num">54,000</td>
+              <td>如东海上风电</td>
+              <td>场站备件仓</td>
+              <td><span class="status status-low">偏低</span></td>
+              <td>2026-06-29</td>
+              <td class="op"><a href="#">详情</a><a href="#">调拨</a></td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="pagination">
+          <span>显示第 1–8 条，共 1,286 条</span>
+          <div class="page-btns">
+            <button type="button">&lt;</button>
+            <button type="button" class="cur">1</button>
+            <button type="button">2</button>
+            <button type="button">3</button>
+            <button type="button">…</button>
+            <button type="button">129</button>
+            <button type="button">&gt;</button>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    document.getElementById('orgTree').addEventListener('click', function (e) {
+      var node = e.target.closest('.tree-node');
+      if (!node) return;
+      this.querySelectorAll('.tree-node').forEach(function (n) { n.classList.remove('is-active'); });
+      node.classList.add('is-active');
+      document.getElementById('scopeName').textContent = node.getAttribute('data-name') || '当前组织';
+    });
+  </script>
+</body>
+</html>

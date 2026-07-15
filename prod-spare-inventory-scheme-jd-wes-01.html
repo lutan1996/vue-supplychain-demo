@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>方案 · 京东 WES/WCS/云仓/物控 · 生产物资库存管理</title>
+  <style>
+    :root {
+      --jd-red: #e1251b;
+      --jd-red-dark: #c8161d;
+      --primary: #e1251b;
+      --primary-soft: #fff1f0;
+      --navy: #1a1a2e;
+      --border: #ebebeb;
+      --text: #262626;
+      --muted: #8c8c8c;
+      --bg: #f0f2f5;
+      --warn: #d48806;
+      --danger: #cf1322;
+      --ok: #389e0d;
+      --link: #1768dd;
+      --wcs-blue: #1677ff;
+      --twin: #722ed1;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      font-size: 13px;
+      min-height: 100vh;
+    }
+    .scheme-banner {
+      background: linear-gradient(90deg, #1a1a2e 0%, #c8161d 50%, #e1251b 100%);
+      color: #fff;
+      padding: 12px 20px;
+      border-bottom: 3px solid #a01016;
+    }
+    .scheme-banner .row1 {
+      display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; margin-bottom: 6px;
+    }
+    .scheme-banner .tag {
+      background: rgba(255,255,255,.22); padding: 2px 10px; border-radius: 3px;
+      font-weight: 700; font-size: 14px;
+    }
+    .scheme-banner .desc { font-size: 13px; opacity: .95; }
+    .scheme-banner .meta { font-size: 12px; line-height: 1.75; opacity: .92; }
+    .scheme-banner .meta a { color: #ffe58f; word-break: break-all; }
+    .scheme-banner .map {
+      margin-top: 6px; font-size: 11px; line-height: 1.7;
+      background: rgba(0,0,0,.2); border-radius: 4px; padding: 6px 10px;
+    }
+    .scheme-banner .checks {
+      display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px;
+    }
+    .scheme-banner .checks span {
+      background: rgba(0,0,0,.25); border: 1px solid rgba(255,255,255,.25);
+      padding: 1px 8px; border-radius: 10px; font-size: 11px;
+    }
+    .app-header {
+      height: 48px; background: #fff; border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between; padding: 0 18px;
+    }
+    .app-header .brand { font-weight: 600; font-size: 14px; }
+    .app-header .brand em {
+      font-style: normal; color: var(--jd-red); margin-left: 8px; font-weight: 500;
+    }
+    .cap-tabs {
+      display: flex; gap: 0; background: #fff; border-bottom: 1px solid var(--border); padding: 0 14px;
+    }
+    .cap-tabs button {
+      border: none; background: transparent; padding: 10px 14px; font-size: 13px;
+      color: #595959; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px;
+    }
+    .cap-tabs button.active {
+      color: var(--jd-red); font-weight: 600; border-bottom-color: var(--jd-red);
+    }
+    .cap-tabs button .hint {
+      display: block; font-size: 10px; color: var(--muted); font-weight: 400; margin-top: 1px;
+    }
+    .layout {
+      display: flex; height: calc(100vh - 48px - 110px - 44px); min-height: 640px;
+    }
+    .org-tree {
+      width: 210px; flex-shrink: 0; background: #fff; border-right: 1px solid var(--border);
+      display: flex; flex-direction: column;
+    }
+    .org-tree-hd {
+      padding: 10px 12px; border-bottom: 1px solid var(--border); font-weight: 600;
+    }
+    .org-tree-hd input {
+      width: 100%; margin-top: 8px; height: 28px; border: 1px solid #d9d9d9;
+      border-radius: 4px; padding: 0 8px; font-size: 12px;
+    }
+    .org-tree-body { flex: 1; overflow: auto; padding: 8px 6px; }
+    .tree-node {
+      padding: 6px 8px; border-radius: 4px; cursor: pointer; line-height: 1.4; user-select: none;
+    }
+    .tree-node:hover { background: #fff1f0; }
+    .tree-node.is-active { background: var(--primary-soft); color: var(--jd-red); font-weight: 600; }
+    .tree-node .indent-1 { padding-left: 14px; display: block; }
+    .tree-node .indent-2 { padding-left: 28px; display: block; }
+    .tree-node .cnt { color: var(--muted); font-weight: 400; font-size: 12px; margin-left: 4px; }
+    .main { flex: 1; min-width: 0; overflow: auto; padding: 12px 14px 18px; }
+    .side-panel {
+      width: 268px; flex-shrink: 0; background: #fff; border-left: 1px solid var(--border);
+      display: flex; flex-direction: column; overflow: hidden;
+    }
+    .side-panel .hd {
+      padding: 10px 12px; font-weight: 600; border-bottom: 1px solid var(--border);
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .side-panel .hd .badge {
+      background: var(--jd-red); color: #fff; font-size: 11px;
+      padding: 0 6px; border-radius: 10px; font-weight: 500;
+    }
+    .side-body { flex: 1; overflow: auto; padding: 10px; }
+    .page-title {
+      font-size: 16px; font-weight: 700; margin-bottom: 8px;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .page-title .crumb { font-size: 12px; color: var(--muted); font-weight: 400; }
+    .tip {
+      background: #fff7e6; border: 1px solid #ffd591; color: #ad6800;
+      border-radius: 4px; padding: 8px 10px; font-size: 12px; margin-bottom: 10px; line-height: 1.6;
+    }
+
+    /* WCS：设备/任务协同状态条 */
+    .wcs-strip {
+      display: grid; grid-template-columns: repeat(6, 1fr); gap: 0;
+      background: #fff; border: 1px solid var(--border); border-radius: 6px;
+      margin-bottom: 10px; overflow: hidden;
+    }
+    .wcs-item {
+      padding: 10px 8px; text-align: center; border-right: 1px solid var(--border);
+      position: relative; cursor: pointer;
+    }
+    .wcs-item:last-child { border-right: 0; }
+    .wcs-item:hover, .wcs-item.active { background: #f0f5ff; }
+    .wcs-item .n { font-size: 20px; font-weight: 700; color: var(--wcs-blue); line-height: 1.2; }
+    .wcs-item .n.warn { color: var(--warn); }
+    .wcs-item .n.danger { color: var(--danger); }
+    .wcs-item .n.ok { color: var(--ok); }
+    .wcs-item .l { font-size: 11px; color: var(--muted); margin-top: 3px; }
+    .wcs-item .arrow {
+      position: absolute; right: -5px; top: 50%; transform: translateY(-50%);
+      width: 0; height: 0;
+      border-top: 5px solid transparent; border-bottom: 5px solid transparent;
+      border-left: 5px solid #d9d9d9; z-index: 1;
+    }
+    .wcs-item:last-child .arrow { display: none; }
+    .wcs-label {
+      font-size: 11px; color: var(--wcs-blue); font-weight: 600;
+      margin-bottom: 4px; letter-spacing: .5px;
+    }
+
+    /* 云仓：多仓运营视图 */
+    .wh-grid {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 10px;
+    }
+    .wh-card {
+      background: #fff; border: 1px solid var(--border); border-radius: 6px; padding: 10px 12px;
+    }
+    .wh-card .name { font-weight: 600; font-size: 12px; margin-bottom: 6px; display: flex; justify-content: space-between; }
+    .wh-card .name .tag {
+      font-size: 10px; font-weight: 500; padding: 0 5px; border-radius: 2px;
+      background: #f6ffed; color: var(--ok);
+    }
+    .wh-card .name .tag.warn { background: #fff7e6; color: var(--warn); }
+    .wh-card .name .tag.danger { background: #fff1f0; color: var(--danger); }
+    .wh-card .stats { display: flex; gap: 10px; font-size: 11px; color: var(--muted); }
+    .wh-card .stats b { color: var(--text); font-size: 14px; display: block; }
+
+    /* 物控：简版数字孪生状态图 */
+    .twin {
+      background: #fff; border: 1px solid var(--border); border-radius: 6px;
+      padding: 10px 12px; margin-bottom: 10px;
+    }
+    .twin-hd {
+      display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;
+    }
+    .twin-hd h3 { font-size: 12px; font-weight: 700; color: var(--twin); }
+    .twin-hd span { font-size: 11px; color: var(--muted); }
+    .twin-flow {
+      display: flex; align-items: center; gap: 0; justify-content: space-between;
+    }
+    .twin-node {
+      flex: 1; text-align: center; padding: 8px 4px; border-radius: 4px;
+      background: #f9f0ff; border: 1px solid #d3adf7; font-size: 11px;
+    }
+    .twin-node.hot { background: #fff1f0; border-color: #ffa39e; }
+    .twin-node.ok { background: #f6ffed; border-color: #b7eb8f; }
+    .twin-node b { display: block; font-size: 13px; margin-bottom: 2px; }
+    .twin-arrow { color: #bfbfbf; font-size: 16px; padding: 0 4px; flex-shrink: 0; }
+
+    .kpis {
+      display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; margin-bottom: 10px;
+    }
+    .kpi {
+      background: #fff; border: 1px solid var(--border); border-radius: 6px;
+      padding: 10px 12px; position: relative; overflow: hidden;
+    }
+    .kpi::before {
+      content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--jd-red);
+    }
+    .kpi .k { color: var(--muted); font-size: 12px; }
+    .kpi .v { font-size: 22px; font-weight: 700; margin: 4px 0 2px; letter-spacing: -.5px; }
+    .kpi .v.warn { color: var(--warn); }
+    .kpi .v.danger { color: var(--danger); }
+    .kpi .sub { color: var(--muted); font-size: 11px; }
+
+    /* WES：仓内执行/优先级任务 */
+    .wes-tasks {
+      display: flex; gap: 6px; margin-bottom: 10px; flex-wrap: wrap;
+    }
+    .wes-task {
+      display: inline-flex; align-items: center; gap: 6px; height: 30px;
+      padding: 0 10px; border-radius: 4px; border: 1px solid #ffccc7;
+      background: #fff1f0; color: var(--jd-red); font-size: 12px; font-weight: 500; cursor: pointer;
+    }
+    .wes-task.p0 { border-color: #ffa39e; background: #fff1f0; }
+    .wes-task.p1 { border-color: #ffe58f; background: #fffbe6; color: #d48806; }
+    .wes-task.ok { border-color: #b7eb8f; background: #f6ffed; color: var(--ok); }
+    .wes-task .badge {
+      background: var(--jd-red); color: #fff; font-size: 10px;
+      padding: 0 5px; border-radius: 8px; line-height: 16px; min-width: 16px; text-align: center;
+    }
+
+    .filters {
+      background: #fff; border: 1px solid var(--border); border-radius: 6px;
+      padding: 10px 12px; display: grid; grid-template-columns: repeat(6, minmax(0, 1fr));
+      gap: 8px; margin-bottom: 8px;
+    }
+    .filters label { display: block; color: var(--muted); font-size: 12px; margin-bottom: 4px; }
+    .filters input, .filters select {
+      width: 100%; height: 28px; border: 1px solid #d9d9d9; border-radius: 4px;
+      padding: 0 8px; font-size: 12px;
+    }
+    .toolbar {
+      display: flex; align-items: center; gap: 8px; margin-bottom: 8px; flex-wrap: wrap;
+    }
+    .btn {
+      height: 30px; padding: 0 12px; border: 1px solid #d9d9d9; background: #fff;
+      border-radius: 4px; cursor: pointer; font-size: 13px;
+    }
+    .btn.pri { background: var(--jd-red); color: #fff; border-color: var(--jd-red); }
+    .btn.ok { color: var(--ok); border-color: #b7eb8f; background: #f6ffed; }
+    .btn.ghost-red { color: var(--jd-red); border-color: #ffa39e; }
+    .table-card {
+      background: #fff; border: 1px solid var(--border); border-radius: 6px; overflow: hidden;
+    }
+    table { width: 100%; border-collapse: collapse; }
+    th, td {
+      padding: 8px 10px; border-bottom: 1px solid #f0f0f0; text-align: left;
+      white-space: nowrap; font-size: 12px;
+    }
+    th { background: #fafafa; color: #595959; font-weight: 600; }
+    td.num, th.num { text-align: right; }
+    tr.urgent td { background: #fff1f0; }
+    .status {
+      display: inline-block; padding: 1px 6px; border-radius: 2px; font-size: 11px;
+    }
+    .status-ok { background: #f6ffed; color: #389e0d; }
+    .status-low { background: #fff7e6; color: #d48806; }
+    .status-zero { background: #fff1f0; color: #cf1322; }
+    .status-idle { background: #f5f5f5; color: #8c8c8c; }
+    .status-exec { background: #e6f4ff; color: #1677ff; }
+    .prio {
+      display: inline-block; min-width: 28px; text-align: center;
+      font-weight: 700; font-size: 11px; padding: 1px 4px; border-radius: 2px;
+    }
+    .prio-p0 { background: #fff1f0; color: #cf1322; }
+    .prio-p1 { background: #fff7e6; color: #d48806; }
+    .prio-p2 { background: #f5f5f5; color: #8c8c8c; }
+    .op a { color: var(--link); margin-right: 8px; text-decoration: none; }
+    .op a.go { color: var(--jd-red); font-weight: 600; }
+    .pagination {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 8px 12px; color: var(--muted); font-size: 12px;
+    }
+    .page-btns button {
+      min-width: 28px; height: 28px; border: 1px solid #d9d9d9; background: #fff;
+      margin-left: 4px; border-radius: 3px; cursor: pointer;
+    }
+    .page-btns .cur { border-color: var(--jd-red); color: var(--jd-red); }
+    .alert-card {
+      border: 1px solid #ffccc7; background: #fff2f0; border-radius: 6px;
+      padding: 10px; margin-bottom: 8px;
+    }
+    .alert-card.warn { border-color: #ffe58f; background: #fffbe6; }
+    .alert-card.decide { border-color: #91caff; background: #e6f4ff; }
+    .alert-card .t { font-weight: 600; margin-bottom: 4px; font-size: 12px; }
+    .alert-card .d { color: #595959; font-size: 12px; line-height: 1.5; margin-bottom: 8px; }
+    .alert-card .acts { display: flex; gap: 6px; }
+    .alert-card button {
+      border: 1px solid #ffccc7; background: #fff; color: var(--jd-red);
+      font-size: 12px; padding: 3px 8px; border-radius: 3px; cursor: pointer;
+    }
+    .alert-card.warn button { border-color: #ffe58f; color: #d48806; }
+    .alert-card.decide button { border-color: #91caff; color: #1677ff; }
+    .sec-label {
+      font-size: 11px; font-weight: 600; color: var(--muted);
+      margin: 4px 0 8px; text-transform: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="scheme-banner">
+    <div class="row1">
+      <span class="tag">方案 · 京东 WES 映射</span>
+      <span class="desc">生产备件台账 — 吸收 WES 执行 / WCS 协同 / 云仓多仓 / 物控可视 / 智慧供应链决策</span>
+    </div>
+    <div class="meta">
+      参考 URL（产品能力页 + 登录入口，非现成库存后台）：
+      <a href="https://www.jdl.com/WES" target="_blank" rel="noopener">1. jdl.com/WES</a>
+      · <a href="https://www.jdl.com/WCS" target="_blank" rel="noopener">2. jdl.com/WCS</a>
+      · <a href="https://www.jdl.com/hk/cloudwarehouse/" target="_blank" rel="noopener">3. jdl.com/hk/cloudwarehouse/</a>
+      · <a href="https://www.jdl.com/thingtalk" target="_blank" rel="noopener">4. jdl.com/thingtalk</a>
+      · <a href="https://ysc.jd.com/login" target="_blank" rel="noopener">5. ysc.jd.com/login</a>
+    </div>
+    <div class="map">
+      映射说明：WES→仓内作业优先级任务条 · WCS→出入库/调拨协同状态条 · 云仓→多仓运营卡片 · 物控→场站备件流转简图 · 智慧供应链→右侧 KPI 预警与调拨建议
+    </div>
+    <div class="checks">
+      <span>✓ 生产备件台账（发电/项目/场站）</span>
+      <span>✓ 左组织树</span>
+      <span>✓ 顶部 KPI</span>
+      <span>✓ 筛选 + 台账表</span>
+      <span>✓ 导入 / 导出</span>
+      <span>✓ WES 优先级任务</span>
+      <span>✓ WCS 协同状态条</span>
+      <span>✓ 云仓多仓视图</span>
+      <span>✓ 物控简版状态图</span>
+      <span>✓ 库存决策预警</span>
+    </div>
+  </div>
+
+  <div class="app-header">
+    <div class="brand">新能源供应链管理系统 <em>生产物资库存管理</em></div>
+    <div style="color:#8c8c8c;font-size:12px;">草图预览 · 假数据 · 京东 WES/WCS/云仓/物控映射</div>
+  </div>
+
+  <div class="cap-tabs">
+    <button type="button" class="active">备件台账<span class="hint">主台账</span></button>
+    <button type="button">仓内执行<span class="hint">← WES</span></button>
+    <button type="button">协同控制<span class="hint">← WCS</span></button>
+    <button type="button">多仓运营<span class="hint">← 云仓</span></button>
+    <button type="button">物控可视<span class="hint">← 物控</span></button>
+    <button type="button">库存决策<span class="hint">← 智慧供应链</span></button>
+  </div>
+
+  <div class="layout">
+    <aside class="org-tree">
+      <div class="org-tree-hd">
+        <div>组织 / 仓网范围</div>
+        <input type="search" placeholder="搜索公司/场站" />
+      </div>
+      <div class="org-tree-body" id="orgTree">
+        <div class="tree-node is-active" data-name="集团全部">▾ 国家能源集团 <span class="cnt">(1,286)</span></div>
+        <div class="tree-node" data-name="华北分公司"><span class="indent-1">▾ 华北新能源分公司 <span class="cnt">(412)</span></span></div>
+        <div class="tree-node" data-name="张北风电场"><span class="indent-2">· 张北风电场 <span class="cnt">(128)</span></span></div>
+        <div class="tree-node" data-name="康保风电场"><span class="indent-2">· 康保风电场 <span class="cnt">(96)</span></span></div>
+        <div class="tree-node" data-name="尚义光伏电站"><span class="indent-2">· 尚义光伏电站 <span class="cnt">(84)</span></span></div>
+        <div class="tree-node" data-name="华东分公司"><span class="indent-1">▾ 华东新能源分公司 <span class="cnt">(368)</span></span></div>
+        <div class="tree-node" data-name="如东海上风电"><span class="indent-2">· 如东海上风电场 <span class="cnt">(156)</span></span></div>
+        <div class="tree-node" data-name="滨海风电场"><span class="indent-2">· 滨海风电场 <span class="cnt">(112)</span></span></div>
+        <div class="tree-node" data-name="西北分公司"><span class="indent-1">▾ 西北新能源分公司 <span class="cnt">(506)</span></span></div>
+        <div class="tree-node" data-name="格尔木光伏"><span class="indent-2">· 格尔木光伏电站 <span class="cnt">(210)</span></span></div>
+        <div class="tree-node" data-name="酒泉风电基地"><span class="indent-2">· 酒泉风电基地 <span class="cnt">(188)</span></span></div>
+      </div>
+    </aside>
+
+    <main class="main">
+      <div class="page-title">
+        生产备件台账
+        <span class="crumb">仓储管理 / 生产物资库存管理</span>
+      </div>
+
+      <div class="tip">
+        当前范围：<strong id="scopeName">集团全部</strong>。本页为发电/项目公司/场站<strong>生产备件</strong>台账（非办公物资）。
+        价值：库存清晰 → 跨公司借用 → 少采购 → 降资金占用。
+      </div>
+
+      <div class="wcs-label">WCS 映射 · 备件作业协同状态</div>
+      <div class="wcs-strip">
+        <div class="wcs-item active">
+          <div class="n">1,286</div>
+          <div class="l">在库 SKU</div>
+          <span class="arrow"></span>
+        </div>
+        <div class="wcs-item">
+          <div class="n warn">9</div>
+          <div class="l">待入库上账</div>
+          <span class="arrow"></span>
+        </div>
+        <div class="wcs-item">
+          <div class="n danger">12</div>
+          <div class="l">待调拨执行</div>
+          <span class="arrow"></span>
+        </div>
+        <div class="wcs-item">
+          <div class="n ok">28</div>
+          <div class="l">在途协同</div>
+          <span class="arrow"></span>
+        </div>
+        <div class="wcs-item">
+          <div class="n warn">37</div>
+          <div class="l">低库存任务</div>
+          <span class="arrow"></span>
+        </div>
+        <div class="wcs-item">
+          <div class="n">19</div>
+          <div class="l">呆滞待处置</div>
+        </div>
+      </div>
+
+      <div class="sec-label">云仓映射 · 标准仓 / 场站仓运营视图</div>
+      <div class="wh-grid">
+        <div class="wh-card">
+          <div class="name">华北区域中心仓 <span class="tag">健康</span></div>
+          <div class="stats">
+            <div><b>412</b>SKU</div>
+            <div><b>98%</b>可用率</div>
+            <div><b>3</b>预警</div>
+          </div>
+        </div>
+        <div class="wh-card">
+          <div class="name">华东区域中心仓 <span class="tag warn">关注</span></div>
+          <div class="stats">
+            <div><b>368</b>SKU</div>
+            <div><b>91%</b>可用率</div>
+            <div><b>8</b>预警</div>
+          </div>
+        </div>
+        <div class="wh-card">
+          <div class="name">西北区域中心仓 <span class="tag">健康</span></div>
+          <div class="stats">
+            <div><b>506</b>SKU</div>
+            <div><b>96%</b>可用率</div>
+            <div><b>4</b>预警</div>
+          </div>
+        </div>
+        <div class="wh-card">
+          <div class="name">公司共享仓 <span class="tag danger">紧张</span></div>
+          <div class="stats">
+            <div><b>186</b>SKU</div>
+            <div><b>82%</b>可用率</div>
+            <div><b>11</b>预警</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="twin">
+        <div class="twin-hd">
+          <h3>物控映射 · 场站备件流转状态（简版）</h3>
+          <span>非数字孪生宣传页 · 一线可操作状态</span>
+        </div>
+        <div class="twin-flow">
+          <div class="twin-node ok"><b>采购/调入</b>在途 28</div>
+          <span class="twin-arrow">→</span>
+          <div class="twin-node"><b>场站备件仓</b>在库 48,620</div>
+          <span class="twin-arrow">→</span>
+          <div class="twin-node hot"><b>领用/出库</b>今日 14</div>
+          <span class="twin-arrow">→</span>
+          <div class="twin-node"><b>跨站调拨</b>执行中 12</div>
+          <span class="twin-arrow">→</span>
+          <div class="twin-node ok"><b>归还/上账</b>待确认 5</div>
+        </div>
+      </div>
+
+      <div class="kpis">
+        <div class="kpi"><div class="k">备件 SKU</div><div class="v">1,286</div><div class="sub">覆盖 6 类关键部件</div></div>
+        <div class="kpi"><div class="k">库存总量（件）</div><div class="v">48,620</div><div class="sub">较上月 +2.1%</div></div>
+        <div class="kpi"><div class="k">库存金额（万元）</div><div class="v">12,680</div><div class="sub">含在途 860</div></div>
+        <div class="kpi"><div class="k">低库存预警</div><div class="v warn">37</div><div class="sub">需补货/调拨</div></div>
+        <div class="kpi"><div class="k">呆滞备件</div><div class="v danger">19</div><div class="sub">超 180 天未动</div></div>
+      </div>
+
+      <div class="sec-label">WES 映射 · 仓内优先级任务（作业队列）</div>
+      <div class="wes-tasks">
+        <button class="wes-task p0" type="button">P0 零库存紧急调拨 <span class="badge">4</span></button>
+        <button class="wes-task p0" type="button">P0 关键备件偏低 <span class="badge">7</span></button>
+        <button class="wes-task p1" type="button">P1 待入库上账 9</button>
+        <button class="wes-task p1" type="button">P1 在途到货确认 6</button>
+        <button class="wes-task ok" type="button">可跨公司借用 14</button>
+        <button class="wes-task" type="button">今日出入库 23</button>
+      </div>
+
+      <div class="filters">
+        <div>
+          <label>备件编码 / 名称</label>
+          <input type="search" placeholder="支持模糊查询" />
+        </div>
+        <div>
+          <label>备件类别</label>
+          <select>
+            <option>全部类别</option>
+            <option>风机叶片</option>
+            <option>齿轮箱</option>
+            <option>变流器</option>
+            <option>变频器</option>
+            <option>电缆/开关</option>
+            <option>光伏逆变器</option>
+          </select>
+        </div>
+        <div>
+          <label>库存状态</label>
+          <select>
+            <option>全部</option>
+            <option>正常</option>
+            <option>偏低</option>
+            <option>零库存</option>
+            <option>执行中</option>
+            <option>呆滞</option>
+          </select>
+        </div>
+        <div>
+          <label>存放仓库</label>
+          <select>
+            <option>全部仓库</option>
+            <option>场站备件仓</option>
+            <option>区域中心仓</option>
+            <option>公司共享仓</option>
+          </select>
+        </div>
+        <div>
+          <label>作业优先级</label>
+          <select>
+            <option>全部</option>
+            <option>P0 紧急</option>
+            <option>P1 重要</option>
+            <option>P2 一般</option>
+          </select>
+        </div>
+        <div>
+          <label>可借出方</label>
+          <select>
+            <option>不限</option>
+            <option>仅看有货可借</option>
+            <option>仅看缺货待借</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="toolbar">
+        <button class="btn pri" type="button">查询</button>
+        <button class="btn" type="button">重置</button>
+        <button class="btn ok" type="button">导入存量</button>
+        <button class="btn ghost-red" type="button">导出 Excel</button>
+        <button class="btn" type="button">打印台账</button>
+        <button class="btn" type="button">发起调拨申请</button>
+        <span style="margin-left:auto;color:#8c8c8c;font-size:12px;">共 1,286 条 · 第 1/129 页</span>
+      </div>
+
+      <div class="table-card">
+        <table>
+          <thead>
+            <tr>
+              <th>优先级</th>
+              <th>备件编码</th>
+              <th>备件名称</th>
+              <th>规格型号</th>
+              <th>类别</th>
+              <th class="num">可用</th>
+              <th class="num">安全</th>
+              <th>货位</th>
+              <th>有货场站</th>
+              <th>缺货场站</th>
+              <th>状态</th>
+              <th>建议动作</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="urgent">
+              <td><span class="prio prio-p0">P0</span></td>
+              <td>SP-PV-01156</td>
+              <td>组串式逆变器风扇组件</td>
+              <td>Huawei SUN2000</td>
+              <td>光伏逆变器</td>
+              <td class="num">0</td>
+              <td class="num">6</td>
+              <td>A-01-03</td>
+              <td>尚义×8</td>
+              <td>格尔木缺 6</td>
+              <td><span class="status status-zero">零库存</span></td>
+              <td>尚义调拨 6</td>
+              <td class="op"><a class="go" href="#">执行调拨</a><a href="#">补货</a></td>
+            </tr>
+            <tr class="urgent">
+              <td><span class="prio prio-p0">P0</span></td>
+              <td>SP-BL-00087</td>
+              <td>变流器 IGBT 模块</td>
+              <td>Infineon FF450R</td>
+              <td>变流器</td>
+              <td class="num">2</td>
+              <td class="num">4</td>
+              <td>B-12-08</td>
+              <td>酒泉×5</td>
+              <td>康保缺 2</td>
+              <td><span class="status status-low">偏低</span></td>
+              <td>酒泉→康保</td>
+              <td class="op"><a class="go" href="#">执行调拨</a><a href="#">详情</a></td>
+            </tr>
+            <tr>
+              <td><span class="prio prio-p1">P1</span></td>
+              <td>SP-BJ-00128</td>
+              <td>变桨轴承密封圈</td>
+              <td>Φ1200 / NBR</td>
+              <td>风机叶片</td>
+              <td class="num">6</td>
+              <td class="num">8</td>
+              <td>C-03-11</td>
+              <td>如东×12</td>
+              <td>张北缺 2</td>
+              <td><span class="status status-exec">在途执行</span></td>
+              <td>跟踪在途 4</td>
+              <td class="op"><a href="#">跟踪</a><a href="#">借入</a></td>
+            </tr>
+            <tr>
+              <td><span class="prio prio-p1">P1</span></td>
+              <td>SP-BJ-00201</td>
+              <td>叶片雷电接闪器</td>
+              <td>Type III / Cu</td>
+              <td>风机叶片</td>
+              <td class="num">9</td>
+              <td class="num">12</td>
+              <td>海上-02</td>
+              <td>滨海×4</td>
+              <td>如东缺 3</td>
+              <td><span class="status status-low">偏低</span></td>
+              <td>共享仓调入 3</td>
+              <td class="op"><a class="go" href="#">执行调拨</a></td>
+            </tr>
+            <tr>
+              <td><span class="prio prio-p2">P2</span></td>
+              <td>SP-CL-00402</td>
+              <td>齿轮箱润滑油滤芯</td>
+              <td>HX-80 / ISO VG320</td>
+              <td>齿轮箱</td>
+              <td class="num">42</td>
+              <td class="num">20</td>
+              <td>D-07-02</td>
+              <td>如东×28 · 滨海×14</td>
+              <td>—</td>
+              <td><span class="status status-ok">正常</span></td>
+              <td>可支援外场</td>
+              <td class="op"><a href="#">详情</a><a href="#">借出</a></td>
+            </tr>
+            <tr>
+              <td><span class="prio prio-p2">P2</span></td>
+              <td>SP-DL-00821</td>
+              <td>35kV 真空断路器触头</td>
+              <td>ZN63A-12</td>
+              <td>电缆/开关</td>
+              <td class="num">18</td>
+              <td class="num">5</td>
+              <td>共享-A1</td>
+              <td>酒泉×18</td>
+              <td>—</td>
+              <td><span class="status status-ok">正常</span></td>
+              <td>发布余量</td>
+              <td class="op"><a href="#">详情</a><a href="#">借出</a></td>
+            </tr>
+            <tr>
+              <td><span class="prio prio-p2">P2</span></td>
+              <td>SP-YB-00334</td>
+              <td>偏航电机刹车片</td>
+              <td>GW155-4.5</td>
+              <td>变频器</td>
+              <td class="num">24</td>
+              <td class="num">8</td>
+              <td>E-02-09</td>
+              <td>滨海×24</td>
+              <td>—</td>
+              <td><span class="status status-idle">呆滞</span></td>
+              <td>处置 / 降安全线</td>
+              <td class="op"><a href="#">详情</a><a href="#">处置</a></td>
+            </tr>
+            <tr>
+              <td><span class="prio prio-p2">P2</span></td>
+              <td>SP-CL-00510</td>
+              <td>主轴轴承温度传感器</td>
+              <td>PT100 / Class A</td>
+              <td>齿轮箱</td>
+              <td class="num">15</td>
+              <td class="num">10</td>
+              <td>F-04-01</td>
+              <td>张北×9 · 如东×6</td>
+              <td>—</td>
+              <td><span class="status status-ok">正常</span></td>
+              <td>—</td>
+              <td class="op"><a href="#">详情</a><a href="#">借出</a></td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="pagination">
+          <span>显示第 1–8 条，共 1,286 条</span>
+          <div class="page-btns">
+            <button type="button">&lt;</button>
+            <button type="button" class="cur">1</button>
+            <button type="button">2</button>
+            <button type="button">3</button>
+            <button type="button">…</button>
+            <button type="button">129</button>
+            <button type="button">&gt;</button>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <aside class="side-panel">
+      <div class="hd">
+        <span>决策 / 预警建议</span>
+        <span class="badge">7</span>
+      </div>
+      <div class="side-body">
+        <div class="sec-label" style="margin-top:0;">智慧供应链映射 · 库存决策支持</div>
+        <div class="alert-card">
+          <div class="t">低库存 · 变桨轴承密封圈</div>
+          <div class="d">张北库存 6 &lt; 安全 8。如东有货 12，建议借入 2 件，预计可规避采购约 ¥16,200。</div>
+          <div class="acts">
+            <button type="button">一键调拨</button>
+            <button type="button">忽略</button>
+          </div>
+        </div>
+        <div class="alert-card">
+          <div class="t">零库存 · 逆变器风扇组件</div>
+          <div class="d">格尔木 0 件。尚义光伏有货 8，建议借入 6 件补齐安全库存。</div>
+          <div class="acts">
+            <button type="button">一键调拨</button>
+            <button type="button">转补货</button>
+          </div>
+        </div>
+        <div class="alert-card decide">
+          <div class="t">决策 · IGBT 模块跨公司路径</div>
+          <div class="d">康保 2 &lt; 安全 4。酒泉共享仓可借 5，建议路径：酒泉 → 康保，优先于新采购。</div>
+          <div class="acts">
+            <button type="button">采纳建议</button>
+            <button type="button">对比采购</button>
+          </div>
+        </div>
+        <div class="alert-card warn">
+          <div class="t">呆滞 · 偏航电机刹车片</div>
+          <div class="d">滨海 24 件超 180 天未动。华北/华东暂无缺货，建议处置或降安全库存。</div>
+          <div class="acts">
+            <button type="button">发起处置</button>
+            <button type="button">稍后</button>
+          </div>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <script>
+    document.getElementById('orgTree').addEventListener('click', function (e) {
+      var node = e.target.closest('.tree-node');
+      if (!node) return;
+      this.querySelectorAll('.tree-node').forEach(function (n) { n.classList.remove('is-active'); });
+      node.classList.add('is-active');
+      document.getElementById('scopeName').textContent = node.getAttribute('data-name') || '当前组织';
+    });
+  </script>
+</body>
+</html>

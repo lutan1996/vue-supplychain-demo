@@ -1,0 +1,74 @@
+[46755:4663891:0713/143334.410782:ERROR:ui/display/mac/cv_display_link_mac.mm:194] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+[46755:4663891:0713/143334.411678:ERROR:ui/display/mac/cv_display_link_mac.mm:194] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+[46755:4663891:0713/143334.411897:ERROR:ui/display/mac/cv_display_link_mac.mm:194] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+[46755:4663891:0713/143334.412126:ERROR:ui/display/mac/cv_display_link_mac.mm:194] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+[46755:4663891:0713/143335.266624:ERROR:ui/display/mac/cv_display_link_mac.mm:194] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+[46755:4663891:0713/143335.395324:ERROR:ui/display/mac/cv_display_link_mac.mm:194] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+[46755:4663891:0713/143335.572802:ERROR:ui/display/mac/cv_display_link_mac.mm:194] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+[46755:4663891:0713/143335.573138:ERROR:ui/display/mac/cv_display_link_mac.mm:194] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+[46755:4663891:0713/143335.573382:ERROR:ui/display/mac/cv_display_link_mac.mm:194] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+Trying to load the allocator multiple times. This is *not* supported.
+[46755:4663891:0713/143337.479023:ERROR:ui/display/mac/cv_display_link_mac.mm:194] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+[46755:4663891:0713/143337.618368:ERROR:ui/display/mac/cv_display_link_mac.mm:194] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+[46755:4663891:0713/143337.753428:ERROR:ui/display/mac/cv_display_link_mac.mm:194] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+[46755:4663891:0713/143337.880569:ERROR:ui/display/mac/cv_display_link_mac.mm:194] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+[46755:4663891:0713/143338.007738:ERROR:ui/display/mac/cv_display_link_mac.mm:194] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+[46755:4663891:0713/143338.150295:ERROR:ui/display/mac/cv_display_link_mac.mm:194] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+[46755:4663891:0713/143338.329020:ERROR:ui/display/mac/cv_display_link_mac.mm:194] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+[47027:4664724:0713/143352.937176:VERBOSE1:chrome/updater/updater.cc:374] Version: 152.0.7933.0, opt, x86_64, command line: /Users/lutan/Library/Application Support/Google/GoogleUpdater/152.0.7933.0/GoogleUpdater.app/Contents/MacOS/GoogleUpdater --wake-all --enable-logging --vmodule=*/components/update_client/*=2,*/chrome/enterprise_companion/*=2,*/chrome/updater/*=2
+[47027:4664724:0713/143352.938288:VERBOSE1:chrome/updater/updater.cc:377] OS version: 15.7.7, arch: x86_64, System uptime (seconds): 249568, parent pid: 46739
+[47027:4664724:0713/143352.942749:VERBOSE1:chrome/updater/updater.cc:382] Available disk space in install directory (/Users/lutan/Library/Application Support/Google/GoogleUpdater): 238136053760B (221.781GiB) / 499963174912B (465.627GiB)
+[47027:4664724:0713/143352.942814:VERBOSE1:chrome/updater/updater.cc:386] Available disk space in temporary directory (/var/folders/zg/w96xmz093p5b24rf49lfv4500000gn/T/): 238136053760B (221.781GiB) / 499963174912B (465.627GiB)
+[47027:4664724:0713/143352.942995:VERBOSE2:chrome/updater/event_history.cc:265] Emitted a UPDATER_PROCESS START event to the history log
+[47029:4664728:0713/143352.957778:VERBOSE1:chrome/updater/updater.cc:374] Version: 152.0.7933.0, opt, x86_64, command line: /Users/lutan/Library/Application Support/Google/GoogleUpdater/152.0.7933.0/GoogleUpdater.app/Contents/MacOS/GoogleUpdater --crash-handler --database=/Users/lutan/Library/Application Support/Google/GoogleUpdater/152.0.7933.0/Crashpad --url=https://clients2.google.com/cr/report --annotation=prod=Update4 --annotation=ver=152.0.7933.0 --handshake-fd=6 --enable-logging --vmodule=*/components/update_client/*=2,*/chrome/enterprise_companion/*=2,*/chrome/updater/*=2
+[47029:4664728:0713/143352.958785:VERBOSE1:chrome/updater/updater.cc:377] OS version: 15.7.7, arch: x86_64, System uptime (seconds): 249568, parent pid: 1
+[47029:4664728:0713/143352.962849:VERBOSE1:chrome/updater/updater.cc:382] Available disk space in install directory (/Users/lutan/Library/Application Support/Google/GoogleUpdater): 238136053760B (221.781GiB) / 499963174912B (465.627GiB)
+[47029:4664728:0713/143352.962933:VERBOSE1:chrome/updater/updater.cc:386] Available disk space in temporary directory (/var/folders/zg/w96xmz093p5b24rf49lfv4500000gn/T/): 238136053760B (221.781GiB) / 499963174912B (465.627GiB)
+[47029:4664728:0713/143352.963121:VERBOSE2:chrome/updater/event_history.cc:265] Emitted a UPDATER_PROCESS START event to the history log
+[47027:4664724:0713/143352.964077:VERBOSE1:chrome/updater/crash_reporter.cc:124] Crash handler launched and ready.
+[47027:4664724:0713/143352.965533:VERBOSE1:chrome/updater/crash_client.cc:108] Found 0 completed crash reports
+[47027:4664724:0713/143352.965685:VERBOSE1:chrome/updater/crash_client.cc:132] Found 0 pending crash reports
+[47027:4664724:0713/143352.965840:ERROR:third_party/crashpad/crashpad/util/file/file_io_posix.cc:145] open /Users/lutan/Library/Application Support/Google/RLZ/Crashpad/settings.dat: No such file or directory (2)
+[47027:4664724:0713/143352.966162:VERBOSE1:chrome/updater/updater.cc:105] Crash reporting initialized.
+[47027:4664741:0713/143352.966770:VERBOSE1:chrome/updater/app/app_wakeall.cc:58] Launching `/Users/lutan/Library/Application Support/Google/GoogleUpdater/152.0.7933.0/GoogleUpdater.app/Contents/MacOS/GoogleUpdater --wake`
+[47030:4664745:0713/143352.996032:VERBOSE1:chrome/updater/updater.cc:374] Version: 152.0.7933.0, opt, x86_64, command line: /Users/lutan/Library/Application Support/Google/GoogleUpdater/152.0.7933.0/GoogleUpdater.app/Contents/MacOS/GoogleUpdater --wake --enable-logging --vmodule=*/components/update_client/*=2,*/chrome/enterprise_companion/*=2,*/chrome/updater/*=2
+[47030:4664745:0713/143352.997063:VERBOSE1:chrome/updater/updater.cc:377] OS version: 15.7.7, arch: x86_64, System uptime (seconds): 249568, parent pid: 47027
+[47030:4664745:0713/143353.001074:VERBOSE1:chrome/updater/updater.cc:382] Available disk space in install directory (/Users/lutan/Library/Application Support/Google/GoogleUpdater): 238136053760B (221.781GiB) / 499963174912B (465.627GiB)
+[47030:4664745:0713/143353.001138:VERBOSE1:chrome/updater/updater.cc:386] Available disk space in temporary directory (/var/folders/zg/w96xmz093p5b24rf49lfv4500000gn/T/): 238136053760B (221.781GiB) / 499963174912B (465.627GiB)
+[47030:4664745:0713/143353.001323:VERBOSE2:chrome/updater/event_history.cc:265] Emitted a UPDATER_PROCESS START event to the history log
+[47032:4664749:0713/143353.015498:VERBOSE1:chrome/updater/updater.cc:374] Version: 152.0.7933.0, opt, x86_64, command line: /Users/lutan/Library/Application Support/Google/GoogleUpdater/152.0.7933.0/GoogleUpdater.app/Contents/MacOS/GoogleUpdater --crash-handler --database=/Users/lutan/Library/Application Support/Google/GoogleUpdater/152.0.7933.0/Crashpad --url=https://clients2.google.com/cr/report --annotation=prod=Update4 --annotation=ver=152.0.7933.0 --handshake-fd=6 --enable-logging --vmodule=*/components/update_client/*=2,*/chrome/enterprise_companion/*=2,*/chrome/updater/*=2
+[47032:4664749:0713/143353.016773:VERBOSE1:chrome/updater/updater.cc:377] OS version: 15.7.7, arch: x86_64, System uptime (seconds): 249568, parent pid: 1
+[47032:4664749:0713/143353.020420:VERBOSE1:chrome/updater/updater.cc:382] Available disk space in install directory (/Users/lutan/Library/Application Support/Google/GoogleUpdater): 238136053760B (221.781GiB) / 499963174912B (465.627GiB)
+[47032:4664749:0713/143353.020478:VERBOSE1:chrome/updater/updater.cc:386] Available disk space in temporary directory (/var/folders/zg/w96xmz093p5b24rf49lfv4500000gn/T/): 238136053760B (221.781GiB) / 499963174912B (465.627GiB)
+[47032:4664749:0713/143353.020655:VERBOSE2:chrome/updater/event_history.cc:265] Emitted a UPDATER_PROCESS START event to the history log
+[47030:4664745:0713/143353.021795:VERBOSE1:chrome/updater/crash_reporter.cc:124] Crash handler launched and ready.
+[47030:4664745:0713/143353.023200:VERBOSE1:chrome/updater/crash_client.cc:108] Found 0 completed crash reports
+[47030:4664745:0713/143353.023338:VERBOSE1:chrome/updater/crash_client.cc:132] Found 0 pending crash reports
+[47030:4664745:0713/143353.023485:ERROR:third_party/crashpad/crashpad/util/file/file_io_posix.cc:145] open /Users/lutan/Library/Application Support/Google/RLZ/Crashpad/settings.dat: No such file or directory (2)
+[47030:4664745:0713/143353.023787:VERBOSE1:chrome/updater/updater.cc:105] Crash reporting initialized.
+[47030:4664745:0713/143353.024235:VERBOSE1:chrome/updater/ipc/update_service_internal_proxy_mojo.cc:61] Run
+[46739:4663825:0713/143357.359705:ERROR:google_apis/gcm/engine/registration_request.cc:291] Registration response error message: DEPRECATED_ENDPOINT
+[46739:4663825:0713/143359.287718:ERROR:google_apis/gcm/engine/connection_factory_impl.cc:435] Failed to connect to MCS endpoint with error -111
+[47030:4664745:0713/143409.560947:VERBOSE1:chrome/updater/app/app.cc:52] Shutdown: 0
+[47030:4664745:0713/143409.563845:VERBOSE2:chrome/updater/event_history.cc:265] Emitted a UPDATER_PROCESS END event to the history log
+[47030:4664745:0713/143409.563971:VERBOSE1:chrome/updater/updater.cc:419] UpdaterMain (--wake) returned 0.
+[47027:4664741:0713/143409.821435:VERBOSE1:chrome/updater/app/app_wakeall.cc:68] `/Users/lutan/Library/Application Support/Google/GoogleUpdater/152.0.7933.0/GoogleUpdater.app/Contents/MacOS/GoogleUpdater --wake` exited 0
+[47027:4664724:0713/143409.822164:VERBOSE1:chrome/updater/app/app.cc:52] Shutdown: 0
+[47027:4664724:0713/143409.823649:VERBOSE2:chrome/updater/event_history.cc:265] Emitted a UPDATER_PROCESS END event to the history log
+[47027:4664724:0713/143409.823738:VERBOSE1:chrome/updater/updater.cc:419] UpdaterMain (--wake-all) returned 0.
+[47032:4664749:0713/143419.581067:VERBOSE2:chrome/updater/event_history.cc:265] Emitted a UPDATER_PROCESS END event to the history log
+[47032:4664749:0713/143419.581574:VERBOSE1:chrome/updater/updater.cc:419] UpdaterMain (--crash-handler) returned 0.
+[47029:4664728:0713/143419.584402:VERBOSE2:chrome/updater/event_history.cc:265] Emitted a UPDATER_PROCESS END event to the history log
+[47029:4664728:0713/143419.584548:VERBOSE1:chrome/updater/updater.cc:419] UpdaterMain (--crash-handler) returned 0.
+[46739:4663825:0713/143428.375179:ERROR:google_apis/gcm/engine/registration_request.cc:291] Registration response error message: DEPRECATED_ENDPOINT
+[46755:4663891:0713/143445.680420:ERROR:ui/display/mac/cv_display_link_mac.mm:194] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+[46739:4663825:0713/143523.253022:ERROR:google_apis/gcm/engine/registration_request.cc:291] Registration response error message: DEPRECATED_ENDPOINT
+Created TensorFlow Lite XNNPACK delegate for CPU.
+Trying to load the allocator multiple times. This is *not* supported.
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+I0000 00:00:1783924594.476393 4670006 environment.cc:558] Selected adapter: Intel(R) Iris(TM) Plus Graphics 645, arch=gen-9, vendor=intel, backend=Metal, adapterType=Integrated GPU
+I0000 00:00:1783924594.563832 4670032 environment.cc:558] Selected adapter: Intel(R) Iris(TM) Plus Graphics 645, arch=gen-9, vendor=intel, backend=Metal, adapterType=Integrated GPU
+[46739:4663825:0713/143708.286432:ERROR:google_apis/gcm/engine/registration_request.cc:291] Registration response error message: DEPRECATED_ENDPOINT
+[46739:4663762:0713/143811.375804:ERROR:content/browser/gpu/gpu_process_host.cc:1089] GPU process exited unexpectedly: exit_code=15
+[50390:4673833:0713/143812.340314:ERROR:base/apple/mach_port_rendezvous_mac.cc:256] bootstrap_look_up com.google.Chrome.MachPortRendezvousServer.1: Permission denied (1100)
+[50390:4673833:0713/143812.341186:ERROR:base/memory/shared_memory_switch.cc:261] No rendezvous client, terminating process (parent died?)

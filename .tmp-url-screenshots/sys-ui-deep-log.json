@@ -1,0 +1,106 @@
+[
+  {
+    "kingdee_links": [
+      {
+        "t": "首页",
+        "h": "https://open.kingdee.com/K3Cloud/Open/Home.aspx"
+      },
+      {
+        "t": "我的平台",
+        "h": "https://open.kingdee.com/K3Cloud/Open/Consle"
+      },
+      {
+        "t": "产品大厅",
+        "h": "https://open.kingdee.com/K3Cloud/Open/Products.aspx"
+      },
+      {
+        "t": "体验中心",
+        "h": "https://open.kingdee.com/K3Cloud/Open/ExpressHome.aspx"
+      },
+      {
+        "t": "金蝶云社区",
+        "h": "https://open.kingdee.com/K3Cloud/Open/DevCommunity.ashx"
+      },
+      {
+        "t": "补丁下载",
+        "h": "https://open.kingdee.com/K3Cloud/Open/PTDownload.aspx"
+      },
+      {
+        "t": "注册",
+        "h": "https://cloud.kingdee.com/passport/signup"
+      },
+      {
+        "t": "登录",
+        "h": "https://open.kingdee.com/K3Cloud/Open/Consle"
+      },
+      {
+        "t": "个人信息",
+        "h": "https://open.kingdee.com/K3Cloud/Open/Profile.aspx"
+      },
+      {
+        "t": "退出",
+        "h": "https://open.kingdee.com/K3Cloud/Open/Home.aspx?act=logout"
+      },
+      {
+        "t": "首页",
+        "h": "https://open.kingdee.com/K3Cloud/Open/Home.aspx"
+      },
+      {
+        "t": "我的平台",
+        "h": "https://open.kingdee.com/K3Cloud/Open/Consle"
+      },
+      {
+        "t": "产品大厅",
+        "h": "https://open.kingdee.com/K3Cloud/Open/Products.aspx"
+      },
+      {
+        "t": "体验中心",
+        "h": "https://open.kingdee.com/K3Cloud/Open/ExpressHome.aspx"
+      },
+      {
+        "t": "金蝶云社区",
+        "h": "https://open.kingdee.com/K3Cloud/Open/DevCommunity.ashx"
+      },
+      {
+        "t": "补丁下载",
+        "h": "https://open.kingdee.com/K3Cloud/Open/PTDownload.aspx"
+      },
+      {
+        "t": "登录",
+        "h": "https://open.kingdee.com/K3Cloud/Open/Consle"
+      },
+      {
+        "t": "个人信息",
+        "h": "https://open.kingdee.com/K3Cloud/Open/Profile.aspx"
+      },
+      {
+        "t": "退出",
+        "h": "https://open.kingdee.com/K3Cloud/Open/Home.aspx?act=logout"
+      },
+      {
+        "t": "翻译平台",
+        "h": "https://translation.open.kingdee.com/K3cloud/Silverlight/ML.aspx"
+      },
+      {
+        "t": "电商ERP",
+        "h": "http://drp.k3cloud.kingdee.com/iSale"
+      },
+      {
+        "t": "原首页登录",
+        "h": "https://open.kingdee.com/K3Cloud/cdpportal/index.aspx"
+      },
+      {
+        "t": "管理中心",
+        "h": "https://open.kingdee.com/K3Cloud/CDP/Index.aspx"
+      },
+      {
+        "t": "用户协议",
+        "h": "https://cloud.kingdee.com/passport/#/policy-agree/client-kd"
+      },
+      {
+        "t": "隐私政策",
+        "h": "https://cloud.kingdee.com/passport/#/policy-agree/privacy-policy"
+      }
+    ]
+  }
+]

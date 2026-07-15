@@ -1,0 +1,14 @@
+2026/07/13-14:32:28.212 47200f Reusing MANIFEST /Users/lutan/Projects/vue-supplychain-demo/.tmp-url-screenshots/chrome-profile-2/Default/Local Storage/leveldb/MANIFEST-000001
+2026/07/13-14:32:28.229 47200f Recovering log #10
+2026/07/13-14:32:28.230 47200f Reusing old log /Users/lutan/Projects/vue-supplychain-demo/.tmp-url-screenshots/chrome-profile-2/Default/Local Storage/leveldb/000010.log 
+2026/07/13-14:33:04.379 472012 Level-0 table #13: started
+2026/07/13-14:33:04.433 472012 Level-0 table #13: 143722 bytes OK
+2026/07/13-14:33:04.464 472012 Delete type=0 #10
+2026/07/13-14:33:04.468 472012 Compacting 4@0 + 0@1 files
+2026/07/13-14:33:04.487 472012 Generated table #14@0: 80 keys, 331656 bytes
+2026/07/13-14:33:04.487 472012 Compacted 4@0 + 0@1 files => 331656 bytes
+2026/07/13-14:33:04.491 472012 compacted to: files[ 0 1 0 0 0 0 0 ]
+2026/07/13-14:33:04.494 472012 Delete type=2 #3
+2026/07/13-14:33:04.494 472012 Delete type=2 #7
+2026/07/13-14:33:04.494 472012 Delete type=2 #13
+2026/07/13-14:33:04.494 472012 Delete type=2 #9

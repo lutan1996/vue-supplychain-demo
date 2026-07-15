@@ -1,0 +1,54 @@
+[41543:4649546:0713/142803.363247:ERROR:ui/display/mac/cv_display_link_mac.mm:194] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+[41543:4649546:0713/142803.367888:ERROR:ui/display/mac/cv_display_link_mac.mm:194] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+[41543:4649546:0713/142803.368059:ERROR:ui/display/mac/cv_display_link_mac.mm:194] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+[41543:4649546:0713/142803.368287:ERROR:ui/display/mac/cv_display_link_mac.mm:194] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+[41543:4649546:0713/142803.368481:ERROR:ui/display/mac/cv_display_link_mac.mm:194] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+[41543:4649546:0713/142803.368717:ERROR:ui/display/mac/cv_display_link_mac.mm:194] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+[41543:4649546:0713/142806.003892:ERROR:ui/display/mac/cv_display_link_mac.mm:194] CVDisplayLinkCreateWithCGDisplay failed. CVReturn: -6670
+Trying to load the allocator multiple times. This is *not* supported.
+711651 bytes written to file /Users/lutan/Projects/vue-supplychain-demo/.tmp-url-screenshots/10-yonyou-trial.png
+[41528:4649528:0713/142808.875523:ERROR:base/process/process_mac.cc:53] task_policy_set TASK_CATEGORY_POLICY: (os/kern) invalid argument (4)
+[41528:4649528:0713/142808.876530:ERROR:base/process/process_mac.cc:98] task_policy_set TASK_SUPPRESSION_POLICY: (os/kern) invalid argument (4)
+[41869:4650535:0713/142821.743805:VERBOSE1:chrome/updater/updater.cc:374] Version: 152.0.7933.0, opt, x86_64, command line: /Users/lutan/Library/Application Support/Google/GoogleUpdater/152.0.7933.0/GoogleUpdater.app/Contents/MacOS/GoogleUpdater --wake-all --enable-logging --vmodule=*/components/update_client/*=2,*/chrome/enterprise_companion/*=2,*/chrome/updater/*=2
+[41869:4650535:0713/142821.744832:VERBOSE1:chrome/updater/updater.cc:377] OS version: 15.7.7, arch: x86_64, System uptime (seconds): 249236, parent pid: 41528
+[41869:4650535:0713/142821.748632:VERBOSE1:chrome/updater/updater.cc:382] Available disk space in install directory (/Users/lutan/Library/Application Support/Google/GoogleUpdater): 239383076864B (222.943GiB) / 499963174912B (465.627GiB)
+[41869:4650535:0713/142821.748683:VERBOSE1:chrome/updater/updater.cc:386] Available disk space in temporary directory (/var/folders/zg/w96xmz093p5b24rf49lfv4500000gn/T/): 239383076864B (222.943GiB) / 499963174912B (465.627GiB)
+[41869:4650535:0713/142821.749004:VERBOSE2:chrome/updater/event_history.cc:265] Emitted a UPDATER_PROCESS START event to the history log
+[41871:4650539:0713/142821.765806:VERBOSE1:chrome/updater/updater.cc:374] Version: 152.0.7933.0, opt, x86_64, command line: /Users/lutan/Library/Application Support/Google/GoogleUpdater/152.0.7933.0/GoogleUpdater.app/Contents/MacOS/GoogleUpdater --crash-handler --database=/Users/lutan/Library/Application Support/Google/GoogleUpdater/152.0.7933.0/Crashpad --url=https://clients2.google.com/cr/report --annotation=prod=Update4 --annotation=ver=152.0.7933.0 --handshake-fd=6 --enable-logging --vmodule=*/components/update_client/*=2,*/chrome/enterprise_companion/*=2,*/chrome/updater/*=2
+[41871:4650539:0713/142821.767313:VERBOSE1:chrome/updater/updater.cc:377] OS version: 15.7.7, arch: x86_64, System uptime (seconds): 249236, parent pid: 1
+[41871:4650539:0713/142821.772692:VERBOSE1:chrome/updater/updater.cc:382] Available disk space in install directory (/Users/lutan/Library/Application Support/Google/GoogleUpdater): 239383076864B (222.943GiB) / 499963174912B (465.627GiB)
+[41871:4650539:0713/142821.772742:VERBOSE1:chrome/updater/updater.cc:386] Available disk space in temporary directory (/var/folders/zg/w96xmz093p5b24rf49lfv4500000gn/T/): 239383076864B (222.943GiB) / 499963174912B (465.627GiB)
+[41871:4650539:0713/142821.772904:VERBOSE2:chrome/updater/event_history.cc:265] Emitted a UPDATER_PROCESS START event to the history log
+[41869:4650535:0713/142821.775796:VERBOSE1:chrome/updater/crash_reporter.cc:124] Crash handler launched and ready.
+[41869:4650535:0713/142821.777497:VERBOSE1:chrome/updater/crash_client.cc:108] Found 0 completed crash reports
+[41869:4650535:0713/142821.777718:VERBOSE1:chrome/updater/crash_client.cc:132] Found 0 pending crash reports
+[41869:4650535:0713/142821.777953:ERROR:third_party/crashpad/crashpad/util/file/file_io_posix.cc:145] open /Users/lutan/Library/Application Support/Google/RLZ/Crashpad/settings.dat: No such file or directory (2)
+[41869:4650535:0713/142821.778429:VERBOSE1:chrome/updater/updater.cc:105] Crash reporting initialized.
+[41869:4650548:0713/142821.779136:VERBOSE1:chrome/updater/app/app_wakeall.cc:58] Launching `/Users/lutan/Library/Application Support/Google/GoogleUpdater/152.0.7933.0/GoogleUpdater.app/Contents/MacOS/GoogleUpdater --wake`
+[41872:4650552:0713/142821.800070:VERBOSE1:chrome/updater/updater.cc:374] Version: 152.0.7933.0, opt, x86_64, command line: /Users/lutan/Library/Application Support/Google/GoogleUpdater/152.0.7933.0/GoogleUpdater.app/Contents/MacOS/GoogleUpdater --wake --enable-logging --vmodule=*/components/update_client/*=2,*/chrome/enterprise_companion/*=2,*/chrome/updater/*=2
+[41872:4650552:0713/142821.801539:VERBOSE1:chrome/updater/updater.cc:377] OS version: 15.7.7, arch: x86_64, System uptime (seconds): 249237, parent pid: 41869
+[41872:4650552:0713/142821.824385:VERBOSE1:chrome/updater/updater.cc:382] Available disk space in install directory (/Users/lutan/Library/Application Support/Google/GoogleUpdater): 239383076864B (222.943GiB) / 499963174912B (465.627GiB)
+[41872:4650552:0713/142821.825868:VERBOSE1:chrome/updater/updater.cc:386] Available disk space in temporary directory (/var/folders/zg/w96xmz093p5b24rf49lfv4500000gn/T/): 239383076864B (222.943GiB) / 499963174912B (465.627GiB)
+[41872:4650552:0713/142821.826107:VERBOSE2:chrome/updater/event_history.cc:265] Emitted a UPDATER_PROCESS START event to the history log
+[41874:4650561:0713/142821.904717:VERBOSE1:chrome/updater/updater.cc:374] Version: 152.0.7933.0, opt, x86_64, command line: /Users/lutan/Library/Application Support/Google/GoogleUpdater/152.0.7933.0/GoogleUpdater.app/Contents/MacOS/GoogleUpdater --crash-handler --database=/Users/lutan/Library/Application Support/Google/GoogleUpdater/152.0.7933.0/Crashpad --url=https://clients2.google.com/cr/report --annotation=prod=Update4 --annotation=ver=152.0.7933.0 --handshake-fd=6 --enable-logging --vmodule=*/components/update_client/*=2,*/chrome/enterprise_companion/*=2,*/chrome/updater/*=2
+[41874:4650561:0713/142821.910018:VERBOSE1:chrome/updater/updater.cc:377] OS version: 15.7.7, arch: x86_64, System uptime (seconds): 249237, parent pid: 1
+[41874:4650561:0713/142821.920548:VERBOSE1:chrome/updater/updater.cc:382] Available disk space in install directory (/Users/lutan/Library/Application Support/Google/GoogleUpdater): 239383076864B (222.943GiB) / 499963174912B (465.627GiB)
+[41874:4650561:0713/142821.920604:VERBOSE1:chrome/updater/updater.cc:386] Available disk space in temporary directory (/var/folders/zg/w96xmz093p5b24rf49lfv4500000gn/T/): 239383076864B (222.943GiB) / 499963174912B (465.627GiB)
+[41874:4650561:0713/142821.920781:VERBOSE2:chrome/updater/event_history.cc:265] Emitted a UPDATER_PROCESS START event to the history log
+[41872:4650552:0713/142821.926110:VERBOSE1:chrome/updater/crash_reporter.cc:124] Crash handler launched and ready.
+[41872:4650552:0713/142821.931478:VERBOSE1:chrome/updater/crash_client.cc:108] Found 0 completed crash reports
+[41872:4650552:0713/142821.931672:VERBOSE1:chrome/updater/crash_client.cc:132] Found 0 pending crash reports
+[41872:4650552:0713/142821.931872:ERROR:third_party/crashpad/crashpad/util/file/file_io_posix.cc:145] open /Users/lutan/Library/Application Support/Google/RLZ/Crashpad/settings.dat: No such file or directory (2)
+[41872:4650552:0713/142821.932554:VERBOSE1:chrome/updater/updater.cc:105] Crash reporting initialized.
+[41872:4650552:0713/142821.933606:VERBOSE1:chrome/updater/ipc/update_service_internal_proxy_mojo.cc:61] Run
+[41872:4650552:0713/142839.317192:VERBOSE1:chrome/updater/app/app.cc:52] Shutdown: 0
+[41872:4650552:0713/142839.333170:VERBOSE2:chrome/updater/event_history.cc:265] Emitted a UPDATER_PROCESS END event to the history log
+[41872:4650552:0713/142839.333252:VERBOSE1:chrome/updater/updater.cc:419] UpdaterMain (--wake) returned 0.
+[41869:4650548:0713/142839.562140:VERBOSE1:chrome/updater/app/app_wakeall.cc:68] `/Users/lutan/Library/Application Support/Google/GoogleUpdater/152.0.7933.0/GoogleUpdater.app/Contents/MacOS/GoogleUpdater --wake` exited 0
+[41869:4650535:0713/142839.563602:VERBOSE1:chrome/updater/app/app.cc:52] Shutdown: 0
+[41869:4650535:0713/142839.564867:VERBOSE2:chrome/updater/event_history.cc:265] Emitted a UPDATER_PROCESS END event to the history log
+[41869:4650535:0713/142839.564964:VERBOSE1:chrome/updater/updater.cc:419] UpdaterMain (--wake-all) returned 0.
+[41874:4650561:0713/142849.330038:VERBOSE2:chrome/updater/event_history.cc:265] Emitted a UPDATER_PROCESS END event to the history log
+[41874:4650561:0713/142849.330367:VERBOSE1:chrome/updater/updater.cc:419] UpdaterMain (--crash-handler) returned 0.
+[41871:4650539:0713/142849.334322:VERBOSE2:chrome/updater/event_history.cc:265] Emitted a UPDATER_PROCESS END event to the history log
+[41871:4650539:0713/142849.334535:VERBOSE1:chrome/updater/updater.cc:419] UpdaterMain (--crash-handler) returned 0.

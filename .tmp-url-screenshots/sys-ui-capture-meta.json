@@ -1,0 +1,53 @@
+[
+  {
+    "name": "zoho-inventory-demo",
+    "url": "https://www.zoho.com/us/inventory/inventory-software-demo/",
+    "ok": false,
+    "title": "",
+    "final_url": "",
+    "error": "Page.goto: Timeout 60000ms exceeded.\nCall log:\n  - navigating to \"https://www.zoho.com/us/inventory/inventory-software-demo/\", waiting until \"domcontentloaded\"\n"
+  },
+  {
+    "name": "odoo-inventory",
+    "url": "https://demo.odoo.com/odoo/inventory",
+    "ok": false,
+    "title": "",
+    "final_url": "",
+    "error": "Page.goto: Timeout 60000ms exceeded.\nCall log:\n  - navigating to \"https://demo.odoo.com/odoo/inventory\", waiting until \"domcontentloaded\"\n"
+  },
+  {
+    "name": "sap-fiori-f1595",
+    "url": "https://fioriappslibrary.hana.ondemand.com/sap/fix/externalViewer/#/detail/Apps('F1595')/S35",
+    "ok": true,
+    "title": "SAP Fiori Apps Reference Library",
+    "final_url": "https://fioriappslibrary.hana.ondemand.com/sap/fix/externalViewer/#/detail/Apps('F1595')/S35",
+    "error": "",
+    "size": 207773
+  },
+  {
+    "name": "sap-community-stock",
+    "url": "https://community.sap.com/t5/enterprise-resource-planning-blog-posts-by-sap/stock-multiple-materials-key-features-s-4hana-public-cloud/ba-p/14174701",
+    "ok": true,
+    "title": "请稍候…",
+    "final_url": "https://community.sap.com/t5/enterprise-resource-planning-blog-posts-by-sap/stock-multiple-materials-key-features-s-4hana-public-cloud/ba-p/14174701",
+    "error": "",
+    "size": 37575
+  },
+  {
+    "name": "grafana-play-home",
+    "url": "https://play.grafana.org/d/000000012/grafana-play-home?orgId=1",
+    "ok": false,
+    "title": "",
+    "final_url": "",
+    "error": "Page.goto: Timeout 60000ms exceeded.\nCall log:\n  - navigating to \"https://play.grafana.org/d/000000012/grafana-play-home?orgId=1\", waiting until \"domcontentloaded\"\n"
+  },
+  {
+    "name": "kingdee-open-express",
+    "url": "https://open.kingdee.com/K3Cloud/Open/ExpressHome.aspx",
+    "ok": true,
+    "title": "金蝶云星空开放平台",
+    "final_url": "https://open.kingdee.com/K3Cloud/Open/ExpressHome.aspx",
+    "error": "",
+    "size": 644915
+  }
+]
