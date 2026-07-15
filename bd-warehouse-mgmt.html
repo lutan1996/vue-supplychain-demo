@@ -134,8 +134,21 @@
       <main class="main-scroll"><div class="carrier-main-inner">
 
         <div class="bd-filter">
-          <label>所属场站</label>
-          <select><option value="">请选择所属场站</option><option>齐心营风电场</option><option>中衡龙腾第一光伏电站</option><option>横龙风电场</option><option>海上射阳风电场</option></select>
+          <label>所属组织</label>
+          <select>
+            <option value="">请选择所属组织</option>
+            <optgroup label="销售公司">
+              <option>山西龙源新能源有限公司</option>
+              <option>河北龙源风电有限公司</option>
+              <option>海上龙源风力发电有限公司</option>
+            </optgroup>
+            <optgroup label="场站">
+              <option>齐心营风电场</option>
+              <option>中衡龙腾第一光伏电站</option>
+              <option>横龙风电场</option>
+              <option>海上射阳风电场</option>
+            </optgroup>
+          </select>
           <label>仓库名称</label>
           <input placeholder="请输入仓库名称" />
           <label>仓库状态</label>
@@ -148,13 +161,13 @@
         <div class="bd-panel">
           <table class="bd-table">
             <thead><tr>
-              <th>序号</th><th>仓库名称</th><th>所属电站</th><th>物料标签类别</th><th>打印机 IP</th><th>仓库状态</th><th>操作</th>
+              <th>序号</th><th>仓库名称</th><th>所属组织</th><th>组织层级</th><th>物料标签类别</th><th>打印机 IP</th><th>仓库状态</th><th>操作</th>
             </tr></thead>
             <tbody>
-              <tr><td>1</td><td>备件库</td><td>中衡龙腾第一光伏电站</td><td><span class="bd-tag wait">普通标签</span></td><td>10.20.12.30</td><td><span class="bd-tag ok">已发布</span></td><td class="bd-op"><a href="#">详情</a><a href="#" class="warn">取消发布</a><a href="bd-warehouse-area.html">库区查询</a></td></tr>
-              <tr><td>2</td><td>临时测试</td><td>齐心营风电场</td><td><span class="bd-tag wait">普通标签</span></td><td>192.168.100.100</td><td><span class="bd-tag wait">未发布</span></td><td class="bd-op"><a href="#">发布</a><a href="#">修改</a><a href="#" class="danger">删除</a></td></tr>
-              <tr><td>3</td><td>测试数据</td><td>齐心营风电场</td><td><span class="bd-tag wait">普通标签</span></td><td>192.168.100.101</td><td><span class="bd-tag wait">未发布</span></td><td class="bd-op"><a href="#">发布</a><a href="#">修改</a><a href="#" class="danger">删除</a></td></tr>
-              <tr><td>4</td><td>横龙仓库</td><td>横龙风电场</td><td><span class="bd-tag wait">普通标签</span></td><td>10.20.12.45</td><td><span class="bd-tag ok">已发布</span></td><td class="bd-op"><a href="#">详情</a><a href="#" class="warn">取消发布</a><a href="bd-warehouse-area.html">库区查询</a></td></tr>
+              <tr><td>1</td><td>山西公司中心仓</td><td>山西龙源新能源有限公司</td><td><span class="bd-tag ok">公司级</span></td><td><span class="bd-tag wait">普通标签</span></td><td>10.20.12.30</td><td><span class="bd-tag ok">已发布</span></td><td class="bd-op"><a href="#">详情</a><a href="#" class="warn">取消发布</a><a href="bd-warehouse-area.html">库区查询</a></td></tr>
+              <tr><td>2</td><td>备件库</td><td>中衡龙腾第一光伏电站</td><td><span class="bd-tag wait">场站级</span></td><td><span class="bd-tag wait">普通标签</span></td><td>10.20.12.31</td><td><span class="bd-tag ok">已发布</span></td><td class="bd-op"><a href="#">详情</a><a href="#" class="warn">取消发布</a><a href="bd-warehouse-area.html">库区查询</a></td></tr>
+              <tr><td>3</td><td>临时测试</td><td>齐心营风电场</td><td><span class="bd-tag wait">场站级</span></td><td><span class="bd-tag wait">普通标签</span></td><td>192.168.100.100</td><td><span class="bd-tag wait">未发布</span></td><td class="bd-op"><a href="#">发布</a><a href="#">修改</a><a href="#" class="danger">删除</a></td></tr>
+              <tr><td>4</td><td>横龙仓库</td><td>横龙风电场</td><td><span class="bd-tag wait">场站级</span></td><td><span class="bd-tag wait">普通标签</span></td><td>10.20.12.45</td><td><span class="bd-tag ok">已发布</span></td><td class="bd-op"><a href="#">详情</a><a href="#" class="warn">取消发布</a><a href="bd-warehouse-area.html">库区查询</a></td></tr>
             </tbody>
           </table>
           <div class="bd-foot"><span>共 4 条</span><span>10 条/页 · 1 / 1</span></div>
@@ -163,7 +176,7 @@
           <div class="bd-modal">
             <div class="bd-modal-hd">新建仓库</div>
             <div class="bd-modal-bd">
-              <div class="bd-field"><label><span class="req">*</span> 所属场站</label><select><option value="">请选择所属场站</option><option>齐心营风电场</option><option>横龙风电场</option></select></div>
+              <div class="bd-field"><label><span class="req">*</span> 所属组织</label><select><option value="">请选择所属组织</option><optgroup label="销售公司"><option>山西龙源新能源有限公司</option><option>河北龙源风电有限公司</option></optgroup><optgroup label="场站"><option>齐心营风电场</option><option>横龙风电场</option></optgroup></select></div>
               <div class="bd-field"><label><span class="req">*</span> 仓库名称</label><input placeholder="请输入仓库名称" /></div>
               <div class="bd-field"><label>物料标签类别</label><div class="bd-radios"><label><input type="radio" name="tag" checked /> 普通标签</label><label><input type="radio" name="tag" /> RFID标签</label><label><input type="radio" name="tag" /> 手写标签</label></div></div>
               <div class="bd-field"><label>打印机 IP</label><div style="display:flex;gap:8px"><input placeholder="请输入打印机IP" style="flex:1"/><button class="bd-btn ghost" type="button">测试连接</button></div></div>

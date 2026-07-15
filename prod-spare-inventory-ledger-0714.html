@@ -874,6 +874,10 @@
       transition: transform .28s ease;
     }
     .rail.open { transform: translateX(0); }
+    .rail.detail-mode {
+      width: 760px;
+      max-width: 96vw;
+    }
     .rail-hd {
       position: sticky;
       top: 0;
@@ -990,6 +994,62 @@
     }
     .timeline li:last-child { border-bottom: 0; }
     .timeline .tm { color: var(--muted); }
+    .detail-summary {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      background: #f8fbff;
+      border: 1px solid #d6e4ff;
+      border-radius: 8px;
+      padding: 10px;
+      margin-bottom: 10px;
+      font-size: 12px;
+      color: #475569;
+    }
+    .detail-summary b {
+      display: block;
+      color: #1f2d3d;
+      font-size: 14px;
+      margin-bottom: 2px;
+    }
+    .warehouse-field-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      font-size: 12px;
+      background: #fff;
+      border: 1px solid #e8edf4;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .warehouse-field-table th,
+    .warehouse-field-table td {
+      padding: 8px 10px;
+      border-bottom: 1px solid #eef2f7;
+      text-align: left;
+      vertical-align: top;
+      line-height: 1.45;
+    }
+    .warehouse-field-table th {
+      background: #f7f9fc;
+      color: #5a6b82;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    .warehouse-field-table tr:last-child td { border-bottom: 0; }
+    .warehouse-field-table .field-name {
+      width: 110px;
+      color: #1f2d3d;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    .warehouse-field-table .field-value {
+      width: 170px;
+      color: #1677ff;
+      font-weight: 600;
+    }
+    .warehouse-field-table .field-desc { color: #64748b; }
+    .warehouse-field-table .field-rule { color: #8c9bb0; }
 
     .map-note {
       margin-top: 8px;
@@ -1344,9 +1404,11 @@
   <div class="alert-mask" id="alertMask"></div>
   <aside class="rail" id="alertDrawer" aria-hidden="true">
     <div class="rail-hd">
-      <h2>库存预警</h2>
+      <h2 id="drawerTitle">库存预警</h2>
       <button type="button" class="rail-close" id="btnCloseAlert" aria-label="关闭">✕</button>
     </div>
+    <div id="detailDrawerBody" style="display:none"></div>
+    <div id="alertDrawerBody">
     <div class="rail-sec">
       <h3>待处理预警 <span class="cnt" id="alertCnt">6</span></h3>
       <div class="alert-item">
@@ -1413,6 +1475,7 @@
         <li><div class="tm">08:50</div><div>系统识别新增低库存预警 3 条</div></li>
         <li><div class="tm">08:20</div><div>共享仓发布余量：断路器触头 10 件可借</div></li>
       </ul>
+    </div>
     </div>
   </aside>
 
@@ -1507,6 +1570,35 @@
       product: "",
       kw: ""
     };
+
+    var WAREHOUSE_DETAIL_FIELDS = [
+      { name: "物资编码", desc: "系统物料编码", rule: "一物一码，检索核心，不可重复", value: function (r) { return r.code; } },
+      { name: "原厂物料号", desc: "厂家备件型号编码", rule: "新能源备件多厂商匹配查询使用", value: function (r) { return "OEM-" + r.model; } },
+      { name: "物资名称", desc: "备件全称", rule: "如：风机 IGBT 模块、储能高压熔断器", value: function (r) { return r.name; } },
+      { name: "规格型号", desc: "完整参数规格", rule: "功率、电压、适配机组型号（风机 / 逆变器型号）", value: function (r) { return r.model; } },
+      { name: "物资大类", desc: "分类", rule: "风电备件 / 光伏备件 / 储能备件 / 工具辅材 / 其他", value: function (r) { return r.type; } },
+      { name: "适用机型", desc: "适配那些机型", rule: "", value: "金风 GW150 / 联合动力 UP2000" },
+      { name: "安装位置", desc: "", rule: "", value: function (r) { return r.type + "系统"; } },
+      { name: "制造商", desc: "", rule: "", value: "东方电气风电股份有限公司" },
+      { name: "供应商", desc: "", rule: "", value: "国能供应链华北分公司" },
+      { name: "单位", desc: "计量单位", rule: "件、套、卷、箱、kg", value: "件" },
+      { name: "采购单价", desc: "单品不含税单价", rule: "财务成本核算、库存价值统计", value: function (r) { return "¥" + money(Math.round((r.amount || 0) / Math.max(r.qty || 1, 1))); } },
+      { name: "总成本", desc: "该行明细金额", rule: "单价 × 入库数量，自动计算", value: function (r) { return "¥" + money(r.amount); } },
+      { name: "生产批次号", desc: "厂家批次", rule: "储能电池、电子件强制记录，追溯质保", value: function (r) { return "LOT-" + r.start.replace(/-/g, "") + "-" + r.code.slice(-3); } },
+      { name: "生产日期", desc: "备件出厂日期", rule: "用于临期预警", value: "2026-03-18" },
+      { name: "质保到期日", desc: "质保截止时间", rule: "系统自动计算，搜索列表标红临期物资", value: "2028-03-17" },
+      { name: "五级库位编码", desc: "存放完整位置编码", rule: "格式：仓库 - 库区 - 货架 - 层 - 库位，上架后绑定", value: function (r) { return r.loc + " / A-03-02-08"; } },
+      { name: "仓库编码", desc: "一级层级", rule: "放到某个仓库", value: function (r) { return r.loc.split("/")[1] ? r.loc.split("/")[1].trim() : "主仓"; } },
+      { name: "库区编码", desc: "二级层级", rule: "风电区 / 储能区 / 返修区 / 报废暂存区", value: function (r) { return r.type + "区"; } },
+      { name: "货架编码", desc: "三级层级", rule: "库区下货架编号", value: "HJ-A03" },
+      { name: "层数", desc: "四级层级", rule: "货架 1/2/3 层", value: "2层" },
+      { name: "库位编号", desc: "五级最小单元", rule: "最小存放位置，一个库位仅存同一种备件", value: "KW-08" },
+      { name: "库位二维码", desc: "库位条码内容", rule: "PDA 扫码上架、盘点使用", value: "QR-KW-A03-02-08" },
+      { name: "物资条码 / 二维码", desc: "备件实物条码", rule: "单件备件扫码识别物资档案", value: function (r) { return "QR-" + r.code + "-0001"; } },
+      { name: "物资状态", desc: "库存属性", rule: "正常 / 借出 / 报废，用于后续展示状态", value: function (r) { return r.status; } },
+      { name: "备注", desc: "单行备件说明", rule: "如：抢修备用件、外包装破损、单独存放防潮", value: "抢修备用件，按仓储字段表补充展示" },
+      { name: "附件", desc: "上传照片等附件信息", rule: "", value: "实物照片 2 张 / 质保文件 1 份" }
+    ];
 
     /* 组织库存汇总：集团→项目公司；项目公司→风电场（对齐讨论 + 关键部件台账工厂清单） */
     var ORG_PIE_COLORS = ["#1677ff", "#36cfc9", "#95de64", "#ffc53d", "#ff85c0", "#9254de", "#69b1ff"];
@@ -1664,18 +1756,7 @@
     }
 
     function rowOps(r) {
-      var html = '<td class="op">' +
-        '<a href="#" data-op="详情">详情</a>';
-      if (r.status === "呆滞") {
-        html += '<a class="warn" href="#" data-op="处置">处置</a>';
-      } else {
-        html += '<a href="#" data-op="调拨">调拨</a>';
-      }
-      if (r.status === "零库存") {
-        html += '<a class="danger" href="#" data-op="补货">补货</a>';
-      }
-      html += "</td>";
-      return html;
+      return '<td class="op"><a href="#" data-op="详情" data-code="' + r.code + '">详情</a></td>';
     }
 
     function renderTable() {
@@ -1722,8 +1803,10 @@
       if (!a) return;
       e.preventDefault();
       var op = a.getAttribute("data-op");
-      if (op === "调拨" || op === "补货" || op === "处置") {
-        openAlertDrawer();
+      if (op === "详情") {
+        var code = a.getAttribute("data-code");
+        var row = filteredRows().filter(function (r) { return r.code === code; })[0];
+        if (row) openDetailDrawer(row);
       }
     });
     var btnTransferApply = document.getElementById("btnTransferApply");
@@ -1733,6 +1816,39 @@
 
     /* 预警抽屉：从右往左滑出 */
     function openAlertDrawer() {
+      document.getElementById("drawerTitle").textContent = "库存预警";
+      document.getElementById("alertDrawer").classList.remove("detail-mode");
+      document.getElementById("alertDrawerBody").style.display = "";
+      document.getElementById("detailDrawerBody").style.display = "none";
+      document.getElementById("alertMask").classList.add("open");
+      document.getElementById("alertDrawer").classList.add("open");
+      document.getElementById("alertDrawer").setAttribute("aria-hidden", "false");
+    }
+    function fieldValue(field, row) {
+      return typeof field.value === "function" ? field.value(row) : field.value;
+    }
+    function openDetailDrawer(row) {
+      document.getElementById("drawerTitle").textContent = "物资仓储详情";
+      document.getElementById("alertDrawer").classList.add("detail-mode");
+      document.getElementById("alertDrawerBody").style.display = "none";
+      var rowsHtml = WAREHOUSE_DETAIL_FIELDS.map(function (f) {
+        return "<tr>" +
+          '<td class="field-name">' + f.name + "</td>" +
+          '<td class="field-value">' + fieldValue(f, row) + "</td>" +
+          '<td class="field-desc">' + (f.desc || "-") + "</td>" +
+          '<td class="field-rule">' + (f.rule || "-") + "</td>" +
+          "</tr>";
+      }).join("");
+      document.getElementById("detailDrawerBody").innerHTML =
+        '<div class="detail-summary">' +
+          '<div><b>' + row.name + '</b>物资编码：' + row.code + '</div>' +
+          '<div><b>' + row.company + '</b>当前位置：' + row.loc + '</div>' +
+        '</div>' +
+        '<div class="rail-sec"><h3>详细仓储字段表 <span class="cnt g">26项</span></h3>' +
+        '<table class="warehouse-field-table"><thead><tr><th>字段名称</th><th>当前值</th><th>字段说明</th><th>业务规则 & 新能源备件适配</th></tr></thead><tbody>' +
+        rowsHtml +
+        "</tbody></table></div>";
+      document.getElementById("detailDrawerBody").style.display = "";
       document.getElementById("alertMask").classList.add("open");
       document.getElementById("alertDrawer").classList.add("open");
       document.getElementById("alertDrawer").setAttribute("aria-hidden", "false");
