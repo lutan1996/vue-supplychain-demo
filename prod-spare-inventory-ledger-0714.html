@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>生产物资库存台账 - 新能源物资供应链管理系统</title>
+  <title>生产物资库存管理 - 新能源物资供应链管理系统</title>
   <link rel="stylesheet" href="css/vendor/fa-all.min.css" />
   <link rel="stylesheet" href="css/subpage-base.css" />
   <link rel="stylesheet" href="css/carrier-management.css" />
@@ -261,7 +261,32 @@
       color: var(--muted);
       margin-top: 2px;
     }
-    .page-hd .ops { display: flex; gap: 6px; flex-wrap: wrap; }
+    .page-hd .ops { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+    .page-view-switch {
+      display: inline-flex;
+      align-items: center;
+      background: #f5f8fc;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      overflow: hidden;
+      margin-right: 4px;
+    }
+    .page-view-switch a {
+      height: 30px;
+      padding: 0 12px;
+      display: inline-flex;
+      align-items: center;
+      font-size: 12px;
+      color: #64748b;
+      text-decoration: none;
+      border-right: 1px solid #e2e8f0;
+    }
+    .page-view-switch a:last-child { border-right: 0; }
+    .page-view-switch a.on {
+      background: #1677ff;
+      color: #fff;
+      font-weight: 600;
+    }
     .btn {
       height: 30px;
       border-radius: 4px;
@@ -1082,9 +1107,13 @@
     <div class="center">
       <div class="page-hd">
         <div>
-          <h1>生产物资库存台账</h1>
+          <h1>生产物资库存管理</h1>
         </div>
         <div class="ops">
+          <div class="page-view-switch" aria-label="生产物资库存管理视图切换">
+            <a class="on" href="prod-spare-inventory-ledger-0714.html">库存总览</a>
+            <a href="prod-spare-storage-0714.html">仓库视图</a>
+          </div>
           <button class="btn warn-entry" type="button" id="btnOpenAlert">预警<span class="badge">6</span></button>
           <button class="btn pri" type="button">查询</button>
         </div>

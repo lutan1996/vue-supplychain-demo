@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>备件存储 - 生产物资库存管理</title>
+  <title>生产物资库存管理 · 仓库视图 - 新能源物资供应链管理系统</title>
   <link rel="stylesheet" href="css/vendor/fa-all.min.css" />
   <link rel="stylesheet" href="css/subpage-base.css" />
   <link rel="stylesheet" href="css/source-navbar-header.css" />
@@ -28,9 +28,26 @@
     .ps-card.on{border-color:#91caff;background:#f0f7ff;box-shadow:inset 3px 0 0 var(--pri)}
     .ps-card .pic{width:56px;height:56px;border-radius:4px;background:linear-gradient(135deg,#d6e4ff,#f0f5ff);flex-shrink:0;display:flex;align-items:center;justify-content:center;color:#69b1ff;font-size:22px}
     .ps-card .meta{font-size:12px;color:#64748b;line-height:1.55;min-width:0}
-    .ps-card .meta b{display:block;color:var(--t);font-size:13px;margin-bottom:2px}
-    .ps-card .tags{margin-top:4px;display:flex;gap:4px;flex-wrap:wrap}
+    .ps-card .meta b{display:block;color:var(--t);font-size:13px;margin-bottom:4px}
+    .ps-card .rowline{display:flex;align-items:center;gap:6px;margin-top:2px}
+    .ps-card .rowline .k{color:#94a3b8;min-width:52px}
+    .ps-status{
+      display:inline-flex;align-items:center;height:18px;padding:0 7px;border-radius:999px;
+      font-size:11px;font-weight:600;border:1px solid transparent;
+    }
+    .ps-status.ok{color:#389e0d;background:#f6ffed;border-color:#b7eb8f}
+    .ps-status.warn{color:#d46b08;background:#fff7e6;border-color:#ffd591}
+    .ps-status.off{color:#8c8c8c;background:#f5f5f5;border-color:#d9d9d9}
+    .ps-card .tags{margin-top:6px;display:flex;gap:4px;flex-wrap:wrap}
     .ps-card .tags span{font-size:10px;padding:1px 6px;border-radius:2px;background:#e6f4ff;color:#1677ff}
+    .ps-topbar{
+      display:flex;align-items:center;justify-content:space-between;gap:10px;
+      padding:8px 12px;background:#fff;border-bottom:1px solid var(--bd);
+    }
+    .ps-view-switch{display:inline-flex;align-items:center;background:#f5f8fc;border:1px solid #e2e8f0;border-radius:6px;overflow:hidden}
+    .ps-view-switch a{height:28px;padding:0 12px;display:inline-flex;align-items:center;font-size:12px;color:#64748b;text-decoration:none;border-right:1px solid #e2e8f0}
+    .ps-view-switch a:last-child{border-right:0}
+    .ps-view-switch a.on{background:#1677ff;color:#fff;font-weight:600}
     .ps-detail{flex:1;background:#fff;display:flex;flex-direction:column;min-width:0;overflow:hidden}
     .ps-d-hd{padding:14px 18px 0;border-bottom:1px solid var(--bd)}
     .ps-d-hd h2{margin:0 0 6px;font-size:18px;color:var(--t)}
@@ -112,8 +129,14 @@
         <div class="nav-item" title="系统管理"><span class="nav-label">系统管理</span></div>
       </aside>
       <main class="main-scroll" style="padding:0;overflow:hidden">
-        <a class="ps-back" href="prod-spare-inventory-ledger-0714.html">‹ 备件存储</a>
-        <div class="ps-wrap" style="height:calc(100vh - 92px)">
+        <div class="ps-topbar">
+          <div class="ps-view-switch" aria-label="生产物资库存管理视图切换">
+            <a href="prod-spare-inventory-ledger-0714.html">库存总览</a>
+            <a class="on" href="prod-spare-storage-0714.html">仓库视图</a>
+          </div>
+          <a class="ps-back" href="prod-spare-inventory-ledger-0714.html" style="margin:0">‹ 返回库存总览</a>
+        </div>
+        <div class="ps-wrap" style="height:calc(100vh - 104px)">
           <aside class="ps-org">
             <div class="search"><input placeholder="搜索组织" /></div>
             <div class="ps-org-list" id="orgList">
@@ -248,13 +271,20 @@
       ]
     };
     function defaultList(){ return warehouses['龙源电力']; }
+    function statusClass(s){
+      if(s==='正常使用' || s==='已发布') return 'ok';
+      if(s==='建设中' || s==='未发布') return 'warn';
+      return 'off';
+    }
     function renderCards(org){
       var list = warehouses[org] || defaultList();
       var box = document.getElementById('whCards');
       box.innerHTML = list.map(function(w,i){
         return '<div class="ps-card'+(i===0?' on':'')+'" data-i="'+i+'">'+
           '<div class="pic">仓</div><div class="meta"><b>'+w.name+'</b>'+
-          '仓库状态：'+w.status+'<br/>负责人：'+w.owner+'<br/>联系电话：'+w.phone+
+          '<div class="rowline"><span class="k">仓库状态</span><span class="ps-status '+statusClass(w.status)+'">'+w.status+'</span></div>'+
+          '<div class="rowline"><span class="k">负责人</span><span>'+w.owner+'</span></div>'+
+          '<div class="rowline"><span class="k">联系电话</span><span>'+w.phone+'</span></div>'+
           '<div class="tags">'+w.tags.map(function(t){return '<span>'+t+'</span>'}).join('')+'</div></div></div>';
       }).join('');
       selectWh(list[0]);
