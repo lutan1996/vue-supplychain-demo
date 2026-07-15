@@ -668,18 +668,22 @@
     .page-subpage .ledger-page .ledger-detail-table col.c-idx { width: 56px; min-width: 56px; }
     .page-subpage .ledger-page .ledger-detail-table col.c-date { width: 110px; min-width: 110px; }
     .page-subpage .ledger-page .ledger-detail-table col.c-factory { width: 220px; min-width: 220px; }
-    .page-subpage .ledger-page .ledger-detail-table col.c-loc { width: 200px; min-width: 200px; }
     .page-subpage .ledger-page .ledger-detail-table col.c-code { width: 120px; min-width: 120px; }
+    .page-subpage .ledger-page .ledger-detail-table col.c-oem { width: 150px; min-width: 150px; }
     .page-subpage .ledger-page .ledger-detail-table col.c-name { width: 120px; min-width: 120px; }
     .page-subpage .ledger-page .ledger-detail-table col.c-type { width: 110px; min-width: 110px; }
     .page-subpage .ledger-page .ledger-detail-table col.c-model { width: 120px; min-width: 120px; }
+    .page-subpage .ledger-page .ledger-detail-table col.c-machine { width: 180px; min-width: 180px; }
+    .page-subpage .ledger-page .ledger-detail-table col.c-maker { width: 210px; min-width: 210px; }
+    .page-subpage .ledger-page .ledger-detail-table col.c-unit { width: 70px; min-width: 70px; }
+    .page-subpage .ledger-page .ledger-detail-table col.c-bin { width: 260px; min-width: 260px; }
     .page-subpage .ledger-page .ledger-detail-table col.c-qty { width: 100px; min-width: 100px; }
     .page-subpage .ledger-page .ledger-detail-table col.c-amt { width: 120px; min-width: 120px; }
     .page-subpage .ledger-page .ledger-detail-table col.c-safe { width: 88px; min-width: 88px; }
     .page-subpage .ledger-page .ledger-detail-table col.c-st { width: 110px; min-width: 110px; }
-    .page-subpage .ledger-page .ledger-detail-table col.c-op { width: 180px; min-width: 180px; }
-    .page-subpage .ledger-page .ledger-detail-table th:nth-child(13),
-    .page-subpage .ledger-page .ledger-detail-table td:nth-child(13),
+    .page-subpage .ledger-page .ledger-detail-table col.c-op { width: 80px; min-width: 80px; }
+    .page-subpage .ledger-page .ledger-detail-table th:nth-child(17),
+    .page-subpage .ledger-page .ledger-detail-table td:nth-child(17),
     .page-subpage .ledger-page .ledger-detail-table th.op,
     .page-subpage .ledger-page .ledger-detail-table td.op {
       min-width: 180px !important;
@@ -1382,11 +1386,15 @@
               <col class="c-date" />
               <col class="c-date" />
               <col class="c-factory" />
-              <col class="c-loc" />
               <col class="c-code" />
+              <col class="c-oem" />
               <col class="c-name" />
               <col class="c-type" />
               <col class="c-model" />
+              <col class="c-machine" />
+              <col class="c-maker" />
+              <col class="c-unit" />
+              <col class="c-bin" />
               <col class="c-qty" />
               <col class="c-amt" />
               <col class="c-st" />
@@ -1398,11 +1406,15 @@
                 <th>起始时间</th>
                 <th>终止时间</th>
                 <th>工厂描述</th>
-                <th>库存地点描述</th>
                 <th>产品编码</th>
+                <th>原厂物料号</th>
                 <th>产品名称</th>
                 <th>物资类型</th>
                 <th>规格型号</th>
+                <th>适用机型</th>
+                <th>制造商</th>
+                <th>单位</th>
+                <th>五级库位编码</th>
                 <th>期末库存数量</th>
                 <th>期末库存金额</th>
                 <th>库存状态</th>
@@ -1596,23 +1608,30 @@
       kw: ""
     };
 
+    function originalPartNo(r) { return "OEM-" + r.model; }
+    function applicableModel() { return "金风 GW150 / 联合动力 UP2000"; }
+    function manufacturer() { return "东方电气风电股份有限公司"; }
+    function stockUnit() { return "件"; }
+    function fiveLevelLocation(r) { return r.loc + " / A-03-02-08"; }
+
     var WAREHOUSE_DETAIL_FIELDS = [
-      { name: "物资编码", desc: "系统物料编码", rule: "一物一码，检索核心，不可重复", value: function (r) { return r.code; } },
-      { name: "原厂物料号", desc: "厂家备件型号编码", rule: "新能源备件多厂商匹配查询使用", value: function (r) { return "OEM-" + r.model; } },
-      { name: "物资名称", desc: "备件全称", rule: "如：风机 IGBT 模块、储能高压熔断器", value: function (r) { return r.name; } },
+      { name: "产品编码", desc: "系统产品编码", rule: "一物一码，检索核心，不可重复", value: function (r) { return r.code; } },
+      { name: "原厂物料号", desc: "厂家备件型号编码", rule: "新能源备件多厂商匹配查询使用", value: originalPartNo },
+      { name: "产品名称", desc: "备件全称", rule: "如：风机 IGBT 模块、储能高压熔断器", value: function (r) { return r.name; } },
       { name: "规格型号", desc: "完整参数规格", rule: "功率、电压、适配机组型号（风机 / 逆变器型号）", value: function (r) { return r.model; } },
-      { name: "物资大类", desc: "分类", rule: "风电备件 / 光伏备件 / 储能备件 / 工具辅材 / 其他", value: function (r) { return r.type; } },
-      { name: "适用机型", desc: "适配那些机型", rule: "", value: "金风 GW150 / 联合动力 UP2000" },
+      { name: "物资类型", desc: "分类", rule: "风电备件 / 光伏备件 / 储能备件 / 工具辅材 / 其他", value: function (r) { return r.type; } },
+      { name: "适用机型", desc: "适配机型", rule: "", value: applicableModel },
       { name: "安装位置", desc: "", rule: "", value: function (r) { return r.type + "系统"; } },
-      { name: "制造商", desc: "", rule: "", value: "东方电气风电股份有限公司" },
+      { name: "制造商", desc: "", rule: "", value: manufacturer },
       { name: "供应商", desc: "", rule: "", value: "国能供应链华北分公司" },
-      { name: "单位", desc: "计量单位", rule: "件、套、卷、箱、kg", value: "件" },
+      { name: "单位", desc: "计量单位", rule: "件、套、卷、箱、kg", value: stockUnit },
       { name: "采购单价", desc: "单品不含税单价", rule: "财务成本核算、库存价值统计", value: function (r) { return "¥" + money(Math.round((r.amount || 0) / Math.max(r.qty || 1, 1))); } },
-      { name: "总成本", desc: "该行明细金额", rule: "单价 × 入库数量，自动计算", value: function (r) { return "¥" + money(r.amount); } },
+      { name: "期末库存数量", desc: "当前账期末库存数量", rule: "按产品与库位汇总", value: function (r) { return r.qty + " " + stockUnit(); } },
+      { name: "期末库存金额", desc: "当前账期末库存金额", rule: "采购单价 × 期末库存数量", value: function (r) { return "¥" + money(r.amount); } },
       { name: "生产批次号", desc: "厂家批次", rule: "储能电池、电子件强制记录，追溯质保", value: function (r) { return "LOT-" + r.start.replace(/-/g, "") + "-" + r.code.slice(-3); } },
       { name: "生产日期", desc: "备件出厂日期", rule: "用于临期预警", value: "2026-03-18" },
       { name: "质保到期日", desc: "质保截止时间", rule: "系统自动计算，搜索列表标红临期物资", value: "2028-03-17" },
-      { name: "五级库位编码", desc: "存放完整位置编码", rule: "格式：仓库 - 库区 - 货架 - 层 - 库位，上架后绑定", value: function (r) { return r.loc + " / A-03-02-08"; } },
+      { name: "五级库位编码", desc: "存放完整位置编码", rule: "格式：仓库 - 库区 - 货架 - 层 - 库位，上架后绑定", value: fiveLevelLocation },
       { name: "仓库编码", desc: "一级层级", rule: "放到某个仓库", value: function (r) { return r.loc.split("/")[1] ? r.loc.split("/")[1].trim() : "主仓"; } },
       { name: "库区编码", desc: "二级层级", rule: "风电区 / 储能区 / 返修区 / 报废暂存区", value: function (r) { return r.type + "区"; } },
       { name: "货架编码", desc: "三级层级", rule: "库区下货架编号", value: "HJ-A03" },
@@ -1620,7 +1639,7 @@
       { name: "库位编号", desc: "五级最小单元", rule: "最小存放位置，一个库位仅存同一种备件", value: "KW-08" },
       { name: "库位二维码", desc: "库位条码内容", rule: "PDA 扫码上架、盘点使用", value: "QR-KW-A03-02-08" },
       { name: "物资条码 / 二维码", desc: "备件实物条码", rule: "单件备件扫码识别物资档案", value: function (r) { return "QR-" + r.code + "-0001"; } },
-      { name: "物资状态", desc: "库存属性", rule: "正常 / 借出 / 报废，用于后续展示状态", value: function (r) { return r.status; } },
+      { name: "库存状态", desc: "库存属性", rule: "正常 / 借出 / 报废，用于后续展示状态", value: function (r) { return r.status; } },
       { name: "备注", desc: "单行备件说明", rule: "如：抢修备用件、外包装破损、单独存放防潮", value: "抢修备用件，按仓储字段表补充展示" },
       { name: "附件", desc: "上传照片等附件信息", rule: "", value: "实物照片 2 张 / 质保文件 1 份" }
     ];
@@ -1794,18 +1813,22 @@
           "<td>" + r.start + "</td>" +
           "<td>" + r.end + "</td>" +
           "<td>" + r.company + "</td>" +
-          "<td>" + r.loc + "</td>" +
           '<td class="code">' + r.code + "</td>" +
+          "<td>" + originalPartNo(r) + "</td>" +
           "<td>" + r.name + "</td>" +
           "<td>" + r.type + "</td>" +
           "<td>" + r.model + "</td>" +
+          "<td>" + applicableModel(r) + "</td>" +
+          "<td>" + manufacturer(r) + "</td>" +
+          "<td>" + stockUnit(r) + "</td>" +
+          "<td>" + fiveLevelLocation(r) + "</td>" +
           '<td class="num">' + r.qty + "</td>" +
           '<td class="num">' + money(r.amount) + "</td>" +
           "<td>" + statusTag(r.status) + "</td>" +
           rowOps(r) +
           "</tr>";
       });
-      document.getElementById("tbody").innerHTML = html || '<tr><td colspan="13" style="text-align:center;color:#8c9bb0;padding:24px">当前筛选无数据</td></tr>';
+      document.getElementById("tbody").innerHTML = html || '<tr><td colspan="17" style="text-align:center;color:#8c9bb0;padding:24px">当前筛选无数据</td></tr>';
     }
 
     function updatePath() {
@@ -1865,10 +1888,10 @@
       }).join("");
       document.getElementById("detailDrawerBody").innerHTML =
         '<div class="detail-summary">' +
-          '<div><b>' + row.name + '</b>物资编码：' + row.code + '</div>' +
-          '<div><b>' + row.company + '</b>当前位置：' + row.loc + '</div>' +
+          '<div><b>' + row.name + '</b>产品编码：' + row.code + '</div>' +
+          '<div><b>' + row.company + '</b>五级库位编码：' + fiveLevelLocation(row) + '</div>' +
         '</div>' +
-        '<div class="rail-sec"><h3>详细仓储字段表 <span class="cnt g">26项</span></h3>' +
+        '<div class="rail-sec"><h3>详细仓储字段表 <span class="cnt g">' + WAREHOUSE_DETAIL_FIELDS.length + '项</span></h3>' +
         '<table class="warehouse-field-table"><thead><tr><th>字段名称</th><th>当前值</th><th>字段说明</th></tr></thead><tbody>' +
         rowsHtml +
         "</tbody></table></div>";
