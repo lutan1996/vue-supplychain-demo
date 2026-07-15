@@ -12,17 +12,12 @@
     *{box-sizing:border-box}
     body.page-subpage .main-scroll{background:#f0f3f8}
     .ps-wrap{display:flex;height:calc(100vh - 56px);min-height:560px}
-    .ps-org{width:200px;background:#fff;border-right:1px solid var(--bd);display:flex;flex-direction:column;flex-shrink:0}
-    .ps-org .search{padding:10px;border-bottom:1px solid var(--bd)}
-    .ps-org input{width:100%;height:30px;border:1px solid #d9e2ec;border-radius:4px;padding:0 10px;font-size:12px}
-    .ps-org-list{flex:1;overflow:auto;padding:6px 0}
-    .ps-org-item{padding:9px 14px;font-size:13px;color:#334155;cursor:pointer}
-    .ps-org-item:hover{background:#f5f9ff}
-    .ps-org-item.on{background:#e6f4ff;color:var(--pri);font-weight:600;border-right:3px solid var(--pri)}
     .ps-main{flex:1;display:flex;min-width:0}
-    .ps-wh-list{width:280px;background:#fff;border-right:1px solid var(--bd);display:flex;flex-direction:column;flex-shrink:0}
+    .ps-wh-list{width:320px;background:#fff;border-right:1px solid var(--bd);display:flex;flex-direction:column;flex-shrink:0}
     .ps-wh-hd{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid var(--bd);font-weight:600;font-size:14px}
-    .ps-wh-hd a{color:var(--pri);font-size:12px;font-weight:500;text-decoration:none}
+    .ps-wh-filter{padding:10px 12px;border-bottom:1px solid var(--bd);background:linear-gradient(180deg,#f8fbff,#fff)}
+    .ps-wh-filter label{display:block;font-size:11px;color:var(--m);margin:10px 0 6px}
+    .ps-org-select{width:100%;height:34px;border:1px solid #c9d7ea;border-radius:4px;background:#fff;padding:0 10px;font-size:12px;color:var(--t)}
     .ps-wh-cards{flex:1;overflow:auto;padding:10px}
     .ps-card{border:1px solid var(--bd);border-radius:6px;padding:10px;margin-bottom:10px;cursor:pointer;background:#fff;display:flex;gap:10px}
     .ps-card.on{border-color:#91caff;background:#f0f7ff;box-shadow:inset 3px 0 0 var(--pri)}
@@ -40,14 +35,9 @@
     .ps-status.off{color:#8c8c8c;background:#f5f5f5;border-color:#d9d9d9}
     .ps-card .tags{margin-top:6px;display:flex;gap:4px;flex-wrap:wrap}
     .ps-card .tags span{font-size:10px;padding:1px 6px;border-radius:2px;background:#e6f4ff;color:#1677ff}
-    .ps-topbar{
-      display:flex;align-items:center;justify-content:space-between;gap:10px;
-      padding:8px 12px;background:#fff;border-bottom:1px solid var(--bd);
-    }
-    .ps-view-switch{display:inline-flex;align-items:center;background:#f5f8fc;border:1px solid #e2e8f0;border-radius:6px;overflow:hidden}
-    .ps-view-switch a{height:28px;padding:0 12px;display:inline-flex;align-items:center;font-size:12px;color:#64748b;text-decoration:none;border-right:1px solid #e2e8f0}
-    .ps-view-switch a:last-child{border-right:0}
-    .ps-view-switch a.on{background:#1677ff;color:#fff;font-weight:600}
+    .ps-view-switch{display:flex;width:100%;align-items:center;background:#eef3fb;border:1px solid #cdd9ea;border-radius:8px;overflow:hidden;padding:2px;gap:2px}
+    .ps-view-switch a{height:30px;flex:1;justify-content:center;padding:0 8px;display:inline-flex;align-items:center;gap:6px;font-size:12px;color:#4b5b73;text-decoration:none;border-radius:6px}
+    .ps-view-switch a.on{background:#1677ff;color:#fff;font-weight:600;box-shadow:0 2px 6px rgba(22,119,255,.28)}
     .ps-detail{flex:1;background:#fff;display:flex;flex-direction:column;min-width:0;overflow:hidden}
     .ps-d-hd{padding:14px 18px 0;border-bottom:1px solid var(--bd)}
     .ps-d-hd h2{margin:0 0 6px;font-size:18px;color:var(--t)}
@@ -65,6 +55,9 @@
       height:32px;border:1px solid #d9e2ec;border-radius:4px;padding:0 10px;font-size:12px;width:100%;
     }
     .ps-field textarea{height:88px;padding:8px 10px;resize:vertical}
+    .ps-field input:disabled,.ps-field select:disabled,.ps-field textarea:disabled{
+      color:#475569;background:#f8fafc;opacity:1;cursor:default;
+    }
     .ps-checks{display:flex;flex-wrap:wrap;gap:12px 18px;padding-top:6px}
     .ps-save{margin-top:8px;text-align:right}
     .ps-save button{height:34px;padding:0 22px;border:0;border-radius:4px;background:#0b1f3a;color:#fff;font-size:13px;cursor:pointer}
@@ -82,12 +75,9 @@
     .ps-bars .bar i{display:block;height:100%;background:linear-gradient(90deg,#69b1ff,#1677ff)}
     .ps-tree{display:flex;gap:14px;min-height:360px}
     .ps-tree-left{width:280px;border:1px solid var(--bd);border-radius:6px;overflow:auto;padding:8px 0}
-    .ps-tree-tools{display:flex;gap:6px;padding:0 10px 8px}
-    .ps-tree-tools button{width:28px;height:28px;border:1px solid #d9e2ec;border-radius:4px;background:#fff;cursor:pointer;font-size:14px}
     .ps-node{padding:6px 12px;font-size:12px;color:#334155;cursor:pointer;display:flex;justify-content:space-between;gap:8px}
     .ps-node:hover{background:#f5f9ff}
     .ps-node.on{background:#e6f4ff;color:var(--pri)}
-    .ps-node .act{color:var(--pri);opacity:.8}
     .ps-indent-1{padding-left:24px}
     .ps-indent-2{padding-left:40px}
     .ps-indent-3{padding-left:56px}
@@ -129,28 +119,34 @@
         <div class="nav-item" title="系统管理"><span class="nav-label">系统管理</span></div>
       </aside>
       <main class="main-scroll" style="padding:0;overflow:hidden">
-        <div class="ps-topbar">
-          <div class="ps-view-switch" aria-label="生产物资库存管理视图切换">
-            <a href="prod-spare-inventory-ledger-0714.html">库存总览</a>
-            <a class="on" href="prod-spare-storage-0714.html">仓库视图</a>
-          </div>
-          <a class="ps-back" href="prod-spare-inventory-ledger-0714.html" style="margin:0">‹ 返回库存总览</a>
-        </div>
-        <div class="ps-wrap" style="height:calc(100vh - 104px)">
-          <aside class="ps-org">
-            <div class="search"><input placeholder="搜索组织" /></div>
-            <div class="ps-org-list" id="orgList">
-              <div class="ps-org-item on" data-org="龙源电力">龙源电力(总计)</div>
-              <div class="ps-org-item" data-org="上海龙源">上海龙源</div>
-              <div class="ps-org-item" data-org="云南龙源">云南龙源</div>
-              <div class="ps-org-item" data-org="天津龙源">天津龙源</div>
-              <div class="ps-org-item" data-org="河北龙源">河北龙源</div>
-              <div class="ps-org-item" data-org="蒙东龙源">蒙东龙源</div>
-            </div>
-          </aside>
+        <div class="ps-wrap">
           <div class="ps-main">
             <section class="ps-wh-list">
-              <div class="ps-wh-hd"><span>仓库列表</span><a href="bd-warehouse-mgmt.html">+ 创建仓库</a></div>
+              <div class="ps-wh-filter">
+                <div class="ps-view-switch" aria-label="生产物资库存管理视图切换">
+                  <a href="prod-spare-inventory-ledger-0714.html"><i class="fa-solid fa-table-list"></i> 库存总览</a>
+                  <a class="on" href="prod-spare-storage-0714.html"><i class="fa-solid fa-warehouse"></i> 仓库视图</a>
+                </div>
+                <label for="warehouseOrgSelect">组织范围</label>
+                <select class="ps-org-select" id="warehouseOrgSelect">
+                  <option value="龙源电力">龙源电力（全部）</option>
+                  <optgroup label="项目公司">
+                    <option value="上海龙源">上海龙源</option>
+                    <option value="云南龙源">云南龙源</option>
+                    <option value="天津龙源">天津龙源</option>
+                    <option value="河北龙源">河北龙源</option>
+                    <option value="蒙东龙源">蒙东龙源</option>
+                  </optgroup>
+                  <optgroup label="场站">
+                    <option value="麒麟山风电场">麒麟山风电场</option>
+                    <option value="康保风电场">康保风电场</option>
+                    <option value="大神堂风电场">大神堂风电场</option>
+                    <option value="齐心营风电场">齐心营风电场</option>
+                    <option value="射阳海上风电场">射阳海上风电场</option>
+                  </optgroup>
+                </select>
+              </div>
+              <div class="ps-wh-hd"><span>仓库列表</span></div>
               <div class="ps-wh-cards" id="whCards"></div>
             </section>
             <section class="ps-detail">
@@ -217,24 +213,18 @@
                   </div>
                   <div class="ps-field"><label><span class="r">*</span> 仓库状态</label><select><option>正常使用</option><option>停用</option><option>建设中</option></select></div>
                   <div class="ps-field"><label>仓库介绍</label><textarea>华北区域生产备件中心仓，承接风机关键部件与变流器模块周转。</textarea></div>
-                  <div class="ps-save"><button type="button">保存修改</button></div>
                 </div>
               </div>
               <div class="ps-pane" id="pane-tree">
                 <div class="ps-tree">
                   <div class="ps-tree-left">
-                    <div class="ps-tree-tools">
-                      <button type="button" title="新增">+</button>
-                      <button type="button" title="编辑">✎</button>
-                      <button type="button" title="删除">🗑</button>
-                    </div>
                     <div class="ps-node on">国家能源集团</div>
-                    <div class="ps-node ps-indent-1">新疆电力 <span class="act">添加下级</span></div>
-                    <div class="ps-node ps-indent-2">测试公司 <span class="act">更多</span></div>
-                    <div class="ps-node ps-indent-3">五月康试验站 <span class="act">更多</span></div>
-                    <div class="ps-node ps-indent-3">风电备件区 <span class="act">更多</span></div>
-                    <div class="ps-node ps-indent-3">光伏配件区 <span class="act">更多</span></div>
-                    <div class="ps-node ps-indent-1">国华新能源 <span class="act">更多</span></div>
+                    <div class="ps-node ps-indent-1">新疆电力</div>
+                    <div class="ps-node ps-indent-2">测试公司</div>
+                    <div class="ps-node ps-indent-3">五月康试验站</div>
+                    <div class="ps-node ps-indent-3">风电备件区</div>
+                    <div class="ps-node ps-indent-3">光伏配件区</div>
+                    <div class="ps-node ps-indent-1">国华新能源</div>
                   </div>
                   <div class="ps-tree-right">
                     <table>
@@ -301,11 +291,8 @@
       document.getElementById('whTitle').textContent=w.name;
       document.getElementById('whIntro').textContent='仓库介绍：'+w.intro;
     }
-    document.getElementById('orgList').addEventListener('click',function(e){
-      var item=e.target.closest('.ps-org-item'); if(!item) return;
-      document.querySelectorAll('.ps-org-item').forEach(function(x){x.classList.remove('on')});
-      item.classList.add('on');
-      renderCards(item.getAttribute('data-org'));
+    document.getElementById('warehouseOrgSelect').addEventListener('change',function(){
+      renderCards(this.value);
     });
     function showTab(name){
       document.querySelectorAll('.ps-tabs button').forEach(function(b){b.classList.toggle('on', b.getAttribute('data-tab')===name)});
@@ -319,6 +306,9 @@
     try{ tab=(new URLSearchParams(location.search)).get('tab')||'info'; }catch(e){}
     if(['items','info','tree'].indexOf(tab)<0) tab='info';
     showTab(tab);
+    document.querySelectorAll('#pane-info input,#pane-info select,#pane-info textarea').forEach(function(control){
+      control.disabled=true;
+    });
     renderCards('龙源电力');
   </script>
 </body>
