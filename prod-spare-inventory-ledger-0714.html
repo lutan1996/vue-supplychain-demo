@@ -1272,9 +1272,9 @@
             </svg>
           </div>
           <div class="kpi">
-            <div class="title">低库存品种 <span class="i" title="可用库存 &lt; 安全库存">i</span></div>
-            <div class="val" style="color:#f5222d">37<small>种</small></div>
-            <div class="trend up">较上期 ↑ 5 种</div>
+            <div class="title">非正常状态物资 <span class="i" title="按物资状态统计借出、待检、返修和报废记录">i</span></div>
+            <div class="val" style="color:#f5222d">37<small>项</small></div>
+            <div class="trend up">较上期 ↑ 5 项</div>
             <svg class="spark" viewBox="0 0 200 36" preserveAspectRatio="none">
               <rect x="8" y="18" width="10" height="14" fill="#ffadd2"/>
               <rect x="28" y="14" width="10" height="18" fill="#ff85c0"/>
@@ -1289,9 +1289,9 @@
             </svg>
           </div>
           <div class="kpi">
-            <div class="title">周转天数 <span class="i" title="参考菜鸟仓配：库存停留天数">i</span></div>
-            <div class="val">37<small>天</small></div>
-            <div class="trend down">较上期 ↓ 降低</div>
+            <div class="title">质保临期批次 <span class="i" title="依据质保到期日统计未来90天内到期的生产批次">i</span></div>
+            <div class="val">18<small>批</small></div>
+            <div class="trend up">较上期 ↑ 3 批</div>
             <div class="ice" style="clip-path: polygon(0 78%, 12% 60%, 24% 70%, 36% 48%, 48% 58%, 60% 36%, 72% 54%, 84% 42%, 100% 50%, 100% 100%, 0 100%);"></div>
           </div>
         </div>
@@ -1326,28 +1326,28 @@
       <div class="chart-row">
         <div class="card">
           <div class="card-hd">
-            <h3 id="distTitle">仓库库存分布</h3>
+            <h3 id="distTitle">仓库物资记录分布</h3>
             <div class="tabs">
-              <button type="button" class="on" data-mode="qty">数量</button>
-              <button type="button" data-mode="amt">金额</button>
+              <button type="button" class="on" data-mode="count">物资数</button>
+              <button type="button" data-mode="cost">总成本</button>
             </div>
           </div>
-          <div class="bar-chart" id="orgBars">
-            <div class="col"><div class="bar" style="height:86%" data-v="3,680"></div><div class="lab">中心主仓</div></div>
-            <div class="col"><div class="bar" style="height:68%" data-v="2,940"></div><div class="lab">备件仓A</div></div>
-            <div class="col"><div class="bar" style="height:57%" data-v="2,460"></div><div class="lab">场站周转仓</div></div>
-            <div class="col"><div class="bar" style="height:43%" data-v="1,860"></div><div class="lab">共享仓</div></div>
-            <div class="col"><div class="bar" style="height:29%" data-v="1,246"></div><div class="lab">近修备件仓</div></div>
-            <div class="col"><div class="bar" style="height:15%" data-v="660"></div><div class="lab">待检仓</div></div>
+          <div class="bar-chart" id="warehouseFieldBars">
+            <div class="col"><div class="bar" style="height:86%" data-v="368条" data-count="368条" data-count-height="86%" data-cost="2,168万" data-cost-height="82%"></div><div class="lab">中心主仓</div></div>
+            <div class="col"><div class="bar" style="height:68%" data-v="294条" data-count="294条" data-count-height="68%" data-cost="1,684万" data-cost-height="64%"></div><div class="lab">备件仓A</div></div>
+            <div class="col"><div class="bar" style="height:57%" data-v="246条" data-count="246条" data-count-height="57%" data-cost="1,526万" data-cost-height="58%"></div><div class="lab">场站周转仓</div></div>
+            <div class="col"><div class="bar" style="height:43%" data-v="186条" data-count="186条" data-count-height="43%" data-cost="1,248万" data-cost-height="47%"></div><div class="lab">共享仓</div></div>
+            <div class="col"><div class="bar" style="height:29%" data-v="124条" data-count="124条" data-count-height="29%" data-cost="1,122万" data-cost-height="42%"></div><div class="lab">近修备件仓</div></div>
+            <div class="col"><div class="bar" style="height:15%" data-v="66条" data-count="66条" data-count-height="15%" data-cost="904万" data-cost-height="34%"></div><div class="lab">待检仓</div></div>
           </div>
-          <div class="field-source">统计字段：仓库编码、期末库存数量 / 期末库存金额</div>
+          <div class="field-source">Excel字段：仓库编码（分组）、总成本（金额）；物资数为明细记录计数</div>
         </div>
 
         <div class="card">
           <div class="card-hd"><h3>库存状态占比</h3></div>
           <div class="dist-body">
             <div class="donut" style="position:relative;background:conic-gradient(#52c41a 0 78%,#1677ff 78% 88%,#fa8c16 88% 96%,#f5222d 96% 100%);">
-              <div class="donut-center"><b>12,846</b><span>件合计</span></div>
+              <div class="donut-center"><b>1,284</b><span>条记录</span></div>
             </div>
             <div class="legend" id="typeLegend">
               <div class="row"><span><i class="dot" style="background:#52c41a"></i>正常</span><b>78%</b></div>
@@ -1356,19 +1356,19 @@
               <div class="row"><span><i class="dot" style="background:#f5222d"></i>报废</span><b>4%</b></div>
             </div>
           </div>
-          <div class="field-source">统计字段：库存状态、期末库存数量</div>
+          <div class="field-source">Excel字段：物资状态；按明细记录计数后计算占比</div>
         </div>
 
         <div class="card">
           <div class="card-hd"><h3>质保到期分布</h3></div>
           <div class="trend-body">
             <div class="warranty-bars">
-              <div class="item danger"><span>90天内到期</span><div class="track"><i style="width:24%"></i></div><b>126件</b></div>
-              <div class="item warn"><span>3～6个月</span><div class="track"><i style="width:42%"></i></div><b>384件</b></div>
-              <div class="item"><span>6～12个月</span><div class="track"><i style="width:68%"></i></div><b>816件</b></div>
-              <div class="item"><span>12个月以上</span><div class="track"><i style="width:92%"></i></div><b>11,520件</b></div>
+              <div class="item danger"><span>90天内到期</span><div class="track"><i style="width:24%"></i></div><b>18批</b></div>
+              <div class="item warn"><span>3～6个月</span><div class="track"><i style="width:42%"></i></div><b>32批</b></div>
+              <div class="item"><span>6～12个月</span><div class="track"><i style="width:68%"></i></div><b>51批</b></div>
+              <div class="item"><span>12个月以上</span><div class="track"><i style="width:92%"></i></div><b>69批</b></div>
             </div>
-            <div class="field-source">统计字段：质保到期日、生产批次号、期末库存数量</div>
+            <div class="field-source">Excel字段：质保到期日、生产批次号；按批次计数</div>
           </div>
         </div>
       </div>
@@ -1862,9 +1862,24 @@
       var distTitle = document.getElementById("distTitle");
       if (!distTitle) return;
       distTitle.textContent =
-        state.org === "龙源电力" ? "仓库库存分布" :
-        state.org + " · 仓库库存分布";
+        state.org === "龙源电力" ? "仓库物资记录分布" :
+        state.org + " · 仓库物资记录分布";
     }
+
+    function setWarehouseChartMode(mode) {
+      document.querySelectorAll(".chart-row .tabs button[data-mode]").forEach(function (btn) {
+        btn.classList.toggle("on", btn.getAttribute("data-mode") === mode);
+      });
+      document.querySelectorAll("#warehouseFieldBars .bar").forEach(function (bar) {
+        bar.style.height = bar.getAttribute("data-" + mode + "-height");
+        bar.setAttribute("data-v", bar.getAttribute("data-" + mode));
+      });
+    }
+    document.querySelectorAll(".chart-row .tabs button[data-mode]").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        setWarehouseChartMode(btn.getAttribute("data-mode"));
+      });
+    });
 
     function refresh() {
       renderTree();
