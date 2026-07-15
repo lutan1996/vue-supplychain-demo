@@ -22,6 +22,32 @@
       height:30px; border:1px solid #d9e2ec; border-radius:4px;
       padding:0 10px; font-size:12px; min-width:140px; background:#fff;
     }
+    .org-select{position:relative;width:220px}
+    .org-select-btn{width:100%;height:34px;border:1px solid #c9d7ea;border-radius:4px;background:#fff;padding:0 28px 0 10px;text-align:left;cursor:pointer;color:#1f2d3d;position:relative;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:12px}
+    .org-select-btn::after{content:"";position:absolute;right:10px;top:50%;width:0;height:0;border-left:4px solid transparent;border-right:4px solid transparent;border-top:5px solid #64748b;transform:translateY(-40%)}
+    .org-dropdown{display:none;position:absolute;left:0;right:0;top:38px;background:#0b1f3a;color:#dbe7f5;border-radius:6px;box-shadow:0 12px 28px rgba(11,31,58,.35);z-index:30;max-height:360px;overflow:auto;padding:6px 0}
+    .org-dropdown.open{display:block}
+    .org-node{padding:7px 12px;cursor:pointer;font-size:12px;display:flex;align-items:center;gap:6px;color:#dbe7f5;user-select:none}
+    .org-node:hover{background:rgba(22,119,255,.28);color:#fff}
+    .org-node.active{background:#1677ff;color:#fff}
+    .org-node .arrow{width:12px;color:#7ea2c9;font-size:10px;flex:0 0 auto;text-align:center;line-height:1}
+    .org-node.l2{padding-left:22px}
+    .org-node.l3{padding-left:42px;color:#c5d5e8}
+    .org-node.l3:hover,.org-node.l3.active{color:#fff}
+    .org-company>.org-stations{display:none}
+    .org-company.open>.org-stations{display:block}
+    .org-company.open>.org-node.l2 .arrow{transform:none}
+    .org-company.open>.org-node.l2 .arrow::before{content:"▼"}
+    .org-company:not(.open)>.org-node.l2 .arrow::before{content:"›"}
+    .org-company>.org-node.l2 .arrow{font-size:0}
+    .org-company>.org-node.l2 .arrow::before{font-size:10px;color:#7ea2c9}
+    .org-root>.org-children{display:none}
+    .org-root.open>.org-children{display:block}
+    .org-root.open>.org-node.group .arrow{transform:none}
+    .org-root.open>.org-node.group .arrow::before{content:"▼"}
+    .org-root:not(.open)>.org-node.group .arrow::before{content:"›"}
+    .org-root>.org-node.group .arrow{font-size:0}
+    .org-root>.org-node.group .arrow::before{font-size:10px;color:#7ea2c9}
     .bd-filter .ops { margin-left:auto; display:flex; gap:8px; }
     .bd-btn {
       height:30px; padding:0 14px; border-radius:4px; font-size:12px;
@@ -65,8 +91,9 @@
     .bd-modal-hd {
       padding:12px 16px; border-bottom:1px solid #eef2f7; font-weight:600; font-size:14px;
     }
-    .bd-modal-bd { padding:14px 16px; display:grid; gap:12px; max-height:70vh; overflow:auto; }
+    .bd-modal-bd { padding:14px 16px; display:grid; gap:12px; max-height:70vh; overflow:visible; }
     .bd-field { display:grid; gap:6px; font-size:12px; color:#475569; }
+    #modalWh .org-dropdown { z-index:40; }
     .bd-field .req { color:#f5222d; }
     .bd-field input, .bd-field select, .bd-field textarea {
       height:32px; border:1px solid #d9e2ec; border-radius:4px; padding:0 10px; font-size:12px;
@@ -135,30 +162,22 @@
 
         <div class="bd-filter">
           <label>所属组织</label>
-          <select id="filterOrg">
-            <option value="">请选择所属组织</option>
-            <optgroup label="河北龙源">
-              <option>河北龙源</option>
-              <option>麒麟山风电场</option>
-              <option>康保风电场</option>
-            </optgroup>
-            <optgroup label="天津龙源">
-              <option>天津龙源</option>
-              <option>大神堂风电场</option>
-            </optgroup>
-            <optgroup label="蒙东龙源">
-              <option>蒙东龙源</option>
-              <option>齐心营风电场</option>
-            </optgroup>
-            <optgroup label="安徽龙源">
-              <option>安徽龙源</option>
-              <option>来安风电场</option>
-            </optgroup>
-            <optgroup label="海上龙源">
-              <option>海上龙源</option>
-              <option>射阳海上风电场</option>
-            </optgroup>
-          </select>
+          <input type="hidden" id="filterOrg" value="" />
+          <div class="org-select">
+            <button type="button" class="org-select-btn" id="filterOrgBtn">龙源电力（全部）</button>
+            <div class="org-dropdown" id="filterOrgDropdown">
+              <div class="org-root open">
+                <div class="org-node group active" data-name="龙源电力" data-level="group"><span class="arrow"></span>龙源电力</div>
+                <div class="org-children">
+                  <div class="org-company open"><div class="org-node l2" data-name="河北龙源" data-level="company"><span class="arrow"></span>河北龙源</div><div class="org-stations"><div class="org-node l3" data-name="麒麟山风电场" data-level="station">麒麟山风电场</div><div class="org-node l3" data-name="康保风电场" data-level="station">康保风电场</div></div></div>
+                  <div class="org-company open"><div class="org-node l2" data-name="天津龙源" data-level="company"><span class="arrow"></span>天津龙源</div><div class="org-stations"><div class="org-node l3" data-name="大神堂风电场" data-level="station">大神堂风电场</div></div></div>
+                  <div class="org-company open"><div class="org-node l2" data-name="蒙东龙源" data-level="company"><span class="arrow"></span>蒙东龙源</div><div class="org-stations"><div class="org-node l3" data-name="齐心营风电场" data-level="station">齐心营风电场</div></div></div>
+                  <div class="org-company open"><div class="org-node l2" data-name="安徽龙源" data-level="company"><span class="arrow"></span>安徽龙源</div><div class="org-stations"><div class="org-node l3" data-name="来安风电场" data-level="station">来安风电场</div></div></div>
+                  <div class="org-company open"><div class="org-node l2" data-name="海上龙源" data-level="company"><span class="arrow"></span>海上龙源</div><div class="org-stations"><div class="org-node l3" data-name="射阳海上风电场" data-level="station">射阳海上风电场</div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
           <label>仓库名称</label>
           <input id="filterName" placeholder="请输入仓库名称" />
           <label>仓库状态</label>
@@ -187,7 +206,24 @@
           <div class="bd-modal">
             <div class="bd-modal-hd" id="whModalTitle">新建仓库</div>
             <div class="bd-modal-bd">
-              <div class="bd-field"><label><span class="req">*</span> 所属组织</label><select id="whOrg"><option value="">请选择所属组织</option><optgroup label="河北龙源"><option>河北龙源</option><option>麒麟山风电场</option><option>康保风电场</option></optgroup><optgroup label="天津龙源"><option>天津龙源</option><option>大神堂风电场</option></optgroup><optgroup label="蒙东龙源"><option>蒙东龙源</option><option>齐心营风电场</option></optgroup><optgroup label="安徽龙源"><option>安徽龙源</option><option>来安风电场</option></optgroup><optgroup label="海上龙源"><option>海上龙源</option><option>射阳海上风电场</option></optgroup></select></div>
+              <div class="bd-field"><label><span class="req">*</span> 所属组织</label>
+                <input type="hidden" id="whOrg" value="" />
+                <div class="org-select" style="width:100%">
+                  <button type="button" class="org-select-btn" id="whOrgBtn">请选择所属组织</button>
+                  <div class="org-dropdown" id="whOrgDropdown">
+                    <div class="org-root open">
+                      <div class="org-node group" data-name="龙源电力" data-level="group"><span class="arrow"></span>龙源电力</div>
+                      <div class="org-children">
+                        <div class="org-company open"><div class="org-node l2" data-name="河北龙源" data-level="company"><span class="arrow"></span>河北龙源</div><div class="org-stations"><div class="org-node l3" data-name="麒麟山风电场" data-level="station">麒麟山风电场</div><div class="org-node l3" data-name="康保风电场" data-level="station">康保风电场</div></div></div>
+                        <div class="org-company open"><div class="org-node l2" data-name="天津龙源" data-level="company"><span class="arrow"></span>天津龙源</div><div class="org-stations"><div class="org-node l3" data-name="大神堂风电场" data-level="station">大神堂风电场</div></div></div>
+                        <div class="org-company open"><div class="org-node l2" data-name="蒙东龙源" data-level="company"><span class="arrow"></span>蒙东龙源</div><div class="org-stations"><div class="org-node l3" data-name="齐心营风电场" data-level="station">齐心营风电场</div></div></div>
+                        <div class="org-company open"><div class="org-node l2" data-name="安徽龙源" data-level="company"><span class="arrow"></span>安徽龙源</div><div class="org-stations"><div class="org-node l3" data-name="来安风电场" data-level="station">来安风电场</div></div></div>
+                        <div class="org-company open"><div class="org-node l2" data-name="海上龙源" data-level="company"><span class="arrow"></span>海上龙源</div><div class="org-stations"><div class="org-node l3" data-name="射阳海上风电场" data-level="station">射阳海上风电场</div></div></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
               <div class="bd-field"><label><span class="req">*</span> 仓库名称</label><input id="whName" placeholder="请输入仓库名称" /></div>
               <div class="bd-field"><label>物料标签类别</label><div class="bd-radios"><label><input type="radio" name="tag" checked /> 普通标签</label><label><input type="radio" name="tag" /> RFID标签</label><label><input type="radio" name="tag" /> 手写标签</label></div></div>
               <div class="bd-field"><label>打印机 IP</label><div style="display:flex;gap:8px"><input id="whIp" placeholder="请输入打印机IP" style="flex:1"/><button class="bd-btn ghost" type="button">测试连接</button></div></div>
@@ -206,11 +242,41 @@
   <script src="js/subpage-clock.js?v=20260714-whcfg-v1"></script>
 <script>
 var whEditing=null,whMode='new';
-function whControls(disabled){document.querySelectorAll('#modalWh input,#modalWh select,#modalWh textarea').forEach(function(x){x.disabled=disabled});document.getElementById('okWh').style.display=disabled?'none':''}
+document.getElementById('filterOrgBtn').addEventListener('click',function(e){e.stopPropagation();document.getElementById('filterOrgDropdown').classList.toggle('open')});
+document.getElementById('filterOrgDropdown').addEventListener('click',function(e){
+  e.stopPropagation();var arrow=e.target.closest('.arrow'),node=e.target.closest('.org-node');if(!node)return;
+  if(arrow){var branch=node.classList.contains('group')?node.closest('.org-root'):node.closest('.org-company');if(branch)branch.classList.toggle('open');return}
+  if(node.classList.contains('group'))node.closest('.org-root').classList.add('open');
+  if(node.classList.contains('l2')||node.classList.contains('l3'))node.closest('.org-company').classList.add('open');
+  this.querySelectorAll('.org-node').forEach(function(x){x.classList.remove('active')});node.classList.add('active');
+  var name=node.getAttribute('data-name'),level=node.getAttribute('data-level');
+  document.getElementById('filterOrg').value=level==='group'?'':name;
+  document.getElementById('filterOrgBtn').textContent=name+(level==='group'?'（全部）':'');
+  this.classList.remove('open');
+});
+document.addEventListener('click',function(){document.getElementById('filterOrgDropdown').classList.remove('open');document.getElementById('whOrgDropdown').classList.remove('open')});
+document.getElementById('whOrgBtn').addEventListener('click',function(e){e.stopPropagation();document.getElementById('whOrgDropdown').classList.toggle('open')});
+document.getElementById('whOrgDropdown').addEventListener('click',function(e){
+  e.stopPropagation();var arrow=e.target.closest('.arrow'),node=e.target.closest('.org-node');if(!node)return;
+  if(arrow){var branch=node.classList.contains('group')?node.closest('.org-root'):node.closest('.org-company');if(branch)branch.classList.toggle('open');return}
+  if(node.classList.contains('group'))node.closest('.org-root').classList.add('open');
+  if(node.classList.contains('l2')||node.classList.contains('l3'))node.closest('.org-company').classList.add('open');
+  this.querySelectorAll('.org-node').forEach(function(x){x.classList.remove('active')});node.classList.add('active');
+  var name=node.getAttribute('data-name'),level=node.getAttribute('data-level');
+  document.getElementById('whOrg').value=level==='group'?'':name;
+  document.getElementById('whOrgBtn').textContent=name+(level==='group'?'（全部）':'');
+  this.classList.remove('open');
+});
+function whControls(disabled){document.querySelectorAll('#modalWh input,#modalWh select,#modalWh textarea,#modalWh .org-select-btn').forEach(function(x){x.disabled=disabled});document.getElementById('okWh').style.display=disabled?'none':''}
+function setWhOrg(name){
+  document.getElementById('whOrg').value=name||'';
+  document.getElementById('whOrgBtn').textContent=name||'请选择所属组织';
+  document.querySelectorAll('#whOrgDropdown .org-node').forEach(function(x){x.classList.toggle('active',!!name&&x.getAttribute('data-name')===name)});
+}
 function openWh(mode,row){
   whMode=mode;whEditing=row||null;
   document.getElementById('whModalTitle').textContent=mode==='new'?'新建仓库':(mode==='edit'?'修改仓库':'仓库详情');
-  document.getElementById('whOrg').value=row?row.cells[2].textContent.trim():'';
+  setWhOrg(row?row.cells[2].textContent.trim():'');
   document.getElementById('whName').value=row?row.cells[1].textContent.trim():'';
   document.getElementById('whIp').value=row?row.cells[5].textContent.trim():'';
   whControls(mode==='detail');document.getElementById('modalWh').classList.add('open');
@@ -229,7 +295,7 @@ document.getElementById('okWh').onclick=function(){
 };
 document.getElementById('warehouseRows').onclick=function(e){var a=e.target.closest('a[data-action]');if(!a)return;e.preventDefault();var row=a.closest('tr'),act=a.dataset.action;if(act==='detail'||act==='edit')openWh(act,row);if(act==='delete'&&confirm('确定删除该仓库吗？')){row.remove();renumberWh()}if(act==='publish'){var tag=row.cells[6].querySelector('.bd-tag'),published=tag.textContent==='已发布';tag.textContent=published?'未发布':'已发布';tag.className='bd-tag '+(published?'wait':'ok');a.textContent=published?'发布':'取消发布';a.className=published?'':'warn'}};
 document.getElementById('btnQueryWh').onclick=function(){var org=document.getElementById('filterOrg').value,name=document.getElementById('filterName').value.trim(),st=document.getElementById('filterStatus').value;document.querySelectorAll('#warehouseRows tr').forEach(function(r){r.style.display=(!org||r.cells[2].textContent.trim()===org)&&(!name||r.cells[1].textContent.indexOf(name)>-1)&&(!st||r.cells[6].textContent.trim()===st)?'':'none'})};
-document.getElementById('btnResetWh').onclick=function(){document.getElementById('filterOrg').value='';document.getElementById('filterName').value='';document.getElementById('filterStatus').value='';document.querySelectorAll('#warehouseRows tr').forEach(function(r){r.style.display=''})};
+document.getElementById('btnResetWh').onclick=function(){document.getElementById('filterOrg').value='';document.getElementById('filterOrgBtn').textContent='龙源电力（全部）';document.getElementById('filterName').value='';document.getElementById('filterStatus').value='';document.querySelectorAll('#filterOrgDropdown .org-node').forEach(function(x){x.classList.toggle('active',x.classList.contains('group'))});document.querySelectorAll('#warehouseRows tr').forEach(function(r){r.style.display=''})};
 </script>
 </body>
 </html>
