@@ -135,26 +135,37 @@
 
         <div class="bd-filter">
           <label>所属组织</label>
-          <select>
+          <select id="filterOrg">
             <option value="">请选择所属组织</option>
-            <optgroup label="销售公司">
-              <option>山西龙源新能源有限公司</option>
-              <option>河北龙源风电有限公司</option>
-              <option>海上龙源风力发电有限公司</option>
+            <optgroup label="河北龙源">
+              <option>河北龙源</option>
+              <option>麒麟山风电场</option>
+              <option>康保风电场</option>
             </optgroup>
-            <optgroup label="场站">
+            <optgroup label="天津龙源">
+              <option>天津龙源</option>
+              <option>大神堂风电场</option>
+            </optgroup>
+            <optgroup label="蒙东龙源">
+              <option>蒙东龙源</option>
               <option>齐心营风电场</option>
-              <option>中衡龙腾第一光伏电站</option>
-              <option>横龙风电场</option>
-              <option>海上射阳风电场</option>
+            </optgroup>
+            <optgroup label="安徽龙源">
+              <option>安徽龙源</option>
+              <option>来安风电场</option>
+            </optgroup>
+            <optgroup label="海上龙源">
+              <option>海上龙源</option>
+              <option>射阳海上风电场</option>
             </optgroup>
           </select>
           <label>仓库名称</label>
-          <input placeholder="请输入仓库名称" />
+          <input id="filterName" placeholder="请输入仓库名称" />
           <label>仓库状态</label>
-          <select><option value="">请选择仓库状态</option><option>已发布</option><option>未发布</option></select>
+          <select id="filterStatus"><option value="">请选择仓库状态</option><option>已发布</option><option>未发布</option></select>
           <div class="ops">
-            <button class="bd-btn pri" type="button">查询</button>
+            <button class="bd-btn pri" type="button" id="btnQueryWh">查询</button>
+            <button class="bd-btn" type="button" id="btnResetWh">重置</button>
             <button class="bd-btn ghost" type="button" id="btnNewWh">新建仓库</button>
           </div>
         </div>
@@ -163,24 +174,24 @@
             <thead><tr>
               <th>序号</th><th>仓库名称</th><th>所属组织</th><th>组织层级</th><th>物料标签类别</th><th>打印机 IP</th><th>仓库状态</th><th>操作</th>
             </tr></thead>
-            <tbody>
-              <tr><td>1</td><td>山西公司中心仓</td><td>山西龙源新能源有限公司</td><td><span class="bd-tag ok">公司级</span></td><td><span class="bd-tag wait">普通标签</span></td><td>10.20.12.30</td><td><span class="bd-tag ok">已发布</span></td><td class="bd-op"><a href="#">详情</a><a href="#" class="warn">取消发布</a><a href="bd-warehouse-area.html">库区查询</a></td></tr>
-              <tr><td>2</td><td>备件库</td><td>中衡龙腾第一光伏电站</td><td><span class="bd-tag wait">场站级</span></td><td><span class="bd-tag wait">普通标签</span></td><td>10.20.12.31</td><td><span class="bd-tag ok">已发布</span></td><td class="bd-op"><a href="#">详情</a><a href="#" class="warn">取消发布</a><a href="bd-warehouse-area.html">库区查询</a></td></tr>
-              <tr><td>3</td><td>临时测试</td><td>齐心营风电场</td><td><span class="bd-tag wait">场站级</span></td><td><span class="bd-tag wait">普通标签</span></td><td>192.168.100.100</td><td><span class="bd-tag wait">未发布</span></td><td class="bd-op"><a href="#">发布</a><a href="#">修改</a><a href="#" class="danger">删除</a></td></tr>
-              <tr><td>4</td><td>横龙仓库</td><td>横龙风电场</td><td><span class="bd-tag wait">场站级</span></td><td><span class="bd-tag wait">普通标签</span></td><td>10.20.12.45</td><td><span class="bd-tag ok">已发布</span></td><td class="bd-op"><a href="#">详情</a><a href="#" class="warn">取消发布</a><a href="bd-warehouse-area.html">库区查询</a></td></tr>
+            <tbody id="warehouseRows">
+              <tr><td>1</td><td>山西公司中心仓</td><td>山西龙源新能源有限公司</td><td><span class="bd-tag ok">公司级</span></td><td><span class="bd-tag wait">普通标签</span></td><td>10.20.12.30</td><td><span class="bd-tag ok">已发布</span></td><td class="bd-op"><a href="#" data-action="detail">详情</a><a href="#" data-action="edit">修改</a><a href="#" class="warn" data-action="publish">取消发布</a><a href="#" class="danger" data-action="delete">删除</a><a href="bd-warehouse-area.html">库区查询</a></td></tr>
+              <tr><td>2</td><td>备件库</td><td>中衡龙腾第一光伏电站</td><td><span class="bd-tag wait">场站级</span></td><td><span class="bd-tag wait">普通标签</span></td><td>10.20.12.31</td><td><span class="bd-tag ok">已发布</span></td><td class="bd-op"><a href="#" data-action="detail">详情</a><a href="#" data-action="edit">修改</a><a href="#" class="warn" data-action="publish">取消发布</a><a href="#" class="danger" data-action="delete">删除</a><a href="bd-warehouse-area.html">库区查询</a></td></tr>
+              <tr><td>3</td><td>临时测试</td><td>齐心营风电场</td><td><span class="bd-tag wait">场站级</span></td><td><span class="bd-tag wait">普通标签</span></td><td>192.168.100.100</td><td><span class="bd-tag wait">未发布</span></td><td class="bd-op"><a href="#" data-action="detail">详情</a><a href="#" data-action="edit">修改</a><a href="#" data-action="publish">发布</a><a href="#" class="danger" data-action="delete">删除</a><a href="bd-warehouse-area.html">库区查询</a></td></tr>
+              <tr><td>4</td><td>横龙仓库</td><td>横龙风电场</td><td><span class="bd-tag wait">场站级</span></td><td><span class="bd-tag wait">普通标签</span></td><td>10.20.12.45</td><td><span class="bd-tag ok">已发布</span></td><td class="bd-op"><a href="#" data-action="detail">详情</a><a href="#" data-action="edit">修改</a><a href="#" class="warn" data-action="publish">取消发布</a><a href="#" class="danger" data-action="delete">删除</a><a href="bd-warehouse-area.html">库区查询</a></td></tr>
             </tbody>
           </table>
           <div class="bd-foot"><span>共 4 条</span><span>10 条/页 · 1 / 1</span></div>
         </div>
         <div class="bd-modal-mask" id="modalWh">
           <div class="bd-modal">
-            <div class="bd-modal-hd">新建仓库</div>
+            <div class="bd-modal-hd" id="whModalTitle">新建仓库</div>
             <div class="bd-modal-bd">
-              <div class="bd-field"><label><span class="req">*</span> 所属组织</label><select><option value="">请选择所属组织</option><optgroup label="销售公司"><option>山西龙源新能源有限公司</option><option>河北龙源风电有限公司</option></optgroup><optgroup label="场站"><option>齐心营风电场</option><option>横龙风电场</option></optgroup></select></div>
-              <div class="bd-field"><label><span class="req">*</span> 仓库名称</label><input placeholder="请输入仓库名称" /></div>
+              <div class="bd-field"><label><span class="req">*</span> 所属组织</label><select id="whOrg"><option value="">请选择所属组织</option><optgroup label="河北龙源"><option>河北龙源</option><option>麒麟山风电场</option><option>康保风电场</option></optgroup><optgroup label="天津龙源"><option>天津龙源</option><option>大神堂风电场</option></optgroup><optgroup label="蒙东龙源"><option>蒙东龙源</option><option>齐心营风电场</option></optgroup><optgroup label="安徽龙源"><option>安徽龙源</option><option>来安风电场</option></optgroup><optgroup label="海上龙源"><option>海上龙源</option><option>射阳海上风电场</option></optgroup></select></div>
+              <div class="bd-field"><label><span class="req">*</span> 仓库名称</label><input id="whName" placeholder="请输入仓库名称" /></div>
               <div class="bd-field"><label>物料标签类别</label><div class="bd-radios"><label><input type="radio" name="tag" checked /> 普通标签</label><label><input type="radio" name="tag" /> RFID标签</label><label><input type="radio" name="tag" /> 手写标签</label></div></div>
-              <div class="bd-field"><label>打印机 IP</label><div style="display:flex;gap:8px"><input placeholder="请输入打印机IP" style="flex:1"/><button class="bd-btn ghost" type="button">测试连接</button></div></div>
-              <div class="bd-field"><label>备注</label><textarea placeholder="请输入"></textarea></div>
+              <div class="bd-field"><label>打印机 IP</label><div style="display:flex;gap:8px"><input id="whIp" placeholder="请输入打印机IP" style="flex:1"/><button class="bd-btn ghost" type="button">测试连接</button></div></div>
+              <div class="bd-field"><label>备注</label><textarea id="whRemark" placeholder="请输入"></textarea></div>
             </div>
             <div class="bd-modal-ft"><button class="bd-btn pri" type="button" id="okWh">确定</button><button class="bd-btn" type="button" id="cancelWh">取消</button></div>
           </div>
@@ -194,8 +205,31 @@
   <script src="js/site-footer.js"></script>
   <script src="js/subpage-clock.js?v=20260714-whcfg-v1"></script>
 <script>
-document.getElementById('btnNewWh').onclick=function(){document.getElementById('modalWh').classList.add('open')};
-document.getElementById('cancelWh').onclick=document.getElementById('okWh').onclick=function(){document.getElementById('modalWh').classList.remove('open')};
+var whEditing=null,whMode='new';
+function whControls(disabled){document.querySelectorAll('#modalWh input,#modalWh select,#modalWh textarea').forEach(function(x){x.disabled=disabled});document.getElementById('okWh').style.display=disabled?'none':''}
+function openWh(mode,row){
+  whMode=mode;whEditing=row||null;
+  document.getElementById('whModalTitle').textContent=mode==='new'?'新建仓库':(mode==='edit'?'修改仓库':'仓库详情');
+  document.getElementById('whOrg').value=row?row.cells[2].textContent.trim():'';
+  document.getElementById('whName').value=row?row.cells[1].textContent.trim():'';
+  document.getElementById('whIp').value=row?row.cells[5].textContent.trim():'';
+  whControls(mode==='detail');document.getElementById('modalWh').classList.add('open');
+}
+function whOps(){return '<a href="#" data-action="detail">详情</a><a href="#" data-action="edit">修改</a><a href="#" data-action="publish">发布</a><a href="#" class="danger" data-action="delete">删除</a><a href="bd-warehouse-area.html">库区查询</a>'}
+function renumberWh(){document.querySelectorAll('#warehouseRows tr').forEach(function(r,i){r.cells[0].textContent=i+1});document.querySelector('.bd-foot span').textContent='共 '+document.querySelectorAll('#warehouseRows tr').length+' 条'}
+document.getElementById('btnNewWh').onclick=function(){openWh('new')};
+document.getElementById('cancelWh').onclick=function(){document.getElementById('modalWh').classList.remove('open')};
+document.getElementById('okWh').onclick=function(){
+  var org=document.getElementById('whOrg').value,name=document.getElementById('whName').value.trim(),ip=document.getElementById('whIp').value.trim()||'—';
+  if(!org||!name){alert('请填写所属组织和仓库名称');return}
+  var level=['河北龙源','天津龙源','蒙东龙源','安徽龙源','海上龙源'].indexOf(org)>-1?'公司级':'场站级';
+  if(whMode==='new'){var row=document.getElementById('warehouseRows').insertRow();row.innerHTML='<td></td><td>'+name+'</td><td>'+org+'</td><td><span class="bd-tag wait">'+level+'</span></td><td><span class="bd-tag wait">普通标签</span></td><td>'+ip+'</td><td><span class="bd-tag wait">未发布</span></td><td class="bd-op">'+whOps()+'</td>'}
+  else{whEditing.cells[1].textContent=name;whEditing.cells[2].textContent=org;whEditing.cells[3].innerHTML='<span class="bd-tag wait">'+level+'</span>';whEditing.cells[5].textContent=ip}
+  renumberWh();document.getElementById('modalWh').classList.remove('open');
+};
+document.getElementById('warehouseRows').onclick=function(e){var a=e.target.closest('a[data-action]');if(!a)return;e.preventDefault();var row=a.closest('tr'),act=a.dataset.action;if(act==='detail'||act==='edit')openWh(act,row);if(act==='delete'&&confirm('确定删除该仓库吗？')){row.remove();renumberWh()}if(act==='publish'){var tag=row.cells[6].querySelector('.bd-tag'),published=tag.textContent==='已发布';tag.textContent=published?'未发布':'已发布';tag.className='bd-tag '+(published?'wait':'ok');a.textContent=published?'发布':'取消发布';a.className=published?'':'warn'}};
+document.getElementById('btnQueryWh').onclick=function(){var org=document.getElementById('filterOrg').value,name=document.getElementById('filterName').value.trim(),st=document.getElementById('filterStatus').value;document.querySelectorAll('#warehouseRows tr').forEach(function(r){r.style.display=(!org||r.cells[2].textContent.trim()===org)&&(!name||r.cells[1].textContent.indexOf(name)>-1)&&(!st||r.cells[6].textContent.trim()===st)?'':'none'})};
+document.getElementById('btnResetWh').onclick=function(){document.getElementById('filterOrg').value='';document.getElementById('filterName').value='';document.getElementById('filterStatus').value='';document.querySelectorAll('#warehouseRows tr').forEach(function(r){r.style.display=''})};
 </script>
 </body>
 </html>

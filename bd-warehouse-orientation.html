@@ -93,7 +93,9 @@
       background:#fff; border:1px solid #91caff; border-radius:6px; overflow:hidden;
       box-shadow:0 2px 8px rgba(22,119,255,.08);
     }
-    .ori-shelf .nm { background:#1677ff; color:#fff; padding:6px 8px; font-size:12px; font-weight:600; }
+    .ori-shelf .nm { background:#1677ff; color:#fff; padding:6px 8px; font-size:12px; font-weight:600;display:flex;align-items:center;justify-content:space-between;gap:4px; }
+    .ori-shelf .nm .acts{display:flex;gap:3px}
+    .ori-shelf .nm button{border:0;background:rgba(255,255,255,.18);color:#fff;border-radius:3px;cursor:pointer;width:20px;height:20px;padding:0}
     .ori-shelf .layer {
       border-top:1px solid #e8edf4; padding:8px; font-size:11px; color:#475569; cursor:context-menu;
     }
@@ -134,20 +136,22 @@
       <main class="main-scroll"><div class="carrier-main-inner">
 
         <div class="bd-filter">
-          <label>所属场站</label><select><option value="">请选择所属场站</option><option selected>齐心营风电场</option><option>横龙风电场</option></select>
-          <label>所属仓库</label><select><option value="">请选择所属仓库</option><option selected>临时测试</option><option>横龙仓库</option></select>
-          <label>所属库区</label><select><option value="">请选择所属库区</option><option selected>临时库区</option><option>第一库区</option></select>
+          <label>所属组织</label><select id="oriOrg"><option value="">请选择所属组织</option><option selected>齐心营风电场</option><option>横龙风电场</option></select>
+          <label>所属仓库</label><select id="oriWh"><option value="">请选择所属仓库</option><option selected>临时测试</option><option>横龙仓库</option></select>
+          <label>所属库区</label><select id="oriArea"><option value="">请选择所属库区</option><option selected>临时库区</option><option>第一库区</option></select>
+          <label>货架名称</label><input id="oriName" placeholder="请输入货架名称" />
           <div class="ops">
-            <button class="bd-btn pri">查询</button>
-            <button class="bd-btn">还原方位配置</button>
-            <button class="bd-btn pri">提交方位配置</button>
+            <button class="bd-btn pri" id="btnQueryOri">查询</button>
+            <button class="bd-btn ghost" id="btnAddOri">新增方位</button>
+            <button class="bd-btn" id="btnResetOri">还原方位配置</button>
+            <button class="bd-btn pri" id="btnSaveOri">提交方位配置</button>
           </div>
         </div>
         <div class="bd-panel">
           <div class="ori-canvas" id="oriCanvas">
-            <div class="ori-shelf"><div class="nm">临时货架</div><div class="layer" data-tip="1层 · 3 位">1层 · 3 位</div><div class="layer" data-tip="2层 · 2 位">2层 · 2 位</div></div>
-            <div class="ori-shelf"><div class="nm">1号货架</div><div class="layer">1层 · 4 位</div><div class="layer">2层 · 4 位</div><div class="layer">3层 · 2 位</div></div>
-            <div class="ori-shelf"><div class="nm">2号货架</div><div class="layer">1层 · 5 位</div><div class="layer">2层 · 5 位</div></div>
+            <div class="ori-shelf"><div class="nm"><span>临时货架</span><span class="acts"><button data-action="edit" title="修改">✎</button><button data-action="delete" title="删除">×</button></span></div><div class="layer" data-tip="1层 · 3 位">1层 · 3 位</div><div class="layer" data-tip="2层 · 2 位">2层 · 2 位</div></div>
+            <div class="ori-shelf"><div class="nm"><span>1号货架</span><span class="acts"><button data-action="edit" title="修改">✎</button><button data-action="delete" title="删除">×</button></span></div><div class="layer">1层 · 4 位</div><div class="layer">2层 · 4 位</div><div class="layer">3层 · 2 位</div></div>
+            <div class="ori-shelf"><div class="nm"><span>2号货架</span><span class="acts"><button data-action="edit" title="修改">✎</button><button data-action="delete" title="删除">×</button></span></div><div class="layer">1层 · 5 位</div><div class="layer">2层 · 5 位</div></div>
             <div class="ori-tip">*提示：鼠标右键点击货架层级查看详细内容</div>
           </div>
         </div>
@@ -160,11 +164,17 @@
   <script src="js/site-footer.js"></script>
   <script src="js/subpage-clock.js?v=20260714-whcfg-v1"></script>
 <script>
+var oriCanvas=document.getElementById('oriCanvas'),oriInitial=oriCanvas.innerHTML;
 document.getElementById('oriCanvas').addEventListener('contextmenu',function(e){
   var layer=e.target.closest('.layer'); if(!layer) return;
   e.preventDefault();
-  alert('货架层级详情\n'+layer.closest('.ori-shelf').querySelector('.nm').textContent+' · '+layer.textContent);
+  alert('货架层级详情\n'+layer.closest('.ori-shelf').querySelector('.nm span').textContent+' · '+layer.textContent);
 });
+oriCanvas.addEventListener('click',function(e){var b=e.target.closest('button[data-action]');if(!b)return;var shelf=b.closest('.ori-shelf'),act=b.dataset.action;if(act==='delete'&&confirm('确定删除该货架方位吗？'))shelf.remove();if(act==='edit'){var old=shelf.querySelector('.nm>span').textContent,name=prompt('请输入货架名称',old);if(name&&name.trim())shelf.querySelector('.nm>span').textContent=name.trim()}});
+document.getElementById('btnAddOri').onclick=function(){var name=prompt('请输入新增货架名称','新货架');if(!name||!name.trim())return;var shelf=document.createElement('div');shelf.className='ori-shelf';shelf.innerHTML='<div class="nm"><span>'+name.trim()+'</span><span class="acts"><button data-action="edit" title="修改">✎</button><button data-action="delete" title="删除">×</button></span></div><div class="layer">1层 · 3 位</div><div class="layer">2层 · 3 位</div>';oriCanvas.insertBefore(shelf,oriCanvas.querySelector('.ori-tip'))};
+document.getElementById('btnQueryOri').onclick=function(){var kw=document.getElementById('oriName').value.trim();oriCanvas.querySelectorAll('.ori-shelf').forEach(function(s){s.style.display=!kw||s.querySelector('.nm>span').textContent.indexOf(kw)>-1?'inline-block':'none'})};
+document.getElementById('btnResetOri').onclick=function(){oriCanvas.innerHTML=oriInitial;document.getElementById('oriName').value=''};
+document.getElementById('btnSaveOri').onclick=function(){alert('方位配置已提交，共 '+oriCanvas.querySelectorAll('.ori-shelf').length+' 个货架')};
 </script>
 </body>
 </html>

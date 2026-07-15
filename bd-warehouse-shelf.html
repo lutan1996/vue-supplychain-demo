@@ -134,33 +134,33 @@
       <main class="main-scroll"><div class="carrier-main-inner">
 
         <div class="bd-filter">
-          <label>所属场站</label><select><option value="">请选择所属场站</option><option>齐心营风电场</option><option>横龙风电场</option></select>
-          <label>所属仓库</label><select><option value="">请选择仓库</option><option>临时测试</option><option>横龙仓库</option></select>
-          <label>所属库区</label><select><option value="">请选择库区</option><option>临时库区</option><option>第一库区</option></select>
-          <label>货架状态</label><select><option value="">请选择货架状态</option><option>已发布</option><option>未发布</option></select>
-          <label>货架名称</label><input placeholder="请输入货架名称" />
-          <div class="ops"><button class="bd-btn pri">查询</button><button class="bd-btn ghost" id="btnNewShelf">新建货架</button></div>
+          <label>所属组织</label><select id="shelfFilterOrg"><option value="">请选择所属组织</option><option>齐心营风电场</option><option>横龙风电场</option></select>
+          <label>所属仓库</label><select id="shelfFilterWh"><option value="">请选择仓库</option><option>临时测试</option><option>横龙仓库</option></select>
+          <label>所属库区</label><select id="shelfFilterArea"><option value="">请选择库区</option><option>临时库区</option><option>第一库区</option></select>
+          <label>货架状态</label><select id="shelfFilterStatus"><option value="">请选择货架状态</option><option>已发布</option><option>未发布</option></select>
+          <label>货架名称</label><input id="shelfFilterName" placeholder="请输入货架名称" />
+          <div class="ops"><button class="bd-btn pri" id="btnQueryShelf">查询</button><button class="bd-btn" id="btnResetShelf">重置</button><button class="bd-btn ghost" id="btnNewShelf">新建货架</button></div>
         </div>
         <div class="bd-panel">
           <table class="bd-table">
             <thead><tr><th>序号</th><th>货架名称</th><th>货架层数</th><th>所属电站</th><th>所属仓库</th><th>所属库区</th><th>创建时间</th><th>货架状态</th><th>操作</th></tr></thead>
-            <tbody>
-              <tr><td>1</td><td>临时货架</td><td>2</td><td>齐心营风电场</td><td>临时测试</td><td>临时库区</td><td>—</td><td><span class="bd-tag ok">已发布</span></td><td class="bd-op"><a href="#">详情</a><a href="#" class="warn">取消发布</a></td></tr>
-              <tr><td>2</td><td>1号货架</td><td>3</td><td>横龙风电场</td><td>横龙仓库</td><td>第一库区</td><td>—</td><td><span class="bd-tag ok">已发布</span></td><td class="bd-op"><a href="#">详情</a><a href="#" class="warn">取消发布</a></td></tr>
-              <tr><td>3</td><td>2号货架</td><td>2</td><td>横龙风电场</td><td>横龙仓库</td><td>第一库区</td><td>—</td><td><span class="bd-tag ok">已发布</span></td><td class="bd-op"><a href="#">详情</a><a href="#" class="warn">取消发布</a></td></tr>
-              <tr><td>4</td><td>第二货架</td><td>1</td><td>齐心营风电场</td><td>临时测试</td><td>临时库区</td><td>—</td><td><span class="bd-tag ok">已发布</span></td><td class="bd-op"><a href="#">详情</a><a href="#" class="warn">取消发布</a></td></tr>
+            <tbody id="shelfRows">
+              <tr><td>1</td><td>临时货架</td><td>2</td><td>齐心营风电场</td><td>临时测试</td><td>临时库区</td><td>2026-07-14 09:20</td><td><span class="bd-tag ok">已发布</span></td><td class="bd-op"><a href="#" data-action="detail">详情</a><a href="#" data-action="edit">修改</a><a href="#" class="warn" data-action="publish">取消发布</a><a href="#" class="danger" data-action="delete">删除</a><a href="bd-warehouse-orientation.html">方位配置</a></td></tr>
+              <tr><td>2</td><td>1号货架</td><td>3</td><td>横龙风电场</td><td>横龙仓库</td><td>第一库区</td><td>2026-07-14 09:35</td><td><span class="bd-tag ok">已发布</span></td><td class="bd-op"><a href="#" data-action="detail">详情</a><a href="#" data-action="edit">修改</a><a href="#" class="warn" data-action="publish">取消发布</a><a href="#" class="danger" data-action="delete">删除</a><a href="bd-warehouse-orientation.html">方位配置</a></td></tr>
+              <tr><td>3</td><td>2号货架</td><td>2</td><td>横龙风电场</td><td>横龙仓库</td><td>第一库区</td><td>2026-07-14 09:42</td><td><span class="bd-tag wait">未发布</span></td><td class="bd-op"><a href="#" data-action="detail">详情</a><a href="#" data-action="edit">修改</a><a href="#" data-action="publish">发布</a><a href="#" class="danger" data-action="delete">删除</a><a href="bd-warehouse-orientation.html">方位配置</a></td></tr>
+              <tr><td>4</td><td>第二货架</td><td>1</td><td>齐心营风电场</td><td>临时测试</td><td>临时库区</td><td>2026-07-14 10:10</td><td><span class="bd-tag ok">已发布</span></td><td class="bd-op"><a href="#" data-action="detail">详情</a><a href="#" data-action="edit">修改</a><a href="#" class="warn" data-action="publish">取消发布</a><a href="#" class="danger" data-action="delete">删除</a><a href="bd-warehouse-orientation.html">方位配置</a></td></tr>
             </tbody>
           </table>
           <div class="bd-foot"><span>共 9 条</span><span>10 条/页 · 1 / 1</span></div>
         </div>
         <div class="bd-modal-mask" id="modalShelf">
           <div class="bd-modal" style="width:620px">
-            <div class="bd-modal-hd">新建货架</div>
+            <div class="bd-modal-hd" id="shelfModalTitle">新建货架</div>
             <div class="bd-modal-bd">
-              <div class="bd-field"><label><span class="req">*</span> 所属场站</label><select><option value="">请选择所属场站</option><option>齐心营风电场</option><option>海上射阳风电场</option></select></div>
-              <div class="bd-field"><label><span class="req">*</span> 所属仓库</label><select><option value="">请选择仓库</option><option>临时测试</option><option>备件库</option></select></div>
-              <div class="bd-field"><label><span class="req">*</span> 所属库区</label><select><option value="">请选择库区</option><option>临时库区</option><option>第一库区</option></select></div>
-              <div class="bd-field"><label><span class="req">*</span> 货架名称</label><input placeholder="请输入货架名称" /></div>
+              <div class="bd-field"><label><span class="req">*</span> 所属组织</label><select id="shelfOrg"><option value="">请选择所属组织</option><option>齐心营风电场</option><option>横龙风电场</option></select></div>
+              <div class="bd-field"><label><span class="req">*</span> 所属仓库</label><select id="shelfWh"><option value="">请选择仓库</option><option>临时测试</option><option>横龙仓库</option></select></div>
+              <div class="bd-field"><label><span class="req">*</span> 所属库区</label><select id="shelfArea"><option value="">请选择库区</option><option>临时库区</option><option>第一库区</option></select></div>
+              <div class="bd-field"><label><span class="req">*</span> 货架名称</label><input id="shelfName" placeholder="请输入货架名称" /></div>
               <div class="bd-field"><label><span class="req">*</span> 货架层数</label>
                 <div class="bd-step"><button type="button" id="layerMinus">-</button><input id="layerCnt" value="2" /><button type="button" id="layerPlus">+</button></div>
               </div>
@@ -179,17 +179,27 @@
   <script src="js/site-footer.js"></script>
   <script src="js/subpage-clock.js?v=20260714-whcfg-v1"></script>
 <script>
+var shelfEditing=null,shelfMode='new';
 function renderLayers(){
   var n=parseInt(document.getElementById('layerCnt').value,10)||1;
   var tb=document.querySelector('#layerTable tbody'); tb.innerHTML='';
   for(var i=1;i<=n;i++){
-    tb.innerHTML+='<tr><td>'+i+'层</td><td><div class="bd-step"><button type="button">-</button><input value="'+(i===1?3:2)+'" /><button type="button">+</button></div></td></tr>';
+    tb.innerHTML+='<tr><td>'+i+'层</td><td><div class="bd-step"><button type="button" data-step="-1">-</button><input value="'+(i===1?3:2)+'" /><button type="button" data-step="1">+</button></div></td></tr>';
   }
 }
-document.getElementById('btnNewShelf').onclick=function(){document.getElementById('modalShelf').classList.add('open');renderLayers();};
+function shelfControls(disabled){document.querySelectorAll('#modalShelf input,#modalShelf select,#modalShelf textarea,#modalShelf .bd-step button').forEach(function(x){x.disabled=disabled});document.getElementById('okShelf').style.display=disabled?'none':''}
+function openShelf(mode,row){shelfMode=mode;shelfEditing=row||null;document.getElementById('shelfModalTitle').textContent=mode==='new'?'新建货架':(mode==='edit'?'修改货架':'货架详情');document.getElementById('shelfOrg').value=row?row.cells[3].textContent.trim():'';document.getElementById('shelfWh').value=row?row.cells[4].textContent.trim():'';document.getElementById('shelfArea').value=row?row.cells[5].textContent.trim():'';document.getElementById('shelfName').value=row?row.cells[1].textContent.trim():'';document.getElementById('layerCnt').value=row?row.cells[2].textContent.trim():'2';renderLayers();shelfControls(mode==='detail');document.getElementById('modalShelf').classList.add('open')}
+function shelfOps(){return '<a href="#" data-action="detail">详情</a><a href="#" data-action="edit">修改</a><a href="#" data-action="publish">发布</a><a href="#" class="danger" data-action="delete">删除</a><a href="bd-warehouse-orientation.html">方位配置</a>'}
+function renumberShelf(){document.querySelectorAll('#shelfRows tr').forEach(function(r,i){r.cells[0].textContent=i+1});document.querySelector('.bd-foot span').textContent='共 '+document.querySelectorAll('#shelfRows tr').length+' 条'}
+document.getElementById('btnNewShelf').onclick=function(){openShelf('new')};
 document.getElementById('layerMinus').onclick=function(){var el=document.getElementById('layerCnt');el.value=Math.max(1,(+el.value||1)-1);renderLayers();};
 document.getElementById('layerPlus').onclick=function(){var el=document.getElementById('layerCnt');el.value=(+el.value||1)+1;renderLayers();};
-document.getElementById('cancelShelf').onclick=document.getElementById('okShelf').onclick=function(){document.getElementById('modalShelf').classList.remove('open')};
+document.getElementById('layerTable').onclick=function(e){var b=e.target.closest('button[data-step]');if(!b)return;var input=b.parentNode.querySelector('input');input.value=Math.max(1,(+input.value||1)+(+b.dataset.step))};
+document.getElementById('cancelShelf').onclick=function(){document.getElementById('modalShelf').classList.remove('open')};
+document.getElementById('okShelf').onclick=function(){var org=document.getElementById('shelfOrg').value,wh=document.getElementById('shelfWh').value,area=document.getElementById('shelfArea').value,name=document.getElementById('shelfName').value.trim(),layers=document.getElementById('layerCnt').value;if(!org||!wh||!area||!name){alert('请填写所属组织、仓库、库区和货架名称');return}if(shelfMode==='new'){var row=document.getElementById('shelfRows').insertRow(),now=new Date().toLocaleString('zh-CN',{hour12:false});row.innerHTML='<td></td><td>'+name+'</td><td>'+layers+'</td><td>'+org+'</td><td>'+wh+'</td><td>'+area+'</td><td>'+now+'</td><td><span class="bd-tag wait">未发布</span></td><td class="bd-op">'+shelfOps()+'</td>'}else{shelfEditing.cells[1].textContent=name;shelfEditing.cells[2].textContent=layers;shelfEditing.cells[3].textContent=org;shelfEditing.cells[4].textContent=wh;shelfEditing.cells[5].textContent=area}renumberShelf();document.getElementById('modalShelf').classList.remove('open')};
+document.getElementById('shelfRows').onclick=function(e){var a=e.target.closest('a[data-action]');if(!a)return;e.preventDefault();var row=a.closest('tr'),act=a.dataset.action;if(act==='detail'||act==='edit')openShelf(act,row);if(act==='delete'&&confirm('确定删除该货架吗？')){row.remove();renumberShelf()}if(act==='publish'){var tag=row.cells[7].querySelector('.bd-tag'),published=tag.textContent==='已发布';tag.textContent=published?'未发布':'已发布';tag.className='bd-tag '+(published?'wait':'ok');a.textContent=published?'发布':'取消发布';a.className=published?'':'warn'}};
+document.getElementById('btnQueryShelf').onclick=function(){var org=document.getElementById('shelfFilterOrg').value,wh=document.getElementById('shelfFilterWh').value,area=document.getElementById('shelfFilterArea').value,st=document.getElementById('shelfFilterStatus').value,name=document.getElementById('shelfFilterName').value.trim();document.querySelectorAll('#shelfRows tr').forEach(function(r){r.style.display=(!org||r.cells[3].textContent.trim()===org)&&(!wh||r.cells[4].textContent.trim()===wh)&&(!area||r.cells[5].textContent.trim()===area)&&(!st||r.cells[7].textContent.trim()===st)&&(!name||r.cells[1].textContent.indexOf(name)>-1)?'':'none'})};
+document.getElementById('btnResetShelf').onclick=function(){['shelfFilterOrg','shelfFilterWh','shelfFilterArea','shelfFilterStatus'].forEach(function(id){document.getElementById(id).value=''});document.getElementById('shelfFilterName').value='';document.querySelectorAll('#shelfRows tr').forEach(function(r){r.style.display=''})};
 </script>
 </body>
 </html>
