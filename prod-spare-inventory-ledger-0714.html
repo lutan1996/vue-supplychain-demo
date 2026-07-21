@@ -8,6 +8,7 @@
   <link rel="stylesheet" href="css/subpage-base.css" />
   <link rel="stylesheet" href="css/carrier-management.css" />
   <link rel="stylesheet" href="css/source-navbar-header.css" />
+  <link rel="stylesheet" href="css/warehouse-modal.css" />
   <style>
     :root {
       --primary: #1677ff;
@@ -1146,6 +1147,157 @@
     }
     .map-note b { color: #334155; }
 
+    /* ===== 发起调拨申请弹窗 ===== */
+    #transferApplyMask .wh-modal-box {
+      width: min(920px, 100%);
+      max-height: min(92vh, 860px);
+    }
+    .xfer-sec {
+      background: #fafbfd;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 12px;
+      margin-bottom: 10px;
+    }
+    .xfer-sec:last-child { margin-bottom: 0; }
+    .xfer-sec-hd {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+    .xfer-sec-hd h4 {
+      margin: 0;
+      font-size: 13px;
+      font-weight: 700;
+      color: #1f2d3d;
+    }
+    .xfer-meta-grid,
+    .xfer-form-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 8px 10px;
+    }
+    .xfer-form-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .xfer-field label {
+      display: block;
+      font-size: 12px;
+      color: #516a87;
+      margin-bottom: 4px;
+    }
+    .xfer-field input,
+    .xfer-field select,
+    .xfer-field textarea {
+      width: 100%;
+      height: 32px;
+      border: 1px solid #d9d9d9;
+      border-radius: 6px;
+      padding: 0 10px;
+      font-size: 12px;
+      box-sizing: border-box;
+      font-family: inherit;
+      color: #333;
+      background: #fff;
+    }
+    .xfer-field textarea {
+      height: 56px;
+      padding: 8px 10px;
+      resize: vertical;
+    }
+    .xfer-field input[readonly],
+    .xfer-field select:disabled {
+      background: #f5f7fa;
+      color: #5d738d;
+    }
+    .xfer-field.span2 { grid-column: span 2; }
+    .xfer-field.span3 { grid-column: span 3; }
+    .xfer-field.span4 { grid-column: span 4; }
+    .xfer-add-btn {
+      height: 28px;
+      padding: 0 10px;
+      border: 1px solid #91caff;
+      border-radius: 4px;
+      background: #e6f4ff;
+      color: #1677ff;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .xfer-table-wrap {
+      overflow: auto;
+      border: 1px solid #e8edf4;
+      border-radius: 6px;
+      background: #fff;
+    }
+    .xfer-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+      min-width: 760px;
+    }
+    .xfer-table th,
+    .xfer-table td {
+      padding: 6px 8px;
+      border-bottom: 1px solid #eef2f7;
+      text-align: left;
+      vertical-align: middle;
+      white-space: nowrap;
+    }
+    .xfer-table th {
+      background: #f7f9fc;
+      color: #5a6b82;
+      font-weight: 600;
+    }
+    .xfer-table tr:last-child td { border-bottom: 0; }
+    .xfer-table input[type="number"] {
+      width: 64px;
+      height: 28px;
+      border: 1px solid #d9d9d9;
+      border-radius: 4px;
+      padding: 0 6px;
+      font-size: 12px;
+    }
+    .xfer-table .rm {
+      border: 0;
+      background: transparent;
+      color: #ff4d4f;
+      cursor: pointer;
+      font-size: 12px;
+      padding: 0;
+    }
+    .xfer-empty {
+      padding: 18px;
+      text-align: center;
+      color: #8c9bb0;
+      font-size: 12px;
+    }
+    .xfer-approval {
+      margin-top: 8px;
+      padding: 8px 10px;
+      background: #f6ffed;
+      border: 1px solid #b7eb8f;
+      border-radius: 6px;
+      font-size: 12px;
+      color: #389e0d;
+      line-height: 1.5;
+    }
+    .xfer-toast {
+      position: fixed;
+      top: 72px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 10030;
+      background: #fff;
+      border: 1px solid #b7eb8f;
+      box-shadow: 0 8px 24px rgba(15, 23, 42, .12);
+      border-radius: 8px;
+      padding: 10px 16px;
+      font-size: 13px;
+      color: #1f2d3d;
+      display: none;
+    }
+    .xfer-toast.show { display: block; }
+
     @media (max-width: 1280px) {
       .shell { grid-template-columns: 220px minmax(0,1fr); }
       .summary-band { grid-template-columns: 1fr; }
@@ -1561,6 +1713,139 @@
     </div>
   </aside>
 
+  <!-- 发起调拨申请：居中弹窗 -->
+  <div class="wh-modal-mask" id="transferApplyMask" aria-hidden="true">
+    <div class="wh-modal-box" role="dialog" aria-modal="true" aria-labelledby="transferApplyTitle">
+      <div class="wh-modal-head">
+        <h3 class="wh-modal-title" id="transferApplyTitle">发起调拨申请</h3>
+        <button type="button" class="wh-modal-close" id="btnCloseTransferApply" aria-label="关闭">×</button>
+      </div>
+      <div class="wh-modal-body">
+        <div class="xfer-sec">
+          <div class="xfer-sec-hd"><h4>申请单信息</h4></div>
+          <div class="xfer-meta-grid">
+            <div class="xfer-field">
+              <label for="xferApplyNo">申请单号</label>
+              <input id="xferApplyNo" type="text" readonly />
+            </div>
+            <div class="xfer-field">
+              <label for="xferApplyDate">申请日期</label>
+              <input id="xferApplyDate" type="date" readonly />
+            </div>
+            <div class="xfer-field">
+              <label for="xferApplicant">申请人</label>
+              <input id="xferApplicant" type="text" value="张明" readonly />
+            </div>
+            <div class="xfer-field">
+              <label for="xferApplyOrg">所属组织</label>
+              <input id="xferApplyOrg" type="text" readonly />
+            </div>
+          </div>
+        </div>
+
+        <div class="xfer-sec">
+          <div class="xfer-sec-hd"><h4>调拨路径</h4></div>
+          <div class="xfer-form-grid">
+            <div class="xfer-field">
+              <label for="xferFromOrg">调出单位</label>
+              <select id="xferFromOrg"></select>
+            </div>
+            <div class="xfer-field">
+              <label for="xferFromWh">调出仓库</label>
+              <select id="xferFromWh"></select>
+            </div>
+            <div class="xfer-field">
+              <label for="xferFromLoc">五级库位编码</label>
+              <input id="xferFromLoc" type="text" readonly />
+            </div>
+            <div class="xfer-field">
+              <label for="xferToOrg">调入单位</label>
+              <select id="xferToOrg"></select>
+            </div>
+            <div class="xfer-field">
+              <label for="xferToWh">调入仓库</label>
+              <select id="xferToWh"></select>
+            </div>
+            <div class="xfer-field">
+              <label for="xferType">调拨类型</label>
+              <select id="xferType">
+                <option value="场站内调拨">场站内调拨</option>
+                <option value="跨场站调拨" selected>跨场站调拨</option>
+                <option value="跨公司调拨">跨公司调拨</option>
+                <option value="共享仓借调">共享仓借调</option>
+              </select>
+            </div>
+            <div class="xfer-field">
+              <label for="xferExpectDate">期望到货日期</label>
+              <input id="xferExpectDate" type="date" />
+            </div>
+            <div class="xfer-field">
+              <label for="xferReason">调拨原因</label>
+              <select id="xferReason">
+                <option value="低库存补货">低库存补货</option>
+                <option value="抢修需求">抢修需求</option>
+                <option value="呆滞消化">呆滞消化</option>
+                <option value="共享余量调配">共享余量调配</option>
+                <option value="其他">其他</option>
+              </select>
+            </div>
+            <div class="xfer-field">
+              <label for="xferUrgent">紧急程度</label>
+              <select id="xferUrgent">
+                <option value="普通">普通</option>
+                <option value="紧急">紧急</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="xfer-sec">
+          <div class="xfer-sec-hd">
+            <h4>调拨明细</h4>
+            <button type="button" class="xfer-add-btn" id="btnXferAddLine">+ 添加物资</button>
+          </div>
+          <div class="xfer-table-wrap">
+            <table class="xfer-table">
+              <thead>
+                <tr>
+                  <th>产品编码</th>
+                  <th>产品名称</th>
+                  <th>设备出厂唯一编码</th>
+                  <th>规格型号</th>
+                  <th>适用机型</th>
+                  <th>单位</th>
+                  <th>可调出数量</th>
+                  <th>申请调拨数量</th>
+                  <th>五级库位编码</th>
+                  <th>库存状态</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody id="xferLineBody"></tbody>
+            </table>
+            <div class="xfer-empty" id="xferEmptyTip" style="display:none">当前无可调拨物资，请先添加或调整筛选条件。</div>
+          </div>
+        </div>
+
+        <div class="xfer-sec">
+          <div class="xfer-form-grid">
+            <div class="xfer-field span3">
+              <label for="xferRemark">备注</label>
+              <textarea id="xferRemark" placeholder="如：康保 3 号风机 IGBT 抢修，需 48 小时内到场"></textarea>
+            </div>
+          </div>
+          <div class="xfer-approval" id="xferApprovalHint">提交后将进入审批：场站库管 → 项目公司物资主管 → 集团供应链（跨公司时）</div>
+        </div>
+      </div>
+      <div class="wh-modal-foot">
+        <button type="button" class="wh-btn wh-btn--ghost" id="btnCancelTransferApply">取消</button>
+        <button type="button" class="wh-btn wh-btn--ghost" id="btnDraftTransferApply">保存草稿</button>
+        <button type="button" class="wh-btn wh-btn--primary" id="btnSubmitTransferApply">提交申请</button>
+      </div>
+    </div>
+  </div>
+  <div class="xfer-toast" id="xferToast"></div>
+
   <script src="js/sidebar-actions.js"></script>
   <script src="js/subpage-feature-title.js"></script>
   <script src="js/site-footer.js"></script>
@@ -1920,9 +2205,216 @@
       }
     });
     var btnTransferApply = document.getElementById("btnTransferApply");
-    if (btnTransferApply) {
-      btnTransferApply.addEventListener("click", function () { openAlertDrawer(); });
+    var transferApplyMask = document.getElementById("transferApplyMask");
+    var xferLineBody = document.getElementById("xferLineBody");
+    var xferLines = [];
+    var xferSeq = 1;
+
+    function todayStr() {
+      return new Date().toISOString().slice(0, 10);
     }
+    function genApplyNo() {
+      var d = todayStr().replace(/-/g, "");
+      return "DB-" + d + "-" + String(xferSeq++).padStart(3, "0");
+    }
+    function stationFromRow(r) {
+      return (r.loc.split("/")[0] || r.company).trim();
+    }
+    function warehouseFromRow(r) {
+      var parts = r.loc.split("/");
+      return parts.length > 1 ? parts[1].trim() : "主仓";
+    }
+    function orgOptions() {
+      var opts = [{ value: "龙源电力", label: "龙源电力（全部）" }];
+      ORG_SUMMARY.group.forEach(function (g) {
+        opts.push({ value: g.key, label: g.name });
+        (ORG_SUMMARY.company[g.key] || []).forEach(function (s) {
+          opts.push({ value: s.key, label: s.name });
+        });
+      });
+      return opts;
+    }
+    function warehouseOptions() {
+      var map = {};
+      ROWS.forEach(function (r) {
+        var key = stationFromRow(r) + " / " + warehouseFromRow(r);
+        map[key] = { station: stationFromRow(r), warehouse: warehouseFromRow(r), loc: r.loc };
+      });
+      return Object.keys(map).map(function (k) { return map[k]; });
+    }
+    function fillSelect(el, options, selected) {
+      el.innerHTML = options.map(function (o) {
+        var val = typeof o === "string" ? o : o.value;
+        var label = typeof o === "string" ? o : o.label;
+        return '<option value="' + val + '"' + (val === selected ? " selected" : "") + ">" + label + "</option>";
+      }).join("");
+    }
+    function currentOrgLabel() {
+      if (state.org === "龙源电力") return "龙源电力（全部）";
+      var found = ORG_SUMMARY.group.filter(function (g) { return g.key === state.org; })[0];
+      if (found) return found.name;
+      var label = state.org;
+      Object.keys(ORG_SUMMARY.company).forEach(function (ck) {
+        ORG_SUMMARY.company[ck].forEach(function (s) {
+          if (s.key === state.org) label = s.name;
+        });
+      });
+      return label;
+    }
+    function transferableRows() {
+      return filteredRows().filter(function (r) {
+        return r.qty > 0 && r.status === "正常";
+      });
+    }
+    function renderXferLines() {
+      var emptyTip = document.getElementById("xferEmptyTip");
+      if (!xferLines.length) {
+        xferLineBody.innerHTML = "";
+        if (emptyTip) emptyTip.style.display = "block";
+        return;
+      }
+      if (emptyTip) emptyTip.style.display = "none";
+      xferLineBody.innerHTML = xferLines.map(function (line, idx) {
+        return "<tr data-idx=\"" + idx + "\">" +
+          "<td>" + line.code + "</td>" +
+          "<td>" + line.name + "</td>" +
+          "<td>" + factoryUniqueCode(line) + "</td>" +
+          "<td>" + line.model + "</td>" +
+          "<td>" + applicableModel(line) + "</td>" +
+          "<td>" + stockUnit() + "</td>" +
+          "<td>" + line.qty + "</td>" +
+          '<td><input type="number" min="1" max="' + line.qty + '" value="' + line.applyQty + '" data-qty /></td>' +
+          "<td>" + fiveLevelLocation(line) + "</td>" +
+          "<td>" + line.status + "</td>" +
+          '<td><button type="button" class="rm" data-rm>删除</button></td>' +
+          "</tr>";
+      }).join("");
+    }
+    function syncFromWhFields() {
+      var fromOrg = document.getElementById("xferFromOrg").value;
+      var fromWh = document.getElementById("xferFromWh").value;
+      var match = ROWS.filter(function (r) {
+        return stationFromRow(r) === fromOrg || r.company.indexOf(fromOrg.replace("风电场", "")) >= 0 || fromOrg.indexOf(stationFromRow(r).replace("风电场", "")) >= 0;
+      }).filter(function (r) {
+        return warehouseFromRow(r) === fromWh || r.loc.indexOf(fromWh) >= 0;
+      })[0];
+      document.getElementById("xferFromLoc").value = match ? fiveLevelLocation(match) : "";
+    }
+    function updateApprovalHint() {
+      var type = document.getElementById("xferType").value;
+      var hint = document.getElementById("xferApprovalHint");
+      if (type === "跨公司调拨") {
+        hint.textContent = "提交后将进入审批：场站库管 → 项目公司物资主管 → 集团供应链";
+      } else if (type === "共享仓借调") {
+        hint.textContent = "提交后将进入审批：共享仓管理员 → 借入场站库管 → 项目公司物资主管";
+      } else {
+        hint.textContent = "提交后将进入审批：场站库管 → 项目公司物资主管";
+      }
+    }
+    function openTransferApplyModal() {
+      document.getElementById("xferApplyNo").value = genApplyNo();
+      document.getElementById("xferApplyDate").value = todayStr();
+      document.getElementById("xferApplyOrg").value = currentOrgLabel();
+      var orgOpts = orgOptions();
+      fillSelect(document.getElementById("xferFromOrg"), orgOpts, state.org === "龙源电力" ? "康保风电场" : state.org);
+      fillSelect(document.getElementById("xferToOrg"), orgOpts, "麒麟山风电场");
+      var whOpts = warehouseOptions();
+      var whNames = whOpts.map(function (w) { return w.warehouse; });
+      fillSelect(document.getElementById("xferFromWh"), whNames, whNames[0] || "主仓");
+      fillSelect(document.getElementById("xferToWh"), whNames, whNames[1] || whNames[0] || "主仓");
+      document.getElementById("xferExpectDate").value = todayStr();
+      document.getElementById("xferReason").value = "低库存补货";
+      document.getElementById("xferUrgent").value = "普通";
+      document.getElementById("xferRemark").value = "";
+      syncFromWhFields();
+      updateApprovalHint();
+      xferLines = transferableRows().slice(0, 3).map(function (r) {
+        return Object.assign({}, r, { applyQty: Math.min(Math.max(1, r.safe || 1), r.qty) });
+      });
+      renderXferLines();
+      transferApplyMask.classList.add("show");
+      transferApplyMask.setAttribute("aria-hidden", "false");
+      document.body.style.overflow = "hidden";
+    }
+    function closeTransferApplyModal() {
+      transferApplyMask.classList.remove("show");
+      transferApplyMask.setAttribute("aria-hidden", "true");
+      document.body.style.overflow = "";
+    }
+    function showXferToast(msg) {
+      var toast = document.getElementById("xferToast");
+      toast.textContent = msg;
+      toast.classList.add("show");
+      clearTimeout(showXferToast._t);
+      showXferToast._t = setTimeout(function () { toast.classList.remove("show"); }, 3200);
+    }
+    function validateTransferApply() {
+      if (!xferLines.length) {
+        alert("请至少添加一条可调拨物资。");
+        return false;
+      }
+      var invalid = false;
+      xferLineBody.querySelectorAll("tr").forEach(function (tr, idx) {
+        var input = tr.querySelector("[data-qty]");
+        var line = xferLines[idx];
+        if (!input || !line) return;
+        var n = Number(input.value);
+        if (!n || n <= 0 || n > line.qty) invalid = true;
+        line.applyQty = n;
+      });
+      if (invalid) {
+        alert("申请调拨数量需在 1 到可调出数量之间。");
+        return false;
+      }
+      return true;
+    }
+    if (btnTransferApply) {
+      btnTransferApply.addEventListener("click", openTransferApplyModal);
+    }
+    document.getElementById("btnCloseTransferApply").addEventListener("click", closeTransferApplyModal);
+    document.getElementById("btnCancelTransferApply").addEventListener("click", closeTransferApplyModal);
+    transferApplyMask.addEventListener("click", function (e) {
+      if (e.target === transferApplyMask) closeTransferApplyModal();
+    });
+    document.getElementById("xferType").addEventListener("change", updateApprovalHint);
+    document.getElementById("xferFromOrg").addEventListener("change", syncFromWhFields);
+    document.getElementById("xferFromWh").addEventListener("change", syncFromWhFields);
+    document.getElementById("btnXferAddLine").addEventListener("click", function () {
+      var candidates = transferableRows().filter(function (r) {
+        return !xferLines.some(function (x) { return x.code === r.code && x.loc === r.loc; });
+      });
+      if (!candidates.length) {
+        alert("当前筛选结果中没有更多可调拨物资。");
+        return;
+      }
+      var pick = candidates[0];
+      xferLines.push(Object.assign({}, pick, { applyQty: 1 }));
+      renderXferLines();
+    });
+    xferLineBody.addEventListener("click", function (e) {
+      var rm = e.target.closest("[data-rm]");
+      if (!rm) return;
+      var tr = rm.closest("tr");
+      var idx = Number(tr.getAttribute("data-idx"));
+      xferLines.splice(idx, 1);
+      renderXferLines();
+    });
+    document.getElementById("btnDraftTransferApply").addEventListener("click", function () {
+      if (!validateTransferApply()) return;
+      showXferToast("调拨申请草稿已保存：" + document.getElementById("xferApplyNo").value);
+      closeTransferApplyModal();
+    });
+    document.getElementById("btnSubmitTransferApply").addEventListener("click", function () {
+      if (!validateTransferApply()) return;
+      var no = document.getElementById("xferApplyNo").value;
+      var fromOrg = document.getElementById("xferFromOrg").value;
+      var toOrg = document.getElementById("xferToOrg").value;
+      showXferToast("调拨申请已提交，单号 " + no + "，" + fromOrg + " → " + toOrg + "，待审批");
+      closeTransferApplyModal();
+    });
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape" && transferApplyMask.classList.contains("show")) closeTransferApplyModal();
+    });
 
     /* 预警抽屉：从右往左滑出 */
     function openAlertDrawer() {
