@@ -16,7 +16,6 @@
       --muted: #8c9bb0;
       --border: #e8edf4;
       --bg: #f0f3f8;
-      --rail: #0b1f3a;
     }
     * { box-sizing: border-box; }
     .ledger-page {
@@ -36,10 +35,7 @@
       background: #fff;
       border-bottom: 1px solid var(--border);
     }
-    .page-view-switch {
-      display: flex;
-      gap: 4px;
-    }
+    .page-view-switch { display: flex; gap: 4px; }
     .page-view-switch a {
       display: inline-flex;
       align-items: center;
@@ -61,16 +57,14 @@
       flex: 1;
       min-height: 0;
       display: grid;
-      grid-template-columns: 200px auto minmax(0, 1.15fr) minmax(280px, 0.85fr);
+      grid-template-columns: 200px auto minmax(0, 1.15fr) minmax(300px, 0.9fr);
       gap: 0;
       overflow: hidden;
     }
-    .ly-home.no-station {
-      grid-template-columns: 200px minmax(0, 1.35fr) minmax(300px, 0.95fr);
-    }
-    .ly-home.station-collapsed {
-      grid-template-columns: 200px 44px minmax(0, 1.2fr) minmax(280px, 0.85fr);
-    }
+    .ly-home.no-station { grid-template-columns: 200px minmax(0, 1.45fr) minmax(300px, 0.95fr); }
+    .ly-home.station-collapsed { grid-template-columns: 200px 44px minmax(0, 1.2fr) minmax(300px, 0.9fr); }
+    .ly-home.no-station.station-collapsed { grid-template-columns: 200px minmax(0, 1.45fr) minmax(300px, 0.95fr); }
+
     .ly-col {
       min-height: 0;
       display: flex;
@@ -80,77 +74,57 @@
       overflow: hidden;
     }
     .ly-col:last-child { border-right: 0; }
-
-    .org-col { background: var(--rail); color: #dbe7f5; border-right-color: #173456; }
-    .org-col .col-hd {
-      padding: 12px 14px 10px;
-      border-bottom: 1px solid rgba(255,255,255,.08);
+    .col-hd {
+      padding: 10px 12px 8px;
+      border-bottom: 1px solid var(--border);
+      background: #f8fbff;
     }
-    .org-col .col-hd h2 {
+    .col-hd h2, .col-hd h3 {
       margin: 0;
-      font-size: 15px;
-      color: #fff;
+      font-size: 13px;
       font-weight: 700;
+      color: #1f2d3d;
     }
-    .org-col .col-hd p {
-      margin: 4px 0 0;
-      font-size: 11px;
-      color: #8fb0d4;
+    .col-hd p {
+      margin: 3px 0 0;
+      font-size: 10px;
+      color: var(--muted);
     }
-    .org-tree {
-      flex: 1;
-      overflow: auto;
-      padding: 6px 0 12px;
+    .col-hd-row {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 6px;
     }
+
+    .org-tree { flex: 1; overflow: auto; padding: 6px 8px 12px; }
     .org-tree .node {
       display: flex;
       align-items: center;
       gap: 6px;
-      padding: 8px 14px;
+      padding: 8px 10px;
+      border-radius: 6px;
       cursor: pointer;
       font-size: 12px;
-      color: #dbe7f5;
+      color: #334155;
       user-select: none;
     }
-    .org-tree .node:hover { background: rgba(22,119,255,.28); color: #fff; }
-    .org-tree .node.on { background: #1677ff; color: #fff; }
-    .org-tree .node.l2 { padding-left: 28px; }
-    .org-tree .node .arrow {
-      width: 12px;
-      font-size: 10px;
-      color: #7ea2c9;
-      flex: 0 0 auto;
-    }
+    .org-tree .node:hover { background: #f0f7ff; color: var(--primary); }
+    .org-tree .node.on { background: var(--primary-soft); color: var(--primary); font-weight: 600; }
+    .org-tree .node.l2 { padding-left: 24px; }
+    .org-tree .node .arrow { width: 12px; font-size: 10px; color: #94a3b8; flex: 0 0 auto; }
     .org-tree .group-wrap.open > .node.l1 .arrow::before { content: "▼"; }
     .org-tree .group-wrap:not(.open) > .node.l1 .arrow::before { content: "›"; }
     .org-tree .children { display: none; }
     .org-tree .group-wrap.open > .children { display: block; }
 
     .station-col { width: 168px; transition: width .2s ease; }
+    .station-col.hidden { display: none; }
     .station-col.collapsed { width: 44px; min-width: 44px; }
     .station-col.collapsed .station-list,
     .station-col.collapsed .col-hd span,
     .station-col.collapsed .col-hd p { display: none; }
-    .station-col .col-hd {
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      gap: 6px;
-      padding: 10px 10px 8px;
-      border-bottom: 1px solid var(--border);
-      background: #f8fbff;
-    }
-    .station-col .col-hd span {
-      font-size: 13px;
-      font-weight: 700;
-      color: #1f2d3d;
-    }
-    .station-col .col-hd p {
-      margin: 2px 0 0;
-      font-size: 10px;
-      color: var(--muted);
-    }
-    .station-toggle {
+    .icon-btn {
       flex: 0 0 auto;
       width: 24px;
       height: 24px;
@@ -162,11 +136,7 @@
       font-size: 12px;
       line-height: 1;
     }
-    .station-list {
-      flex: 1;
-      overflow: auto;
-      padding: 6px;
-    }
+    .station-list { flex: 1; overflow: auto; padding: 6px; }
     .station-item {
       padding: 9px 10px;
       border-radius: 6px;
@@ -176,134 +146,146 @@
     }
     .station-item:hover { background: #f0f7ff; border-color: #d6e4ff; }
     .station-item.on { background: var(--primary-soft); border-color: #91caff; }
-    .station-item b {
-      display: block;
-      font-size: 12px;
-      color: #1f2d3d;
-      margin-bottom: 3px;
-    }
-    .station-item small {
-      font-size: 10px;
-      color: var(--muted);
-      line-height: 1.35;
-    }
+    .station-item b { display: block; font-size: 12px; margin-bottom: 3px; }
+    .station-item small { font-size: 10px; color: var(--muted); line-height: 1.35; }
 
-    .turbine-col { background: #eef4fa; border-right-color: #dbe6f2; }
-    .turbine-top {
-      padding: 10px 12px 8px;
-      border-bottom: 1px solid #dbe6f2;
-      background: #fff;
-    }
-    .turbine-top h3 {
-      margin: 0 0 8px;
-      font-size: 13px;
-      font-weight: 700;
-    }
-    .mat-bar {
+    .main-col { background: #eef4fa; }
+    .tab-row {
       display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
+      align-items: center;
+      gap: 0;
+      padding: 0 12px;
+      background: #fff;
+      border-bottom: 1px solid var(--border);
     }
-    .mat-chip {
-      height: 26px;
-      padding: 0 10px;
-      border: 1px solid #d6e4ff;
-      border-radius: 13px;
-      background: #f8fbff;
-      color: #475569;
-      font-size: 11px;
+    .tab-row.equip-tabs { border-bottom: 0; padding-top: 8px; }
+    .tab-row.mat-tabs { padding-bottom: 0; background: #fafbfd; }
+    .tab-btn {
+      height: 34px;
+      padding: 0 14px;
+      border: 0;
+      border-bottom: 2px solid transparent;
+      background: transparent;
+      color: #64748b;
+      font-size: 13px;
       cursor: pointer;
-      white-space: nowrap;
+      margin-bottom: -1px;
     }
-    .mat-chip.on {
-      background: var(--primary);
-      border-color: var(--primary);
-      color: #fff;
+    .tab-btn.on {
+      color: var(--primary);
+      border-bottom-color: var(--primary);
       font-weight: 600;
     }
-    .turbine-stage {
+    .tab-btn.mat { font-size: 12px; height: 30px; padding: 0 10px; }
+    .main-head {
+      padding: 8px 12px;
+      background: #fff;
+      border-bottom: 1px solid var(--border);
+      font-size: 12px;
+      color: #64748b;
+    }
+    .main-head b { color: #1f2d3d; }
+
+    .main-stage {
       flex: 1;
       min-height: 0;
-      position: relative;
+      overflow: auto;
       display: flex;
       align-items: center;
       justify-content: center;
       padding: 12px;
-      overflow: hidden;
     }
-    .turbine-img-wrap {
-      position: relative;
-      width: min(100%, 520px);
-      max-height: 100%;
+    .diagram-wrap {
+      width: min(100%, 560px);
+      height: min(100%, 560px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
-    .turbine-img-wrap img {
-      display: block;
-      width: 100%;
-      height: auto;
-      max-height: calc(100vh - 220px);
-      object-fit: contain;
-      user-select: none;
-      pointer-events: none;
-    }
-    .hotspot {
-      position: absolute;
-      border: 2px solid transparent;
-      border-radius: 6px;
-      background: rgba(22,119,255,0);
+    .diagram-wrap svg { width: 100%; height: 100%; max-height: calc(100vh - 260px); }
+    .svg-part {
       cursor: pointer;
-      transition: background .15s, border-color .15s, box-shadow .15s;
+      transition: filter .15s, opacity .15s;
     }
-    .hotspot:hover,
-    .hotspot.on {
-      background: rgba(22,119,255,.18);
-      border-color: #1677ff;
-      box-shadow: 0 0 0 3px rgba(22,119,255,.15);
-    }
-    .hotspot .tag {
-      position: absolute;
-      left: 50%;
-      top: -20px;
-      transform: translateX(-50%);
-      padding: 1px 6px;
-      border-radius: 3px;
-      background: #1677ff;
-      color: #fff;
-      font-size: 10px;
-      white-space: nowrap;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity .15s;
-    }
-    .hotspot:hover .tag,
-    .hotspot.on .tag { opacity: 1; }
-
-    .detail-col { background: #fff; }
-    .detail-col .col-hd {
-      padding: 12px 14px 10px;
-      border-bottom: 1px solid var(--border);
-    }
-    .detail-col .col-hd h3 {
-      margin: 0;
-      font-size: 14px;
-      font-weight: 700;
-    }
-    .detail-col .col-hd p {
-      margin: 4px 0 0;
+    .svg-part:hover { filter: brightness(1.08); }
+    .svg-part.on { filter: drop-shadow(0 0 6px rgba(22,119,255,.65)); }
+    .svg-part .hit { fill: rgba(22,119,255,0); stroke: transparent; }
+    .svg-part.on .hit, .svg-part:hover .hit { fill: rgba(22,119,255,.12); stroke: #1677ff; stroke-width: 1.2; }
+    .svg-label {
       font-size: 11px;
-      color: var(--muted);
+      fill: #334155;
+      pointer-events: none;
+      font-family: inherit;
     }
-    .detail-body {
-      flex: 1;
-      overflow: auto;
-      padding: 12px 14px 16px;
+
+    .group-panel, .station-panel {
+      width: 100%;
+      max-width: 920px;
+      padding: 8px 4px;
     }
-    .detail-empty {
-      color: var(--muted);
+    .group-panel h2 { margin: 0 0 6px; font-size: 20px; }
+    .group-panel p { margin: 0 0 14px; color: var(--muted); }
+    .group-kpis {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+    .group-kpi {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px;
+    }
+    .group-kpi .k { font-size: 11px; color: var(--muted); margin-bottom: 4px; }
+    .group-kpi .v { font-size: 20px; font-weight: 700; }
+    .group-cards {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+    .group-card {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px;
+      cursor: pointer;
+    }
+    .group-card:hover { border-color: #91caff; box-shadow: 0 4px 14px rgba(22,119,255,.08); }
+    .group-card b { display: block; font-size: 13px; margin-bottom: 6px; }
+    .group-card small { color: var(--muted); font-size: 11px; line-height: 1.4; }
+
+    .station-panel .cam-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 10px;
+    }
+    .cam-box {
+      background: #0f172a;
+      border-radius: 8px;
+      height: 120px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #94a3b8;
       font-size: 12px;
-      line-height: 1.6;
-      padding: 24px 8px;
-      text-align: center;
+      border: 1px solid #1e293b;
     }
+    .unit-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+    .unit-tag {
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      background: #f0fdf4;
+      color: #166534;
+      border: 1px solid #bbf7d0;
+    }
+    .unit-tag.warn { background: #fff7ed; color: #c2410c; border-color: #fed7aa; }
+    .unit-tag.idle { background: #f8fafc; color: #64748b; border-color: #e2e8f0; }
+
+    .detail-body { flex: 1; overflow: auto; padding: 12px 14px 16px; }
+    .detail-empty { color: var(--muted); font-size: 12px; line-height: 1.6; padding: 24px 8px; text-align: center; }
     .part-summary {
       background: #f8fbff;
       border: 1px solid #d6e4ff;
@@ -311,17 +293,8 @@
       padding: 10px 12px;
       margin-bottom: 10px;
     }
-    .part-summary h4 {
-      margin: 0 0 6px;
-      font-size: 15px;
-      color: #1f2d3d;
-    }
-    .part-summary p {
-      margin: 0;
-      font-size: 12px;
-      color: #64748b;
-      line-height: 1.55;
-    }
+    .part-summary h4 { margin: 0 0 6px; font-size: 15px; }
+    .part-summary p { margin: 0; font-size: 12px; color: #64748b; line-height: 1.55; }
     .detail-kpis {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -335,62 +308,37 @@
       padding: 8px 10px;
     }
     .detail-kpi .k { font-size: 10px; color: var(--muted); margin-bottom: 2px; }
-    .detail-kpi .v { font-size: 16px; font-weight: 700; color: #1f2d3d; }
+    .detail-kpi .v { font-size: 16px; font-weight: 700; }
     .detail-kpi .v small { font-size: 11px; font-weight: 600; color: var(--muted); }
-    .spare-list {
+    .mini-chart {
+      background: #fafbfd;
       border: 1px solid var(--border);
       border-radius: 8px;
-      overflow: hidden;
+      padding: 10px;
+      margin-bottom: 10px;
     }
-    .spare-list-hd {
-      padding: 8px 10px;
-      background: #f7f9fc;
-      border-bottom: 1px solid var(--border);
-      font-size: 12px;
-      font-weight: 700;
+    .mini-chart h5 { margin: 0 0 8px; font-size: 12px; }
+    .bar-mini-row {
+      display: grid;
+      grid-template-columns: 52px 1fr 34px;
+      gap: 6px;
+      align-items: center;
+      font-size: 11px;
+      margin-bottom: 4px;
+      color: #64748b;
     }
-    .spare-item {
-      padding: 8px 10px;
-      border-bottom: 1px solid #eef2f7;
-      font-size: 12px;
-    }
+    .bar-mini-row .track { height: 6px; background: #e8edf4; border-radius: 4px; overflow: hidden; }
+    .bar-mini-row .track i { display: block; height: 100%; border-radius: 4px; background: linear-gradient(90deg,#69b1ff,#1677ff); }
+    .spare-list { border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+    .spare-list-hd { padding: 8px 10px; background: #f7f9fc; border-bottom: 1px solid var(--border); font-size: 12px; font-weight: 700; }
+    .spare-item { padding: 8px 10px; border-bottom: 1px solid #eef2f7; font-size: 12px; }
     .spare-item:last-child { border-bottom: 0; }
     .spare-item b { color: #1f2d3d; }
     .spare-item span { color: #64748b; display: block; margin-top: 2px; line-height: 1.4; }
-    .group-panel {
-      flex: 1;
-      padding: 20px 24px;
-      overflow: auto;
-    }
-    .group-panel h2 {
-      margin: 0 0 6px;
-      font-size: 20px;
-    }
-    .group-panel p {
-      margin: 0 0 16px;
-      color: var(--muted);
-      font-size: 13px;
-    }
-    .group-cards {
-      display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 10px;
-      max-width: 920px;
-    }
-    .group-card {
-      background: #fff;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 12px;
-      cursor: pointer;
-    }
-    .group-card:hover { border-color: #91caff; box-shadow: 0 4px 14px rgba(22,119,255,.08); }
-    .group-card b { display: block; font-size: 13px; margin-bottom: 6px; }
-    .group-card small { color: var(--muted); font-size: 11px; line-height: 1.4; }
 
     @media (max-width: 1280px) {
-      .ly-home { grid-template-columns: 180px auto minmax(0, 1fr) 260px; }
-      .group-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .ly-home { grid-template-columns: 180px auto minmax(0, 1fr) 280px; }
+      .group-kpis, .group-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     }
   </style>
 </head>
@@ -435,8 +383,8 @@
 
       <main class="main-scroll">
         <div class="ledger-page">
-          <div class="ledger-view-row" aria-label="生产物资库存管理视图">
-            <div class="page-view-switch" aria-label="生产物资库存管理视图切换">
+          <div class="ledger-view-row">
+            <div class="page-view-switch">
               <a class="on" href="prod-spare-inventory-ledger-0714.html"><i class="fa-solid fa-house"></i> 龙源电力首页</a>
               <a href="prod-spare-storage-0714.html"><i class="fa-solid fa-warehouse"></i> 仓库视图</a>
             </div>
@@ -446,42 +394,42 @@
             <aside class="ly-col org-col">
               <div class="col-hd">
                 <h2>龙源电力</h2>
-                <p>选择项目公司查看风电场与风机备件</p>
+                <p>选择项目公司查看风电场与备件结构</p>
               </div>
               <div class="org-tree" id="orgTree"></div>
             </aside>
 
-            <aside class="ly-col station-col" id="stationCol">
+            <aside class="ly-col station-col hidden" id="stationCol">
               <div class="col-hd">
-                <div>
-                  <span id="stationColTitle">风电场</span>
-                  <p id="stationColSub">请选择左侧项目公司</p>
+                <div class="col-hd-row" style="width:100%">
+                  <div>
+                    <span id="stationColTitle">风电场</span>
+                    <p id="stationColSub">请选择项目公司</p>
+                  </div>
+                  <button type="button" class="icon-btn" id="btnStationToggle" title="展开/折叠风电场列">◀</button>
                 </div>
-                <button type="button" class="station-toggle" id="btnStationToggle" title="展开/折叠风电场列">◀</button>
               </div>
               <div class="station-list" id="stationList"></div>
             </aside>
 
-            <section class="ly-col turbine-col" id="turbineCol">
-              <div class="turbine-top">
-                <h3 id="turbineTitle">风机结构 · 备件关联视图</h3>
-                <div class="mat-bar" id="matBar"></div>
-              </div>
-              <div class="turbine-stage" id="turbineStage">
-                <div class="group-panel" id="groupPanel" style="display:none"></div>
-                <div class="turbine-img-wrap" id="turbineWrap">
-                  <img src="assets/wind-turbine-cutaway.png" alt="风机剖面结构图" />
-                </div>
+            <section class="ly-col main-col" id="mainCol">
+              <div class="tab-row equip-tabs" id="equipTabs"></div>
+              <div class="tab-row mat-tabs" id="matTabs"></div>
+              <div class="main-head" id="mainHead"><b>龙源电力</b> · 请选择项目公司</div>
+              <div class="main-stage" id="mainStage">
+                <div class="group-panel" id="groupPanel"></div>
+                <div class="station-panel" id="stationPanel" style="display:none"></div>
+                <div class="diagram-wrap" id="diagramWrap" style="display:none"></div>
               </div>
             </section>
 
             <aside class="ly-col detail-col">
               <div class="col-hd">
-                <h3 id="detailTitle">零部件详情</h3>
-                <p id="detailSub">点击风机结构图中的部位查看关联备件</p>
+                <h3 id="detailTitle">详情信息</h3>
+                <p id="detailSub">选择组织、部位或场站后展示</p>
               </div>
               <div class="detail-body" id="detailBody">
-                <div class="detail-empty">请在中间风机结构图中选择一个部位，右侧将展示该部位关联的生产备件、库存数量与适用机型等信息。</div>
+                <div class="detail-empty">请先在左侧选择项目公司；在公司层级点击风机部位查看备件详情，或选择具体风电场查看运行监控。</div>
               </div>
             </aside>
           </div>
@@ -497,140 +445,131 @@
   <script>
     var ORG_DATA = [
       { key: "山西龙源", name: "山西龙源", stations: [
-        { name: "雁门关风电场", units: "12台", status: "10台运行 · 2台检修" },
-        { name: "右玉风电场", units: "8台", status: "7台运行 · 1台备用" },
-        { name: "神池风电场", units: "6台", status: "6台运行" },
-        { name: "平鲁风电场", units: "10台", status: "9台运行 · 1台检修" }
+        { name: "雁门关风电场", units: 12, run: 10, maint: 2, standby: 0 },
+        { name: "右玉风电场", units: 8, run: 7, maint: 0, standby: 1 },
+        { name: "神池风电场", units: 6, run: 6, maint: 0, standby: 0 },
+        { name: "平鲁风电场", units: 10, run: 9, maint: 1, standby: 0 }
       ]},
       { key: "河北龙源", name: "河北龙源", stations: [
-        { name: "麒麟山风电场", units: "18台", status: "16台运行 · 2台检修" },
-        { name: "康保风电场", units: "14台", status: "13台运行 · 1台备用" }
+        { name: "麒麟山风电场", units: 18, run: 16, maint: 2, standby: 0 },
+        { name: "康保风电场", units: 14, run: 13, maint: 0, standby: 1 }
       ]},
       { key: "天津龙源", name: "天津龙源", stations: [
-        { name: "大神堂风电场", units: "16台", status: "15台运行 · 1台检修" }
+        { name: "大神堂风电场", units: 16, run: 15, maint: 1, standby: 0 }
       ]},
       { key: "蒙东龙源", name: "蒙东龙源", stations: [
-        { name: "齐心营风电场", units: "11台", status: "10台运行 · 1台备用" }
+        { name: "齐心营风电场", units: 11, run: 10, maint: 0, standby: 1 }
       ]},
       { key: "安徽龙源", name: "安徽龙源", stations: [
-        { name: "来安风电场", units: "9台", status: "8台运行 · 1台检修" }
+        { name: "来安风电场", units: 9, run: 8, maint: 1, standby: 0 }
       ]},
       { key: "海上龙源", name: "海上龙源", stations: [
-        { name: "射阳海上风电场", units: "20台", status: "18台运行 · 2台检修" }
+        { name: "射阳海上风电场", units: 20, run: 18, maint: 2, standby: 0 }
       ]}
     ];
 
+    var EQUIP_TABS = [
+      { id: "wind", label: "风机" },
+      { id: "pv", label: "光伏" },
+      { id: "storage", label: "储能" }
+    ];
     var MAT_TYPES = ["全部", "叶片", "齿轮箱", "变桨", "偏航", "主轴", "电机/变流", "液压", "滤芯/传感器"];
 
     var TURBINE_PARTS = [
-      { id: "blade", name: "叶片", type: "叶片", left: "4%", top: "58%", width: "22%", height: "28%",
-        desc: "捕获风能的核心部件，包含主叶片、叶根连接件及密封辅材。",
-        spares: [
-          { code: "B00000005", name: "叶片", qty: 12, model: "SW64-2.0", status: "正常" },
-          { code: "B00000042", name: "叶片密封套", qty: 0, model: "YM-TF-01", status: "零库存" }
-        ]},
-      { id: "hub-cover", name: "轮毂外罩", type: "叶片", left: "24%", top: "52%", width: "10%", height: "12%",
-        desc: "保护轮毂总成的外罩结构，含连接紧固件与防腐涂层辅材。",
-        spares: [
-          { code: "B00000033", name: "轮毂外罩密封圈", qty: 6, model: "HB-MF-20", status: "正常" }
-        ]},
-      { id: "hub", name: "轮毂", type: "主轴", left: "28%", top: "44%", width: "12%", height: "14%",
-        desc: "连接叶片与主轴的总成，承担变桨与载荷传递。",
-        spares: [
-          { code: "B00000016", name: "主轴轴承", qty: 6, model: "BR-120", status: "正常" },
-          { code: "B00001234", name: "变桨轴承", qty: 4, model: "BP-2.0MW", status: "正常" }
-        ]},
-      { id: "front-rotor", name: "前盘式转子", type: "电机/变流", left: "36%", top: "36%", width: "10%", height: "16%",
-        desc: "直驱/半直驱机组永磁发电机前盘转子，含永磁体与磁极组件。",
-        spares: [
-          { code: "B00000018", name: "IGBT 模块", qty: 2, model: "FF450R", status: "正常" },
-          { code: "B00001888", name: "变频器模块", qty: 1, model: "VF-800", status: "正常" }
-        ]},
-      { id: "stator", name: "中间定子", type: "电机/变流", left: "44%", top: "34%", width: "10%", height: "18%",
-        desc: "发电机定子铁芯与绕组总成，负责电磁转换。",
-        spares: [
-          { code: "B00000051", name: "逆变器风扇", qty: 48, model: "INV-FAN-120", status: "正常" },
-          { code: "B00001236", name: "塔筒振动传感器", qty: 15, model: "TS-300", status: "正常" }
-        ]},
-      { id: "rear-rotor", name: "后盘式转子", type: "电机/变流", left: "52%", top: "36%", width: "10%", height: "16%",
-        desc: "发电机后盘转子组件，与前盘转子共同构成盘式永磁结构。",
-        spares: [
-          { code: "B00000018", name: "IGBT 模块", qty: 2, model: "FF450R", status: "正常" }
-        ]},
-      { id: "cabinet", name: "电器柜", type: "电机/变流", left: "58%", top: "28%", width: "14%", height: "18%",
-        desc: "机舱内变流、控制、保护与通信设备集成柜体。",
-        spares: [
-          { code: "B00001888", name: "变频器模块", qty: 1, model: "VF-800", status: "正常" },
-          { code: "B00002119", name: "偏航电机", qty: 3, model: "PY-DJ-55", status: "正常" }
-        ]},
-      { id: "nacelle", name: "机舱", type: "偏航", left: "34%", top: "22%", width: "38%", height: "22%",
-        desc: "承载发电机、变桨、偏航、冷却及监测系统的核心舱体。",
-        spares: [
-          { code: "B00002119", name: "偏航电机", qty: 3, model: "PY-DJ-55", status: "正常" },
-          { code: "B00000028", name: "偏航减速机", qty: 2, model: "PY-JS-3.0", status: "正常" }
-        ]},
-      { id: "tower", name: "塔架", type: "滤芯/传感器", left: "42%", top: "62%", width: "16%", height: "30%",
-        desc: "支撑机舱与叶片的基础结构，含塔筒监测与内部辅材。",
-        spares: [
-          { code: "B00001236", name: "塔筒振动传感器", qty: 15, model: "TS-300", status: "正常" },
-          { code: "B00001235", name: "齿轮箱滤芯", qty: 86, model: "GX-LX-90", status: "正常" }
-        ]},
-      { id: "gearbox", name: "齿轮箱", type: "齿轮箱", left: "46%", top: "42%", width: "12%", height: "14%",
-        desc: "双馈/增速机型传动链核心部件，关联润滑油回路与滤芯。",
-        spares: [
-          { code: "B00001235", name: "齿轮箱滤芯", qty: 86, model: "GX-LX-90", status: "正常" },
-          { code: "B00000055", name: "液压泵", qty: 4, model: "YY-B-80", status: "正常" }
-        ]}
+      { id: "blade", name: "叶片", type: "叶片", desc: "捕获风能的核心部件，包含主叶片、叶根连接件及密封辅材。",
+        spares: [{ code: "B00000005", name: "叶片", qty: 12, model: "SW64-2.0", status: "正常" }, { code: "B00000042", name: "叶片密封套", qty: 0, model: "YM-TF-01", status: "零库存" }],
+        stats: [{ label: "正常", pct: 78 }, { label: "借出", pct: 12 }, { label: "待检", pct: 10 }] },
+      { id: "hub", name: "轮毂", type: "主轴", desc: "连接叶片与主轴的总成，承担变桨与载荷传递。",
+        spares: [{ code: "B00000016", name: "主轴轴承", qty: 6, model: "BR-120", status: "正常" }, { code: "B00001234", name: "变桨轴承", qty: 4, model: "BP-2.0MW", status: "正常" }],
+        stats: [{ label: "正常", pct: 85 }, { label: "借出", pct: 8 }, { label: "待检", pct: 7 }] },
+      { id: "gearbox", name: "齿轮箱", type: "齿轮箱", desc: "传动链核心部件，关联润滑油回路与滤芯。",
+        spares: [{ code: "B00001235", name: "齿轮箱滤芯", qty: 86, model: "GX-LX-90", status: "正常" }, { code: "B00000055", name: "液压泵", qty: 4, model: "YY-B-80", status: "正常" }],
+        stats: [{ label: "正常", pct: 72 }, { label: "借出", pct: 18 }, { label: "呆滞", pct: 10 }] },
+      { id: "generator", name: "发电机", type: "电机/变流", desc: "永磁/双馈发电机总成，含定子、转子与冷却系统。",
+        spares: [{ code: "B00000018", name: "IGBT 模块", qty: 2, model: "FF450R", status: "正常" }, { code: "B00001888", name: "变频器模块", qty: 1, model: "VF-800", status: "正常" }],
+        stats: [{ label: "正常", pct: 68 }, { label: "借出", pct: 22 }, { label: "零库存", pct: 10 }] },
+      { id: "cabinet", name: "电器柜", type: "电机/变流", desc: "机舱内变流、控制、保护与通信设备集成柜体。",
+        spares: [{ code: "B00002119", name: "偏航电机", qty: 3, model: "PY-DJ-55", status: "正常" }],
+        stats: [{ label: "正常", pct: 80 }, { label: "借出", pct: 15 }, { label: "待检", pct: 5 }] },
+      { id: "nacelle", name: "机舱", type: "偏航", desc: "承载发电机、变桨、偏航、冷却及监测系统的核心舱体。",
+        spares: [{ code: "B00000028", name: "偏航减速机", qty: 2, model: "PY-JS-3.0", status: "正常" }],
+        stats: [{ label: "正常", pct: 76 }, { label: "借出", pct: 14 }, { label: "待检", pct: 10 }] },
+      { id: "tower", name: "塔架", type: "滤芯/传感器", desc: "支撑机舱与叶片的基础结构，含塔筒监测与内部辅材。",
+        spares: [{ code: "B00001236", name: "塔筒振动传感器", qty: 15, model: "TS-300", status: "正常" }],
+        stats: [{ label: "正常", pct: 88 }, { label: "借出", pct: 7 }, { label: "待检", pct: 5 }] }
     ];
 
     var state = {
       level: "group",
       company: "",
       station: "",
-      partId: "",
+      equip: "wind",
       matType: "全部",
+      partId: "",
       stationCollapsed: false
     };
 
-    var orgTreeEl = document.getElementById("orgTree");
-    var stationCol = document.getElementById("stationCol");
-    var stationListEl = document.getElementById("stationList");
     var lyHome = document.getElementById("lyHome");
+    var stationCol = document.getElementById("stationCol");
     var groupPanel = document.getElementById("groupPanel");
-    var turbineWrap = document.getElementById("turbineWrap");
+    var stationPanel = document.getElementById("stationPanel");
+    var diagramWrap = document.getElementById("diagramWrap");
     var detailBody = document.getElementById("detailBody");
     var detailTitle = document.getElementById("detailTitle");
     var detailSub = document.getElementById("detailSub");
-    var turbineTitle = document.getElementById("turbineTitle");
-
-    function renderOrgTree() {
-      var html = '<div class="group-wrap open">' +
-        '<div class="node l1 on" data-level="group" data-key="龙源电力"><span class="arrow"></span>龙源电力</div>' +
-        '<div class="children">';
-      ORG_DATA.forEach(function (c) {
-        var active = state.level === "company" && state.company === c.key ? " on" : "";
-        html += '<div class="node l2' + active + '" data-level="company" data-key="' + c.key + '">' + c.name + '</div>';
-      });
-      html += '</div></div>';
-      orgTreeEl.innerHTML = html;
-    }
+    var mainHead = document.getElementById("mainHead");
 
     function companyData(key) {
       return ORG_DATA.filter(function (c) { return c.key === key; })[0];
     }
 
-    function renderGroupPanel() {
-      groupPanel.style.display = "block";
-      turbineWrap.style.display = "none";
-      turbineTitle.textContent = "龙源电力 · 项目公司概览";
-      var cards = ORG_DATA.map(function (c) {
-        var total = c.stations.reduce(function (s, x) { return s + parseInt(x.units, 10) || 0; }, 0);
-        return '<div class="group-card" data-company="' + c.key + '"><b>' + c.name + '</b><small>' +
-          c.stations.length + ' 个风电场 · 约 ' + total + ' 台机组</small></div>';
+    function stationStatusText(s) {
+      var parts = [s.run + "台运行"];
+      if (s.maint) parts.push(s.maint + "台检修");
+      if (s.standby) parts.push(s.standby + "台备用");
+      return s.units + "台 · " + parts.join(" · ");
+    }
+
+    function renderOrgTree() {
+      var html = '<div class="group-wrap open">' +
+        '<div class="node l1' + (state.level === "group" ? " on" : "") + '" data-level="group"><span class="arrow"></span>龙源电力</div><div class="children">';
+      ORG_DATA.forEach(function (c) {
+        html += '<div class="node l2' + (state.company === c.key ? " on" : "") + '" data-level="company" data-key="' + c.key + '">' + c.name + '</div>';
+      });
+      html += '</div></div>';
+      document.getElementById("orgTree").innerHTML = html;
+    }
+
+    function renderEquipTabs(show) {
+      var el = document.getElementById("equipTabs");
+      if (!show) { el.style.display = "none"; return; }
+      el.style.display = "flex";
+      el.innerHTML = EQUIP_TABS.map(function (t) {
+        return '<button type="button" class="tab-btn' + (state.equip === t.id ? " on" : "") + '" data-equip="' + t.id + '">' + t.label + '</button>';
       }).join("");
-      groupPanel.innerHTML = '<h2>龙源电力</h2><p>点击左侧或下方项目公司，查看下属风电场及风机备件结构。</p><div class="group-cards">' + cards + '</div>';
-      groupPanel.querySelectorAll("[data-company]").forEach(function (el) {
-        el.onclick = function () { selectCompany(el.getAttribute("data-company")); };
+      el.querySelectorAll(".tab-btn").forEach(function (btn) {
+        btn.onclick = function () {
+          state.equip = btn.getAttribute("data-equip");
+          state.partId = "";
+          renderAll();
+        };
+      });
+    }
+
+    function renderMatTabs(show) {
+      var el = document.getElementById("matTabs");
+      if (!show) { el.style.display = "none"; return; }
+      el.style.display = "flex";
+      el.innerHTML = MAT_TYPES.map(function (t) {
+        return '<button type="button" class="tab-btn mat' + (state.matType === t ? " on" : "") + '" data-type="' + t + '">' + t + '</button>';
+      }).join("");
+      el.querySelectorAll(".tab-btn").forEach(function (btn) {
+        btn.onclick = function () {
+          state.matType = btn.getAttribute("data-type");
+          renderMatTabs(true);
+          renderDiagram();
+          if (state.partId) renderPartDetail(state.partId);
+        };
       });
     }
 
@@ -638,65 +577,150 @@
       var c = companyData(state.company);
       document.getElementById("stationColTitle").textContent = state.company + " · 风电场";
       document.getElementById("stationColSub").textContent = c ? ("共 " + c.stations.length + " 个场站") : "";
-      if (!c) {
-        stationListEl.innerHTML = '<div class="detail-empty">请选择项目公司</div>';
-        return;
-      }
-      stationListEl.innerHTML = c.stations.map(function (s) {
-        var on = state.station === s.name ? " on" : "";
-        return '<div class="station-item' + on + '" data-station="' + s.name + '"><b>' + s.name + '</b><small>' +
-          s.units + '<br/>' + s.status + '</small></div>';
+      var list = document.getElementById("stationList");
+      if (!c) { list.innerHTML = ""; return; }
+      list.innerHTML = c.stations.map(function (s) {
+        return '<div class="station-item' + (state.station === s.name ? " on" : "") + '" data-station="' + s.name + '"><b>' + s.name + '</b><small>' + stationStatusText(s) + '</small></div>';
       }).join("");
-      stationListEl.querySelectorAll(".station-item").forEach(function (el) {
+      list.querySelectorAll(".station-item").forEach(function (el) {
         el.onclick = function () { selectStation(el.getAttribute("data-station")); };
       });
     }
 
-    function renderMatBar() {
-      document.getElementById("matBar").innerHTML = MAT_TYPES.map(function (t) {
-        return '<button type="button" class="mat-chip' + (state.matType === t ? " on" : "") + '" data-type="' + t + '">' + t + '</button>';
-      }).join("");
-      document.getElementById("matBar").querySelectorAll(".mat-chip").forEach(function (btn) {
-        btn.onclick = function () {
-          state.matType = btn.getAttribute("data-type");
-          renderMatBar();
-          if (state.partId) renderPartDetail(state.partId);
-        };
+    function renderGroupPanel() {
+      groupPanel.style.display = "block";
+      stationPanel.style.display = "none";
+      diagramWrap.style.display = "none";
+      var totalUnits = 0, totalStations = 0;
+      ORG_DATA.forEach(function (c) {
+        totalStations += c.stations.length;
+        c.stations.forEach(function (s) { totalUnits += s.units; });
       });
+      var cards = ORG_DATA.map(function (c) {
+        var units = c.stations.reduce(function (n, s) { return n + s.units; }, 0);
+        return '<div class="group-card" data-company="' + c.key + '"><b>' + c.name + '</b><small>' + c.stations.length + ' 个风电场 · ' + units + ' 台机组</small></div>';
+      }).join("");
+      groupPanel.innerHTML =
+        '<h2>龙源电力 · 集团总览</h2><p>点击项目公司进入公司层级，查看下属风电场及风机备件结构。</p>' +
+        '<div class="group-kpis">' +
+          '<div class="group-kpi"><div class="k">项目公司</div><div class="v">' + ORG_DATA.length + '</div></div>' +
+          '<div class="group-kpi"><div class="k">风电场</div><div class="v">' + totalStations + '</div></div>' +
+          '<div class="group-kpi"><div class="k">机组总数</div><div class="v">' + totalUnits + '</div></div>' +
+          '<div class="group-kpi"><div class="k">在运机组</div><div class="v">' + Math.round(totalUnits * 0.92) + '</div></div>' +
+        '</div><div class="group-cards">' + cards + '</div>';
+      groupPanel.querySelectorAll("[data-company]").forEach(function (el) {
+        el.onclick = function () { selectCompany(el.getAttribute("data-company")); };
+      });
+      mainHead.innerHTML = '<b>龙源电力</b> · 集团总览';
+      detailTitle.textContent = "龙源电力 · 汇总信息";
+      detailSub.textContent = "集团层级视图";
+      detailBody.innerHTML =
+        '<div class="part-summary"><h4>龙源电力</h4><p>当前为集团总览。选择具体项目公司（如山西龙源）后，右侧将推出现场列表及风机结构图。</p></div>' +
+        '<div class="mini-chart"><h5>各项目公司机组分布</h5>' +
+        ORG_DATA.map(function (c) {
+          var u = c.stations.reduce(function (n, s) { return n + s.units; }, 0);
+          return '<div class="bar-mini-row"><span>' + c.name.replace("龙源", "") + '</span><div class="track"><i style="width:' + Math.min(100, u / 2) + '%"></i></div><b>' + u + '</b></div>';
+        }).join("") + '</div>';
     }
 
-    function renderHotspots() {
+    function renderStationPanel() {
+      var c = companyData(state.company);
+      var s = c && c.stations.filter(function (x) { return x.name === state.station; })[0];
+      groupPanel.style.display = "none";
+      stationPanel.style.display = "block";
+      diagramWrap.style.display = "none";
+      if (!s) return;
+      var tags = [];
+      for (var i = 0; i < s.run; i++) tags.push('<span class="unit-tag">#' + (i + 1) + ' 运行</span>');
+      for (var j = 0; j < s.maint; j++) tags.push('<span class="unit-tag warn">#' + (s.run + j + 1) + ' 检修</span>');
+      for (var k = 0; k < s.standby; k++) tags.push('<span class="unit-tag idle">#' + (s.run + s.maint + k + 1) + ' 备用</span>');
+      stationPanel.innerHTML =
+        '<h2>' + s.name + '</h2><p>场站层级视图 · 运行监控与现场感知（风机结构图在公司层级展示）</p>' +
+        '<div class="group-kpis">' +
+          '<div class="group-kpi"><div class="k">机组总数</div><div class="v">' + s.units + '</div></div>' +
+          '<div class="group-kpi"><div class="k">运行</div><div class="v">' + s.run + '</div></div>' +
+          '<div class="group-kpi"><div class="k">检修</div><div class="v">' + s.maint + '</div></div>' +
+          '<div class="group-kpi"><div class="k">备用</div><div class="v">' + s.standby + '</div></div>' +
+        '</div><div class="unit-tags">' + tags.join("") + '</div>' +
+        '<div class="cam-grid"><div class="cam-box">主控室监控</div><div class="cam-box">升压站监控</div><div class="cam-box">风机阵列 A 区</div><div class="cam-box">风机阵列 B 区</div></div>';
+      mainHead.innerHTML = '<b>' + state.company + '</b> · ' + s.name + ' · 场站监控';
+      detailTitle.textContent = s.name + " · 运行概况";
+      detailSub.textContent = "场站层级 · 监控视图";
+      detailBody.innerHTML =
+        '<div class="part-summary"><h4>' + s.name + '</h4><p>' + stationStatusText(s) + '。场站层级侧重运行监控，备件结构请返回公司层级查看。</p></div>' +
+        '<div class="mini-chart"><h5>机组状态分布</h5>' +
+          '<div class="bar-mini-row"><span>运行</span><div class="track"><i style="width:' + (s.run / s.units * 100) + '%"></i></div><b>' + s.run + '</b></div>' +
+          '<div class="bar-mini-row"><span>检修</span><div class="track"><i style="width:' + (s.maint / s.units * 100) + '%;background:#fa8c16"></i></div><b>' + s.maint + '</b></div>' +
+          '<div class="bar-mini-row"><span>备用</span><div class="track"><i style="width:' + (s.standby / s.units * 100) + '%;background:#94a3b8"></i></div><b>' + s.standby + '</b></div>' +
+        '</div>';
+    }
+
+    function turbineSvg() {
       var parts = TURBINE_PARTS.filter(function (p) {
-        return state.matType === "全部" || p.type.indexOf(state.matType.replace("/", "")) >= 0 || state.matType.indexOf(p.type.replace("/", "")) >= 0;
+        if (state.matType === "全部") return true;
+        return p.type.indexOf(state.matType.replace("/", "")) >= 0 || state.matType.indexOf(p.type.replace("/", "")) >= 0;
       });
-      var existing = turbineWrap.querySelectorAll(".hotspot");
-      existing.forEach(function (n) { n.remove(); });
-      parts.forEach(function (p) {
-        var btn = document.createElement("button");
-        btn.type = "button";
-        btn.className = "hotspot" + (state.partId === p.id ? " on" : "");
-        btn.style.left = p.left;
-        btn.style.top = p.top;
-        btn.style.width = p.width;
-        btn.style.height = p.height;
-        btn.setAttribute("data-part", p.id);
-        btn.innerHTML = '<span class="tag">' + p.name + '</span>';
-        btn.onclick = function () { selectPart(p.id); };
-        turbineWrap.appendChild(btn);
-      });
+      var svg = '<svg viewBox="0 0 520 560" xmlns="http://www.w3.org/2000/svg" aria-label="风机三维结构图">';
+      svg += '<defs>' +
+        '<linearGradient id="gTower" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#cbd5e1"/><stop offset="50%" stop-color="#f8fafc"/><stop offset="100%" stop-color="#94a3b8"/></linearGradient>' +
+        '<linearGradient id="gNacelle" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#e2e8f0"/><stop offset="100%" stop-color="#94a3b8"/></linearGradient>' +
+        '<linearGradient id="gBlade" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#f8fafc"/><stop offset="100%" stop-color="#cbd5e1"/></linearGradient>' +
+        '<linearGradient id="gHub" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#64748b"/><stop offset="100%" stop-color="#334155"/></linearGradient>' +
+        '<linearGradient id="gGen" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#fdba74"/><stop offset="100%" stop-color="#fb923c"/></linearGradient>' +
+        '<linearGradient id="gBox" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#bae6fd"/><stop offset="100%" stop-color="#7dd3fc"/></linearGradient>' +
+        '</defs>';
+      svg += '<ellipse cx="260" cy="520" rx="120" ry="18" fill="rgba(15,23,42,.08)"/>';
+      svg += '<g class="svg-part' + (state.partId === "tower" ? " on" : "") + '" data-part="tower"><polygon points="235,510 285,510 270,280 250,280" fill="url(#gTower)" stroke="#64748b" stroke-width="1.2"/><rect class="hit" x="235" y="280" width="50" height="230" rx="4"/><text class="svg-label" x="292" y="420">塔架</text></g>';
+      svg += '<g class="svg-part' + (state.partId === "nacelle" ? " on" : "") + '" data-part="nacelle"><polygon points="210,290 340,260 350,220 200,250" fill="url(#gNacelle)" stroke="#64748b" stroke-width="1.2"/><rect class="hit" x="200" y="220" width="150" height="72" rx="6"/><text class="svg-label" x="355" y="255">机舱</text></g>';
+      svg += '<g class="svg-part' + (state.partId === "blade" ? " on" : "") + '" data-part="blade"><polygon points="70,360 190,250 210,265 95,380" fill="url(#gBlade)" stroke="#64748b" stroke-width="1.2"/><rect class="hit" x="70" y="245" width="145" height="140" rx="8" transform="rotate(-18 140 310)"/><text class="svg-label" x="48" y="350">叶片</text></g>';
+      svg += '<g class="svg-part' + (state.partId === "hub" ? " on" : "") + '" data-part="hub"><circle cx="205" cy="255" r="24" fill="url(#gHub)" stroke="#475569" stroke-width="1.5"/><rect class="hit" x="181" y="231" width="48" height="48" rx="24"/><text class="svg-label" x="170" y="248">轮毂</text></g>';
+      svg += '<g class="svg-part' + (state.partId === "gearbox" ? " on" : "") + '" data-part="gearbox"><rect x="230" y="238" width="36" height="28" rx="4" fill="#475569" stroke="#334155"/><rect class="hit" x="228" y="236" width="40" height="32" rx="4"/><text class="svg-label" x="272" y="256">齿轮箱</text></g>';
+      svg += '<g class="svg-part' + (state.partId === "generator" ? " on" : "") + '" data-part="generator"><rect x="268" y="232" width="42" height="36" rx="6" fill="url(#gGen)" stroke="#ea580c" stroke-width="1.2"/><rect class="hit" x="266" y="230" width="46" height="40" rx="6"/><text class="svg-label" x="318" y="252">发电机</text></g>';
+      svg += '<g class="svg-part' + (state.partId === "cabinet" ? " on" : "") + '" data-part="cabinet"><rect x="312" y="228" width="34" height="40" rx="4" fill="url(#gBox)" stroke="#0284c7" stroke-width="1.2"/><rect class="hit" x="310" y="226" width="38" height="44" rx="4"/><text class="svg-label" x="350" y="248">电器柜</text></g>';
+      svg += '</svg>';
+      return svg;
+    }
+
+    function pvSvg() {
+      return '<svg viewBox="0 0 520 360" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="pvG" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#1e3a8a"/><stop offset="100%" stop-color="#3b82f6"/></linearGradient></defs><polygon points="60,260 460,180 460,120 60,200" fill="url(#pvG)" stroke="#1d4ed8"/><polygon points="80,220 440,150 440,110 80,180" fill="#60a5fa" opacity=".55"/><text x="180" y="300" fill="#64748b" font-size="14">光伏组件阵列 · 演示视图</text></svg>';
+    }
+
+    function storageSvg() {
+      return '<svg viewBox="0 0 520 360" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="stG" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#10b981"/><stop offset="100%" stop-color="#047857"/></linearGradient></defs><rect x="160" y="80" width="200" height="200" rx="16" fill="url(#stG)" stroke="#059669"/><rect x="190" y="110" width="140" height="30" rx="6" fill="#ecfdf5" opacity=".8"/><rect x="190" y="160" width="140" height="30" rx="6" fill="#ecfdf5" opacity=".6"/><text x="175" y="310" fill="#64748b" font-size="14">储能电池舱 · 演示视图</text></svg>';
+    }
+
+    function renderDiagram() {
+      if (state.level !== "company" || state.station) return;
+      groupPanel.style.display = "none";
+      stationPanel.style.display = "none";
+      diagramWrap.style.display = "flex";
+      if (state.equip === "wind") {
+        diagramWrap.innerHTML = turbineSvg();
+        diagramWrap.querySelectorAll(".svg-part").forEach(function (g) {
+          var id = g.getAttribute("data-part");
+          if (!TURBINE_PARTS.some(function (p) { return p.id === id; })) return;
+          g.onclick = function () { selectPart(id); };
+        });
+      } else if (state.equip === "pv") {
+        diagramWrap.innerHTML = pvSvg();
+      } else {
+        diagramWrap.innerHTML = storageSvg();
+      }
+      mainHead.innerHTML = '<b>' + state.company + '</b> · ' + (state.equip === "wind" ? "风机结构" : state.equip === "pv" ? "光伏设备" : "储能设备") + ' · 点击部位查看备件';
     }
 
     function renderPartDetail(partId) {
       var part = TURBINE_PARTS.filter(function (p) { return p.id === partId; })[0];
       if (!part) return;
-      var spares = part.spares.filter(function (s) {
-        if (state.matType === "全部") return true;
-        return part.type.indexOf(state.matType.replace("/", "")) >= 0 || state.matType.indexOf(part.type.replace("/", "")) >= 0;
-      });
+      var spares = part.spares;
+      if (state.matType !== "全部") {
+        spares = spares.filter(function () {
+          return part.type.indexOf(state.matType.replace("/", "")) >= 0 || state.matType.indexOf(part.type.replace("/", "")) >= 0;
+        });
+      }
       var totalQty = spares.reduce(function (n, s) { return n + s.qty; }, 0);
-      var scope = state.station || state.company || "龙源电力";
       detailTitle.textContent = part.name + " · 关联备件";
-      detailSub.textContent = scope + " · 点击风机部位联动展示";
+      detailSub.textContent = (state.company || "龙源电力") + " · 部位联动详情";
       detailBody.innerHTML =
         '<div class="part-summary"><h4>' + part.name + '</h4><p>' + part.desc + '</p></div>' +
         '<div class="detail-kpis">' +
@@ -705,27 +729,48 @@
           '<div class="detail-kpi"><div class="k">物资类型</div><div class="v" style="font-size:13px">' + part.type + '</div></div>' +
           '<div class="detail-kpi"><div class="k">适用机型</div><div class="v" style="font-size:13px">金风 GW150 / UP2000</div></div>' +
         '</div>' +
+        '<div class="mini-chart"><h5>库存状态分布</h5>' +
+        (part.stats || []).map(function (s) {
+          return '<div class="bar-mini-row"><span>' + s.label + '</span><div class="track"><i style="width:' + s.pct + '%"></i></div><b>' + s.pct + '%</b></div>';
+        }).join("") + '</div>' +
         '<div class="spare-list"><div class="spare-list-hd">关联生产备件清单</div>' +
         (spares.length ? spares.map(function (s) {
-          return '<div class="spare-item"><b>' + s.name + ' · ' + s.code + '</b><span>规格型号：' + s.model +
-            ' · 库存数量：' + s.qty + ' 件 · 库存状态：' + s.status + '</span></div>';
-        }).join("") : '<div class="spare-item"><span>当前物资类型筛选下暂无关联备件。</span></div>') +
+          return '<div class="spare-item"><b>' + s.name + ' · ' + s.code + '</b><span>规格型号：' + s.model + ' · 库存：' + s.qty + ' 件 · 状态：' + s.status + '</span></div>';
+        }).join("") : '<div class="spare-item"><span>当前筛选下暂无关联备件</span></div>') +
         '</div>';
     }
 
-    function showCompanyView() {
-      lyHome.classList.remove("no-station");
-      groupPanel.style.display = "none";
-      turbineWrap.style.display = "block";
-      turbineTitle.textContent = state.company + " · 风机结构 · 备件关联视图";
+    function updateLayoutClasses() {
+      lyHome.classList.toggle("no-station", state.level === "group");
+      stationCol.classList.toggle("hidden", state.level === "group");
+      stationCol.classList.toggle("collapsed", state.stationCollapsed && state.level === "company");
+      lyHome.classList.toggle("station-collapsed", state.stationCollapsed && state.level === "company");
+    }
+
+    function renderAll() {
+      renderOrgTree();
+      updateLayoutClasses();
+      if (state.level === "group") {
+        renderEquipTabs(false);
+        renderMatTabs(false);
+        renderGroupPanel();
+        return;
+      }
       renderStations();
-      renderMatBar();
-      renderHotspots();
+      if (state.station) {
+        renderEquipTabs(false);
+        renderMatTabs(false);
+        renderStationPanel();
+        return;
+      }
+      renderEquipTabs(true);
+      renderMatTabs(true);
+      renderDiagram();
       if (state.partId) renderPartDetail(state.partId);
       else {
         detailTitle.textContent = "零部件详情";
         detailSub.textContent = "点击风机结构图中的部位查看关联备件";
-        detailBody.innerHTML = '<div class="detail-empty">请在中间风机结构图中选择一个部位，右侧将展示该部位关联的生产备件、库存数量与适用机型等信息。</div>';
+        detailBody.innerHTML = '<div class="detail-empty">请在中间结构图中选择一个部位，右侧将展示关联生产备件、库存数量及状态分布。</div>';
       }
     }
 
@@ -734,19 +779,18 @@
       state.company = key;
       state.station = "";
       state.partId = "";
-      renderOrgTree();
-      showCompanyView();
+      renderAll();
     }
 
     function selectStation(name) {
       state.station = name;
-      renderStations();
-      if (state.partId) renderPartDetail(state.partId);
+      state.partId = "";
+      renderAll();
     }
 
     function selectPart(id) {
       state.partId = id;
-      renderHotspots();
+      renderDiagram();
       renderPartDetail(id);
     }
 
@@ -755,41 +799,26 @@
       state.company = "";
       state.station = "";
       state.partId = "";
-      renderOrgTree();
-      renderGroupPanel();
-      stationListEl.innerHTML = '<div class="detail-empty">请选择项目公司</div>';
-      document.getElementById("stationColTitle").textContent = "风电场";
-      document.getElementById("stationColSub").textContent = "请选择左侧项目公司";
-      detailTitle.textContent = "零部件详情";
-      detailSub.textContent = "选择项目公司后查看风机结构与备件";
-      detailBody.innerHTML = '<div class="detail-empty">请先在左侧选择项目公司（如山西龙源），再点击风电场与风机部位查看备件详情。</div>';
+      renderAll();
     }
 
-    orgTreeEl.addEventListener("click", function (e) {
+    document.getElementById("orgTree").addEventListener("click", function (e) {
       var node = e.target.closest(".node");
       if (!node) return;
-      var level = node.getAttribute("data-level");
-      if (level === "group") {
-        var wrap = node.parentElement;
-        if (wrap.classList.contains("group-wrap")) wrap.classList.toggle("open");
+      if (node.getAttribute("data-level") === "group") {
+        node.parentElement.classList.toggle("open");
         selectGroup();
         return;
       }
-      if (level === "company") selectCompany(node.getAttribute("data-key"));
+      if (node.getAttribute("data-level") === "company") selectCompany(node.getAttribute("data-key"));
     });
 
     document.getElementById("btnStationToggle").addEventListener("click", function () {
       state.stationCollapsed = !state.stationCollapsed;
-      stationCol.classList.toggle("collapsed", state.stationCollapsed);
-      lyHome.classList.toggle("station-collapsed", state.stationCollapsed);
       this.textContent = state.stationCollapsed ? "▶" : "◀";
-      this.title = state.stationCollapsed ? "展开风电场列" : "折叠风电场列";
+      renderAll();
     });
 
-    renderOrgTree();
-    renderMatBar();
-    renderHotspots();
-    selectGroup();
     selectCompany("山西龙源");
   </script>
 </body>
