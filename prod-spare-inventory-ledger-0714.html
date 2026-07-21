@@ -3,6 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
   <title>生产物资库存管理 - 新能源物资供应链管理系统</title>
   <link rel="stylesheet" href="css/vendor/fa-all.min.css" />
   <link rel="stylesheet" href="css/subpage-base.css" />
@@ -207,7 +209,7 @@
       justify-content: center;
       position: relative;
       border-radius: 12px;
-      overflow: hidden;
+      overflow: visible;
       background: radial-gradient(ellipse at 50% 35%, rgba(56,189,248,.12), transparent 65%), linear-gradient(180deg, #eef6ff 0%, #e3edf7 100%);
       box-shadow: inset 0 0 0 1px rgba(148,163,184,.25);
     }
@@ -217,36 +219,30 @@
       height: 100% !important;
       outline: none;
     }
-    .diagram-label-layer {
+    .diagram-callout-svg {
       position: absolute;
       inset: 0;
+      width: 100%;
+      height: 100%;
       pointer-events: none;
-      overflow: hidden;
-      z-index: 2;
+      z-index: 4;
+      overflow: visible;
     }
-    .diagram-label {
-      position: absolute;
-      transform: translate(-50%, -50%);
-      padding: 3px 9px;
-      border-radius: 4px;
-      background: rgba(255,255,255,.94);
-      border: 1px solid rgba(22,119,255,.45);
-      color: #1677ff;
-      font-size: 12px;
+    .diagram-callout-svg line {
+      stroke: #1f2d3d;
+      stroke-width: 1.2;
+      stroke-linecap: round;
+    }
+    .diagram-callout-svg text {
+      fill: #1f2d3d;
+      font-size: 13px;
       font-weight: 600;
-      white-space: nowrap;
-      box-shadow: 0 2px 8px rgba(15,23,42,.12);
       pointer-events: auto;
       cursor: pointer;
-      transition: background .15s, color .15s, border-color .15s;
+      user-select: none;
     }
-    .diagram-label.on {
-      background: #1677ff;
-      color: #fff;
-      border-color: #1677ff;
-    }
-    .diagram-label:hover { background: #e6f4ff; }
-    .diagram-label.on:hover { background: #0958d9; }
+    .diagram-callout-svg g.on line { stroke: #1677ff; stroke-width: 1.6; }
+    .diagram-callout-svg g.on text { fill: #1677ff; }
 
     .group-panel, .station-panel {
       width: 100%;
@@ -468,7 +464,7 @@
     </div>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js?v=20260721-wind-xray-v6"></script>
   <script src="js/sidebar-actions.js"></script>
   <script src="js/subpage-feature-title.js"></script>
   <script src="js/site-footer.js"></script>
@@ -611,7 +607,7 @@
       document.getElementById("orgTree").innerHTML = html;
     }
 
-    var scene3d = { renderer: null, scene: null, camera: null, animId: null, meshes: [], callouts: [], labelLayer: null, container: null };
+    var scene3d = { renderer: null, scene: null, camera: null, animId: null, meshes: [], calloutItems: [], calloutSvg: null, container: null };
 
     function getMatTypes() { return MAT_TYPES_BY_EQUIP[state.equip] || MAT_TYPES_BY_EQUIP.wind; }
     function getCurrentParts() {
@@ -754,10 +750,10 @@
           scene3d.renderer.domElement.parentNode.removeChild(scene3d.renderer.domElement);
         }
       }
-      if (scene3d.labelLayer && scene3d.labelLayer.parentNode) {
-        scene3d.labelLayer.parentNode.removeChild(scene3d.labelLayer);
+      if (scene3d.calloutSvg && scene3d.calloutSvg.parentNode) {
+        scene3d.calloutSvg.parentNode.removeChild(scene3d.calloutSvg);
       }
-      scene3d = { renderer: null, scene: null, camera: null, animId: null, meshes: [], callouts: [], labelLayer: null, container: null };
+      scene3d = { renderer: null, scene: null, camera: null, animId: null, meshes: [], calloutItems: [], calloutSvg: null, container: null };
     }
 
     function addMesh(scene, meshes, geo, color, x, y, z, partId, opts) {
@@ -787,89 +783,103 @@
     }
 
     var WIND_CALLOUT_DEFS = [
-      { id: "blade", name: "叶片", anchor: { x: -1.05, y: 11.4, z: 0.15 }, label: { x: -4.2, y: 12.8, z: -1.5 } },
-      { id: "hub", name: "轮毂", anchor: { x: -1.05, y: 8.85, z: 0.15 }, label: { x: -3.6, y: 9.8, z: 1.8 } },
-      { id: "gearbox", name: "齿轮箱", anchor: { x: 0.38, y: 8.85, z: 0.15 }, label: { x: -0.8, y: 10.6, z: 2.8 } },
-      { id: "generator", name: "发电机", anchor: { x: 1.0, y: 8.85, z: 0.15 }, label: { x: 2.2, y: 10.8, z: 2.5 } },
-      { id: "cabinet", name: "电器柜", anchor: { x: 1.62, y: 8.95, z: 0.15 }, label: { x: 3.5, y: 10.2, z: 1.2 } },
-      { id: "nacelle", name: "机舱", anchor: { x: 0.15, y: 9.55, z: 0.15 }, label: { x: 0.2, y: 11.2, z: 3.2 } },
-      { id: "tower", name: "塔架", anchor: { x: 0, y: 4.2, z: 0 }, label: { x: 2.8, y: 4.5, z: 3.5 } }
+      { id: "blade", name: "叶片", anchor: { x: -1.05, y: 11.2, z: 0.15 }, offset: { x: -95, y: -28 } },
+      { id: "hub", name: "轮毂", anchor: { x: -1.05, y: 8.85, z: 0.15 }, offset: { x: -105, y: 8 } },
+      { id: "gearbox", name: "齿轮箱", anchor: { x: 0.38, y: 8.85, z: 0.15 }, offset: { x: -55, y: -55 } },
+      { id: "generator", name: "发电机", anchor: { x: 1.0, y: 8.85, z: 0.15 }, offset: { x: 70, y: -50 } },
+      { id: "cabinet", name: "电器柜", anchor: { x: 1.62, y: 8.95, z: 0.15 }, offset: { x: 95, y: -15 } },
+      { id: "nacelle", name: "机舱", anchor: { x: 0.15, y: 9.5, z: 0.15 }, offset: { x: 15, y: -72 } },
+      { id: "tower", name: "塔架", anchor: { x: 0, y: 4.2, z: 0 }, offset: { x: 88, y: 12 } }
     ];
 
-    function buildWindCallouts(scene) {
-      scene3d.callouts = WIND_CALLOUT_DEFS.map(function (d) {
-        var a = new THREE.Vector3(d.anchor.x, d.anchor.y, d.anchor.z);
-        var l = new THREE.Vector3(d.label.x, d.label.y, d.label.z);
-        var geo = new THREE.BufferGeometry().setFromPoints([a, l]);
-        var line = new THREE.Line(geo, new THREE.LineBasicMaterial({ color: 0x1677ff, transparent: true, opacity: 0.82 }));
-        line.userData.partId = d.id;
-        scene.add(line);
-        return { partId: d.id, name: d.name, labelPos: l, line: line, el: null };
-      });
+    function projectLocalPoint(local, scene, camera, w, h) {
+      var v = new THREE.Vector3(local.x, local.y, local.z);
+      scene.localToWorld(v);
+      v.project(camera);
+      return {
+        x: (v.x * 0.5 + 0.5) * w,
+        y: (-v.y * 0.5 + 0.5) * h,
+        behind: v.z > 1
+      };
     }
 
-    function setupWindLabelLayer(container) {
-      var layer = document.createElement("div");
-      layer.className = "diagram-label-layer";
-      scene3d.callouts.forEach(function (c) {
-        var el = document.createElement("div");
-        el.className = "diagram-label" + (state.partId === c.partId ? " on" : "");
-        el.textContent = c.name;
-        el.onclick = function () { selectPart(c.partId); };
-        layer.appendChild(el);
-        c.el = el;
+    function setupWindCalloutSvg(container) {
+      var w = container.clientWidth || 560;
+      var h = container.clientHeight || 480;
+      var svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+      svg.setAttribute("class", "diagram-callout-svg");
+      svg.setAttribute("viewBox", "0 0 " + w + " " + h);
+      svg.setAttribute("preserveAspectRatio", "none");
+      scene3d.calloutItems = WIND_CALLOUT_DEFS.map(function (d) {
+        var g = document.createElementNS("http://www.w3.org/2000/svg", "g");
+        g.setAttribute("data-part", d.id);
+        if (state.partId === d.id) g.setAttribute("class", "on");
+        var line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+        var text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+        text.textContent = d.name;
+        text.addEventListener("click", function () { selectPart(d.id); });
+        g.appendChild(line);
+        g.appendChild(text);
+        svg.appendChild(g);
+        return { partId: d.id, name: d.name, anchor: d.anchor, offset: d.offset, g: g, line: line, text: text };
       });
-      container.appendChild(layer);
-      scene3d.labelLayer = layer;
+      container.appendChild(svg);
+      scene3d.calloutSvg = svg;
     }
 
     function updateCalloutLabels() {
-      if (!scene3d.callouts.length || !scene3d.camera || !scene3d.container) return;
+      if (!scene3d.calloutItems.length || !scene3d.camera || !scene3d.container || !scene3d.scene) return;
       var w = scene3d.container.clientWidth || 560;
       var h = scene3d.container.clientHeight || 480;
-      var wp = new THREE.Vector3();
-      scene3d.callouts.forEach(function (c) {
-        if (!c.el) return;
+      if (scene3d.calloutSvg) {
+        scene3d.calloutSvg.setAttribute("viewBox", "0 0 " + w + " " + h);
+      }
+      scene3d.calloutItems.forEach(function (c) {
         var part = getCurrentParts().filter(function (p) { return p.id === c.partId; })[0];
         var visible = !part || partMatchesMat(part);
-        c.el.style.display = visible ? "" : "none";
-        c.line.visible = visible;
+        c.g.style.display = visible ? "" : "none";
         if (!visible) return;
-        wp.copy(c.labelPos);
-        scene3d.scene.localToWorld(wp);
-        wp.project(scene3d.camera);
-        if (wp.z > 1) { c.el.style.opacity = "0.35"; } else { c.el.style.opacity = "1"; }
-        c.el.style.left = ((wp.x * 0.5 + 0.5) * w) + "px";
-        c.el.style.top = ((-wp.y * 0.5 + 0.5) * h) + "px";
-        c.el.classList.toggle("on", state.partId === c.partId);
+        var ap = projectLocalPoint(c.anchor, scene3d.scene, scene3d.camera, w, h);
+        var lx = ap.x + c.offset.x;
+        var ly = ap.y + c.offset.y;
+        c.line.setAttribute("x1", ap.x);
+        c.line.setAttribute("y1", ap.y);
+        c.line.setAttribute("x2", lx);
+        c.line.setAttribute("y2", ly);
+        c.text.setAttribute("x", lx + 4);
+        c.text.setAttribute("y", ly + 4);
+        c.g.style.opacity = ap.behind ? "0.35" : "1";
+        c.g.setAttribute("class", state.partId === c.partId ? "on" : "");
       });
     }
 
     function buildWindScene(scene, meshes) {
-      addMesh(scene, meshes, new THREE.CylinderGeometry(0.55, 0.8, 8.5, 32), 0xdce3ec, 0, 4.25, 0, "tower", {
-        metalness: 0.5, roughness: 0.4, transparent: true, opacity: 0.28, side: THREE.DoubleSide, depthWrite: false, renderOrder: 2
-      });
       addMesh(scene, [], new THREE.CylinderGeometry(0.38, 0.55, 8.2, 20), 0xb8c5d6, 0, 4.15, 0, "", { metalness: 0.45, roughness: 0.5 });
-      for (var t = 1; t <= 4; t++) {
-        addMesh(scene, [], new THREE.TorusGeometry(0.52 + t * 0.04, 0.03, 8, 32), 0x94a3b8, 0, t * 1.8, 0, "", { metalness: 0.6, rx: Math.PI / 2, transparent: true, opacity: 0.55 });
-      }
-      addMesh(scene, meshes, new THREE.BoxGeometry(0.72, 0.6, 0.6), 0x334155, 0.38, 8.85, 0.15, "gearbox", { matType: "齿轮箱", metalness: 0.65, renderOrder: 0 });
-      addMesh(scene, meshes, new THREE.CylinderGeometry(0.54, 0.54, 1.08, 32), 0xf97316, 1.0, 8.85, 0.15, "generator", { matType: "电机/变流", rx: Math.PI / 2, metalness: 0.55, renderOrder: 0 });
-      addMesh(scene, meshes, new THREE.BoxGeometry(0.6, 1.08, 0.7), 0x38bdf8, 1.62, 8.95, 0.15, "cabinet", { matType: "电机/变流", metalness: 0.4, renderOrder: 0 });
-      addMesh(scene, [], new THREE.CylinderGeometry(0.12, 0.12, 0.9, 16), 0x64748b, -0.35, 8.85, 0.15, "", { metalness: 0.55, rx: Math.PI / 2 });
+      addMesh(scene, meshes, new THREE.BoxGeometry(0.75, 0.62, 0.62), 0x334155, 0.38, 8.85, 0.15, "gearbox", { matType: "齿轮箱", metalness: 0.65, renderOrder: 0 });
+      addMesh(scene, meshes, new THREE.CylinderGeometry(0.56, 0.56, 1.1, 32), 0xf97316, 1.0, 8.85, 0.15, "generator", { matType: "电机/变流", rx: Math.PI / 2, metalness: 0.55, renderOrder: 0 });
+      addMesh(scene, meshes, new THREE.CylinderGeometry(0.42, 0.42, 0.18, 32), 0xea580c, 1.55, 8.85, 0.15, "", { rx: Math.PI / 2, metalness: 0.5 });
+      addMesh(scene, meshes, new THREE.BoxGeometry(0.62, 1.1, 0.72), 0x38bdf8, 1.62, 8.95, 0.15, "cabinet", { matType: "电机/变流", metalness: 0.4, renderOrder: 0 });
+      addMesh(scene, [], new THREE.BoxGeometry(2.35, 0.1, 1.35), 0x2dd4bf, 0.15, 8.72, 0.15, "", { metalness: 0.2, roughness: 0.6 });
+      addMesh(scene, [], new THREE.CylinderGeometry(0.12, 0.12, 0.95, 16), 0x64748b, -0.35, 8.85, 0.15, "", { metalness: 0.55, rx: Math.PI / 2 });
       addMesh(scene, meshes, new THREE.SphereGeometry(0.62, 28, 28), 0x475569, -1.05, 8.85, 0.15, "hub", { metalness: 0.7, renderOrder: 0 });
-      addMesh(scene, meshes, new THREE.BoxGeometry(2.75, 1.48, 1.78), 0x7dd3fc, 0.15, 8.85, 0.15, "nacelle", {
-        metalness: 0.15, roughness: 0.35, transparent: true, opacity: 0.18, side: THREE.DoubleSide, depthWrite: false, renderOrder: 3
+      addMesh(scene, meshes, new THREE.BoxGeometry(2.85, 1.52, 1.82), 0x7dd3fc, 0.15, 8.85, 0.15, "nacelle", {
+        metalness: 0.1, roughness: 0.3, transparent: true, opacity: 0.1, side: THREE.DoubleSide, depthWrite: false, renderOrder: 5
       });
       for (var i = 0; i < 3; i++) {
         var blade = addMesh(scene, meshes, new THREE.BoxGeometry(0.16, 5.4, 0.82), 0xe2e8f0, -1.05, 8.85, 0.15, i === 0 ? "blade" : "", {
-          matType: "叶片", metalness: 0.35, transparent: true, opacity: 0.52, side: THREE.DoubleSide, depthWrite: false, renderOrder: 2
+          matType: "叶片", metalness: 0.3, transparent: true, opacity: 0.38, side: THREE.DoubleSide, depthWrite: false, renderOrder: 4
         });
         blade.rotation.z = (i * Math.PI * 2 / 3) - Math.PI / 2;
         blade.translateY(2.7);
         if (i !== 0) blade.userData.partId = "";
       }
-      addMesh(scene, [], new THREE.CylinderGeometry(0.04, 0.04, 0.8, 12), 0x64748b, 0.15, 9.65, 0.15, "", { metalness: 0.5, transparent: true, opacity: 0.6 });
+      addMesh(scene, meshes, new THREE.CylinderGeometry(0.55, 0.8, 8.5, 32), 0xdce3ec, 0, 4.25, 0, "tower", {
+        metalness: 0.45, roughness: 0.45, transparent: true, opacity: 0.14, side: THREE.DoubleSide, depthWrite: false, renderOrder: 4
+      });
+      for (var t = 1; t <= 4; t++) {
+        addMesh(scene, [], new THREE.TorusGeometry(0.52 + t * 0.04, 0.03, 8, 32), 0x94a3b8, 0, t * 1.8, 0, "", { metalness: 0.6, rx: Math.PI / 2, transparent: true, opacity: 0.35, depthWrite: false });
+      }
+      addMesh(scene, [], new THREE.CylinderGeometry(0.04, 0.04, 0.8, 12), 0x64748b, 0.15, 9.65, 0.15, "", { metalness: 0.5, transparent: true, opacity: 0.45, depthWrite: false });
     }
 
     function buildPvScene(scene, meshes) {
@@ -944,8 +954,7 @@
       builder(scene, scene3d.meshes);
       updateMeshVisibility();
       if (state.equip === "wind") {
-        buildWindCallouts(scene);
-        setupWindLabelLayer(container);
+        setupWindCalloutSvg(container);
       }
 
       scene3d.renderer = renderer;
@@ -994,7 +1003,7 @@
         diagramWrap.innerHTML = '<div class="detail-empty">3D 引擎加载中，请刷新页面</div>';
         return;
       }
-      if (scene3d.renderer && scene3d.lastEquip === state.equip && scene3d.container === diagramWrap) {
+      if (scene3d.renderer && scene3d.lastEquip === state.equip && scene3d.container === diagramWrap && (state.equip !== "wind" || scene3d.calloutSvg)) {
         updateMeshVisibility();
         return;
       }
