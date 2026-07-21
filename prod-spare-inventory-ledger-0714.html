@@ -1009,12 +1009,14 @@
     }
 
     function renderDiagram() {
-      if (state.level !== "company" || state.station) return;
+      if (state.station) return;
       groupPanel.style.display = "none";
       stationPanel.style.display = "none";
       diagramWrap.style.display = "flex";
       var labels = { wind: "风机结构", pv: "光伏设备", storage: "储能设备" };
-      mainHead.innerHTML = '<b>' + state.company + '</b> · ' + labels[state.equip] + ' · 3D 立体模型 · 点击部位查看备件';
+      var scopeLabel = state.level === "group" ? "龙源电力" : state.company;
+      var scopeNote = state.level === "group" ? "总体" : "";
+      mainHead.innerHTML = '<b>' + scopeLabel + '</b> · ' + labels[state.equip] + ' · ' + scopeNote + '3D 立体模型 · 点击部位查看备件';
       if (typeof THREE === "undefined") {
         diagramWrap.innerHTML = '<div class="detail-empty">3D 引擎加载中，请刷新页面</div>';
         return;
@@ -1062,13 +1064,29 @@
       lyHome.classList.toggle("station-collapsed", state.stationCollapsed && state.level === "company");
     }
 
+    function renderDiagramDetailEmpty() {
+      if (state.partId) {
+        renderPartDetail(state.partId);
+        return;
+      }
+      detailTitle.textContent = "零部件详情";
+      if (state.level === "group") {
+        detailSub.textContent = "龙源电力 · 总体图 · 部位联动详情";
+        detailBody.innerHTML = '<div class="detail-empty">请在中间 3D 立体模型中选择一个部位，右侧将展示龙源电力总体关联备件、库存数量及状态分布。</div>';
+      } else {
+        detailSub.textContent = "点击 3D 模型中的部位查看关联备件";
+        detailBody.innerHTML = '<div class="detail-empty">请在中间 3D 立体模型中选择一个部位，右侧将展示关联生产备件、库存数量及状态分布。</div>';
+      }
+    }
+
     function renderAll() {
       renderOrgTree();
       updateLayoutClasses();
       if (state.level === "group") {
-        renderEquipTabs(false);
-        renderMatTabs(false);
-        renderGroupPanel();
+        renderEquipTabs(true);
+        renderMatTabs(true);
+        renderDiagram();
+        renderDiagramDetailEmpty();
         return;
       }
       renderStations();
@@ -1081,12 +1099,7 @@
       renderEquipTabs(true);
       renderMatTabs(true);
       renderDiagram();
-      if (state.partId) renderPartDetail(state.partId);
-      else {
-        detailTitle.textContent = "零部件详情";
-        detailSub.textContent = "点击 3D 模型中的部位查看关联备件";
-        detailBody.innerHTML = '<div class="detail-empty">请在中间 3D 立体模型中选择一个部位，右侧将展示关联生产备件、库存数量及状态分布。</div>';
-      }
+      renderDiagramDetailEmpty();
     }
 
     function selectCompany(key) {
@@ -1094,6 +1107,8 @@
       state.company = key;
       state.station = "";
       state.partId = "";
+      state.stationCollapsed = false;
+      document.getElementById("btnStationToggle").textContent = "◀";
       renderAll();
     }
 
@@ -1114,6 +1129,7 @@
       state.company = "";
       state.station = "";
       state.partId = "";
+      state.stationCollapsed = true;
       renderAll();
     }
 
@@ -1147,7 +1163,7 @@
       }, true);
     })();
 
-    selectCompany("山西龙源");
+    selectGroup();
   </script>
 </body>
 </html>
