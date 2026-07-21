@@ -36,6 +36,8 @@
       align-items: center;
       background: #fff;
       border-bottom: 1px solid var(--border);
+      position: relative;
+      z-index: 20;
     }
     .page-view-switch { display: flex; gap: 4px; }
     .page-view-switch a {
@@ -412,7 +414,7 @@
           <div class="ledger-view-row">
             <div class="page-view-switch">
               <a class="on" href="prod-spare-inventory-ledger-0714.html"><i class="fa-solid fa-house"></i> 龙源电力首页</a>
-              <a href="prod-spare-storage-0714.html"><i class="fa-solid fa-warehouse"></i> 仓库视图</a>
+              <a href="prod-spare-storage-0714.html" data-action="prod-spare-storage" data-label="仓库视图" id="linkWarehouseView"><i class="fa-solid fa-warehouse"></i> 仓库视图</a>
             </div>
           </div>
 
@@ -942,8 +944,8 @@
       var scene = new THREE.Scene();
       var camera = new THREE.PerspectiveCamera(45, w / h, 0.1, 200);
       if (state.equip === "wind") {
-        camera.position.set(10, 5.2, 12);
-        camera.lookAt(0, 3.6, 0);
+        camera.position.set(11.5, 4.2, 14);
+        camera.lookAt(0, 2.2, 0);
       } else {
         camera.position.set(8, 6.5, 11);
         camera.lookAt(0, 1.5, 0);
@@ -1131,6 +1133,19 @@
       this.textContent = state.stationCollapsed ? "▶" : "◀";
       renderAll();
     });
+
+    (function bindWarehouseViewLink() {
+      var link = document.getElementById("linkWarehouseView");
+      if (!link) return;
+      link.addEventListener("click", function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        if (typeof navigateBySidebarAction === "function" && navigateBySidebarAction("prod-spare-storage", { label: "仓库视图" })) {
+          return;
+        }
+        window.location.href = "prod-spare-storage-0714.html";
+      }, true);
+    })();
 
     selectCompany("山西龙源");
   </script>
