@@ -1149,7 +1149,7 @@
 
     /* ===== 发起调拨申请弹窗 ===== */
     #transferApplyMask .wh-modal-box {
-      width: min(920px, 100%);
+      width: min(980px, 100%);
       max-height: min(92vh, 860px);
     }
     .xfer-sec {
@@ -1228,41 +1228,50 @@
       border: 1px solid #e8edf4;
       border-radius: 6px;
       background: #fff;
+      max-height: 220px;
     }
     .xfer-table {
-      width: 100%;
+      width: max(100%, 1080px);
       border-collapse: collapse;
-      font-size: 12px;
-      min-width: 860px;
+      font-size: 11px;
       table-layout: fixed;
     }
+    .xfer-table col.col-code { width: 82px; }
+    .xfer-table col.col-name { width: 72px; }
+    .xfer-table col.col-sn { width: 104px; }
+    .xfer-table col.col-model { width: 72px; }
+    .xfer-table col.col-machine { width: 118px; }
+    .xfer-table col.col-unit { width: 38px; }
+    .xfer-table col.col-avail { width: 58px; }
+    .xfer-table col.col-qty { width: 72px; }
+    .xfer-table col.col-loc { width: 150px; }
+    .xfer-table col.col-st { width: 58px; }
+    .xfer-table col.col-op { width: 46px; }
     .xfer-table th,
     .xfer-table td {
-      padding: 6px 8px;
+      padding: 6px 6px;
       border-bottom: 1px solid #eef2f7;
       text-align: left;
       vertical-align: top;
-      white-space: normal;
-      word-break: break-word;
-      overflow-wrap: anywhere;
-      line-height: 1.35;
+      line-height: 1.4;
+      overflow: hidden;
     }
     .xfer-table th {
       background: #f7f9fc;
       color: #5a6b82;
       font-weight: 600;
+      white-space: normal;
+      word-break: break-word;
     }
-    .xfer-table th:nth-child(1), .xfer-table td:nth-child(1) { width: 88px; }
-    .xfer-table th:nth-child(2), .xfer-table td:nth-child(2) { width: 72px; }
-    .xfer-table th:nth-child(3), .xfer-table td:nth-child(3) { width: 108px; }
-    .xfer-table th:nth-child(4), .xfer-table td:nth-child(4) { width: 72px; }
-    .xfer-table th:nth-child(5), .xfer-table td:nth-child(5) { width: 118px; }
-    .xfer-table th:nth-child(6), .xfer-table td:nth-child(6) { width: 40px; white-space: nowrap; }
-    .xfer-table th:nth-child(7), .xfer-table td:nth-child(7) { width: 56px; white-space: nowrap; text-align: center; }
-    .xfer-table th:nth-child(8), .xfer-table td:nth-child(8) { width: 72px; white-space: nowrap; text-align: center; }
-    .xfer-table th:nth-child(9), .xfer-table td:nth-child(9) { width: 132px; }
-    .xfer-table th:nth-child(10), .xfer-table td:nth-child(10) { width: 56px; white-space: nowrap; text-align: center; }
-    .xfer-table th:nth-child(11), .xfer-table td:nth-child(11) { width: 44px; white-space: nowrap; text-align: center; }
+    .xfer-cell {
+      display: block;
+      max-width: 100%;
+      white-space: normal;
+      word-break: break-all;
+      overflow-wrap: anywhere;
+    }
+    .xfer-table .cell-center { text-align: center; }
+    .xfer-table .cell-center .xfer-cell { word-break: normal; }
     .xfer-table tr:last-child td { border-bottom: 0; }
     .xfer-table input[type="number"] {
       width: 64px;
@@ -1286,16 +1295,6 @@
       color: #8c9bb0;
       font-size: 12px;
     }
-    .xfer-approval {
-      margin-top: 8px;
-      padding: 8px 10px;
-      background: #f6ffed;
-      border: 1px solid #b7eb8f;
-      border-radius: 6px;
-      font-size: 12px;
-      color: #389e0d;
-      line-height: 1.5;
-    }
     .xfer-toast {
       position: fixed;
       top: 72px;
@@ -1303,7 +1302,7 @@
       transform: translateX(-50%);
       z-index: 10030;
       background: #fff;
-      border: 1px solid #b7eb8f;
+      border: 1px solid #91caff;
       box-shadow: 0 8px 24px rgba(15, 23, 42, .12);
       border-radius: 8px;
       padding: 10px 16px;
@@ -1821,6 +1820,19 @@
           </div>
           <div class="xfer-table-wrap">
             <table class="xfer-table">
+              <colgroup>
+                <col class="col-code" />
+                <col class="col-name" />
+                <col class="col-sn" />
+                <col class="col-model" />
+                <col class="col-machine" />
+                <col class="col-unit" />
+                <col class="col-avail" />
+                <col class="col-qty" />
+                <col class="col-loc" />
+                <col class="col-st" />
+                <col class="col-op" />
+              </colgroup>
               <thead>
                 <tr>
                   <th>产品编码</th>
@@ -1849,7 +1861,6 @@
               <textarea id="xferRemark" placeholder="如：康保 3 号风机 IGBT 抢修，需 48 小时内到场"></textarea>
             </div>
           </div>
-          <div class="xfer-approval" id="xferApprovalHint">提交后将进入审批：场站库管 → 项目公司物资主管 → 集团供应链（跨公司时）</div>
         </div>
       </div>
       <div class="wh-modal-foot">
@@ -2291,17 +2302,17 @@
       if (emptyTip) emptyTip.style.display = "none";
       xferLineBody.innerHTML = xferLines.map(function (line, idx) {
         return "<tr data-idx=\"" + idx + "\">" +
-          "<td>" + line.code + "</td>" +
-          "<td>" + line.name + "</td>" +
-          "<td>" + factoryUniqueCode(line) + "</td>" +
-          "<td>" + line.model + "</td>" +
-          "<td>" + applicableModel(line) + "</td>" +
-          "<td>" + stockUnit() + "</td>" +
-          "<td>" + line.qty + "</td>" +
-          '<td><input type="number" min="1" max="' + line.qty + '" value="' + line.applyQty + '" data-qty /></td>' +
-          "<td>" + fiveLevelLocation(line) + "</td>" +
-          "<td>" + line.status + "</td>" +
-          '<td><button type="button" class="rm" data-rm>删除</button></td>' +
+          '<td><span class="xfer-cell">' + line.code + "</span></td>" +
+          '<td><span class="xfer-cell">' + line.name + "</span></td>" +
+          '<td><span class="xfer-cell">' + factoryUniqueCode(line) + "</span></td>" +
+          '<td><span class="xfer-cell">' + line.model + "</span></td>" +
+          '<td><span class="xfer-cell">' + applicableModel(line) + "</span></td>" +
+          '<td class="cell-center"><span class="xfer-cell">' + stockUnit() + "</span></td>" +
+          '<td class="cell-center"><span class="xfer-cell">' + line.qty + "</span></td>" +
+          '<td class="cell-center"><input type="number" min="1" max="' + line.qty + '" value="' + line.applyQty + '" data-qty /></td>' +
+          '<td><span class="xfer-cell">' + fiveLevelLocation(line) + "</span></td>" +
+          '<td class="cell-center"><span class="xfer-cell">' + line.status + "</span></td>" +
+          '<td class="cell-center"><button type="button" class="rm" data-rm>删除</button></td>' +
           "</tr>";
       }).join("");
     }
@@ -2314,17 +2325,6 @@
         return warehouseFromRow(r) === fromWh || r.loc.indexOf(fromWh) >= 0;
       })[0];
       document.getElementById("xferFromLoc").value = match ? fiveLevelLocation(match) : "";
-    }
-    function updateApprovalHint() {
-      var type = document.getElementById("xferType").value;
-      var hint = document.getElementById("xferApprovalHint");
-      if (type === "跨公司调拨") {
-        hint.textContent = "提交后将进入审批：场站库管 → 项目公司物资主管 → 集团供应链";
-      } else if (type === "共享仓借调") {
-        hint.textContent = "提交后将进入审批：共享仓管理员 → 借入场站库管 → 项目公司物资主管";
-      } else {
-        hint.textContent = "提交后将进入审批：场站库管 → 项目公司物资主管";
-      }
     }
     function openTransferApplyModal() {
       document.getElementById("xferApplyNo").value = genApplyNo();
@@ -2342,7 +2342,6 @@
       document.getElementById("xferUrgent").value = "普通";
       document.getElementById("xferRemark").value = "";
       syncFromWhFields();
-      updateApprovalHint();
       xferLines = transferableRows().slice(0, 3).map(function (r) {
         return Object.assign({}, r, { applyQty: Math.min(Math.max(1, r.safe || 1), r.qty) });
       });
@@ -2391,7 +2390,6 @@
     transferApplyMask.addEventListener("click", function (e) {
       if (e.target === transferApplyMask) closeTransferApplyModal();
     });
-    document.getElementById("xferType").addEventListener("change", updateApprovalHint);
     document.getElementById("xferFromOrg").addEventListener("change", syncFromWhFields);
     document.getElementById("xferFromWh").addEventListener("change", syncFromWhFields);
     document.getElementById("btnXferAddLine").addEventListener("click", function () {
@@ -2424,7 +2422,7 @@
       var no = document.getElementById("xferApplyNo").value;
       var fromOrg = document.getElementById("xferFromOrg").value;
       var toOrg = document.getElementById("xferToOrg").value;
-      showXferToast("调拨申请已提交，单号 " + no + "，" + fromOrg + " → " + toOrg + "，待审批");
+      showXferToast("调拨申请已提交，单号 " + no + "，" + fromOrg + " → " + toOrg);
       closeTransferApplyModal();
     });
     document.addEventListener("keydown", function (e) {
