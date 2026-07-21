@@ -8,43 +8,17 @@
   <link rel="stylesheet" href="css/subpage-base.css" />
   <link rel="stylesheet" href="css/carrier-management.css" />
   <link rel="stylesheet" href="css/source-navbar-header.css" />
-  <link rel="stylesheet" href="css/warehouse-modal.css" />
   <style>
     :root {
       --primary: #1677ff;
       --primary-soft: #e6f4ff;
-      --primary-deep: #0958d9;
-      --ok: #52c41a;
-      --ok-soft: #f6ffed;
-      --warn: #fa8c16;
-      --warn-soft: #fff7e6;
-      --danger: #f5222d;
-      --danger-soft: #fff1f0;
       --text: #1f2d3d;
       --muted: #8c9bb0;
       --border: #e8edf4;
       --bg: #f0f3f8;
-      --surface: #ffffff;
       --rail: #0b1f3a;
     }
     * { box-sizing: border-box; }
-    .scheme-banner {
-      background: linear-gradient(90deg, #0b1f3a, #1677ff 55%, #36cfc9);
-      color: #fff;
-      padding: 8px 16px;
-      display: flex;
-      align-items: baseline;
-      gap: 14px;
-      margin: 0 0 0;
-    }
-    .scheme-banner .tag {
-      background: rgba(255,255,255,.2);
-      padding: 2px 10px;
-      border-radius: 3px;
-      font-weight: 700;
-      font-size: 13px;
-    }
-    .scheme-banner .desc { font-size: 12px; opacity: .93; }
     .ledger-page {
       display: flex;
       flex-direction: column;
@@ -52,12 +26,6 @@
       background: var(--bg);
       color: var(--text);
       font-size: 13px;
-    }
-    .shell {
-      display: grid;
-      grid-template-columns: 248px minmax(0, 1fr);
-      flex: 1;
-      min-height: 680px;
     }
     .ledger-view-row {
       flex: 0 0 auto;
@@ -68,1254 +36,361 @@
       background: #fff;
       border-bottom: 1px solid var(--border);
     }
+    .page-view-switch {
+      display: flex;
+      gap: 4px;
+    }
+    .page-view-switch a {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      height: 32px;
+      padding: 0 14px;
+      border-radius: 4px;
+      color: #64748b;
+      text-decoration: none;
+      font-size: 13px;
+    }
+    .page-view-switch a.on {
+      background: var(--primary-soft);
+      color: var(--primary);
+      font-weight: 600;
+    }
 
-    /* ===== Left: org + material tree ===== */
-    .left {
-      background: #fff;
-      border-right: 1px solid var(--border);
+    .ly-home {
+      flex: 1;
+      min-height: 0;
+      display: grid;
+      grid-template-columns: 200px auto minmax(0, 1.15fr) minmax(280px, 0.85fr);
+      gap: 0;
+      overflow: hidden;
+    }
+    .ly-home.no-station {
+      grid-template-columns: 200px minmax(0, 1.35fr) minmax(300px, 0.95fr);
+    }
+    .ly-home.station-collapsed {
+      grid-template-columns: 200px 44px minmax(0, 1.2fr) minmax(280px, 0.85fr);
+    }
+    .ly-col {
+      min-height: 0;
       display: flex;
       flex-direction: column;
-      min-height: 0;
+      background: #fff;
+      border-right: 1px solid var(--border);
+      overflow: hidden;
     }
-    .org-pick {
-      padding: 10px 12px;
-      border-bottom: 1px solid var(--border);
-      background: linear-gradient(180deg, #f8fbff, #fff);
+    .ly-col:last-child { border-right: 0; }
+
+    .org-col { background: var(--rail); color: #dbe7f5; border-right-color: #173456; }
+    .org-col .col-hd {
+      padding: 12px 14px 10px;
+      border-bottom: 1px solid rgba(255,255,255,.08);
     }
-    .org-pick label {
-      display: block;
+    .org-col .col-hd h2 {
+      margin: 0;
+      font-size: 15px;
+      color: #fff;
+      font-weight: 700;
+    }
+    .org-col .col-hd p {
+      margin: 4px 0 0;
       font-size: 11px;
+      color: #8fb0d4;
+    }
+    .org-tree {
+      flex: 1;
+      overflow: auto;
+      padding: 6px 0 12px;
+    }
+    .org-tree .node {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 14px;
+      cursor: pointer;
+      font-size: 12px;
+      color: #dbe7f5;
+      user-select: none;
+    }
+    .org-tree .node:hover { background: rgba(22,119,255,.28); color: #fff; }
+    .org-tree .node.on { background: #1677ff; color: #fff; }
+    .org-tree .node.l2 { padding-left: 28px; }
+    .org-tree .node .arrow {
+      width: 12px;
+      font-size: 10px;
+      color: #7ea2c9;
+      flex: 0 0 auto;
+    }
+    .org-tree .group-wrap.open > .node.l1 .arrow::before { content: "▼"; }
+    .org-tree .group-wrap:not(.open) > .node.l1 .arrow::before { content: "›"; }
+    .org-tree .children { display: none; }
+    .org-tree .group-wrap.open > .children { display: block; }
+
+    .station-col { width: 168px; transition: width .2s ease; }
+    .station-col.collapsed { width: 44px; min-width: 44px; }
+    .station-col.collapsed .station-list,
+    .station-col.collapsed .col-hd span,
+    .station-col.collapsed .col-hd p { display: none; }
+    .station-col .col-hd {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 6px;
+      padding: 10px 10px 8px;
+      border-bottom: 1px solid var(--border);
+      background: #f8fbff;
+    }
+    .station-col .col-hd span {
+      font-size: 13px;
+      font-weight: 700;
+      color: #1f2d3d;
+    }
+    .station-col .col-hd p {
+      margin: 2px 0 0;
+      font-size: 10px;
       color: var(--muted);
-      margin-bottom: 6px;
     }
-    .org-select {
-      position: relative;
-    }
-    .org-select-btn {
-      width: 100%;
-      height: 34px;
+    .station-toggle {
+      flex: 0 0 auto;
+      width: 24px;
+      height: 24px;
       border: 1px solid #c9d7ea;
       border-radius: 4px;
       background: #fff;
-      padding: 0 28px 0 10px;
-      text-align: left;
-      cursor: pointer;
-      color: var(--text);
-      position: relative;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    .org-select-btn::after {
-      content: "";
-      position: absolute;
-      right: 10px; top: 50%;
-      width: 0; height: 0;
-      border-left: 4px solid transparent;
-      border-right: 4px solid transparent;
-      border-top: 5px solid #64748b;
-      transform: translateY(-40%);
-    }
-    .org-dropdown {
-      display: none;
-      position: absolute;
-      left: 0; right: 0; top: 38px;
-      background: #0b1f3a;
-      color: #dbe7f5;
-      border-radius: 6px;
-      box-shadow: 0 12px 28px rgba(11,31,58,.35);
-      z-index: 30;
-      max-height: 360px;
-      overflow: auto;
-      padding: 6px 0;
-    }
-    .org-dropdown.open { display: block; }
-    .org-node {
-      padding: 7px 12px;
+      color: #64748b;
       cursor: pointer;
       font-size: 12px;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      color: #dbe7f5;
-      user-select: none;
-    }
-    .org-node:hover { background: rgba(22,119,255,.28); color: #fff; }
-    .org-node.active { background: #1677ff; color: #fff; }
-    .org-node .arrow {
-      width: 12px;
-      color: #7ea2c9;
-      font-size: 10px;
-      flex: 0 0 auto;
-      text-align: center;
       line-height: 1;
     }
-    .org-node.l2 { padding-left: 22px; }
-    .org-node.l3 { padding-left: 42px; color: #c5d5e8; }
-    .org-node.l3:hover, .org-node.l3.active { color: #fff; }
-    .org-company > .org-stations { display: none; }
-    .org-company.open > .org-stations { display: block; }
-    .org-company.open > .org-node.l2 .arrow { transform: none; }
-    .org-company.open > .org-node.l2 .arrow::before { content: "▼"; }
-    .org-company:not(.open) > .org-node.l2 .arrow::before { content: "›"; }
-    .org-company > .org-node.l2 .arrow { font-size: 0; }
-    .org-company > .org-node.l2 .arrow::before {
-      font-size: 10px;
-      color: #7ea2c9;
-    }
-    .org-root > .org-children { display: none; }
-    .org-root.open > .org-children { display: block; }
-    .org-root.open > .org-node.group .arrow { transform: none; }
-    .org-root.open > .org-node.group .arrow::before { content: "▼"; }
-    .org-root:not(.open) > .org-node.group .arrow::before { content: "›"; }
-    .org-root > .org-node.group .arrow { font-size: 0; }
-    .org-root > .org-node.group .arrow::before {
-      font-size: 10px;
-      color: #7ea2c9;
-    }
-
-    .mat-hd {
-      padding: 10px 12px 6px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-    .mat-hd h3 { font-size: 13px; font-weight: 700; }
-    .mat-hd .hint { font-size: 11px; color: var(--muted); }
-    .mat-search {
-      margin: 0 12px 8px;
-    }
-    .mat-search input {
-      width: 100%;
-      height: 30px;
-      border: 1px solid #d7e0ec;
-      border-radius: 4px;
-      padding: 0 10px;
-      font-size: 12px;
-    }
-    .mat-tree {
+    .station-list {
       flex: 1;
       overflow: auto;
-      padding: 0 8px 12px;
+      padding: 6px;
     }
-    .type-item, .prod-item {
-      border-radius: 4px;
-      cursor: pointer;
-      user-select: none;
-    }
-    .type-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 7px 8px;
-      gap: 6px;
-    }
-    .type-item:hover .type-row, .type-item.active > .type-row {
-      background: var(--primary-soft);
-      color: var(--primary-deep);
-    }
-    .type-row .name {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      min-width: 0;
-      font-weight: 600;
-    }
-    .type-row .caret {
-      width: 12px;
-      color: var(--muted);
-      font-size: 10px;
-      transition: transform .15s;
-    }
-    .type-item.open > .type-row .caret { transform: rotate(90deg); color: var(--primary); }
-    .type-row .cnt {
-      font-size: 11px;
-      color: var(--muted);
-      font-weight: 500;
-      flex: 0 0 auto;
-    }
-    .type-item.active > .type-row .cnt { color: var(--primary); font-weight: 700; }
-    .prod-list { display: none; padding: 0 0 4px 18px; }
-    .type-item.open > .prod-list { display: block; }
-    .prod-item {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 5px 8px;
-      margin-bottom: 1px;
-      font-size: 12px;
-      color: #334155;
-    }
-    .prod-item:hover, .prod-item.active {
-      background: #f0f7ff;
-      color: var(--primary);
-    }
-    .prod-item .pcnt { color: var(--muted); font-size: 11px; }
-
-    /* ===== Center ===== */
-    .center {
-      overflow: auto;
-      padding: 12px 14px 18px;
-      min-width: 0;
-    }
-    .page-hd {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 10px;
-      gap: 10px;
-    }
-    .page-hd h1 { font-size: 17px; font-weight: 700; }
-    .page-hd .scope {
-      font-size: 12px;
-      color: var(--muted);
-      margin-top: 2px;
-    }
-    .page-hd .ops { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
-    .page-title-row { display: flex; align-items: center; gap: 14px; }
-    .page-view-switch {
-      display: inline-flex;
-      align-items: center;
-      background: #eef3fb;
-      border: 1px solid #cdd9ea;
-      border-radius: 8px;
-      overflow: hidden;
-      padding: 2px;
-      gap: 2px;
-    }
-    .page-view-switch a {
-      height: 30px;
-      padding: 0 16px;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 13px;
-      color: #4b5b73;
-      text-decoration: none;
+    .station-item {
+      padding: 9px 10px;
       border-radius: 6px;
-    }
-    .page-view-switch a:hover { color: #1677ff; }
-    .page-view-switch a.on {
-      background: #1677ff;
-      color: #fff;
-      font-weight: 600;
-      box-shadow: 0 2px 6px rgba(22,119,255,.28);
-    }
-    .org-pick .page-view-switch {
-      display: flex;
-      width: 100%;
-      margin-bottom: 10px;
-    }
-    .org-pick .page-view-switch a {
-      flex: 1;
-      justify-content: center;
-      padding: 0 8px;
-    }
-    .side-page-title {
-      margin: 1px 0 11px;
-      color: var(--text);
-      font-size: 15px;
-      font-weight: 700;
-      line-height: 22px;
-    }
-    .page-hd.actions-only {
-      min-height: 32px;
-      justify-content: flex-end;
-    }
-    .btn {
-      height: 30px;
-      border-radius: 4px;
-      border: 1px solid #cbd5e1;
-      background: #fff;
-      padding: 0 12px;
-      font-size: 12px;
       cursor: pointer;
-      color: #334155;
+      border: 1px solid transparent;
+      margin-bottom: 4px;
     }
-    .btn.pri { background: var(--primary); border-color: var(--primary); color: #fff; }
-    .btn.ok { background: #52c41a; border-color: #52c41a; color: #fff; }
-    .btn.ghost:hover { border-color: var(--primary); color: var(--primary); }
-    .table-toolbar .ops { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
-
-    /* KPI row — Ant Design Pro style + ice/wave bottom */
-    .kpi-row {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 10px;
-      margin-bottom: 10px;
-    }
-    .kpi {
-      background: #fff;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 12px 14px 0;
-      position: relative;
-      overflow: hidden;
-      min-height: 118px;
-    }
-    .kpi .title {
-      font-size: 12px;
-      color: var(--muted);
-      display: flex;
-      align-items: center;
-      gap: 4px;
-    }
-    .kpi .title .i {
-      width: 14px; height: 14px;
-      border-radius: 50%;
-      border: 1px solid #c9d4e3;
-      color: #8c9bb0;
-      font-size: 10px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      cursor: help;
-    }
-    .kpi .val {
-      font-size: 26px;
-      font-weight: 700;
-      margin: 6px 0 2px;
-      letter-spacing: -.5px;
-      line-height: 1.15;
-    }
-    .kpi .val small { font-size: 13px; font-weight: 500; color: var(--muted); margin-left: 2px; }
-    .kpi .trend {
-      font-size: 12px;
-      margin-bottom: 8px;
-    }
-    .kpi .trend.up { color: var(--danger); }
-    .kpi .trend.down { color: var(--ok); }
-    .kpi .trend.flat { color: var(--muted); }
-    .kpi .spark {
-      height: 36px;
-      margin: 0 -14px;
+    .station-item:hover { background: #f0f7ff; border-color: #d6e4ff; }
+    .station-item.on { background: var(--primary-soft); border-color: #91caff; }
+    .station-item b {
       display: block;
-    }
-    .kpi .ice {
-      height: 28px;
-      margin: 0 -14px;
-      background:
-        radial-gradient(120% 80% at 10% 120%, rgba(22,119,255,.22), transparent 55%),
-        radial-gradient(100% 90% at 55% 130%, rgba(54,207,201,.28), transparent 50%),
-        radial-gradient(90% 70% at 90% 120%, rgba(22,119,255,.18), transparent 45%),
-        linear-gradient(180deg, transparent, rgba(230,244,255,.65));
-      clip-path: polygon(0 70%, 8% 55%, 18% 62%, 28% 40%, 40% 52%, 52% 28%, 64% 48%, 76% 34%, 88% 50%, 100% 42%, 100% 100%, 0 100%);
-    }
-
-    /* Charts row */
-    .chart-row {
-      display: grid;
-      grid-template-columns: 1.4fr 1fr 1fr;
-      gap: 10px;
-      margin-bottom: 10px;
-    }
-    .card {
-      background: #fff;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 12px 14px;
-      min-height: 210px;
-    }
-    .card-hd {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 8px;
-    }
-    .card-hd h3 { font-size: 13px; font-weight: 700; }
-    .card-hd .tabs { display: flex; gap: 2px; background: #f5f7fb; border-radius: 4px; padding: 2px; }
-    .card-hd .tabs button {
-      border: 0;
-      background: transparent;
-      padding: 3px 10px;
-      border-radius: 3px;
       font-size: 12px;
-      color: var(--muted);
-      cursor: pointer;
+      color: #1f2d3d;
+      margin-bottom: 3px;
     }
-    .card-hd .tabs button.on {
-      background: #fff;
-      color: var(--primary);
-      box-shadow: 0 1px 2px rgba(15,23,42,.08);
-    }
-    .bar-chart {
-      display: flex;
-      align-items: flex-end;
-      gap: 8px;
-      height: 140px;
-      padding: 8px 4px 0;
-      border-bottom: 1px solid #eef2f7;
-    }
-    .bar-chart .col {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 6px;
-      height: 100%;
-      justify-content: flex-end;
-    }
-    .bar-chart .bar {
-      width: 70%;
-      max-width: 36px;
-      border-radius: 4px 4px 0 0;
-      background: linear-gradient(180deg, #69b1ff, #1677ff);
-      position: relative;
-    }
-    .bar-chart .bar::after {
-      content: attr(data-v);
-      position: absolute;
-      top: -16px;
-      left: 50%;
-      transform: translateX(-50%);
+    .station-item small {
       font-size: 10px;
       color: var(--muted);
-      white-space: nowrap;
-    }
-    .bar-chart .lab { font-size: 11px; color: var(--muted); }
-
-    .dist-body {
-      display: grid;
-      grid-template-columns: 120px 1fr;
-      gap: 10px;
-      align-items: center;
-      height: 160px;
-    }
-    .donut {
-      width: 110px; height: 110px;
-      border-radius: 50%;
-      background: conic-gradient(
-        #1677ff 0 34%,
-        #36cfc9 34% 58%,
-        #95de64 58% 74%,
-        #ffc53d 74% 88%,
-        #ff85c0 88% 100%
-      );
-      position: relative;
-      margin: 0 auto;
-    }
-    .donut::after {
-      content: "";
-      position: absolute;
-      inset: 28px;
-      background: #fff;
-      border-radius: 50%;
-    }
-    .donut-center {
-      position: absolute;
-      inset: 0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      z-index: 1;
-      pointer-events: none;
-    }
-    .donut-center b { font-size: 16px; line-height: 1.1; }
-    .donut-center span { font-size: 10px; color: var(--muted); }
-    .legend { font-size: 12px; }
-    .legend .row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 8px;
-      padding: 4px 0;
-    }
-    .legend .dot {
-      width: 8px; height: 8px; border-radius: 50%;
-      display: inline-block; margin-right: 6px;
-    }
-
-    .trend-body { height: 160px; position: relative; }
-    .trend-body svg { width: 100%; height: 140px; display: block; }
-    .trend-meta {
-      display: flex;
-      gap: 14px;
-      font-size: 11px;
-      color: var(--muted);
-      margin-top: 2px;
-    }
-    .trend-meta i {
-      display: inline-block;
-      width: 10px; height: 3px;
-      border-radius: 2px;
-      margin-right: 4px;
-      vertical-align: middle;
-    }
-    .warranty-bars {
-      display: grid;
-      gap: 13px;
-      padding: 10px 2px 0;
-    }
-    .warranty-bars .item {
-      display: grid;
-      grid-template-columns: 76px 1fr 42px;
-      gap: 8px;
-      align-items: center;
-      font-size: 11px;
-      color: #64748b;
-    }
-    .warranty-bars .track {
-      height: 10px;
-      border-radius: 5px;
-      background: #edf2f7;
-      overflow: hidden;
-    }
-    .warranty-bars .track i {
-      display: block;
-      height: 100%;
-      border-radius: 5px;
-      background: linear-gradient(90deg,#69b1ff,#1677ff);
-    }
-    .warranty-bars .item.warn .track i { background: linear-gradient(90deg,#ffd666,#fa8c16); }
-    .warranty-bars .item.danger .track i { background: linear-gradient(90deg,#ff7875,#f5222d); }
-    .warranty-bars .item b { text-align: right; color: #334155; }
-    .field-source {
-      margin-top: 12px;
-      padding-top: 8px;
-      border-top: 1px dashed #dce5f0;
-      color: #8c9bb0;
-      font-size: 10px;
-    }
-
-    /* Filters + product quick chips */
-    .filters {
-      background: #fff;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 10px 12px;
-      margin-bottom: 8px;
-    }
-    .filter-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      align-items: center;
-    }
-    .filters input, .filters select {
-      height: 30px;
-      border: 1px solid #cbd5e1;
-      border-radius: 4px;
-      padding: 0 10px;
-      font-size: 12px;
-      background: #fff;
-    }
-    .filters input { width: 180px; }
-    .product-chips {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-      margin-top: 8px;
-      padding-top: 8px;
-      border-top: 1px dashed #e5ebf3;
-    }
-    .product-chips .label {
-      font-size: 12px;
-      color: var(--muted);
-      line-height: 24px;
-      margin-right: 2px;
-    }
-    .chip {
-      height: 24px;
-      border-radius: 12px;
-      border: 1px solid #d6e0ee;
-      background: #f8fafc;
-      padding: 0 10px;
-      font-size: 12px;
-      cursor: pointer;
-      color: #475569;
-    }
-    .chip:hover { border-color: #91caff; color: var(--primary); }
-    .chip.on {
-      background: var(--primary-soft);
-      border-color: #91caff;
-      color: var(--primary-deep);
-      font-weight: 600;
-    }
-
-    /* Detail table */
-    .table-wrap {
-      background: #fff;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      overflow: hidden;
-    }
-    .btn.ok { background: #52c41a; border-color: #52c41a; color: #fff; }
-    .btn.ok:hover { background: #73d13d; border-color: #73d13d; }
-    .table-toolbar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 8px 12px;
-      border-bottom: 1px solid var(--border);
-      background: #fafbfd;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
-    .table-toolbar .meta { color: var(--muted); font-size: 12px; white-space: nowrap; }
-    .table-toolbar .ops {
-      display: flex;
-      gap: 6px;
-      flex-wrap: wrap;
-      align-items: center;
-    }
-    .table-scroll {
-      overflow: auto;
-      max-height: 380px;
-    }
-    /* 覆盖 subpage-base 的 table-layout:fixed，避免列被压扁后 nowrap 文字重叠 */
-    .page-subpage .ledger-page .table-wrap {
-      overflow: hidden;
-    }
-    .page-subpage .ledger-page .table-scroll {
-      overflow: auto !important;
-      -webkit-overflow-scrolling: touch;
-    }
-    .page-subpage .ledger-page .ledger-detail-table {
-      width: max-content !important;
-      min-width: 1620px !important;
-      table-layout: auto !important;
-      border-collapse: separate !important;
-      border-spacing: 0;
-    }
-    .page-subpage .ledger-page .ledger-detail-table thead th,
-    .page-subpage .ledger-page .ledger-detail-table tbody td {
-      padding: 9px 12px !important;
-      border-bottom: 1px solid #eef2f7;
-      text-align: left;
-      white-space: nowrap !important;
-      word-break: normal !important;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      vertical-align: middle !important;
-      background-clip: padding-box;
-      box-sizing: border-box;
-      max-width: none !important;
-    }
-    .page-subpage .ledger-page .ledger-detail-table thead th {
-      background: #f7f9fc !important;
-      color: #5a6b82;
-      font-weight: 600;
-      font-size: 12px;
-      position: sticky;
-      top: 0;
-      z-index: 2;
       line-height: 1.35;
     }
-    .page-subpage .ledger-page .ledger-detail-table thead th .sub {
-      display: block;
-      font-weight: 500;
-      color: #8c9bb0;
-      font-size: 11px;
-      margin-top: 2px;
-      white-space: nowrap;
-    }
-    .page-subpage .ledger-page .ledger-detail-table tbody td.num {
-      text-align: right;
-      font-variant-numeric: tabular-nums;
-    }
-    .page-subpage .ledger-page .ledger-detail-table tbody td.code {
-      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-      color: #334155;
-    }
-    .page-subpage .ledger-page .ledger-detail-table tbody tr:hover td {
-      background: #f8fbff;
-    }
-    .page-subpage .ledger-page .ledger-detail-table col.c-idx { width: 56px; min-width: 56px; }
-    .page-subpage .ledger-page .ledger-detail-table col.c-date { width: 110px; min-width: 110px; }
-    .page-subpage .ledger-page .ledger-detail-table col.c-factory { width: 220px; min-width: 220px; }
-    .page-subpage .ledger-page .ledger-detail-table col.c-code { width: 120px; min-width: 120px; }
-    .page-subpage .ledger-page .ledger-detail-table col.c-oem { width: 150px; min-width: 150px; }
-    .page-subpage .ledger-page .ledger-detail-table col.c-name { width: 120px; min-width: 120px; }
-    .page-subpage .ledger-page .ledger-detail-table col.c-type { width: 110px; min-width: 110px; }
-    .page-subpage .ledger-page .ledger-detail-table col.c-model { width: 120px; min-width: 120px; }
-    .page-subpage .ledger-page .ledger-detail-table col.c-machine { width: 180px; min-width: 180px; }
-    .page-subpage .ledger-page .ledger-detail-table col.c-maker { width: 210px; min-width: 210px; }
-    .page-subpage .ledger-page .ledger-detail-table col.c-unit { width: 70px; min-width: 70px; }
-    .page-subpage .ledger-page .ledger-detail-table col.c-bin { width: 260px; min-width: 260px; }
-    .page-subpage .ledger-page .ledger-detail-table col.c-qty { width: 100px; min-width: 100px; }
-    .page-subpage .ledger-page .ledger-detail-table col.c-amt { width: 120px; min-width: 120px; }
-    .page-subpage .ledger-page .ledger-detail-table col.c-safe { width: 88px; min-width: 88px; }
-    .page-subpage .ledger-page .ledger-detail-table col.c-st { width: 110px; min-width: 110px; }
-    .page-subpage .ledger-page .ledger-detail-table col.c-op { width: 80px; min-width: 80px; }
-    .page-subpage .ledger-page .ledger-detail-table th:nth-child(17),
-    .page-subpage .ledger-page .ledger-detail-table td:nth-child(17),
-    .page-subpage .ledger-page .ledger-detail-table th.op,
-    .page-subpage .ledger-page .ledger-detail-table td.op {
-      min-width: 180px !important;
-      width: 180px;
-      overflow: visible !important;
-      text-overflow: clip !important;
-      white-space: nowrap !important;
-    }
-    .page-subpage .ledger-page .ledger-detail-table th:nth-child(1),
-    .page-subpage .ledger-page .ledger-detail-table td:nth-child(1) { min-width: 56px; }
-    .page-subpage .ledger-page .ledger-detail-table th:nth-child(2),
-    .page-subpage .ledger-page .ledger-detail-table td:nth-child(2),
-    .page-subpage .ledger-page .ledger-detail-table th:nth-child(3),
-    .page-subpage .ledger-page .ledger-detail-table td:nth-child(3) { min-width: 110px; }
-    .page-subpage .ledger-page .ledger-detail-table th:nth-child(4),
-    .page-subpage .ledger-page .ledger-detail-table td:nth-child(4) { min-width: 220px; }
-    .page-subpage .ledger-page .ledger-detail-table th:nth-child(5),
-    .page-subpage .ledger-page .ledger-detail-table td:nth-child(5) { min-width: 200px; }
-    .page-subpage .ledger-page .ledger-detail-table th:nth-child(6),
-    .page-subpage .ledger-page .ledger-detail-table td:nth-child(6) { min-width: 120px; }
-    .page-subpage .ledger-page .ledger-detail-table th:nth-child(7),
-    .page-subpage .ledger-page .ledger-detail-table td:nth-child(7) { min-width: 120px; }
-    .tag-pill {
-      display: inline-block;
-      padding: 1px 8px;
-      border-radius: 10px;
-      font-size: 11px;
-      font-weight: 600;
-    }
-    .tag-pill.ok { background: var(--ok-soft); color: #389e0d; }
-    .tag-pill.warn { background: var(--warn-soft); color: #d46b08; }
-    .tag-pill.danger { background: var(--danger-soft); color: #cf1322; }
-    .pager {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 8px 12px;
-      color: var(--muted);
-      font-size: 12px;
-      gap: 12px;
-    }
-    .pager > span:first-child {
-      white-space: normal;
-      line-height: 1.4;
-    }
 
-    /* KPI + 组织库存汇总（列表+占比条，不再重复饼图） */
-    .summary-band {
-      display: grid;
-      grid-template-columns: minmax(0, 1.05fr) minmax(380px, 460px);
-      gap: 10px;
-      margin-bottom: 10px;
-    }
-    .summary-band .kpi-row {
-      margin-bottom: 0;
-      grid-template-columns: 1fr 1fr;
-    }
-    .factory-list {
+    .turbine-col { background: #eef4fa; border-right-color: #dbe6f2; }
+    .turbine-top {
+      padding: 10px 12px 8px;
+      border-bottom: 1px solid #dbe6f2;
       background: #fff;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
-      min-height: 236px;
-      max-height: 260px;
     }
-    .factory-list-hd {
-      padding: 8px 12px;
-      border-bottom: 1px solid var(--border);
+    .turbine-top h3 {
+      margin: 0 0 8px;
       font-size: 13px;
       font-weight: 700;
-      background: #fafbfd;
+    }
+    .mat-bar {
       display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 8px;
+      flex-wrap: wrap;
+      gap: 6px;
     }
-    .factory-list-hd .cnt {
+    .mat-chip {
+      height: 26px;
+      padding: 0 10px;
+      border: 1px solid #d6e4ff;
+      border-radius: 13px;
+      background: #f8fbff;
+      color: #475569;
       font-size: 11px;
-      color: var(--muted);
-      font-weight: 500;
+      cursor: pointer;
+      white-space: nowrap;
     }
-    .factory-list-body {
-      overflow: auto;
+    .mat-chip.on {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: #fff;
+      font-weight: 600;
+    }
+    .turbine-stage {
       flex: 1;
       min-height: 0;
-      padding: 0;
-    }
-    .factory-list table {
-      width: 100%;
-      border-collapse: collapse;
-      min-width: 420px;
-      table-layout: fixed;
-    }
-    .factory-list th, .factory-list td {
-      padding: 7px 10px;
-      border-bottom: 1px solid #eef2f7;
-      font-size: 12px;
-      vertical-align: middle;
-    }
-    .factory-list th {
-      background: #f7f9fc;
-      color: #5a6b82;
-      font-weight: 600;
-      position: sticky;
-      top: 0;
-      z-index: 1;
-      white-space: nowrap;
-      overflow: visible;
-      text-overflow: clip;
-    }
-    .factory-list td {
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    .factory-list td.num { text-align: right; font-variant-numeric: tabular-nums; font-weight: 600; }
-    .factory-list td.pct { text-align: right; color: #64748b; font-variant-numeric: tabular-nums; white-space: nowrap; }
-    .factory-list tr:hover td { background: #f8fbff; cursor: pointer; }
-    .factory-list tr.is-active td { background: var(--primary-soft); color: var(--primary-deep); }
-    .factory-list .bar-mini {
-      display: block;
-      height: 4px;
-      border-radius: 2px;
-      background: #e8edf4;
-      margin-top: 4px;
-      overflow: hidden;
-    }
-    .factory-list .bar-mini i {
-      display: block;
-      height: 100%;
-      background: linear-gradient(90deg, #69b1ff, #1677ff);
-      border-radius: 2px;
-    }
-    .ledger-detail-table td.op,
-    .page-subpage .ledger-page .ledger-detail-table td.op {
-      color: #1677ff;
-      font-size: 12px;
-      line-height: 1.4;
-    }
-    .ledger-detail-table .op a,
-    .page-subpage .ledger-page .ledger-detail-table .op a {
-      display: inline !important;
-      visibility: visible !important;
-      opacity: 1 !important;
-      color: #1677ff !important;
-      text-decoration: none;
-      margin-right: 8px;
-      white-space: nowrap;
-      font-size: 12px;
-      line-height: 1.4;
-    }
-    .ledger-detail-table .op a:hover { text-decoration: underline; }
-    .ledger-detail-table .op a.danger,
-    .page-subpage .ledger-page .ledger-detail-table .op a.danger { color: #cf1322 !important; }
-    .ledger-detail-table .op a.warn,
-    .page-subpage .ledger-page .ledger-detail-table .op a.warn { color: #d46b08 !important; }
-    .btn.warn-entry {
-      background: #fff1f0;
-      border-color: #ffa39e;
-      color: #cf1322;
       position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px;
+      overflow: hidden;
     }
-    .btn.warn-entry .badge {
+    .turbine-img-wrap {
+      position: relative;
+      width: min(100%, 520px);
+      max-height: 100%;
+    }
+    .turbine-img-wrap img {
+      display: block;
+      width: 100%;
+      height: auto;
+      max-height: calc(100vh - 220px);
+      object-fit: contain;
+      user-select: none;
+      pointer-events: none;
+    }
+    .hotspot {
       position: absolute;
-      top: -6px; right: -6px;
-      min-width: 16px; height: 16px;
-      border-radius: 8px;
-      background: #f5222d;
+      border: 2px solid transparent;
+      border-radius: 6px;
+      background: rgba(22,119,255,0);
+      cursor: pointer;
+      transition: background .15s, border-color .15s, box-shadow .15s;
+    }
+    .hotspot:hover,
+    .hotspot.on {
+      background: rgba(22,119,255,.18);
+      border-color: #1677ff;
+      box-shadow: 0 0 0 3px rgba(22,119,255,.15);
+    }
+    .hotspot .tag {
+      position: absolute;
+      left: 50%;
+      top: -20px;
+      transform: translateX(-50%);
+      padding: 1px 6px;
+      border-radius: 3px;
+      background: #1677ff;
       color: #fff;
       font-size: 10px;
-      line-height: 16px;
-      padding: 0 4px;
-      font-weight: 700;
+      white-space: nowrap;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .15s;
     }
+    .hotspot:hover .tag,
+    .hotspot.on .tag { opacity: 1; }
 
-    /* ===== 预警抽屉：从右往左滑出 ===== */
-    .alert-mask {
-      position: fixed;
-      inset: 0;
-      background: rgba(15, 23, 42, .35);
-      z-index: 1000;
-      opacity: 0;
-      visibility: hidden;
-      transition: opacity .2s ease, visibility .2s ease;
-    }
-    .alert-mask.open { opacity: 1; visibility: visible; }
-    .rail {
-      position: fixed;
-      top: 0; right: 0;
-      width: 360px;
-      max-width: 92vw;
-      height: 100vh;
-      background: #fff;
-      border-left: 1px solid var(--border);
-      box-shadow: -8px 0 28px rgba(15, 23, 42, .18);
-      overflow: auto;
-      padding: 0 10px 16px;
-      z-index: 1001;
-      transform: translateX(100%);
-      transition: transform .28s ease;
-    }
-    .rail.open { transform: translateX(0); }
-    .rail.detail-mode {
-      top: 50%;
-      right: 50%;
-      width: 820px;
-      max-width: 92vw;
-      height: auto;
-      max-height: 88vh;
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      box-shadow: 0 18px 56px rgba(15, 23, 42, .28);
-      transform: translate(50%, calc(-50% + 24px));
-      opacity: 0;
-      visibility: hidden;
-      transition: transform .22s ease, opacity .22s ease, visibility .22s ease;
-    }
-    .rail.detail-mode.open {
-      transform: translate(50%, -50%);
-      opacity: 1;
-      visibility: visible;
-    }
-    .rail-hd {
-      position: sticky;
-      top: 0;
-      z-index: 2;
-      background: #fff;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 12px 4px 10px;
-      margin-bottom: 4px;
+    .detail-col { background: #fff; }
+    .detail-col .col-hd {
+      padding: 12px 14px 10px;
       border-bottom: 1px solid var(--border);
     }
-    .rail-hd h2 { font-size: 15px; font-weight: 700; }
-    .rail-close {
-      width: 28px; height: 28px;
-      border: 1px solid #d9e0ea;
-      border-radius: 4px;
-      background: #fff;
-      cursor: pointer;
-      font-size: 16px;
-      line-height: 1;
-      color: #64748b;
-    }
-    .rail-close:hover { color: #cf1322; border-color: #ffa39e; background: #fff1f0; }
-    .rail-sec {
-      background: #fafbfd;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 10px;
-      margin-bottom: 10px;
-    }
-    .rail-sec h3 {
-      font-size: 13px;
+    .detail-col .col-hd h3 {
+      margin: 0;
+      font-size: 14px;
       font-weight: 700;
-      margin-bottom: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
     }
-    .rail-sec h3 .cnt {
-      background: var(--danger-soft);
-      color: var(--danger);
+    .detail-col .col-hd p {
+      margin: 4px 0 0;
       font-size: 11px;
-      padding: 1px 8px;
-      border-radius: 10px;
+      color: var(--muted);
     }
-    .rail-sec h3 .cnt.g {
-      background: var(--ok-soft);
-      color: #389e0d;
+    .detail-body {
+      flex: 1;
+      overflow: auto;
+      padding: 12px 14px 16px;
     }
-    .alert-item {
-      background: #fff;
-      border: 1px solid #fecdd3;
-      border-left: 3px solid var(--danger);
-      border-radius: 6px;
-      padding: 8px 10px;
-      margin-bottom: 8px;
-    }
-    .alert-item.warn {
-      border-color: #ffd8a8;
-      border-left-color: var(--warn);
-    }
-    .alert-item .t { font-weight: 700; color: #9f1239; margin-bottom: 2px; }
-    .alert-item.warn .t { color: #b45309; }
-    .alert-item .d { font-size: 12px; color: #64748b; margin-bottom: 6px; }
-    .alert-item .act { display: flex; gap: 6px; }
-    .alert-item .act button {
-      height: 24px;
-      border-radius: 3px;
-      border: 1px solid #cbd5e1;
-      background: #fff;
-      padding: 0 8px;
-      font-size: 11px;
-      cursor: pointer;
-    }
-    .alert-item .act button.pri {
-      background: var(--danger);
-      border-color: var(--danger);
-      color: #fff;
-    }
-    .alert-item.warn .act button.pri {
-      background: var(--warn);
-      border-color: var(--warn);
-    }
-    .suggest {
-      background: #fff;
-      border: 1px solid #b7eb8f;
-      border-radius: 6px;
-      padding: 8px 10px;
-      margin-bottom: 8px;
-    }
-    .suggest .t { font-weight: 700; margin-bottom: 2px; }
-    .suggest .d { font-size: 12px; color: #64748b; }
-    .suggest .meta { font-size: 11px; color: #389e0d; margin: 4px 0 6px; }
-    .suggest button {
-      width: 100%;
-      height: 28px;
-      border: 1px solid #95de64;
-      background: var(--ok-soft);
-      color: #389e0d;
-      border-radius: 4px;
-      cursor: pointer;
+    .detail-empty {
+      color: var(--muted);
       font-size: 12px;
-      font-weight: 600;
+      line-height: 1.6;
+      padding: 24px 8px;
+      text-align: center;
     }
-    .timeline { list-style: none; }
-    .timeline li {
-      display: grid;
-      grid-template-columns: 42px 1fr;
-      gap: 8px;
-      padding: 6px 0;
-      border-bottom: 1px dashed #e8edf4;
-      font-size: 12px;
-    }
-    .timeline li:last-child { border-bottom: 0; }
-    .timeline .tm { color: var(--muted); }
-    .detail-summary {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px;
+    .part-summary {
       background: #f8fbff;
       border: 1px solid #d6e4ff;
       border-radius: 8px;
-      padding: 10px;
-      margin-bottom: 10px;
-      font-size: 12px;
-      color: #475569;
-    }
-    .detail-summary b {
-      display: block;
-      color: #1f2d3d;
-      font-size: 14px;
-      margin-bottom: 2px;
-    }
-    .warehouse-field-table {
-      width: 100%;
-      border-collapse: separate;
-      border-spacing: 0;
-      font-size: 12px;
-      background: #fff;
-      border: 1px solid #e8edf4;
-      border-radius: 8px;
-      overflow: hidden;
-    }
-    .warehouse-field-table th,
-    .warehouse-field-table td {
-      padding: 8px 10px;
-      border-bottom: 1px solid #eef2f7;
-      text-align: left;
-      vertical-align: top;
-      line-height: 1.45;
-    }
-    .warehouse-field-table th {
-      background: #f7f9fc;
-      color: #5a6b82;
-      font-weight: 600;
-      white-space: nowrap;
-    }
-    .warehouse-field-table tr:last-child td { border-bottom: 0; }
-    .warehouse-field-table .field-name {
-      width: 110px;
-      color: #1f2d3d;
-      font-weight: 600;
-      white-space: nowrap;
-    }
-    .warehouse-field-table .field-value {
-      width: 170px;
-      color: #1677ff;
-      font-weight: 600;
-    }
-    .warehouse-field-table .field-desc { color: #64748b; }
-
-    .map-note {
-      margin-top: 8px;
-      padding: 8px 10px;
-      background: #f8fafc;
-      border-radius: 6px;
-      font-size: 11px;
-      color: #64748b;
-      line-height: 1.55;
-    }
-    .map-note b { color: #334155; }
-
-    /* ===== 发起调拨申请弹窗 ===== */
-    #transferApplyMask .wh-modal-box {
-      width: min(980px, 100%);
-      max-height: min(92vh, 860px);
-    }
-    .xfer-sec {
-      background: #fafbfd;
-      border: 1px solid var(--border);
-      border-radius: 8px;
       padding: 10px 12px;
       margin-bottom: 10px;
     }
-    .xfer-sec:last-child { margin-bottom: 0; }
-    .xfer-sec-hd {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 8px;
-      margin-bottom: 8px;
-    }
-    .xfer-sec-hd h4 {
-      margin: 0;
-      font-size: 13px;
-      font-weight: 700;
+    .part-summary h4 {
+      margin: 0 0 6px;
+      font-size: 15px;
       color: #1f2d3d;
     }
-    .xfer-meta-grid,
-    .xfer-form-grid {
+    .part-summary p {
+      margin: 0;
+      font-size: 12px;
+      color: #64748b;
+      line-height: 1.55;
+    }
+    .detail-kpis {
       display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 8px 10px;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+      margin-bottom: 10px;
     }
-    .xfer-form-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-    .xfer-field label {
-      display: block;
-      font-size: 12px;
-      color: #516a87;
-      margin-bottom: 4px;
-    }
-    .xfer-field input,
-    .xfer-field select,
-    .xfer-field textarea {
-      width: 100%;
-      height: 32px;
-      border: 1px solid #d9d9d9;
+    .detail-kpi {
+      background: #fafbfd;
+      border: 1px solid var(--border);
       border-radius: 6px;
-      padding: 0 10px;
-      font-size: 12px;
-      box-sizing: border-box;
-      font-family: inherit;
-      color: #333;
-      background: #fff;
-    }
-    .xfer-field textarea {
-      height: 56px;
       padding: 8px 10px;
-      resize: vertical;
     }
-    .xfer-field input[readonly],
-    .xfer-field select:disabled {
-      background: #f5f7fa;
-      color: #5d738d;
-    }
-    .xfer-field.span2 { grid-column: span 2; }
-    .xfer-field.span3 { grid-column: span 3; }
-    .xfer-field.span4 { grid-column: span 4; }
-    .xfer-add-btn {
-      height: 28px;
-      padding: 0 10px;
-      border: 1px solid #91caff;
-      border-radius: 4px;
-      background: #e6f4ff;
-      color: #1677ff;
-      font-size: 12px;
-      cursor: pointer;
-    }
-    .xfer-table-wrap {
-      overflow: auto;
-      border: 1px solid #e8edf4;
-      border-radius: 6px;
-      background: #fff;
-      max-height: 220px;
-    }
-    .xfer-table {
-      width: max(100%, 1080px);
-      border-collapse: collapse;
-      font-size: 11px;
-      table-layout: fixed;
-    }
-    .xfer-table col.col-code { width: 82px; }
-    .xfer-table col.col-name { width: 72px; }
-    .xfer-table col.col-sn { width: 104px; }
-    .xfer-table col.col-model { width: 72px; }
-    .xfer-table col.col-machine { width: 118px; }
-    .xfer-table col.col-unit { width: 38px; }
-    .xfer-table col.col-avail { width: 58px; }
-    .xfer-table col.col-qty { width: 72px; }
-    .xfer-table col.col-loc { width: 150px; }
-    .xfer-table col.col-st { width: 58px; }
-    .xfer-table col.col-op { width: 46px; }
-    .xfer-table th,
-    .xfer-table td {
-      padding: 6px 6px;
-      border-bottom: 1px solid #eef2f7;
-      text-align: left;
-      vertical-align: top;
-      line-height: 1.4;
+    .detail-kpi .k { font-size: 10px; color: var(--muted); margin-bottom: 2px; }
+    .detail-kpi .v { font-size: 16px; font-weight: 700; color: #1f2d3d; }
+    .detail-kpi .v small { font-size: 11px; font-weight: 600; color: var(--muted); }
+    .spare-list {
+      border: 1px solid var(--border);
+      border-radius: 8px;
       overflow: hidden;
     }
-    .xfer-table th {
+    .spare-list-hd {
+      padding: 8px 10px;
       background: #f7f9fc;
-      color: #5a6b82;
-      font-weight: 600;
-      white-space: normal;
-      word-break: break-word;
+      border-bottom: 1px solid var(--border);
+      font-size: 12px;
+      font-weight: 700;
     }
-    .xfer-cell {
-      display: block;
-      max-width: 100%;
-      white-space: normal;
-      word-break: break-all;
-      overflow-wrap: anywhere;
-    }
-    .xfer-table .cell-center { text-align: center; }
-    .xfer-table .cell-center .xfer-cell { word-break: normal; }
-    .xfer-table tr:last-child td { border-bottom: 0; }
-    .xfer-table input[type="number"] {
-      width: 64px;
-      height: 28px;
-      border: 1px solid #d9d9d9;
-      border-radius: 4px;
-      padding: 0 6px;
+    .spare-item {
+      padding: 8px 10px;
+      border-bottom: 1px solid #eef2f7;
       font-size: 12px;
     }
-    .xfer-table .rm {
-      border: 0;
-      background: transparent;
-      color: #ff4d4f;
-      cursor: pointer;
-      font-size: 12px;
-      padding: 0;
+    .spare-item:last-child { border-bottom: 0; }
+    .spare-item b { color: #1f2d3d; }
+    .spare-item span { color: #64748b; display: block; margin-top: 2px; line-height: 1.4; }
+    .group-panel {
+      flex: 1;
+      padding: 20px 24px;
+      overflow: auto;
     }
-    .xfer-empty {
-      padding: 18px;
-      text-align: center;
-      color: #8c9bb0;
-      font-size: 12px;
+    .group-panel h2 {
+      margin: 0 0 6px;
+      font-size: 20px;
     }
-    .xfer-toast {
-      position: fixed;
-      top: 72px;
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 10030;
-      background: #fff;
-      border: 1px solid #91caff;
-      box-shadow: 0 8px 24px rgba(15, 23, 42, .12);
-      border-radius: 8px;
-      padding: 10px 16px;
+    .group-panel p {
+      margin: 0 0 16px;
+      color: var(--muted);
       font-size: 13px;
-      color: #1f2d3d;
-      display: none;
     }
-    .xfer-toast.show { display: block; }
+    .group-cards {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+      max-width: 920px;
+    }
+    .group-card {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px;
+      cursor: pointer;
+    }
+    .group-card:hover { border-color: #91caff; box-shadow: 0 4px 14px rgba(22,119,255,.08); }
+    .group-card b { display: block; font-size: 13px; margin-bottom: 6px; }
+    .group-card small { color: var(--muted); font-size: 11px; line-height: 1.4; }
 
     @media (max-width: 1280px) {
-      .shell { grid-template-columns: 220px minmax(0,1fr); }
-      .summary-band { grid-template-columns: 1fr; }
-      .kpi-row, .chart-row { grid-template-columns: 1fr 1fr; }
+      .ly-home { grid-template-columns: 180px auto minmax(0, 1fr) 260px; }
+      .group-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     }
   </style>
 </head>
@@ -1330,7 +405,7 @@
         <a class="header-logo" href="index-portal-screen-alt.html" aria-label="国家能源集团">
           <img src="assets/logo-chenergy.png" alt="国家能源集团 CHN ENERGY" width="220" height="40" />
         </a>
-        <div class="header-source-brand"><p>新能源供应链管理系统</p></div>
+        <div class="header-source-brand"><p>新能源物资供应链管理系统</p></div>
       </div>
       <div class="header-right">
         <span class="clock" id="clock"></span>
@@ -1360,1259 +435,362 @@
 
       <main class="main-scroll">
         <div class="ledger-page">
-  <div class="ledger-view-row" aria-label="生产物资库存管理视图">
-    <div class="page-view-switch" aria-label="生产物资库存管理视图切换">
-      <a class="on" href="prod-spare-inventory-ledger-0714.html"><i class="fa-solid fa-table-list"></i> 库存总览</a>
-      <a href="prod-spare-storage-0714.html"><i class="fa-solid fa-warehouse"></i> 仓库视图</a>
-    </div>
-  </div>
-  <div class="shell">
-    <!-- LEFT -->
-    <aside class="left">
-      <div class="org-pick">
-        <div class="side-page-title">生产物资库存管理</div>
-        <label>组织范围</label>
-        <div class="org-select">
-          <button type="button" class="org-select-btn" id="orgBtn">龙源电力（全部）</button>
-          <div class="org-dropdown" id="orgDropdown">
-            <div class="org-root open" id="orgRoot">
-              <div class="org-node group active" data-name="龙源电力" data-level="group"><span class="arrow"></span>龙源电力</div>
-              <div class="org-children">
-                <div class="org-company open">
-                  <div class="org-node l2" data-name="河北龙源" data-level="company"><span class="arrow"></span>河北龙源</div>
-                  <div class="org-stations">
-                    <div class="org-node l3" data-name="麒麟山风电场" data-level="station">麒麟山风电场</div>
-                    <div class="org-node l3" data-name="康保风电场" data-level="station">康保风电场</div>
-                  </div>
+          <div class="ledger-view-row" aria-label="生产物资库存管理视图">
+            <div class="page-view-switch" aria-label="生产物资库存管理视图切换">
+              <a class="on" href="prod-spare-inventory-ledger-0714.html"><i class="fa-solid fa-house"></i> 龙源电力首页</a>
+              <a href="prod-spare-storage-0714.html"><i class="fa-solid fa-warehouse"></i> 仓库视图</a>
+            </div>
+          </div>
+
+          <div class="ly-home" id="lyHome">
+            <aside class="ly-col org-col">
+              <div class="col-hd">
+                <h2>龙源电力</h2>
+                <p>选择项目公司查看风电场与风机备件</p>
+              </div>
+              <div class="org-tree" id="orgTree"></div>
+            </aside>
+
+            <aside class="ly-col station-col" id="stationCol">
+              <div class="col-hd">
+                <div>
+                  <span id="stationColTitle">风电场</span>
+                  <p id="stationColSub">请选择左侧项目公司</p>
                 </div>
-                <div class="org-company open">
-                  <div class="org-node l2" data-name="天津龙源" data-level="company"><span class="arrow"></span>天津龙源</div>
-                  <div class="org-stations">
-                    <div class="org-node l3" data-name="大神堂风电场" data-level="station">大神堂风电场</div>
-                  </div>
-                </div>
-                <div class="org-company open">
-                  <div class="org-node l2" data-name="蒙东龙源" data-level="company"><span class="arrow"></span>蒙东龙源</div>
-                  <div class="org-stations">
-                    <div class="org-node l3" data-name="齐心营风电场" data-level="station">齐心营风电场</div>
-                  </div>
-                </div>
-                <div class="org-company open">
-                  <div class="org-node l2" data-name="安徽龙源" data-level="company"><span class="arrow"></span>安徽龙源</div>
-                  <div class="org-stations">
-                    <div class="org-node l3" data-name="来安风电场" data-level="station">来安风电场</div>
-                  </div>
-                </div>
-                <div class="org-company open">
-                  <div class="org-node l2" data-name="海上龙源" data-level="company"><span class="arrow"></span>海上龙源</div>
-                  <div class="org-stations">
-                    <div class="org-node l3" data-name="射阳海上风电场" data-level="station">射阳海上风电场</div>
-                  </div>
+                <button type="button" class="station-toggle" id="btnStationToggle" title="展开/折叠风电场列">◀</button>
+              </div>
+              <div class="station-list" id="stationList"></div>
+            </aside>
+
+            <section class="ly-col turbine-col" id="turbineCol">
+              <div class="turbine-top">
+                <h3 id="turbineTitle">风机结构 · 备件关联视图</h3>
+                <div class="mat-bar" id="matBar"></div>
+              </div>
+              <div class="turbine-stage" id="turbineStage">
+                <div class="group-panel" id="groupPanel" style="display:none"></div>
+                <div class="turbine-img-wrap" id="turbineWrap">
+                  <img src="assets/wind-turbine-cutaway.png" alt="风机剖面结构图" />
                 </div>
               </div>
-            </div>
-          </div>
-        </div>
-      </div>
+            </section>
 
-      <div class="mat-hd">
-        <h3>物资类型</h3>
-      </div>
-      <div class="mat-search">
-        <input id="matKw" type="search" placeholder="搜索物资类型 / 产品名称" />
-      </div>
-      <div class="mat-tree" id="matTree"></div>
-    </aside>
-
-    <!-- CENTER -->
-    <div class="center">
-      <div class="page-hd actions-only">
-        <div class="ops">
-          <button class="btn warn-entry" type="button" id="btnOpenAlert">预警<span class="badge">6</span></button>
-          <button class="btn pri" type="button">查询</button>
-        </div>
-      </div>
-
-      <!-- KPI + 工厂描述列表（对齐关键部件台账） -->
-      <div class="summary-band">
-        <div class="kpi-row">
-          <div class="kpi">
-            <div class="title">库存总量 <span class="i" title="当前组织范围内在库生产物资件数（含备件）">i</span></div>
-            <div class="val">12,846<small>件</small></div>
-            <div class="trend down">较上月 ↓ 3.2%</div>
-            <div class="ice"></div>
+            <aside class="ly-col detail-col">
+              <div class="col-hd">
+                <h3 id="detailTitle">零部件详情</h3>
+                <p id="detailSub">点击风机结构图中的部位查看关联备件</p>
+              </div>
+              <div class="detail-body" id="detailBody">
+                <div class="detail-empty">请在中间风机结构图中选择一个部位，右侧将展示该部位关联的生产备件、库存数量与适用机型等信息。</div>
+              </div>
+            </aside>
           </div>
-          <div class="kpi">
-            <div class="title">库存金额 <span class="i" title="按含税采购成本估算">i</span></div>
-            <div class="val">8,652<small>万</small></div>
-            <div class="trend up">较上月 ↑ 1.8%</div>
-            <svg class="spark" viewBox="0 0 200 36" preserveAspectRatio="none">
-              <defs>
-                <linearGradient id="g1" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stop-color="#1677ff" stop-opacity=".35"/>
-                  <stop offset="100%" stop-color="#1677ff" stop-opacity="0"/>
-                </linearGradient>
-              </defs>
-              <path d="M0,28 L20,24 L40,26 L60,18 L80,20 L100,12 L120,16 L140,10 L160,14 L180,8 L200,11 L200,36 L0,36 Z" fill="url(#g1)"/>
-              <path d="M0,28 L20,24 L40,26 L60,18 L80,20 L100,12 L120,16 L140,10 L160,14 L180,8 L200,11" fill="none" stroke="#1677ff" stroke-width="2"/>
-            </svg>
-          </div>
-          <div class="kpi">
-            <div class="title">非正常状态物资 <span class="i" title="按物资状态统计借出、待检、返修和报废记录">i</span></div>
-            <div class="val" style="color:#f5222d">37<small>项</small></div>
-            <div class="trend up">较上期 ↑ 5 项</div>
-            <svg class="spark" viewBox="0 0 200 36" preserveAspectRatio="none">
-              <rect x="8" y="18" width="10" height="14" fill="#ffadd2"/>
-              <rect x="28" y="14" width="10" height="18" fill="#ff85c0"/>
-              <rect x="48" y="10" width="10" height="22" fill="#f759ab"/>
-              <rect x="68" y="16" width="10" height="16" fill="#ff85c0"/>
-              <rect x="88" y="8" width="10" height="24" fill="#eb2f96"/>
-              <rect x="108" y="12" width="10" height="20" fill="#f759ab"/>
-              <rect x="128" y="6" width="10" height="26" fill="#c41d7f"/>
-              <rect x="148" y="11" width="10" height="21" fill="#eb2f96"/>
-              <rect x="168" y="4" width="10" height="28" fill="#c41d7f"/>
-              <rect x="188" y="9" width="10" height="23" fill="#eb2f96"/>
-            </svg>
-          </div>
-          <div class="kpi">
-            <div class="title">质保临期批次 <span class="i" title="依据质保到期日统计未来90天内到期的生产批次">i</span></div>
-            <div class="val">18<small>批</small></div>
-            <div class="trend up">较上期 ↑ 3 批</div>
-            <div class="ice" style="clip-path: polygon(0 78%, 12% 60%, 24% 70%, 36% 48%, 48% 58%, 60% 36%, 72% 54%, 84% 42%, 100% 50%, 100% 100%, 0 100%);"></div>
-          </div>
-        </div>
-        <div class="factory-list" id="orgSummaryPanel">
-          <div class="factory-list-hd">
-            <span id="orgSummaryTitle">项目公司库存汇总</span>
-            <span class="cnt" id="orgSummaryCnt">共 0 项</span>
-          </div>
-          <div class="factory-list-body">
-            <table>
-              <colgroup>
-                <col style="width:38%" />
-                <col style="width:20%" />
-                <col style="width:16%" />
-                <col style="width:26%" />
-              </colgroup>
-              <thead>
-                <tr>
-                  <th id="orgColName">工厂描述</th>
-                  <th style="text-align:right">库存数量</th>
-                  <th style="text-align:right">占比</th>
-                  <th style="text-align:right">库存金额</th>
-                </tr>
-              </thead>
-              <tbody id="factoryListBody"></tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-
-      <!-- Charts -->
-      <div class="chart-row">
-        <div class="card">
-          <div class="card-hd">
-            <h3 id="distTitle">仓库物资记录分布</h3>
-            <div class="tabs">
-              <button type="button" class="on" data-mode="count">物资数</button>
-              <button type="button" data-mode="cost">总成本</button>
-            </div>
-          </div>
-          <div class="bar-chart" id="warehouseFieldBars">
-            <div class="col"><div class="bar" style="height:86%" data-v="368条" data-count="368条" data-count-height="86%" data-cost="2,168万" data-cost-height="82%"></div><div class="lab">中心主仓</div></div>
-            <div class="col"><div class="bar" style="height:68%" data-v="294条" data-count="294条" data-count-height="68%" data-cost="1,684万" data-cost-height="64%"></div><div class="lab">备件仓A</div></div>
-            <div class="col"><div class="bar" style="height:57%" data-v="246条" data-count="246条" data-count-height="57%" data-cost="1,526万" data-cost-height="58%"></div><div class="lab">场站周转仓</div></div>
-            <div class="col"><div class="bar" style="height:43%" data-v="186条" data-count="186条" data-count-height="43%" data-cost="1,248万" data-cost-height="47%"></div><div class="lab">共享仓</div></div>
-            <div class="col"><div class="bar" style="height:29%" data-v="124条" data-count="124条" data-count-height="29%" data-cost="1,122万" data-cost-height="42%"></div><div class="lab">近修备件仓</div></div>
-            <div class="col"><div class="bar" style="height:15%" data-v="66条" data-count="66条" data-count-height="15%" data-cost="904万" data-cost-height="34%"></div><div class="lab">待检仓</div></div>
-          </div>
-          <div class="field-source">Excel字段：仓库编码（分组）、总成本（金额）；物资数为明细记录计数</div>
-        </div>
-
-        <div class="card">
-          <div class="card-hd"><h3>库存状态占比</h3></div>
-          <div class="dist-body">
-            <div class="donut" style="position:relative;background:conic-gradient(#52c41a 0 78%,#1677ff 78% 88%,#fa8c16 88% 96%,#f5222d 96% 100%);">
-              <div class="donut-center"><b>1,284</b><span>条记录</span></div>
-            </div>
-            <div class="legend" id="typeLegend">
-              <div class="row"><span><i class="dot" style="background:#52c41a"></i>正常</span><b>78%</b></div>
-              <div class="row"><span><i class="dot" style="background:#1677ff"></i>借出</span><b>10%</b></div>
-              <div class="row"><span><i class="dot" style="background:#fa8c16"></i>待检/返修</span><b>8%</b></div>
-              <div class="row"><span><i class="dot" style="background:#f5222d"></i>报废</span><b>4%</b></div>
-            </div>
-          </div>
-          <div class="field-source">Excel字段：物资状态；按明细记录计数后计算占比</div>
-        </div>
-
-        <div class="card">
-          <div class="card-hd"><h3>质保到期分布</h3></div>
-          <div class="trend-body">
-            <div class="warranty-bars">
-              <div class="item danger"><span>90天内到期</span><div class="track"><i style="width:24%"></i></div><b>18批</b></div>
-              <div class="item warn"><span>3～6个月</span><div class="track"><i style="width:42%"></i></div><b>32批</b></div>
-              <div class="item"><span>6～12个月</span><div class="track"><i style="width:68%"></i></div><b>51批</b></div>
-              <div class="item"><span>12个月以上</span><div class="track"><i style="width:92%"></i></div><b>69批</b></div>
-            </div>
-            <div class="field-source">Excel字段：质保到期日、生产批次号；按批次计数</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Filters -->
-      <div class="filters">
-        <div class="filter-row">
-          <select id="periodSel">
-            <option>账期 2026-07</option>
-            <option>账期 2026-06</option>
-            <option>账期 2026-05</option>
-          </select>
-          <input id="kw" type="search" placeholder="产品名称 / 产品编码 / 场站" />
-          <select id="statusSel">
-            <option value="">库存状态：全部</option>
-            <option>正常</option>
-            <option>零库存</option>
-            <option>呆滞</option>
-          </select>
-        </div>
-      </div>
-
-      <!-- Detail table -->
-      <div class="table-wrap">
-        <div class="table-toolbar">
-          <div class="ops">
-            <button class="btn pri" type="button" id="btnQuery">查询</button>
-            <button class="btn ghost" type="button" id="btnReset">重置</button>
-            <button class="btn ok" type="button" id="btnImport">导入</button>
-            <button class="btn ghost" type="button" id="btnExport">导出 Excel</button>
-            <button class="btn ghost" type="button" id="btnPrint">打印台帐</button>
-            <button class="btn ghost" type="button" id="btnTransferApply">发起调拨申请</button>
-          </div>
-          <div class="meta">共 <b id="rowCount">0</b> 条 · 第 1/1 页</div>
-        </div>
-        <div class="table-scroll">
-          <table class="ledger-detail-table pd-table--wide">
-            <colgroup>
-              <col class="c-idx" />
-              <col class="c-date" />
-              <col class="c-date" />
-              <col class="c-factory" />
-              <col class="c-code" />
-              <col class="c-oem" />
-              <col class="c-name" />
-              <col class="c-type" />
-              <col class="c-model" />
-              <col class="c-machine" />
-              <col class="c-maker" />
-              <col class="c-unit" />
-              <col class="c-bin" />
-              <col class="c-qty" />
-              <col class="c-amt" />
-              <col class="c-st" />
-              <col class="c-op" />
-            </colgroup>
-            <thead>
-              <tr>
-                <th>序号</th>
-                <th>起始时间</th>
-                <th>终止时间</th>
-                <th>工厂描述</th>
-                <th>产品编码</th>
-                <th>设备出厂唯一编码</th>
-                <th>产品名称</th>
-                <th>物资类型</th>
-                <th>规格型号</th>
-                <th>适用机型</th>
-                <th>制造商</th>
-                <th>单位</th>
-                <th>五级库位编码</th>
-                <th>期末库存数量</th>
-                <th>期末库存金额</th>
-                <th>库存状态</th>
-                <th class="op">操作</th>
-              </tr>
-            </thead>
-            <tbody id="tbody"></tbody>
-          </table>
-        </div>
-        <div class="pager">
-          <span></span>
-          <span>上一页 · 1 · 下一页</span>
-        </div>
-      </div>
-    </div>
-
-  </div>
         </div>
       </main>
     </div>
   </div>
-
-  <!-- 预警抽屉：从右往左滑出，可 ✕ 关闭 -->
-  <div class="alert-mask" id="alertMask"></div>
-  <aside class="rail" id="alertDrawer" aria-hidden="true">
-    <div class="rail-hd">
-      <h2 id="drawerTitle">库存预警</h2>
-      <button type="button" class="rail-close" id="btnCloseAlert" aria-label="关闭">✕</button>
-    </div>
-    <div id="detailDrawerBody" style="display:none"></div>
-    <div id="alertDrawerBody">
-    <div class="rail-sec">
-      <h3>待处理预警 <span class="cnt" id="alertCnt">6</span></h3>
-      <div class="alert-item">
-        <div class="t">零库存 · 叶片密封套</div>
-        <div class="d">康保风电场 · 安全库存 8 · 在途 0 · 产品 B00000042</div>
-        <div class="act">
-          <button class="pri" type="button">立即调拨</button>
-          <button type="button">建采购单</button>
-        </div>
-      </div>
-      <div class="alert-item">
-        <div class="t">关键偏低 · IGBT 模块</div>
-        <div class="d">麒麟山风电场 · 可用 2 / 安全 6 · B00000018</div>
-        <div class="act">
-          <button class="pri" type="button">从射阳调入</button>
-          <button type="button">忽略今日</button>
-        </div>
-      </div>
-      <div class="alert-item warn">
-        <div class="t">呆滞超 180 天 · 刹车片</div>
-        <div class="d">来安风电场 · 24 件占压约 1.9 万 · B00000057</div>
-        <div class="act">
-          <button class="pri" type="button">发起调出</button>
-          <button type="button">标记核查</button>
-        </div>
-      </div>
-      <div class="alert-item warn">
-        <div class="t">超期在途 · 主轴轴承</div>
-        <div class="d">齐心营 · 采购单 CG-2026-031 · 预计延误 3 天</div>
-        <div class="act">
-          <button class="pri" type="button">催交</button>
-          <button type="button">改签</button>
-        </div>
-      </div>
-    </div>
-
-    <div class="rail-sec">
-      <h3>可调拨建议 <span class="cnt g">5</span></h3>
-      <div class="suggest">
-        <div class="t">射阳海上仓 → 康保</div>
-        <div class="d">叶片密封套 B00000042 · 建议调拨 4 件</div>
-        <div class="meta">匹配度 96% · 预计到场 2 天 · 可省紧急采购</div>
-        <button type="button">一键生成调拨单</button>
-      </div>
-      <div class="suggest">
-        <div class="t">张北共享仓 → 麒麟山</div>
-        <div class="d">IGBT 模块 B00000018 · 建议调拨 3 件</div>
-        <div class="meta">匹配度 93% · 陆运 1 天 · 可省 ¥18.6 万</div>
-        <button type="button">一键生成调拨单</button>
-      </div>
-      <div class="suggest">
-        <div class="t">来安 → 大神堂</div>
-        <div class="d">变桨电池组 B00000031 · 建议调拨 2 套</div>
-        <div class="meta">匹配度 88% · 消化呆滞库存</div>
-        <button type="button">一键生成调拨单</button>
-      </div>
-    </div>
-
-    <div class="rail-sec">
-      <h3>今日作业动态</h3>
-      <ul class="timeline">
-        <li><div class="tm">09:42</div><div>麒麟山仓完成滤芯入库 20 件</div></li>
-        <li><div class="tm">09:15</div><div>射阳→康保 IGBT 调拨单已提交</div></li>
-        <li><div class="tm">08:50</div><div>系统识别新增低库存预警 3 条</div></li>
-        <li><div class="tm">08:20</div><div>共享仓发布余量：断路器触头 10 件可借</div></li>
-      </ul>
-    </div>
-    </div>
-  </aside>
-
-  <!-- 发起调拨申请：居中弹窗 -->
-  <div class="wh-modal-mask" id="transferApplyMask" aria-hidden="true">
-    <div class="wh-modal-box" role="dialog" aria-modal="true" aria-labelledby="transferApplyTitle">
-      <div class="wh-modal-head">
-        <h3 class="wh-modal-title" id="transferApplyTitle">发起调拨申请</h3>
-        <button type="button" class="wh-modal-close" id="btnCloseTransferApply" aria-label="关闭">×</button>
-      </div>
-      <div class="wh-modal-body">
-        <div class="xfer-sec">
-          <div class="xfer-sec-hd"><h4>申请单信息</h4></div>
-          <div class="xfer-meta-grid">
-            <div class="xfer-field">
-              <label for="xferApplyNo">申请单号</label>
-              <input id="xferApplyNo" type="text" readonly />
-            </div>
-            <div class="xfer-field">
-              <label for="xferApplyDate">申请日期</label>
-              <input id="xferApplyDate" type="date" readonly />
-            </div>
-            <div class="xfer-field">
-              <label for="xferApplicant">申请人</label>
-              <input id="xferApplicant" type="text" value="张明" readonly />
-            </div>
-            <div class="xfer-field">
-              <label for="xferApplyOrg">所属组织</label>
-              <input id="xferApplyOrg" type="text" readonly />
-            </div>
-          </div>
-        </div>
-
-        <div class="xfer-sec">
-          <div class="xfer-sec-hd"><h4>调拨路径</h4></div>
-          <div class="xfer-form-grid">
-            <div class="xfer-field">
-              <label for="xferFromOrg">调出单位</label>
-              <select id="xferFromOrg"></select>
-            </div>
-            <div class="xfer-field">
-              <label for="xferFromWh">调出仓库</label>
-              <select id="xferFromWh"></select>
-            </div>
-            <div class="xfer-field">
-              <label for="xferFromLoc">五级库位编码</label>
-              <input id="xferFromLoc" type="text" readonly />
-            </div>
-            <div class="xfer-field">
-              <label for="xferToOrg">调入单位</label>
-              <select id="xferToOrg"></select>
-            </div>
-            <div class="xfer-field">
-              <label for="xferToWh">调入仓库</label>
-              <select id="xferToWh"></select>
-            </div>
-            <div class="xfer-field">
-              <label for="xferType">调拨类型</label>
-              <select id="xferType">
-                <option value="场站内调拨">场站内调拨</option>
-                <option value="跨场站调拨" selected>跨场站调拨</option>
-                <option value="跨公司调拨">跨公司调拨</option>
-                <option value="共享仓借调">共享仓借调</option>
-              </select>
-            </div>
-            <div class="xfer-field">
-              <label for="xferExpectDate">期望到货日期</label>
-              <input id="xferExpectDate" type="date" />
-            </div>
-            <div class="xfer-field">
-              <label for="xferReason">调拨原因</label>
-              <select id="xferReason">
-                <option value="低库存补货">低库存补货</option>
-                <option value="抢修需求">抢修需求</option>
-                <option value="呆滞消化">呆滞消化</option>
-                <option value="共享余量调配">共享余量调配</option>
-                <option value="其他">其他</option>
-              </select>
-            </div>
-            <div class="xfer-field">
-              <label for="xferUrgent">紧急程度</label>
-              <select id="xferUrgent">
-                <option value="普通">普通</option>
-                <option value="紧急">紧急</option>
-              </select>
-            </div>
-          </div>
-        </div>
-
-        <div class="xfer-sec">
-          <div class="xfer-sec-hd">
-            <h4>调拨明细</h4>
-            <button type="button" class="xfer-add-btn" id="btnXferAddLine">+ 添加物资</button>
-          </div>
-          <div class="xfer-table-wrap">
-            <table class="xfer-table">
-              <colgroup>
-                <col class="col-code" />
-                <col class="col-name" />
-                <col class="col-sn" />
-                <col class="col-model" />
-                <col class="col-machine" />
-                <col class="col-unit" />
-                <col class="col-avail" />
-                <col class="col-qty" />
-                <col class="col-loc" />
-                <col class="col-st" />
-                <col class="col-op" />
-              </colgroup>
-              <thead>
-                <tr>
-                  <th>产品编码</th>
-                  <th>产品名称</th>
-                  <th>设备出厂唯一编码</th>
-                  <th>规格型号</th>
-                  <th>适用机型</th>
-                  <th>单位</th>
-                  <th>可调出数量</th>
-                  <th>申请调拨数量</th>
-                  <th>五级库位编码</th>
-                  <th>库存状态</th>
-                  <th>操作</th>
-                </tr>
-              </thead>
-              <tbody id="xferLineBody"></tbody>
-            </table>
-            <div class="xfer-empty" id="xferEmptyTip" style="display:none">当前无可调拨物资，请先添加或调整筛选条件。</div>
-          </div>
-        </div>
-
-        <div class="xfer-sec">
-          <div class="xfer-form-grid">
-            <div class="xfer-field span3">
-              <label for="xferRemark">备注</label>
-              <textarea id="xferRemark" placeholder="如：康保 3 号风机 IGBT 抢修，需 48 小时内到场"></textarea>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="wh-modal-foot">
-        <button type="button" class="wh-btn wh-btn--ghost" id="btnCancelTransferApply">取消</button>
-        <button type="button" class="wh-btn wh-btn--ghost" id="btnDraftTransferApply">保存草稿</button>
-        <button type="button" class="wh-btn wh-btn--primary" id="btnSubmitTransferApply">提交申请</button>
-      </div>
-    </div>
-  </div>
-  <div class="xfer-toast" id="xferToast"></div>
 
   <script src="js/sidebar-actions.js"></script>
   <script src="js/subpage-feature-title.js"></script>
   <script src="js/site-footer.js"></script>
   <script src="js/subpage-clock.js"></script>
   <script>
-    /* 物资类型 → 产品（名称+数量），编码对齐本系统 B+8位 */
-    var MAT_TREE = [
-      {
-        type: "叶片", cnt: 1286,
-        products: [
-          { name: "叶片", code: "B00000005", model: "SW64-2.0", cnt: 420 },
-          { name: "备用叶片", code: "B00000018", model: "SW70-3.0", cnt: 186 },
-          { name: "叶片密封套", code: "B00000042", model: "YM-TF-01", cnt: 680 }
-        ]
-      },
-      {
-        type: "齿轮箱", cnt: 980,
-        products: [
-          { name: "齿轮箱", code: "B00000012", model: "GW-GX-3.2MW", cnt: 56 },
-          { name: "齿轮箱滤芯", code: "B00001235", model: "GX-LX-90", cnt: 624 },
-          { name: "润滑油滤网", code: "B00001237", model: "LY-50", cnt: 300 }
-        ]
-      },
-      {
-        type: "变桨", cnt: 860,
-        products: [
-          { name: "变桨轴承", code: "B00001234", model: "BP-2.0MW", cnt: 48 },
-          { name: "变桨电池组", code: "B00000031", model: "BP-BAT-48V", cnt: 212 },
-          { name: "变桨密封圈", code: "B00000033", model: "BP-MF-20", cnt: 600 }
-        ]
-      },
-      {
-        type: "偏航", cnt: 620,
-        products: [
-          { name: "偏航电机", code: "B00002119", model: "PY-DJ-55", cnt: 72 },
-          { name: "偏航减速机", code: "B00000028", model: "PY-JS-3.0", cnt: 548 }
-        ]
-      },
-      {
-        type: "主轴", cnt: 410,
-        products: [
-          { name: "主轴轴承", code: "B00000016", model: "BR-120", cnt: 94 },
-          { name: "主轴温度传感器", code: "B00000045", model: "PT100", cnt: 316 }
-        ]
-      },
-      {
-        type: "电机 / 变流", cnt: 740,
-        products: [
-          { name: "变频器模块", code: "B00001888", model: "VF-800", cnt: 120 },
-          { name: "IGBT 模块", code: "B00000018", model: "FF450R", cnt: 210 },
-          { name: "逆变器风扇", code: "B00000051", model: "INV-FAN-120", cnt: 410 }
-        ]
-      },
-      {
-        type: "液压", cnt: 520,
-        products: [
-          { name: "液压站密封包", code: "B00003102", model: "YY-MFB-6", cnt: 286 },
-          { name: "液压泵", code: "B00000055", model: "YY-B-80", cnt: 234 }
-        ]
-      },
-      {
-        type: "滤芯 / 传感器", cnt: 1180,
-        products: [
-          { name: "塔筒振动传感器", code: "B00001236", model: "TS-300", cnt: 380 },
-          { name: "空气滤芯", code: "B00000060", model: "AF-200", cnt: 800 }
-        ]
-      }
+    var ORG_DATA = [
+      { key: "山西龙源", name: "山西龙源", stations: [
+        { name: "雁门关风电场", units: "12台", status: "10台运行 · 2台检修" },
+        { name: "右玉风电场", units: "8台", status: "7台运行 · 1台备用" },
+        { name: "神池风电场", units: "6台", status: "6台运行" },
+        { name: "平鲁风电场", units: "10台", status: "9台运行 · 1台检修" }
+      ]},
+      { key: "河北龙源", name: "河北龙源", stations: [
+        { name: "麒麟山风电场", units: "18台", status: "16台运行 · 2台检修" },
+        { name: "康保风电场", units: "14台", status: "13台运行 · 1台备用" }
+      ]},
+      { key: "天津龙源", name: "天津龙源", stations: [
+        { name: "大神堂风电场", units: "16台", status: "15台运行 · 1台检修" }
+      ]},
+      { key: "蒙东龙源", name: "蒙东龙源", stations: [
+        { name: "齐心营风电场", units: "11台", status: "10台运行 · 1台备用" }
+      ]},
+      { key: "安徽龙源", name: "安徽龙源", stations: [
+        { name: "来安风电场", units: "9台", status: "8台运行 · 1台检修" }
+      ]},
+      { key: "海上龙源", name: "海上龙源", stations: [
+        { name: "射阳海上风电场", units: "20台", status: "18台运行 · 2台检修" }
+      ]}
     ];
 
-    var ROWS = [
-      { start: "2026-07-01", end: "2026-07-31", company: "河北龙源风电有限公司", loc: "麒麟山风电场 / 备件仓A", code: "B00000005", name: "叶片", type: "叶片", model: "SW64-2.0", qty: 12, amount: 1080000, safe: 6, status: "正常" },
-      { start: "2026-07-01", end: "2026-07-31", company: "河北龙源风电有限公司", loc: "康保风电场 / 主仓", code: "B00000042", name: "叶片密封套", type: "叶片", model: "YM-TF-01", qty: 0, amount: 0, safe: 8, status: "零库存" },
-      { start: "2026-07-01", end: "2026-07-31", company: "河北龙源风电有限公司", loc: "麒麟山风电场 / 电控区", code: "B00000018", name: "IGBT 模块", type: "电机 / 变流", model: "FF450R", qty: 2, amount: 372000, safe: 6, status: "正常" },
-      { start: "2026-07-01", end: "2026-07-31", company: "天津龙源电力有限公司", loc: "大神堂风电场 / 机械仓", code: "B00001234", name: "变桨轴承", type: "变桨", model: "BP-2.0MW", qty: 4, amount: 2720000, safe: 2, status: "正常" },
-      { start: "2026-07-01", end: "2026-07-31", company: "蒙东龙源新能源有限公司", loc: "齐心营风电场 / 主仓", code: "B00000016", name: "主轴轴承", type: "主轴", model: "BR-120", qty: 6, amount: 780000, safe: 4, status: "正常" },
-      { start: "2026-07-01", end: "2026-07-31", company: "龙源（来安）新能源有限公司", loc: "来安风电场 / 备件区", code: "B00000057", name: "刹车片", type: "液压", model: "BK-200", qty: 24, amount: 19200, safe: 10, status: "呆滞" },
-      { start: "2026-07-01", end: "2026-07-31", company: "龙源（来安）新能源有限公司", loc: "来安风电场 / 电控仓", code: "B00000031", name: "变桨电池组", type: "变桨", model: "BP-BAT-48V", qty: 18, amount: 216000, safe: 8, status: "正常" },
-      { start: "2026-07-01", end: "2026-07-31", company: "海上龙源风力发电有限公司", loc: "射阳海上风电场 / 共享仓", code: "B00001235", name: "齿轮箱滤芯", type: "齿轮箱", model: "GX-LX-90", qty: 86, amount: 619200, safe: 40, status: "正常" },
-      { start: "2026-07-01", end: "2026-07-31", company: "河北龙源风电有限公司", loc: "麒麟山风电场 / 备件仓B", code: "B00002119", name: "偏航电机", type: "偏航", model: "PY-DJ-55", qty: 3, amount: 1560000, safe: 2, status: "正常" },
-      { start: "2026-07-01", end: "2026-07-31", company: "蒙东龙源新能源有限公司", loc: "齐心营风电场 / 电控柜", code: "B00001888", name: "变频器模块", type: "电机 / 变流", model: "VF-800", qty: 1, amount: 122500, safe: 3, status: "正常" },
-      { start: "2026-07-01", end: "2026-07-31", company: "天津龙源电力有限公司", loc: "大神堂风电场 / 传感器柜", code: "B00001236", name: "塔筒振动传感器", type: "滤芯 / 传感器", model: "TS-300", qty: 15, amount: 3150000, safe: 8, status: "正常" },
-      { start: "2026-07-01", end: "2026-07-31", company: "海上龙源风力发电有限公司", loc: "射阳海上风电场 / 共享仓", code: "B00000051", name: "逆变器风扇", type: "电机 / 变流", model: "INV-FAN-120", qty: 48, amount: 96000, safe: 20, status: "正常" }
+    var MAT_TYPES = ["全部", "叶片", "齿轮箱", "变桨", "偏航", "主轴", "电机/变流", "液压", "滤芯/传感器"];
+
+    var TURBINE_PARTS = [
+      { id: "blade", name: "叶片", type: "叶片", left: "4%", top: "58%", width: "22%", height: "28%",
+        desc: "捕获风能的核心部件，包含主叶片、叶根连接件及密封辅材。",
+        spares: [
+          { code: "B00000005", name: "叶片", qty: 12, model: "SW64-2.0", status: "正常" },
+          { code: "B00000042", name: "叶片密封套", qty: 0, model: "YM-TF-01", status: "零库存" }
+        ]},
+      { id: "hub-cover", name: "轮毂外罩", type: "叶片", left: "24%", top: "52%", width: "10%", height: "12%",
+        desc: "保护轮毂总成的外罩结构，含连接紧固件与防腐涂层辅材。",
+        spares: [
+          { code: "B00000033", name: "轮毂外罩密封圈", qty: 6, model: "HB-MF-20", status: "正常" }
+        ]},
+      { id: "hub", name: "轮毂", type: "主轴", left: "28%", top: "44%", width: "12%", height: "14%",
+        desc: "连接叶片与主轴的总成，承担变桨与载荷传递。",
+        spares: [
+          { code: "B00000016", name: "主轴轴承", qty: 6, model: "BR-120", status: "正常" },
+          { code: "B00001234", name: "变桨轴承", qty: 4, model: "BP-2.0MW", status: "正常" }
+        ]},
+      { id: "front-rotor", name: "前盘式转子", type: "电机/变流", left: "36%", top: "36%", width: "10%", height: "16%",
+        desc: "直驱/半直驱机组永磁发电机前盘转子，含永磁体与磁极组件。",
+        spares: [
+          { code: "B00000018", name: "IGBT 模块", qty: 2, model: "FF450R", status: "正常" },
+          { code: "B00001888", name: "变频器模块", qty: 1, model: "VF-800", status: "正常" }
+        ]},
+      { id: "stator", name: "中间定子", type: "电机/变流", left: "44%", top: "34%", width: "10%", height: "18%",
+        desc: "发电机定子铁芯与绕组总成，负责电磁转换。",
+        spares: [
+          { code: "B00000051", name: "逆变器风扇", qty: 48, model: "INV-FAN-120", status: "正常" },
+          { code: "B00001236", name: "塔筒振动传感器", qty: 15, model: "TS-300", status: "正常" }
+        ]},
+      { id: "rear-rotor", name: "后盘式转子", type: "电机/变流", left: "52%", top: "36%", width: "10%", height: "16%",
+        desc: "发电机后盘转子组件，与前盘转子共同构成盘式永磁结构。",
+        spares: [
+          { code: "B00000018", name: "IGBT 模块", qty: 2, model: "FF450R", status: "正常" }
+        ]},
+      { id: "cabinet", name: "电器柜", type: "电机/变流", left: "58%", top: "28%", width: "14%", height: "18%",
+        desc: "机舱内变流、控制、保护与通信设备集成柜体。",
+        spares: [
+          { code: "B00001888", name: "变频器模块", qty: 1, model: "VF-800", status: "正常" },
+          { code: "B00002119", name: "偏航电机", qty: 3, model: "PY-DJ-55", status: "正常" }
+        ]},
+      { id: "nacelle", name: "机舱", type: "偏航", left: "34%", top: "22%", width: "38%", height: "22%",
+        desc: "承载发电机、变桨、偏航、冷却及监测系统的核心舱体。",
+        spares: [
+          { code: "B00002119", name: "偏航电机", qty: 3, model: "PY-DJ-55", status: "正常" },
+          { code: "B00000028", name: "偏航减速机", qty: 2, model: "PY-JS-3.0", status: "正常" }
+        ]},
+      { id: "tower", name: "塔架", type: "滤芯/传感器", left: "42%", top: "62%", width: "16%", height: "30%",
+        desc: "支撑机舱与叶片的基础结构，含塔筒监测与内部辅材。",
+        spares: [
+          { code: "B00001236", name: "塔筒振动传感器", qty: 15, model: "TS-300", status: "正常" },
+          { code: "B00001235", name: "齿轮箱滤芯", qty: 86, model: "GX-LX-90", status: "正常" }
+        ]},
+      { id: "gearbox", name: "齿轮箱", type: "齿轮箱", left: "46%", top: "42%", width: "12%", height: "14%",
+        desc: "双馈/增速机型传动链核心部件，关联润滑油回路与滤芯。",
+        spares: [
+          { code: "B00001235", name: "齿轮箱滤芯", qty: 86, model: "GX-LX-90", status: "正常" },
+          { code: "B00000055", name: "液压泵", qty: 4, model: "YY-B-80", status: "正常" }
+        ]}
     ];
 
     var state = {
-      org: "龙源电力",
-      orgLevel: "group",
-      type: "",
-      product: "",
-      kw: ""
+      level: "group",
+      company: "",
+      station: "",
+      partId: "",
+      matType: "全部",
+      stationCollapsed: false
     };
 
-    function factoryUniqueCode(r) {
-      return "SN-" + r.model.replace(/[^A-Za-z0-9]/g, "").toUpperCase() + "-" + r.code.slice(-4);
-    }
-    function applicableModel() { return "金风 GW150 / 联合动力 UP2000"; }
-    function manufacturer() { return "东方电气风电股份有限公司"; }
-    function stockUnit() { return "件"; }
-    function fiveLevelLocation(r) { return r.loc + " / A-03-02-08"; }
+    var orgTreeEl = document.getElementById("orgTree");
+    var stationCol = document.getElementById("stationCol");
+    var stationListEl = document.getElementById("stationList");
+    var lyHome = document.getElementById("lyHome");
+    var groupPanel = document.getElementById("groupPanel");
+    var turbineWrap = document.getElementById("turbineWrap");
+    var detailBody = document.getElementById("detailBody");
+    var detailTitle = document.getElementById("detailTitle");
+    var detailSub = document.getElementById("detailSub");
+    var turbineTitle = document.getElementById("turbineTitle");
 
-    var WAREHOUSE_DETAIL_FIELDS = [
-      { name: "产品编码", desc: "系统产品编码", rule: "一物一码，检索核心，不可重复", value: function (r) { return r.code; } },
-      { name: "设备出厂唯一编码", desc: "设备出厂时生成的唯一识别编码", rule: "与本系统设备档案一一对应，不可重复", value: factoryUniqueCode },
-      { name: "产品名称", desc: "备件全称", rule: "如：风机 IGBT 模块、储能高压熔断器", value: function (r) { return r.name; } },
-      { name: "规格型号", desc: "完整参数规格", rule: "功率、电压、适配机组型号（风机 / 逆变器型号）", value: function (r) { return r.model; } },
-      { name: "物资类型", desc: "分类", rule: "风电备件 / 光伏备件 / 储能备件 / 工具辅材 / 其他", value: function (r) { return r.type; } },
-      { name: "适用机型", desc: "适配机型", rule: "", value: applicableModel },
-      { name: "安装位置", desc: "", rule: "", value: function (r) { return r.type + "系统"; } },
-      { name: "制造商", desc: "", rule: "", value: manufacturer },
-      { name: "供应商", desc: "", rule: "", value: "国能供应链华北分公司" },
-      { name: "单位", desc: "计量单位", rule: "件、套、卷、箱、kg", value: stockUnit },
-      { name: "采购单价", desc: "单品不含税单价", rule: "财务成本核算、库存价值统计", value: function (r) { return "¥" + money(Math.round((r.amount || 0) / Math.max(r.qty || 1, 1))); } },
-      { name: "期末库存数量", desc: "当前账期末库存数量", rule: "按产品与库位汇总", value: function (r) { return r.qty + " " + stockUnit(); } },
-      { name: "期末库存金额", desc: "当前账期末库存金额", rule: "采购单价 × 期末库存数量", value: function (r) { return "¥" + money(r.amount); } },
-      { name: "生产批次号", desc: "厂家批次", rule: "储能电池、电子件强制记录，追溯质保", value: function (r) { return "LOT-" + r.start.replace(/-/g, "") + "-" + r.code.slice(-3); } },
-      { name: "生产日期", desc: "备件出厂日期", rule: "用于临期预警", value: "2026-03-18" },
-      { name: "质保到期日", desc: "质保截止时间", rule: "系统自动计算，搜索列表标红临期物资", value: "2028-03-17" },
-      { name: "五级库位编码", desc: "存放完整位置编码", rule: "格式：仓库 - 库区 - 货架 - 层 - 库位，上架后绑定", value: fiveLevelLocation },
-      { name: "仓库编码", desc: "一级层级", rule: "放到某个仓库", value: function (r) { return r.loc.split("/")[1] ? r.loc.split("/")[1].trim() : "主仓"; } },
-      { name: "库区编码", desc: "二级层级", rule: "风电区 / 储能区 / 返修区 / 报废暂存区", value: function (r) { return r.type + "区"; } },
-      { name: "货架编码", desc: "三级层级", rule: "库区下货架编号", value: "HJ-A03" },
-      { name: "层数", desc: "四级层级", rule: "货架 1/2/3 层", value: "2层" },
-      { name: "库位编号", desc: "五级最小单元", rule: "最小存放位置，一个库位仅存同一种备件", value: "KW-08" },
-      { name: "库位二维码", desc: "库位条码内容", rule: "PDA 扫码上架、盘点使用", value: "QR-KW-A03-02-08" },
-      { name: "物资条码 / 二维码", desc: "备件实物条码", rule: "单件备件扫码识别物资档案", value: function (r) { return "QR-" + r.code + "-0001"; } },
-      { name: "库存状态", desc: "库存属性", rule: "正常 / 借出 / 报废，用于后续展示状态", value: function (r) { return r.status; } },
-      { name: "备注", desc: "单行备件说明", rule: "如：抢修备用件、外包装破损、单独存放防潮", value: "抢修备用件，按仓储字段表补充展示" },
-      { name: "附件", desc: "上传照片等附件信息", rule: "", value: "实物照片 2 张 / 质保文件 1 份" }
-    ];
-
-    /* 组织库存汇总：集团→项目公司；项目公司→风电场（对齐讨论 + 关键部件台账工厂清单） */
-    var ORG_PIE_COLORS = ["#1677ff", "#36cfc9", "#95de64", "#ffc53d", "#ff85c0", "#9254de", "#69b1ff"];
-    var ORG_SUMMARY = {
-      group: [
-        { key: "河北龙源", name: "河北龙源风电有限公司", qty: 3210, amount: 21680000 },
-        { key: "蒙东龙源", name: "蒙东龙源新能源有限公司", qty: 2540, amount: 16840000 },
-        { key: "天津龙源", name: "天津龙源电力有限公司", qty: 2180, amount: 15260000 },
-        { key: "安徽龙源", name: "龙源（来安）新能源有限公司", qty: 1920, amount: 12480000 },
-        { key: "海上龙源", name: "海上龙源风力发电有限公司", qty: 1560, amount: 11220000 },
-        { key: "其他", name: "其他项目公司合计", qty: 1436, amount: 9040000 }
-      ],
-      company: {
-        "河北龙源": [
-          { key: "麒麟山风电场", name: "麒麟山风电场", qty: 1850, amount: 12860000 },
-          { key: "康保风电场", name: "康保风电场", qty: 1360, amount: 8820000 }
-        ],
-        "天津龙源": [
-          { key: "大神堂风电场", name: "大神堂风电场", qty: 2180, amount: 15260000 }
-        ],
-        "蒙东龙源": [
-          { key: "齐心营风电场", name: "齐心营风电场", qty: 2540, amount: 16840000 }
-        ],
-        "安徽龙源": [
-          { key: "来安风电场", name: "来安风电场", qty: 1920, amount: 12480000 }
-        ],
-        "海上龙源": [
-          { key: "射阳海上风电场", name: "射阳海上风电场", qty: 1560, amount: 11220000 }
-        ]
-      }
-    };
-
-    function money(n) {
-      return n.toLocaleString("zh-CN", { minimumFractionDigits: 0, maximumFractionDigits: 0 });
-    }
-
-    function moneyWan(n) {
-      if (n >= 10000) return (n / 10000).toFixed(n >= 100000 ? 0 : 1) + "万";
-      return money(n);
-    }
-
-    function getOrgRows() {
-      var org = state.org;
-      if (org === "龙源电力") {
-        return { title: "项目公司库存汇总", col: "工厂描述", level: "company", rows: ORG_SUMMARY.group.slice() };
-      }
-      if (ORG_SUMMARY.company[org]) {
-        return { title: org + " · 下场站库存", col: "场站", level: "station", rows: ORG_SUMMARY.company[org].slice() };
-      }
-      /* 选到具体场站：只展示当前场站一行 */
-      var found = null;
-      Object.keys(ORG_SUMMARY.company).forEach(function (ck) {
-        ORG_SUMMARY.company[ck].forEach(function (s) {
-          if (s.key === org) found = s;
-        });
+    function renderOrgTree() {
+      var html = '<div class="group-wrap open">' +
+        '<div class="node l1 on" data-level="group" data-key="龙源电力"><span class="arrow"></span>龙源电力</div>' +
+        '<div class="children">';
+      ORG_DATA.forEach(function (c) {
+        var active = state.level === "company" && state.company === c.key ? " on" : "";
+        html += '<div class="node l2' + active + '" data-level="company" data-key="' + c.key + '">' + c.name + '</div>';
       });
-      if (found) {
-        return { title: "当前场站库存", col: "场站", level: "station", rows: [found] };
-      }
-      return { title: "项目公司库存汇总", col: "工厂描述", level: "company", rows: ORG_SUMMARY.group.slice() };
+      html += '</div></div>';
+      orgTreeEl.innerHTML = html;
     }
 
-    function renderOrgSummary() {
-      var meta = getOrgRows();
-      var rows = meta.rows;
-      var totalQty = rows.reduce(function (s, r) { return s + r.qty; }, 0) || 1;
-      var titleEl = document.getElementById("orgSummaryTitle");
-      var cntEl = document.getElementById("orgSummaryCnt");
-      var colEl = document.getElementById("orgColName");
-      var body = document.getElementById("factoryListBody");
-      if (titleEl) titleEl.textContent = meta.title;
-      if (cntEl) cntEl.textContent = "共 " + rows.length + " 项";
-      if (colEl) colEl.textContent = meta.col;
-
-      var html = "";
-      rows.forEach(function (r, i) {
-        var pct = ((r.qty / totalQty) * 100);
-        var active = state.org === r.key ? " is-active" : "";
-        html += '<tr class="' + active.trim() + '" data-org="' + r.key + '" data-level="' + meta.level + '">' +
-          "<td title=\"" + r.name + "\">" + r.name +
-          '<span class="bar-mini"><i style="width:' + pct.toFixed(1) + "%;background:" + ORG_PIE_COLORS[i % ORG_PIE_COLORS.length] + '"></i></span></td>' +
-          '<td class="num">' + money(r.qty) + "</td>" +
-          '<td class="pct">' + pct.toFixed(1) + "%</td>" +
-          '<td class="num">' + moneyWan(r.amount) + "</td>" +
-          "</tr>";
-      });
-      if (body) body.innerHTML = html || '<tr><td colspan="4" style="text-align:center;color:#8c9bb0;padding:16px">暂无汇总数据</td></tr>';
+    function companyData(key) {
+      return ORG_DATA.filter(function (c) { return c.key === key; })[0];
     }
 
-    function statusTag(s) {
-      if (s === "正常") return '<span class="tag-pill ok">正常</span>';
-      if (s === "零库存") return '<span class="tag-pill danger">' + s + '</span>';
-      return '<span class="tag-pill warn">' + s + '</span>';
-    }
-
-    function renderTree() {
-      var kw = (document.getElementById("matKw").value || "").trim();
-      var html = "";
-      MAT_TREE.forEach(function (t, idx) {
-        var matchedProds = t.products.filter(function (p) {
-          if (!kw) return true;
-          return (t.type + p.name + p.code).indexOf(kw) >= 0;
-        });
-        if (kw && !matchedProds.length && t.type.indexOf(kw) < 0) return;
-        var prods = kw ? matchedProds : t.products;
-        var open = state.type === t.type || (!!kw && matchedProds.length);
-        var active = state.type === t.type && !state.product;
-        html += '<div class="type-item' + (open ? " open" : "") + (active ? " active" : "") + '" data-type="' + t.type + '">';
-        html += '<div class="type-row"><span class="name"><span class="caret">▶</span>' + t.type + '</span><span class="cnt">(' + t.cnt + ')</span></div>';
-        html += '<div class="prod-list">';
-        prods.forEach(function (p) {
-          var pa = state.product === p.code;
-          html += '<div class="prod-item' + (pa ? " active" : "") + '" data-type="' + t.type + '" data-code="' + p.code + '" data-name="' + p.name + '">';
-          html += '<span>' + p.name + '</span><span class="pcnt">(' + p.cnt + ')</span></div>';
-        });
-        html += "</div></div>";
-      });
-      document.getElementById("matTree").innerHTML = html || '<div style="padding:12px;color:#8c9bb0">无匹配物资类型</div>';
-    }
-
-    function filteredRows() {
-      return ROWS.filter(function (r) {
-        if (state.type && r.type !== state.type) return false;
-        if (state.product && r.code !== state.product) return false;
-        if (state.org && state.org !== "龙源电力") {
-          if (r.company.indexOf(state.org.replace("龙源", "")) < 0 && r.company.indexOf(state.org) < 0 && r.loc.indexOf(state.org) < 0) {
-            // soft match by company / station keywords
-            var key = state.org;
-            if (r.company.indexOf(key) < 0 && r.loc.indexOf(key) < 0) {
-              // allow partial regional names
-              if (!(key.indexOf("河北") >= 0 && r.company.indexOf("河北") >= 0) &&
-                  !(key.indexOf("天津") >= 0 && r.company.indexOf("天津") >= 0) &&
-                  !(key.indexOf("蒙东") >= 0 && r.company.indexOf("蒙东") >= 0) &&
-                  !(key.indexOf("来安") >= 0 && r.company.indexOf("来安") >= 0) &&
-                  !(key.indexOf("海上") >= 0 && r.company.indexOf("海上") >= 0) &&
-                  !(key.indexOf("麒麟山") >= 0 && r.loc.indexOf("麒麟山") >= 0) &&
-                  !(key.indexOf("康保") >= 0 && r.loc.indexOf("康保") >= 0) &&
-                  !(key.indexOf("大神堂") >= 0 && r.loc.indexOf("大神堂") >= 0) &&
-                  !(key.indexOf("齐心营") >= 0 && r.loc.indexOf("齐心营") >= 0) &&
-                  !(key.indexOf("射阳") >= 0 && r.loc.indexOf("射阳") >= 0)) {
-                return false;
-              }
-            }
-          }
-        }
-        var kw = state.kw;
-        if (kw) {
-          var blob = r.company + r.loc + r.code + r.name + r.type + r.model;
-          if (blob.indexOf(kw) < 0) return false;
-        }
-        var st = document.getElementById("statusSel").value;
-        if (st && r.status !== st) return false;
-        return true;
-      });
-    }
-
-    function rowOps(r) {
-      return '<td class="op"><a href="#" data-op="详情" data-code="' + r.code + '">详情</a></td>';
-    }
-
-    function renderTable() {
-      var rows = filteredRows();
-      document.getElementById("rowCount").textContent = String(rows.length);
-      var html = "";
-      rows.forEach(function (r, i) {
-        html += "<tr>" +
-          "<td>" + (i + 1) + "</td>" +
-          "<td>" + r.start + "</td>" +
-          "<td>" + r.end + "</td>" +
-          "<td>" + r.company + "</td>" +
-          '<td class="code">' + r.code + "</td>" +
-          "<td>" + factoryUniqueCode(r) + "</td>" +
-          "<td>" + r.name + "</td>" +
-          "<td>" + r.type + "</td>" +
-          "<td>" + r.model + "</td>" +
-          "<td>" + applicableModel(r) + "</td>" +
-          "<td>" + manufacturer(r) + "</td>" +
-          "<td>" + stockUnit(r) + "</td>" +
-          "<td>" + fiveLevelLocation(r) + "</td>" +
-          '<td class="num">' + r.qty + "</td>" +
-          '<td class="num">' + money(r.amount) + "</td>" +
-          "<td>" + statusTag(r.status) + "</td>" +
-          rowOps(r) +
-          "</tr>";
-      });
-      document.getElementById("tbody").innerHTML = html || '<tr><td colspan="17" style="text-align:center;color:#8c9bb0;padding:24px">当前筛选无数据</td></tr>';
-    }
-
-    function updatePath() {
-      var distTitle = document.getElementById("distTitle");
-      if (!distTitle) return;
-      distTitle.textContent =
-        state.org === "龙源电力" ? "仓库物资记录分布" :
-        state.org + " · 仓库物资记录分布";
-    }
-
-    function setWarehouseChartMode(mode) {
-      document.querySelectorAll(".chart-row .tabs button[data-mode]").forEach(function (btn) {
-        btn.classList.toggle("on", btn.getAttribute("data-mode") === mode);
-      });
-      document.querySelectorAll("#warehouseFieldBars .bar").forEach(function (bar) {
-        bar.style.height = bar.getAttribute("data-" + mode + "-height");
-        bar.setAttribute("data-v", bar.getAttribute("data-" + mode));
-      });
-    }
-    document.querySelectorAll(".chart-row .tabs button[data-mode]").forEach(function (btn) {
-      btn.addEventListener("click", function () {
-        setWarehouseChartMode(btn.getAttribute("data-mode"));
-      });
-    });
-
-    function refresh() {
-      renderTree();
-      renderOrgSummary();
-      renderTable();
-      updatePath();
-    }
-
-    document.getElementById("tbody").addEventListener("click", function (e) {
-      var a = e.target.closest("a[data-op]");
-      if (!a) return;
-      e.preventDefault();
-      var op = a.getAttribute("data-op");
-      if (op === "详情") {
-        var code = a.getAttribute("data-code");
-        var row = filteredRows().filter(function (r) { return r.code === code; })[0];
-        if (row) openDetailDrawer(row);
-      }
-    });
-    var btnTransferApply = document.getElementById("btnTransferApply");
-    var transferApplyMask = document.getElementById("transferApplyMask");
-    var xferLineBody = document.getElementById("xferLineBody");
-    var xferLines = [];
-    var xferSeq = 1;
-
-    function todayStr() {
-      return new Date().toISOString().slice(0, 10);
-    }
-    function genApplyNo() {
-      var d = todayStr().replace(/-/g, "");
-      return "DB-" + d + "-" + String(xferSeq++).padStart(3, "0");
-    }
-    function stationFromRow(r) {
-      return (r.loc.split("/")[0] || r.company).trim();
-    }
-    function warehouseFromRow(r) {
-      var parts = r.loc.split("/");
-      return parts.length > 1 ? parts[1].trim() : "主仓";
-    }
-    function orgOptions() {
-      var opts = [{ value: "龙源电力", label: "龙源电力（全部）" }];
-      ORG_SUMMARY.group.forEach(function (g) {
-        opts.push({ value: g.key, label: g.name });
-        (ORG_SUMMARY.company[g.key] || []).forEach(function (s) {
-          opts.push({ value: s.key, label: s.name });
-        });
-      });
-      return opts;
-    }
-    function warehouseOptions() {
-      var map = {};
-      ROWS.forEach(function (r) {
-        var key = stationFromRow(r) + " / " + warehouseFromRow(r);
-        map[key] = { station: stationFromRow(r), warehouse: warehouseFromRow(r), loc: r.loc };
-      });
-      return Object.keys(map).map(function (k) { return map[k]; });
-    }
-    function fillSelect(el, options, selected) {
-      el.innerHTML = options.map(function (o) {
-        var val = typeof o === "string" ? o : o.value;
-        var label = typeof o === "string" ? o : o.label;
-        return '<option value="' + val + '"' + (val === selected ? " selected" : "") + ">" + label + "</option>";
+    function renderGroupPanel() {
+      groupPanel.style.display = "block";
+      turbineWrap.style.display = "none";
+      turbineTitle.textContent = "龙源电力 · 项目公司概览";
+      var cards = ORG_DATA.map(function (c) {
+        var total = c.stations.reduce(function (s, x) { return s + parseInt(x.units, 10) || 0; }, 0);
+        return '<div class="group-card" data-company="' + c.key + '"><b>' + c.name + '</b><small>' +
+          c.stations.length + ' 个风电场 · 约 ' + total + ' 台机组</small></div>';
       }).join("");
-    }
-    function currentOrgLabel() {
-      if (state.org === "龙源电力") return "龙源电力（全部）";
-      var found = ORG_SUMMARY.group.filter(function (g) { return g.key === state.org; })[0];
-      if (found) return found.name;
-      var label = state.org;
-      Object.keys(ORG_SUMMARY.company).forEach(function (ck) {
-        ORG_SUMMARY.company[ck].forEach(function (s) {
-          if (s.key === state.org) label = s.name;
-        });
-      });
-      return label;
-    }
-    function transferableRows() {
-      return filteredRows().filter(function (r) {
-        return r.qty > 0 && r.status === "正常";
+      groupPanel.innerHTML = '<h2>龙源电力</h2><p>点击左侧或下方项目公司，查看下属风电场及风机备件结构。</p><div class="group-cards">' + cards + '</div>';
+      groupPanel.querySelectorAll("[data-company]").forEach(function (el) {
+        el.onclick = function () { selectCompany(el.getAttribute("data-company")); };
       });
     }
-    function renderXferLines() {
-      var emptyTip = document.getElementById("xferEmptyTip");
-      if (!xferLines.length) {
-        xferLineBody.innerHTML = "";
-        if (emptyTip) emptyTip.style.display = "block";
+
+    function renderStations() {
+      var c = companyData(state.company);
+      document.getElementById("stationColTitle").textContent = state.company + " · 风电场";
+      document.getElementById("stationColSub").textContent = c ? ("共 " + c.stations.length + " 个场站") : "";
+      if (!c) {
+        stationListEl.innerHTML = '<div class="detail-empty">请选择项目公司</div>';
         return;
       }
-      if (emptyTip) emptyTip.style.display = "none";
-      xferLineBody.innerHTML = xferLines.map(function (line, idx) {
-        return "<tr data-idx=\"" + idx + "\">" +
-          '<td><span class="xfer-cell">' + line.code + "</span></td>" +
-          '<td><span class="xfer-cell">' + line.name + "</span></td>" +
-          '<td><span class="xfer-cell">' + factoryUniqueCode(line) + "</span></td>" +
-          '<td><span class="xfer-cell">' + line.model + "</span></td>" +
-          '<td><span class="xfer-cell">' + applicableModel(line) + "</span></td>" +
-          '<td class="cell-center"><span class="xfer-cell">' + stockUnit() + "</span></td>" +
-          '<td class="cell-center"><span class="xfer-cell">' + line.qty + "</span></td>" +
-          '<td class="cell-center"><input type="number" min="1" max="' + line.qty + '" value="' + line.applyQty + '" data-qty /></td>' +
-          '<td><span class="xfer-cell">' + fiveLevelLocation(line) + "</span></td>" +
-          '<td class="cell-center"><span class="xfer-cell">' + line.status + "</span></td>" +
-          '<td class="cell-center"><button type="button" class="rm" data-rm>删除</button></td>' +
-          "</tr>";
+      stationListEl.innerHTML = c.stations.map(function (s) {
+        var on = state.station === s.name ? " on" : "";
+        return '<div class="station-item' + on + '" data-station="' + s.name + '"><b>' + s.name + '</b><small>' +
+          s.units + '<br/>' + s.status + '</small></div>';
       }).join("");
-    }
-    function syncFromWhFields() {
-      var fromOrg = document.getElementById("xferFromOrg").value;
-      var fromWh = document.getElementById("xferFromWh").value;
-      var match = ROWS.filter(function (r) {
-        return stationFromRow(r) === fromOrg || r.company.indexOf(fromOrg.replace("风电场", "")) >= 0 || fromOrg.indexOf(stationFromRow(r).replace("风电场", "")) >= 0;
-      }).filter(function (r) {
-        return warehouseFromRow(r) === fromWh || r.loc.indexOf(fromWh) >= 0;
-      })[0];
-      document.getElementById("xferFromLoc").value = match ? fiveLevelLocation(match) : "";
-    }
-    function openTransferApplyModal() {
-      document.getElementById("xferApplyNo").value = genApplyNo();
-      document.getElementById("xferApplyDate").value = todayStr();
-      document.getElementById("xferApplyOrg").value = currentOrgLabel();
-      var orgOpts = orgOptions();
-      fillSelect(document.getElementById("xferFromOrg"), orgOpts, state.org === "龙源电力" ? "康保风电场" : state.org);
-      fillSelect(document.getElementById("xferToOrg"), orgOpts, "麒麟山风电场");
-      var whOpts = warehouseOptions();
-      var whNames = whOpts.map(function (w) { return w.warehouse; });
-      fillSelect(document.getElementById("xferFromWh"), whNames, whNames[0] || "主仓");
-      fillSelect(document.getElementById("xferToWh"), whNames, whNames[1] || whNames[0] || "主仓");
-      document.getElementById("xferExpectDate").value = todayStr();
-      document.getElementById("xferReason").value = "低库存补货";
-      document.getElementById("xferUrgent").value = "普通";
-      document.getElementById("xferRemark").value = "";
-      syncFromWhFields();
-      xferLines = transferableRows().slice(0, 3).map(function (r) {
-        return Object.assign({}, r, { applyQty: Math.min(Math.max(1, r.safe || 1), r.qty) });
+      stationListEl.querySelectorAll(".station-item").forEach(function (el) {
+        el.onclick = function () { selectStation(el.getAttribute("data-station")); };
       });
-      renderXferLines();
-      transferApplyMask.classList.add("show");
-      transferApplyMask.setAttribute("aria-hidden", "false");
-      document.body.style.overflow = "hidden";
     }
-    function closeTransferApplyModal() {
-      transferApplyMask.classList.remove("show");
-      transferApplyMask.setAttribute("aria-hidden", "true");
-      document.body.style.overflow = "";
-    }
-    function showXferToast(msg) {
-      var toast = document.getElementById("xferToast");
-      toast.textContent = msg;
-      toast.classList.add("show");
-      clearTimeout(showXferToast._t);
-      showXferToast._t = setTimeout(function () { toast.classList.remove("show"); }, 3200);
-    }
-    function validateTransferApply() {
-      if (!xferLines.length) {
-        alert("请至少添加一条可调拨物资。");
-        return false;
-      }
-      var invalid = false;
-      xferLineBody.querySelectorAll("tr").forEach(function (tr, idx) {
-        var input = tr.querySelector("[data-qty]");
-        var line = xferLines[idx];
-        if (!input || !line) return;
-        var n = Number(input.value);
-        if (!n || n <= 0 || n > line.qty) invalid = true;
-        line.applyQty = n;
-      });
-      if (invalid) {
-        alert("申请调拨数量需在 1 到可调出数量之间。");
-        return false;
-      }
-      return true;
-    }
-    if (btnTransferApply) {
-      btnTransferApply.addEventListener("click", openTransferApplyModal);
-    }
-    document.getElementById("btnCloseTransferApply").addEventListener("click", closeTransferApplyModal);
-    document.getElementById("btnCancelTransferApply").addEventListener("click", closeTransferApplyModal);
-    transferApplyMask.addEventListener("click", function (e) {
-      if (e.target === transferApplyMask) closeTransferApplyModal();
-    });
-    document.getElementById("xferFromOrg").addEventListener("change", syncFromWhFields);
-    document.getElementById("xferFromWh").addEventListener("change", syncFromWhFields);
-    document.getElementById("btnXferAddLine").addEventListener("click", function () {
-      var candidates = transferableRows().filter(function (r) {
-        return !xferLines.some(function (x) { return x.code === r.code && x.loc === r.loc; });
-      });
-      if (!candidates.length) {
-        alert("当前筛选结果中没有更多可调拨物资。");
-        return;
-      }
-      var pick = candidates[0];
-      xferLines.push(Object.assign({}, pick, { applyQty: 1 }));
-      renderXferLines();
-    });
-    xferLineBody.addEventListener("click", function (e) {
-      var rm = e.target.closest("[data-rm]");
-      if (!rm) return;
-      var tr = rm.closest("tr");
-      var idx = Number(tr.getAttribute("data-idx"));
-      xferLines.splice(idx, 1);
-      renderXferLines();
-    });
-    document.getElementById("btnDraftTransferApply").addEventListener("click", function () {
-      if (!validateTransferApply()) return;
-      showXferToast("调拨申请草稿已保存：" + document.getElementById("xferApplyNo").value);
-      closeTransferApplyModal();
-    });
-    document.getElementById("btnSubmitTransferApply").addEventListener("click", function () {
-      if (!validateTransferApply()) return;
-      var no = document.getElementById("xferApplyNo").value;
-      var fromOrg = document.getElementById("xferFromOrg").value;
-      var toOrg = document.getElementById("xferToOrg").value;
-      showXferToast("调拨申请已提交，单号 " + no + "，" + fromOrg + " → " + toOrg);
-      closeTransferApplyModal();
-    });
-    document.addEventListener("keydown", function (e) {
-      if (e.key === "Escape" && transferApplyMask.classList.contains("show")) closeTransferApplyModal();
-    });
 
-    /* 预警抽屉：从右往左滑出 */
-    function openAlertDrawer() {
-      document.getElementById("drawerTitle").textContent = "库存预警";
-      document.getElementById("alertDrawer").classList.remove("detail-mode");
-      document.getElementById("alertDrawerBody").style.display = "";
-      document.getElementById("detailDrawerBody").style.display = "none";
-      document.getElementById("alertMask").classList.add("open");
-      document.getElementById("alertDrawer").classList.add("open");
-      document.getElementById("alertDrawer").setAttribute("aria-hidden", "false");
-    }
-    function fieldValue(field, row) {
-      return typeof field.value === "function" ? field.value(row) : field.value;
-    }
-    function openDetailDrawer(row) {
-      document.getElementById("drawerTitle").textContent = "物资仓储详情";
-      document.getElementById("alertDrawer").classList.add("detail-mode");
-      document.getElementById("alertDrawerBody").style.display = "none";
-      var rowsHtml = WAREHOUSE_DETAIL_FIELDS.map(function (f) {
-        return "<tr>" +
-          '<td class="field-name">' + f.name + "</td>" +
-          '<td class="field-value">' + fieldValue(f, row) + "</td>" +
-          '<td class="field-desc">' + (f.desc || "-") + "</td>" +
-          "</tr>";
+    function renderMatBar() {
+      document.getElementById("matBar").innerHTML = MAT_TYPES.map(function (t) {
+        return '<button type="button" class="mat-chip' + (state.matType === t ? " on" : "") + '" data-type="' + t + '">' + t + '</button>';
       }).join("");
-      document.getElementById("detailDrawerBody").innerHTML =
-        '<div class="detail-summary">' +
-          '<div><b>' + row.name + '</b>产品编码：' + row.code + '</div>' +
-          '<div><b>' + row.company + '</b>五级库位编码：' + fiveLevelLocation(row) + '</div>' +
+      document.getElementById("matBar").querySelectorAll(".mat-chip").forEach(function (btn) {
+        btn.onclick = function () {
+          state.matType = btn.getAttribute("data-type");
+          renderMatBar();
+          if (state.partId) renderPartDetail(state.partId);
+        };
+      });
+    }
+
+    function renderHotspots() {
+      var parts = TURBINE_PARTS.filter(function (p) {
+        return state.matType === "全部" || p.type.indexOf(state.matType.replace("/", "")) >= 0 || state.matType.indexOf(p.type.replace("/", "")) >= 0;
+      });
+      var existing = turbineWrap.querySelectorAll(".hotspot");
+      existing.forEach(function (n) { n.remove(); });
+      parts.forEach(function (p) {
+        var btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "hotspot" + (state.partId === p.id ? " on" : "");
+        btn.style.left = p.left;
+        btn.style.top = p.top;
+        btn.style.width = p.width;
+        btn.style.height = p.height;
+        btn.setAttribute("data-part", p.id);
+        btn.innerHTML = '<span class="tag">' + p.name + '</span>';
+        btn.onclick = function () { selectPart(p.id); };
+        turbineWrap.appendChild(btn);
+      });
+    }
+
+    function renderPartDetail(partId) {
+      var part = TURBINE_PARTS.filter(function (p) { return p.id === partId; })[0];
+      if (!part) return;
+      var spares = part.spares.filter(function (s) {
+        if (state.matType === "全部") return true;
+        return part.type.indexOf(state.matType.replace("/", "")) >= 0 || state.matType.indexOf(part.type.replace("/", "")) >= 0;
+      });
+      var totalQty = spares.reduce(function (n, s) { return n + s.qty; }, 0);
+      var scope = state.station || state.company || "龙源电力";
+      detailTitle.textContent = part.name + " · 关联备件";
+      detailSub.textContent = scope + " · 点击风机部位联动展示";
+      detailBody.innerHTML =
+        '<div class="part-summary"><h4>' + part.name + '</h4><p>' + part.desc + '</p></div>' +
+        '<div class="detail-kpis">' +
+          '<div class="detail-kpi"><div class="k">关联备件品种</div><div class="v">' + spares.length + '<small> 种</small></div></div>' +
+          '<div class="detail-kpi"><div class="k">当前库存数量</div><div class="v">' + totalQty + '<small> 件</small></div></div>' +
+          '<div class="detail-kpi"><div class="k">物资类型</div><div class="v" style="font-size:13px">' + part.type + '</div></div>' +
+          '<div class="detail-kpi"><div class="k">适用机型</div><div class="v" style="font-size:13px">金风 GW150 / UP2000</div></div>' +
         '</div>' +
-        '<div class="rail-sec"><h3>详细仓储字段表 <span class="cnt g">' + WAREHOUSE_DETAIL_FIELDS.length + '项</span></h3>' +
-        '<table class="warehouse-field-table"><thead><tr><th>字段名称</th><th>当前值</th><th>字段说明</th></tr></thead><tbody>' +
-        rowsHtml +
-        "</tbody></table></div>";
-      document.getElementById("detailDrawerBody").style.display = "";
-      document.getElementById("alertMask").classList.add("open");
-      document.getElementById("alertDrawer").classList.add("open");
-      document.getElementById("alertDrawer").setAttribute("aria-hidden", "false");
+        '<div class="spare-list"><div class="spare-list-hd">关联生产备件清单</div>' +
+        (spares.length ? spares.map(function (s) {
+          return '<div class="spare-item"><b>' + s.name + ' · ' + s.code + '</b><span>规格型号：' + s.model +
+            ' · 库存数量：' + s.qty + ' 件 · 库存状态：' + s.status + '</span></div>';
+        }).join("") : '<div class="spare-item"><span>当前物资类型筛选下暂无关联备件。</span></div>') +
+        '</div>';
     }
-    function closeAlertDrawer() {
-      document.getElementById("alertMask").classList.remove("open");
-      document.getElementById("alertDrawer").classList.remove("open");
-      document.getElementById("alertDrawer").setAttribute("aria-hidden", "true");
+
+    function showCompanyView() {
+      lyHome.classList.remove("no-station");
+      groupPanel.style.display = "none";
+      turbineWrap.style.display = "block";
+      turbineTitle.textContent = state.company + " · 风机结构 · 备件关联视图";
+      renderStations();
+      renderMatBar();
+      renderHotspots();
+      if (state.partId) renderPartDetail(state.partId);
+      else {
+        detailTitle.textContent = "零部件详情";
+        detailSub.textContent = "点击风机结构图中的部位查看关联备件";
+        detailBody.innerHTML = '<div class="detail-empty">请在中间风机结构图中选择一个部位，右侧将展示该部位关联的生产备件、库存数量与适用机型等信息。</div>';
+      }
     }
-    document.getElementById("btnOpenAlert").addEventListener("click", openAlertDrawer);
-    document.getElementById("btnCloseAlert").addEventListener("click", closeAlertDrawer);
-    document.getElementById("alertMask").addEventListener("click", closeAlertDrawer);
-    document.addEventListener("keydown", function (e) {
-      if (e.key === "Escape") closeAlertDrawer();
-    });
 
-    /* 组织汇总列表点击 → 下钻 / 筛选明细 */
-    document.getElementById("factoryListBody").addEventListener("click", function (e) {
-      var tr = e.target.closest("tr[data-org]");
-      if (!tr) return;
-      var key = tr.getAttribute("data-org");
-      var level = tr.getAttribute("data-level") || "company";
-      if (key === "其他") {
-        state.org = "龙源电力";
-        state.orgLevel = "group";
-        document.getElementById("orgBtn").textContent = "龙源电力（全部）";
-      } else {
-        state.org = key;
-        state.orgLevel = level;
-        document.getElementById("orgBtn").textContent = key;
-      }
-      document.querySelectorAll("#orgDropdown .org-node").forEach(function (x) {
-        x.classList.toggle("active", x.getAttribute("data-name") === state.org);
-      });
-      document.querySelectorAll("#orgDropdown .org-company").forEach(function (c) {
-        var n = c.querySelector(".org-node.l2");
-        if (n && n.getAttribute("data-name") === state.org) c.classList.add("open");
-      });
-      document.getElementById("orgRoot").classList.add("open");
-      refresh();
-    });
+    function selectCompany(key) {
+      state.level = "company";
+      state.company = key;
+      state.station = "";
+      state.partId = "";
+      renderOrgTree();
+      showCompanyView();
+    }
 
-    /* events */
-    document.getElementById("orgBtn").addEventListener("click", function (e) {
-      e.stopPropagation();
-      document.getElementById("orgDropdown").classList.toggle("open");
-    });
-    document.getElementById("orgDropdown").addEventListener("click", function (e) {
-      e.stopPropagation();
-      var arrow = e.target.closest(".arrow");
-      var n = e.target.closest(".org-node");
-      if (!n) return;
+    function selectStation(name) {
+      state.station = name;
+      renderStations();
+      if (state.partId) renderPartDetail(state.partId);
+    }
 
-      /* 点箭头：只展开/收起，不改选中 */
-      if (arrow) {
-        if (n.classList.contains("group")) {
-          document.getElementById("orgRoot").classList.toggle("open");
-        } else if (n.classList.contains("l2")) {
-          var company = n.closest(".org-company");
-          if (company) company.classList.toggle("open");
-        }
+    function selectPart(id) {
+      state.partId = id;
+      renderHotspots();
+      renderPartDetail(id);
+    }
+
+    function selectGroup() {
+      state.level = "group";
+      state.company = "";
+      state.station = "";
+      state.partId = "";
+      renderOrgTree();
+      renderGroupPanel();
+      stationListEl.innerHTML = '<div class="detail-empty">请选择项目公司</div>';
+      document.getElementById("stationColTitle").textContent = "风电场";
+      document.getElementById("stationColSub").textContent = "请选择左侧项目公司";
+      detailTitle.textContent = "零部件详情";
+      detailSub.textContent = "选择项目公司后查看风机结构与备件";
+      detailBody.innerHTML = '<div class="detail-empty">请先在左侧选择项目公司（如山西龙源），再点击风电场与风机部位查看备件详情。</div>';
+    }
+
+    orgTreeEl.addEventListener("click", function (e) {
+      var node = e.target.closest(".node");
+      if (!node) return;
+      var level = node.getAttribute("data-level");
+      if (level === "group") {
+        var wrap = node.parentElement;
+        if (wrap.classList.contains("group-wrap")) wrap.classList.toggle("open");
+        selectGroup();
         return;
       }
-
-      /* 点公司名：选中并展开其下场站 */
-      if (n.classList.contains("l2")) {
-        var c = n.closest(".org-company");
-        if (c && !c.classList.contains("open")) c.classList.add("open");
-        document.getElementById("orgRoot").classList.add("open");
-      }
-      if (n.classList.contains("group")) {
-        document.getElementById("orgRoot").classList.add("open");
-      }
-      if (n.classList.contains("l3")) {
-        var p = n.closest(".org-company");
-        if (p) p.classList.add("open");
-        document.getElementById("orgRoot").classList.add("open");
-      }
-
-      this.querySelectorAll(".org-node").forEach(function (x) { x.classList.remove("active"); });
-      n.classList.add("active");
-      state.org = n.getAttribute("data-name");
-      var level = n.getAttribute("data-level");
-      state.orgLevel = level || "group";
-      document.getElementById("orgBtn").textContent = state.org + (level === "group" ? "（全部）" : "");
-      this.classList.remove("open");
-      refresh();
-    });
-    document.addEventListener("click", function () {
-      document.getElementById("orgDropdown").classList.remove("open");
+      if (level === "company") selectCompany(node.getAttribute("data-key"));
     });
 
-    document.getElementById("matTree").addEventListener("click", function (e) {
-      var prod = e.target.closest(".prod-item");
-      if (prod) {
-        state.type = prod.getAttribute("data-type");
-        state.product = prod.getAttribute("data-code");
-        refresh();
-        return;
-      }
-      var type = e.target.closest(".type-item");
-      if (!type) return;
-      var name = type.getAttribute("data-type");
-      if (state.type === name && !state.product) {
-        // toggle collapse only
-        type.classList.toggle("open");
-        return;
-      }
-      state.type = name;
-      state.product = "";
-      refresh();
+    document.getElementById("btnStationToggle").addEventListener("click", function () {
+      state.stationCollapsed = !state.stationCollapsed;
+      stationCol.classList.toggle("collapsed", state.stationCollapsed);
+      lyHome.classList.toggle("station-collapsed", state.stationCollapsed);
+      this.textContent = state.stationCollapsed ? "▶" : "◀";
+      this.title = state.stationCollapsed ? "展开风电场列" : "折叠风电场列";
     });
 
-    document.getElementById("matKw").addEventListener("input", function () {
-      renderTree();
-    });
-    document.getElementById("btnQuery").addEventListener("click", function () {
-      state.kw = (document.getElementById("kw").value || "").trim();
-      renderTable();
-    });
-    document.getElementById("btnReset").addEventListener("click", function () {
-      state.type = "";
-      state.product = "";
-      state.kw = "";
-      state.org = "龙源电力";
-      document.getElementById("kw").value = "";
-      document.getElementById("statusSel").value = "";
-      document.getElementById("matKw").value = "";
-      document.getElementById("orgBtn").textContent = "龙源电力（全部）";
-      document.getElementById("orgRoot").classList.add("open");
-      document.querySelectorAll("#orgDropdown .org-company").forEach(function (c) { c.classList.add("open"); });
-      document.querySelectorAll("#orgDropdown .org-node").forEach(function (x) { x.classList.remove("active"); });
-      var rootNode = document.querySelector("#orgDropdown .org-node.group");
-      if (rootNode) rootNode.classList.add("active");
-      refresh();
-    });
-    document.getElementById("kw").addEventListener("keydown", function (e) {
-      if (e.key === "Enter") {
-        state.kw = this.value.trim();
-        renderTable();
-      }
-    });
-    document.querySelector(".card-hd .tabs").addEventListener("click", function (e) {
-      var b = e.target.closest("button");
-      if (!b) return;
-      this.querySelectorAll("button").forEach(function (x) { x.classList.remove("on"); });
-      b.classList.add("on");
-    });
-
-    refresh();
+    renderOrgTree();
+    renderMatBar();
+    renderHotspots();
+    selectGroup();
+    selectCompany("山西龙源");
   </script>
 </body>
 </html>
