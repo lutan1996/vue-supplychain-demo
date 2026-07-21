@@ -200,49 +200,23 @@
     }
     .diagram-wrap {
       width: min(100%, 620px);
-      height: min(100%, 620px);
+      height: min(100%, 580px);
+      min-height: 420px;
       display: flex;
       align-items: center;
       justify-content: center;
       position: relative;
+      border-radius: 12px;
+      overflow: hidden;
+      background: radial-gradient(ellipse at 50% 35%, rgba(56,189,248,.12), transparent 65%), linear-gradient(180deg, #eef6ff 0%, #e3edf7 100%);
+      box-shadow: inset 0 0 0 1px rgba(148,163,184,.25);
     }
-    .diagram-wrap svg {
-      width: 100%;
-      height: 100%;
-      max-height: calc(100vh - 250px);
-      filter: drop-shadow(0 18px 36px rgba(15, 35, 70, .16));
+    .diagram-wrap canvas {
+      display: block;
+      width: 100% !important;
+      height: 100% !important;
+      outline: none;
     }
-    .svg-part {
-      cursor: pointer;
-      transition: filter .2s ease, opacity .2s ease;
-    }
-    .svg-part .solid { transition: stroke .2s ease, filter .2s ease; }
-    .svg-part:hover .solid { filter: brightness(1.06); stroke: rgba(56, 189, 248, .85); }
-    .svg-part.on .solid {
-      stroke: #38bdf8;
-      stroke-width: 2.2;
-      filter: drop-shadow(0 0 10px rgba(56, 189, 248, .75)) brightness(1.08);
-    }
-    .svg-part .hit { fill: rgba(56, 189, 248, 0); stroke: transparent; pointer-events: all; }
-    .svg-part.on .hit, .svg-part:hover .hit {
-      fill: rgba(56, 189, 248, .10);
-      stroke: rgba(56, 189, 248, .55);
-      stroke-width: 1.5;
-    }
-    .svg-label {
-      font-size: 12px;
-      fill: #334155;
-      font-weight: 600;
-      pointer-events: none;
-      font-family: inherit;
-    }
-    .svg-label-tech {
-      font-size: 10px;
-      fill: #64748b;
-      pointer-events: none;
-      font-family: inherit;
-    }
-    .svg-leader { stroke: #94a3b8; stroke-width: 1; fill: none; pointer-events: none; }
 
     .group-panel, .station-panel {
       width: 100%;
@@ -464,6 +438,7 @@
     </div>
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
   <script src="js/sidebar-actions.js"></script>
   <script src="js/subpage-feature-title.js"></script>
   <script src="js/site-footer.js"></script>
@@ -499,7 +474,11 @@
       { id: "pv", label: "光伏" },
       { id: "storage", label: "储能" }
     ];
-    var MAT_TYPES = ["全部", "叶片", "齿轮箱", "变桨", "偏航", "主轴", "电机/变流", "液压", "滤芯/传感器"];
+    var MAT_TYPES_BY_EQUIP = {
+      wind: ["全部", "叶片", "齿轮箱", "变桨", "偏航", "主轴", "电机/变流", "液压", "滤芯/传感器"],
+      pv: ["全部", "组件", "逆变器", "支架", "汇流箱", "线缆"],
+      storage: ["全部", "电池模组", "PCS", "BMS", "消防", "温控"]
+    };
 
     var TURBINE_PARTS = [
       { id: "blade", name: "叶片", type: "叶片", desc: "捕获风能的核心部件，包含主叶片、叶根连接件及密封辅材。",
@@ -523,6 +502,42 @@
       { id: "tower", name: "塔架", type: "滤芯/传感器", desc: "支撑机舱与叶片的基础结构，含塔筒监测与内部辅材。",
         spares: [{ code: "B00001236", name: "塔筒振动传感器", qty: 15, model: "TS-300", status: "正常" }],
         stats: [{ label: "正常", pct: 88 }, { label: "借出", pct: 7 }, { label: "待检", pct: 5 }] }
+    ];
+
+    var PV_PARTS = [
+      { id: "module", name: "光伏组件", type: "组件", desc: "晶硅/薄膜发电组件阵列，含边框、接线盒与封装辅材。",
+        spares: [{ code: "B0000PV01", name: "单晶组件 550W", qty: 420, model: "PV-550-M10", status: "正常" }, { code: "B0000PV02", name: "组件接线盒", qty: 86, model: "JB-H4", status: "正常" }],
+        stats: [{ label: "正常", pct: 82 }, { label: "借出", pct: 10 }, { label: "待检", pct: 8 }] },
+      { id: "inverter", name: "逆变器", type: "逆变器", desc: "组串/集中式逆变器，负责 DC-AC 转换与并网控制。",
+        spares: [{ code: "B0000PV10", name: "组串逆变器", qty: 24, model: "INV-110K", status: "正常" }, { code: "B0000PV11", name: "逆变器风扇", qty: 12, model: "FAN-120", status: "正常" }],
+        stats: [{ label: "正常", pct: 75 }, { label: "借出", pct: 15 }, { label: "零库存", pct: 10 }] },
+      { id: "bracket", name: "支架系统", type: "支架", desc: "固定组件的钢结构/铝合金支架及紧固件。",
+        spares: [{ code: "B0000PV20", name: "C 型导轨", qty: 560, model: "GR-40", status: "正常" }],
+        stats: [{ label: "正常", pct: 90 }, { label: "借出", pct: 6 }, { label: "待检", pct: 4 }] },
+      { id: "combiner", name: "汇流箱", type: "汇流箱", desc: "汇流各组串并接入逆变器的配电单元。",
+        spares: [{ code: "B0000PV30", name: "16 路汇流箱", qty: 18, model: "CB-16", status: "正常" }],
+        stats: [{ label: "正常", pct: 80 }, { label: "借出", pct: 12 }, { label: "待检", pct: 8 }] },
+      { id: "cable", name: "直流线缆", type: "线缆", desc: "光伏专用直流线缆、MC4 接头及辅材。",
+        spares: [{ code: "B0000PV40", name: "PV 直流电缆", qty: 3200, model: "PV1-F1", status: "正常" }],
+        stats: [{ label: "正常", pct: 86 }, { label: "借出", pct: 9 }, { label: "待检", pct: 5 }] }
+    ];
+
+    var STORAGE_PARTS = [
+      { id: "battery", name: "电池模组", type: "电池模组", desc: "磷酸铁锂/三元电池模组，储能系统核心能量单元。",
+        spares: [{ code: "B0000ES01", name: "280Ah 电池模组", qty: 48, model: "BM-280", status: "正常" }, { code: "B0000ES02", name: "模组连接铜排", qty: 120, model: "CP-80", status: "正常" }],
+        stats: [{ label: "正常", pct: 84 }, { label: "借出", pct: 8 }, { label: "待检", pct: 8 }] },
+      { id: "pcs", name: "PCS 变流器", type: "PCS", desc: "储能双向变流器，负责充放电及电网交互。",
+        spares: [{ code: "B0000ES10", name: "PCS 功率模块", qty: 6, model: "PCS-2.5MW", status: "正常" }],
+        stats: [{ label: "正常", pct: 70 }, { label: "借出", pct: 20 }, { label: "零库存", pct: 10 }] },
+      { id: "bms", name: "BMS 系统", type: "BMS", desc: "电池管理系统，负责 SOC/SOH 监测与均衡控制。",
+        spares: [{ code: "B0000ES20", name: "BMS 主控板", qty: 8, model: "BMS-M", status: "正常" }],
+        stats: [{ label: "正常", pct: 78 }, { label: "借出", pct: 14 }, { label: "待检", pct: 8 }] },
+      { id: "fire", name: "消防系统", type: "消防", desc: "储能舱消防探测、抑制与报警联动装置。",
+        spares: [{ code: "B0000ES30", name: "全氟己酮灭火装置", qty: 4, model: "FK-5-1-12", status: "正常" }],
+        stats: [{ label: "正常", pct: 92 }, { label: "借出", pct: 5 }, { label: "待检", pct: 3 }] },
+      { id: "cooling", name: "温控系统", type: "温控", desc: "液冷/风冷温控单元，保障电池工作温度区间。",
+        spares: [{ code: "B0000ES40", name: "液冷循环泵", qty: 6, model: "LC-P80", status: "正常" }],
+        stats: [{ label: "正常", pct: 81 }, { label: "借出", pct: 11 }, { label: "待检", pct: 8 }] }
     ];
 
     var state = {
@@ -566,6 +581,19 @@
       document.getElementById("orgTree").innerHTML = html;
     }
 
+    var scene3d = { renderer: null, scene: null, camera: null, animId: null, meshes: [], container: null };
+
+    function getMatTypes() { return MAT_TYPES_BY_EQUIP[state.equip] || MAT_TYPES_BY_EQUIP.wind; }
+    function getCurrentParts() {
+      if (state.equip === "pv") return PV_PARTS;
+      if (state.equip === "storage") return STORAGE_PARTS;
+      return TURBINE_PARTS;
+    }
+    function partMatchesMat(part) {
+      if (state.matType === "全部") return true;
+      return part.type.indexOf(state.matType.replace("/", "")) >= 0 || state.matType.indexOf(part.type.replace("/", "")) >= 0;
+    }
+
     function renderEquipTabs(show) {
       var el = document.getElementById("equipTabs");
       if (!show) { el.style.display = "none"; return; }
@@ -576,6 +604,7 @@
       el.querySelectorAll(".tab-btn").forEach(function (btn) {
         btn.onclick = function () {
           state.equip = btn.getAttribute("data-equip");
+          state.matType = "全部";
           state.partId = "";
           renderAll();
         };
@@ -586,14 +615,20 @@
       var el = document.getElementById("matTabs");
       if (!show) { el.style.display = "none"; return; }
       el.style.display = "flex";
-      el.innerHTML = MAT_TYPES.map(function (t) {
+      var types = getMatTypes();
+      if (types.indexOf(state.matType) < 0) state.matType = "全部";
+      el.innerHTML = types.map(function (t) {
         return '<button type="button" class="tab-btn mat' + (state.matType === t ? " on" : "") + '" data-type="' + t + '">' + t + '</button>';
       }).join("");
       el.querySelectorAll(".tab-btn").forEach(function (btn) {
         btn.onclick = function () {
           state.matType = btn.getAttribute("data-type");
           renderMatTabs(true);
-          renderDiagram();
+          updateMeshVisibility();
+          if (state.partId) {
+            var part = getCurrentParts().filter(function (p) { return p.id === state.partId; })[0];
+            if (!part || !partMatchesMat(part)) state.partId = "";
+          }
           if (state.partId) renderPartDetail(state.partId);
         };
       });
@@ -681,101 +716,162 @@
         '</div>';
     }
 
-    function partCls(id) { return state.partId === id ? " on" : ""; }
-
-    function turbineSvg() {
-      var svg = '<svg viewBox="0 0 720 680" xmlns="http://www.w3.org/2000/svg" aria-label="风机三维剖面结构图">';
-      svg += '<defs>' +
-        '<linearGradient id="skyG" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#f8fbff"/><stop offset="100%" stop-color="#dbeafe"/></linearGradient>' +
-        '<linearGradient id="towerFront" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#e2e8f0"/><stop offset="45%" stop-color="#f8fafc"/><stop offset="100%" stop-color="#cbd5e1"/></linearGradient>' +
-        '<linearGradient id="towerSide" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#94a3b8"/><stop offset="100%" stop-color="#64748b"/></linearGradient>' +
-        '<linearGradient id="nacelleShell" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#ffffff"/><stop offset="100%" stop-color="#dbeafe"/></linearGradient>' +
-        '<linearGradient id="nacelleInner" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#5eead4"/><stop offset="100%" stop-color="#2dd4bf"/></linearGradient>' +
-        '<linearGradient id="bladeG" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#f8fafc"/><stop offset="55%" stop-color="#e2e8f0"/><stop offset="100%" stop-color="#cbd5e1"/></linearGradient>' +
-        '<linearGradient id="hubG" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#64748b"/><stop offset="100%" stop-color="#334155"/></linearGradient>' +
-        '<linearGradient id="magG" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#fdba74"/><stop offset="100%" stop-color="#ea580c"/></linearGradient>' +
-        '<linearGradient id="copperG" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#fcd34d"/><stop offset="100%" stop-color="#d97706"/></linearGradient>' +
-        '<linearGradient id="cabG" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#bae6fd"/><stop offset="100%" stop-color="#38bdf8"/></linearGradient>' +
-        '<filter id="softShadow" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="8" stdDeviation="8" flood-color="#0f172a" flood-opacity=".18"/></filter>' +
-        '<filter id="partGlow" x="-30%" y="-30%" width="160%" height="160%"><feDropShadow dx="0" dy="0" stdDeviation="6" flood-color="#38bdf8" flood-opacity=".85"/></filter>' +
-        '</defs>';
-
-      svg += '<rect width="720" height="680" fill="url(#skyG)"/>';
-      svg += '<g opacity=".35"><path d="M0 620 H720" stroke="#94a3b8" stroke-width="1"/><path d="M360 120 V640" stroke="#cbd5e1" stroke-dasharray="4 6"/></g>';
-      svg += '<ellipse cx="360" cy="638" rx="150" ry="20" fill="rgba(15,23,42,.08)"/>';
-
-      /* 塔架 - 等距三棱柱 */
-      svg += '<g class="svg-part' + partCls("tower") + '" data-part="tower" filter="url(#softShadow)">' +
-        '<polygon class="solid" points="318,630 402,630 392,300 328,300" fill="url(#towerSide)" stroke="#64748b" stroke-width="1.2"/>' +
-        '<polygon class="solid" points="328,300 392,300 372,280 338,280" fill="#e2e8f0" stroke="#64748b" stroke-width="1"/>' +
-        '<polygon class="solid" points="318,630 328,300 338,280 348,610" fill="url(#towerFront)" stroke="#64748b" stroke-width="1.2"/>' +
-        '<rect class="hit" x="310" y="275" width="100" height="360" rx="6"/>' +
-        '<line class="svg-leader" x1="408" y1="460" x2="470" y2="460"/><text class="svg-label" x="476" y="464">塔架</text></g>';
-
-      /* 叶片 x3 - 主叶片可点 */
-      svg += '<g opacity=".55"><polygon points="250,360 170,430 160,420 235,350" fill="url(#bladeG)" stroke="#94a3b8"/><polygon points="250,360 330,250 340,258 255,368" fill="#e2e8f0" stroke="#94a3b8"/></g>';
-      svg += '<g opacity=".65"><polygon points="250,360 330,250 340,258 255,368" fill="url(#bladeG)" stroke="#94a3b8"/></g>';
-      svg += '<g class="svg-part' + partCls("blade") + '" data-part="blade" filter="url(#softShadow)">' +
-        '<polygon class="solid" points="250,360 90,500 110,518 268,378" fill="url(#bladeG)" stroke="#64748b" stroke-width="1.4"/>' +
-        '<polygon class="solid" points="250,360 268,378 255,368 240,352" fill="#f1f5f9" stroke="#64748b" stroke-width="1"/>' +
-        '<rect class="hit" x="78" y="340" width="195" height="190" rx="10" transform="rotate(-28 175 430)"/>' +
-        '<line class="svg-leader" x1="95" y1="505" x2="40" y2="540"/><text class="svg-label" x="8" y="558">叶片</text></g>';
-
-      /* 机舱外壳 */
-      svg += '<g class="svg-part' + partCls("nacelle") + '" data-part="nacelle" filter="url(#softShadow)">' +
-        '<path class="solid" d="M250,300 C250,270 420,250 470,255 L500,270 C505,285 500,310 470,320 L280,330 Z" fill="url(#nacelleShell)" stroke="#64748b" stroke-width="1.4"/>' +
-        '<path class="solid" d="M280,330 L470,320 L460,300 L290,295 Z" fill="#e2e8f0" stroke="#64748b" stroke-width="1"/>' +
-        '<rect class="hit" x="248" y="248" width="260" height="88" rx="10"/>' +
-        '<line class="svg-leader" x1="505" y1="285" x2="560" y2="250"/><text class="svg-label" x="566" y="254">机舱</text></g>';
-
-      /* 轮毂 + 轮毂外罩 */
-      svg += '<g class="svg-part' + partCls("hub") + '" data-part="hub">' +
-        '<ellipse class="solid" cx="248" cy="302" rx="28" ry="32" fill="url(#hubG)" stroke="#334155" stroke-width="1.5"/>' +
-        '<path class="solid" d="M220,302 C220,282 276,282 276,302 C276,322 220,322 220,302 Z" fill="#475569" stroke="#334155" stroke-width="1.2"/>' +
-        '<circle class="hit" cx="248" cy="302" r="34"/></g>' +
-        '<line class="svg-leader" x1="214" y1="302" x2="160" y2="290"/><text class="svg-label" x="88" y="294">轮毂</text>';
-
-      /* 机舱内平台 */
-      svg += '<path d="M285,305 L455,295 L450,315 L290,325 Z" fill="url(#nacelleInner)" opacity=".85" stroke="#14b8a6" stroke-width=".8"/>';
-
-      /* 齿轮箱 */
-      svg += '<g class="svg-part' + partCls("gearbox") + '" data-part="gearbox">' +
-        '<rect class="solid" x="292" y="286" width="34" height="28" rx="5" fill="#475569" stroke="#1e293b" stroke-width="1.2"/>' +
-        '<rect class="hit" x="288" y="282" width="42" height="36" rx="5"/>' +
-        '<line class="svg-leader" x1="326" y1="286" x2="326" y2="250"/><text class="svg-label" x="296" y="244">齿轮箱</text></g>';
-
-      /* 发电机剖面 - 前盘式转子 / 定子 / 后盘式转子 */
-      svg += '<g class="svg-part' + partCls("generator") + '" data-part="generator">' +
-        '<ellipse class="solid" cx="352" cy="300" rx="18" ry="34" fill="url(#magG)" stroke="#c2410c" stroke-width="1"/>' +
-        '<ellipse class="solid" cx="372" cy="300" rx="10" ry="28" fill="url(#copperG)" stroke="#b45309" stroke-width="1"/>' +
-        '<ellipse class="solid" cx="388" cy="300" rx="16" ry="30" fill="url(#magG)" stroke="#c2410c" stroke-width="1"/>' +
-        '<rect class="solid" x="334" y="264" width="68" height="72" rx="8" fill="rgba(255,255,255,.08)" stroke="#38bdf8" stroke-width="1" stroke-dasharray="3 3"/>' +
-        '<rect class="hit" x="330" y="260" width="76" height="80" rx="8"/>' +
-        '<line class="svg-leader" x1="402" y1="300" x2="450" y2="300"/><text class="svg-label" x="456" y="304">发电机</text>' +
-        '<text class="svg-label-tech" x="334" y="256">前盘式转子</text><text class="svg-label-tech" x="364" y="256">定子绕组</text><text class="svg-label-tech" x="392" y="256">后盘式转子</text></g>';
-
-      /* 电器柜 */
-      svg += '<g class="svg-part' + partCls("cabinet") + '" data-part="cabinet">' +
-        '<rect class="solid" x="430" y="272" width="38" height="52" rx="5" fill="url(#cabG)" stroke="#0284c7" stroke-width="1.3"/>' +
-        '<rect class="solid" x="436" y="280" width="26" height="8" rx="2" fill="#e0f2fe" opacity=".9"/>' +
-        '<rect class="solid" x="436" y="294" width="26" height="8" rx="2" fill="#e0f2fe" opacity=".7"/>' +
-        '<rect class="hit" x="426" y="268" width="46" height="60" rx="6"/>' +
-        '<line class="svg-leader" x1="468" y1="298" x2="520" y2="330"/><text class="svg-label" x="526" y="334">电器柜</text></g>';
-
-      /* 顶部风速仪 */
-      svg += '<g opacity=".9"><line x1="360" y1="248" x2="360" y2="228" stroke="#64748b" stroke-width="2"/><circle cx="360" cy="224" r="5" fill="#ef4444"/></g>';
-
-      svg += '<text x="24" y="34" class="svg-label-tech" fill="#64748b">风机结构三维剖面 · 点击部位联动备件详情</text>';
-      svg += '</svg>';
-      return svg;
+    function disposeScene3d() {
+      if (scene3d.animId) cancelAnimationFrame(scene3d.animId);
+      if (scene3d.renderer) {
+        scene3d.renderer.dispose();
+        if (scene3d.renderer.domElement && scene3d.renderer.domElement.parentNode) {
+          scene3d.renderer.domElement.parentNode.removeChild(scene3d.renderer.domElement);
+        }
+      }
+      scene3d = { renderer: null, scene: null, camera: null, animId: null, meshes: [], container: null };
     }
 
-    function pvSvg() {
-      return '<svg viewBox="0 0 520 360" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="pvG" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#1e3a8a"/><stop offset="100%" stop-color="#3b82f6"/></linearGradient></defs><polygon points="60,260 460,180 460,120 60,200" fill="url(#pvG)" stroke="#1d4ed8"/><polygon points="80,220 440,150 440,110 80,180" fill="#60a5fa" opacity=".55"/><text x="180" y="300" fill="#64748b" font-size="14">光伏组件阵列 · 演示视图</text></svg>';
+    function addMesh(scene, meshes, geo, color, x, y, z, partId, opts) {
+      opts = opts || {};
+      var mat = new THREE.MeshStandardMaterial({
+        color: color,
+        metalness: opts.metalness != null ? opts.metalness : 0.35,
+        roughness: opts.roughness != null ? opts.roughness : 0.45,
+        transparent: !!opts.transparent,
+        opacity: opts.opacity != null ? opts.opacity : 1,
+        emissive: opts.emissive != null ? opts.emissive : 0x000000,
+        emissiveIntensity: opts.emissiveIntensity != null ? opts.emissiveIntensity : 0
+      });
+      var mesh = new THREE.Mesh(geo, mat);
+      mesh.position.set(x, y, z);
+      if (opts.rx) mesh.rotation.x = opts.rx;
+      if (opts.ry) mesh.rotation.y = opts.ry;
+      if (opts.rz) mesh.rotation.z = opts.rz;
+      mesh.userData.partId = partId;
+      mesh.userData.matType = opts.matType || "";
+      scene.add(mesh);
+      if (partId) meshes.push(mesh);
+      return mesh;
     }
 
-    function storageSvg() {
-      return '<svg viewBox="0 0 520 360" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="stG" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#10b981"/><stop offset="100%" stop-color="#047857"/></linearGradient></defs><rect x="160" y="80" width="200" height="200" rx="16" fill="url(#stG)" stroke="#059669"/><rect x="190" y="110" width="140" height="30" rx="6" fill="#ecfdf5" opacity=".8"/><rect x="190" y="160" width="140" height="30" rx="6" fill="#ecfdf5" opacity=".6"/><text x="175" y="310" fill="#64748b" font-size="14">储能电池舱 · 演示视图</text></svg>';
+    function buildWindScene(scene, meshes) {
+      addMesh(scene, meshes, new THREE.CylinderGeometry(0.55, 0.8, 8.5, 32), 0xdce3ec, 0, 4.25, 0, "tower", { metalness: 0.55, roughness: 0.35 });
+      for (var t = 1; t <= 4; t++) {
+        addMesh(scene, [], new THREE.TorusGeometry(0.52 + t * 0.04, 0.03, 8, 32), 0x94a3b8, 0, t * 1.8, 0, "", { metalness: 0.6, rx: Math.PI / 2 });
+      }
+      addMesh(scene, meshes, new THREE.BoxGeometry(2.6, 1.35, 1.6), 0xf8fafc, 0.15, 8.85, 0.15, "nacelle", { metalness: 0.25, roughness: 0.55 });
+      addMesh(scene, meshes, new THREE.SphereGeometry(0.62, 28, 28), 0x475569, -1.05, 8.85, 0.15, "hub", { metalness: 0.65 });
+      for (var i = 0; i < 3; i++) {
+        var blade = addMesh(scene, meshes, new THREE.BoxGeometry(0.16, 5.4, 0.82), 0xe2e8f0, -1.05, 8.85, 0.15, i === 0 ? "blade" : "", { matType: "叶片", metalness: 0.4 });
+        blade.rotation.z = (i * Math.PI * 2 / 3) - Math.PI / 2;
+        blade.translateY(2.7);
+        if (i !== 0) blade.userData.partId = "";
+      }
+      addMesh(scene, meshes, new THREE.BoxGeometry(0.7, 0.58, 0.58), 0x334155, 0.38, 8.85, 0.15, "gearbox", { matType: "齿轮箱", metalness: 0.6 });
+      addMesh(scene, meshes, new THREE.CylinderGeometry(0.52, 0.52, 1.05, 32), 0xf97316, 1.0, 8.85, 0.15, "generator", { matType: "电机/变流", rx: Math.PI / 2, metalness: 0.5 });
+      addMesh(scene, meshes, new THREE.BoxGeometry(0.58, 1.05, 0.68), 0x38bdf8, 1.62, 8.95, 0.15, "cabinet", { matType: "电机/变流", metalness: 0.35 });
+      addMesh(scene, [], new THREE.CylinderGeometry(0.04, 0.04, 0.8, 12), 0x64748b, 0.15, 9.65, 0.15, "", { metalness: 0.5 });
+    }
+
+    function buildPvScene(scene, meshes) {
+      addMesh(scene, [], new THREE.BoxGeometry(7, 0.12, 4.5), 0x64748b, 0, 0.45, 0, "", { metalness: 0.45 });
+      for (var r = 0; r < 4; r++) {
+        for (var c = 0; c < 6; c++) {
+          var pid = (r === 1 && c === 3) ? "module" : "";
+          var panel = addMesh(scene, meshes, new THREE.BoxGeometry(0.88, 0.05, 1.45), 0x1e3a8a, -2.5 + c * 0.95, 0.95 + r * 0.12, -0.8 + r * 0.45, pid, { matType: "组件", rx: -0.48, metalness: 0.65, roughness: 0.25 });
+          if (!pid) panel.userData.partId = "";
+        }
+      }
+      addMesh(scene, meshes, new THREE.BoxGeometry(0.85, 1.35, 0.65), 0xf59e0b, 3.0, 1.05, 0.6, "inverter", { matType: "逆变器", metalness: 0.4 });
+      addMesh(scene, meshes, new THREE.BoxGeometry(0.45, 2.0, 0.38), 0x94a3b8, -3.4, 1.35, 1.3, "bracket", { matType: "支架", metalness: 0.55 });
+      addMesh(scene, meshes, new THREE.BoxGeometry(0.75, 0.95, 0.52), 0x334155, 2.1, 0.95, -1.3, "combiner", { matType: "汇流箱", metalness: 0.45 });
+      addMesh(scene, meshes, new THREE.CylinderGeometry(0.035, 0.035, 4.2, 12), 0xdc2626, 1.2, 0.65, 0.1, "cable", { matType: "线缆", rx: Math.PI / 2 });
+      addMesh(scene, [], new THREE.SphereGeometry(0.35, 16, 16), 0xfbbf24, 4.5, 5.5, -3, "", { emissive: 0xfbbf24, emissiveIntensity: 0.75, metalness: 0.1 });
+    }
+
+    function buildStorageScene(scene, meshes) {
+      addMesh(scene, [], new THREE.BoxGeometry(5.8, 2.9, 2.5), 0xd1fae5, 0, 1.55, 0, "", { roughness: 0.75 });
+      addMesh(scene, [], new THREE.BoxGeometry(5.5, 2.7, 2.3), 0x047857, 0, 1.55, 0, "", { transparent: true, opacity: 0.12, metalness: 0.2 });
+      for (var i = 0; i < 5; i++) {
+        var bat = addMesh(scene, meshes, new THREE.BoxGeometry(0.85, 1.65, 0.72), 0x10b981, -1.8 + i * 0.9, 1.55, 0, i === 2 ? "battery" : "", { matType: "电池模组", metalness: 0.45, roughness: 0.35 });
+        if (i !== 2) bat.userData.partId = "";
+      }
+      addMesh(scene, meshes, new THREE.BoxGeometry(1.05, 1.85, 0.85), 0x2563eb, 2.35, 1.65, 0.65, "pcs", { matType: "PCS", metalness: 0.5 });
+      addMesh(scene, meshes, new THREE.BoxGeometry(0.55, 0.42, 0.38), 0x6366f1, -2.35, 2.55, 0.85, "bms", { matType: "BMS", metalness: 0.35 });
+      addMesh(scene, meshes, new THREE.CylinderGeometry(0.2, 0.2, 0.55, 16), 0xef4444, 2.4, 2.65, -0.75, "fire", { matType: "消防", metalness: 0.4 });
+      addMesh(scene, meshes, new THREE.BoxGeometry(0.85, 0.55, 0.55), 0x0ea5e9, -2.05, 0.85, -0.85, "cooling", { matType: "温控", metalness: 0.35 });
+    }
+
+    function updateMeshVisibility() {
+      scene3d.meshes.forEach(function (m) {
+        if (!m.userData.partId) return;
+        var part = getCurrentParts().filter(function (p) { return p.id === m.userData.partId; })[0];
+        m.visible = !part || partMatchesMat(part);
+      });
+    }
+
+    function initScene3d(container, builder) {
+      disposeScene3d();
+      scene3d.container = container;
+      container.innerHTML = "";
+      var w = container.clientWidth || 560;
+      var h = container.clientHeight || 480;
+      var renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+      renderer.setSize(w, h);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+      container.appendChild(renderer.domElement);
+
+      var scene = new THREE.Scene();
+      var camera = new THREE.PerspectiveCamera(45, w / h, 0.1, 200);
+      camera.position.set(state.equip === "wind" ? 9 : 8, 6.5, 11);
+      camera.lookAt(0, state.equip === "wind" ? 5 : 1.5, 0);
+
+      scene.add(new THREE.AmbientLight(0xffffff, 0.55));
+      var key = new THREE.DirectionalLight(0xffffff, 0.95);
+      key.position.set(6, 12, 8);
+      scene.add(key);
+      var rim = new THREE.DirectionalLight(0x38bdf8, 0.45);
+      rim.position.set(-8, 6, -6);
+      scene.add(rim);
+
+      var ground = new THREE.Mesh(
+        new THREE.CircleGeometry(14, 64),
+        new THREE.MeshStandardMaterial({ color: 0xdbeafe, metalness: 0.1, roughness: 0.85 })
+      );
+      ground.rotation.x = -Math.PI / 2;
+      scene.add(ground);
+
+      builder(scene, scene3d.meshes);
+      updateMeshVisibility();
+
+      scene3d.renderer = renderer;
+      scene3d.scene = scene;
+      scene3d.camera = camera;
+      scene3d.lastEquip = state.equip;
+
+      var raycaster = new THREE.Raycaster();
+      var mouse = new THREE.Vector2();
+      renderer.domElement.addEventListener("click", function (e) {
+        var rect = renderer.domElement.getBoundingClientRect();
+        mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+        mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+        raycaster.setFromCamera(mouse, camera);
+        var hits = raycaster.intersectObjects(scene3d.meshes.filter(function (m) { return m.visible && m.userData.partId; }), false);
+        if (hits[0]) selectPart(hits[0].object.userData.partId);
+      });
+
+      function animate() {
+        scene3d.animId = requestAnimationFrame(animate);
+        scene.rotation.y += 0.004;
+        scene3d.meshes.forEach(function (m) {
+          if (!m.material || !m.material.emissive) return;
+          if (m.userData.partId === state.partId) {
+            m.material.emissive.setHex(0x1677ff);
+            m.material.emissiveIntensity = 0.42;
+          } else {
+            m.material.emissive.setHex(0x000000);
+            m.material.emissiveIntensity = 0;
+          }
+        });
+        renderer.render(scene, camera);
+      }
+      animate();
     }
 
     function renderDiagram() {
@@ -783,30 +879,26 @@
       groupPanel.style.display = "none";
       stationPanel.style.display = "none";
       diagramWrap.style.display = "flex";
-      if (state.equip === "wind") {
-        diagramWrap.innerHTML = turbineSvg();
-        diagramWrap.querySelectorAll(".svg-part").forEach(function (g) {
-          var id = g.getAttribute("data-part");
-          if (!TURBINE_PARTS.some(function (p) { return p.id === id; })) return;
-          g.onclick = function () { selectPart(id); };
-        });
-      } else if (state.equip === "pv") {
-        diagramWrap.innerHTML = pvSvg();
-      } else {
-        diagramWrap.innerHTML = storageSvg();
+      var labels = { wind: "风机结构", pv: "光伏设备", storage: "储能设备" };
+      mainHead.innerHTML = '<b>' + state.company + '</b> · ' + labels[state.equip] + ' · 3D 立体模型 · 点击部位查看备件';
+      if (typeof THREE === "undefined") {
+        diagramWrap.innerHTML = '<div class="detail-empty">3D 引擎加载中，请刷新页面</div>';
+        return;
       }
-      mainHead.innerHTML = '<b>' + state.company + '</b> · ' + (state.equip === "wind" ? "风机结构" : state.equip === "pv" ? "光伏设备" : "储能设备") + ' · 点击部位查看备件';
+      if (scene3d.renderer && scene3d.lastEquip === state.equip && scene3d.container === diagramWrap) {
+        updateMeshVisibility();
+        return;
+      }
+      var builder = buildWindScene;
+      if (state.equip === "pv") builder = buildPvScene;
+      if (state.equip === "storage") builder = buildStorageScene;
+      initScene3d(diagramWrap, builder);
     }
 
     function renderPartDetail(partId) {
-      var part = TURBINE_PARTS.filter(function (p) { return p.id === partId; })[0];
+      var part = getCurrentParts().filter(function (p) { return p.id === partId; })[0];
       if (!part) return;
-      var spares = part.spares;
-      if (state.matType !== "全部") {
-        spares = spares.filter(function () {
-          return part.type.indexOf(state.matType.replace("/", "")) >= 0 || state.matType.indexOf(part.type.replace("/", "")) >= 0;
-        });
-      }
+      var spares = part.spares.filter(function () { return partMatchesMat(part); });
       var totalQty = spares.reduce(function (n, s) { return n + s.qty; }, 0);
       detailTitle.textContent = part.name + " · 关联备件";
       detailSub.textContent = (state.company || "龙源电力") + " · 部位联动详情";
@@ -858,8 +950,8 @@
       if (state.partId) renderPartDetail(state.partId);
       else {
         detailTitle.textContent = "零部件详情";
-        detailSub.textContent = "点击风机结构图中的部位查看关联备件";
-        detailBody.innerHTML = '<div class="detail-empty">请在中间结构图中选择一个部位，右侧将展示关联生产备件、库存数量及状态分布。</div>';
+        detailSub.textContent = "点击 3D 模型中的部位查看关联备件";
+        detailBody.innerHTML = '<div class="detail-empty">请在中间 3D 立体模型中选择一个部位，右侧将展示关联生产备件、库存数量及状态分布。</div>';
       }
     }
 
@@ -879,7 +971,6 @@
 
     function selectPart(id) {
       state.partId = id;
-      renderDiagram();
       renderPartDetail(id);
     }
 
