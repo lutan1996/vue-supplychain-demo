@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN" data-build="20260722-tab3d-v45">
+<html lang="zh-CN" data-build="20260722-tab3d-v46">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -1365,14 +1365,14 @@
         camera.lookAt(0.05, 4.8, 0);
         camera.updateProjectionMatrix();
       } else if (kind === "pv") {
-        camera.fov = 32;
-        camera.position.set(6.8, 4.6, 9.2);
-        camera.lookAt(0, 1.6, 0);
+        camera.fov = 34;
+        camera.position.set(5.2, 3.8, 8.0);
+        camera.lookAt(0.2, 1.35, 0);
         camera.updateProjectionMatrix();
       } else {
-        camera.fov = 32;
-        camera.position.set(7.5, 4.8, 10.2);
-        camera.lookAt(0, 1.8, 0);
+        camera.fov = 34;
+        camera.position.set(6.0, 3.9, 8.6);
+        camera.lookAt(0.15, 1.45, 0);
         camera.updateProjectionMatrix();
       }
     }
@@ -1551,10 +1551,10 @@
     }
 
     function buildStorage(scene, meshes) {
-      /* 集装箱式储能：柜体半透明外壳 + 外显电池簇，避免切换后看起来像空白 */
+      /* 集装箱式储能：半透明外壳 + 外显电池簇，切换时避免看起来像空白闪退 */
       addMesh(scene, [], new THREE.BoxGeometry(6.2, 0.18, 3.2), 0x94a3b8, 0, 0.12, 0, "", { metalness: 0.35, roughness: 0.7 });
-      addMesh(scene, [], new THREE.BoxGeometry(5.8, 2.6, 2.4), 0xdbe4ee, 0, 1.5, 0, "", {
-        metalness: 0.15, roughness: 0.7
+      addMesh(scene, [], new THREE.BoxGeometry(5.8, 2.6, 2.4), 0xb8c9d8, 0, 1.5, 0, "", {
+        metalness: 0.1, roughness: 0.55, transparent: true, opacity: 0.28, side: THREE.DoubleSide, depthWrite: false, renderOrder: 4
       });
       for (var i = 0; i < 5; i++) {
         addMesh(scene, meshes, new THREE.BoxGeometry(0.9, 1.7, 0.78), 0x059669, -1.9 + i * 0.95, 1.45, 0.55, i === 2 ? "es_battery" : "", { metalness: 0.4 });
@@ -1793,7 +1793,7 @@
       document.querySelectorAll("#matTabs button").forEach(function (b) {
         b.classList.toggle("on", b === btn);
       });
-      /* 先切 3D 再刷标注/图表，避免先换标签后模型空一帧像闪退 */
+      /* 先切可见模型并立刻画一帧，避免光伏/储能切换时空一帧像闪退 */
       if (prevKind !== nextKind) {
         if (scene3d.renderer && scene3d.modelsReady) {
           applyKind(nextKind);
@@ -1801,24 +1801,29 @@
           initScene();
         }
       } else if (nextKind === "wind") {
-        /* 同模型页签切换也确保转子引用仍有效 */
         scene3d.rotor = scene3d.windRotor;
       }
+      /* 切页签不强制 setSize，避免画布被清成空白闪一下 */
+      syncRendererSize(false);
       updatePartHighlight();
-      restartAnimLoop();
       paintScene();
-      renderCallouts();
-      renderCharts();
+      try { renderCallouts(); } catch (eCall) {}
+      /* 不重启动画循环（停一下再开会造成画布空白闪一下）；只在死去时拉起 */
+      if (!scene3d.animId) startAnimLoop();
       requestAnimationFrame(function () {
-        if (!scene3d.animId) startAnimLoop();
         paintScene();
+        try { renderCharts(); } catch (eChart) {}
+        requestAnimationFrame(function () {
+          if (!scene3d.animId) startAnimLoop();
+          paintScene();
+        });
       });
     });
 
     function jumpInventoryPage(file, action, label) {
       var href = file;
       if (href && href.indexOf("v=") < 0) {
-        href += (href.indexOf("?") >= 0 ? "&" : "?") + "v=20260722-tab3d-v45";
+        href += (href.indexOf("?") >= 0 ? "&" : "?") + "v=20260722-tab3d-v46";
       }
       if (action && typeof navigateBySidebarAction === "function" && navigateBySidebarAction(action, { label: label || "" })) {
         return true;
