@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN" data-build="20260722-wind-white-v17">
+<html lang="zh-CN" data-build="20260722-dash-proto-v19">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -235,75 +235,158 @@
       flex-direction: column;
     }
     .dash-card h3 {
-      margin: 0 0 8px;
-      font-size: 13px;
+      margin: 0 0 10px;
+      font-size: 14px;
       font-weight: 700;
       color: #1f2d3d;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .dash-card h3::before {
+      content: "";
+      width: 4px;
+      height: 14px;
+      border-radius: 1px;
+      background: #1677ff;
+      flex: 0 0 auto;
     }
     .dash-split {
       flex: 1;
       min-height: 0;
       display: grid;
       grid-template-columns: 1.05fr 1fr;
-      gap: 8px;
+      gap: 10px;
     }
-    .kpi-main {
+    .rt-summary {
+      background: #f7f8fa;
+      border-radius: 6px;
+      padding: 10px 12px 12px;
+      height: 100%;
       display: flex;
-      gap: 16px;
-      align-items: baseline;
+      flex-direction: column;
+    }
+    .rt-summary .rt-title {
+      text-align: center;
+      font-size: 13px;
+      color: #334155;
+      font-weight: 600;
       margin-bottom: 8px;
     }
-    .kpi-main .big {
-      font-size: 22px;
-      font-weight: 700;
-      color: #1677ff;
-      line-height: 1;
+    .rt-summary .rt-vals {
+      display: flex;
+      justify-content: center;
+      gap: 28px;
+      margin-bottom: 12px;
     }
-    .kpi-main .sub {
-      font-size: 18px;
+    .rt-summary .rt-vals b {
+      font-size: 20px;
+      color: #1f2d3d;
       font-weight: 700;
-      color: #334155;
     }
-    .kpi-main .unit { font-size: 12px; color: #64748b; font-weight: 500; margin-left: 2px; }
-    .flow-boxes {
+    .rt-summary .rt-vals span { font-size: 12px; color: #64748b; margin-left: 2px; }
+    .rt-flow {
+      flex: 1;
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 8px;
+      gap: 0;
+      border-top: 1px solid #e8edf4;
+      padding-top: 10px;
     }
-    .flow-box {
-      border: 1px solid #e8edf4;
-      border-radius: 4px;
-      padding: 8px;
-      background: #fafbfd;
+    .rt-flow-col { padding: 0 10px; }
+    .rt-flow-col + .rt-flow-col { border-left: 1px solid #e8edf4; }
+    .rt-flow-col .t {
+      text-align: center;
+      font-size: 12px;
+      color: #334155;
+      font-weight: 600;
+      margin-bottom: 8px;
     }
-    .flow-box .t { font-size: 12px; color: #64748b; margin-bottom: 6px; }
-    .flow-box .r { display: flex; justify-content: space-between; font-size: 12px; color: #334155; margin-top: 3px; }
-    .flow-box .r b { color: #1f2d3d; }
-    .chart-box { min-height: 0; height: 100%; }
-    .chart-box .chart-title {
-      font-size: 11px;
+    .rt-flow-col .r {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
       color: #64748b;
-      margin-bottom: 4px;
+      margin-top: 6px;
+      line-height: 1.4;
+    }
+    .rt-flow-col .r em {
+      font-style: normal;
+      color: #1f2d3d;
+      font-weight: 600;
+    }
+    .chart-box { min-height: 0; height: 100%; display: flex; flex-direction: column; }
+    .chart-box .chart-title {
+      font-size: 12px;
+      color: #334155;
+      font-weight: 600;
+      margin-bottom: 2px;
       text-align: center;
     }
-    .chart-el { width: 100%; height: calc(100% - 18px); min-height: 110px; }
+    .chart-el { width: 100%; flex: 1; min-height: 120px; }
 
-    .idle-grid {
+    .idle-board {
+      position: relative;
+      height: 100%;
+      min-height: 150px;
       display: grid;
       grid-template-columns: 1fr 1fr;
       grid-template-rows: 1fr 1fr;
-      gap: 6px;
+    }
+    .idle-board::before,
+    .idle-board::after {
+      content: "";
+      position: absolute;
+      background: #e8edf4;
+      z-index: 1;
+    }
+    .idle-board::before {
+      left: 50%;
+      top: 8%;
+      bottom: 8%;
+      width: 1px;
+      transform: translateX(-50%);
+    }
+    .idle-board::after {
+      top: 50%;
+      left: 6%;
+      right: 6%;
+      height: 1px;
+      transform: translateY(-50%);
+    }
+    .idle-board .idle-dot {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 18px;
+      height: 18px;
+      margin: -9px 0 0 -9px;
+      border-radius: 50%;
+      background: #91caff;
+      border: 3px solid #e6f4ff;
+      z-index: 2;
+      box-shadow: 0 0 0 1px #69b1ff;
     }
     .idle-cell {
-      border: 1px solid #e8edf4;
-      border-radius: 4px;
-      padding: 8px;
-      background: #fafbfd;
+      padding: 10px 12px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 4px;
     }
-    .idle-cell .t { font-size: 11px; color: #64748b; margin-bottom: 4px; }
-    .idle-cell .v { font-size: 16px; font-weight: 700; color: #1f2d3d; }
-    .idle-cell .m { margin-top: 4px; font-size: 11px; color: #64748b; display: flex; justify-content: space-between; }
-    .idle-cell .pct { color: #1677ff; font-weight: 600; }
+    .idle-cell .t { font-size: 11px; color: #64748b; line-height: 1.35; }
+    .idle-cell .v {
+      font-size: 13px;
+      color: #334155;
+      line-height: 1.4;
+    }
+    .idle-cell .v b {
+      font-size: 16px;
+      font-weight: 700;
+      color: #1f2d3d;
+      margin-right: 6px;
+    }
+    .idle-cell .a { font-size: 11px; color: #64748b; }
 
     .bottom-row {
       display: grid;
@@ -392,23 +475,24 @@
               <div class="dash-card">
                 <h3>实时物资动态</h3>
                 <div class="dash-split">
-                  <div>
-                    <div class="kpi-main">
-                      <div><span class="big">14200</span><span class="unit">件</span></div>
-                      <div><span class="sub">40000</span><span class="unit">万元</span></div>
+                  <div class="rt-summary">
+                    <div class="rt-title">当前库存</div>
+                    <div class="rt-vals">
+                      <div><b>14200</b><span>件</span></div>
+                      <div><b>40000</b><span>万元</span></div>
                     </div>
-                    <div class="flow-boxes">
-                      <div class="flow-box">
+                    <div class="rt-flow">
+                      <div class="rt-flow-col">
                         <div class="t">出库动态</div>
-                        <div class="r"><span>数量</span><b>14200</b></div>
-                        <div class="r"><span>金额</span><b>14200万元</b></div>
-                        <div class="r"><span>占比</span><b>50%</b></div>
+                        <div class="r"><span>数量</span><em>14200 件</em></div>
+                        <div class="r"><span>金额</span><em>14200 万元</em></div>
+                        <div class="r"><span>占比</span><em>50%</em></div>
                       </div>
-                      <div class="flow-box">
+                      <div class="rt-flow-col">
                         <div class="t">入库动态</div>
-                        <div class="r"><span>数量</span><b>14200</b></div>
-                        <div class="r"><span>金额</span><b>14200万元</b></div>
-                        <div class="r"><span>占比</span><b>45%</b></div>
+                        <div class="r"><span>数量</span><em>14200 件</em></div>
+                        <div class="r"><span>金额</span><em>14200 万元</em></div>
+                        <div class="r"><span>占比</span><em>45%</em></div>
                       </div>
                     </div>
                   </div>
@@ -422,26 +506,27 @@
               <div class="dash-card">
                 <h3>呆滞物资动态</h3>
                 <div class="dash-split">
-                  <div class="idle-grid">
+                  <div class="idle-board">
+                    <i class="idle-dot" aria-hidden="true"></i>
                     <div class="idle-cell">
-                      <div class="t">呆滞 30-90 天</div>
-                      <div class="v">1280件</div>
-                      <div class="m"><span class="pct">20%</span><span>2000万元</span></div>
+                      <div class="t">呆滞时长：30天~90天以内</div>
+                      <div class="v"><b>1280件</b>占比:20%</div>
+                      <div class="a">库存金额：2000万元</div>
                     </div>
                     <div class="idle-cell">
-                      <div class="t">呆滞 90-180 天</div>
-                      <div class="v">1280件</div>
-                      <div class="m"><span class="pct">20%</span><span>2000万元</span></div>
+                      <div class="t">呆滞时长：90天~180天以内</div>
+                      <div class="v"><b>1280件</b>占比:30%</div>
+                      <div class="a">库存金额：2000万元</div>
                     </div>
                     <div class="idle-cell">
-                      <div class="t">呆滞 180-360 天</div>
-                      <div class="v">1280件</div>
-                      <div class="m"><span class="pct">30%</span><span>2000万元</span></div>
+                      <div class="t">呆滞时长：180天~360天以内</div>
+                      <div class="v"><b>1280件</b>占比:20%</div>
+                      <div class="a">库存金额：2000万元</div>
                     </div>
                     <div class="idle-cell">
-                      <div class="t">呆滞 360 天以上</div>
-                      <div class="v">1280件</div>
-                      <div class="m"><span class="pct">30%</span><span>2000万元</span></div>
+                      <div class="t">呆滞时长：360天以上</div>
+                      <div class="v"><b>1280件</b>占比:30%</div>
+                      <div class="a">库存金额：2000万元</div>
                     </div>
                   </div>
                   <div class="chart-box">
@@ -488,9 +573,9 @@
     ];
 
     var CALLOUTS = [
-      { id: "blade", title: "叶片", tip: "点击查看叶片相关备件", x: 0.22, y: 0.30, tx: 0.42, ty: 0.22 },
-      { id: "generator", title: "发电机", tip: "点击查看发电机相关备件", x: 0.78, y: 0.34, tx: 0.56, ty: 0.30 },
-      { id: "filter", title: "滤芯/传感器", tip: "点击查看滤芯/传感器相关备件", x: 0.78, y: 0.62, tx: 0.52, ty: 0.58 }
+      { id: "blade", title: "叶片", tip: "点击查看叶片相关备件", x: 0.20, y: 0.28, tx: 0.44, ty: 0.24 },
+      { id: "generator", title: "发电机", tip: "点击查看发电机相关备件", x: 0.80, y: 0.36, tx: 0.56, ty: 0.34 },
+      { id: "filter", title: "滤芯/传感器", tip: "点击查看滤芯/传感器相关备件", x: 0.80, y: 0.60, tx: 0.52, ty: 0.56 }
     ];
 
     var state = {
@@ -594,31 +679,55 @@
       return mesh;
     }
 
-    /* 白净整机风机：对齐参考图的产品渲染风格 */
+    /* 白净整机风机：正面朝向镜头，整机完整入画 */
     function buildWind(scene, meshes) {
       var W = 0xf5f7fb;
       var W2 = 0xe9eef5;
       var G = 0xd3dce8;
-      var nacY = 11.55;
+      var root = new THREE.Group();
+      scene.add(root);
 
-      addMesh(scene, [], new THREE.CylinderGeometry(1.35, 1.55, 0.22, 64), G, 0, 0.11, 0, "", { metalness: 0.2, roughness: 0.72 });
-      addMesh(scene, [], new THREE.CylinderGeometry(0.95, 1.15, 0.16, 64), W2, 0, 0.28, 0, "", { metalness: 0.15, roughness: 0.55 });
+      var nacY = 10.2;
 
-      addMesh(scene, meshes, new THREE.CylinderGeometry(0.26, 0.58, 11.2, 64), W, 0, 5.85, 0, "filter", { metalness: 0.08, roughness: 0.32 });
-      addMesh(scene, [], new THREE.CylinderGeometry(0.255, 0.255, 0.08, 32), G, 0, 3.2, 0, "", { metalness: 0.25, roughness: 0.45 });
-      addMesh(scene, [], new THREE.CylinderGeometry(0.245, 0.245, 0.08, 32), G, 0, 6.4, 0, "", { metalness: 0.25, roughness: 0.45 });
-      addMesh(scene, [], new THREE.CylinderGeometry(0.235, 0.235, 0.08, 32), G, 0, 9.2, 0, "", { metalness: 0.25, roughness: 0.45 });
+      function add(parent, geo, color, x, y, z, partId, opts) {
+        opts = opts || {};
+        var mat = new THREE.MeshStandardMaterial({
+          color: color,
+          metalness: opts.metalness != null ? opts.metalness : 0.1,
+          roughness: opts.roughness != null ? opts.roughness : 0.32
+        });
+        var mesh = new THREE.Mesh(geo, mat);
+        mesh.position.set(x, y, z);
+        if (opts.rx) mesh.rotation.x = opts.rx;
+        if (opts.ry) mesh.rotation.y = opts.ry;
+        if (opts.rz) mesh.rotation.z = opts.rz;
+        if (opts.sx || opts.sy || opts.sz) mesh.scale.set(opts.sx || 1, opts.sy || 1, opts.sz || 1);
+        mesh.userData.partId = partId || "";
+        parent.add(mesh);
+        if (partId) meshes.push(mesh);
+        return mesh;
+      }
 
-      addMesh(scene, meshes, new THREE.BoxGeometry(2.55, 1.05, 1.2), W, 0.42, nacY, 0, "generator", { metalness: 0.1, roughness: 0.28 });
-      addMesh(scene, [], new THREE.BoxGeometry(0.55, 0.72, 0.95), W2, 1.55, nacY - 0.05, 0, "", { metalness: 0.12, roughness: 0.3 });
-      addMesh(scene, [], new THREE.CylinderGeometry(0.12, 0.12, 0.7, 16), G, 0.2, nacY + 0.62, 0, "", { metalness: 0.3, roughness: 0.4 });
+      add(root, new THREE.CylinderGeometry(1.2, 1.4, 0.2, 64), G, 0, 0.1, 0, "", { metalness: 0.2, roughness: 0.72 });
+      add(root, new THREE.CylinderGeometry(0.85, 1.05, 0.14, 64), W2, 0, 0.24, 0, "", { metalness: 0.15, roughness: 0.55 });
+
+      /* 塔筒 */
+      add(root, new THREE.CylinderGeometry(0.24, 0.52, 9.8, 64), W, 0, 5.15, 0, "filter", { metalness: 0.08, roughness: 0.34 });
+      add(root, new THREE.CylinderGeometry(0.235, 0.235, 0.07, 32), G, 0, 2.8, 0, "", { metalness: 0.25, roughness: 0.45 });
+      add(root, new THREE.CylinderGeometry(0.225, 0.225, 0.07, 32), G, 0, 5.5, 0, "", { metalness: 0.25, roughness: 0.45 });
+      add(root, new THREE.CylinderGeometry(0.215, 0.215, 0.07, 32), G, 0, 8.0, 0, "", { metalness: 0.25, roughness: 0.45 });
+
+      /* 机舱：轮毂朝 +Z（正面朝向镜头），机舱体向 -Z 延伸 */
+      add(root, new THREE.BoxGeometry(1.15, 0.95, 2.35), W, 0, nacY, -0.35, "generator", { metalness: 0.1, roughness: 0.28 });
+      add(root, new THREE.BoxGeometry(0.9, 0.7, 0.5), W2, 0, nacY - 0.05, -1.45, "", { metalness: 0.12, roughness: 0.3 });
+      add(root, new THREE.CylinderGeometry(0.1, 0.1, 0.55, 16), G, 0, nacY + 0.55, -0.2, "", { metalness: 0.3, roughness: 0.4 });
 
       var rotor = new THREE.Group();
-      rotor.position.set(-1.05, nacY, 0);
-      scene.add(rotor);
+      rotor.position.set(0, nacY, 1.05);
+      root.add(rotor);
 
       var hub = new THREE.Mesh(
-        new THREE.SphereGeometry(0.52, 40, 40),
+        new THREE.SphereGeometry(0.48, 40, 40),
         new THREE.MeshStandardMaterial({ color: W, metalness: 0.14, roughness: 0.28 })
       );
       rotor.add(hub);
@@ -626,31 +735,30 @@
       hub.userData.partId = "blade";
 
       var nose = new THREE.Mesh(
-        new THREE.ConeGeometry(0.4, 0.95, 40),
+        new THREE.ConeGeometry(0.38, 0.9, 40),
         new THREE.MeshStandardMaterial({ color: W, metalness: 0.12, roughness: 0.26 })
       );
-      nose.rotation.z = Math.PI / 2;
-      nose.position.x = -0.72;
+      nose.rotation.x = -Math.PI / 2;
+      nose.position.z = 0.68;
       rotor.add(nose);
 
       for (var i = 0; i < 3; i++) {
         var bladeRoot = new THREE.Group();
-        var bladeGeo = new THREE.CylinderGeometry(0.045, 0.28, 6.6, 20);
         var blade = new THREE.Mesh(
-          bladeGeo,
+          new THREE.CylinderGeometry(0.04, 0.26, 5.8, 20),
           new THREE.MeshStandardMaterial({ color: W, metalness: 0.08, roughness: 0.3 })
         );
-        blade.scale.set(1, 1, 0.22);
-        blade.position.y = 3.45;
+        blade.scale.set(1, 1, 0.2);
+        blade.position.y = 3.05;
         bladeRoot.add(blade);
         var tip = new THREE.Mesh(
-          new THREE.ConeGeometry(0.06, 0.55, 12),
+          new THREE.ConeGeometry(0.055, 0.5, 12),
           new THREE.MeshStandardMaterial({ color: W, metalness: 0.08, roughness: 0.3 })
         );
-        tip.position.y = 7.0;
-        tip.scale.set(1, 1, 0.35);
+        tip.position.y = 6.15;
+        tip.scale.set(1, 1, 0.32);
         bladeRoot.add(tip);
-        bladeRoot.rotation.z = (i * Math.PI * 2) / 3 + 0.35;
+        bladeRoot.rotation.z = (i * Math.PI * 2) / 3 + 0.4;
         rotor.add(bladeRoot);
         if (i === 0) {
           blade.userData.partId = "blade";
@@ -658,6 +766,8 @@
         }
       }
 
+      /* 略缩小，保证顶叶与底座都进画幅 */
+      root.scale.set(0.82, 0.82, 0.82);
       scene3d.rotor = rotor;
     }
 
@@ -696,11 +806,12 @@
       wrap.innerHTML = "";
       wrap.appendChild(renderer.domElement);
       var scene = new THREE.Scene();
-      var camera = new THREE.PerspectiveCamera(36, w / h, 0.1, 200);
+      var camera = new THREE.PerspectiveCamera(32, w / h, 0.1, 200);
       var isWind = state.mat !== "光伏备件" && state.mat !== "储能备件";
       if (isWind) {
-        camera.position.set(9.8, 8.2, 16.5);
-        camera.lookAt(0, 6.8, 0);
+        /* 正面偏一点侧视：轮毂朝向镜头，整机（底座到叶尖）留边 */
+        camera.position.set(3.2, 7.6, 22.5);
+        camera.lookAt(0, 6.4, 0);
       } else {
         camera.position.set(7.2, 4.2, 9.5);
         camera.lookAt(0, 2.2, 0);
@@ -764,20 +875,42 @@
 
     function renderCharts() {
       if (!window.echarts) return;
-      var whNames = ["xx仓库", "xx仓库", "xx仓库", "xx仓库", "xx仓库", "xx仓库"];
+      var whNames = ["XX仓库", "XX仓库", "XX仓库", "XX仓库", "XX仓库"];
 
       var c1 = ensureChart("chartRealtime");
       if (c1) {
         c1.setOption({
-          color: ["#fa8c16", "#1677ff", "#52c41a"],
-          legend: { bottom: 0, textStyle: { fontSize: 10 }, itemWidth: 10, itemHeight: 8, data: ["出库数量", "当前数量", "入库数量"] },
-          grid: { left: 36, right: 8, top: 18, bottom: 28 },
-          xAxis: { type: "category", data: whNames, axisLabel: { fontSize: 10, color: "#64748b" }, axisTick: { show: false } },
-          yAxis: { type: "value", splitLine: { lineStyle: { color: "#eef2f7" } }, axisLabel: { fontSize: 10, color: "#94a3b8" } },
+          color: ["#1677ff", "#f5222d", "#52c41a"],
+          legend: {
+            top: 0,
+            left: "center",
+            textStyle: { fontSize: 10, color: "#64748b" },
+            itemWidth: 8,
+            itemHeight: 8,
+            data: ["出库数量", "当前数量", "入库数量"]
+          },
+          grid: { left: 42, right: 10, top: 28, bottom: 22 },
+          xAxis: {
+            type: "category",
+            data: whNames,
+            axisLabel: { fontSize: 10, color: "#64748b" },
+            axisTick: { show: false },
+            axisLine: { lineStyle: { color: "#e8edf4" } }
+          },
+          yAxis: {
+            type: "value",
+            name: "单位：件",
+            nameTextStyle: { fontSize: 10, color: "#94a3b8", padding: [0, 0, 0, 8] },
+            min: 0,
+            max: 30,
+            interval: 5,
+            splitLine: { lineStyle: { color: "#eef2f7" } },
+            axisLabel: { fontSize: 10, color: "#94a3b8" }
+          },
           series: [
-            { name: "出库数量", type: "bar", stack: "t", barWidth: 16, data: [320, 280, 360, 300, 260, 340] },
-            { name: "当前数量", type: "bar", stack: "t", data: [520, 480, 540, 500, 460, 510] },
-            { name: "入库数量", type: "bar", stack: "t", data: [210, 190, 230, 200, 180, 220] }
+            { name: "出库数量", type: "bar", stack: "t", barWidth: 18, data: [8, 7, 9, 8, 7] },
+            { name: "当前数量", type: "bar", stack: "t", data: [10, 9, 11, 10, 9] },
+            { name: "入库数量", type: "bar", stack: "t", data: [6, 5, 7, 6, 5] }
           ]
         }, true);
       }
@@ -785,16 +918,43 @@
       var c2 = ensureChart("chartIdle");
       if (c2) {
         c2.setOption({
-          color: ["#1677ff", "#13c2c2", "#faad14", "#f5222d"],
-          legend: { bottom: 0, textStyle: { fontSize: 10 }, itemWidth: 10, itemHeight: 8, data: ["30-90天", "90-180天", "180-360天", "360天以上"] },
-          grid: { left: 36, right: 8, top: 18, bottom: 28 },
-          xAxis: { type: "category", data: whNames, axisLabel: { fontSize: 10, color: "#64748b" }, axisTick: { show: false } },
-          yAxis: { type: "value", splitLine: { lineStyle: { color: "#eef2f7" } }, axisLabel: { fontSize: 10, color: "#94a3b8" } },
+          color: ["#1677ff", "#f5222d", "#52c41a", "#faad14"],
+          legend: {
+            top: 0,
+            left: "center",
+            textStyle: { fontSize: 10, color: "#64748b" },
+            itemWidth: 8,
+            itemHeight: 8,
+            data: [
+              { name: "30~90天以内", itemStyle: { color: "#52c41a" } },
+              { name: "90~180天以内", itemStyle: { color: "#1677ff" } },
+              { name: "示意", itemStyle: { color: "#faad14" } },
+              { name: "示意 ", itemStyle: { color: "#f5222d" } }
+            ]
+          },
+          grid: { left: 42, right: 10, top: 28, bottom: 22 },
+          xAxis: {
+            type: "category",
+            data: whNames,
+            axisLabel: { fontSize: 10, color: "#64748b" },
+            axisTick: { show: false },
+            axisLine: { lineStyle: { color: "#e8edf4" } }
+          },
+          yAxis: {
+            type: "value",
+            name: "单位：万元",
+            nameTextStyle: { fontSize: 10, color: "#94a3b8", padding: [0, 0, 0, 0] },
+            min: 0,
+            max: 30,
+            interval: 5,
+            splitLine: { lineStyle: { color: "#eef2f7" } },
+            axisLabel: { fontSize: 10, color: "#94a3b8" }
+          },
           series: [
-            { name: "30-90天", type: "bar", stack: "i", barWidth: 16, data: [120, 100, 140, 110, 90, 130] },
-            { name: "90-180天", type: "bar", stack: "i", data: [90, 80, 100, 85, 70, 95] },
-            { name: "180-360天", type: "bar", stack: "i", data: [70, 60, 80, 65, 55, 75] },
-            { name: "360天以上", type: "bar", stack: "i", data: [50, 40, 60, 45, 35, 55] }
+            { name: "90~180天以内", type: "bar", stack: "i", barWidth: 18, data: [8, 7, 8, 7, 6] },
+            { name: "示意 ", type: "bar", stack: "i", data: [6, 5, 6, 5, 5] },
+            { name: "30~90天以内", type: "bar", stack: "i", data: [5, 4, 5, 4, 4] },
+            { name: "示意", type: "bar", stack: "i", data: [4, 0, 0, 0, 0] }
           ]
         }, true);
       }
