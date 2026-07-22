@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN" data-build="20260722-tab3d-v48">
+<html lang="zh-CN" data-build="20260722-tab3d-v49">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -774,7 +774,6 @@
                       </div>
                     </div>
                     <div class="chart-box">
-                      <div class="chart-title">各仓库数量占比情况</div>
                       <div class="chart-legend" aria-hidden="true">
                         <span><i style="background:#1677ff"></i>出库数量</span>
                         <span><i style="background:#f5222d"></i>当前数量</span>
@@ -817,7 +816,6 @@
                       </div>
                     </div>
                     <div class="chart-box">
-                      <div class="chart-title">各仓库呆滞金额占比情况</div>
                       <div class="chart-legend" aria-hidden="true">
                         <span><i style="background:#52c41a"></i>30~90天以内</span>
                         <span><i style="background:#1677ff"></i>90~180天以内</span>
@@ -1958,7 +1956,7 @@
     function jumpInventoryPage(file, action, label) {
       var href = file;
       if (href && href.indexOf("v=") < 0) {
-        href += (href.indexOf("?") >= 0 ? "&" : "?") + "v=20260722-tab3d-v48";
+        href += (href.indexOf("?") >= 0 ? "&" : "?") + "v=20260722-tab3d-v49";
       }
       if (action && typeof navigateBySidebarAction === "function" && navigateBySidebarAction(action, { label: label || "" })) {
         return true;
