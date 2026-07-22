@@ -85,14 +85,16 @@
     }
     /* 货架方位画布 */
     .ori-canvas {
-      min-height:420px; margin:12px; border:1px dashed #91caff; border-radius:8px;
+      min-height:480px; margin:12px; border:1px dashed #91caff; border-radius:8px;
       background:linear-gradient(180deg,#f8fbff,#eef5ff); position:relative; padding:20px;
+      overflow:auto; user-select:none;
     }
     .ori-shelf {
-      display:inline-block; width:120px; margin:10px; vertical-align:top;
+      position:absolute; width:128px;
       background:#fff; border:1px solid #91caff; border-radius:6px; overflow:hidden;
-      box-shadow:0 2px 8px rgba(22,119,255,.08);
+      box-shadow:0 2px 8px rgba(22,119,255,.08); cursor:grab; z-index:2;
     }
+    .ori-shelf.is-dragging { cursor:grabbing; box-shadow:0 8px 20px rgba(22,119,255,.22); z-index:5; opacity:.96; }
     .ori-shelf .nm { background:#1677ff; color:#fff; padding:6px 8px; font-size:12px; font-weight:600;display:flex;align-items:center;justify-content:space-between;gap:4px; }
     .ori-shelf .nm .acts{display:flex;gap:3px}
     .ori-shelf .nm button{border:0;background:rgba(255,255,255,.18);color:#fff;border-radius:3px;cursor:pointer;width:20px;height:20px;padding:0}
@@ -100,7 +102,22 @@
       border-top:1px solid #e8edf4; padding:8px; font-size:11px; color:#475569; cursor:context-menu;
     }
     .ori-shelf .layer:hover { background:#e6f4ff; }
-    .ori-tip { position:absolute; right:16px; bottom:12px; color:#cf1322; font-size:12px; }
+    .ori-tip { position:absolute; right:16px; bottom:12px; color:#cf1322; font-size:12px; z-index:1; pointer-events:none; }
+    .ori-detail-modal { width:min(1100px,96vw); }
+    .ori-detail-modal .bd-modal-hd { display:flex; align-items:center; justify-content:space-between; }
+    .ori-detail-modal .bd-modal-hd .close-x {
+      border:0; background:transparent; color:#8c9bb0; font-size:20px; line-height:1; cursor:pointer; padding:0 4px;
+    }
+    .ori-detail-modal .bd-modal-hd .close-x:hover { color:#1677ff; }
+    .ori-detail-modal .bd-modal-bd { padding:0; max-height:68vh; overflow:auto; }
+    .ori-mat-table { width:100%; border-collapse:collapse; font-size:12px; }
+    .ori-mat-table th, .ori-mat-table td {
+      border:1px solid #e8edf4; padding:8px 10px; text-align:left; color:#334155; white-space:nowrap;
+    }
+    .ori-mat-table thead th { background:#f7f9fc; color:#5a6b82; font-weight:600; position:sticky; top:0; z-index:1; }
+    .ori-mat-table tbody tr:hover td { background:#f8fbff; }
+    .ori-mat-table .col-check { width:36px; text-align:center; }
+    .ori-mat-table input[type="checkbox"] { width:14px; height:14px; accent-color:#1677ff; cursor:pointer; }
   </style>
 </head>
 <body class="page-source-navbar page-subpage page-logistics bd-wh">
@@ -149,32 +166,230 @@
         </div>
         <div class="bd-panel">
           <div class="ori-canvas" id="oriCanvas">
-            <div class="ori-shelf"><div class="nm"><span>临时货架</span><span class="acts"><button data-action="edit" title="修改">✎</button><button data-action="delete" title="删除">×</button></span></div><div class="layer" data-tip="1层 · 3 位">1层 · 3 位</div><div class="layer" data-tip="2层 · 2 位">2层 · 2 位</div></div>
-            <div class="ori-shelf"><div class="nm"><span>1号货架</span><span class="acts"><button data-action="edit" title="修改">✎</button><button data-action="delete" title="删除">×</button></span></div><div class="layer">1层 · 4 位</div><div class="layer">2层 · 4 位</div><div class="layer">3层 · 2 位</div></div>
-            <div class="ori-shelf"><div class="nm"><span>2号货架</span><span class="acts"><button data-action="edit" title="修改">✎</button><button data-action="delete" title="删除">×</button></span></div><div class="layer">1层 · 5 位</div><div class="layer">2层 · 5 位</div></div>
-            <div class="ori-tip">*提示：鼠标右键点击货架层级查看详细内容</div>
+            <div class="ori-shelf" style="left:24px;top:24px"><div class="nm"><span>临时货架</span><span class="acts"><button type="button" data-action="edit" title="修改">✎</button><button type="button" data-action="delete" title="删除">×</button></span></div><div class="layer" data-layer="1">1层 · 3 位</div><div class="layer" data-layer="2">2层 · 2 位</div></div>
+            <div class="ori-shelf" style="left:172px;top:24px"><div class="nm"><span>1号货架</span><span class="acts"><button type="button" data-action="edit" title="修改">✎</button><button type="button" data-action="delete" title="删除">×</button></span></div><div class="layer" data-layer="1">1层 · 4 位</div><div class="layer" data-layer="2">2层 · 4 位</div><div class="layer" data-layer="3">3层 · 2 位</div></div>
+            <div class="ori-shelf" style="left:320px;top:24px"><div class="nm"><span>2号货架</span><span class="acts"><button type="button" data-action="edit" title="修改">✎</button><button type="button" data-action="delete" title="删除">×</button></span></div><div class="layer" data-layer="1">1层 · 5 位</div><div class="layer" data-layer="2">2层 · 5 位</div></div>
+            <div class="ori-shelf" style="left:468px;top:24px"><div class="nm"><span>3号货架</span><span class="acts"><button type="button" data-action="edit" title="修改">✎</button><button type="button" data-action="delete" title="删除">×</button></span></div><div class="layer" data-layer="1">1层 · 4 位</div><div class="layer" data-layer="2">2层 · 7 位</div><div class="layer" data-layer="3">3层 · 3 位</div></div>
+            <div class="ori-tip">*提示：拖动货架可调整方位；鼠标右键点击货架层级查看详细内容</div>
           </div>
         </div>
 
       </div></main>
     </div>
   </div>
+
+  <div class="bd-modal-mask" id="modalOriDetail" aria-hidden="true">
+    <div class="bd-modal ori-detail-modal" role="dialog" aria-modal="true">
+      <div class="bd-modal-hd">
+        <span id="oriDetailTitle">货架层级详情</span>
+        <button type="button" class="close-x" id="btnCloseOriDetailX" aria-label="关闭">×</button>
+      </div>
+      <div class="bd-modal-bd">
+        <table class="ori-mat-table">
+          <thead>
+            <tr>
+              <th class="col-check"><input type="checkbox" id="oriMatCheckAll" aria-label="全选" /></th>
+              <th>序号</th>
+              <th>物料名称</th>
+              <th>所属场站</th>
+              <th>所属仓库</th>
+              <th>所属库区</th>
+              <th>存放库位</th>
+              <th>物料编码</th>
+              <th>计量单位</th>
+              <th>物料状态</th>
+            </tr>
+          </thead>
+          <tbody id="oriMatRows"></tbody>
+        </table>
+      </div>
+      <div class="bd-modal-ft">
+        <button type="button" class="bd-btn pri" id="btnCloseOriDetail">关闭</button>
+      </div>
+    </div>
+  </div>
+
   <script src="js/sidebar-actions.js"></script>
   <script src="js/subpage-feature-title.js"></script>
   <script src="js/site-footer.js"></script>
   <script src="js/subpage-clock.js?v=20260722-wh-ops-v13"></script>
 <script>
-var oriCanvas=document.getElementById('oriCanvas'),oriInitial=oriCanvas.innerHTML;
-document.getElementById('oriCanvas').addEventListener('contextmenu',function(e){
-  var layer=e.target.closest('.layer'); if(!layer) return;
-  e.preventDefault();
-  alert('货架层级详情\n'+layer.closest('.ori-shelf').querySelector('.nm span').textContent+' · '+layer.textContent);
-});
-oriCanvas.addEventListener('click',function(e){var b=e.target.closest('button[data-action]');if(!b)return;var shelf=b.closest('.ori-shelf'),act=b.dataset.action;if(act==='delete'&&confirm('确定删除该货架方位吗？'))shelf.remove();if(act==='edit'){var old=shelf.querySelector('.nm>span').textContent,name=prompt('请输入货架名称',old);if(name&&name.trim())shelf.querySelector('.nm>span').textContent=name.trim()}});
-document.getElementById('btnAddOri').onclick=function(){var name=prompt('请输入新增货架名称','新货架');if(!name||!name.trim())return;var shelf=document.createElement('div');shelf.className='ori-shelf';shelf.innerHTML='<div class="nm"><span>'+name.trim()+'</span><span class="acts"><button data-action="edit" title="修改">✎</button><button data-action="delete" title="删除">×</button></span></div><div class="layer">1层 · 3 位</div><div class="layer">2层 · 3 位</div>';oriCanvas.insertBefore(shelf,oriCanvas.querySelector('.ori-tip'))};
-document.getElementById('btnQueryOri').onclick=function(){var kw=document.getElementById('oriName').value.trim();oriCanvas.querySelectorAll('.ori-shelf').forEach(function(s){s.style.display=!kw||s.querySelector('.nm>span').textContent.indexOf(kw)>-1?'inline-block':'none'})};
-document.getElementById('btnResetOri').onclick=function(){oriCanvas.innerHTML=oriInitial;document.getElementById('oriName').value=''};
-document.getElementById('btnSaveOri').onclick=function(){alert('方位配置已提交，共 '+oriCanvas.querySelectorAll('.ori-shelf').length+' 个货架')};
+(function () {
+  var oriCanvas = document.getElementById("oriCanvas");
+  var oriInitial = oriCanvas.innerHTML;
+  var modal = document.getElementById("modalOriDetail");
+  var titleEl = document.getElementById("oriDetailTitle");
+  var rowsEl = document.getElementById("oriMatRows");
+  var checkAll = document.getElementById("oriMatCheckAll");
+  var dragState = null;
+
+  /* 图1 明细 1:1 还原 */
+  var LAYER_ITEMS = [
+    { name: "PROFIBUS主站端子模块", station: "3", warehouse: "1999773447397429250", area: "2003750545665343489", slot: "", code: "3004051", unit: "", status: "已发布" },
+    { name: "CANopen子模块_BECKHOFF_主站", station: "3", warehouse: "1999773447397429250", area: "2003750545665343489", slot: "", code: "3000136", unit: "", status: "已发布" },
+    { name: "K-BUS高速数字量输出模块", station: "3", warehouse: "1999773447397429250", area: "2003750545665343489", slot: "", code: "3000151", unit: "", status: "已发布" },
+    { name: "4通道模拟量输入端子", station: "3", warehouse: "1999773447397429250", area: "2003750545665343489", slot: "", code: "3000153", unit: "", status: "已发布" },
+    { name: "速度监视器", station: "3", warehouse: "1999773447397429250", area: "2003750545665343489", slot: "", code: "3004052", unit: "", status: "已发布" },
+    { name: "辅助触点", station: "3", warehouse: "1999773447397429250", area: "2003750545665343489", slot: "", code: "3000162", unit: "", status: "已发布" },
+    { name: "测试物料5", station: "3", warehouse: "1999773447397429250", area: "2003750545665343489", slot: "", code: "3004057", unit: "", status: "已发布" }
+  ];
+
+  function esc(s) {
+    return String(s == null ? "" : s)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;");
+  }
+
+  function openDetail(shelfName, layerNo) {
+    titleEl.textContent = shelfName + " 第" + layerNo + "层";
+    rowsEl.innerHTML = LAYER_ITEMS.map(function (item, i) {
+      return (
+        "<tr>" +
+          '<td class="col-check"><input type="checkbox" /></td>' +
+          "<td>" + (i + 1) + "</td>" +
+          "<td>" + esc(item.name) + "</td>" +
+          "<td>" + esc(item.station) + "</td>" +
+          "<td>" + esc(item.warehouse) + "</td>" +
+          "<td>" + esc(item.area) + "</td>" +
+          "<td>" + esc(item.slot) + "</td>" +
+          "<td>" + esc(item.code) + "</td>" +
+          "<td>" + esc(item.unit) + "</td>" +
+          '<td><span class="bd-tag ok">' + esc(item.status) + "</span></td>" +
+        "</tr>"
+      );
+    }).join("");
+    checkAll.checked = false;
+    modal.classList.add("open");
+    modal.setAttribute("aria-hidden", "false");
+  }
+
+  function closeDetail() {
+    modal.classList.remove("open");
+    modal.setAttribute("aria-hidden", "true");
+  }
+
+  function clamp(n, min, max) {
+    return Math.max(min, Math.min(max, n));
+  }
+
+  function placeShelf(shelf, left, top) {
+    var maxL = Math.max(0, oriCanvas.clientWidth - shelf.offsetWidth - 8);
+    var maxT = Math.max(0, oriCanvas.clientHeight - shelf.offsetHeight - 8);
+    shelf.style.left = clamp(left, 0, maxL) + "px";
+    shelf.style.top = clamp(top, 0, maxT) + "px";
+  }
+
+  function bindDrag(shelf) {
+    shelf.addEventListener("mousedown", function (e) {
+      if (e.button !== 0) return;
+      if (e.target.closest("button") || e.target.closest("a")) return;
+      e.preventDefault();
+      var rect = shelf.getBoundingClientRect();
+      var canvasRect = oriCanvas.getBoundingClientRect();
+      dragState = {
+        shelf: shelf,
+        ox: e.clientX - rect.left,
+        oy: e.clientY - rect.top,
+        canvasLeft: canvasRect.left,
+        canvasTop: canvasRect.top,
+        scrollL: oriCanvas.scrollLeft,
+        scrollT: oriCanvas.scrollTop
+      };
+      shelf.classList.add("is-dragging");
+    });
+  }
+
+  function initShelves() {
+    oriCanvas.querySelectorAll(".ori-shelf").forEach(bindDrag);
+  }
+
+  document.addEventListener("mousemove", function (e) {
+    if (!dragState) return;
+    var left = e.clientX - dragState.canvasLeft - dragState.ox + dragState.scrollL;
+    var top = e.clientY - dragState.canvasTop - dragState.oy + dragState.scrollT;
+    placeShelf(dragState.shelf, left, top);
+  });
+
+  document.addEventListener("mouseup", function () {
+    if (!dragState) return;
+    dragState.shelf.classList.remove("is-dragging");
+    dragState = null;
+  });
+
+  oriCanvas.addEventListener("contextmenu", function (e) {
+    var shelf = e.target.closest(".ori-shelf");
+    if (!shelf) return;
+    e.preventDefault();
+    var name = (shelf.querySelector(".nm > span") || {}).textContent || "货架";
+    var layer = e.target.closest(".layer");
+    var layerNo = layer && layer.getAttribute("data-layer")
+      ? layer.getAttribute("data-layer")
+      : (layer && /(\d+)\s*层/.test(layer.textContent || "") ? RegExp.$1 : "1");
+    openDetail(name, layerNo);
+  });
+
+  oriCanvas.addEventListener("click", function (e) {
+    var b = e.target.closest("button[data-action]");
+    if (!b) return;
+    var shelf = b.closest(".ori-shelf");
+    var act = b.dataset.action;
+    if (act === "delete" && confirm("确定删除该货架方位吗？")) shelf.remove();
+    if (act === "edit") {
+      var old = shelf.querySelector(".nm > span").textContent;
+      var name = prompt("请输入货架名称", old);
+      if (name && name.trim()) shelf.querySelector(".nm > span").textContent = name.trim();
+    }
+  });
+
+  document.getElementById("btnAddOri").onclick = function () {
+    var name = prompt("请输入新增货架名称", "新货架");
+    if (!name || !name.trim()) return;
+    var shelf = document.createElement("div");
+    shelf.className = "ori-shelf";
+    shelf.style.left = "24px";
+    shelf.style.top = "200px";
+    shelf.innerHTML =
+      '<div class="nm"><span>' + esc(name.trim()) + '</span><span class="acts">' +
+      '<button type="button" data-action="edit" title="修改">✎</button>' +
+      '<button type="button" data-action="delete" title="删除">×</button></span></div>' +
+      '<div class="layer" data-layer="1">1层 · 3 位</div>' +
+      '<div class="layer" data-layer="2">2层 · 3 位</div>';
+    oriCanvas.insertBefore(shelf, oriCanvas.querySelector(".ori-tip"));
+    bindDrag(shelf);
+  };
+
+  document.getElementById("btnQueryOri").onclick = function () {
+    var kw = document.getElementById("oriName").value.trim();
+    oriCanvas.querySelectorAll(".ori-shelf").forEach(function (s) {
+      s.style.display = !kw || s.querySelector(".nm > span").textContent.indexOf(kw) > -1 ? "block" : "none";
+    });
+  };
+
+  document.getElementById("btnResetOri").onclick = function () {
+    oriCanvas.innerHTML = oriInitial;
+    document.getElementById("oriName").value = "";
+    initShelves();
+  };
+
+  document.getElementById("btnSaveOri").onclick = function () {
+    alert("方位配置已提交，共 " + oriCanvas.querySelectorAll(".ori-shelf").length + " 个货架");
+  };
+
+  document.getElementById("btnCloseOriDetail").onclick = closeDetail;
+  document.getElementById("btnCloseOriDetailX").onclick = closeDetail;
+  modal.addEventListener("click", function (e) {
+    if (e.target === modal) closeDetail();
+  });
+  checkAll.addEventListener("change", function () {
+    rowsEl.querySelectorAll('input[type="checkbox"]').forEach(function (c) {
+      c.checked = checkAll.checked;
+    });
+  });
+
+  initShelves();
+})();
 </script>
 </body>
 </html>
