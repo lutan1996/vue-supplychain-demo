@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN" data-build="20260722-station-wh-v7">
+<html lang="zh-CN" data-build="20260722-station-wh-v8">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -108,20 +108,6 @@
       background: #f7f9fc;
       color: #5a6b82;
       font-weight: 600;
-    }
-    .sd-table .filter-row th {
-      background: #fff;
-      padding: 4px 6px;
-    }
-    .sd-table .filter-row input {
-      width: 100%;
-      height: 26px;
-      border: 1px solid #d9e2ec;
-      border-radius: 2px;
-      padding: 0 6px;
-      font-size: 11px;
-      color: var(--t);
-      background: #fff;
     }
     .sd-table tbody tr:hover { background: #f5f9ff; }
     .sd-pager {
@@ -668,19 +654,6 @@
                     <th>单位</th>
                     <th>采购单价</th>
                   </tr>
-                  <tr class="filter-row">
-                    <th></th>
-                    <th><input data-col="1" placeholder="" /></th>
-                    <th><input data-col="2" placeholder="" /></th>
-                    <th><input data-col="3" placeholder="" /></th>
-                    <th><input data-col="4" placeholder="" /></th>
-                    <th><input data-col="5" placeholder="" /></th>
-                    <th><input data-col="6" placeholder="" /></th>
-                    <th><input data-col="7" placeholder="" /></th>
-                    <th><input data-col="8" placeholder="" /></th>
-                    <th><input data-col="9" placeholder="" /></th>
-                    <th><input data-col="10" placeholder="" /></th>
-                  </tr>
                 </thead>
                 <tbody id="stockBody"></tbody>
               </table>
@@ -917,26 +890,6 @@
       document.getElementById("totalTip").textContent = "共 " + list.length + " 条记录";
     }
 
-    function applyFilter() {
-      var inputs = document.querySelectorAll(".filter-row input[data-col]");
-      var filters = {};
-      inputs.forEach(function (inp) {
-        var c = Number(inp.getAttribute("data-col"));
-        var v = (inp.value || "").trim();
-        if (v) filters[c] = v;
-      });
-      var keys = Object.keys(filters);
-      var list = ROWS.filter(function (r) {
-        return keys.every(function (k) {
-          return String(r[Number(k) - 1] || "").indexOf(filters[k]) >= 0;
-        });
-      });
-      renderTable(list);
-    }
-
-    document.querySelectorAll(".filter-row input").forEach(function (inp) {
-      inp.addEventListener("input", applyFilter);
-    });
     renderTable(ROWS);
 
     document.getElementById("btnExport").addEventListener("click", function () {
