@@ -2046,7 +2046,8 @@
       "bd-warehouse-shelf.html": 1,
       "bd-warehouse-orientation.html": 1
     };
-    if (keepWarehouseOps[file]) return;
+    /* srcdoc/演示壳内 pathname 不是真实文件名，用 body.bd-wh 兜底识别仓储配置页 */
+    if (keepWarehouseOps[file] || (document.body && document.body.classList.contains("bd-wh"))) return;
     if (file === "purchase-plan-management.html" || file === "contract-management.html") return;
     var host = root && root.querySelectorAll ? root : document;
     var tables = host.querySelectorAll("table");
