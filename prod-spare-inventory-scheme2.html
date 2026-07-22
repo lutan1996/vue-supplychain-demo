@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN" data-build="20260722-tab3d-v41">
+<html lang="zh-CN" data-build="20260722-tab3d-v42">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -1354,8 +1354,8 @@
       var camera = scene3d.camera;
       if (!camera) return;
       if (kind === "wind") {
-        camera.position.set(13.2, 5.8, 12.0);
-        camera.lookAt(0.05, 5.1, 0);
+        camera.position.set(16.8, 7.2, 15.2);
+        camera.lookAt(0.05, 5.0, 0);
       } else if (kind === "pv") {
         camera.position.set(6.8, 4.6, 9.2);
         camera.lookAt(0, 1.6, 0);
@@ -1507,7 +1507,7 @@
 
       /* 侧视，对齐原图透视角度 */
       scene.rotation.y = -0.55;
-      scene.scale.set(1.08, 1.08, 1.08);
+      scene.scale.set(0.92, 0.92, 0.92);
 
       scene3d.rotor = null;
       scene3d.windRotor = null;
@@ -1789,7 +1789,7 @@
     function jumpInventoryPage(file, action, label) {
       var href = file;
       if (href && href.indexOf("v=") < 0) {
-        href += (href.indexOf("?") >= 0 ? "&" : "?") + "v=20260722-tab3d-v41";
+        href += (href.indexOf("?") >= 0 ? "&" : "?") + "v=20260722-tab3d-v42";
       }
       if (action && typeof navigateBySidebarAction === "function" && navigateBySidebarAction(action, { label: label || "" })) {
         return true;
