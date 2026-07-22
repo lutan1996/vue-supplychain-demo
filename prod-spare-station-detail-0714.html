@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN" data-build="20260722-station-wh-v2">
+<html lang="zh-CN" data-build="20260722-station-wh-v3">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -192,8 +192,27 @@
       font-size: 11px;
       color: var(--m);
       display: flex;
+      align-items: center;
       flex-wrap: wrap;
-      gap: 10px 16px;
+      gap: 6px 8px;
+    }
+    .wh-meta .meta-label { color: #64748b; flex: 0 0 auto; }
+    .wh-tags {
+      display: inline-flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .wh-tags span {
+      display: inline-flex;
+      align-items: center;
+      height: 22px;
+      padding: 0 8px;
+      border: 1px solid #d9e2ec;
+      border-radius: 2px;
+      background: #f7f9fc;
+      color: #5a6b82;
+      font-size: 11px;
+      line-height: 1;
     }
     .wh-tabs {
       display: flex;
@@ -223,13 +242,15 @@
       overflow: auto;
       padding: 10px 14px 12px;
     }
-    .wh-pane.on { display: flex; flex-direction: column; gap: 10px; }
+    .wh-pane.on { display: flex; flex-direction: column; gap: 8px; }
     .wh-legend {
       display: flex;
       flex-wrap: wrap;
       gap: 10px 14px;
       font-size: 11px;
       color: #64748b;
+      padding-bottom: 8px;
+      border-bottom: 1px solid #eef2f7;
     }
     .wh-legend span {
       display: inline-flex;
@@ -242,58 +263,85 @@
       border-radius: 50%;
       display: inline-block;
     }
+    .wh-legend i.diamond {
+      width: 8px;
+      height: 8px;
+      border-radius: 1px;
+      transform: rotate(45deg);
+    }
     .wh-legend .ok { background: var(--ok); }
     .wh-legend .warn { background: var(--warn); }
     .wh-legend .danger { background: var(--danger); }
     .wh-metrics {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 8px 16px;
+      gap: 0;
+      border-bottom: 1px solid #eef2f7;
     }
+    .wh-metric {
+      padding: 8px 10px 10px 0;
+      border-bottom: 1px solid #eef2f7;
+    }
+    .wh-metric:nth-child(odd) { padding-right: 12px; }
+    .wh-metric:nth-child(even) { padding-left: 12px; border-left: 1px solid transparent; }
+    .wh-metric:nth-child(3),
+    .wh-metric:nth-child(4) { border-bottom: 0; }
     .wh-metric .k {
-      font-size: 11px;
-      color: #64748b;
-      margin-bottom: 2px;
+      display: inline-block;
+      font-size: 12px;
+      color: #334155;
+      margin-bottom: 4px;
+      padding-bottom: 2px;
+      border-bottom: 1px solid #c9d7ea;
+      line-height: 1.3;
     }
     .wh-metric .v {
       font-size: 12px;
       color: var(--t);
-      line-height: 1.45;
+      line-height: 1.55;
     }
     .wh-metric .v b {
-      font-size: 14px;
+      font-size: 13px;
       font-weight: 700;
       margin-right: 2px;
     }
     .wh-charts {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 8px;
-      min-height: 140px;
+      gap: 0;
+      min-height: 168px;
+      border-top: 1px solid #eef2f7;
+      border-bottom: 1px solid #eef2f7;
+      padding: 6px 0 4px;
     }
     .wh-chart-box {
       min-width: 0;
       display: flex;
       flex-direction: column;
       align-items: center;
+      padding: 0 4px;
+    }
+    .wh-chart-box + .wh-chart-box {
+      border-left: 1px solid #eef2f7;
     }
     .wh-chart-box .ct {
-      font-size: 11px;
-      color: #64748b;
+      font-size: 12px;
+      color: #334155;
+      font-weight: 600;
       margin-bottom: 2px;
     }
-    .wh-chart-el { width: 100%; height: 120px; }
+    .wh-chart-el { width: 100%; height: 150px; }
     .wh-cam {
-      margin-top: auto;
-      height: 72px;
-      border-radius: 4px;
+      flex: 1 1 auto;
+      min-height: 160px;
+      border-radius: 2px;
       background: #e8edf4;
       color: #94a3b8;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 12px;
-      border: 1px dashed #c9d7ea;
+      font-size: 13px;
+      border: 1px solid #d9e2ec;
     }
     .wh-info-form {
       display: grid;
@@ -521,8 +569,13 @@
                 <div class="wh-status">仓库状态：<b>正常</b></div>
               </div>
               <div class="wh-meta">
-                <span>仓库类型：场站备件库</span>
-                <span>仓库面积：860㎡</span>
+                <span class="meta-label">仓库类型：</span>
+                <div class="wh-tags">
+                  <span>仓库类型</span>
+                  <span>仓库类型</span>
+                  <span>仓库类型</span>
+                  <span>仓库类型</span>
+                </div>
               </div>
               <div class="wh-tabs" id="whTabs">
                 <button type="button" class="on" data-tab="items">仓库物品</button>
@@ -533,25 +586,25 @@
               <div class="wh-pane on" id="paneItems">
                 <div class="wh-legend">
                   <span><i class="ok"></i>正常</span>
-                  <span><i class="warn"></i>临近超期</span>
-                  <span><i class="danger"></i>超60天以上库存</span>
+                  <span><i class="warn diamond"></i>归还超期</span>
+                  <span><i class="danger"></i>超60天以上呆滞</span>
                 </div>
                 <div class="wh-metrics">
                   <div class="wh-metric">
                     <div class="k">当前库存</div>
-                    <div class="v"><b>400</b>件<br /><b>2500</b>万元</div>
+                    <div class="v"><b>400</b>件　<b>2500</b>万元</div>
                   </div>
                   <div class="wh-metric">
                     <div class="k">入库库存</div>
-                    <div class="v"><b>400</b>件<br /><b>2500</b>万元</div>
+                    <div class="v"><b>400</b>件　<b>2500</b>万元</div>
                   </div>
                   <div class="wh-metric">
                     <div class="k">出库库存</div>
-                    <div class="v"><b>400</b>件<br /><b>2500</b>万元</div>
+                    <div class="v"><b>400</b>件　<b>2500</b>万元</div>
                   </div>
                   <div class="wh-metric">
                     <div class="k">累计废旧</div>
-                    <div class="v"><b>400</b>件<br /><b>2500</b>万元</div>
+                    <div class="v"><b>400</b>件　<b>2500</b>万元</div>
                   </div>
                 </div>
                 <div class="wh-charts">
@@ -560,7 +613,7 @@
                     <div class="wh-chart-el" id="chartDist"></div>
                   </div>
                   <div class="wh-chart-box">
-                    <div class="ct">库位利用率</div>
+                    <div class="ct">库存利用率</div>
                     <div class="wh-chart-el" id="chartUtil"></div>
                   </div>
                 </div>
@@ -690,41 +743,64 @@
 
     function initCharts() {
       if (!window.echarts) return;
+      var labelStyle = {
+        show: true,
+        formatter: "{c} {b}",
+        color: "#334155",
+        fontSize: 10,
+        lineHeight: 14
+      };
+      var labelLineStyle = {
+        show: true,
+        length: 10,
+        length2: 12,
+        smooth: false,
+        lineStyle: { color: "#91caff", width: 1 }
+      };
       var dist = echarts.init(document.getElementById("chartDist"));
       dist.setOption({
-        color: ["#1677ff", "#13c2c2", "#52c41a", "#faad14", "#f5222d", "#eb2f96", "#722ed1", "#2f54eb"],
+        color: ["#1677ff", "#eb2f96", "#13c2c2", "#722ed1"],
         tooltip: { trigger: "item" },
+        title: {
+          text: "库存数量",
+          left: "center",
+          top: "43%",
+          textStyle: { fontSize: 11, color: "#64748b", fontWeight: 400 }
+        },
         series: [{
           type: "pie",
-          radius: ["48%", "72%"],
+          radius: ["36%", "58%"],
           center: ["50%", "52%"],
-          label: { show: false },
+          avoidLabelOverlap: true,
+          label: labelStyle,
+          labelLine: labelLineStyle,
           data: [
-            { name: "库区A", value: 28 },
-            { name: "库区B", value: 22 },
-            { name: "库区C", value: 18 },
-            { name: "库区D", value: 14 },
-            { name: "其他", value: 18 }
+            { name: "风电库区", value: 1895 },
+            { name: "风电库区", value: 1895 },
+            { name: "风电库区", value: 1895 }
           ]
         }]
       });
       var util = echarts.init(document.getElementById("chartUtil"));
       util.setOption({
+        color: ["#1677ff", "#13c2c2"],
+        tooltip: { trigger: "item" },
+        title: {
+          text: "库位数量",
+          left: "center",
+          top: "43%",
+          textStyle: { fontSize: 11, color: "#64748b", fontWeight: 400 }
+        },
         series: [{
           type: "pie",
-          radius: ["55%", "78%"],
+          radius: ["36%", "58%"],
           center: ["50%", "52%"],
-          label: {
-            show: true,
-            position: "center",
-            formatter: "72%",
-            fontSize: 16,
-            fontWeight: 700,
-            color: "#1f2d3d"
-          },
+          avoidLabelOverlap: true,
+          label: labelStyle,
+          labelLine: labelLineStyle,
           data: [
-            { value: 72, itemStyle: { color: "#52c41a" } },
-            { value: 28, itemStyle: { color: "#e8edf4" } }
+            { name: "风电库区", value: 1895 },
+            { name: "风电库区", value: 1895 }
           ]
         }]
       });
@@ -769,8 +845,8 @@
             "<h4>" + r.name + "</h4>" +
             '<div class="rack-stats">' +
               "<span>当前库存：<b>" + r.stats.cur + "</b></span>" +
-              "<span>临近超期：<b>" + r.stats.near + "</b></span>" +
-              "<span>超60天：<b>" + r.stats.over + "</b></span>" +
+              "<span>归还超期：<b>" + r.stats.near + "</b></span>" +
+              "<span>超60天以上呆滞：<b>" + r.stats.over + "</b></span>" +
             "</div>" +
             bins +
           "</div>"
