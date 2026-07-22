@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN" data-build="20260722-station-wh-v4">
+<html lang="zh-CN" data-build="20260722-station-wh-v5">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -345,25 +345,135 @@
     }
     .wh-info-form {
       display: grid;
-      gap: 10px;
+      gap: 12px;
       font-size: 12px;
       color: #475569;
+      padding-bottom: 4px;
     }
-    .wh-info-form .row {
+    .wh-info-form .f-row {
       display: grid;
-      grid-template-columns: 72px 1fr;
+      grid-template-columns: 76px 1fr;
       gap: 8px;
-      align-items: center;
+      align-items: start;
     }
-    .wh-info-form .row span { color: var(--m); text-align: right; }
-    .wh-zone-tree {
+    .wh-info-form .f-row > label {
+      padding-top: 7px;
+      color: #475569;
+      text-align: right;
+      line-height: 1.3;
+      white-space: nowrap;
+    }
+    .wh-info-form .f-row > label .req { color: #f5222d; margin-right: 2px; }
+    .wh-info-form input[type="text"],
+    .wh-info-form select,
+    .wh-info-form textarea {
+      width: 100%;
+      height: 32px;
+      border: 1px solid #d9e2ec;
+      border-radius: 4px;
+      padding: 0 10px;
+      font-size: 12px;
+      color: var(--t);
+      background: #fff;
+      outline: none;
+    }
+    .wh-info-form textarea {
+      height: 88px;
+      padding: 8px 10px;
+      resize: vertical;
+      line-height: 1.5;
+    }
+    .wh-info-form input:focus,
+    .wh-info-form select:focus,
+    .wh-info-form textarea:focus {
+      border-color: #91caff;
+    }
+    .addr-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr 1fr;
+      gap: 6px;
+    }
+    .type-checks {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px 14px;
+      padding-top: 4px;
+    }
+    .type-checks label {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      font-size: 11px;
+      color: #475569;
+      cursor: pointer;
+      min-width: 56px;
+    }
+    .type-checks input {
+      width: 14px;
+      height: 14px;
+      accent-color: #64748b;
+      cursor: pointer;
+    }
+    .wh-zone-layout {
+      display: grid;
+      grid-template-columns: minmax(140px, 42%) minmax(0, 1fr);
+      gap: 10px;
+      min-height: 0;
+      flex: 1;
+    }
+    .wh-zone-side {
+      border: 1px solid #dbe7f5;
+      border-radius: 4px;
+      background: #f5f9ff;
+      overflow: auto;
+      padding: 6px 0;
+      min-height: 220px;
+    }
+    .wh-zone-side .n {
+      padding: 6px 10px;
       font-size: 12px;
       color: #334155;
-      line-height: 1.9;
-      padding-left: 4px;
+      cursor: pointer;
+      line-height: 1.35;
+      user-select: none;
     }
-    .wh-zone-tree .l2 { padding-left: 16px; color: #64748b; }
-    .wh-zone-tree .l3 { padding-left: 32px; color: #94a3b8; }
+    .wh-zone-side .n:hover { background: rgba(22, 119, 255, 0.08); }
+    .wh-zone-side .n.on {
+      background: #e6f4ff;
+      color: #1677ff;
+      font-weight: 600;
+    }
+    .wh-zone-side .n.l1 { padding-left: 10px; }
+    .wh-zone-side .n.l2 { padding-left: 24px; }
+    .wh-zone-side .n.l3 { padding-left: 38px; }
+    .wh-zone-side .n.l4 { padding-left: 52px; }
+    .wh-zone-side .n.l5 { padding-left: 66px; color: #64748b; }
+    .wh-zone-main {
+      border: 1px solid #e8edf4;
+      border-radius: 4px;
+      overflow: auto;
+      min-height: 220px;
+      background: #fff;
+    }
+    .wh-zone-main table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+    }
+    .wh-zone-main th,
+    .wh-zone-main td {
+      padding: 10px 12px;
+      border-bottom: 1px solid #eef2f7;
+      text-align: left;
+      color: var(--t);
+    }
+    .wh-zone-main thead th {
+      background: #f7f9fc;
+      color: #5a6b82;
+      font-weight: 600;
+    }
+    .wh-zone-main tbody tr:hover { background: #f5f9ff; }
 
     /* 右：货架可视化 */
     .sd-right {
@@ -640,26 +750,99 @@
 
               <div class="wh-pane" id="paneInfo">
                 <div class="wh-info-form">
-                  <div class="row"><span>仓库名称</span><div id="infoName">—</div></div>
-                  <div class="row"><span>所属组织</span><div id="infoOrg">—</div></div>
-                  <div class="row"><span>所属场站</span><div id="infoStation">—</div></div>
-                  <div class="row"><span>仓库类型</span><div>场站备件库</div></div>
-                  <div class="row"><span>仓库状态</span><div style="color:#389e0d">正常</div></div>
-                  <div class="row"><span>仓库面积</span><div>860㎡</div></div>
-                  <div class="row"><span>联系人</span><div>张工 / 138****0621</div></div>
+                  <div class="f-row">
+                    <label><i class="req">*</i>仓库名称</label>
+                    <input id="infoName" type="text" value="一号中心主仓" />
+                  </div>
+                  <div class="f-row">
+                    <label><i class="req">*</i>仓库地址</label>
+                    <div class="addr-row">
+                      <select aria-label="省/市">
+                        <option selected>北京市</option>
+                        <option>上海市</option>
+                        <option>云南省</option>
+                      </select>
+                      <select aria-label="区/县">
+                        <option selected>朝阳区</option>
+                        <option>浦东新区</option>
+                        <option>崇明区</option>
+                      </select>
+                      <select aria-label="街道">
+                        <option selected>xx街道</option>
+                        <option>临港街道</option>
+                      </select>
+                      <input type="text" value="xx路" aria-label="详细地址" />
+                    </div>
+                  </div>
+                  <div class="f-row">
+                    <label><i class="req">*</i>负责部门</label>
+                    <select>
+                      <option selected>安全生产部</option>
+                      <option>物资管理部</option>
+                      <option>运维部</option>
+                    </select>
+                  </div>
+                  <div class="f-row">
+                    <label><i class="req">*</i>负责人</label>
+                    <select>
+                      <option selected>张三</option>
+                      <option>李四</option>
+                      <option>王五</option>
+                    </select>
+                  </div>
+                  <div class="f-row">
+                    <label><i class="req">*</i>联系电话</label>
+                    <input type="text" value="12355661500" />
+                  </div>
+                  <div class="f-row">
+                    <label><i class="req">*</i>仓库类型</label>
+                    <div class="type-checks">
+                      <label><input type="checkbox" checked />中心主仓</label>
+                      <label><input type="checkbox" />场站周转仓</label>
+                      <label><input type="checkbox" />近修备件仓</label>
+                      <label><input type="checkbox" />报废暂存仓</label>
+                      <label><input type="checkbox" />其他仓</label>
+                    </div>
+                  </div>
+                  <div class="f-row">
+                    <label><i class="req">*</i>仓库状态</label>
+                    <select>
+                      <option selected>正常使用</option>
+                      <option>停用</option>
+                      <option>检修中</option>
+                    </select>
+                  </div>
+                  <div class="f-row">
+                    <label>仓库介绍</label>
+                    <textarea>华北区域生产备件中心仓，承接风机关键部件与变流器模块周转。</textarea>
+                  </div>
                 </div>
               </div>
 
               <div class="wh-pane" id="paneZone">
-                <div class="wh-zone-tree">
-                  <div>● 一层库区</div>
-                  <div class="l2">├ 1号货架</div>
-                  <div class="l3">├ A01–A12 库位</div>
-                  <div class="l2">├ 2号货架</div>
-                  <div class="l3">├ B01–B08 库位</div>
-                  <div>● 二层库区</div>
-                  <div class="l2">├ 3号货架</div>
-                  <div class="l3">├ C01–C10 库位</div>
+                <div class="wh-zone-layout">
+                  <aside class="wh-zone-side" id="zoneTree">
+                    <div class="n l1 on" data-node="group">国家能源集团</div>
+                    <div class="n l2" data-node="xj">新疆电力</div>
+                    <div class="n l3" data-node="test">测试公司</div>
+                    <div class="n l4" data-node="station">五月康试验站</div>
+                    <div class="n l5" data-node="wind">风电备件区</div>
+                    <div class="n l5" data-node="pv">光伏配件区</div>
+                    <div class="n l2" data-node="gh">国华新能源</div>
+                  </aside>
+                  <div class="wh-zone-main">
+                    <table>
+                      <thead>
+                        <tr><th>节点名称</th><th>创建时间</th></tr>
+                      </thead>
+                      <tbody id="zoneBody">
+                        <tr><td>风电备件区</td><td>2026-05-12 09:20:11</td></tr>
+                        <tr><td>变流器货架</td><td>2026-05-12 09:25:03</td></tr>
+                        <tr><td>轴承货架</td><td>2026-05-18 14:02:40</td></tr>
+                        <tr><td>光伏配件区</td><td>2026-06-01 10:11:22</td></tr>
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
               </div>
             </aside>
@@ -696,9 +879,8 @@
     document.getElementById("bcOrg").textContent = org;
     document.getElementById("bcStation").textContent = station;
     document.getElementById("whName").textContent = whName;
-    document.getElementById("infoName").textContent = whName;
-    document.getElementById("infoOrg").textContent = org;
-    document.getElementById("infoStation").textContent = station;
+    var infoName = document.getElementById("infoName");
+    if (infoName) infoName.value = whName;
     document.title = station + " · 仓库详情 - 新能源物资供应链管理系统";
 
     var ROWS = [
@@ -757,6 +939,51 @@
       document.getElementById("paneItems").classList.toggle("on", tab === "items");
       document.getElementById("paneInfo").classList.toggle("on", tab === "info");
       document.getElementById("paneZone").classList.toggle("on", tab === "zone");
+    });
+
+    var ZONE_TABLE = {
+      group: [
+        ["新疆电力", "2026-03-01 10:00:00"],
+        ["国华新能源", "2026-03-01 10:05:00"]
+      ],
+      xj: [
+        ["测试公司", "2026-04-02 11:12:00"]
+      ],
+      test: [
+        ["五月康试验站", "2026-04-18 08:30:00"]
+      ],
+      station: [
+        ["风电备件区", "2026-05-12 09:20:11"],
+        ["变流器货架", "2026-05-12 09:25:03"],
+        ["轴承货架", "2026-05-18 14:02:40"],
+        ["光伏配件区", "2026-06-01 10:11:22"]
+      ],
+      wind: [
+        ["变流器货架", "2026-05-12 09:25:03"],
+        ["轴承货架", "2026-05-18 14:02:40"]
+      ],
+      pv: [
+        ["光伏配件区", "2026-06-01 10:11:22"]
+      ],
+      gh: [
+        ["国华新能源", "2026-03-01 10:05:00"]
+      ]
+    };
+
+    function renderZoneTable(key) {
+      var rows = ZONE_TABLE[key] || ZONE_TABLE.station;
+      document.getElementById("zoneBody").innerHTML = rows.map(function (r) {
+        return "<tr><td>" + r[0] + "</td><td>" + r[1] + "</td></tr>";
+      }).join("");
+    }
+
+    document.getElementById("zoneTree").addEventListener("click", function (e) {
+      var n = e.target.closest(".n[data-node]");
+      if (!n) return;
+      document.querySelectorAll("#zoneTree .n").forEach(function (el) {
+        el.classList.toggle("on", el === n);
+      });
+      renderZoneTable(n.getAttribute("data-node"));
     });
 
     function initCharts() {
