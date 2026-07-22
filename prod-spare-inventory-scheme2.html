@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN" data-build="20260722-tab3d-v50">
+<html lang="zh-CN" data-build="20260722-tab3d-v51">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -577,69 +577,70 @@
       position: relative;
       height: 100%;
       min-height: 0;
-      background: #f7f8fa;
-      border-radius: 6px;
+      background: linear-gradient(165deg, #f5f9ff 0%, #f8fafc 50%, #f3f6fb 100%);
+      border: 1px solid #e8eef8;
+      border-radius: 8px;
       display: grid;
       grid-template-columns: 1fr 1fr;
       grid-template-rows: 1fr 1fr;
+      gap: 6px;
+      padding: 6px;
       overflow: hidden;
     }
     .idle-board::before,
-    .idle-board::after {
-      content: "";
-      position: absolute;
-      background: #e8edf4;
-      z-index: 1;
-    }
-    .idle-board::before {
-      left: 50%;
-      top: 8%;
-      bottom: 8%;
-      width: 1px;
-      transform: translateX(-50%);
-    }
-    .idle-board::after {
-      top: 50%;
-      left: 6%;
-      right: 6%;
-      height: 1px;
-      transform: translateY(-50%);
-    }
-    .idle-board .idle-dot {
-      position: absolute;
-      left: 50%;
-      top: 50%;
-      width: 18px;
-      height: 18px;
-      margin: -9px 0 0 -9px;
-      border-radius: 50%;
-      background: #91caff;
-      border: 3px solid #e6f4ff;
-      z-index: 2;
-      box-shadow: 0 0 0 1px #69b1ff;
-    }
+    .idle-board::after,
+    .idle-board .idle-dot { display: none; }
     .idle-cell {
-      padding: 6px 10px;
+      padding: 8px 10px;
       display: flex;
       flex-direction: column;
       justify-content: center;
-      gap: 2px;
+      gap: 4px;
       min-height: 0;
       overflow: hidden;
+      background: #fff;
+      border: 1px solid #eef2f7;
+      border-radius: 6px;
+      border-top-width: 2px;
+      box-shadow: 0 1px 0 rgba(255, 255, 255, 0.9) inset;
     }
-    .idle-cell .t { font-size: 10px; color: #64748b; line-height: 1.3; }
+    .idle-cell:nth-child(1) { border-top-color: #1677ff; }
+    .idle-cell:nth-child(2) { border-top-color: #13c2c2; }
+    .idle-cell:nth-child(3) { border-top-color: #faad14; }
+    .idle-cell:nth-child(4) { border-top-color: #f5222d; }
+    .idle-cell .t {
+      font-size: 10px;
+      color: #64748b;
+      line-height: 1.3;
+      font-weight: 600;
+    }
+    .idle-cell .t em {
+      font-style: normal;
+      color: #334155;
+      font-weight: 700;
+    }
     .idle-cell .v {
       font-size: 12px;
       color: #334155;
-      line-height: 1.3;
+      line-height: 1.25;
     }
     .idle-cell .v b {
-      font-size: 14px;
+      font-size: 16px;
       font-weight: 700;
       color: #1f2d3d;
-      margin-right: 6px;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: -0.02em;
     }
-    .idle-cell .a { font-size: 10px; color: #64748b; }
+    .idle-cell .a {
+      font-size: 10px;
+      color: #64748b;
+      line-height: 1.3;
+      padding: 2px 6px;
+      border-radius: 4px;
+      background: #f8fafc;
+      width: fit-content;
+      max-width: 100%;
+    }
 
     .bottom-row {
       display: contents;
@@ -793,26 +794,25 @@
                   <h3>呆滞物资动态</h3>
                   <div class="dash-split">
                     <div class="idle-board">
-                      <i class="idle-dot" aria-hidden="true"></i>
                       <div class="idle-cell">
-                        <div class="t">呆滞时长：30天-90天以内</div>
-                        <div class="v"><b>1280件</b>占比20%</div>
-                        <div class="a">库存金额2000万元</div>
+                        <div class="t">呆滞时长 · <em>30~90天</em></div>
+                        <div class="v"><b>1280件</b></div>
+                        <div class="a">库存金额 2000万元</div>
                       </div>
                       <div class="idle-cell">
-                        <div class="t">呆滞时长：90天-180天以内</div>
-                        <div class="v"><b>1280件</b>占比30%</div>
-                        <div class="a">库存金额2000万元</div>
+                        <div class="t">呆滞时长 · <em>90~180天</em></div>
+                        <div class="v"><b>1280件</b></div>
+                        <div class="a">库存金额 2000万元</div>
                       </div>
                       <div class="idle-cell">
-                        <div class="t">呆滞时长：180天-360天以内</div>
-                        <div class="v"><b>1280件</b>占比20%</div>
-                        <div class="a">库存金额2000万元</div>
+                        <div class="t">呆滞时长 · <em>180~360天</em></div>
+                        <div class="v"><b>1280件</b></div>
+                        <div class="a">库存金额 2000万元</div>
                       </div>
                       <div class="idle-cell">
-                        <div class="t">呆滞时长：360天以上</div>
-                        <div class="v"><b>1280件</b>占比30%</div>
-                        <div class="a">库存金额2000万元</div>
+                        <div class="t">呆滞时长 · <em>360天以上</em></div>
+                        <div class="v"><b>1280件</b></div>
+                        <div class="a">库存金额 2000万元</div>
                       </div>
                     </div>
                     <div class="chart-box">
@@ -1755,8 +1755,8 @@
         var row = d.idle[i];
         var v = cell.querySelector(".v");
         var a = cell.querySelector(".a");
-        if (v) v.innerHTML = "<b>" + row.qty + "</b>占比" + row.pct;
-        if (a) a.textContent = "库存金额" + row.amt;
+        if (v) v.innerHTML = "<b>" + row.qty + "</b>";
+        if (a) a.textContent = "库存金额 " + row.amt;
       }
     }
 
@@ -1964,7 +1964,7 @@
     function jumpInventoryPage(file, action, label) {
       var href = file;
       if (href && href.indexOf("v=") < 0) {
-        href += (href.indexOf("?") >= 0 ? "&" : "?") + "v=20260722-tab3d-v50";
+        href += (href.indexOf("?") >= 0 ? "&" : "?") + "v=20260722-tab3d-v51";
       }
       if (action && typeof navigateBySidebarAction === "function" && navigateBySidebarAction(action, { label: label || "" })) {
         return true;
