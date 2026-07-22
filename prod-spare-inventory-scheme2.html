@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN" data-build="20260722-tab3d-v43">
+<html lang="zh-CN" data-build="20260722-tab3d-v44">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -1262,9 +1262,14 @@
         scene3d.renderer = null;
         scene3d.scene = null;
         scene3d.camera = null;
+        scene3d.rotor = null;
+        scene3d.windRotor = null;
       }, false);
       renderer.domElement.addEventListener("webglcontextrestored", function () {
-        setTimeout(function () { initScene(); }, 0);
+        setTimeout(function () {
+          disposeScene();
+          initScene();
+        }, 0);
       }, false);
       wrap.innerHTML = "";
       wrap.appendChild(renderer.domElement);
@@ -1354,15 +1359,21 @@
       var camera = scene3d.camera;
       if (!camera) return;
       if (kind === "wind") {
-        /* 正面侧视：略侧对机舱看清内部；整体下移、稍放大 */
-        camera.position.set(12.8, 5.4, 14.6);
-        camera.lookAt(0.1, 4.2, 0);
+        /* 拉远+略降，保证机舱与叶片完整入画 */
+        camera.fov = 36;
+        camera.position.set(17.5, 6.2, 16.2);
+        camera.lookAt(0.05, 4.8, 0);
+        camera.updateProjectionMatrix();
       } else if (kind === "pv") {
+        camera.fov = 32;
         camera.position.set(6.8, 4.6, 9.2);
         camera.lookAt(0, 1.6, 0);
+        camera.updateProjectionMatrix();
       } else {
+        camera.fov = 32;
         camera.position.set(7.5, 4.8, 10.2);
         camera.lookAt(0, 1.8, 0);
+        camera.updateProjectionMatrix();
       }
     }
 
@@ -1370,15 +1381,26 @@
       if (scene3d.animId) return;
       var myGen = sceneGen;
       function animate() {
-        if (myGen !== sceneGen) return;
-        if (!scene3d.renderer || !scene3d.scene || !scene3d.camera) return;
+        if (myGen !== sceneGen || !scene3d.renderer || !scene3d.scene || !scene3d.camera) {
+          scene3d.animId = null;
+          return;
+        }
         scene3d.animId = requestAnimationFrame(animate);
         try {
-          if (scene3d.rotor) scene3d.rotor.rotation.x += 0.008;
+          if (scene3d.kind === "wind" && scene3d.rotor) {
+            scene3d.rotor.rotation.x += 0.006;
+          }
           scene3d.renderer.render(scene3d.scene, scene3d.camera);
-        } catch (eAnim) {}
+        } catch (eAnim) {
+          scene3d.animId = null;
+        }
       }
       animate();
+    }
+
+    function restartAnimLoop() {
+      stopAnimLoop();
+      startAnimLoop();
     }
 
     function updatePartHighlight() {
@@ -1508,10 +1530,10 @@
       /* 底座 */
       addMesh(scene, [], new THREE.CylinderGeometry(1.15, 1.35, 0.14, 40), 0xcbd5e1, 0, 0.05, 0, "", { metalness: 0.12, roughness: 0.85 });
 
-      /* 正面侧视（对齐图2），整体略下移、稍放大 */
+      /* 正面侧视；略缩小保证整机入画 */
       scene.rotation.y = -0.22;
-      scene.position.y = -0.55;
-      scene.scale.set(1.05, 1.05, 1.05);
+      scene.position.y = -0.35;
+      scene.scale.set(0.86, 0.86, 0.86);
 
       scene3d.windRotor = rotor;
       scene3d.rotor = rotor;
@@ -1778,14 +1800,17 @@
         } else {
           initScene();
         }
+      } else if (nextKind === "wind") {
+        /* 同模型页签切换也确保转子引用仍有效 */
+        scene3d.rotor = scene3d.windRotor;
       }
       updatePartHighlight();
-      startAnimLoop();
+      restartAnimLoop();
       paintScene();
       renderCallouts();
       renderCharts();
       requestAnimationFrame(function () {
-        startAnimLoop();
+        if (!scene3d.animId) startAnimLoop();
         paintScene();
       });
     });
@@ -1793,7 +1818,7 @@
     function jumpInventoryPage(file, action, label) {
       var href = file;
       if (href && href.indexOf("v=") < 0) {
-        href += (href.indexOf("?") >= 0 ? "&" : "?") + "v=20260722-tab3d-v43";
+        href += (href.indexOf("?") >= 0 ? "&" : "?") + "v=20260722-tab3d-v44";
       }
       if (action && typeof navigateBySidebarAction === "function" && navigateBySidebarAction(action, { label: label || "" })) {
         return true;
