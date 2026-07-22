@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN" data-build="20260722-station-wh-v10">
+<html lang="zh-CN" data-build="20260722-station-wh-v11">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -569,13 +569,49 @@
     }
     .wh-zone-main tbody tr:hover { background: #f5f9ff; }
 
-    /* 右：货架可视化 */
+    /* 右：货架可视化 + 仓库信息页签 */
     .sd-right {
       display: flex;
       flex-direction: column;
       min-width: 0;
       overflow: hidden;
       background: #fafbfd;
+    }
+    .right-tabs {
+      flex: 0 0 auto;
+      display: flex;
+      gap: 20px;
+      padding: 0 12px;
+      border-bottom: 1px solid var(--bd);
+      background: #fff;
+    }
+    .right-tabs button {
+      border: 0;
+      background: transparent;
+      padding: 8px 0 7px;
+      font-size: 13px;
+      color: #64748b;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -1px;
+    }
+    .right-tabs button.on {
+      color: var(--pri);
+      font-weight: 600;
+      border-bottom-color: var(--pri);
+    }
+    .right-pane {
+      display: none;
+      flex: 1;
+      min-height: 0;
+      overflow: hidden;
+      flex-direction: column;
+    }
+    .right-pane.on { display: flex; }
+    .right-pane#paneRightInfo {
+      overflow: auto;
+      padding: 12px 14px 16px;
+      background: #fff;
     }
     .rack-toolbar {
       flex: 0 0 auto;
@@ -839,15 +875,93 @@
             </aside>
 
             <div class="sd-right">
-              <div class="rack-toolbar">
-                <label for="matCat">物资大类：</label>
-                <select id="matCat">
-                  <option value="风电备件" selected>风电备件</option>
-                  <option value="光伏备件">光伏备件</option>
-                  <option value="储能备件">储能备件</option>
-                </select>
+              <div class="right-tabs" id="rightTabs">
+                <button type="button" class="on" data-rtab="items">仓库物品</button>
+                <button type="button" data-rtab="info">仓库信息</button>
               </div>
-              <div class="rack-list" id="rackList"></div>
+
+              <div class="right-pane on" id="paneRightItems">
+                <div class="rack-toolbar">
+                  <label for="matCat">物资大类：</label>
+                  <select id="matCat">
+                    <option value="风电备件" selected>风电备件</option>
+                    <option value="光伏备件">光伏备件</option>
+                    <option value="储能备件">储能备件</option>
+                  </select>
+                </div>
+                <div class="rack-list" id="rackList"></div>
+              </div>
+
+              <div class="right-pane" id="paneRightInfo">
+                <div class="wh-info-form">
+                  <div class="f-row">
+                    <label><i class="req">*</i>仓库名称</label>
+                    <input id="infoName" type="text" value="名称示意" />
+                  </div>
+                  <div class="f-row">
+                    <label><i class="req">*</i>仓库地址</label>
+                    <div class="addr-row">
+                      <select aria-label="省/市">
+                        <option selected>北京市</option>
+                        <option>上海市</option>
+                        <option>云南省</option>
+                      </select>
+                      <select aria-label="区/县">
+                        <option selected>朝阳区</option>
+                        <option>浦东新区</option>
+                        <option>崇明区</option>
+                      </select>
+                      <select aria-label="街道">
+                        <option selected>xx街道</option>
+                        <option>临港街道</option>
+                      </select>
+                      <input type="text" value="xx路" aria-label="详细地址" />
+                    </div>
+                  </div>
+                  <div class="f-row">
+                    <label><i class="req">*</i>负责部门</label>
+                    <select>
+                      <option selected>安全生产部</option>
+                      <option>物资管理部</option>
+                      <option>运维部</option>
+                    </select>
+                  </div>
+                  <div class="f-row">
+                    <label><i class="req">*</i>负责人</label>
+                    <select>
+                      <option selected>张三</option>
+                      <option>李四</option>
+                      <option>王五</option>
+                    </select>
+                  </div>
+                  <div class="f-row">
+                    <label><i class="req">*</i>联系电话</label>
+                    <input type="text" value="12355661500" />
+                  </div>
+                  <div class="f-row">
+                    <label><i class="req">*</i>仓库类型</label>
+                    <div class="type-checks">
+                      <label><input type="checkbox" />中心主仓</label>
+                      <label><input type="checkbox" />场站周转仓</label>
+                      <label><input type="checkbox" />返修备件仓</label>
+                      <label><input type="checkbox" checked />报废暂存仓</label>
+                      <label><input type="checkbox" />其他仓</label>
+                    </div>
+                  </div>
+                  <div class="f-row">
+                    <label><i class="req">*</i>仓库状态</label>
+                    <select>
+                      <option selected>正常使用</option>
+                      <option>停用</option>
+                      <option>检修中</option>
+                    </select>
+                  </div>
+                  <div class="f-row">
+                    <label>仓库介绍</label>
+                    <textarea>文字示意</textarea>
+                  </div>
+                </div>
+              </div>
             </div>
           </section>
         </div>
@@ -873,6 +987,17 @@
     document.getElementById("bcStation").textContent = station;
     document.getElementById("whName").textContent = whName;
     document.title = station + " · 仓库详情 - 新能源物资供应链管理系统";
+
+    document.getElementById("rightTabs").addEventListener("click", function (e) {
+      var btn = e.target.closest("button[data-rtab]");
+      if (!btn) return;
+      var tab = btn.getAttribute("data-rtab");
+      document.querySelectorAll("#rightTabs button").forEach(function (b) {
+        b.classList.toggle("on", b === btn);
+      });
+      document.getElementById("paneRightItems").classList.toggle("on", tab === "items");
+      document.getElementById("paneRightInfo").classList.toggle("on", tab === "info");
+    });
 
     /* 组织树：与库存总览分公司数据对齐，样式对齐展开列表示意 */
     var ORG_DATA = [
@@ -958,7 +1083,7 @@
         }
         var href = "prod-spare-station-detail-0714.html?org=" + encodeURIComponent(nextOrg) +
           "&station=" + encodeURIComponent(stationName) +
-          "&v=20260722-station-wh-v10";
+          "&v=20260722-station-wh-v11";
         location.href = href;
         return;
       }
