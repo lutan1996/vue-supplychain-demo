@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN" data-build="20260722-tab3d-v54">
+<html lang="zh-CN" data-build="20260722-tab3d-v55">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -935,9 +935,9 @@
 
     var CALLOUTS_BY_KIND = {
       wind: [
-        { id: "blade", title: "叶片", tip: "点击查看叶片相关备件", x: 0.14, y: 0.20, tx: 0.34, ty: 0.26 },
-        { id: "generator", title: "发电机", tip: "点击查看发电机相关备件", x: 0.86, y: 0.28, tx: 0.62, ty: 0.32 },
-        { id: "filter", title: "滤芯/传感器", tip: "点击查看滤芯/传感器相关备件", x: 0.84, y: 0.58, tx: 0.50, ty: 0.52 }
+        { id: "blade", title: "叶片", tip: "点击查看叶片相关备件", x: 0.10, y: 0.22, tx: 0.28, ty: 0.30 },
+        { id: "generator", title: "发电机", tip: "点击查看发电机相关备件", x: 0.88, y: 0.24, tx: 0.60, ty: 0.30 },
+        { id: "filter", title: "滤芯/传感器", tip: "点击查看滤芯/传感器相关备件", x: 0.86, y: 0.55, tx: 0.52, ty: 0.48 }
       ],
       pv: [
         { id: "pv_module", title: "光伏组件", tip: "点击查看光伏组件相关备件", x: 0.16, y: 0.40, tx: 0.40, ty: 0.48 },
@@ -1465,10 +1465,10 @@
       var camera = scene3d.camera;
       if (!camera) return;
       if (kind === "wind") {
-        /* 侧视整机：拉远保证塔筒+叶片完整入画，占比适中 */
-        camera.fov = 36;
-        camera.position.set(19.2, 6.4, 17.8);
-        camera.lookAt(0.05, 4.5, 0);
+        /* 侧视整机：放大占比，略侧对机舱看全侧面 */
+        camera.fov = 34;
+        camera.position.set(14.8, 5.5, 12.2);
+        camera.lookAt(-0.15, 4.35, 0);
         camera.updateProjectionMatrix();
       } else if (kind === "pv") {
         camera.fov = 34;
@@ -1642,10 +1642,10 @@
       /* 底座 */
       addMesh(scene, [], new THREE.CylinderGeometry(1.15, 1.35, 0.14, 40), 0xcbd5e1, 0, 0.05, 0, "", { metalness: 0.12, roughness: 0.85 });
 
-      /* 侧视完整风机；略缩小保证整机入画 */
-      scene.rotation.y = -0.22;
-      scene.position.y = -0.35;
-      scene.scale.set(0.78, 0.78, 0.78);
+      /* 侧视完整风机；放大并略侧转，机舱侧面看全 */
+      scene.rotation.y = -0.52;
+      scene.position.y = -0.45;
+      scene.scale.set(1.05, 1.05, 1.05);
 
       scene3d.windRotor = rotor;
       scene3d.rotor = rotor;
@@ -1943,7 +1943,7 @@
     function jumpInventoryPage(file, action, label) {
       var href = file;
       if (href && href.indexOf("v=") < 0) {
-        href += (href.indexOf("?") >= 0 ? "&" : "?") + "v=20260722-tab3d-v54";
+        href += (href.indexOf("?") >= 0 ? "&" : "?") + "v=20260722-tab3d-v55";
       }
       if (action && typeof navigateBySidebarAction === "function" && navigateBySidebarAction(action, { label: label || "" })) {
         return true;
