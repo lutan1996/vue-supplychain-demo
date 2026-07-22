@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN" data-build="20260722-tab3d-v30">
+<html lang="zh-CN" data-build="20260722-tab3d-v31">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -222,6 +222,12 @@
       position: absolute;
       left: 0;
       top: 0;
+      width: 100% !important;
+      height: 100% !important;
+      transform: translateZ(0);
+    }
+    #calloutLayer {
+      transition: none !important;
     }
     .callout-layer {
       position: absolute;
@@ -781,8 +787,16 @@
     function renderCallouts() {
       var show = state.mat === "全部" || state.mat === "风机备件";
       var layer = document.getElementById("calloutLayer");
-      if (!show) {
-        layer.innerHTML = "";
+      if (!layer) return;
+      layer.style.visibility = show ? "visible" : "hidden";
+      layer.style.opacity = show ? "1" : "0";
+      layer.style.pointerEvents = show ? "auto" : "none";
+      if (!show) return;
+      /* 标注 DOM 只建一次，避免切回风机时整层重建闪一下 */
+      if (layer.getAttribute("data-built") === "1") {
+        layer.querySelectorAll(".callout").forEach(function (el) {
+          el.classList.toggle("on", el.getAttribute("data-part") === state.partId);
+        });
         return;
       }
       var lines = CALLOUTS.map(function (c) {
@@ -797,14 +811,15 @@
         );
       }).join("");
       layer.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">' + lines + "</svg>" + boxes;
+      layer.setAttribute("data-built", "1");
       layer.querySelectorAll(".callout").forEach(function (el) {
         el.onclick = function () {
           state.partId = el.getAttribute("data-part");
           renderCallouts();
+          updatePartHighlight();
         };
       });
     }
-
 
     function disposeObject3D(obj) {
       if (!obj) return;
@@ -864,21 +879,33 @@
 
     function syncRendererSize(force) {
       if (!scene3d.renderer || !scene3d.camera) return false;
+      if (scene3d._sizing) return true;
       var wrap = document.getElementById("diagramWrap");
       if (!wrap) return false;
       var w = Math.max(1, Math.floor(wrap.clientWidth));
       var h = Math.max(1, Math.floor(wrap.clientHeight));
       if (w < 8 || h < 8) return false;
-      if (!force && scene3d.lastW === w && scene3d.lastH === h) return true;
+      /* 哪怕 force，尺寸没变也绝不 setSize——否则切页签会闪白 */
+      if (scene3d.lastW === w && scene3d.lastH === h) return true;
+      if (!force && Math.abs(scene3d.lastW - w) < 2 && Math.abs(scene3d.lastH - h) < 2) return true;
+      scene3d._sizing = true;
       scene3d.lastW = w;
       scene3d.lastH = h;
       scene3d.camera.aspect = w / h;
       scene3d.camera.updateProjectionMatrix();
       scene3d.renderer.setSize(w, h, false);
       var canvas = scene3d.renderer.domElement;
-      canvas.style.width = w + "px";
-      canvas.style.height = h + "px";
+      canvas.style.width = "100%";
+      canvas.style.height = "100%";
+      scene3d._sizing = false;
       return true;
+    }
+
+    function paintScene() {
+      if (!scene3d.renderer || !scene3d.scene || !scene3d.camera) return;
+      try {
+        scene3d.renderer.render(scene3d.scene, scene3d.camera);
+      } catch (ePaint) {}
     }
 
     function ensureRenderer() {
@@ -894,12 +921,12 @@
 
       var w = Math.max(8, Math.floor(wrap.clientWidth || 600));
       var h = Math.max(8, Math.floor(wrap.clientHeight || 480));
-      var renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: "high-performance" });
+      var renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false, powerPreference: "high-performance", preserveDrawingBuffer: true });
       renderer.setPixelRatio(1);
-      renderer.setClearColor(0x000000, 0);
+      renderer.setClearColor(0xf3f7fc, 1);
       renderer.setSize(w, h, false);
-      renderer.domElement.style.width = w + "px";
-      renderer.domElement.style.height = h + "px";
+      renderer.domElement.style.width = "100%";
+      renderer.domElement.style.height = "100%";
       renderer.domElement.addEventListener("webglcontextlost", function (ev) {
         ev.preventDefault();
         sceneGen += 1;
@@ -937,13 +964,11 @@
       if (typeof ResizeObserver !== "undefined" && !scene3d.ro) {
         var roTimer = null;
         scene3d.ro = new ResizeObserver(function () {
+          if (scene3d._sizing) return;
           if (roTimer) clearTimeout(roTimer);
           roTimer = setTimeout(function () {
-            syncRendererSize(false);
-            if (scene3d.renderer && scene3d.scene && scene3d.camera) {
-              scene3d.renderer.render(scene3d.scene, scene3d.camera);
-            }
-          }, 60);
+            if (syncRendererSize(false)) paintScene();
+          }, 120);
         });
         scene3d.ro.observe(wrap);
       }
@@ -1017,32 +1042,24 @@
     }
 
     function startAnimLoop() {
-      if (scene3d.animId) return;
-      var myGen = sceneGen;
-      function animate() {
-        if (myGen !== sceneGen) return;
-        if (!scene3d.renderer || !scene3d.scene || !scene3d.camera) return;
-        scene3d.animId = requestAnimationFrame(animate);
-        try {
-          if (scene3d.lastPart !== state.partId) {
-            scene3d.lastPart = state.partId || "";
-            (scene3d.meshes || []).forEach(function (m) {
-              if (!m || !m.material || !m.material.emissive) return;
-              if (m.userData.partId && m.userData.partId === state.partId) {
-                m.material.emissive.setHex(0x1677ff);
-                m.material.emissiveIntensity = 0.28;
-              } else {
-                m.material.emissive.setHex(0x000000);
-                m.material.emissiveIntensity = 0;
-              }
-            });
-          }
-          scene3d.renderer.render(scene3d.scene, scene3d.camera);
-        } catch (eAnim) {
-          /* keep loop alive; next frame may recover */
+      /* 风机不再旋转：取消每帧 rAF，改为按需 paint，从根上消掉透明清屏闪烁 */
+      stopAnimLoop();
+      paintScene();
+    }
+
+    function updatePartHighlight() {
+      (scene3d.meshes || []).forEach(function (m) {
+        if (!m || !m.material || !m.material.emissive) return;
+        if (m.userData.partId && m.userData.partId === state.partId) {
+          m.material.emissive.setHex(0x1677ff);
+          m.material.emissiveIntensity = 0.28;
+        } else {
+          m.material.emissive.setHex(0x000000);
+          m.material.emissiveIntensity = 0;
         }
-      }
-      animate();
+      });
+      scene3d.lastPart = state.partId || "";
+      paintScene();
     }
 
     function initScene() {
@@ -1058,17 +1075,11 @@
         ensureBaseScene();
         ensureModels();
         applyKind(modelKind(state.mat));
-        if (!syncRendererSize(true)) {
-          requestAnimationFrame(function () {
-            syncRendererSize(true);
-            if (scene3d.renderer && scene3d.scene && scene3d.camera) {
-              scene3d.renderer.render(scene3d.scene, scene3d.camera);
-            }
-          });
-        } else if (scene3d.renderer && scene3d.scene && scene3d.camera) {
-          scene3d.renderer.render(scene3d.scene, scene3d.camera);
-        }
-        startAnimLoop();
+        syncRendererSize(false);
+        paintScene();
+        requestAnimationFrame(function () {
+          if (syncRendererSize(false)) paintScene();
+        });
       }
 
       var w0 = wrap.clientWidth;
@@ -1398,16 +1409,13 @@
       });
       renderCallouts();
       if (prevKind === nextKind && scene3d.modelsReady) {
-        scene3d.lastPart = "";
+        updatePartHighlight();
         return;
       }
-      /* 页签切换：三套模型只建一次，只切 visible，绝不销毁 WebGL */
+      /* 只切模型可见性 + 镜头，绝不 setSize / 绝不重建 WebGL */
       if (scene3d.renderer && scene3d.modelsReady) {
         applyKind(nextKind);
-        syncRendererSize(true);
-        try {
-          scene3d.renderer.render(scene3d.scene, scene3d.camera);
-        } catch (eRender) {}
+        paintScene();
         return;
       }
       initScene();
@@ -1416,7 +1424,7 @@
     function jumpInventoryPage(file, action, label) {
       var href = file;
       if (href && href.indexOf("v=") < 0) {
-        href += (href.indexOf("?") >= 0 ? "&" : "?") + "v=20260722-tab3d-v30";
+        href += (href.indexOf("?") >= 0 ? "&" : "?") + "v=20260722-tab3d-v31";
       }
       if (action && typeof navigateBySidebarAction === "function" && navigateBySidebarAction(action, { label: label || "" })) {
         return true;
@@ -1475,7 +1483,7 @@
     })();
 
     window.addEventListener("resize", function () {
-      syncRendererSize(false);
+      if (syncRendererSize(false)) paintScene();
       Object.keys(charts).forEach(function (k) {
         if (charts[k]) charts[k].resize();
       });
