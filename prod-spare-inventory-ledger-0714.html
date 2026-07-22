@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN" data-build="20260722-tab3d-v31">
+<html lang="zh-CN" data-build="20260722-tab3d-v32">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -222,13 +222,102 @@
       position: absolute;
       left: 0;
       top: 0;
-      width: 100% !important;
-      height: 100% !important;
-      transform: translateZ(0);
     }
     #calloutLayer {
       transition: none !important;
     }
+    .part-detail-pop {
+      position: absolute;
+      right: 12px;
+      top: 12px;
+      width: min(320px, calc(100% - 24px));
+      max-height: calc(100% - 24px);
+      overflow: auto;
+      z-index: 6;
+      background: #fff;
+      border: 1px solid #91caff;
+      border-radius: 6px;
+      box-shadow: 0 8px 24px rgba(15, 23, 42, 0.12);
+      padding: 12px 12px 10px;
+      display: none;
+    }
+    .part-detail-pop.show { display: block; }
+    .part-detail-pop .phd {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+    .part-detail-pop .phd h4 {
+      margin: 0;
+      font-size: 14px;
+      color: #1f2d3d;
+      font-weight: 700;
+    }
+    .part-detail-pop .phd .sub {
+      margin: 2px 0 0;
+      font-size: 11px;
+      color: #8c9bb0;
+    }
+    .part-detail-pop .x {
+      border: 0;
+      background: #f5f7fb;
+      width: 24px;
+      height: 24px;
+      border-radius: 4px;
+      cursor: pointer;
+      color: #64748b;
+      line-height: 24px;
+      flex: 0 0 auto;
+    }
+    .part-detail-pop .x:hover { background: #e6f4ff; color: #1677ff; }
+    .part-detail-pop .desc {
+      font-size: 12px;
+      color: #475569;
+      line-height: 1.5;
+      margin-bottom: 10px;
+    }
+    .part-detail-pop .kpis {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+      margin-bottom: 10px;
+    }
+    .part-detail-pop .kpi {
+      background: #f8fafc;
+      border: 1px solid #eef2f7;
+      border-radius: 4px;
+      padding: 8px;
+    }
+    .part-detail-pop .kpi .k { font-size: 11px; color: #94a3b8; }
+    .part-detail-pop .kpi .v { font-size: 16px; font-weight: 700; color: #1f2d3d; margin-top: 2px; }
+    .part-detail-pop .kpi .v small { font-size: 11px; font-weight: 500; color: #94a3b8; margin-left: 2px; }
+    .part-detail-pop .list-hd {
+      font-size: 12px;
+      font-weight: 700;
+      color: #334155;
+      margin-bottom: 6px;
+    }
+    .part-detail-pop .spare {
+      border: 1px solid #eef2f7;
+      border-radius: 4px;
+      padding: 8px 10px;
+      margin-bottom: 6px;
+      background: #fff;
+    }
+    .part-detail-pop .spare b {
+      display: block;
+      font-size: 12px;
+      color: #1f2d3d;
+      margin-bottom: 2px;
+    }
+    .part-detail-pop .spare span {
+      font-size: 11px;
+      color: #64748b;
+      line-height: 1.4;
+    }
+
     .callout-layer {
       position: absolute;
       inset: 0;
@@ -612,9 +701,19 @@
                 <button type="button" data-mat="储能备件">储能备件</button>
               </div>
               <div class="diagram-stage">
-                <div id="diagramWrap"></div>
-                <div class="callout-layer" id="calloutLayer"></div>
-              </div>
+                  <div id="diagramWrap"></div>
+                  <div class="callout-layer" id="calloutLayer"></div>
+                  <div class="part-detail-pop" id="partDetailPop" aria-live="polite">
+                    <div class="phd">
+                      <div>
+                        <h4 id="partDetailTitle">部位详情</h4>
+                        <p class="sub" id="partDetailSub">点击标注查看关联备件</p>
+                      </div>
+                      <button type="button" class="x" id="partDetailClose" aria-label="关闭">×</button>
+                    </div>
+                    <div id="partDetailBody"></div>
+                  </div>
+                </div>
             </section>
 
             <!-- 右：四块看板 -->
@@ -738,6 +837,39 @@
       { id: "filter", title: "滤芯/传感器", tip: "点击查看滤芯/传感器相关备件", x: 0.80, y: 0.60, tx: 0.52, ty: 0.56 }
     ];
 
+    var PART_DETAILS = {
+      blade: {
+        name: "叶片",
+        type: "叶片",
+        desc: "风机叶片总成及相关密封、紧固辅材，点击后查看该部位关联库存备件。",
+        spares: [
+          { code: "B00000005", name: "叶片", qty: 12, model: "SW64-2.0", status: "正常" },
+          { code: "B00000042", name: "叶片密封套", qty: 0, model: "YM-TF-01", status: "零库存" },
+          { code: "B00000016", name: "主轴轴承", qty: 6, model: "BR-120", status: "正常" }
+        ]
+      },
+      generator: {
+        name: "发电机",
+        type: "电机/变流",
+        desc: "永磁/双馈发电机总成，含定子、转子与冷却系统相关备件。",
+        spares: [
+          { code: "B00000018", name: "IGBT 模块", qty: 2, model: "FF450R", status: "正常" },
+          { code: "B00001888", name: "变频器模块", qty: 1, model: "VF-800", status: "正常" },
+          { code: "B00002119", name: "偏航电机", qty: 3, model: "PY-DJ-55", status: "正常" }
+        ]
+      },
+      filter: {
+        name: "滤芯/传感器",
+        type: "滤芯/传感器",
+        desc: "齿轮箱滤芯、塔筒监测传感器及液压相关耗材。",
+        spares: [
+          { code: "B00001235", name: "齿轮箱滤芯", qty: 86, model: "GX-LX-90", status: "正常" },
+          { code: "B00001236", name: "塔筒振动传感器", qty: 15, model: "TS-300", status: "正常" },
+          { code: "B00000055", name: "液压泵", qty: 4, model: "YY-B-80", status: "正常" }
+        ]
+      }
+    };
+
     var state = {
       level: "company",
       company: "上海龙源",
@@ -791,8 +923,10 @@
       layer.style.visibility = show ? "visible" : "hidden";
       layer.style.opacity = show ? "1" : "0";
       layer.style.pointerEvents = show ? "auto" : "none";
-      if (!show) return;
-      /* 标注 DOM 只建一次，避免切回风机时整层重建闪一下 */
+      if (!show) {
+        hidePartDetail();
+        return;
+      }
       if (layer.getAttribute("data-built") === "1") {
         layer.querySelectorAll(".callout").forEach(function (el) {
           el.classList.toggle("on", el.getAttribute("data-part") === state.partId);
@@ -813,10 +947,13 @@
       layer.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">' + lines + "</svg>" + boxes;
       layer.setAttribute("data-built", "1");
       layer.querySelectorAll(".callout").forEach(function (el) {
-        el.onclick = function () {
+        el.onclick = function (ev) {
+          if (ev && ev.stopPropagation) ev.stopPropagation();
           state.partId = el.getAttribute("data-part");
           renderCallouts();
           updatePartHighlight();
+          showPartDetail(state.partId);
+          requestAnimationFrame(function () { paintScene(); });
         };
       });
     }
@@ -885,7 +1022,6 @@
       var w = Math.max(1, Math.floor(wrap.clientWidth));
       var h = Math.max(1, Math.floor(wrap.clientHeight));
       if (w < 8 || h < 8) return false;
-      /* 哪怕 force，尺寸没变也绝不 setSize——否则切页签会闪白 */
       if (scene3d.lastW === w && scene3d.lastH === h) return true;
       if (!force && Math.abs(scene3d.lastW - w) < 2 && Math.abs(scene3d.lastH - h) < 2) return true;
       scene3d._sizing = true;
@@ -895,8 +1031,8 @@
       scene3d.camera.updateProjectionMatrix();
       scene3d.renderer.setSize(w, h, false);
       var canvas = scene3d.renderer.domElement;
-      canvas.style.width = "100%";
-      canvas.style.height = "100%";
+      canvas.style.width = w + "px";
+      canvas.style.height = h + "px";
       scene3d._sizing = false;
       return true;
     }
@@ -907,6 +1043,39 @@
         scene3d.renderer.render(scene3d.scene, scene3d.camera);
       } catch (ePaint) {}
     }
+
+    function hidePartDetail() {
+      var pop = document.getElementById("partDetailPop");
+      if (pop) pop.classList.remove("show");
+    }
+
+    function showPartDetail(partId) {
+      var pop = document.getElementById("partDetailPop");
+      var title = document.getElementById("partDetailTitle");
+      var sub = document.getElementById("partDetailSub");
+      var body = document.getElementById("partDetailBody");
+      if (!pop || !title || !sub || !body) return;
+      var part = PART_DETAILS[partId];
+      if (!part) {
+        hidePartDetail();
+        return;
+      }
+      var totalQty = part.spares.reduce(function (n, s) { return n + s.qty; }, 0);
+      title.textContent = part.name + " · 关联备件";
+      sub.textContent = (state.company || "龙源电力") + " · 部位联动详情";
+      body.innerHTML =
+        '<div class="desc">' + part.desc + '</div>' +
+        '<div class="kpis">' +
+          '<div class="kpi"><div class="k">关联备件品种</div><div class="v">' + part.spares.length + '<small>种</small></div></div>' +
+          '<div class="kpi"><div class="k">当前库存数量</div><div class="v">' + totalQty + '<small>件</small></div></div>' +
+        '</div>' +
+        '<div class="list-hd">关联生产备件清单</div>' +
+        part.spares.map(function (s) {
+          return '<div class="spare"><b>' + s.name + ' · ' + s.code + '</b><span>规格：' + s.model + ' · 库存：' + s.qty + ' 件 · 状态：' + s.status + '</span></div>';
+        }).join("");
+      pop.classList.add("show");
+    }
+
 
     function ensureRenderer() {
       var wrap = document.getElementById("diagramWrap");
@@ -925,8 +1094,8 @@
       renderer.setPixelRatio(1);
       renderer.setClearColor(0xf3f7fc, 1);
       renderer.setSize(w, h, false);
-      renderer.domElement.style.width = "100%";
-      renderer.domElement.style.height = "100%";
+      renderer.domElement.style.width = w + "px";
+      renderer.domElement.style.height = h + "px";
       renderer.domElement.addEventListener("webglcontextlost", function (ev) {
         ev.preventDefault();
         sceneGen += 1;
@@ -1042,21 +1211,31 @@
     }
 
     function startAnimLoop() {
-      /* 风机不再旋转：取消每帧 rAF，改为按需 paint，从根上消掉透明清屏闪烁 */
-      stopAnimLoop();
-      paintScene();
+      if (scene3d.animId) return;
+      var myGen = sceneGen;
+      function animate() {
+        if (myGen !== sceneGen) return;
+        if (!scene3d.renderer || !scene3d.scene || !scene3d.camera) return;
+        scene3d.animId = requestAnimationFrame(animate);
+        try {
+          scene3d.renderer.render(scene3d.scene, scene3d.camera);
+        } catch (eAnim) {}
+      }
+      animate();
     }
 
     function updatePartHighlight() {
       (scene3d.meshes || []).forEach(function (m) {
         if (!m || !m.material || !m.material.emissive) return;
-        if (m.userData.partId && m.userData.partId === state.partId) {
-          m.material.emissive.setHex(0x1677ff);
-          m.material.emissiveIntensity = 0.28;
-        } else {
-          m.material.emissive.setHex(0x000000);
-          m.material.emissiveIntensity = 0;
-        }
+        try {
+          if (m.userData.partId && m.userData.partId === state.partId) {
+            m.material.emissive.setHex(0x1677ff);
+            m.material.emissiveIntensity = 0.35;
+          } else {
+            m.material.emissive.setHex(0x000000);
+            m.material.emissiveIntensity = 0;
+          }
+        } catch (eMat) {}
       });
       scene3d.lastPart = state.partId || "";
       paintScene();
@@ -1077,6 +1256,7 @@
         applyKind(modelKind(state.mat));
         syncRendererSize(false);
         paintScene();
+        startAnimLoop();
         requestAnimationFrame(function () {
           if (syncRendererSize(false)) paintScene();
         });
@@ -1404,15 +1584,16 @@
       var nextKind = modelKind(nextMat);
       state.mat = nextMat;
       state.partId = "";
+      hidePartDetail();
       document.querySelectorAll("#matTabs button").forEach(function (b) {
         b.classList.toggle("on", b === btn);
       });
       renderCallouts();
       if (prevKind === nextKind && scene3d.modelsReady) {
         updatePartHighlight();
+        paintScene();
         return;
       }
-      /* 只切模型可见性 + 镜头，绝不 setSize / 绝不重建 WebGL */
       if (scene3d.renderer && scene3d.modelsReady) {
         applyKind(nextKind);
         paintScene();
@@ -1424,7 +1605,7 @@
     function jumpInventoryPage(file, action, label) {
       var href = file;
       if (href && href.indexOf("v=") < 0) {
-        href += (href.indexOf("?") >= 0 ? "&" : "?") + "v=20260722-tab3d-v31";
+        href += (href.indexOf("?") >= 0 ? "&" : "?") + "v=20260722-tab3d-v32";
       }
       if (action && typeof navigateBySidebarAction === "function" && navigateBySidebarAction(action, { label: label || "" })) {
         return true;
@@ -1488,6 +1669,20 @@
         if (charts[k]) charts[k].resize();
       });
     });
+
+
+    (function bindPartDetailClose() {
+      var btn = document.getElementById("partDetailClose");
+      if (!btn) return;
+      btn.addEventListener("click", function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        state.partId = "";
+        hidePartDetail();
+        renderCallouts();
+        updatePartHighlight();
+      });
+    })();
 
     renderAll();
   })();
