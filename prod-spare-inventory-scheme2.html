@@ -262,7 +262,7 @@
       z-index: 2;
       align-items: center;
       justify-content: center;
-      background: #34aad0;
+      background: #fff;
       overflow: hidden;
     }
     .wind-cutaway.on { display: flex; }
@@ -298,7 +298,7 @@
       position: absolute;
       inset: 16%;
       border-radius: 50%;
-      background: #34aad0;
+      background: #fff;
     }
     .wind-spin .hub {
       position: absolute;
@@ -441,6 +441,9 @@
       pointer-events: none;
       z-index: 3;
     }
+    .wind-cutaway-frame > .callout-layer {
+      z-index: 4;
+    }
     .callout-layer svg {
       position: absolute;
       inset: 0;
@@ -451,31 +454,34 @@
     .callout {
       position: absolute;
       pointer-events: auto;
-      min-width: 150px;
-      max-width: 178px;
-      padding: 8px 10px;
-      background: #eef6ff;
-      border: 1px solid #69b1ff;
+      min-width: 132px;
+      max-width: 168px;
+      padding: 7px 10px 8px;
+      background: #f3f8fc;
+      border: 1px solid #c6ddf5;
       border-radius: 2px;
-      box-shadow: none;
+      box-shadow: 0 1px 4px rgba(15, 23, 42, 0.06);
       cursor: pointer;
       transform: translate(-50%, -50%);
     }
     .callout:hover, .callout.on {
-      background: #e6f4ff;
-      border-color: #1677ff;
+      background: #eaf3fb;
+      border-color: #69b1ff;
+    }
+    .callout.on {
+      box-shadow: 0 0 0 1px #1677ff inset;
     }
     .callout b {
       display: block;
       font-size: 13px;
       color: #1677ff;
-      font-weight: 600;
+      font-weight: 700;
       margin-bottom: 2px;
     }
     .callout span {
       display: block;
       font-size: 11px;
-      color: #5b7aa3;
+      color: #6b7c93;
       line-height: 1.35;
     }
 
@@ -904,7 +910,7 @@
                   <div id="diagramWrap"></div>
                   <div class="wind-cutaway" id="windCutaway" aria-label="风机剖视">
                     <div class="wind-cutaway-frame">
-                      <img src="assets/wind-turbine-cutaway.png" alt="风机侧面剖视" draggable="false" />
+                      <img src="assets/wind-turbine-cutaway-clean.png" alt="风机侧面剖视" draggable="false" />
                       <div class="wind-spin" aria-hidden="true">
                         <div class="disk"></div>
                         <div class="blades">
@@ -914,6 +920,7 @@
                         </div>
                         <div class="hub"></div>
                       </div>
+                      <div class="callout-layer" id="windCalloutLayer"></div>
                     </div>
                   </div>
                   <div class="callout-layer" id="calloutLayer"></div>
@@ -1035,9 +1042,19 @@
 
     var CALLOUTS_BY_KIND = {
       wind: [
-        { id: "blade", title: "叶片", tip: "点击查看叶片相关备件", x: 0.12, y: 0.18, tx: 0.26, ty: 0.32 },
-        { id: "filter", title: "滤芯/传感器", tip: "点击查看滤芯/传感器相关备件", x: 0.86, y: 0.18, tx: 0.72, ty: 0.28 },
-        { id: "generator", title: "发电机", tip: "点击查看发电机相关备件", x: 0.84, y: 0.55, tx: 0.58, ty: 0.48 }
+        { id: "hub_cover", title: "轮毂外罩", tip: "点击查看轮毂外罩相关备件", x: 0.09, y: 0.40, tx: 0.20, ty: 0.42 },
+        { id: "hub", title: "轮毂", tip: "点击查看轮毂相关备件", x: 0.09, y: 0.51, tx: 0.24, ty: 0.48 },
+        { id: "blade", title: "叶片", tip: "点击查看叶片相关备件", x: 0.10, y: 0.63, tx: 0.22, ty: 0.56 },
+        { id: "front_rotor", title: "前盘式转子", tip: "点击查看前盘式转子相关备件", x: 0.36, y: 0.18, tx: 0.39, ty: 0.38 },
+        { id: "magnet", title: "永久磁铁", tip: "点击查看永久磁铁相关备件", x: 0.28, y: 0.44, tx: 0.42, ty: 0.45 },
+        { id: "stator_winding", title: "中间定子绕组", tip: "点击查看中间定子绕组相关备件", x: 0.52, y: 0.12, tx: 0.50, ty: 0.40 },
+        { id: "stator", title: "中间定子", tip: "点击查看中间定子相关备件", x: 0.58, y: 0.48, tx: 0.52, ty: 0.47 },
+        { id: "rear_rotor", title: "后盘式转子", tip: "点击查看后盘式转子相关备件", x: 0.78, y: 0.16, tx: 0.62, ty: 0.40 },
+        { id: "filter", title: "滤芯/传感器", tip: "点击查看滤芯/传感器相关备件", x: 0.70, y: 0.10, tx: 0.64, ty: 0.26 },
+        { id: "generator", title: "发电机", tip: "点击查看发电机相关备件", x: 0.72, y: 0.56, tx: 0.56, ty: 0.48 },
+        { id: "cabinet", title: "电器柜", tip: "点击查看电器柜相关备件", x: 0.90, y: 0.42, tx: 0.78, ty: 0.48 },
+        { id: "nacelle", title: "机舱", tip: "点击查看机舱相关备件", x: 0.90, y: 0.66, tx: 0.80, ty: 0.58 },
+        { id: "tower", title: "塔架", tip: "点击查看塔架相关备件", x: 0.48, y: 0.90, tx: 0.50, ty: 0.76 }
       ],
       pv: [
         { id: "pv_module", title: "光伏组件", tip: "点击查看光伏组件相关备件", x: 0.16, y: 0.40, tx: 0.40, ty: 0.48 },
@@ -1133,6 +1150,206 @@
           { name: "接头", value: 4 }, { name: "其他", value: 3 }
         ],
         scrap: [48, 40, 36, 30, 24, 18]
+      },
+      hub_cover: {
+        label: "轮毂外罩",
+        qty: "420", amt: "1860",
+        outQty: "36 件", outAmt: "160 万元", outPct: "18%",
+        inQty: "28 件", inAmt: "124 万元", inPct: "14%",
+        idle: [
+          { qty: "18件", pct: "9%", amt: "72万元" },
+          { qty: "24件", pct: "11%", amt: "96万元" },
+          { qty: "16件", pct: "8%", amt: "64万元" },
+          { qty: "12件", pct: "6%", amt: "48万元" }
+        ],
+        rtOut: [3, 2, 4, 3, 2], rtCur: [7, 6, 8, 7, 5], rtIn: [2, 2, 3, 2, 1], rtMax: 18,
+        idleS1: [2, 2, 3, 2, 1], idleS2: [3, 2, 3, 2, 2], idleS3: [2, 1, 2, 2, 1], idleS4: [1, 1, 1, 1, 0], idleMax: 16,
+        pie: [
+          { name: "外罩壳体", value: 40 }, { name: "密封圈", value: 18 }, { name: "紧固件", value: 14 },
+          { name: "导流罩", value: 10 }, { name: "胶条", value: 8 }, { name: "螺栓", value: 5 },
+          { name: "垫片", value: 3 }, { name: "其他", value: 2 }
+        ],
+        scrap: [10, 8, 7, 6, 4, 3]
+      },
+      hub: {
+        label: "轮毂",
+        qty: "680", amt: "5400",
+        outQty: "42 件", outAmt: "420 万元", outPct: "16%",
+        inQty: "30 件", inAmt: "300 万元", inPct: "12%",
+        idle: [
+          { qty: "22件", pct: "8%", amt: "210万元" },
+          { qty: "28件", pct: "10%", amt: "268万元" },
+          { qty: "18件", pct: "7%", amt: "172万元" },
+          { qty: "14件", pct: "5%", amt: "134万元" }
+        ],
+        rtOut: [3, 3, 4, 3, 2], rtCur: [9, 8, 10, 9, 7], rtIn: [2, 2, 3, 2, 2], rtMax: 22,
+        idleS1: [3, 2, 3, 3, 2], idleS2: [3, 3, 4, 3, 2], idleS3: [2, 2, 3, 2, 1], idleS4: [1, 1, 2, 1, 1], idleMax: 18,
+        pie: [
+          { name: "轮毂本体", value: 36 }, { name: "变桨轴承", value: 22 }, { name: "锁紧盘", value: 14 },
+          { name: "螺栓组", value: 10 }, { name: "密封件", value: 8 }, { name: "润滑管路", value: 5 },
+          { name: "传感器座", value: 3 }, { name: "其他", value: 2 }
+        ],
+        scrap: [14, 12, 10, 8, 6, 4]
+      },
+      front_rotor: {
+        label: "前盘式转子",
+        qty: "246", amt: "6800",
+        outQty: "18 件", outAmt: "520 万元", outPct: "12%",
+        inQty: "14 件", inAmt: "400 万元", inPct: "10%",
+        idle: [
+          { qty: "10件", pct: "7%", amt: "280万元" },
+          { qty: "14件", pct: "9%", amt: "390万元" },
+          { qty: "9件", pct: "6%", amt: "250万元" },
+          { qty: "6件", pct: "4%", amt: "170万元" }
+        ],
+        rtOut: [2, 1, 2, 2, 1], rtCur: [5, 4, 6, 5, 4], rtIn: [1, 1, 2, 1, 1], rtMax: 14,
+        idleS1: [2, 1, 2, 2, 1], idleS2: [2, 2, 3, 2, 1], idleS3: [1, 1, 2, 1, 1], idleS4: [1, 0, 1, 1, 0], idleMax: 12,
+        pie: [
+          { name: "前盘本体", value: 38 }, { name: "磁钢槽", value: 20 }, { name: "紧固件", value: 14 },
+          { name: "平衡块", value: 10 }, { name: "绝缘垫", value: 8 }, { name: "轴承位", value: 5 },
+          { name: "密封", value: 3 }, { name: "其他", value: 2 }
+        ],
+        scrap: [8, 7, 6, 5, 4, 2]
+      },
+      magnet: {
+        label: "永久磁铁",
+        qty: "1860", amt: "9200",
+        outQty: "96 件", outAmt: "480 万元", outPct: "20%",
+        inQty: "78 件", inAmt: "390 万元", inPct: "16%",
+        idle: [
+          { qty: "54件", pct: "10%", amt: "260万元" },
+          { qty: "68件", pct: "12%", amt: "330万元" },
+          { qty: "42件", pct: "8%", amt: "200万元" },
+          { qty: "30件", pct: "6%", amt: "140万元" }
+        ],
+        rtOut: [5, 4, 6, 5, 4], rtCur: [11, 10, 12, 11, 9], rtIn: [4, 3, 5, 4, 3], rtMax: 28,
+        idleS1: [4, 3, 5, 4, 3], idleS2: [5, 4, 5, 4, 3], idleS3: [3, 3, 4, 3, 2], idleS4: [2, 1, 2, 2, 1], idleMax: 22,
+        pie: [
+          { name: "钕铁硼磁钢", value: 48 }, { name: "磁靴", value: 16 }, { name: "固定楔", value: 12 },
+          { name: "环氧胶", value: 8 }, { name: "防护罩", value: 6 }, { name: "隔磁片", value: 5 },
+          { name: "紧固件", value: 3 }, { name: "其他", value: 2 }
+        ],
+        scrap: [20, 16, 14, 12, 9, 6]
+      },
+      stator_winding: {
+        label: "中间定子绕组",
+        qty: "520", amt: "7600",
+        outQty: "28 件", outAmt: "420 万元", outPct: "14%",
+        inQty: "22 件", inAmt: "330 万元", inPct: "11%",
+        idle: [
+          { qty: "16件", pct: "8%", amt: "240万元" },
+          { qty: "20件", pct: "10%", amt: "300万元" },
+          { qty: "14件", pct: "7%", amt: "210万元" },
+          { qty: "10件", pct: "5%", amt: "150万元" }
+        ],
+        rtOut: [2, 2, 3, 2, 2], rtCur: [7, 6, 8, 7, 5], rtIn: [2, 1, 2, 2, 1], rtMax: 18,
+        idleS1: [2, 2, 3, 2, 1], idleS2: [3, 2, 3, 3, 2], idleS3: [2, 1, 2, 2, 1], idleS4: [1, 1, 1, 1, 0], idleMax: 16,
+        pie: [
+          { name: "绕组线圈", value: 42 }, { name: "绝缘漆", value: 16 }, { name: "槽楔", value: 12 },
+          { name: "引出线", value: 10 }, { name: "绑扎带", value: 8 }, { name: "端箍", value: 6 },
+          { name: "垫条", value: 4 }, { name: "其他", value: 2 }
+        ],
+        scrap: [11, 9, 8, 7, 5, 3]
+      },
+      stator: {
+        label: "中间定子",
+        qty: "310", amt: "5400",
+        outQty: "16 件", outAmt: "280 万元", outPct: "12%",
+        inQty: "12 件", inAmt: "210 万元", inPct: "9%",
+        idle: [
+          { qty: "10件", pct: "7%", amt: "160万元" },
+          { qty: "12件", pct: "8%", amt: "190万元" },
+          { qty: "8件", pct: "6%", amt: "130万元" },
+          { qty: "6件", pct: "4%", amt: "100万元" }
+        ],
+        rtOut: [2, 1, 2, 2, 1], rtCur: [5, 5, 6, 5, 4], rtIn: [1, 1, 2, 1, 1], rtMax: 14,
+        idleS1: [2, 1, 2, 1, 1], idleS2: [2, 2, 2, 2, 1], idleS3: [1, 1, 2, 1, 1], idleS4: [1, 0, 1, 1, 0], idleMax: 12,
+        pie: [
+          { name: "定子铁心", value: 40 }, { name: "机座", value: 18 }, { name: "压圈", value: 14 },
+          { name: "通风槽", value: 10 }, { name: "定位键", value: 8 }, { name: "紧固件", value: 5 },
+          { name: "绝缘件", value: 3 }, { name: "其他", value: 2 }
+        ],
+        scrap: [9, 8, 7, 5, 4, 2]
+      },
+      rear_rotor: {
+        label: "后盘式转子",
+        qty: "238", amt: "6400",
+        outQty: "16 件", outAmt: "460 万元", outPct: "11%",
+        inQty: "12 件", inAmt: "350 万元", inPct: "9%",
+        idle: [
+          { qty: "9件", pct: "6%", amt: "240万元" },
+          { qty: "12件", pct: "8%", amt: "320万元" },
+          { qty: "8件", pct: "5%", amt: "210万元" },
+          { qty: "5件", pct: "4%", amt: "140万元" }
+        ],
+        rtOut: [2, 1, 2, 1, 1], rtCur: [5, 4, 5, 5, 3], rtIn: [1, 1, 1, 1, 1], rtMax: 14,
+        idleS1: [1, 1, 2, 1, 1], idleS2: [2, 2, 2, 2, 1], idleS3: [1, 1, 2, 1, 1], idleS4: [1, 0, 1, 0, 0], idleMax: 12,
+        pie: [
+          { name: "后盘本体", value: 38 }, { name: "磁钢槽", value: 20 }, { name: "紧固件", value: 14 },
+          { name: "平衡块", value: 10 }, { name: "绝缘垫", value: 8 }, { name: "轴承位", value: 5 },
+          { name: "密封", value: 3 }, { name: "其他", value: 2 }
+        ],
+        scrap: [7, 6, 5, 4, 3, 2]
+      },
+      cabinet: {
+        label: "电器柜",
+        qty: "960", amt: "4800",
+        outQty: "64 件", outAmt: "320 万元", outPct: "22%",
+        inQty: "52 件", inAmt: "260 万元", inPct: "18%",
+        idle: [
+          { qty: "36件", pct: "11%", amt: "180万元" },
+          { qty: "42件", pct: "13%", amt: "210万元" },
+          { qty: "28件", pct: "9%", amt: "140万元" },
+          { qty: "20件", pct: "6%", amt: "100万元" }
+        ],
+        rtOut: [4, 4, 5, 4, 3], rtCur: [9, 8, 10, 9, 7], rtIn: [3, 3, 4, 3, 2], rtMax: 24,
+        idleS1: [3, 3, 4, 3, 2], idleS2: [4, 3, 4, 4, 3], idleS3: [3, 2, 3, 2, 2], idleS4: [2, 1, 2, 1, 1], idleMax: 20,
+        pie: [
+          { name: "控制模块", value: 32 }, { name: "接触器", value: 18 }, { name: "断路器", value: 14 },
+          { name: "端子排", value: 12 }, { name: "风扇", value: 8 }, { name: "柜体", value: 8 },
+          { name: "线缆", value: 5 }, { name: "其他", value: 3 }
+        ],
+        scrap: [16, 14, 12, 10, 8, 5]
+      },
+      nacelle: {
+        label: "机舱",
+        qty: "740", amt: "6200",
+        outQty: "38 件", outAmt: "360 万元", outPct: "15%",
+        inQty: "30 件", inAmt: "280 万元", inPct: "12%",
+        idle: [
+          { qty: "24件", pct: "9%", amt: "210万元" },
+          { qty: "30件", pct: "11%", amt: "260万元" },
+          { qty: "20件", pct: "8%", amt: "180万元" },
+          { qty: "14件", pct: "5%", amt: "120万元" }
+        ],
+        rtOut: [3, 3, 4, 3, 2], rtCur: [8, 7, 9, 8, 6], rtIn: [2, 2, 3, 2, 2], rtMax: 20,
+        idleS1: [3, 2, 3, 3, 2], idleS2: [3, 3, 4, 3, 2], idleS3: [2, 2, 3, 2, 1], idleS4: [1, 1, 2, 1, 1], idleMax: 18,
+        pie: [
+          { name: "机舱罩", value: 34 }, { name: "底板", value: 18 }, { name: "偏航轴承", value: 16 },
+          { name: "密封条", value: 10 }, { name: "检修门", value: 8 }, { name: "紧固件", value: 7 },
+          { name: "护栏", value: 4 }, { name: "其他", value: 3 }
+        ],
+        scrap: [13, 11, 9, 8, 6, 4]
+      },
+      tower: {
+        label: "塔架",
+        qty: "1120", amt: "15600",
+        outQty: "26 件", outAmt: "680 万元", outPct: "10%",
+        inQty: "20 件", inAmt: "520 万元", inPct: "8%",
+        idle: [
+          { qty: "14件", pct: "6%", amt: "360万元" },
+          { qty: "18件", pct: "8%", amt: "460万元" },
+          { qty: "12件", pct: "5%", amt: "300万元" },
+          { qty: "8件", pct: "4%", amt: "200万元" }
+        ],
+        rtOut: [2, 2, 3, 2, 1], rtCur: [6, 5, 7, 6, 5], rtIn: [1, 1, 2, 1, 1], rtMax: 16,
+        idleS1: [2, 1, 2, 2, 1], idleS2: [2, 2, 3, 2, 2], idleS3: [1, 1, 2, 1, 1], idleS4: [1, 1, 1, 1, 0], idleMax: 14,
+        pie: [
+          { name: "塔筒段", value: 44 }, { name: "法兰", value: 16 }, { name: "高强螺栓", value: 14 },
+          { name: "内平台", value: 10 }, { name: "爬梯", value: 6 }, { name: "电缆支架", value: 5 },
+          { name: "防腐件", value: 3 }, { name: "其他", value: 2 }
+        ],
+        scrap: [10, 9, 7, 6, 4, 3]
       },
       pv_module: {
         label: "光伏组件",
@@ -1308,10 +1525,33 @@
     }
 
     function renderCallouts() {
-      var layer = document.getElementById("calloutLayer");
-      if (!layer) return;
       var kind = modelKind(state.mat);
+      var stageLayer = document.getElementById("calloutLayer");
+      var windLayer = document.getElementById("windCalloutLayer");
+      var layer = kind === "wind" ? windLayer : stageLayer;
+      if (!layer) return;
       var list = getCallouts();
+
+      /* 风机标注挂在剖视图内；光伏/储能挂在舞台层 */
+      if (stageLayer) {
+        stageLayer.style.visibility = kind === "wind" ? "hidden" : "visible";
+        stageLayer.style.pointerEvents = kind === "wind" ? "none" : "auto";
+        if (kind === "wind") {
+          stageLayer.innerHTML = "";
+          stageLayer.removeAttribute("data-built");
+          stageLayer.removeAttribute("data-kind");
+        }
+      }
+      if (windLayer) {
+        windLayer.style.visibility = kind === "wind" ? "visible" : "hidden";
+        windLayer.style.pointerEvents = kind === "wind" ? "auto" : "none";
+        if (kind !== "wind") {
+          windLayer.innerHTML = "";
+          windLayer.removeAttribute("data-built");
+          windLayer.removeAttribute("data-kind");
+        }
+      }
+
       layer.style.visibility = "visible";
       layer.style.opacity = "1";
       layer.style.pointerEvents = "auto";
@@ -1575,7 +1815,7 @@
         camera.position.set(0, 2.2, 9.2);
         camera.lookAt(0, 2.2, 0);
         camera.updateProjectionMatrix();
-        if (scene3d.renderer) scene3d.renderer.setClearColor(0x34aad0, 1);
+        if (scene3d.renderer) scene3d.renderer.setClearColor(0xffffff, 1);
       } else if (kind === "pv") {
         camera.fov = 34;
         camera.position.set(5.2, 3.8, 8.0);
