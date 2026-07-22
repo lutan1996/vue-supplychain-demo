@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN" data-build="20260722-3d-stable-v25">
+<html lang="zh-CN" data-build="20260722-scheme2-proto-v26">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -108,7 +108,8 @@
       flex: 1 1 auto;
       min-height: 0;
       display: grid;
-      grid-template-columns: 240px minmax(400px, 1.15fr) minmax(0, 1.05fr);
+      /* 方案2原型：左组织树 + 右主区（上风机、下四宫格） */
+      grid-template-columns: 220px minmax(0, 1fr);
       gap: 8px;
       padding: 6px 8px 8px;
       overflow: hidden;
@@ -122,6 +123,25 @@
       overflow: hidden;
       display: flex;
       flex-direction: column;
+    }
+
+    .main-col {
+      min-height: 0;
+      min-width: 0;
+      display: grid;
+      grid-template-rows: minmax(0, 1.2fr) minmax(0, 1fr);
+      gap: 6px;
+      overflow: hidden;
+    }
+
+    .dash-grid {
+      min-height: 0;
+      min-width: 0;
+      display: grid;
+      grid-template-columns: minmax(0, 1.4fr) minmax(0, 0.95fr);
+      grid-template-rows: minmax(0, 1fr) minmax(0, 1fr);
+      gap: 6px;
+      overflow: hidden;
     }
 
     /* 左侧：组织 + 风电场 */
@@ -261,17 +281,7 @@
       line-height: 1.35;
     }
 
-    /* 右侧看板：三块等比压缩，禁止内部滚动，保证 100% 缩放一屏展示 */
-    .right-pane {
-      display: grid;
-      grid-template-rows: minmax(0, 1.12fr) minmax(0, 1.05fr) minmax(0, 0.9fr);
-      gap: 6px;
-      background: transparent;
-      border: 0;
-      overflow: hidden;
-      padding-right: 0;
-      min-height: 0;
-    }
+    /* 看板卡片 */
     .dash-card {
       background: #fff;
       border: 1px solid var(--border);
@@ -488,11 +498,7 @@
     .idle-cell .a { font-size: 10px; color: #64748b; }
 
     .bottom-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 6px;
-      min-height: 0;
-      overflow: hidden;
+      display: contents;
     }
     .bottom-row .dash-card { min-height: 0; }
 
@@ -524,7 +530,7 @@
     }
 
     @media (max-width: 1280px) {
-      .ly-home { grid-template-columns: 200px minmax(340px, 1fr) minmax(0, 1fr); }
+      .ly-home { grid-template-columns: 180px minmax(0, 1fr); }
     }
   </style>
 </head>
@@ -591,110 +597,110 @@
               </div>
             </aside>
 
-            <!-- 中：四块看板（方案2：与风机对调） -->
-            <aside class="right-pane" id="rightPane">
-              <div class="dash-card">
-                <h3>实时物资动态</h3>
-                <div class="dash-split">
-                  <div class="rt-summary">
-                    <div class="rt-head">
-                      <div class="rt-title">当前库存</div>
-                      <div class="rt-vals">
-                        <div><b>14200</b><span>件</span></div>
-                        <div><b>40000</b><span>万元</span></div>
+            <!-- 右主区：上风机，下四宫格（对齐生产管控原型） -->
+            <div class="main-col">
+              <section class="ly-pane mid-pane">
+                <div class="mat-tabs" id="matTabs">
+                  <button type="button" class="on" data-mat="全部">全部</button>
+                  <button type="button" data-mat="风机备件">风机备件</button>
+                  <button type="button" data-mat="光伏备件">光伏备件</button>
+                  <button type="button" data-mat="储能备件">储能备件</button>
+                </div>
+                <div class="diagram-stage">
+                  <div id="diagramWrap"></div>
+                  <div class="callout-layer" id="calloutLayer"></div>
+                </div>
+              </section>
+
+              <div class="dash-grid" id="rightPane">
+                <div class="dash-card">
+                  <h3>实时物资动态</h3>
+                  <div class="dash-split">
+                    <div class="rt-summary">
+                      <div class="rt-head">
+                        <div class="rt-title">当前库存</div>
+                        <div class="rt-vals">
+                          <div><b>14200</b><span>件</span></div>
+                          <div><b>40000</b><span>万元</span></div>
+                        </div>
+                      </div>
+                      <div class="rt-flow">
+                        <div class="rt-flow-col">
+                          <div class="t">出库动态</div>
+                          <div class="r"><span>数量</span><em>14200 件</em></div>
+                          <div class="r"><span>金额</span><em>14200 万元</em></div>
+                          <div class="r"><span>占比</span><em>50%</em></div>
+                        </div>
+                        <div class="rt-flow-col">
+                          <div class="t">入库动态</div>
+                          <div class="r"><span>数量</span><em>14200 件</em></div>
+                          <div class="r"><span>金额</span><em>14200 万元</em></div>
+                          <div class="r"><span>占比</span><em>45%</em></div>
+                        </div>
                       </div>
                     </div>
-                    <div class="rt-flow">
-                      <div class="rt-flow-col">
-                        <div class="t">出库动态</div>
-                        <div class="r"><span>数量</span><em>14200 件</em></div>
-                        <div class="r"><span>金额</span><em>14200 万元</em></div>
-                        <div class="r"><span>占比</span><em>50%</em></div>
+                    <div class="chart-box">
+                      <div class="chart-title">各仓库数量占比情况</div>
+                      <div class="chart-legend" aria-hidden="true">
+                        <span><i style="background:#1677ff"></i>出库数量</span>
+                        <span><i style="background:#f5222d"></i>当前数量</span>
+                        <span><i style="background:#52c41a"></i>入库数量</span>
                       </div>
-                      <div class="rt-flow-col">
-                        <div class="t">入库动态</div>
-                        <div class="r"><span>数量</span><em>14200 件</em></div>
-                        <div class="r"><span>金额</span><em>14200 万元</em></div>
-                        <div class="r"><span>占比</span><em>45%</em></div>
-                      </div>
+                      <div class="chart-el" id="chartRealtime"></div>
                     </div>
-                  </div>
-                  <div class="chart-box">
-                    <div class="chart-title">各仓库数量占比情况</div>
-                    <div class="chart-legend" aria-hidden="true">
-                      <span><i style="background:#1677ff"></i>出库数量</span>
-                      <span><i style="background:#f5222d"></i>当前数量</span>
-                      <span><i style="background:#52c41a"></i>入库数量</span>
-                    </div>
-                    <div class="chart-el" id="chartRealtime"></div>
                   </div>
                 </div>
-              </div>
 
-              <div class="dash-card">
-                <h3>呆滞物资动态</h3>
-                <div class="dash-split">
-                  <div class="idle-board">
-                    <i class="idle-dot" aria-hidden="true"></i>
-                    <div class="idle-cell">
-                      <div class="t">呆滞时长：30天-90天以内</div>
-                      <div class="v"><b>1280件</b>占比20%</div>
-                      <div class="a">库存金额2000万元</div>
-                    </div>
-                    <div class="idle-cell">
-                      <div class="t">呆滞时长：90天-180天以内</div>
-                      <div class="v"><b>1280件</b>占比30%</div>
-                      <div class="a">库存金额2000万元</div>
-                    </div>
-                    <div class="idle-cell">
-                      <div class="t">呆滞时长：180天-360天以内</div>
-                      <div class="v"><b>1280件</b>占比20%</div>
-                      <div class="a">库存金额2000万元</div>
-                    </div>
-                    <div class="idle-cell">
-                      <div class="t">呆滞时长：360天以上</div>
-                      <div class="v"><b>1280件</b>占比30%</div>
-                      <div class="a">库存金额2000万元</div>
-                    </div>
-                  </div>
-                  <div class="chart-box">
-                    <div class="chart-title">各仓库呆滞金额占比情况</div>
-                    <div class="chart-legend" aria-hidden="true">
-                      <span><i style="background:#52c41a"></i>30~90天以内</span>
-                      <span><i style="background:#1677ff"></i>90~180天以内</span>
-                      <span><i style="background:#faad14"></i>示意</span>
-                      <span><i style="background:#f5222d"></i>示意</span>
-                    </div>
-                    <div class="chart-el" id="chartIdle"></div>
-                  </div>
-                </div>
-              </div>
-
-              <div class="bottom-row">
                 <div class="dash-card">
                   <h3>库存金额动态</h3>
                   <div class="chart-el" id="chartAmount" style="height:100%"></div>
                 </div>
+
+                <div class="dash-card">
+                  <h3>呆滞物资动态</h3>
+                  <div class="dash-split">
+                    <div class="idle-board">
+                      <i class="idle-dot" aria-hidden="true"></i>
+                      <div class="idle-cell">
+                        <div class="t">呆滞时长：30天-90天以内</div>
+                        <div class="v"><b>1280件</b>占比20%</div>
+                        <div class="a">库存金额2000万元</div>
+                      </div>
+                      <div class="idle-cell">
+                        <div class="t">呆滞时长：90天-180天以内</div>
+                        <div class="v"><b>1280件</b>占比30%</div>
+                        <div class="a">库存金额2000万元</div>
+                      </div>
+                      <div class="idle-cell">
+                        <div class="t">呆滞时长：180天-360天以内</div>
+                        <div class="v"><b>1280件</b>占比20%</div>
+                        <div class="a">库存金额2000万元</div>
+                      </div>
+                      <div class="idle-cell">
+                        <div class="t">呆滞时长：360天以上</div>
+                        <div class="v"><b>1280件</b>占比30%</div>
+                        <div class="a">库存金额2000万元</div>
+                      </div>
+                    </div>
+                    <div class="chart-box">
+                      <div class="chart-title">各仓库呆滞金额占比情况</div>
+                      <div class="chart-legend" aria-hidden="true">
+                        <span><i style="background:#52c41a"></i>30~90天以内</span>
+                        <span><i style="background:#1677ff"></i>90~180天以内</span>
+                        <span><i style="background:#faad14"></i>示意</span>
+                        <span><i style="background:#f5222d"></i>示意</span>
+                      </div>
+                      <div class="chart-el" id="chartIdle"></div>
+                    </div>
+                  </div>
+                </div>
+
                 <div class="dash-card">
                   <h3>报废数量动态</h3>
                   <div class="chart-el" id="chartScrap" style="height:100%"></div>
                 </div>
               </div>
-            </aside>
-
-            <!-- 右：备件页签 + 3D（方案2：与看板对调） -->
-            <section class="ly-pane mid-pane">
-              <div class="mat-tabs" id="matTabs">
-                <button type="button" class="on" data-mat="全部">全部</button>
-                <button type="button" data-mat="风机备件">风机备件</button>
-                <button type="button" data-mat="光伏备件">光伏备件</button>
-                <button type="button" data-mat="储能备件">储能备件</button>
-              </div>
-              <div class="diagram-stage">
-                <div id="diagramWrap"></div>
-                <div class="callout-layer" id="calloutLayer"></div>
-              </div>
-            </section>
+            </div>
           </div>
         </div>
       </main>
