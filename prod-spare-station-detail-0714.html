@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN" data-build="20260722-station-wh-v9">
+<html lang="zh-CN" data-build="20260722-station-wh-v10">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -21,6 +21,122 @@
     body.page-subpage .main-scroll {
       background: #f0f3f8;
       overflow: hidden !important;
+      display: flex;
+      flex-direction: column;
+    }
+    /* 组织树收起/展开（面包屑左侧） */
+    .sd-shell {
+      flex: 1;
+      min-height: 0;
+      display: flex;
+      overflow: hidden;
+    }
+    .sd-org-panel {
+      width: 0;
+      flex: 0 0 auto;
+      overflow: hidden;
+      background: #0b2a5c;
+      color: #dbe7f7;
+      display: flex;
+      flex-direction: column;
+      transition: width 0.2s ease;
+      border-right: 0 solid #0b2a5c;
+    }
+    .sd-shell.org-open .sd-org-panel {
+      width: 248px;
+      border-right-width: 1px;
+      border-right-color: #163a6e;
+    }
+    .sd-org-search {
+      flex: 0 0 auto;
+      padding: 10px 10px 8px;
+    }
+    .sd-org-search input {
+      width: 100%;
+      height: 28px;
+      border: 0;
+      border-radius: 2px;
+      padding: 0 10px;
+      font-size: 12px;
+      color: #1f2d3d;
+      background: #fff;
+      outline: none;
+    }
+    .sd-org-tree {
+      flex: 1;
+      min-height: 0;
+      overflow: auto;
+      padding: 4px 0 12px;
+      font-size: 12px;
+      line-height: 1.5;
+    }
+    .sd-org-tree .n {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 10px;
+      cursor: pointer;
+      color: #c9d7ea;
+      user-select: none;
+      white-space: nowrap;
+    }
+    .sd-org-tree .n:hover { background: rgba(255, 255, 255, 0.08); color: #fff; }
+    .sd-org-tree .n.on { background: rgba(22, 119, 255, 0.35); color: #fff; }
+    .sd-org-tree .n .caret {
+      width: 12px;
+      text-align: center;
+      font-size: 10px;
+      color: #8fb0d9;
+      flex: 0 0 auto;
+    }
+    .sd-org-tree .n.l0 { padding-left: 10px; font-weight: 600; color: #fff; }
+    .sd-org-tree .n.l1 { padding-left: 22px; }
+    .sd-org-tree .n.l2 { padding-left: 36px; }
+    .sd-org-tree .n.l3 { padding-left: 52px; color: #a8bdd6; }
+    .sd-org-tree .n.l3.on { color: #fff; }
+    .sd-org-tree .n.is-hidden { display: none; }
+    .sd-main-col {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .sd-bc-row {
+      flex: 0 0 auto;
+      display: flex;
+      align-items: stretch;
+      background: #fff;
+      border-bottom: 1px solid var(--bd);
+    }
+    .sd-org-toggle {
+      width: 32px;
+      height: 32px;
+      border: 0;
+      margin: 0;
+      padding: 0;
+      background: #1677ff;
+      color: #fff;
+      cursor: pointer;
+      flex: 0 0 auto;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      line-height: 1;
+    }
+    .sd-org-toggle:hover { background: #4096ff; }
+    .sd-org-toggle .fa-angles-up { display: none; }
+    .sd-shell.org-open .sd-org-toggle .fa-angles-down { display: none; }
+    .sd-shell.org-open .sd-org-toggle .fa-angles-up { display: inline-block; }
+    .sd-bc-row .subpage-breadcrumb {
+      flex: 1;
+      margin: 0 !important;
+      padding: 6px 14px !important;
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      min-width: 0;
     }
     .sd-page {
       padding: 0 10px 8px;
@@ -28,8 +144,8 @@
       flex-direction: column;
       gap: 8px;
       min-height: 0;
-      /* header + breadcrumb + footer */
-      height: calc(100vh - 56px - 26px - 28px);
+      flex: 1;
+      height: auto;
       overflow: hidden;
     }
     .sd-top, .sd-bottom {
@@ -596,18 +712,31 @@
       </aside>
 
       <main class="main-scroll">
-        <!-- 面包屑：首页 / 实物管理 / 生产物资库存管理 / 分公司 / 风电场 -->
-        <nav class="subpage-breadcrumb" aria-label="面包屑">
-          <a href="index-portal-screen-alt.html">首页</a>
-          <span class="sep">/</span>
-          <span>实物管理</span>
-          <span class="sep">/</span>
-          <a href="prod-spare-inventory-scheme2.html" id="bcInventory">生产物资库存管理</a>
-          <span class="sep">/</span>
-          <span id="bcOrg">上海龙源</span>
-          <span class="sep">/</span>
-          <span id="bcStation">东海大桥风电场</span>
-        </nav>
+        <div class="sd-shell" id="sdShell">
+          <aside class="sd-org-panel" id="sdOrgPanel" aria-label="组织树">
+            <div class="sd-org-search">
+              <input type="search" id="sdOrgSearch" placeholder="搜索分公司 / 风电场" autocomplete="off" />
+            </div>
+            <div class="sd-org-tree" id="sdOrgTree"></div>
+          </aside>
+          <div class="sd-main-col">
+            <div class="sd-bc-row">
+              <button type="button" class="sd-org-toggle" id="sdOrgToggle" aria-expanded="false" title="展开组织树" aria-controls="sdOrgPanel">
+                <i class="fa-solid fa-angles-down" aria-hidden="true"></i>
+                <i class="fa-solid fa-angles-up" aria-hidden="true"></i>
+              </button>
+              <nav class="subpage-breadcrumb" aria-label="面包屑">
+                <a href="index-portal-screen-alt.html">首页</a>
+                <span class="sep">/</span>
+                <span>实物管理</span>
+                <span class="sep">/</span>
+                <a href="prod-spare-inventory-scheme2.html" id="bcInventory">生产物资库存管理</a>
+                <span class="sep">/</span>
+                <span id="bcOrg">上海龙源</span>
+                <span class="sep">/</span>
+                <span id="bcStation">东海大桥风电场</span>
+              </nav>
+            </div>
 
         <div class="sd-page">
           <!-- 上：库存数据表 -->
@@ -722,6 +851,8 @@
             </div>
           </section>
         </div>
+          </div>
+        </div>
       </main>
     </div>
   </div>
@@ -742,6 +873,103 @@
     document.getElementById("bcStation").textContent = station;
     document.getElementById("whName").textContent = whName;
     document.title = station + " · 仓库详情 - 新能源物资供应链管理系统";
+
+    /* 组织树：与库存总览分公司数据对齐，样式对齐展开列表示意 */
+    var ORG_DATA = [
+      { key: "上海龙源", name: "上海龙源", stations: ["东海大桥风电场", "临港风电场", "崇明风电场", "奉贤风电场"] },
+      { key: "云南龙源", name: "云南龙源", stations: ["大理风电场", "楚雄风电场", "曲靖风电场"] },
+      { key: "天津龙源", name: "天津龙源", stations: ["大神堂风电场", "汉沽风电场"] },
+      { key: "山西龙源", name: "山西龙源", stations: ["雁门关风电场", "右玉风电场", "神池风电场", "平鲁风电场"] },
+      { key: "河北龙源", name: "河北龙源", stations: ["麒麟山风电场", "康保风电场"] },
+      { key: "蒙东龙源", name: "蒙东龙源", stations: ["齐心营风电场"] },
+      { key: "安徽龙源", name: "安徽龙源", stations: ["来安风电场"] },
+      { key: "海上龙源", name: "海上龙源", stations: ["射阳海上风电场"] },
+      { key: "甘肃龙源", name: "甘肃龙源", stations: ["酒泉风电场", "武威风电场"] },
+      { key: "宁夏龙源", name: "宁夏龙源", stations: ["中卫龙轩第一风电场", "五里坡第一风电场", "月亮山第一风电场", "红寺堡第一风电场", "太阳山第一风电场", "长山头第一风电场"] }
+    ];
+    var orgOpen = { group: true, longyuan: true };
+    ORG_DATA.forEach(function (c) {
+      orgOpen["co:" + c.key] = c.key === org;
+    });
+
+    function renderOrgTree(kw) {
+      kw = (kw || "").trim();
+      var html = "";
+      html += '<div class="n l0" data-node="group"><span class="caret">' + (orgOpen.group ? "▼" : "▶") + "</span><span>国家能源集团</span></div>";
+      if (orgOpen.group) {
+        html += '<div class="n l1" data-node="longyuan"><span class="caret">' + (orgOpen.longyuan ? "▼" : "▶") + "</span><span>龙源电力</span></div>";
+        if (orgOpen.longyuan) {
+          ORG_DATA.forEach(function (c) {
+            var matchCo = !kw || c.name.indexOf(kw) >= 0 || (c.stations || []).some(function (s) { return s.indexOf(kw) >= 0; });
+            if (!matchCo) return;
+            var coKey = "co:" + c.key;
+            var coOpen = !!orgOpen[coKey];
+            html += '<div class="n l2" data-node="' + coKey + '" data-org="' + c.key + '"><span class="caret">' + (coOpen ? "▼" : "▶") + "</span><span>" + c.name + "</span></div>";
+            if (coOpen) {
+              (c.stations || []).forEach(function (s) {
+                if (kw && c.name.indexOf(kw) < 0 && s.indexOf(kw) < 0) return;
+                var on = c.key === org && s === station ? " on" : "";
+                html += '<div class="n l3' + on + '" data-station="' + s + '" data-org="' + c.key + '"><span class="caret"></span><span>' + s + "</span></div>";
+              });
+            }
+          });
+        }
+      }
+      document.getElementById("sdOrgTree").innerHTML = html;
+    }
+
+    function setOrgPanel(open) {
+      var shell = document.getElementById("sdShell");
+      var btn = document.getElementById("sdOrgToggle");
+      shell.classList.toggle("org-open", !!open);
+      btn.setAttribute("aria-expanded", open ? "true" : "false");
+      btn.title = open ? "收起组织树" : "展开组织树";
+    }
+
+    document.getElementById("sdOrgToggle").addEventListener("click", function () {
+      var open = !document.getElementById("sdShell").classList.contains("org-open");
+      setOrgPanel(open);
+      if (open) renderOrgTree(document.getElementById("sdOrgSearch").value);
+    });
+
+    document.getElementById("sdOrgSearch").addEventListener("input", function () {
+      var v = this.value || "";
+      if (v.trim()) {
+        orgOpen.group = true;
+        orgOpen.longyuan = true;
+        ORG_DATA.forEach(function (c) {
+          if (c.name.indexOf(v) >= 0 || (c.stations || []).some(function (s) { return s.indexOf(v) >= 0; })) {
+            orgOpen["co:" + c.key] = true;
+          }
+        });
+      }
+      renderOrgTree(v);
+    });
+
+    document.getElementById("sdOrgTree").addEventListener("click", function (e) {
+      var n = e.target.closest(".n");
+      if (!n) return;
+      var stationName = n.getAttribute("data-station");
+      if (stationName) {
+        var nextOrg = n.getAttribute("data-org") || org;
+        if (nextOrg === org && stationName === station) {
+          setOrgPanel(false);
+          return;
+        }
+        var href = "prod-spare-station-detail-0714.html?org=" + encodeURIComponent(nextOrg) +
+          "&station=" + encodeURIComponent(stationName) +
+          "&v=20260722-station-wh-v10";
+        location.href = href;
+        return;
+      }
+      var node = n.getAttribute("data-node");
+      if (!node) return;
+      orgOpen[node] = !orgOpen[node];
+      renderOrgTree(document.getElementById("sdOrgSearch").value);
+    });
+
+    renderOrgTree("");
+    setOrgPanel(false);
 
     var ROWS = [
       ["WZ-FD-00128", "OEM-BP-2048", "变桨轴承", "BP-2.0MW", "风电备件", "2.0MW机组", "轮毂/变桨", "SKF", "套", "680000"],
