@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN" data-build="20260722-legend-top-v22">
+<html lang="zh-CN" data-build="20260722-fit-screen-v23">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -24,15 +24,19 @@
     .ledger-page {
       display: flex;
       flex-direction: column;
-      min-height: calc(100vh - 56px);
+      flex: 1 1 auto;
+      min-height: 0;
+      height: 100%;
+      max-height: 100%;
+      overflow: hidden;
       background: var(--bg);
       color: var(--text);
       font-size: 13px;
     }
     .ledger-view-row {
       flex: 0 0 auto;
-      min-height: 48px;
-      padding: 9px 12px 7px;
+      min-height: 40px;
+      padding: 6px 10px;
       display: flex;
       align-items: center;
       background: #fff;
@@ -101,12 +105,12 @@
     .overview-dd-menu a.on { background: #e6f4ff; color: #1677ff; font-weight: 600; }
 
     .ly-home {
-      flex: 1;
+      flex: 1 1 auto;
       min-height: 0;
       display: grid;
-      grid-template-columns: 260px minmax(0, 1.05fr) minmax(420px, 1.15fr);
-      gap: 10px;
-      padding: 10px 12px 12px;
+      grid-template-columns: 240px minmax(0, 1.05fr) minmax(400px, 1.15fr);
+      gap: 8px;
+      padding: 6px 8px 8px;
       overflow: hidden;
     }
 
@@ -181,7 +185,7 @@
     .mat-tabs {
       display: flex;
       gap: 0;
-      padding: 10px 12px 0;
+      padding: 6px 10px 0;
       border-bottom: 1px solid var(--border);
       background: #fff;
       flex: 0 0 auto;
@@ -189,9 +193,9 @@
     .mat-tabs button {
       border: 0;
       background: transparent;
-      height: 34px;
-      padding: 0 14px;
-      font-size: 13px;
+      height: 30px;
+      padding: 0 12px;
+      font-size: 12px;
       color: #64748b;
       cursor: pointer;
       border-bottom: 2px solid transparent;
@@ -257,38 +261,41 @@
       line-height: 1.35;
     }
 
-    /* 右侧看板 */
+    /* 右侧看板：三块等比压缩，禁止内部滚动，保证 100% 缩放一屏展示 */
     .right-pane {
       display: grid;
-      grid-template-rows: 1.15fr 1.05fr 1fr;
-      gap: 10px;
+      grid-template-rows: minmax(0, 1.12fr) minmax(0, 1.05fr) minmax(0, 0.9fr);
+      gap: 6px;
       background: transparent;
       border: 0;
-      overflow: auto;
-      padding-right: 2px;
+      overflow: hidden;
+      padding-right: 0;
+      min-height: 0;
     }
     .dash-card {
       background: #fff;
       border: 1px solid var(--border);
       border-radius: 6px;
-      padding: 10px 12px;
+      padding: 6px 8px;
       min-height: 0;
       display: flex;
       flex-direction: column;
+      overflow: hidden;
     }
     .dash-card h3 {
-      margin: 0 0 10px;
-      font-size: 14px;
+      margin: 0 0 4px;
+      font-size: 13px;
       font-weight: 700;
       color: #1f2d3d;
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
+      flex: 0 0 auto;
     }
     .dash-card h3::before {
       content: "";
-      width: 4px;
-      height: 14px;
+      width: 3px;
+      height: 12px;
       border-radius: 1px;
       background: #1677ff;
       flex: 0 0 auto;
@@ -298,31 +305,33 @@
       min-height: 0;
       display: grid;
       grid-template-columns: 1.05fr 1fr;
-      gap: 10px;
+      gap: 6px;
     }
     .rt-summary {
       background: #f7f8fa;
       border-radius: 6px;
-      padding: 12px 12px 14px;
+      padding: 6px 8px 8px;
       height: 100%;
       display: flex;
       flex-direction: column;
       min-height: 0;
+      overflow: hidden;
     }
     .rt-head {
       position: relative;
       display: flex;
       align-items: flex-end;
       justify-content: center;
-      gap: 32px;
-      padding: 20px 8px 14px;
+      gap: 24px;
+      padding: 14px 4px 6px;
+      flex: 0 0 auto;
     }
     .rt-summary .rt-title {
       position: absolute;
       left: 50%;
       top: 0;
       transform: translateX(-50%);
-      font-size: 13px;
+      font-size: 12px;
       color: #334155;
       font-weight: 600;
       line-height: 1.2;
@@ -338,38 +347,38 @@
       gap: 2px;
     }
     .rt-summary .rt-vals b {
-      font-size: 22px;
+      font-size: 18px;
       color: #1f2d3d;
       font-weight: 700;
       line-height: 1;
     }
     .rt-summary .rt-vals > div:first-child b { color: #1677ff; }
-    .rt-summary .rt-vals span { font-size: 12px; color: #64748b; margin-left: 2px; }
+    .rt-summary .rt-vals span { font-size: 11px; color: #64748b; margin-left: 2px; }
     .rt-flow {
       flex: 1;
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 0;
       border-top: 1px solid #e8edf4;
-      padding-top: 10px;
+      padding-top: 6px;
       min-height: 0;
     }
-    .rt-flow-col { padding: 0 12px; }
+    .rt-flow-col { padding: 0 8px; }
     .rt-flow-col + .rt-flow-col { border-left: 1px solid #e8edf4; }
     .rt-flow-col .t {
       text-align: center;
-      font-size: 12px;
+      font-size: 11px;
       color: #334155;
       font-weight: 600;
-      margin-bottom: 8px;
+      margin-bottom: 4px;
     }
     .rt-flow-col .r {
       display: flex;
       justify-content: space-between;
-      font-size: 12px;
+      font-size: 11px;
       color: #64748b;
-      margin-top: 6px;
-      line-height: 1.4;
+      margin-top: 3px;
+      line-height: 1.3;
     }
     .rt-flow-col .r em {
       font-style: normal;
@@ -389,34 +398,37 @@
       flex-wrap: wrap;
       justify-content: center;
       align-items: center;
-      gap: 10px 14px;
-      padding: 2px 0 4px;
+      gap: 6px 10px;
+      padding: 0 0 2px;
       flex: 0 0 auto;
     }
     .chart-legend span {
       display: inline-flex;
       align-items: center;
-      gap: 5px;
+      gap: 4px;
       font-size: 10px;
       color: #64748b;
       white-space: nowrap;
       line-height: 1;
     }
     .chart-legend i {
-      width: 8px;
-      height: 8px;
+      width: 7px;
+      height: 7px;
       border-radius: 50%;
       flex: 0 0 auto;
     }
-    .chart-el { width: 100%; flex: 1; min-height: 120px; }
+    .chart-el { width: 100%; flex: 1; min-height: 0; }
 
     .idle-board {
       position: relative;
       height: 100%;
-      min-height: 150px;
+      min-height: 0;
+      background: #f7f8fa;
+      border-radius: 6px;
       display: grid;
       grid-template-columns: 1fr 1fr;
       grid-template-rows: 1fr 1fr;
+      overflow: hidden;
     }
     .idle-board::before,
     .idle-board::after {
@@ -453,36 +465,66 @@
       box-shadow: 0 0 0 1px #69b1ff;
     }
     .idle-cell {
-      padding: 10px 12px;
+      padding: 6px 10px;
       display: flex;
       flex-direction: column;
       justify-content: center;
-      gap: 4px;
+      gap: 2px;
+      min-height: 0;
+      overflow: hidden;
     }
-    .idle-cell .t { font-size: 11px; color: #64748b; line-height: 1.35; }
+    .idle-cell .t { font-size: 10px; color: #64748b; line-height: 1.3; }
     .idle-cell .v {
-      font-size: 13px;
+      font-size: 12px;
       color: #334155;
-      line-height: 1.4;
+      line-height: 1.3;
     }
     .idle-cell .v b {
-      font-size: 16px;
+      font-size: 14px;
       font-weight: 700;
       color: #1f2d3d;
       margin-right: 6px;
     }
-    .idle-cell .a { font-size: 11px; color: #64748b; }
+    .idle-cell .a { font-size: 10px; color: #64748b; }
 
     .bottom-row {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 10px;
+      gap: 6px;
       min-height: 0;
+      overflow: hidden;
     }
-    .bottom-row .dash-card { min-height: 180px; }
+    .bottom-row .dash-card { min-height: 0; }
+
+    /* 本页锁死高度链，100% 缩放不出现纵向滚动 */
+    body.page-logistics.page-subpage .layout {
+      height: auto;
+      max-height: none;
+      flex: 1 1 0;
+      min-height: 0;
+      overflow: hidden;
+    }
+    body.page-logistics.page-subpage .main-scroll {
+      overflow: hidden !important;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+      flex: 1 1 auto;
+    }
+    body.page-logistics.page-subpage .main-scroll > .subpage-breadcrumb {
+      flex: 0 0 auto;
+      margin: 4px 8px 0;
+      font-size: 12px;
+      line-height: 1.2;
+    }
+    body.page-logistics.page-subpage .app-site-footer {
+      padding: 4px 10px 5px;
+      font-size: 10px;
+      line-height: 1.3;
+    }
 
     @media (max-width: 1280px) {
-      .ly-home { grid-template-columns: 220px minmax(0, 1fr) minmax(360px, 1fr); }
+      .ly-home { grid-template-columns: 200px minmax(0, 1fr) minmax(340px, 1fr); }
     }
   </style>
 </head>
@@ -609,24 +651,24 @@
                   <div class="idle-board">
                     <i class="idle-dot" aria-hidden="true"></i>
                     <div class="idle-cell">
-                      <div class="t">呆滞时长：30天~90天以内</div>
-                      <div class="v"><b>1280件</b>占比:20%</div>
-                      <div class="a">库存金额：2000万元</div>
+                      <div class="t">呆滞时长：30天-90天以内</div>
+                      <div class="v"><b>1280件</b>占比20%</div>
+                      <div class="a">库存金额2000万元</div>
                     </div>
                     <div class="idle-cell">
-                      <div class="t">呆滞时长：90天~180天以内</div>
-                      <div class="v"><b>1280件</b>占比:30%</div>
-                      <div class="a">库存金额：2000万元</div>
+                      <div class="t">呆滞时长：90天-180天以内</div>
+                      <div class="v"><b>1280件</b>占比30%</div>
+                      <div class="a">库存金额2000万元</div>
                     </div>
                     <div class="idle-cell">
-                      <div class="t">呆滞时长：180天~360天以内</div>
-                      <div class="v"><b>1280件</b>占比:20%</div>
-                      <div class="a">库存金额：2000万元</div>
+                      <div class="t">呆滞时长：180天-360天以内</div>
+                      <div class="v"><b>1280件</b>占比20%</div>
+                      <div class="a">库存金额2000万元</div>
                     </div>
                     <div class="idle-cell">
                       <div class="t">呆滞时长：360天以上</div>
-                      <div class="v"><b>1280件</b>占比:30%</div>
-                      <div class="a">库存金额：2000万元</div>
+                      <div class="v"><b>1280件</b>占比30%</div>
+                      <div class="a">库存金额2000万元</div>
                     </div>
                   </div>
                   <div class="chart-box">
@@ -645,11 +687,11 @@
               <div class="bottom-row">
                 <div class="dash-card">
                   <h3>库存金额动态</h3>
-                  <div class="chart-el" id="chartAmount" style="min-height:140px;height:100%"></div>
+                  <div class="chart-el" id="chartAmount" style="height:100%"></div>
                 </div>
                 <div class="dash-card">
                   <h3>报废数量动态</h3>
-                  <div class="chart-el" id="chartScrap" style="min-height:140px;height:100%"></div>
+                  <div class="chart-el" id="chartScrap" style="height:100%"></div>
                 </div>
               </div>
             </aside>
