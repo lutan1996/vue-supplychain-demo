@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN" data-build="20260722-tab3d-v34">
+<html lang="zh-CN" data-build="20260722-tab3d-v35">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -821,11 +821,23 @@
       { key: "海上龙源", name: "海上龙源", stations: ["射阳海上风电场"] }
     ];
 
-    var CALLOUTS = [
-      { id: "blade", title: "叶片", tip: "点击查看叶片相关备件", x: 0.20, y: 0.28, tx: 0.44, ty: 0.24 },
-      { id: "generator", title: "发电机", tip: "点击查看发电机相关备件", x: 0.80, y: 0.36, tx: 0.56, ty: 0.34 },
-      { id: "filter", title: "滤芯/传感器", tip: "点击查看滤芯/传感器相关备件", x: 0.80, y: 0.60, tx: 0.52, ty: 0.56 }
-    ];
+    var CALLOUTS_BY_KIND = {
+      wind: [
+        { id: "blade", title: "叶片", tip: "点击查看叶片相关备件", x: 0.20, y: 0.28, tx: 0.44, ty: 0.24 },
+        { id: "generator", title: "发电机", tip: "点击查看发电机相关备件", x: 0.80, y: 0.36, tx: 0.56, ty: 0.34 },
+        { id: "filter", title: "滤芯/传感器", tip: "点击查看滤芯/传感器相关备件", x: 0.80, y: 0.60, tx: 0.52, ty: 0.56 }
+      ],
+      pv: [
+        { id: "pv_module", title: "光伏组件", tip: "点击查看光伏组件相关备件", x: 0.16, y: 0.40, tx: 0.40, ty: 0.48 },
+        { id: "pv_inverter", title: "逆变器", tip: "点击查看逆变器相关备件", x: 0.84, y: 0.34, tx: 0.70, ty: 0.50 },
+        { id: "pv_combiner", title: "汇流箱", tip: "点击查看汇流箱相关备件", x: 0.78, y: 0.70, tx: 0.58, ty: 0.62 }
+      ],
+      storage: [
+        { id: "es_battery", title: "电池模组", tip: "点击查看电池模组相关备件", x: 0.16, y: 0.42, tx: 0.42, ty: 0.50 },
+        { id: "es_pcs", title: "PCS变流器", tip: "点击查看PCS相关备件", x: 0.84, y: 0.36, tx: 0.68, ty: 0.48 },
+        { id: "es_sensor", title: "温控/传感器", tip: "点击查看温控传感器相关备件", x: 0.18, y: 0.72, tx: 0.34, ty: 0.62 }
+      ]
+    };
 
 
     /* 点击部位后，右侧/下方四块看板切换为该零部件数据（无弹窗） */
@@ -909,7 +921,128 @@
           { name: "接头", value: 4 }, { name: "其他", value: 3 }
         ],
         scrap: [48, 40, 36, 30, 24, 18]
+      },
+      pv_module: {
+        label: "光伏组件",
+        qty: "5420", amt: "12800",
+        outQty: "680 件", outAmt: "1560 万元", outPct: "22%",
+        inQty: "520 件", inAmt: "1180 万元", inPct: "18%",
+        idle: [
+          { qty: "260件", pct: "10%", amt: "580万元" },
+          { qty: "310件", pct: "12%", amt: "720万元" },
+          { qty: "180件", pct: "8%", amt: "420万元" },
+          { qty: "140件", pct: "6%", amt: "320万元" }
+        ],
+        rtOut: [7, 6, 8, 7, 5], rtCur: [16, 14, 18, 15, 12], rtIn: [5, 4, 6, 5, 4], rtMax: 35,
+        idleS1: [5, 4, 6, 5, 4], idleS2: [6, 5, 7, 6, 5], idleS3: [4, 3, 5, 4, 3], idleS4: [2, 2, 3, 2, 1], idleMax: 30,
+        pie: [
+          { name: "单晶组件", value: 46 }, { name: "接线盒", value: 16 }, { name: "边框", value: 12 },
+          { name: "胶膜", value: 8 }, { name: "背板", value: 6 }, { name: "MC4接头", value: 5 },
+          { name: "紧固件", value: 4 }, { name: "其他", value: 3 }
+        ],
+        scrap: [36, 30, 26, 22, 18, 12]
+      },
+      pv_inverter: {
+        label: "逆变器",
+        qty: "286", amt: "9600",
+        outQty: "24 件", outAmt: "860 万元", outPct: "14%",
+        inQty: "18 件", inAmt: "640 万元", inPct: "11%",
+        idle: [
+          { qty: "12件", pct: "8%", amt: "420万元" },
+          { qty: "16件", pct: "10%", amt: "560万元" },
+          { qty: "10件", pct: "7%", amt: "350万元" },
+          { qty: "8件", pct: "5%", amt: "280万元" }
+        ],
+        rtOut: [2, 2, 3, 2, 1], rtCur: [6, 5, 7, 6, 4], rtIn: [1, 1, 2, 1, 1], rtMax: 16,
+        idleS1: [2, 2, 3, 2, 1], idleS2: [3, 2, 3, 2, 2], idleS3: [2, 1, 2, 2, 1], idleS4: [1, 1, 1, 1, 0], idleMax: 16,
+        pie: [
+          { name: "组串逆变器", value: 38 }, { name: "风扇", value: 18 }, { name: "电容", value: 12 },
+          { name: "功率模块", value: 10 }, { name: "通讯板", value: 8 }, { name: "散热片", value: 6 },
+          { name: "熔断器", value: 5 }, { name: "其他", value: 3 }
+        ],
+        scrap: [14, 12, 10, 8, 6, 4]
+      },
+      pv_combiner: {
+        label: "汇流箱",
+        qty: "468", amt: "2100",
+        outQty: "42 件", outAmt: "186 万元", outPct: "20%",
+        inQty: "36 件", inAmt: "160 万元", inPct: "16%",
+        idle: [
+          { qty: "28件", pct: "12%", amt: "96万元" },
+          { qty: "34件", pct: "14%", amt: "118万元" },
+          { qty: "22件", pct: "9%", amt: "76万元" },
+          { qty: "16件", pct: "7%", amt: "54万元" }
+        ],
+        rtOut: [3, 3, 4, 3, 2], rtCur: [8, 7, 9, 8, 6], rtIn: [2, 2, 3, 2, 2], rtMax: 20,
+        idleS1: [3, 2, 3, 3, 2], idleS2: [3, 3, 4, 3, 2], idleS3: [2, 2, 3, 2, 1], idleS4: [1, 1, 2, 1, 1], idleMax: 18,
+        pie: [
+          { name: "16路汇流箱", value: 40 }, { name: "防雷模块", value: 18 }, { name: "熔丝", value: 14 },
+          { name: "监测板", value: 10 }, { name: "接线端子", value: 7 }, { name: "箱体", value: 5 },
+          { name: "密封件", value: 4 }, { name: "其他", value: 2 }
+        ],
+        scrap: [18, 15, 12, 10, 8, 5]
+      },
+      es_battery: {
+        label: "电池模组",
+        qty: "1960", amt: "18600",
+        outQty: "120 件", outAmt: "1480 万元", outPct: "18%",
+        inQty: "96 件", inAmt: "1180 万元", inPct: "14%",
+        idle: [
+          { qty: "64件", pct: "9%", amt: "760万元" },
+          { qty: "78件", pct: "11%", amt: "920万元" },
+          { qty: "52件", pct: "8%", amt: "610万元" },
+          { qty: "36件", pct: "5%", amt: "420万元" }
+        ],
+        rtOut: [4, 4, 5, 4, 3], rtCur: [11, 10, 12, 11, 9], rtIn: [3, 3, 4, 3, 2], rtMax: 28,
+        idleS1: [4, 3, 5, 4, 3], idleS2: [5, 4, 5, 4, 3], idleS3: [3, 3, 4, 3, 2], idleS4: [2, 1, 2, 2, 1], idleMax: 24,
+        pie: [
+          { name: "280Ah模组", value: 44 }, { name: "铜排", value: 16 }, { name: "端板", value: 12 },
+          { name: "均衡线", value: 8 }, { name: "绝缘件", value: 7 }, { name: "连接器", value: 6 },
+          { name: "紧固件", value: 4 }, { name: "其他", value: 3 }
+        ],
+        scrap: [28, 24, 20, 16, 12, 8]
+      },
+      es_pcs: {
+        label: "PCS变流器",
+        qty: "128", amt: "11200",
+        outQty: "8 件", outAmt: "720 万元", outPct: "12%",
+        inQty: "6 件", inAmt: "540 万元", inPct: "9%",
+        idle: [
+          { qty: "6件", pct: "7%", amt: "480万元" },
+          { qty: "8件", pct: "9%", amt: "640万元" },
+          { qty: "5件", pct: "6%", amt: "400万元" },
+          { qty: "4件", pct: "4%", amt: "320万元" }
+        ],
+        rtOut: [1, 1, 2, 1, 1], rtCur: [4, 3, 5, 4, 3], rtIn: [1, 0, 1, 1, 0], rtMax: 12,
+        idleS1: [2, 1, 2, 2, 1], idleS2: [2, 2, 3, 2, 1], idleS3: [1, 1, 2, 1, 1], idleS4: [1, 0, 1, 1, 0], idleMax: 12,
+        pie: [
+          { name: "功率模块", value: 36 }, { name: "电抗器", value: 18 }, { name: "控制板", value: 14 },
+          { name: "散热风扇", value: 10 }, { name: "接触器", value: 8 }, { name: "电容", value: 6 },
+          { name: "滤波器", value: 5 }, { name: "其他", value: 3 }
+        ],
+        scrap: [9, 8, 7, 5, 4, 3]
+      },
+      es_sensor: {
+        label: "温控/传感器",
+        qty: "860", amt: "1860",
+        outQty: "96 件", outAmt: "210 万元", outPct: "24%",
+        inQty: "78 件", inAmt: "168 万元", inPct: "20%",
+        idle: [
+          { qty: "48件", pct: "11%", amt: "96万元" },
+          { qty: "56件", pct: "13%", amt: "112万元" },
+          { qty: "36件", pct: "9%", amt: "72万元" },
+          { qty: "28件", pct: "7%", amt: "56万元" }
+        ],
+        rtOut: [5, 4, 6, 5, 4], rtCur: [9, 8, 10, 9, 7], rtIn: [4, 3, 5, 4, 3], rtMax: 24,
+        idleS1: [3, 3, 4, 3, 2], idleS2: [4, 3, 4, 3, 3], idleS3: [3, 2, 3, 2, 2], idleS4: [2, 1, 2, 1, 1], idleMax: 20,
+        pie: [
+          { name: "温度传感器", value: 32 }, { name: "液冷泵", value: 20 }, { name: "BMS探头", value: 16 },
+          { name: "烟感", value: 10 }, { name: "管路接头", value: 8 }, { name: "冷却液", value: 6 },
+          { name: "密封圈", value: 5 }, { name: "其他", value: 3 }
+        ],
+        scrap: [20, 16, 14, 11, 9, 6]
       }
+
     };
 
     var state = {
@@ -958,27 +1091,32 @@
       }).join("");
     }
 
+    function getCallouts() {
+      return CALLOUTS_BY_KIND[modelKind(state.mat)] || CALLOUTS_BY_KIND.wind;
+    }
+
     function renderCallouts() {
-      var show = state.mat === "全部" || state.mat === "风机备件";
       var layer = document.getElementById("calloutLayer");
       if (!layer) return;
-      layer.style.visibility = show ? "visible" : "hidden";
-      layer.style.opacity = show ? "1" : "0";
-      layer.style.pointerEvents = show ? "auto" : "none";
-      if (!show) {
-        return;
-      }
-      if (layer.getAttribute("data-built") === "1") {
+      var kind = modelKind(state.mat);
+      var list = getCallouts();
+      layer.style.visibility = "visible";
+      layer.style.opacity = "1";
+      layer.style.pointerEvents = "auto";
+
+      /* 切风机/光伏/储能时重建引线；同页签只刷新选中态 */
+      if (layer.getAttribute("data-kind") === kind && layer.getAttribute("data-built") === "1") {
         layer.querySelectorAll(".callout").forEach(function (el) {
           el.classList.toggle("on", el.getAttribute("data-part") === state.partId);
         });
         return;
       }
-      var lines = CALLOUTS.map(function (c) {
+
+      var lines = list.map(function (c) {
         return '<line x1="' + (c.x * 100) + '%" y1="' + (c.y * 100) + '%" x2="' + (c.tx * 100) + '%" y2="' + (c.ty * 100) + '%" stroke="#69b1ff" stroke-width="1.2" />' +
           '<circle cx="' + (c.tx * 100) + '%" cy="' + (c.ty * 100) + '%" r="2.5" fill="#1677ff" />';
       }).join("");
-      var boxes = CALLOUTS.map(function (c) {
+      var boxes = list.map(function (c) {
         return (
           '<div class="callout' + (state.partId === c.id ? " on" : "") + '" data-part="' + c.id + '" style="left:' + (c.x * 100) + "%;top:" + (c.y * 100) + '%">' +
             "<b>" + c.title + "</b><span>" + c.tip + "</span>" +
@@ -987,6 +1125,7 @@
       }).join("");
       layer.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">' + lines + "</svg>" + boxes;
       layer.setAttribute("data-built", "1");
+      layer.setAttribute("data-kind", kind);
       layer.querySelectorAll(".callout").forEach(function (el) {
         el.onclick = function (ev) {
           if (ev && ev.stopPropagation) ev.stopPropagation();
@@ -1402,11 +1541,11 @@
       addMesh(scene, [], new THREE.BoxGeometry(7, 0.12, 4.5), 0x64748b, 0, 0.45, 0, "", { metalness: 0.45 });
       for (var r = 0; r < 3; r++) {
         for (var c = 0; c < 4; c++) {
-          addMesh(scene, meshes, new THREE.BoxGeometry(0.88, 0.05, 1.45), 0x1e3a8a, -2.5 + c * 0.95, 0.95 + r * 0.12, -0.8 + r * 0.45, r === 1 && c === 1 ? "blade" : "", { rx: -0.48, metalness: 0.65 });
+          addMesh(scene, meshes, new THREE.BoxGeometry(0.88, 0.05, 1.45), 0x1e3a8a, -2.5 + c * 0.95, 0.95 + r * 0.12, -0.8 + r * 0.45, r === 1 && c === 1 ? "pv_module" : "", { rx: -0.48, metalness: 0.65 });
         }
       }
-      addMesh(scene, meshes, new THREE.BoxGeometry(0.85, 1.35, 0.65), 0xf59e0b, 3.0, 1.05, 0.6, "generator", { metalness: 0.4 });
-      addMesh(scene, meshes, new THREE.BoxGeometry(0.75, 0.95, 0.52), 0x334155, 2.1, 0.95, -1.3, "filter", { metalness: 0.45 });
+      addMesh(scene, meshes, new THREE.BoxGeometry(0.85, 1.35, 0.65), 0xf59e0b, 3.0, 1.05, 0.6, "pv_inverter", { metalness: 0.4 });
+      addMesh(scene, meshes, new THREE.BoxGeometry(0.75, 0.95, 0.52), 0x334155, 2.1, 0.95, -1.3, "pv_combiner", { metalness: 0.45 });
     }
 
     function buildStorage(scene, meshes) {
@@ -1416,11 +1555,11 @@
         metalness: 0.2, roughness: 0.55, transparent: true, opacity: 0.35, depthWrite: false
       });
       for (var i = 0; i < 5; i++) {
-        addMesh(scene, meshes, new THREE.BoxGeometry(0.9, 1.7, 0.78), 0x059669, -1.9 + i * 0.95, 1.45, 0.55, i === 2 ? "blade" : "", { metalness: 0.4 });
+        addMesh(scene, meshes, new THREE.BoxGeometry(0.9, 1.7, 0.78), 0x059669, -1.9 + i * 0.95, 1.45, 0.55, i === 2 ? "es_battery" : "", { metalness: 0.4 });
         addMesh(scene, [], new THREE.BoxGeometry(0.82, 0.12, 0.7), 0x064e3b, -1.9 + i * 0.95, 2.38, 0.55, "", { metalness: 0.35 });
       }
-      addMesh(scene, meshes, new THREE.BoxGeometry(1.15, 1.95, 0.95), 0x2563eb, 2.55, 1.55, 0.75, "generator", { metalness: 0.5 });
-      addMesh(scene, meshes, new THREE.BoxGeometry(0.9, 0.6, 0.6), 0x0ea5e9, -2.35, 0.75, -0.95, "filter", { metalness: 0.35 });
+      addMesh(scene, meshes, new THREE.BoxGeometry(1.15, 1.95, 0.95), 0x2563eb, 2.55, 1.55, 0.75, "es_pcs", { metalness: 0.5 });
+      addMesh(scene, meshes, new THREE.BoxGeometry(0.9, 0.6, 0.6), 0x0ea5e9, -2.35, 0.75, -0.95, "es_sensor", { metalness: 0.35 });
       addMesh(scene, [], new THREE.BoxGeometry(0.35, 2.2, 0.35), 0xf97316, 3.35, 1.4, -0.7, "", { metalness: 0.25 });
     }
 
@@ -1647,7 +1786,10 @@
       }
       if (scene3d.renderer && scene3d.modelsReady) {
         applyKind(nextKind);
+        updatePartHighlight();
+        syncRendererSize(false);
         paintScene();
+        requestAnimationFrame(function () { paintScene(); });
         return;
       }
       initScene();
@@ -1656,7 +1798,7 @@
     function jumpInventoryPage(file, action, label) {
       var href = file;
       if (href && href.indexOf("v=") < 0) {
-        href += (href.indexOf("?") >= 0 ? "&" : "?") + "v=20260722-tab3d-v34";
+        href += (href.indexOf("?") >= 0 ? "&" : "?") + "v=20260722-tab3d-v35";
       }
       if (action && typeof navigateBySidebarAction === "function" && navigateBySidebarAction(action, { label: label || "" })) {
         return true;
