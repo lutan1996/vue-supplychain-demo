@@ -244,8 +244,10 @@
       background: linear-gradient(180deg, #ffffff 0%, #f3f7fc 55%, #e9f0f8 100%);
     }
     .diagram-stage.is-wind {
-      background: #fff;
+      background: #eef1f5;
     }
+    /* 旧 SVG 剖视停用：风机与光伏一样走 Three.js 3D */
+    .wind-cutaway { display: none !important; }
     #diagramWrap {
       position: absolute;
       inset: 0;
@@ -257,48 +259,6 @@
       left: 0;
       top: 0;
     }
-    /* 风机：自绘侧面剖视 SVG（无原图黑字）+ 叶片融入画面旋转 */
-    .wind-cutaway {
-      display: none;
-      position: absolute;
-      inset: 0;
-      z-index: 2;
-      align-items: center;
-      justify-content: center;
-      background: #fff;
-      overflow: hidden;
-    }
-    .wind-cutaway.on { display: flex; }
-    .wind-cutaway-frame {
-      position: relative;
-      width: 100%;
-      height: 100%;
-      max-width: 100%;
-    }
-    .wind-art {
-      position: absolute;
-      left: 22%;
-      right: 22%;
-      top: 4%;
-      bottom: 4%;
-      pointer-events: none;
-      z-index: 1;
-    }
-    .wind-art svg {
-      width: 100%;
-      height: 100%;
-      display: block;
-      overflow: visible;
-    }
-    .wind-art .blade-spin {
-      transform-origin: 0 0;
-      animation: windBladeSpin 8s linear infinite;
-    }
-    @keyframes windBladeSpin {
-      from { transform: rotate(0deg); }
-      to { transform: rotate(360deg); }
-    }
-    .diagram-stage.is-wind #diagramWrap { visibility: hidden; }
     #calloutLayer {
       transition: none !important;
     }
@@ -1138,21 +1098,21 @@
     ];
 
     var CALLOUTS_BY_KIND = {
+      /* 风机：左右两列整齐 + 折线引线，锚点对准 3D 部件 */
       wind: [
-        /* 标注靠边，引线拉长，不挡风机主体（中间 56% 为图） */
-        { id: "hub_cover", title: "轮毂外罩", tip: "点击查看轮毂外罩相关备件", x: 0.01, y: 0.22, tx: 0.32, ty: 0.44, side: "left" },
-        { id: "hub", title: "轮毂", tip: "点击查看轮毂相关备件", x: 0.01, y: 0.38, tx: 0.35, ty: 0.44, side: "left" },
-        { id: "blade", title: "叶片", tip: "点击查看叶片相关备件", x: 0.01, y: 0.54, tx: 0.30, ty: 0.70, side: "left" },
-        { id: "magnet", title: "永久磁铁", tip: "点击查看永久磁铁相关备件", x: 0.01, y: 0.70, tx: 0.42, ty: 0.42, side: "left" },
-        { id: "tower", title: "塔架", tip: "点击查看塔架相关备件", x: 0.01, y: 0.88, tx: 0.50, ty: 0.82, side: "left" },
-        { id: "front_rotor", title: "前盘式转子", tip: "点击查看前盘式转子相关备件", x: 0.99, y: 0.14, tx: 0.42, ty: 0.40, side: "right" },
-        { id: "stator_winding", title: "中间定子绕组", tip: "点击查看中间定子绕组相关备件", x: 0.99, y: 0.26, tx: 0.48, ty: 0.40, side: "right" },
-        { id: "filter", title: "滤芯/传感器", tip: "点击查看滤芯/传感器相关备件", x: 0.99, y: 0.38, tx: 0.58, ty: 0.20, side: "right" },
-        { id: "rear_rotor", title: "后盘式转子", tip: "点击查看后盘式转子相关备件", x: 0.99, y: 0.50, tx: 0.56, ty: 0.40, side: "right" },
-        { id: "stator", title: "中间定子", tip: "点击查看中间定子相关备件", x: 0.99, y: 0.62, tx: 0.54, ty: 0.44, side: "right" },
-        { id: "generator", title: "发电机", tip: "点击查看发电机相关备件", x: 0.99, y: 0.74, tx: 0.50, ty: 0.48, side: "right" },
-        { id: "cabinet", title: "电器柜", tip: "点击查看电器柜相关备件", x: 0.99, y: 0.86, tx: 0.70, ty: 0.42, side: "right" },
-        { id: "nacelle", title: "机舱", tip: "点击查看机舱相关备件", x: 0.99, y: 0.96, tx: 0.72, ty: 0.30, side: "right" }
+        { id: "hub_cover", title: "轮毂外罩", tip: "点击查看轮毂外罩相关备件", x: 0.04, y: 0.28, tx: 0.26, ty: 0.28, side: "left" },
+        { id: "hub", title: "轮毂", tip: "点击查看轮毂相关备件", x: 0.04, y: 0.38, tx: 0.29, ty: 0.38, side: "left" },
+        { id: "blade", title: "叶片", tip: "点击查看叶片相关备件", x: 0.04, y: 0.50, tx: 0.18, ty: 0.50, side: "left" },
+        { id: "magnet", title: "永久磁铁", tip: "点击查看永久磁铁相关备件", x: 0.04, y: 0.62, tx: 0.36, ty: 0.62, side: "left" },
+        { id: "tower", title: "塔架", tip: "点击查看塔架相关备件", x: 0.04, y: 0.80, tx: 0.48, ty: 0.80, side: "left" },
+        { id: "filter", title: "滤芯/传感器", tip: "点击查看滤芯/传感器相关备件", x: 0.96, y: 0.20, tx: 0.58, ty: 0.20, side: "right" },
+        { id: "front_rotor", title: "前盘式转子", tip: "点击查看前盘式转子相关备件", x: 0.96, y: 0.32, tx: 0.38, ty: 0.32, side: "right" },
+        { id: "stator_winding", title: "中间定子绕组", tip: "点击查看中间定子绕组相关备件", x: 0.96, y: 0.42, tx: 0.44, ty: 0.42, side: "right" },
+        { id: "stator", title: "中间定子", tip: "点击查看中间定子相关备件", x: 0.96, y: 0.52, tx: 0.50, ty: 0.52, side: "right" },
+        { id: "rear_rotor", title: "后盘式转子", tip: "点击查看后盘式转子相关备件", x: 0.96, y: 0.60, tx: 0.56, ty: 0.60, side: "right" },
+        { id: "generator", title: "发电机", tip: "点击查看发电机相关备件", x: 0.96, y: 0.70, tx: 0.62, ty: 0.70, side: "right" },
+        { id: "cabinet", title: "电器柜", tip: "点击查看电器柜相关备件", x: 0.96, y: 0.80, tx: 0.70, ty: 0.80, side: "right" },
+        { id: "nacelle", title: "机舱", tip: "点击查看机舱相关备件", x: 0.96, y: 0.90, tx: 0.66, ty: 0.90, side: "right" }
       ],
       pv: [
         { id: "pv_module", title: "光伏组件", tip: "点击查看光伏组件相关备件", x: 0.16, y: 0.40, tx: 0.40, ty: 0.48 },
@@ -1626,28 +1586,16 @@
       var kind = modelKind(state.mat);
       var stageLayer = document.getElementById("calloutLayer");
       var windLayer = document.getElementById("windCalloutLayer");
-      var layer = kind === "wind" ? windLayer : stageLayer;
+      /* 风机与光伏一样挂舞台层；旧剖视层清空 */
+      var layer = stageLayer;
       if (!layer) return;
       var list = getCallouts();
-
-      /* 风机标注挂在剖视图内；光伏/储能挂在舞台层 */
-      if (stageLayer) {
-        stageLayer.style.visibility = kind === "wind" ? "hidden" : "visible";
-        stageLayer.style.pointerEvents = kind === "wind" ? "none" : "auto";
-        if (kind === "wind") {
-          stageLayer.innerHTML = "";
-          stageLayer.removeAttribute("data-built");
-          stageLayer.removeAttribute("data-kind");
-        }
-      }
       if (windLayer) {
-        windLayer.style.visibility = kind === "wind" ? "visible" : "hidden";
-        windLayer.style.pointerEvents = kind === "wind" ? "auto" : "none";
-        if (kind !== "wind") {
-          windLayer.innerHTML = "";
-          windLayer.removeAttribute("data-built");
-          windLayer.removeAttribute("data-kind");
-        }
+        windLayer.innerHTML = "";
+        windLayer.style.visibility = "hidden";
+        windLayer.style.pointerEvents = "none";
+        windLayer.removeAttribute("data-built");
+        windLayer.removeAttribute("data-kind");
       }
 
       layer.style.visibility = "visible";
@@ -1662,12 +1610,24 @@
         return;
       }
 
+      /* 水平引线为主（同高对齐），少量折线；整齐不交叉 */
       var lines = list.map(function (c) {
-        var lx = c.x;
-        if (c.side === "left") lx = c.x + 0.10;
-        if (c.side === "right") lx = c.x - 0.10;
-        return '<line x1="' + (lx * 100) + '%" y1="' + (c.y * 100) + '%" x2="' + (c.tx * 100) + '%" y2="' + (c.ty * 100) + '%" stroke="#69b1ff" stroke-width="1.2" />' +
-          '<circle cx="' + (c.tx * 100) + '%" cy="' + (c.ty * 100) + '%" r="2.5" fill="#1677ff" />';
+        var x1 = c.x * 100;
+        var y1 = c.y * 100;
+        var x2 = c.tx * 100;
+        var y2 = c.ty * 100;
+        if (c.side === "left") x1 = (c.x + 0.108) * 100;
+        if (c.side === "right") x1 = (c.x - 0.108) * 100;
+        var d;
+        if (Math.abs(c.y - c.ty) < 0.04) {
+          d = "M" + x1 + " " + y1 + " L" + x2 + " " + y1;
+          y2 = y1;
+        } else {
+          var mid = c.side === "left" ? 20 : (c.side === "right" ? 80 : ((x1 + x2) / 2));
+          d = "M" + x1 + " " + y1 + " L" + mid + " " + y1 + " L" + x2 + " " + y2;
+        }
+        return '<path d="' + d + '" fill="none" stroke="#69b1ff" stroke-width="0.32" />' +
+          '<circle cx="' + x2 + '" cy="' + y2 + '" r="0.65" fill="#1677ff" />';
       }).join("");
       var boxes = list.map(function (c) {
         var sideCls = c.side === "left" ? " side-left" : (c.side === "right" ? " side-right" : "");
@@ -1677,7 +1637,7 @@
           "</div>"
         );
       }).join("");
-      layer.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">' + lines + "</svg>" + boxes;
+      layer.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="none">' + lines + "</svg>" + boxes;
       layer.setAttribute("data-built", "1");
       layer.setAttribute("data-kind", kind);
       layer.querySelectorAll(".callout").forEach(function (el) {
@@ -1902,22 +1862,22 @@
       scene3d.meshes = (scene3d.meshByKind && scene3d.meshByKind[kind]) || [];
       scene3d.kind = kind;
       scene3d.lastPart = "";
-      /* 风机用参考图 DOM 清晰展示，不再依赖 3D 转子 */
-      scene3d.rotor = null;
+      scene3d.rotor = kind === "wind" ? scene3d.windRotor : null;
 
       var stage = document.getElementById("diagramStage");
       var cutaway = document.getElementById("windCutaway");
       if (stage) stage.classList.toggle("is-wind", kind === "wind");
-      if (cutaway) cutaway.classList.toggle("on", kind === "wind");
+      if (cutaway) cutaway.classList.remove("on");
 
       var camera = scene3d.camera;
       if (!camera) return;
       if (kind === "wind") {
-        camera.fov = 32;
-        camera.position.set(0, 2.2, 9.2);
-        camera.lookAt(0, 2.2, 0);
+        /* 与光伏同款俯视 3/4 科技视角 */
+        camera.fov = 33;
+        camera.position.set(3.8, 3.4, 8.6);
+        camera.lookAt(0.05, 2.35, 0);
         camera.updateProjectionMatrix();
-        if (scene3d.renderer) scene3d.renderer.setClearColor(0xffffff, 1);
+        if (scene3d.renderer) scene3d.renderer.setClearColor(0xeef1f5, 1);
       } else if (kind === "pv") {
         camera.fov = 34;
         camera.position.set(5.2, 3.8, 8.0);
@@ -1932,7 +1892,7 @@
         if (scene3d.renderer) scene3d.renderer.setClearColor(0xeef1f5, 1);
       }
       var ground = scene3d.scene && scene3d.scene.getObjectByName("ground");
-      if (ground) ground.visible = kind !== "wind";
+      if (ground) ground.visible = true;
       paintScene();
     }
 
@@ -2037,20 +1997,114 @@
       return mesh;
     }
 
-    /* 风机 3D 仅保留透明热点（供点击），画面由参考图 DOM 呈现 */
+    /* 风机：与光伏同风格的半透明剖视 3D（科技感金属/玻璃） */
     function buildWind(scene, meshes) {
-      addMesh(scene, meshes, new THREE.SphereGeometry(0.55, 12, 10), 0xffffff, -3.15, 3.55, 0.12, "blade", {
-        transparent: true, opacity: 0.001, depthWrite: false
-      });
-      addMesh(scene, meshes, new THREE.SphereGeometry(0.5, 12, 10), 0xffffff, 1.05, 2.35, 0.12, "generator", {
-        transparent: true, opacity: 0.001, depthWrite: false
-      });
-      addMesh(scene, meshes, new THREE.SphereGeometry(0.42, 12, 10), 0xffffff, 2.55, 3.55, 0.12, "filter", {
-        transparent: true, opacity: 0.001, depthWrite: false
-      });
-      scene.position.set(0, -0.75, 0);
-      scene3d.windRotor = null;
-      scene3d.rotor = null;
+      var nacY = 2.85;
+      var shellOpt = {
+        metalness: 0.08, roughness: 0.22, transparent: true, opacity: 0.24,
+        side: THREE.DoubleSide, depthWrite: false, renderOrder: 4
+      };
+
+      /* 塔架 */
+      addMesh(scene, meshes, new THREE.CylinderGeometry(0.38, 0.52, 2.55, 28, 1, true), 0xb8c9d8, 0, 1.15, 0, "tower", Object.assign({}, shellOpt, { opacity: 0.16 }));
+      addMesh(scene, [], new THREE.CylinderGeometry(0.16, 0.2, 2.4, 12), 0x334155, 0, 1.15, 0, "", { metalness: 0.55, roughness: 0.4 });
+
+      /* 机舱外壳（半透明剖视） */
+      addMesh(scene, meshes, new THREE.BoxGeometry(4.35, 1.42, 1.65), 0xb8c9d8, 0.2, nacY, 0, "nacelle", shellOpt);
+      addMesh(scene, [], new THREE.BoxGeometry(4.1, 0.14, 1.45), 0xb8c9d8, 0.2, nacY + 0.72, 0, "", Object.assign({}, shellOpt, { opacity: 0.22 }));
+
+      /* 青色平台 */
+      addMesh(scene, [], new THREE.BoxGeometry(3.9, 0.12, 1.35), 0x0ea5e9, 0.25, nacY - 0.58, 0, "", { metalness: 0.55, roughness: 0.35 });
+
+      /* 主轴 */
+      addMesh(scene, [], new THREE.CylinderGeometry(0.09, 0.09, 3.35, 16), 0x64748b, -0.15, nacY, 0, "", { rz: Math.PI / 2, metalness: 0.72, roughness: 0.28 });
+
+      /* 前盘式转子 */
+      addMesh(scene, meshes, new THREE.CylinderGeometry(0.74, 0.74, 0.16, 28), 0x94a3b8, -1.05, nacY, 0, "front_rotor", { rz: Math.PI / 2, metalness: 0.6, roughness: 0.32 });
+
+      /* 永久磁铁 */
+      for (var mi = 0; mi < 8; mi++) {
+        var ang = (mi / 8) * Math.PI * 2;
+        var my = nacY + Math.sin(ang) * 0.52;
+        var mz = Math.cos(ang) * 0.52;
+        addMesh(scene, meshes, new THREE.BoxGeometry(0.22, 0.2, 0.18), 0xc45a28, -0.72, my, mz, mi === 0 ? "magnet" : "", { metalness: 0.45, roughness: 0.4 });
+      }
+
+      /* 中间定子绕组 */
+      for (var wi = 0; wi < 6; wi++) {
+        var wy = nacY - 0.55 + wi * 0.22;
+        addMesh(scene, meshes, new THREE.BoxGeometry(0.42, 0.18, 0.28), 0xd97706, -0.28, wy, 0.42, wi === 2 ? "stator_winding" : "", { metalness: 0.4, roughness: 0.42 });
+        addMesh(scene, [], new THREE.BoxGeometry(0.42, 0.18, 0.28), 0xd97706, -0.28, wy, -0.42, "", { metalness: 0.4, roughness: 0.42 });
+      }
+
+      /* 中间定子 */
+      addMesh(scene, meshes, new THREE.CylinderGeometry(0.62, 0.62, 0.38, 24), 0x06b6d4, 0.28, nacY, 0, "stator", { rz: Math.PI / 2, metalness: 0.5, roughness: 0.35 });
+      addMesh(scene, [], new THREE.CylinderGeometry(0.28, 0.28, 0.42, 16), 0xe0f2fe, 0.28, nacY, 0, "", { rz: Math.PI / 2, metalness: 0.2, roughness: 0.5 });
+
+      /* 后盘式转子 */
+      addMesh(scene, meshes, new THREE.CylinderGeometry(0.74, 0.74, 0.16, 28), 0x94a3b8, 0.78, nacY, 0, "rear_rotor", { rz: Math.PI / 2, metalness: 0.6, roughness: 0.32 });
+
+      /* 发电机主体示意（变流侧） */
+      addMesh(scene, meshes, new THREE.CylinderGeometry(0.48, 0.48, 0.85, 24), 0xc45a28, 1.35, nacY, 0, "generator", { rz: Math.PI / 2, metalness: 0.55, roughness: 0.35 });
+
+      /* 电器柜 */
+      addMesh(scene, meshes, new THREE.BoxGeometry(0.55, 0.85, 0.48), 0x0284c7, 1.95, nacY - 0.12, 0.28, "cabinet", { metalness: 0.45, roughness: 0.38 });
+      addMesh(scene, [], new THREE.BoxGeometry(0.42, 0.08, 0.36), 0xbae6fd, 1.95, nacY + 0.18, 0.28, "", { metalness: 0.2 });
+
+      /* 滤芯/传感器（机舱顶） */
+      addMesh(scene, meshes, new THREE.BoxGeometry(0.42, 0.22, 0.32), 0x475569, 0.85, nacY + 0.92, 0, "filter", { metalness: 0.4 });
+      addMesh(scene, [], new THREE.CylinderGeometry(0.04, 0.04, 0.35, 8), 0x64748b, 0.85, nacY + 1.18, 0, "", { metalness: 0.5 });
+      addMesh(scene, [], new THREE.SphereGeometry(0.08, 10, 8), 0x94a3b8, 0.85, nacY + 1.38, 0, "", { metalness: 0.35 });
+
+      /* 轮毂 + 叶片转子（绕主轴旋转） */
+      var rotor = new THREE.Group();
+      rotor.position.set(-2.2, nacY, 0);
+      rotor.userData.spinAxis = "x";
+
+      var hubMat = new THREE.MeshStandardMaterial({ color: 0xe2e8f0, metalness: 0.35, roughness: 0.32 });
+      var hub = new THREE.Mesh(new THREE.SphereGeometry(0.55, 24, 18), hubMat);
+      hub.userData.partId = "hub";
+      rotor.add(hub);
+      meshes.push(hub);
+
+      var coverMat = new THREE.MeshStandardMaterial({ color: 0xf1f5f9, metalness: 0.25, roughness: 0.35 });
+      var cover = new THREE.Mesh(new THREE.SphereGeometry(0.48, 20, 16), coverMat);
+      cover.scale.set(1.15, 0.92, 0.92);
+      cover.position.x = -0.35;
+      cover.userData.partId = "hub_cover";
+      rotor.add(cover);
+      meshes.push(cover);
+
+      var spinner = new THREE.Mesh(new THREE.ConeGeometry(0.28, 0.55, 18), coverMat);
+      spinner.rotation.z = Math.PI / 2;
+      spinner.position.x = -0.78;
+      spinner.userData.partId = "hub_cover";
+      rotor.add(spinner);
+
+      var bladeMat = new THREE.MeshStandardMaterial({ color: 0xe8eef5, metalness: 0.2, roughness: 0.42 });
+      var bladeGeo = new THREE.CylinderGeometry(0.06, 0.22, 3.15, 10);
+      for (var bi = 0; bi < 3; bi++) {
+        var blade = new THREE.Mesh(bladeGeo, bladeMat);
+        blade.position.y = 1.55;
+        var wrap = new THREE.Group();
+        wrap.rotation.x = (bi * Math.PI * 2) / 3;
+        wrap.add(blade);
+        blade.userData.partId = "blade";
+        rotor.add(wrap);
+        if (bi === 0) meshes.push(blade);
+      }
+
+      scene.add(rotor);
+      /* 科技感补光：青色轮廓光，贴近光伏页观感 */
+      var rim = new THREE.DirectionalLight(0x38bdf8, 0.45);
+      rim.position.set(-4, 6, 5);
+      scene.add(rim);
+      var rim2 = new THREE.DirectionalLight(0xffffff, 0.25);
+      rim2.position.set(5, 3, -4);
+      scene.add(rim2);
+      scene3d.windRotor = rotor;
+      scene3d.rotor = rotor;
+      scene.position.set(0, -0.45, 0);
     }
 
     function buildPv(scene, meshes) {
