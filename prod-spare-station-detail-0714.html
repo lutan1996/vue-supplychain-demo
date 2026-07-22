@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN" data-build="20260722-station-wh-v3">
+<html lang="zh-CN" data-build="20260722-station-wh-v4">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -429,6 +429,16 @@
       gap: 6px;
       min-height: 48px;
     }
+    /* 1号货架：缩小库位块，固定 6 行铺满，不撑大外框、不挤压下方货架 */
+    .rack-card.has-bins .rack-grid {
+      grid-template-columns: repeat(15, minmax(0, 1fr));
+      grid-template-rows: repeat(6, minmax(0, 1fr));
+      gap: 3px;
+      height: 156px;
+      min-height: 156px;
+      max-height: 156px;
+      overflow: hidden;
+    }
     .rack-bin {
       height: 36px;
       border-radius: 3px;
@@ -440,6 +450,14 @@
       color: #fff;
       cursor: default;
       user-select: none;
+    }
+    .rack-card.has-bins .rack-bin {
+      height: auto;
+      min-height: 0;
+      border-radius: 2px;
+      font-size: 9px;
+      font-weight: 600;
+      line-height: 1;
     }
     .rack-bin.ok { background: #1677ff; }
     .rack-bin.warn { background: #faad14; }
@@ -810,8 +828,21 @@
       });
     }
 
-    var BIN_CODES = ["85833", "85834", "85835", "85836", "85837", "85838", "85839", "85840", "85841", "85842", "85843", "85844", "85845", "85846", "85847", "85848", "85849", "85850", "85851", "85852", "85853", "85854"];
-    var BIN_STATUS = ["ok", "ok", "ok", "warn", "ok", "ok", "danger", "ok", "ok", "ok", "warn", "ok", "ok", "ok", "ok", "danger", "ok", "ok", "warn", "ok", "ok", "ok"];
+    /* 1号货架：15列 × 6行，对齐原型密度 */
+    var BIN_COLS = 15;
+    var BIN_ROWS = 6;
+    var BIN_STATUS_PATTERN = ["ok", "ok", "ok", "warn", "ok", "ok", "danger", "ok", "ok", "ok", "warn", "ok", "ok", "ok", "ok", "danger", "ok", "ok", "warn", "ok", "ok", "ok"];
+
+    function buildBins(cat) {
+      var total = BIN_COLS * BIN_ROWS;
+      var html = "";
+      for (var i = 0; i < total; i++) {
+        var code = String(85833 + (i % 22));
+        var st = BIN_STATUS_PATTERN[i % BIN_STATUS_PATTERN.length];
+        html += '<div class="rack-bin ' + st + '" title="' + cat + " · " + code + '">' + code + "</div>";
+      }
+      return '<div class="rack-grid">' + html + "</div>";
+    }
 
     function renderRacks(cat) {
       var racks = [
@@ -832,16 +863,9 @@
         }
       ];
       var html = racks.map(function (r) {
-        var bins = "";
-        if (r.bins) {
-          bins = '<div class="rack-grid">' + BIN_CODES.map(function (code, i) {
-            return '<div class="rack-bin ' + BIN_STATUS[i] + '" title="' + cat + " · " + code + '">' + code + "</div>";
-          }).join("") + "</div>";
-        } else {
-          bins = '<div class="rack-empty"></div>';
-        }
+        var bins = r.bins ? buildBins(cat) : '<div class="rack-empty"></div>';
         return (
-          '<div class="rack-card">' +
+          '<div class="rack-card' + (r.bins ? " has-bins" : "") + '">' +
             "<h4>" + r.name + "</h4>" +
             '<div class="rack-stats">' +
               "<span>当前库存：<b>" + r.stats.cur + "</b></span>" +
