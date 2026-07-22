@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN" data-build="20260722-tab3d-v44">
+<html lang="zh-CN" data-build="20260722-tab3d-v45">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -1361,7 +1361,7 @@
       if (kind === "wind") {
         /* 拉远+略降，保证机舱与叶片完整入画 */
         camera.fov = 36;
-        camera.position.set(17.5, 6.2, 16.2);
+        camera.position.set(16.6, 6.0, 15.4);
         camera.lookAt(0.05, 4.8, 0);
         camera.updateProjectionMatrix();
       } else if (kind === "pv") {
@@ -1533,7 +1533,7 @@
       /* 正面侧视；略缩小保证整机入画 */
       scene.rotation.y = -0.22;
       scene.position.y = -0.35;
-      scene.scale.set(0.86, 0.86, 0.86);
+      scene.scale.set(0.94, 0.94, 0.94);
 
       scene3d.windRotor = rotor;
       scene3d.rotor = rotor;
@@ -1818,7 +1818,7 @@
     function jumpInventoryPage(file, action, label) {
       var href = file;
       if (href && href.indexOf("v=") < 0) {
-        href += (href.indexOf("?") >= 0 ? "&" : "?") + "v=20260722-tab3d-v44";
+        href += (href.indexOf("?") >= 0 ? "&" : "?") + "v=20260722-tab3d-v45";
       }
       if (action && typeof navigateBySidebarAction === "function" && navigateBySidebarAction(action, { label: label || "" })) {
         return true;
