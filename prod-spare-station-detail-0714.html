@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN" data-build="20260722-station-wh-v8">
+<html lang="zh-CN" data-build="20260722-station-wh-v9">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -207,37 +207,15 @@
       font-size: 11px;
       line-height: 1;
     }
-    .wh-tabs {
-      display: flex;
-      gap: 18px;
-      padding: 0 12px;
-      border-bottom: 1px solid var(--bd);
-      flex: 0 0 auto;
-    }
-    .wh-tabs button {
-      border: 0;
-      background: transparent;
-      padding: 6px 0 7px;
-      font-size: 13px;
-      color: #64748b;
-      cursor: pointer;
-      border-bottom: 2px solid transparent;
-      margin-bottom: -1px;
-    }
-    .wh-tabs button.on {
-      color: var(--pri);
-      font-weight: 600;
-      border-bottom-color: var(--pri);
-    }
     .wh-pane {
-      display: none;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
       flex: 1;
       min-height: 0;
       overflow: hidden;
       padding: 6px 10px 8px;
     }
-    .wh-pane.on { display: flex; flex-direction: column; gap: 4px; }
-    #paneInfo, #paneZone { overflow: auto; }
     .wh-legend {
       display: flex;
       flex-wrap: wrap;
@@ -692,13 +670,8 @@
                   <span>仓库类型</span>
                 </div>
               </div>
-              <div class="wh-tabs" id="whTabs">
-                <button type="button" class="on" data-tab="items">仓库物品</button>
-                <button type="button" data-tab="info">仓库信息</button>
-                <button type="button" data-tab="zone">库区层级</button>
-              </div>
 
-              <div class="wh-pane on" id="paneItems">
+              <div class="wh-pane" id="paneItems">
                 <div class="wh-legend">
                   <span><i class="ok"></i>正常</span>
                   <span><i class="warn diamond"></i>归还超期</span>
@@ -734,104 +707,6 @@
                 </div>
                 <div class="wh-cam">监控摄像头画面</div>
               </div>
-
-              <div class="wh-pane" id="paneInfo">
-                <div class="wh-info-form">
-                  <div class="f-row">
-                    <label><i class="req">*</i>仓库名称</label>
-                    <input id="infoName" type="text" value="一号中心主仓" />
-                  </div>
-                  <div class="f-row">
-                    <label><i class="req">*</i>仓库地址</label>
-                    <div class="addr-row">
-                      <select aria-label="省/市">
-                        <option selected>北京市</option>
-                        <option>上海市</option>
-                        <option>云南省</option>
-                      </select>
-                      <select aria-label="区/县">
-                        <option selected>朝阳区</option>
-                        <option>浦东新区</option>
-                        <option>崇明区</option>
-                      </select>
-                      <select aria-label="街道">
-                        <option selected>xx街道</option>
-                        <option>临港街道</option>
-                      </select>
-                      <input type="text" value="xx路" aria-label="详细地址" />
-                    </div>
-                  </div>
-                  <div class="f-row">
-                    <label><i class="req">*</i>负责部门</label>
-                    <select>
-                      <option selected>安全生产部</option>
-                      <option>物资管理部</option>
-                      <option>运维部</option>
-                    </select>
-                  </div>
-                  <div class="f-row">
-                    <label><i class="req">*</i>负责人</label>
-                    <select>
-                      <option selected>张三</option>
-                      <option>李四</option>
-                      <option>王五</option>
-                    </select>
-                  </div>
-                  <div class="f-row">
-                    <label><i class="req">*</i>联系电话</label>
-                    <input type="text" value="12355661500" />
-                  </div>
-                  <div class="f-row">
-                    <label><i class="req">*</i>仓库类型</label>
-                    <div class="type-checks">
-                      <label><input type="checkbox" checked />中心主仓</label>
-                      <label><input type="checkbox" />场站周转仓</label>
-                      <label><input type="checkbox" />近修备件仓</label>
-                      <label><input type="checkbox" />报废暂存仓</label>
-                      <label><input type="checkbox" />其他仓</label>
-                    </div>
-                  </div>
-                  <div class="f-row">
-                    <label><i class="req">*</i>仓库状态</label>
-                    <select>
-                      <option selected>正常使用</option>
-                      <option>停用</option>
-                      <option>检修中</option>
-                    </select>
-                  </div>
-                  <div class="f-row">
-                    <label>仓库介绍</label>
-                    <textarea>华北区域生产备件中心仓，承接风机关键部件与变流器模块周转。</textarea>
-                  </div>
-                </div>
-              </div>
-
-              <div class="wh-pane" id="paneZone">
-                <div class="wh-zone-layout">
-                  <aside class="wh-zone-side" id="zoneTree">
-                    <div class="n l1 on" data-node="group">国家能源集团</div>
-                    <div class="n l2" data-node="xj">新疆电力</div>
-                    <div class="n l3" data-node="test">测试公司</div>
-                    <div class="n l4" data-node="station">五月康试验站</div>
-                    <div class="n l5" data-node="wind">风电备件区</div>
-                    <div class="n l5" data-node="pv">光伏配件区</div>
-                    <div class="n l2" data-node="gh">国华新能源</div>
-                  </aside>
-                  <div class="wh-zone-main">
-                    <table>
-                      <thead>
-                        <tr><th>节点名称</th><th>创建时间</th></tr>
-                      </thead>
-                      <tbody id="zoneBody">
-                        <tr><td>风电备件区</td><td>2026-05-12 09:20:11</td></tr>
-                        <tr><td>变流器货架</td><td>2026-05-12 09:25:03</td></tr>
-                        <tr><td>轴承货架</td><td>2026-05-18 14:02:40</td></tr>
-                        <tr><td>光伏配件区</td><td>2026-06-01 10:11:22</td></tr>
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              </div>
             </aside>
 
             <div class="sd-right">
@@ -866,8 +741,6 @@
     document.getElementById("bcOrg").textContent = org;
     document.getElementById("bcStation").textContent = station;
     document.getElementById("whName").textContent = whName;
-    var infoName = document.getElementById("infoName");
-    if (infoName) infoName.value = whName;
     document.title = station + " · 仓库详情 - 新能源物资供应链管理系统";
 
     var ROWS = [
@@ -896,63 +769,6 @@
       alert("演示：已导出「" + station + "」库存数据（CSV）");
     });
 
-    document.getElementById("whTabs").addEventListener("click", function (e) {
-      var btn = e.target.closest("button[data-tab]");
-      if (!btn) return;
-      document.querySelectorAll("#whTabs button").forEach(function (b) {
-        b.classList.toggle("on", b === btn);
-      });
-      var tab = btn.getAttribute("data-tab");
-      document.getElementById("paneItems").classList.toggle("on", tab === "items");
-      document.getElementById("paneInfo").classList.toggle("on", tab === "info");
-      document.getElementById("paneZone").classList.toggle("on", tab === "zone");
-    });
-
-    var ZONE_TABLE = {
-      group: [
-        ["新疆电力", "2026-03-01 10:00:00"],
-        ["国华新能源", "2026-03-01 10:05:00"]
-      ],
-      xj: [
-        ["测试公司", "2026-04-02 11:12:00"]
-      ],
-      test: [
-        ["五月康试验站", "2026-04-18 08:30:00"]
-      ],
-      station: [
-        ["风电备件区", "2026-05-12 09:20:11"],
-        ["变流器货架", "2026-05-12 09:25:03"],
-        ["轴承货架", "2026-05-18 14:02:40"],
-        ["光伏配件区", "2026-06-01 10:11:22"]
-      ],
-      wind: [
-        ["变流器货架", "2026-05-12 09:25:03"],
-        ["轴承货架", "2026-05-18 14:02:40"]
-      ],
-      pv: [
-        ["光伏配件区", "2026-06-01 10:11:22"]
-      ],
-      gh: [
-        ["国华新能源", "2026-03-01 10:05:00"]
-      ]
-    };
-
-    function renderZoneTable(key) {
-      var rows = ZONE_TABLE[key] || ZONE_TABLE.station;
-      document.getElementById("zoneBody").innerHTML = rows.map(function (r) {
-        return "<tr><td>" + r[0] + "</td><td>" + r[1] + "</td></tr>";
-      }).join("");
-    }
-
-    document.getElementById("zoneTree").addEventListener("click", function (e) {
-      var n = e.target.closest(".n[data-node]");
-      if (!n) return;
-      document.querySelectorAll("#zoneTree .n").forEach(function (el) {
-        el.classList.toggle("on", el === n);
-      });
-      renderZoneTable(n.getAttribute("data-node"));
-    });
-
     function initCharts() {
       if (!window.echarts) return;
       var labelStyle = {
@@ -969,9 +785,10 @@
         smooth: false,
         lineStyle: { color: "#91caff", width: 1 }
       };
+      /* 配色对齐原型：青绿 / 蓝 / 紫 / 粉 */
       var dist = echarts.init(document.getElementById("chartDist"));
       dist.setOption({
-        color: ["#1677ff", "#eb2f96", "#13c2c2", "#722ed1"],
+        color: ["#13c2c2", "#1677ff", "#722ed1", "#eb2f96"],
         tooltip: { trigger: "item" },
         title: {
           text: "库存数量",
@@ -987,15 +804,16 @@
           label: labelStyle,
           labelLine: labelLineStyle,
           data: [
-            { name: "风电库区", value: 1895 },
-            { name: "风电库区", value: 1895 },
-            { name: "风电库区", value: 1895 }
+            { name: "风电库区", value: 1895, itemStyle: { color: "#13c2c2" } },
+            { name: "风电库区", value: 980, itemStyle: { color: "#1677ff" } },
+            { name: "风电库区", value: 520, itemStyle: { color: "#722ed1" } },
+            { name: "风电库区", value: 420, itemStyle: { color: "#eb2f96" } }
           ]
         }]
       });
       var util = echarts.init(document.getElementById("chartUtil"));
       util.setOption({
-        color: ["#1677ff", "#13c2c2"],
+        color: ["#13c2c2", "#1677ff"],
         tooltip: { trigger: "item" },
         title: {
           text: "库位数量",
@@ -1011,8 +829,8 @@
           label: labelStyle,
           labelLine: labelLineStyle,
           data: [
-            { name: "风电库区", value: 1895 },
-            { name: "风电库区", value: 1895 }
+            { name: "风电库区", value: 1895, itemStyle: { color: "#13c2c2" } },
+            { name: "风电库区", value: 820, itemStyle: { color: "#1677ff" } }
           ]
         }]
       });
