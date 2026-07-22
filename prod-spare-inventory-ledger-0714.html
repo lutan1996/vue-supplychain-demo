@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN" data-build="20260722-rt-stock-v21">
+<html lang="zh-CN" data-build="20260722-legend-top-v22">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -384,6 +384,30 @@
       margin-bottom: 2px;
       text-align: center;
     }
+    .chart-legend {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: center;
+      gap: 10px 14px;
+      padding: 2px 0 4px;
+      flex: 0 0 auto;
+    }
+    .chart-legend span {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 10px;
+      color: #64748b;
+      white-space: nowrap;
+      line-height: 1;
+    }
+    .chart-legend i {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex: 0 0 auto;
+    }
     .chart-el { width: 100%; flex: 1; min-height: 120px; }
 
     .idle-board {
@@ -569,6 +593,11 @@
                   </div>
                   <div class="chart-box">
                     <div class="chart-title">各仓库数量占比情况</div>
+                    <div class="chart-legend" aria-hidden="true">
+                      <span><i style="background:#1677ff"></i>出库数量</span>
+                      <span><i style="background:#f5222d"></i>当前数量</span>
+                      <span><i style="background:#52c41a"></i>入库数量</span>
+                    </div>
                     <div class="chart-el" id="chartRealtime"></div>
                   </div>
                 </div>
@@ -602,6 +631,12 @@
                   </div>
                   <div class="chart-box">
                     <div class="chart-title">各仓库呆滞金额占比情况</div>
+                    <div class="chart-legend" aria-hidden="true">
+                      <span><i style="background:#52c41a"></i>30~90天以内</span>
+                      <span><i style="background:#1677ff"></i>90~180天以内</span>
+                      <span><i style="background:#faad14"></i>示意</span>
+                      <span><i style="background:#f5222d"></i>示意</span>
+                    </div>
                     <div class="chart-el" id="chartIdle"></div>
                   </div>
                 </div>
@@ -952,15 +987,8 @@
       if (c1) {
         c1.setOption({
           color: ["#1677ff", "#f5222d", "#52c41a"],
-          legend: {
-            top: 0,
-            left: "center",
-            textStyle: { fontSize: 10, color: "#64748b" },
-            itemWidth: 8,
-            itemHeight: 8,
-            data: ["出库数量", "当前数量", "入库数量"]
-          },
-          grid: { left: 42, right: 10, top: 28, bottom: 22 },
+          legend: { show: false },
+          grid: { left: 42, right: 10, top: 18, bottom: 24 },
           xAxis: {
             type: "category",
             data: whNames,
@@ -990,20 +1018,8 @@
       if (c2) {
         c2.setOption({
           color: ["#1677ff", "#f5222d", "#52c41a", "#faad14"],
-          legend: {
-            top: 0,
-            left: "center",
-            textStyle: { fontSize: 10, color: "#64748b" },
-            itemWidth: 8,
-            itemHeight: 8,
-            data: [
-              { name: "30~90天以内", itemStyle: { color: "#52c41a" } },
-              { name: "90~180天以内", itemStyle: { color: "#1677ff" } },
-              { name: "示意", itemStyle: { color: "#faad14" } },
-              { name: "示意 ", itemStyle: { color: "#f5222d" } }
-            ]
-          },
-          grid: { left: 42, right: 10, top: 28, bottom: 22 },
+          legend: { show: false },
+          grid: { left: 42, right: 10, top: 18, bottom: 24 },
           xAxis: {
             type: "category",
             data: whNames,
