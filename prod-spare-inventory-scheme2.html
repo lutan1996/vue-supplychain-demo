@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN" data-build="20260722-tab3d-v55">
+<html lang="zh-CN" data-build="20260722-tab3d-v56">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -482,12 +482,12 @@
     }
     .rt-summary .rt-vals b {
       font-family: var(--num);
-      font-size: 30px;
+      font-size: 18px;
       color: #0f172a;
       font-weight: 700;
       line-height: 0.95;
       font-variant-numeric: tabular-nums;
-      letter-spacing: -0.04em;
+      letter-spacing: -0.03em;
     }
     .rt-summary .rt-vals > div:first-child b { color: #1677ff; }
     .rt-summary .rt-vals span {
@@ -560,8 +560,8 @@
       font-style: normal;
       color: #0f172a;
       font-weight: 700;
-      font-size: 16px;
-      letter-spacing: -0.03em;
+      font-size: 13px;
+      letter-spacing: -0.02em;
       font-variant-numeric: tabular-nums;
       white-space: nowrap;
     }
@@ -672,11 +672,11 @@
     }
     .idle-cell .v b {
       font-family: var(--num);
-      font-size: 26px;
+      font-size: 16px;
       font-weight: 700;
       color: #0f172a;
       font-variant-numeric: tabular-nums;
-      letter-spacing: -0.04em;
+      letter-spacing: -0.03em;
     }
     .idle-cell:nth-child(1) .v b { color: #1677ff; }
     .idle-cell:nth-child(2) .v b { color: #08979c; }
@@ -1751,6 +1751,25 @@
         c1.setOption({
           color: ["#1677ff", "#f5222d", "#52c41a"],
           legend: { show: false },
+          tooltip: {
+            trigger: "axis",
+            confine: true,
+            backgroundColor: "rgba(255,255,255,0.96)",
+            borderColor: "#d9e2ec",
+            borderWidth: 1,
+            textStyle: { color: "#1f2d3d", fontSize: 12 },
+            formatter: function (params) {
+              var name = (params && params[0] && params[0].axisValue) || "仓库";
+              var html = '<div style="font-weight:700;margin-bottom:6px;color:#1677ff">实时物资动态图</div>';
+              html += '<div style="color:#64748b;margin-bottom:6px;font-size:11px">各仓库出库 / 当前库存 / 入库数量对比</div>';
+              html += '<div style="margin-bottom:4px">' + name + "</div>";
+              (params || []).forEach(function (p) {
+                html += '<div style="display:flex;justify-content:space-between;gap:16px;line-height:1.7">' +
+                  "<span>" + p.marker + p.seriesName + "</span><b>" + p.value + " 件</b></div>";
+              });
+              return html;
+            }
+          },
           grid: { left: 42, right: 10, top: 28, bottom: 24 },
           xAxis: {
             type: "category",
@@ -1783,6 +1802,25 @@
         c2.setOption({
           color: ["#1677ff", "#f5222d", "#52c41a", "#faad14"],
           legend: { show: false },
+          tooltip: {
+            trigger: "axis",
+            confine: true,
+            backgroundColor: "rgba(255,255,255,0.96)",
+            borderColor: "#d9e2ec",
+            borderWidth: 1,
+            textStyle: { color: "#1f2d3d", fontSize: 12 },
+            formatter: function (params) {
+              var name = (params && params[0] && params[0].axisValue) || "仓库";
+              var html = '<div style="font-weight:700;margin-bottom:6px;color:#1677ff">呆滞物资动态图</div>';
+              html += '<div style="color:#64748b;margin-bottom:6px;font-size:11px">各仓库呆滞库存金额（按呆滞时长分层）</div>';
+              html += '<div style="margin-bottom:4px">' + name + "</div>";
+              (params || []).forEach(function (p) {
+                html += '<div style="display:flex;justify-content:space-between;gap:16px;line-height:1.7">' +
+                  "<span>" + p.marker + p.seriesName + "</span><b>" + p.value + " 万元</b></div>";
+              });
+              return html;
+            }
+          },
           grid: { left: 42, right: 10, top: 28, bottom: 24 },
           xAxis: {
             type: "category",
@@ -1943,7 +1981,7 @@
     function jumpInventoryPage(file, action, label) {
       var href = file;
       if (href && href.indexOf("v=") < 0) {
-        href += (href.indexOf("?") >= 0 ? "&" : "?") + "v=20260722-tab3d-v55";
+        href += (href.indexOf("?") >= 0 ? "&" : "?") + "v=20260722-tab3d-v56";
       }
       if (action && typeof navigateBySidebarAction === "function" && navigateBySidebarAction(action, { label: label || "" })) {
         return true;
