@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN" data-build="20260722-tab3d-v29">
+<html lang="zh-CN" data-build="20260722-tab3d-v30">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -741,7 +741,7 @@
     };
 
     var charts = {};
-    var scene3d = { renderer: null, scene: null, camera: null, animId: null, meshes: [], rotor: null };
+    var scene3d = { renderer: null, scene: null, camera: null, animId: null, meshes: [], rotor: null, ro: null, lastW: 0, lastH: 0, kind: "", lastPart: "", baseReady: false, modelsReady: false, roots: null, meshByKind: null, windRotor: null };
     var sceneGen = 0;
 
     function modelKind(mat) {
@@ -805,6 +805,7 @@
       });
     }
 
+
     function disposeObject3D(obj) {
       if (!obj) return;
       if (obj.children && obj.children.length) {
@@ -854,7 +855,11 @@
           scene3d.renderer.domElement.parentNode.removeChild(scene3d.renderer.domElement);
         }
       }
-      scene3d = { renderer: null, scene: null, camera: null, animId: null, meshes: [], rotor: null, ro: null, lastW: 0, lastH: 0, kind: "", lastPart: "" };
+      scene3d = {
+        renderer: null, scene: null, camera: null, animId: null, meshes: [], rotor: null,
+        ro: null, lastW: 0, lastH: 0, kind: "", lastPart: "",
+        baseReady: false, modelsReady: false, roots: null, meshByKind: null, windRotor: null
+      };
     }
 
     function syncRendererSize(force) {
@@ -879,16 +884,37 @@
     function ensureRenderer() {
       var wrap = document.getElementById("diagramWrap");
       if (!wrap || typeof THREE === "undefined") return false;
-      if (scene3d.renderer && scene3d.scene && scene3d.camera) return true;
+      if (scene3d.renderer && scene3d.scene && scene3d.camera) {
+        if (scene3d.renderer.domElement && scene3d.renderer.domElement.isContextLost && scene3d.renderer.domElement.isContextLost()) {
+          disposeScene();
+        } else {
+          return true;
+        }
+      }
 
       var w = Math.max(8, Math.floor(wrap.clientWidth || 600));
       var h = Math.max(8, Math.floor(wrap.clientHeight || 480));
-      var renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+      var renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: "high-performance" });
       renderer.setPixelRatio(1);
       renderer.setClearColor(0x000000, 0);
       renderer.setSize(w, h, false);
       renderer.domElement.style.width = w + "px";
       renderer.domElement.style.height = h + "px";
+      renderer.domElement.addEventListener("webglcontextlost", function (ev) {
+        ev.preventDefault();
+        sceneGen += 1;
+        stopAnimLoop();
+        scene3d.baseReady = false;
+        scene3d.modelsReady = false;
+        scene3d.roots = null;
+        scene3d.meshByKind = null;
+        scene3d.renderer = null;
+        scene3d.scene = null;
+        scene3d.camera = null;
+      }, false);
+      renderer.domElement.addEventListener("webglcontextrestored", function () {
+        setTimeout(function () { initScene(); }, 0);
+      }, false);
       wrap.innerHTML = "";
       wrap.appendChild(renderer.domElement);
 
@@ -901,7 +927,12 @@
       scene3d.lastH = h;
       scene3d.meshes = [];
       scene3d.rotor = null;
+      scene3d.windRotor = null;
       scene3d.lastPart = "";
+      scene3d.baseReady = false;
+      scene3d.modelsReady = false;
+      scene3d.roots = null;
+      scene3d.meshByKind = null;
 
       if (typeof ResizeObserver !== "undefined" && !scene3d.ro) {
         var roTimer = null;
@@ -919,47 +950,9 @@
       return true;
     }
 
-    function startAnimLoop() {
-      if (scene3d.animId) return;
-      var myGen = sceneGen;
-      function animate() {
-        if (myGen !== sceneGen) return;
-        if (!scene3d.renderer || !scene3d.scene || !scene3d.camera) return;
-        scene3d.animId = requestAnimationFrame(animate);
-        if (scene3d.lastPart !== state.partId) {
-          scene3d.lastPart = state.partId || "";
-          (scene3d.meshes || []).forEach(function (m) {
-            if (!m.material || !m.material.emissive) return;
-            if (m.userData.partId && m.userData.partId === state.partId) {
-              m.material.emissive.setHex(0x1677ff);
-              m.material.emissiveIntensity = 0.28;
-            } else {
-              m.material.emissive.setHex(0x000000);
-              m.material.emissiveIntensity = 0;
-            }
-          });
-        }
-        scene3d.renderer.render(scene3d.scene, scene3d.camera);
-      }
-      animate();
-    }
-
-    function buildSceneContent() {
+    function ensureBaseScene() {
+      if (!scene3d.scene || scene3d.baseReady) return;
       var scene = scene3d.scene;
-      var camera = scene3d.camera;
-      if (!scene || !camera) return;
-      clearSceneGraph(scene);
-      scene.rotation.set(0, 0, 0);
-
-      var kind = modelKind(state.mat);
-      if (kind === "wind") {
-        camera.position.set(3.2, 7.6, 22.5);
-        camera.lookAt(0, 6.4, 0);
-      } else {
-        camera.position.set(7.2, 4.2, 9.5);
-        camera.lookAt(0, 2.2, 0);
-      }
-
       scene.add(new THREE.AmbientLight(0xffffff, 0.78));
       var key = new THREE.DirectionalLight(0xffffff, 0.85);
       key.position.set(8, 14, 6);
@@ -972,17 +965,84 @@
         new THREE.MeshStandardMaterial({ color: 0xe8eef6, metalness: 0.05, roughness: 0.92 })
       );
       ground.rotation.x = -Math.PI / 2;
+      ground.name = "ground";
       scene.add(ground);
+      scene3d.baseReady = true;
+    }
 
-      var meshes = [];
-      scene3d.rotor = null;
-      if (kind === "pv") buildPv(scene, meshes);
-      else if (kind === "storage") buildStorage(scene, meshes);
-      else buildWind(scene, meshes);
+    function ensureModels() {
+      if (!scene3d.scene || scene3d.modelsReady) return;
+      var scene = scene3d.scene;
+      var roots = {};
+      var meshByKind = {};
+      ["wind", "pv", "storage"].forEach(function (kind) {
+        var g = new THREE.Group();
+        g.name = "model-" + kind;
+        g.visible = false;
+        var meshes = [];
+        if (kind === "pv") buildPv(g, meshes);
+        else if (kind === "storage") buildStorage(g, meshes);
+        else buildWind(g, meshes);
+        scene.add(g);
+        roots[kind] = g;
+        meshByKind[kind] = meshes;
+      });
+      scene3d.roots = roots;
+      scene3d.meshByKind = meshByKind;
+      scene3d.modelsReady = true;
+    }
 
-      scene3d.meshes = meshes;
+    function applyKind(kind) {
+      if (!scene3d.roots) return;
+      Object.keys(scene3d.roots).forEach(function (k) {
+        scene3d.roots[k].visible = k === kind;
+      });
+      scene3d.meshes = (scene3d.meshByKind && scene3d.meshByKind[kind]) || [];
       scene3d.kind = kind;
       scene3d.lastPart = "";
+      scene3d.rotor = kind === "wind" ? scene3d.windRotor : null;
+
+      var camera = scene3d.camera;
+      if (!camera) return;
+      if (kind === "wind") {
+        camera.position.set(3.2, 7.6, 22.5);
+        camera.lookAt(0, 6.4, 0);
+      } else if (kind === "pv") {
+        camera.position.set(6.8, 4.6, 9.2);
+        camera.lookAt(0, 1.6, 0);
+      } else {
+        camera.position.set(7.5, 4.8, 10.2);
+        camera.lookAt(0, 1.8, 0);
+      }
+    }
+
+    function startAnimLoop() {
+      if (scene3d.animId) return;
+      var myGen = sceneGen;
+      function animate() {
+        if (myGen !== sceneGen) return;
+        if (!scene3d.renderer || !scene3d.scene || !scene3d.camera) return;
+        scene3d.animId = requestAnimationFrame(animate);
+        try {
+          if (scene3d.lastPart !== state.partId) {
+            scene3d.lastPart = state.partId || "";
+            (scene3d.meshes || []).forEach(function (m) {
+              if (!m || !m.material || !m.material.emissive) return;
+              if (m.userData.partId && m.userData.partId === state.partId) {
+                m.material.emissive.setHex(0x1677ff);
+                m.material.emissiveIntensity = 0.28;
+              } else {
+                m.material.emissive.setHex(0x000000);
+                m.material.emissiveIntensity = 0;
+              }
+            });
+          }
+          scene3d.renderer.render(scene3d.scene, scene3d.camera);
+        } catch (eAnim) {
+          /* keep loop alive; next frame may recover */
+        }
+      }
+      animate();
     }
 
     function initScene() {
@@ -995,7 +1055,9 @@
 
       function run() {
         if (!ensureRenderer()) return;
-        buildSceneContent();
+        ensureBaseScene();
+        ensureModels();
+        applyKind(modelKind(state.mat));
         if (!syncRendererSize(true)) {
           requestAnimationFrame(function () {
             syncRendererSize(true);
@@ -1132,6 +1194,7 @@
       /* 略缩小，保证顶叶与底座都进画幅 */
       root.scale.set(0.82, 0.82, 0.82);
       scene3d.rotor = rotor;
+      scene3d.windRotor = rotor;
     }
 
     function buildPv(scene, meshes) {
@@ -1146,12 +1209,18 @@
     }
 
     function buildStorage(scene, meshes) {
-      addMesh(scene, [], new THREE.BoxGeometry(5.8, 2.9, 2.5), 0xd1fae5, 0, 1.55, 0, "", { roughness: 0.75 });
+      /* 集装箱式储能：柜体半透明外壳 + 外显电池簇，避免切换后看起来像空白 */
+      addMesh(scene, [], new THREE.BoxGeometry(6.2, 0.18, 3.2), 0x94a3b8, 0, 0.12, 0, "", { metalness: 0.35, roughness: 0.7 });
+      addMesh(scene, [], new THREE.BoxGeometry(5.8, 2.6, 2.4), 0xcbd5e1, 0, 1.5, 0, "", {
+        metalness: 0.2, roughness: 0.55, transparent: true, opacity: 0.35, depthWrite: false
+      });
       for (var i = 0; i < 5; i++) {
-        addMesh(scene, meshes, new THREE.BoxGeometry(0.85, 1.65, 0.72), 0x10b981, -1.8 + i * 0.9, 1.55, 0, i === 2 ? "blade" : "", { metalness: 0.45 });
+        addMesh(scene, meshes, new THREE.BoxGeometry(0.9, 1.7, 0.78), 0x059669, -1.9 + i * 0.95, 1.45, 0.55, i === 2 ? "blade" : "", { metalness: 0.4 });
+        addMesh(scene, [], new THREE.BoxGeometry(0.82, 0.12, 0.7), 0x064e3b, -1.9 + i * 0.95, 2.38, 0.55, "", { metalness: 0.35 });
       }
-      addMesh(scene, meshes, new THREE.BoxGeometry(1.05, 1.85, 0.85), 0x2563eb, 2.35, 1.65, 0.65, "generator", { metalness: 0.5 });
-      addMesh(scene, meshes, new THREE.BoxGeometry(0.85, 0.55, 0.55), 0x0ea5e9, -2.05, 0.85, -0.85, "filter", { metalness: 0.35 });
+      addMesh(scene, meshes, new THREE.BoxGeometry(1.15, 1.95, 0.95), 0x2563eb, 2.55, 1.55, 0.75, "generator", { metalness: 0.5 });
+      addMesh(scene, meshes, new THREE.BoxGeometry(0.9, 0.6, 0.6), 0x0ea5e9, -2.35, 0.75, -0.95, "filter", { metalness: 0.35 });
+      addMesh(scene, [], new THREE.BoxGeometry(0.35, 2.2, 0.35), 0xf97316, 3.35, 1.4, -0.7, "", { metalness: 0.25 });
     }
 
     function ensureChart(id) {
@@ -1328,19 +1397,26 @@
         b.classList.toggle("on", b === btn);
       });
       renderCallouts();
-      if (prevKind === nextKind && scene3d.renderer) {
-        /* 全部/风机同模型：只刷新标注，不重建场景 */
+      if (prevKind === nextKind && scene3d.modelsReady) {
         scene3d.lastPart = "";
         return;
       }
-      /* 切换风机/光伏/储能：复用 WebGL，只替换场景内容 */
+      /* 页签切换：三套模型只建一次，只切 visible，绝不销毁 WebGL */
+      if (scene3d.renderer && scene3d.modelsReady) {
+        applyKind(nextKind);
+        syncRendererSize(true);
+        try {
+          scene3d.renderer.render(scene3d.scene, scene3d.camera);
+        } catch (eRender) {}
+        return;
+      }
       initScene();
     });
 
     function jumpInventoryPage(file, action, label) {
       var href = file;
       if (href && href.indexOf("v=") < 0) {
-        href += (href.indexOf("?") >= 0 ? "&" : "?") + "v=20260722-tab3d-v29";
+        href += (href.indexOf("?") >= 0 ? "&" : "?") + "v=20260722-tab3d-v30";
       }
       if (action && typeof navigateBySidebarAction === "function" && navigateBySidebarAction(action, { label: label || "" })) {
         return true;
