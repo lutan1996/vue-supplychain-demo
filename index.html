@@ -467,6 +467,7 @@ body.map-demo-hide-shell-topbar .shell .main > .topbar{display:none !important;}
     actionToFile["prod-spare-inventory-scheme2"] = "prod-spare-inventory-scheme2.html";
     actionToFile["prod-spare-storage"] = "prod-spare-storage-0714.html";
     actionToFile["prod-spare-station-detail"] = "prod-spare-station-detail-0714.html";
+    actionToFile["prod-spare-item-detail"] = "prod-spare-item-detail-0714.html";
     labelToFile["采购合同报表管理"] = "purchase-summary-report.html";
     labelToFile["销售合同报表管理"] = "sales-contract-report.html";
     labelToFile["物资列表"] = "sales-material-list.html";
@@ -522,7 +523,9 @@ body.map-demo-hide-shell-topbar .shell .main > .topbar{display:none !important;}
     (function registerProdSparePages() {
       var extras = [
         { title: "生产物资库存管理", file: "prod-spare-inventory-scheme2.html" },
-        { title: "仓库视图", file: "prod-spare-storage-0714.html" }
+        { title: "仓库视图", file: "prod-spare-storage-0714.html" },
+        { title: "风电场仓库详情", file: "prod-spare-station-detail-0714.html" },
+        { title: "物资详情", file: "prod-spare-item-detail-0714.html" }
       ];
       extras.forEach(function (m) {
         if (!m.file || fileToIndex.hasOwnProperty(m.file)) return;
@@ -831,7 +834,7 @@ body.map-demo-hide-shell-topbar .shell .main > .topbar{display:none !important;}
     /* 必须为 true：Blob URL 的 iframe 与 file:// 父页不同源，子页无法可靠调用 parent.__demoOpenPage / postMessage，蓝框子功能会全部失效。srcdoc 与父页同源，侧栏跳转才能工作。 */
     var demoUseSrcdocOnly = true;
     var demoLoadingSafetyTimer = null;
-    var demoPageVersion = "20260722-station-wh-v15";
+    var demoPageVersion = "20260722-item-detail-v1";
 
     function demoAppendVersionBeforeHash(href) {
       if (!href) return href;

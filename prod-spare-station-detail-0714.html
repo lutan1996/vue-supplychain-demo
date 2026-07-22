@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN" data-build="20260722-station-wh-v15">
+<html lang="zh-CN" data-build="20260722-item-detail-v1">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -847,165 +847,6 @@
     }
     .bin-pop-detail:hover { background: #3c92ff; }
 
-    /* 物资照片详情弹窗 */
-    .item-detail-mask {
-      position: fixed;
-      inset: 0;
-      z-index: 1300;
-      background: rgba(15, 23, 42, 0.45);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      padding: 24px;
-    }
-    .item-detail-mask.on { display: flex; }
-    .item-detail {
-      width: min(720px, 94vw);
-      max-height: min(86vh, 640px);
-      background: #fff;
-      border-radius: 8px;
-      box-shadow: 0 18px 48px rgba(15, 23, 42, 0.28);
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-    }
-    .item-detail-hd {
-      flex: 0 0 auto;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 12px 16px;
-      border-bottom: 1px solid #e8edf4;
-      background: linear-gradient(180deg, #f8fbff 0%, #fff 100%);
-    }
-    .item-detail-hd h3 {
-      margin: 0;
-      font-size: 15px;
-      font-weight: 700;
-      color: #1f2d3d;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .item-detail-hd h3::before {
-      content: "";
-      width: 3px;
-      height: 14px;
-      border-radius: 1px;
-      background: #1677ff;
-    }
-    .item-detail-x {
-      width: 28px;
-      height: 28px;
-      border: 0;
-      border-radius: 4px;
-      background: transparent;
-      color: #64748b;
-      font-size: 18px;
-      cursor: pointer;
-      line-height: 1;
-    }
-    .item-detail-x:hover { background: #f1f5f9; color: #1f2d3d; }
-    .item-detail-body {
-      flex: 1;
-      min-height: 0;
-      display: grid;
-      grid-template-columns: minmax(240px, 0.95fr) minmax(280px, 1.05fr);
-      gap: 0;
-      overflow: auto;
-    }
-    .item-detail-photo {
-      padding: 16px;
-      background: #f5f8fc;
-      border-right: 1px solid #eef2f7;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-    .item-detail-photo .ph-frame {
-      flex: 1;
-      min-height: 220px;
-      border: 1px solid #dbe4f0;
-      border-radius: 6px;
-      background: #fff;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      overflow: hidden;
-      position: relative;
-    }
-    .item-detail-photo .ph-frame img {
-      max-width: 100%;
-      max-height: 280px;
-      object-fit: contain;
-      display: block;
-    }
-    .item-detail-photo .ph-cap {
-      font-size: 12px;
-      color: #64748b;
-      text-align: center;
-    }
-    .item-detail-photo .ph-cap b { color: #1f2d3d; font-weight: 600; }
-    .item-detail-fields {
-      padding: 14px 18px 18px;
-      display: grid;
-      grid-template-columns: 92px 1fr;
-      gap: 10px 12px;
-      align-content: start;
-      font-size: 13px;
-    }
-    .item-detail-fields .k {
-      color: #64748b;
-      text-align: right;
-      line-height: 1.45;
-      padding-top: 1px;
-    }
-    .item-detail-fields .v {
-      color: #1f2d3d;
-      font-weight: 600;
-      line-height: 1.45;
-      word-break: break-all;
-    }
-    .item-detail-fields .v.tag {
-      display: inline-flex;
-      width: fit-content;
-      padding: 1px 8px;
-      border-radius: 999px;
-      background: #e6f4ff;
-      color: #1677ff;
-      font-size: 12px;
-      font-weight: 600;
-    }
-    .item-detail-ft {
-      flex: 0 0 auto;
-      padding: 10px 16px;
-      border-top: 1px solid #e8edf4;
-      display: flex;
-      justify-content: flex-end;
-      gap: 8px;
-      background: #fafbfd;
-    }
-    .item-detail-ft button {
-      height: 32px;
-      padding: 0 16px;
-      border-radius: 4px;
-      border: 1px solid #d9e2ec;
-      background: #fff;
-      color: #475569;
-      font-size: 13px;
-      cursor: pointer;
-    }
-    .item-detail-ft .primary {
-      border-color: #1677ff;
-      background: #1677ff;
-      color: #fff;
-    }
-    .item-detail-ft .primary:hover { background: #4096ff; }
-    @media (max-width: 720px) {
-      .item-detail-body { grid-template-columns: 1fr; }
-      .item-detail-photo { border-right: 0; border-bottom: 1px solid #eef2f7; }
-    }
-
     @media (max-width: 1200px) {
       .sd-bottom { grid-template-columns: 300px minmax(0, 1fr); }
     }
@@ -1287,28 +1128,6 @@
     <button type="button" class="bin-pop-detail" id="binPopDetail">查看详情</button>
   </div>
 
-  <div class="item-detail-mask" id="itemDetailMask" aria-hidden="true">
-    <div class="item-detail" role="dialog" aria-modal="true" aria-labelledby="itemDetailTitle">
-      <div class="item-detail-hd">
-        <h3 id="itemDetailTitle">物资详情</h3>
-        <button type="button" class="item-detail-x" id="itemDetailClose" aria-label="关闭">×</button>
-      </div>
-      <div class="item-detail-body">
-        <div class="item-detail-photo">
-          <div class="ph-frame">
-            <img id="itemDetailImg" alt="物资照片" />
-          </div>
-          <div class="ph-cap">物资照片 · <b id="itemDetailPhotoName">—</b></div>
-        </div>
-        <div class="item-detail-fields" id="itemDetailFields"></div>
-      </div>
-      <div class="item-detail-ft">
-        <button type="button" id="itemDetailCancel">关闭</button>
-        <button type="button" class="primary" id="itemDetailOk">确定</button>
-      </div>
-    </div>
-  </div>
-
   <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.1/dist/echarts.min.js"></script>
   <script src="js/sidebar-actions.js"></script>
   <script src="js/subpage-feature-title.js"></script>
@@ -1421,7 +1240,7 @@
         }
         var href = "prod-spare-station-detail-0714.html?org=" + encodeURIComponent(nextOrg) +
           "&station=" + encodeURIComponent(stationName) +
-          "&v=20260722-station-wh-v15";
+          "&v=20260722-item-detail-v1";
         location.href = href;
         return;
       }
@@ -1602,32 +1421,6 @@
 
     var currentBin = null;
 
-    function findRowByMat(code) {
-      for (var i = 0; i < ROWS.length; i++) {
-        if (ROWS[i][0] === code) return ROWS[i];
-      }
-      return ROWS[0];
-    }
-
-    function makeItemPhotoDataUrl(name, code) {
-      var safeName = String(name || "物资").slice(0, 10);
-      var safeCode = String(code || "").slice(0, 14);
-      var svg =
-        '<svg xmlns="http://www.w3.org/2000/svg" width="640" height="480" viewBox="0 0 640 480">' +
-        '<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1">' +
-        '<stop offset="0%" stop-color="#e8f3ff"/><stop offset="100%" stop-color="#d6e8ff"/></linearGradient></defs>' +
-        '<rect width="640" height="480" fill="url(#g)"/>' +
-        '<rect x="170" y="110" width="300" height="220" rx="16" fill="#fff" stroke="#91caff" stroke-width="2"/>' +
-        '<rect x="210" y="150" width="220" height="120" rx="8" fill="#f0f7ff" stroke="#bae0ff"/>' +
-        '<circle cx="320" cy="210" r="34" fill="#1677ff" opacity="0.15"/>' +
-        '<path d="M300 210h40M320 190v40" stroke="#1677ff" stroke-width="6" stroke-linecap="round"/>' +
-        '<text x="320" y="370" text-anchor="middle" fill="#1f2d3d" font-size="28" font-family="sans-serif" font-weight="700">' +
-        safeName + "</text>" +
-        '<text x="320" y="402" text-anchor="middle" fill="#64748b" font-size="16" font-family="sans-serif">' +
-        safeCode + "</text></svg>";
-      return "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(svg);
-    }
-
     function closeBinPop() {
       document.getElementById("binPop").classList.remove("on");
       document.getElementById("binPopMask").classList.remove("on");
@@ -1635,37 +1428,25 @@
       document.getElementById("binPopMask").setAttribute("aria-hidden", "true");
     }
 
-    function closeItemDetail() {
-      document.getElementById("itemDetailMask").classList.remove("on");
-      document.getElementById("itemDetailMask").setAttribute("aria-hidden", "true");
+    function openDemoPage(href) {
+      try {
+        if (window.top && window.top !== window && typeof window.top.__demoOpenPage === "function") {
+          if (window.top.__demoOpenPage(href) === true) return;
+        }
+      } catch (eTop) {}
+      window.location.href = href;
     }
 
     function openItemDetail(bin) {
       if (!bin) return;
-      var row = findRowByMat(bin.mat);
-      var fields = [
-        ["物资编码", row[0]],
-        ["原厂物料号", row[1]],
-        ["物资名称", row[2]],
-        ["规格型号", row[3]],
-        ["物资大类", bin.cat || row[4]],
-        ["适用机型", row[5]],
-        ["安装位置", row[6]],
-        ["制造商", row[7]],
-        ["单位", row[8]],
-        ["采购单价", row[9] + " 元"],
-        ["囤置天数", (bin.days || "0") + " 天"],
-        ["库位编码", bin.code || "—"]
-      ];
-      document.getElementById("itemDetailFields").innerHTML = fields.map(function (f, idx) {
-        var cls = idx === 4 ? ' class="v tag"' : ' class="v"';
-        return '<div class="k">' + f[0] + '</div><div' + cls + ">" + f[1] + "</div>";
-      }).join("");
-      document.getElementById("itemDetailPhotoName").textContent = row[2];
-      document.getElementById("itemDetailImg").src = makeItemPhotoDataUrl(row[2], row[0]);
-      document.getElementById("itemDetailImg").alt = row[2] + " 物资照片";
-      document.getElementById("itemDetailMask").classList.add("on");
-      document.getElementById("itemDetailMask").setAttribute("aria-hidden", "false");
+      var href =
+        "prod-spare-item-detail-0714.html?org=" + encodeURIComponent(org) +
+        "&station=" + encodeURIComponent(station) +
+        "&code=" + encodeURIComponent(bin.mat || "") +
+        "&bin=" + encodeURIComponent(bin.code || "") +
+        "&days=" + encodeURIComponent(bin.days || "") +
+        "&v=20260722-item-detail-v1";
+      openDemoPage(href);
     }
 
     function openBinPop(btn) {
@@ -1720,16 +1501,8 @@
       closeBinPop();
       openItemDetail(currentBin);
     });
-    document.getElementById("itemDetailClose").addEventListener("click", closeItemDetail);
-    document.getElementById("itemDetailCancel").addEventListener("click", closeItemDetail);
-    document.getElementById("itemDetailOk").addEventListener("click", closeItemDetail);
-    document.getElementById("itemDetailMask").addEventListener("click", function (e) {
-      if (e.target === this) closeItemDetail();
-    });
     document.addEventListener("keydown", function (e) {
-      if (e.key !== "Escape") return;
-      if (document.getElementById("itemDetailMask").classList.contains("on")) closeItemDetail();
-      else closeBinPop();
+      if (e.key === "Escape") closeBinPop();
     });
 
     document.getElementById("zoneSelect").addEventListener("change", function () {
