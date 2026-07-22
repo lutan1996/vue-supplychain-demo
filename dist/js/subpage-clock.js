@@ -2040,7 +2040,11 @@
       "inventory-management.html": 1,
       "receipt-inbound.html": 1,
       "idle-materials.html": 1,
-      "warehouse.html": 1
+      "warehouse.html": 1,
+      "bd-warehouse-mgmt.html": 1,
+      "bd-warehouse-area.html": 1,
+      "bd-warehouse-shelf.html": 1,
+      "bd-warehouse-orientation.html": 1
     };
     if (keepWarehouseOps[file]) return;
     if (file === "purchase-plan-management.html" || file === "contract-management.html") return;
