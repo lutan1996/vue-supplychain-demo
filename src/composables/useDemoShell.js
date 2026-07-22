@@ -197,6 +197,7 @@ export function useDemoShell() {
     'purchase-plan-table': 'purchase-plan-table.html',
     'purchase-quality-accept': 'material-procurement-hub.html?tab=m10',
     'prod-spare-inventory': 'prod-spare-inventory-ledger-0714.html',
+    'prod-spare-inventory-scheme2': 'prod-spare-inventory-scheme2.html',
     'prod-spare-storage': 'prod-spare-storage-0714.html',
     'prod-spare-type-detail': 'prod-spare-type-detail-0714.html',
     'bd-warehouse-mgmt': 'bd-warehouse-mgmt.html',

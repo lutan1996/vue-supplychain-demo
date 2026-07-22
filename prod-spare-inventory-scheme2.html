@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-build="20260722-scheme-dd-v20">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <title>生产物资库存管理 · 方案2 - 新能源物资供应链管理系统</title>
+  <link rel="stylesheet" href="css/vendor/fa-all.min.css" />
+  <link rel="stylesheet" href="css/subpage-base.css" />
+  <link rel="stylesheet" href="css/carrier-management.css" />
+  <link rel="stylesheet" href="css/source-navbar-header.css" />
+  <style>
+    :root {
+      --primary: #1677ff;
+      --border: #e8edf4;
+      --bg: #f0f3f8;
+      --text: #1f2d3d;
+    }
+    * { box-sizing: border-box; }
+    .ledger-page {
+      display: flex;
+      flex-direction: column;
+      min-height: calc(100vh - 56px);
+      background: var(--bg);
+      color: var(--text);
+      font-size: 13px;
+    }
+    .ledger-view-row {
+      flex: 0 0 auto;
+      min-height: 48px;
+      padding: 9px 12px 7px;
+      display: flex;
+      align-items: center;
+      background: #fff;
+      border-bottom: 1px solid var(--border);
+      position: relative;
+      z-index: 20;
+    }
+    .page-view-switch { display: flex; gap: 4px; align-items: center; }
+    .page-view-switch > a {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      height: 32px;
+      padding: 0 14px;
+      border-radius: 4px;
+      color: #64748b;
+      text-decoration: none;
+      font-size: 13px;
+    }
+    .overview-dd { position: relative; display: inline-flex; }
+    .overview-dd-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      height: 32px;
+      padding: 0 12px;
+      border: 0;
+      border-radius: 4px;
+      background: var(--primary);
+      color: #fff;
+      font-weight: 600;
+      font-size: 13px;
+      font-family: inherit;
+      cursor: pointer;
+    }
+    .overview-dd-btn .caret { font-size: 10px; opacity: .92; margin-left: 2px; }
+    .overview-dd-menu {
+      display: none;
+      position: absolute;
+      left: 0;
+      top: calc(100% + 4px);
+      min-width: 112px;
+      padding: 4px;
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      box-shadow: 0 10px 24px rgba(15, 23, 42, .14);
+      z-index: 60;
+    }
+    .overview-dd.open .overview-dd-menu { display: block; }
+    .overview-dd-menu a {
+      display: block;
+      padding: 8px 12px;
+      border-radius: 4px;
+      color: #334155;
+      text-decoration: none;
+      font-size: 13px;
+      white-space: nowrap;
+    }
+    .overview-dd-menu a:hover { background: #f0f7ff; color: #1677ff; }
+    .overview-dd-menu a.on { background: #e6f4ff; color: #1677ff; font-weight: 600; }
+    .scheme2-empty {
+      flex: 1;
+      min-height: 0;
+      background: var(--bg);
+    }
+  </style>
+</head>
+<body class="page-source-navbar page-subpage page-logistics">
+  <div class="page-bg" aria-hidden="true"></div>
+  <div class="app">
+    <header class="header">
+      <div class="header-left">
+        <button type="button" class="header-hamburger" aria-label="菜单"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+        <a class="header-logo" href="index-portal-screen-alt.html"><img src="assets/logo-chenergy.png" alt="CHN ENERGY" width="220" height="40" /></a>
+        <div class="header-source-brand"><p>新能源供应链管理系统</p></div>
+      </div>
+      <div class="header-right"><span class="clock" id="clock"></span><div class="user-avatar" title="用户菜单" role="button" tabindex="0">用</div></div>
+    </header>
+    <div class="layout">
+      <aside class="sidebar" aria-label="主导航">
+        <div class="nav-item" title="我的资产"><span class="nav-label">我的资产</span></div>
+        <div class="nav-item" title="我的任务"><span class="nav-label">我的任务</span></div>
+        <a class="nav-item" href="index-portal-screen-alt.html" title="首页"><span class="nav-label">首页</span></a>
+        <a class="nav-item" href="cockpit.html" title="驾驶舱"><span class="nav-label">驾驶舱</span></a>
+        <div class="nav-item" title="采购管理"><span class="nav-label">采购管理</span></div>
+        <div class="nav-item" title="销售管理"><span class="nav-label">销售管理</span></div>
+        <div class="nav-item nav-item--module-active" title="实物管理"><span class="nav-label">实物管理</span></div>
+        <a class="nav-item" href="carrier-management.html" title="物流管理"><span class="nav-label">物流管理</span></a>
+        <div class="nav-item" title="仓储管理"><span class="nav-label">仓储管理</span></div>
+        <div class="nav-item" title="物资采购"><span class="nav-label">物资采购</span></div>
+        <div class="nav-item" title="物资出库与处置"><span class="nav-label">物资出库与处置</span></div>
+        <div class="nav-item" title="绩效考核"><span class="nav-label">绩效考核</span></div>
+        <div class="nav-item" title="公告管理"><span class="nav-label">公告管理</span></div>
+        <div class="nav-item" title="综合业务管理"><span class="nav-label">综合业务管理</span></div>
+        <div class="nav-item" title="数据管理"><span class="nav-label">数据管理</span></div>
+        <div class="nav-item" title="开发工具"><span class="nav-label">开发工具</span></div>
+        <div class="nav-item" title="设置"><span class="nav-label">设置</span></div>
+        <div class="nav-item" title="系统管理"><span class="nav-label">系统管理</span></div>
+      </aside>
+
+      <main class="main-scroll">
+        <div class="ledger-page">
+          <div class="ledger-view-row">
+            <div class="page-view-switch">
+              <div class="overview-dd" id="overviewDd">
+                <button type="button" class="overview-dd-btn" id="overviewDdBtn" aria-haspopup="true" aria-expanded="false">
+                  <i class="fa-solid fa-house"></i> 库存总览 <i class="fa-solid fa-caret-down caret"></i>
+                </button>
+                <div class="overview-dd-menu" id="overviewDdMenu" role="menu">
+                  <a href="prod-spare-inventory-ledger-0714.html" data-action="prod-spare-inventory" data-label="库存总览·方案1" role="menuitem">方案1</a>
+                  <a class="on" href="prod-spare-inventory-scheme2.html" data-action="prod-spare-inventory-scheme2" data-label="库存总览·方案2" role="menuitem">方案2</a>
+                </div>
+              </div>
+              <a href="prod-spare-storage-0714.html" data-action="prod-spare-storage" data-label="仓库视图" id="linkWarehouseView"><i class="fa-solid fa-warehouse"></i> 仓库视图</a>
+            </div>
+          </div>
+          <div class="scheme2-empty" aria-label="方案2内容待定"></div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script src="js/sidebar-actions.js"></script>
+  <script src="js/subpage-feature-title.js"></script>
+  <script src="js/site-footer.js"></script>
+  <script src="js/subpage-clock.js"></script>
+  <script>
+    (function () {
+      function jumpInventoryPage(file, action, label) {
+        if (action && typeof navigateBySidebarAction === "function" && navigateBySidebarAction(action, { label: label || "" })) {
+          return true;
+        }
+        try {
+          if (window.top && window.top !== window && typeof window.top.__demoOpenPage === "function") {
+            if (window.top.__demoOpenPage(file) === true) return true;
+          }
+        } catch (eTop) {}
+        window.location.href = file;
+        return true;
+      }
+      var dd = document.getElementById("overviewDd");
+      var btn = document.getElementById("overviewDdBtn");
+      var menu = document.getElementById("overviewDdMenu");
+      if (dd && btn && menu) {
+        btn.addEventListener("click", function (e) {
+          e.preventDefault();
+          e.stopPropagation();
+          var open = !dd.classList.contains("open");
+          dd.classList.toggle("open", open);
+          btn.setAttribute("aria-expanded", open ? "true" : "false");
+        });
+        menu.addEventListener("click", function (e) {
+          var a = e.target.closest("a[href]");
+          if (!a) return;
+          e.preventDefault();
+          e.stopPropagation();
+          dd.classList.remove("open");
+          btn.setAttribute("aria-expanded", "false");
+          if (a.classList.contains("on")) return;
+          jumpInventoryPage(a.getAttribute("href"), a.getAttribute("data-action"), a.getAttribute("data-label"));
+        }, true);
+        document.addEventListener("click", function () {
+          dd.classList.remove("open");
+          btn.setAttribute("aria-expanded", "false");
+        });
+      }
+      var wh = document.getElementById("linkWarehouseView");
+      if (wh) {
+        wh.addEventListener("click", function (e) {
+          e.preventDefault();
+          e.stopPropagation();
+          jumpInventoryPage("prod-spare-storage-0714.html", "prod-spare-storage", "仓库视图");
+        }, true);
+      }
+    })();
+  </script>
+</body>
+</html>

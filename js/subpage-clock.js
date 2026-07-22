@@ -1200,6 +1200,7 @@
       'bd-warehouse-shelf.html': 'dataNav',
       'bd-warehouse-orientation.html': 'dataNav',
       'prod-spare-inventory-ledger-0714.html': 'physicalMgmt',
+      'prod-spare-inventory-scheme2.html': 'physicalMgmt',
       'prod-spare-storage-0714.html': 'physicalMgmt',
       'prod-spare-type-detail-0714.html': 'physicalMgmt',
       'assets-personal.html': 'assetMgmt',
@@ -1587,7 +1588,7 @@
       else if (inventorySub) displayMod = "盘点管理";
       // 库存管理 / 物资领用 / 项目公司库存管理 显示实物管理
       if (pageLabel === "库存管理" || pageLabel === "物资领用" || pageLabel === "项目公司库存管理") displayMod = "实物管理";
-      if (file === "prod-spare-inventory-ledger-0714.html") {
+      if (file === "prod-spare-inventory-ledger-0714.html" || file === "prod-spare-inventory-scheme2.html") {
         pageLabel = "生产物资库存管理";
         displayMod = "实物管理";
       }
@@ -1628,7 +1629,7 @@
       if (existingNav) {
         var segs = existingNav.querySelectorAll("a, span:not(.sep)");
         if (segs.length >= 3) {
-          if (file === "prod-spare-inventory-ledger-0714.html") {
+          if (file === "prod-spare-inventory-ledger-0714.html" || file === "prod-spare-inventory-scheme2.html") {
             segs[1].textContent = "实物管理";
           } else if (taskSub) {
             segs[1].textContent = "我的任务";
