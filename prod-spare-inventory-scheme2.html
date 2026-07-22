@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN" data-build="20260722-scheme2-swap-v24">
+<html lang="zh-CN" data-build="20260722-3d-stable-v25">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -736,6 +736,13 @@
 
     var charts = {};
     var scene3d = { renderer: null, scene: null, camera: null, animId: null, meshes: [], rotor: null };
+    var sceneGen = 0;
+
+    function modelKind(mat) {
+      if (mat === "光伏备件") return "pv";
+      if (mat === "储能备件") return "storage";
+      return "wind";
+    }
 
     function companyData(key) {
       return ORG_DATA.filter(function (c) { return c.key === key; })[0];
@@ -793,9 +800,16 @@
     }
 
     function disposeScene() {
-      if (scene3d.animId) cancelAnimationFrame(scene3d.animId);
+      sceneGen += 1;
+      if (scene3d.animId) {
+        cancelAnimationFrame(scene3d.animId);
+        scene3d.animId = null;
+      }
       if (scene3d.renderer) {
-        scene3d.renderer.dispose();
+        try {
+          scene3d.renderer.dispose();
+          if (scene3d.renderer.forceContextLoss) scene3d.renderer.forceContextLoss();
+        } catch (eDisp) {}
         if (scene3d.renderer.domElement && scene3d.renderer.domElement.parentNode) {
           scene3d.renderer.domElement.parentNode.removeChild(scene3d.renderer.domElement);
         }
@@ -946,8 +960,9 @@
         return;
       }
       disposeScene();
-      var w = wrap.clientWidth || 600;
-      var h = wrap.clientHeight || 480;
+      var myGen = sceneGen;
+      var w = Math.max(wrap.clientWidth || 0, 2);
+      var h = Math.max(wrap.clientHeight || 0, 2);
       var renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
       renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
       renderer.setSize(w, h);
@@ -955,8 +970,8 @@
       wrap.appendChild(renderer.domElement);
       var scene = new THREE.Scene();
       var camera = new THREE.PerspectiveCamera(32, w / h, 0.1, 200);
-      var isWind = state.mat !== "光伏备件" && state.mat !== "储能备件";
-      if (isWind) {
+      var kind = modelKind(state.mat);
+      if (kind === "wind") {
         /* 正面偏一点侧视：轮毂朝向镜头，整机（底座到叶尖）留边 */
         camera.position.set(3.2, 7.6, 22.5);
         camera.lookAt(0, 6.4, 0);
@@ -980,19 +995,20 @@
 
       var meshes = [];
       scene3d.rotor = null;
-      if (state.mat === "光伏备件") buildPv(scene, meshes);
-      else if (state.mat === "储能备件") buildStorage(scene, meshes);
+      if (kind === "pv") buildPv(scene, meshes);
+      else if (kind === "storage") buildStorage(scene, meshes);
       else buildWind(scene, meshes);
 
       var rotor = scene3d.rotor;
-      scene3d = { renderer: renderer, scene: scene, camera: camera, animId: null, meshes: meshes, rotor: rotor };
+      scene3d = { renderer: renderer, scene: scene, camera: camera, animId: null, meshes: meshes, rotor: rotor, kind: kind };
 
       function animate() {
+        if (myGen !== sceneGen) return;
         scene3d.animId = requestAnimationFrame(animate);
         if (scene3d.rotor) {
           scene3d.rotor.rotation.z += 0.006;
-        } else {
-          scene.rotation.y += 0.003;
+        } else if (scene3d.scene) {
+          scene3d.scene.rotation.y += 0.003;
         }
         scene3d.meshes.forEach(function (m) {
           if (!m.material || !m.material.emissive) return;
@@ -1173,13 +1189,17 @@
     document.getElementById("matTabs").addEventListener("click", function (e) {
       var btn = e.target.closest("button[data-mat]");
       if (!btn) return;
-      state.mat = btn.getAttribute("data-mat");
+      var nextMat = btn.getAttribute("data-mat");
+      var prevKind = modelKind(state.mat);
+      var nextKind = modelKind(nextMat);
+      state.mat = nextMat;
       state.partId = "";
       document.querySelectorAll("#matTabs button").forEach(function (b) {
         b.classList.toggle("on", b === btn);
       });
       renderCallouts();
-      initScene();
+      /* 同类模型不重建 WebGL，避免页签切换闪屏 */
+      if (prevKind !== nextKind || !scene3d.renderer) initScene();
     });
 
     function jumpInventoryPage(file, action, label) {
