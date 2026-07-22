@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN" data-build="20260722-tab3d-v56">
+<html lang="zh-CN" data-build="20260722-tab3d-v57">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -935,9 +935,9 @@
 
     var CALLOUTS_BY_KIND = {
       wind: [
-        { id: "blade", title: "叶片", tip: "点击查看叶片相关备件", x: 0.10, y: 0.22, tx: 0.28, ty: 0.30 },
-        { id: "generator", title: "发电机", tip: "点击查看发电机相关备件", x: 0.88, y: 0.24, tx: 0.60, ty: 0.30 },
-        { id: "filter", title: "滤芯/传感器", tip: "点击查看滤芯/传感器相关备件", x: 0.86, y: 0.55, tx: 0.52, ty: 0.48 }
+        { id: "blade", title: "叶片", tip: "点击查看叶片相关备件", x: 0.08, y: 0.18, tx: 0.26, ty: 0.28 },
+        { id: "generator", title: "发电机", tip: "点击查看发电机相关备件", x: 0.88, y: 0.30, tx: 0.58, ty: 0.34 },
+        { id: "filter", title: "滤芯/传感器", tip: "点击查看滤芯/传感器相关备件", x: 0.86, y: 0.16, tx: 0.62, ty: 0.26 }
       ],
       pv: [
         { id: "pv_module", title: "光伏组件", tip: "点击查看光伏组件相关备件", x: 0.16, y: 0.40, tx: 0.40, ty: 0.48 },
@@ -1465,10 +1465,10 @@
       var camera = scene3d.camera;
       if (!camera) return;
       if (kind === "wind") {
-        /* 侧视整机：放大占比，略侧对机舱看全侧面 */
-        camera.fov = 34;
-        camera.position.set(14.8, 5.5, 12.2);
-        camera.lookAt(-0.15, 4.35, 0);
+        /* 整机侧视：拉高拉远，叶片不裁切；模型下移放大 */
+        camera.fov = 38;
+        camera.position.set(17.8, 7.4, 15.6);
+        camera.lookAt(-0.1, 4.1, 0);
         camera.updateProjectionMatrix();
       } else if (kind === "pv") {
         camera.fov = 34;
@@ -1586,66 +1586,178 @@
       return mesh;
     }
 
-    /* 侧视完整风机：塔筒 + 机舱剖视 + 旋转叶片 */
+    /* 侧视完整风机：白壳剖视机舱（对齐参考图零部件）+ 塔筒 + 旋转叶片 */
     function buildWind(scene, meshes) {
-      /* 塔内细芯 + 滤芯/传感器（实色，透过外壳可见） */
-      addMesh(scene, [], new THREE.CylinderGeometry(0.12, 0.18, 7.8, 16), 0x1e293b, 0, 4.0, 0, "", { metalness: 0.55, roughness: 0.4 });
-      addMesh(scene, meshes, new THREE.CylinderGeometry(0.28, 0.28, 0.95, 20), 0x0f172a, 0.06, 3.35, 0.08, "filter", { metalness: 0.55 });
-      addMesh(scene, [], new THREE.BoxGeometry(0.28, 0.2, 0.24), 0x334155, 0.32, 3.55, 0.08, "", { metalness: 0.45 });
+      var W = 0xf4f6f8;
+      var W2 = 0xe8ecf1;
+      var CYAN = 0xb8d4e8;
+      var CYAN2 = 0x9ec5db;
+      var ORANGE = 0xe67e22;
+      var COPPER = 0xc47a3a;
+      var MET = 0x8b95a5;
+      var MET2 = 0x6b7585;
 
-      /* 主轴 + 齿轮箱（实色） */
-      addMesh(scene, [], new THREE.CylinderGeometry(0.13, 0.13, 1.35, 16), 0x475569, -0.35, 8.85, 0, "", { metalness: 0.65, rx: Math.PI / 2 });
-      addMesh(scene, meshes, new THREE.BoxGeometry(0.9, 0.72, 0.78), 0x1e293b, 0.25, 8.78, 0, "generator", { metalness: 0.7 });
-      addMesh(scene, [], new THREE.CylinderGeometry(0.26, 0.26, 0.32, 16), 0x334155, 0.25, 9.22, 0, "", { metalness: 0.55 });
-
-      /* 电机/变流（橙铜色） */
-      addMesh(scene, meshes, new THREE.CylinderGeometry(0.5, 0.5, 1.1, 28), 0xc2410c, 1.25, 8.85, 0, "generator", { rx: Math.PI / 2, metalness: 0.55 });
-      addMesh(scene, [], new THREE.CylinderGeometry(0.54, 0.54, 0.12, 28), 0x9a3412, 1.82, 8.85, 0, "", { rx: Math.PI / 2, metalness: 0.5 });
-
-      /* 液压（暗红块） */
-      addMesh(scene, [], new THREE.BoxGeometry(0.36, 0.28, 0.34), 0x7f1d1d, 0.55, 8.35, 0.32, "", { metalness: 0.45 });
-
-      /* 偏航 */
-      addMesh(scene, [], new THREE.CylinderGeometry(0.55, 0.62, 0.38, 28), 0x475569, 0.1, 7.95, 0, "", { metalness: 0.6 });
-      addMesh(scene, [], new THREE.TorusGeometry(0.52, 0.05, 8, 28), 0x64748b, 0.1, 7.78, 0, "", { metalness: 0.55, rx: Math.PI / 2 });
-
-      /* 变桨轮毂 + 叶片（转子组，绕主轴 X 旋转） */
-      var rotor = new THREE.Group();
-      rotor.position.set(-1.4, 8.85, 0);
-      scene.add(rotor);
-      addMesh(rotor, meshes, new THREE.SphereGeometry(0.7, 28, 24), 0x1e293b, 0, 0, 0, "blade", { metalness: 0.7 });
-      addMesh(rotor, [], new THREE.ConeGeometry(0.4, 0.65, 20), 0x1e293b, -0.6, 0, 0, "", { metalness: 0.65, rz: Math.PI / 2 });
-      for (var i = 0; i < 3; i++) {
-        var blade = addMesh(rotor, meshes, new THREE.BoxGeometry(0.16, 5.4, 0.72), 0xe2e8f0, 0, 0, 0, i === 0 ? "blade" : "", {
-          metalness: 0.12, roughness: 0.42
+      /* 塔筒（完整） */
+      addMesh(scene, [], new THREE.CylinderGeometry(0.58, 0.86, 7.6, 40), W, 0.15, 3.85, 0, "", {
+        metalness: 0.06, roughness: 0.48
+      });
+      for (var t = 1; t <= 4; t++) {
+        addMesh(scene, [], new THREE.TorusGeometry(0.48 + t * 0.05, 0.03, 8, 32), W2, 0.15, 1.2 + t * 1.35, 0, "", {
+          metalness: 0.12, roughness: 0.55, rx: Math.PI / 2
         });
-        blade.rotation.x = (i * Math.PI * 2) / 3;
-        blade.translateY(2.7);
+      }
+      addMesh(scene, [], new THREE.CylinderGeometry(1.15, 1.35, 0.16, 40), W2, 0.15, 0.08, 0, "", {
+        metalness: 0.08, roughness: 0.7
+      });
+
+      /* 偏航轴承 */
+      addMesh(scene, [], new THREE.CylinderGeometry(0.62, 0.7, 0.32, 36), MET, 0.15, 7.78, 0, "", {
+        metalness: 0.55, roughness: 0.35
+      });
+      addMesh(scene, [], new THREE.TorusGeometry(0.58, 0.045, 8, 32), MET2, 0.15, 7.62, 0, "", {
+        metalness: 0.5, roughness: 0.4, rx: Math.PI / 2
+      });
+
+      var ny = 8.85; /* 机舱中心高度 */
+
+      /* —— 机舱白壳剖视（近侧开口，对齐参考图） —— */
+      addMesh(scene, [], new THREE.BoxGeometry(4.35, 0.12, 1.9), W, 0.45, ny - 0.78, -0.05, "", {
+        metalness: 0.05, roughness: 0.5
+      });
+      addMesh(scene, [], new THREE.BoxGeometry(4.15, 0.12, 1.8), W, 0.45, ny + 0.78, -0.05, "", {
+        metalness: 0.05, roughness: 0.5
+      });
+      addMesh(scene, [], new THREE.BoxGeometry(4.15, 1.45, 0.12), W, 0.45, ny, -0.95, "", {
+        metalness: 0.05, roughness: 0.48
+      });
+      addMesh(scene, [], new THREE.BoxGeometry(0.14, 1.45, 1.8), W, 2.55, ny, -0.05, "", {
+        metalness: 0.05, roughness: 0.48
+      });
+      addMesh(scene, [], new THREE.BoxGeometry(0.4, 1.28, 1.55), W, -1.55, ny - 0.05, -0.12, "", {
+        metalness: 0.06, roughness: 0.46
+      });
+      /* 近侧上下缘，形成剖视开口 */
+      addMesh(scene, [], new THREE.BoxGeometry(4.0, 0.09, 0.12), W2, 0.45, ny - 0.68, 0.88, "", {
+        metalness: 0.06, roughness: 0.45
+      });
+      addMesh(scene, [], new THREE.BoxGeometry(4.0, 0.09, 0.12), W2, 0.45, ny + 0.68, 0.88, "", {
+        metalness: 0.06, roughness: 0.45
+      });
+      addMesh(scene, [], new THREE.BoxGeometry(1.15, 0.22, 1.55), W, 1.95, ny + 0.86, -0.05, "", {
+        metalness: 0.05, roughness: 0.48, rx: -0.08
+      });
+
+      /* 主轴 */
+      addMesh(scene, [], new THREE.CylinderGeometry(0.14, 0.16, 2.35, 24), MET2, -0.15, ny, 0, "", {
+        metalness: 0.7, roughness: 0.28, rz: Math.PI / 2
+      });
+
+      /* —— 发电机盘式结构（参考图：前盘式转子 / 定子绕组 / 永久磁铁 / 后盘式转子） —— */
+      var gx = 0.55;
+      /* 前盘式转子 */
+      addMesh(scene, meshes, new THREE.CylinderGeometry(0.72, 0.72, 0.12, 40), CYAN, gx - 0.55, ny, 0, "generator", {
+        metalness: 0.25, roughness: 0.4, rz: Math.PI / 2
+      });
+      /* 后盘式转子 */
+      addMesh(scene, meshes, new THREE.CylinderGeometry(0.72, 0.72, 0.12, 40), CYAN2, gx + 0.55, ny, 0, "generator", {
+        metalness: 0.25, roughness: 0.4, rz: Math.PI / 2
+      });
+      /* 中间定子 */
+      addMesh(scene, [], new THREE.CylinderGeometry(0.48, 0.48, 0.55, 36), 0xd9e6f0, gx, ny, 0, "", {
+        metalness: 0.15, roughness: 0.5, rz: Math.PI / 2
+      });
+      addMesh(scene, [], new THREE.CylinderGeometry(0.28, 0.28, 0.58, 24), MET, gx, ny, 0, "", {
+        metalness: 0.45, roughness: 0.35, rz: Math.PI / 2
+      });
+      /* 永久磁铁（橙）环布两盘外侧 */
+      for (var m = 0; m < 10; m++) {
+        var ang = (m / 10) * Math.PI * 2;
+        var mx = Math.cos(ang) * 0.58;
+        var mz = Math.sin(ang) * 0.58;
+        addMesh(scene, [], new THREE.BoxGeometry(0.1, 0.16, 0.12), ORANGE, gx - 0.55, ny + mx, mz, "", {
+          metalness: 0.35, roughness: 0.45
+        });
+        addMesh(scene, [], new THREE.BoxGeometry(0.1, 0.16, 0.12), ORANGE, gx + 0.55, ny + mx, mz, "", {
+          metalness: 0.35, roughness: 0.45
+        });
+      }
+      /* 中间定子绕组（铜） */
+      for (var w = 0; w < 12; w++) {
+        var wang = (w / 12) * Math.PI * 2;
+        addMesh(scene, [], new THREE.BoxGeometry(0.42, 0.11, 0.14), COPPER,
+          gx, ny + Math.cos(wang) * 0.42, Math.sin(wang) * 0.42, "", {
+            metalness: 0.4, roughness: 0.45
+          });
+      }
+
+      /* 电器柜（机舱尾部，青蓝） */
+      addMesh(scene, [], new THREE.BoxGeometry(0.48, 0.95, 0.42), CYAN, 2.05, ny - 0.12, 0.38, "", {
+        metalness: 0.12, roughness: 0.5
+      });
+      addMesh(scene, [], new THREE.BoxGeometry(0.48, 0.95, 0.42), CYAN2, 2.05, ny - 0.12, -0.1, "", {
+        metalness: 0.12, roughness: 0.5
+      });
+      addMesh(scene, [], new THREE.BoxGeometry(0.42, 0.72, 0.34), 0xa8c5d8, 2.05, ny - 0.2, -0.48, "", {
+        metalness: 0.12, roughness: 0.52
+      });
+
+      /* 顶部气象传感器 / 滤芯（可点） */
+      addMesh(scene, meshes, new THREE.CylinderGeometry(0.07, 0.09, 0.38, 12), MET, 1.85, ny + 1.15, -0.2, "filter", {
+        metalness: 0.45, roughness: 0.4
+      });
+      addMesh(scene, [], new THREE.SphereGeometry(0.08, 12, 10), 0xe11d48, 1.85, ny + 1.38, -0.2, "", {
+        metalness: 0.3, roughness: 0.4
+      });
+      addMesh(scene, [], new THREE.BoxGeometry(0.32, 0.04, 0.04), MET, 1.85, ny + 1.38, -0.2, "", {
+        metalness: 0.4, roughness: 0.35
+      });
+      addMesh(scene, [], new THREE.BoxGeometry(0.04, 0.04, 0.32), MET, 1.85, ny + 1.38, -0.2, "", {
+        metalness: 0.4, roughness: 0.35
+      });
+
+      /* —— 轮毂 + 导流罩 + 叶片 —— */
+      var rotor = new THREE.Group();
+      rotor.position.set(-2.05, ny, 0);
+      scene.add(rotor);
+
+      addMesh(rotor, meshes, new THREE.SphereGeometry(0.78, 36, 28), W, 0, 0, 0, "blade", {
+        metalness: 0.08, roughness: 0.42
+      });
+      /* 轮毂内腔示意 */
+      addMesh(rotor, [], new THREE.SphereGeometry(0.5, 24, 18), 0xdde4ec, 0.1, 0, 0.12, "", {
+        metalness: 0.05, roughness: 0.55
+      });
+      /* 变桨机构 */
+      for (var p = 0; p < 3; p++) {
+        var pang = (p * Math.PI * 2) / 3 + 0.35;
+        addMesh(rotor, [], new THREE.CylinderGeometry(0.11, 0.13, 0.3, 14), MET,
+          Math.cos(pang) * 0.4, Math.sin(pang) * 0.4, 0.1, "", {
+            metalness: 0.55, roughness: 0.35, rx: Math.PI / 2
+          });
+      }
+      /* 轮毂外罩 / 导流罩鼻锥 */
+      addMesh(rotor, [], new THREE.ConeGeometry(0.58, 0.95, 28), W, -0.92, 0, 0, "", {
+        metalness: 0.08, roughness: 0.4, rz: -Math.PI / 2
+      });
+
+      for (var i = 0; i < 3; i++) {
+        var bladeGrp = new THREE.Group();
+        rotor.add(bladeGrp);
+        bladeGrp.rotation.x = (i * Math.PI * 2) / 3;
+        var blade = addMesh(bladeGrp, meshes, new THREE.BoxGeometry(0.2, 5.1, 0.58), W, 0, 2.75, 0, i === 0 ? "blade" : "", {
+          metalness: 0.05, roughness: 0.4
+        });
+        blade.rotation.z = 0.06;
+        addMesh(bladeGrp, [], new THREE.BoxGeometry(0.1, 4.8, 0.22), W2, 0.07, 2.75, 0, "", {
+          metalness: 0.05, roughness: 0.42
+        });
         if (i !== 0) blade.userData.partId = "";
       }
 
-      /* 玻璃感机舱外壳：极低不透明度，只保留轮廓 */
-      addMesh(scene, [], new THREE.BoxGeometry(3.2, 1.55, 1.7), 0xbae6fd, 0.1, 8.85, 0, "", {
-        metalness: 0.0, roughness: 0.12, transparent: true, opacity: 0.16, side: THREE.DoubleSide, depthWrite: false, renderOrder: 8
-      });
-
-      /* 开口塔筒外壳（无上下盖），避免前后壁叠成实心灰 */
-      addMesh(scene, [], new THREE.CylinderGeometry(0.56, 0.82, 8.4, 36, 1, true), 0xbfdbfe, 0, 4.2, 0, "", {
-        metalness: 0.0, roughness: 0.15, transparent: true, opacity: 0.18, side: THREE.DoubleSide, depthWrite: false, renderOrder: 7
-      });
-      for (var t = 1; t <= 4; t++) {
-        addMesh(scene, [], new THREE.TorusGeometry(0.42 + t * 0.04, 0.025, 8, 28), 0x64748b, 0, 1.1 + t * 1.4, 0, "", {
-          metalness: 0.5, rx: Math.PI / 2, renderOrder: 1
-        });
-      }
-
-      /* 底座 */
-      addMesh(scene, [], new THREE.CylinderGeometry(1.15, 1.35, 0.14, 40), 0xcbd5e1, 0, 0.05, 0, "", { metalness: 0.12, roughness: 0.85 });
-
-      /* 侧视完整风机；放大并略侧转，机舱侧面看全 */
-      scene.rotation.y = -0.52;
-      scene.position.y = -0.45;
-      scene.scale.set(1.05, 1.05, 1.05);
+      /* 放大、下移、略侧转：叶片完整入画，机舱剖视看清 */
+      scene.rotation.y = -0.58;
+      scene.position.set(0.15, -1.75, 0);
+      scene.scale.set(1.12, 1.12, 1.12);
 
       scene3d.windRotor = rotor;
       scene3d.rotor = rotor;
@@ -1981,7 +2093,7 @@
     function jumpInventoryPage(file, action, label) {
       var href = file;
       if (href && href.indexOf("v=") < 0) {
-        href += (href.indexOf("?") >= 0 ? "&" : "?") + "v=20260722-tab3d-v56";
+        href += (href.indexOf("?") >= 0 ? "&" : "?") + "v=20260722-tab3d-v57";
       }
       if (action && typeof navigateBySidebarAction === "function" && navigateBySidebarAction(action, { label: label || "" })) {
         return true;
