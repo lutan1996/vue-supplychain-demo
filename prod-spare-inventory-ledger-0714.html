@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN" data-build="20260722-tab3d-v32">
+<html lang="zh-CN" data-build="20260722-tab3d-v33">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -703,16 +703,6 @@
               <div class="diagram-stage">
                   <div id="diagramWrap"></div>
                   <div class="callout-layer" id="calloutLayer"></div>
-                  <div class="part-detail-pop" id="partDetailPop" aria-live="polite">
-                    <div class="phd">
-                      <div>
-                        <h4 id="partDetailTitle">部位详情</h4>
-                        <p class="sub" id="partDetailSub">点击标注查看关联备件</p>
-                      </div>
-                      <button type="button" class="x" id="partDetailClose" aria-label="关闭">×</button>
-                    </div>
-                    <div id="partDetailBody"></div>
-                  </div>
                 </div>
             </section>
 
@@ -837,36 +827,88 @@
       { id: "filter", title: "滤芯/传感器", tip: "点击查看滤芯/传感器相关备件", x: 0.80, y: 0.60, tx: 0.52, ty: 0.56 }
     ];
 
-    var PART_DETAILS = {
+
+    /* 点击部位后，右侧/下方四块看板切换为该零部件数据（无弹窗） */
+    var DASH_BY_PART = {
+      "": {
+        label: "全部",
+        qty: "14200", amt: "40000",
+        outQty: "14200 件", outAmt: "14200 万元", outPct: "50%",
+        inQty: "14200 件", inAmt: "14200 万元", inPct: "45%",
+        idle: [
+          { qty: "1280件", pct: "20%", amt: "2000万元" },
+          { qty: "1280件", pct: "30%", amt: "2000万元" },
+          { qty: "1280件", pct: "20%", amt: "2000万元" },
+          { qty: "1280件", pct: "30%", amt: "2000万元" }
+        ],
+        rtOut: [8, 7, 9, 8, 7], rtCur: [10, 9, 11, 10, 9], rtIn: [6, 5, 7, 6, 5], rtMax: 30,
+        idleS1: [8, 7, 8, 7, 6], idleS2: [6, 5, 6, 5, 5], idleS3: [5, 4, 5, 4, 4], idleS4: [4, 0, 0, 0, 0], idleMax: 30,
+        pie: [
+          { name: "配件类别1", value: 18 }, { name: "配件类别2", value: 14 }, { name: "配件类别3", value: 12 },
+          { name: "配件类别4", value: 11 }, { name: "配件类别5", value: 10 }, { name: "配件类别6", value: 12 },
+          { name: "配件类别7", value: 13 }, { name: "配件类别8", value: 10 }
+        ],
+        scrap: [86, 72, 64, 58, 50, 42]
+      },
       blade: {
-        name: "叶片",
-        type: "叶片",
-        desc: "风机叶片总成及相关密封、紧固辅材，点击后查看该部位关联库存备件。",
-        spares: [
-          { code: "B00000005", name: "叶片", qty: 12, model: "SW64-2.0", status: "正常" },
-          { code: "B00000042", name: "叶片密封套", qty: 0, model: "YM-TF-01", status: "零库存" },
-          { code: "B00000016", name: "主轴轴承", qty: 6, model: "BR-120", status: "正常" }
-        ]
+        label: "叶片",
+        qty: "1860", amt: "9200",
+        outQty: "320 件", outAmt: "1680 万元", outPct: "28%",
+        inQty: "210 件", inAmt: "1100 万元", inPct: "18%",
+        idle: [
+          { qty: "86件", pct: "12%", amt: "420万元" },
+          { qty: "124件", pct: "18%", amt: "610万元" },
+          { qty: "96件", pct: "14%", amt: "480万元" },
+          { qty: "68件", pct: "10%", amt: "340万元" }
+        ],
+        rtOut: [5, 4, 6, 5, 3], rtCur: [14, 12, 16, 13, 11], rtIn: [3, 2, 4, 3, 2], rtMax: 30,
+        idleS1: [4, 3, 5, 4, 3], idleS2: [5, 4, 6, 5, 4], idleS3: [3, 2, 4, 3, 2], idleS4: [2, 1, 2, 1, 1], idleMax: 25,
+        pie: [
+          { name: "叶片本体", value: 42 }, { name: "密封套", value: 18 }, { name: "主轴轴承", value: 14 },
+          { name: "紧固件", value: 8 }, { name: "防护膜", value: 6 }, { name: "变桨轴承", value: 5 },
+          { name: "其他", value: 4 }, { name: "辅材", value: 3 }
+        ],
+        scrap: [22, 18, 15, 12, 9, 6]
       },
       generator: {
-        name: "发电机",
-        type: "电机/变流",
-        desc: "永磁/双馈发电机总成，含定子、转子与冷却系统相关备件。",
-        spares: [
-          { code: "B00000018", name: "IGBT 模块", qty: 2, model: "FF450R", status: "正常" },
-          { code: "B00001888", name: "变频器模块", qty: 1, model: "VF-800", status: "正常" },
-          { code: "B00002119", name: "偏航电机", qty: 3, model: "PY-DJ-55", status: "正常" }
-        ]
+        label: "发电机",
+        qty: "860", amt: "15600",
+        outQty: "48 件", outAmt: "2200 万元", outPct: "16%",
+        inQty: "36 件", inAmt: "1680 万元", inPct: "12%",
+        idle: [
+          { qty: "24件", pct: "8%", amt: "960万元" },
+          { qty: "36件", pct: "12%", amt: "1440万元" },
+          { qty: "28件", pct: "9%", amt: "1120万元" },
+          { qty: "18件", pct: "6%", amt: "720万元" }
+        ],
+        rtOut: [2, 3, 2, 4, 2], rtCur: [8, 7, 9, 8, 6], rtIn: [1, 2, 1, 2, 1], rtMax: 20,
+        idleS1: [3, 2, 4, 3, 2], idleS2: [4, 3, 5, 4, 3], idleS3: [2, 2, 3, 2, 1], idleS4: [1, 1, 2, 1, 0], idleMax: 20,
+        pie: [
+          { name: "IGBT模块", value: 28 }, { name: "变频器", value: 22 }, { name: "定子组件", value: 16 },
+          { name: "转子组件", value: 12 }, { name: "冷却系统", value: 8 }, { name: "偏航电机", value: 6 },
+          { name: "轴承", value: 5 }, { name: "其他", value: 3 }
+        ],
+        scrap: [12, 10, 9, 8, 6, 4]
       },
       filter: {
-        name: "滤芯/传感器",
-        type: "滤芯/传感器",
-        desc: "齿轮箱滤芯、塔筒监测传感器及液压相关耗材。",
-        spares: [
-          { code: "B00001235", name: "齿轮箱滤芯", qty: 86, model: "GX-LX-90", status: "正常" },
-          { code: "B00001236", name: "塔筒振动传感器", qty: 15, model: "TS-300", status: "正常" },
-          { code: "B00000055", name: "液压泵", qty: 4, model: "YY-B-80", status: "正常" }
-        ]
+        label: "滤芯/传感器",
+        qty: "3280", amt: "4600",
+        outQty: "860 件", outAmt: "980 万元", outPct: "36%",
+        inQty: "720 件", inAmt: "820 万元", inPct: "30%",
+        idle: [
+          { qty: "210件", pct: "16%", amt: "280万元" },
+          { qty: "186件", pct: "14%", amt: "260万元" },
+          { qty: "154件", pct: "12%", amt: "210万元" },
+          { qty: "98件", pct: "8%", amt: "140万元" }
+        ],
+        rtOut: [9, 8, 10, 9, 7], rtCur: [12, 11, 13, 12, 10], rtIn: [7, 6, 8, 7, 5], rtMax: 35,
+        idleS1: [6, 5, 7, 6, 5], idleS2: [5, 4, 6, 5, 4], idleS3: [4, 3, 5, 4, 3], idleS4: [3, 2, 3, 2, 2], idleMax: 30,
+        pie: [
+          { name: "齿轮箱滤芯", value: 34 }, { name: "振动传感器", value: 22 }, { name: "液压泵", value: 14 },
+          { name: "油位传感器", value: 10 }, { name: "滤清器", value: 8 }, { name: "密封圈", value: 5 },
+          { name: "接头", value: 4 }, { name: "其他", value: 3 }
+        ],
+        scrap: [48, 40, 36, 30, 24, 18]
       }
     };
 
@@ -924,7 +966,6 @@
       layer.style.opacity = show ? "1" : "0";
       layer.style.pointerEvents = show ? "auto" : "none";
       if (!show) {
-        hidePartDetail();
         return;
       }
       if (layer.getAttribute("data-built") === "1") {
@@ -952,7 +993,7 @@
           state.partId = el.getAttribute("data-part");
           renderCallouts();
           updatePartHighlight();
-          showPartDetail(state.partId);
+          renderCharts();
           requestAnimationFrame(function () { paintScene(); });
         };
       });
@@ -1044,37 +1085,6 @@
       } catch (ePaint) {}
     }
 
-    function hidePartDetail() {
-      var pop = document.getElementById("partDetailPop");
-      if (pop) pop.classList.remove("show");
-    }
-
-    function showPartDetail(partId) {
-      var pop = document.getElementById("partDetailPop");
-      var title = document.getElementById("partDetailTitle");
-      var sub = document.getElementById("partDetailSub");
-      var body = document.getElementById("partDetailBody");
-      if (!pop || !title || !sub || !body) return;
-      var part = PART_DETAILS[partId];
-      if (!part) {
-        hidePartDetail();
-        return;
-      }
-      var totalQty = part.spares.reduce(function (n, s) { return n + s.qty; }, 0);
-      title.textContent = part.name + " · 关联备件";
-      sub.textContent = (state.company || "龙源电力") + " · 部位联动详情";
-      body.innerHTML =
-        '<div class="desc">' + part.desc + '</div>' +
-        '<div class="kpis">' +
-          '<div class="kpi"><div class="k">关联备件品种</div><div class="v">' + part.spares.length + '<small>种</small></div></div>' +
-          '<div class="kpi"><div class="k">当前库存数量</div><div class="v">' + totalQty + '<small>件</small></div></div>' +
-        '</div>' +
-        '<div class="list-hd">关联生产备件清单</div>' +
-        part.spares.map(function (s) {
-          return '<div class="spare"><b>' + s.name + ' · ' + s.code + '</b><span>规格：' + s.model + ' · 库存：' + s.qty + ' 件 · 状态：' + s.status + '</span></div>';
-        }).join("");
-      pop.classList.add("show");
-    }
 
 
     function ensureRenderer() {
@@ -1426,9 +1436,62 @@
       return charts[id];
     }
 
+    function getDashData() {
+      return DASH_BY_PART[state.partId] || DASH_BY_PART[""];
+    }
+
+    function updateDashTexts() {
+      var d = getDashData();
+      var pane = document.getElementById("rightPane");
+      if (!pane) return;
+      var scope = state.partId ? (" · " + d.label) : "";
+      var cards = pane.querySelectorAll(".dash-card > h3");
+      if (cards[0]) cards[0].textContent = "实时物资动态" + scope;
+      /* 方案1：呆滞是第2张；方案2：库存金额是第2张、呆滞是第3张 */
+      var isScheme2 = !!document.querySelector(".dash-grid");
+      if (isScheme2) {
+        if (cards[1]) cards[1].textContent = "库存金额动态" + scope;
+        if (cards[2]) cards[2].textContent = "呆滞物资动态" + scope;
+        if (cards[3]) cards[3].textContent = "报废数量动态" + scope;
+      } else {
+        if (cards[1]) cards[1].textContent = "呆滞物资动态" + scope;
+        if (cards[2]) cards[2].textContent = "库存金额动态" + scope;
+        if (cards[3]) cards[3].textContent = "报废数量动态" + scope;
+      }
+
+      var vals = pane.querySelectorAll(".rt-vals b");
+      if (vals[0]) vals[0].textContent = d.qty;
+      if (vals[1]) vals[1].textContent = d.amt;
+      var flows = pane.querySelectorAll(".rt-flow-col");
+      if (flows[0]) {
+        var ems = flows[0].querySelectorAll("em");
+        if (ems[0]) ems[0].textContent = d.outQty;
+        if (ems[1]) ems[1].textContent = d.outAmt;
+        if (ems[2]) ems[2].textContent = d.outPct;
+      }
+      if (flows[1]) {
+        var ems2 = flows[1].querySelectorAll("em");
+        if (ems2[0]) ems2[0].textContent = d.inQty;
+        if (ems2[1]) ems2[1].textContent = d.inAmt;
+        if (ems2[2]) ems2[2].textContent = d.inPct;
+      }
+      var cells = pane.querySelectorAll(".idle-cell");
+      for (var i = 0; i < cells.length && i < d.idle.length; i++) {
+        var cell = cells[i];
+        var row = d.idle[i];
+        var v = cell.querySelector(".v");
+        var a = cell.querySelector(".a");
+        if (v) v.innerHTML = "<b>" + row.qty + "</b>占比" + row.pct;
+        if (a) a.textContent = "库存金额" + row.amt;
+      }
+    }
+
     function renderCharts() {
+      updateDashTexts();
       if (!window.echarts) return;
+      var d = getDashData();
       var whNames = ["XX仓库", "XX仓库", "XX仓库", "XX仓库", "XX仓库"];
+      var scrapColors = ["#1677ff", "#1f2d3d", "#f5222d", "#1677ff", "#1f2d3d", "#f5222d"];
 
       var c1 = ensureChart("chartRealtime");
       if (c1) {
@@ -1448,15 +1511,15 @@
             name: "单位：件",
             nameTextStyle: { fontSize: 10, color: "#94a3b8", padding: [0, 0, 0, 8] },
             min: 0,
-            max: 30,
+            max: d.rtMax,
             interval: 5,
             splitLine: { lineStyle: { color: "#eef2f7" } },
             axisLabel: { fontSize: 10, color: "#94a3b8" }
           },
           series: [
-            { name: "出库数量", type: "bar", stack: "t", barWidth: 18, data: [8, 7, 9, 8, 7] },
-            { name: "当前数量", type: "bar", stack: "t", data: [10, 9, 11, 10, 9] },
-            { name: "入库数量", type: "bar", stack: "t", data: [6, 5, 7, 6, 5] }
+            { name: "出库数量", type: "bar", stack: "t", barWidth: 18, data: d.rtOut },
+            { name: "当前数量", type: "bar", stack: "t", data: d.rtCur },
+            { name: "入库数量", type: "bar", stack: "t", data: d.rtIn }
           ]
         }, true);
       }
@@ -1479,16 +1542,16 @@
             name: "单位：万元",
             nameTextStyle: { fontSize: 10, color: "#94a3b8", padding: [0, 0, 0, 0] },
             min: 0,
-            max: 30,
+            max: d.idleMax,
             interval: 5,
             splitLine: { lineStyle: { color: "#eef2f7" } },
             axisLabel: { fontSize: 10, color: "#94a3b8" }
           },
           series: [
-            { name: "90~180天以内", type: "bar", stack: "i", barWidth: 18, data: [8, 7, 8, 7, 6] },
-            { name: "示意 ", type: "bar", stack: "i", data: [6, 5, 6, 5, 5] },
-            { name: "30~90天以内", type: "bar", stack: "i", data: [5, 4, 5, 4, 4] },
-            { name: "示意", type: "bar", stack: "i", data: [4, 0, 0, 0, 0] }
+            { name: "90~180天以内", type: "bar", stack: "i", barWidth: 18, data: d.idleS1 },
+            { name: "示意 ", type: "bar", stack: "i", data: d.idleS2 },
+            { name: "30~90天以内", type: "bar", stack: "i", data: d.idleS3 },
+            { name: "示意", type: "bar", stack: "i", data: d.idleS4 }
           ]
         }, true);
       }
@@ -1503,16 +1566,7 @@
             radius: ["28%", "62%"],
             center: ["50%", "52%"],
             label: { fontSize: 10, color: "#475569" },
-            data: [
-              { name: "配件类别1", value: 18 },
-              { name: "配件类别2", value: 14 },
-              { name: "配件类别3", value: 12 },
-              { name: "配件类别4", value: 11 },
-              { name: "配件类别5", value: 10 },
-              { name: "配件类别6", value: 12 },
-              { name: "配件类别7", value: 13 },
-              { name: "配件类别8", value: 10 }
-            ]
+            data: d.pie
           }]
         }, true);
       }
@@ -1531,14 +1585,9 @@
           series: [{
             type: "bar",
             barWidth: 12,
-            data: [
-              { value: 86, itemStyle: { color: "#1677ff" } },
-              { value: 72, itemStyle: { color: "#1f2d3d" } },
-              { value: 64, itemStyle: { color: "#f5222d" } },
-              { value: 58, itemStyle: { color: "#1677ff" } },
-              { value: 50, itemStyle: { color: "#1f2d3d" } },
-              { value: 42, itemStyle: { color: "#f5222d" } }
-            ]
+            data: d.scrap.map(function (v, i) {
+              return { value: v, itemStyle: { color: scrapColors[i % scrapColors.length] } };
+            })
           }]
         }, true);
       }
@@ -1584,11 +1633,11 @@
       var nextKind = modelKind(nextMat);
       state.mat = nextMat;
       state.partId = "";
-      hidePartDetail();
       document.querySelectorAll("#matTabs button").forEach(function (b) {
         b.classList.toggle("on", b === btn);
       });
       renderCallouts();
+      renderCharts();
       if (prevKind === nextKind && scene3d.modelsReady) {
         updatePartHighlight();
         paintScene();
@@ -1605,7 +1654,7 @@
     function jumpInventoryPage(file, action, label) {
       var href = file;
       if (href && href.indexOf("v=") < 0) {
-        href += (href.indexOf("?") >= 0 ? "&" : "?") + "v=20260722-tab3d-v32";
+        href += (href.indexOf("?") >= 0 ? "&" : "?") + "v=20260722-tab3d-v33";
       }
       if (action && typeof navigateBySidebarAction === "function" && navigateBySidebarAction(action, { label: label || "" })) {
         return true;
@@ -1671,18 +1720,6 @@
     });
 
 
-    (function bindPartDetailClose() {
-      var btn = document.getElementById("partDetailClose");
-      if (!btn) return;
-      btn.addEventListener("click", function (e) {
-        e.preventDefault();
-        e.stopPropagation();
-        state.partId = "";
-        hidePartDetail();
-        renderCallouts();
-        updatePartHighlight();
-      });
-    })();
 
     renderAll();
   })();
