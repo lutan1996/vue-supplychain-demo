@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN" data-build="20260722-tab3d-v33">
+<html lang="zh-CN" data-build="20260722-tab3d-v34">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -1498,7 +1498,7 @@
         c1.setOption({
           color: ["#1677ff", "#f5222d", "#52c41a"],
           legend: { show: false },
-          grid: { left: 42, right: 10, top: 18, bottom: 24 },
+          grid: { left: 42, right: 10, top: 28, bottom: 24 },
           xAxis: {
             type: "category",
             data: whNames,
@@ -1509,7 +1509,8 @@
           yAxis: {
             type: "value",
             name: "单位：件",
-            nameTextStyle: { fontSize: 10, color: "#94a3b8", padding: [0, 0, 0, 8] },
+            nameGap: 10,
+            nameTextStyle: { fontSize: 10, color: "#94a3b8", padding: [8, 0, 0, 8] },
             min: 0,
             max: d.rtMax,
             interval: 5,
@@ -1529,7 +1530,7 @@
         c2.setOption({
           color: ["#1677ff", "#f5222d", "#52c41a", "#faad14"],
           legend: { show: false },
-          grid: { left: 42, right: 10, top: 18, bottom: 24 },
+          grid: { left: 42, right: 10, top: 28, bottom: 24 },
           xAxis: {
             type: "category",
             data: whNames,
@@ -1540,7 +1541,8 @@
           yAxis: {
             type: "value",
             name: "单位：万元",
-            nameTextStyle: { fontSize: 10, color: "#94a3b8", padding: [0, 0, 0, 0] },
+            nameGap: 10,
+            nameTextStyle: { fontSize: 10, color: "#94a3b8", padding: [8, 0, 0, 0] },
             min: 0,
             max: d.idleMax,
             interval: 5,
@@ -1654,7 +1656,7 @@
     function jumpInventoryPage(file, action, label) {
       var href = file;
       if (href && href.indexOf("v=") < 0) {
-        href += (href.indexOf("?") >= 0 ? "&" : "?") + "v=20260722-tab3d-v33";
+        href += (href.indexOf("?") >= 0 ? "&" : "?") + "v=20260722-tab3d-v34";
       }
       if (action && typeof navigateBySidebarAction === "function" && navigateBySidebarAction(action, { label: label || "" })) {
         return true;
