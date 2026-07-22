@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN" data-build="20260722-blade-stable-v27">
+<html lang="zh-CN" data-build="20260722-scheme2-top-v28">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -1259,15 +1259,25 @@
     });
 
     function jumpInventoryPage(file, action, label) {
+      var href = file;
+      if (href && href.indexOf("v=") < 0) {
+        href += (href.indexOf("?") >= 0 ? "&" : "?") + "v=20260722-scheme2-top-v28";
+      }
       if (action && typeof navigateBySidebarAction === "function" && navigateBySidebarAction(action, { label: label || "" })) {
         return true;
       }
       try {
         if (window.top && window.top !== window && typeof window.top.__demoOpenPage === "function") {
-          if (window.top.__demoOpenPage(file) === true) return true;
+          if (window.top.__demoOpenPage(href) === true) return true;
         }
       } catch (eTop) {}
-      window.location.href = file;
+      try {
+        if (window.parent && window.parent !== window && window.parent.postMessage) {
+          window.parent.postMessage({ type: "map-demo-nav", href: href }, "*");
+          return true;
+        }
+      } catch (eMsg) {}
+      window.location.href = href;
       return true;
     }
 

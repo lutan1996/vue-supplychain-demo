@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN" data-build="20260722-blade-stable-v27">
+<html lang="zh-CN" data-build="20260722-scheme2-top-v28">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -128,15 +128,23 @@
     .main-col {
       min-height: 0;
       min-width: 0;
-      display: grid;
-      grid-template-rows: minmax(0, 1.2fr) minmax(0, 1fr);
+      display: flex;
+      flex-direction: column;
       gap: 6px;
       overflow: hidden;
     }
 
+    .main-col > .mid-pane {
+      flex: 1.25 1 0;
+      min-height: 0;
+      width: 100%;
+    }
+
     .dash-grid {
+      flex: 1 1 0;
       min-height: 0;
       min-width: 0;
+      width: 100%;
       display: grid;
       grid-template-columns: minmax(0, 1.4fr) minmax(0, 0.95fr);
       grid-template-rows: minmax(0, 1fr) minmax(0, 1fr);
@@ -579,7 +587,7 @@
             <div class="page-view-switch">
               <div class="overview-dd" id="overviewDd">
                 <button type="button" class="overview-dd-btn" id="overviewDdBtn" aria-haspopup="true" aria-expanded="false">
-                  <i class="fa-solid fa-house"></i> 库存总览 <i class="fa-solid fa-caret-down caret"></i>
+                  <i class="fa-solid fa-house"></i> 库存总览·方案2 <i class="fa-solid fa-caret-down caret"></i>
                 </button>
                 <div class="overview-dd-menu" id="overviewDdMenu" role="menu">
                   <a href="prod-spare-inventory-ledger-0714.html" data-action="prod-spare-inventory" data-label="库存总览·方案1" role="menuitem">方案1</a>
@@ -1265,15 +1273,25 @@
     });
 
     function jumpInventoryPage(file, action, label) {
+      var href = file;
+      if (href && href.indexOf("v=") < 0) {
+        href += (href.indexOf("?") >= 0 ? "&" : "?") + "v=20260722-scheme2-top-v28";
+      }
       if (action && typeof navigateBySidebarAction === "function" && navigateBySidebarAction(action, { label: label || "" })) {
         return true;
       }
       try {
         if (window.top && window.top !== window && typeof window.top.__demoOpenPage === "function") {
-          if (window.top.__demoOpenPage(file) === true) return true;
+          if (window.top.__demoOpenPage(href) === true) return true;
         }
       } catch (eTop) {}
-      window.location.href = file;
+      try {
+        if (window.parent && window.parent !== window && window.parent.postMessage) {
+          window.parent.postMessage({ type: "map-demo-nav", href: href }, "*");
+          return true;
+        }
+      } catch (eMsg) {}
+      window.location.href = href;
       return true;
     }
 

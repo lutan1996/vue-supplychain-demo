@@ -517,6 +517,20 @@ body.map-demo-hide-shell-topbar .shell .main > .topbar{display:none !important;}
 
     buildList();
 
+    /* 生产物资库存方案页：外部直链也要进 fileToIndex，否则方案切换 __demoOpenPage 失败、仍停在方案1 */
+    (function registerProdSparePages() {
+      var extras = [
+        { title: "生产物资库存管理·方案1", file: "prod-spare-inventory-ledger-0714.html" },
+        { title: "生产物资库存管理·方案2", file: "prod-spare-inventory-scheme2.html" },
+        { title: "仓库视图", file: "prod-spare-storage-0714.html" }
+      ];
+      extras.forEach(function (m) {
+        if (!m.file || fileToIndex.hasOwnProperty(m.file)) return;
+        pagesList.push({ title: m.title, file: m.file, group: "other" });
+        fileToIndex[m.file] = pagesList.length - 1;
+      });
+    })();
+
     /* 与 file:// 打开 index-portal-screen-alt.html 同源；旧链接 index.html?view=portal 仍指向同一套嵌入 HTML */
     (function () {
       var home = "index-portal-screen-alt.html";
@@ -817,7 +831,7 @@ body.map-demo-hide-shell-topbar .shell .main > .topbar{display:none !important;}
     /* 必须为 true：Blob URL 的 iframe 与 file:// 父页不同源，子页无法可靠调用 parent.__demoOpenPage / postMessage，蓝框子功能会全部失效。srcdoc 与父页同源，侧栏跳转才能工作。 */
     var demoUseSrcdocOnly = true;
     var demoLoadingSafetyTimer = null;
-    var demoPageVersion = "20260722-blade-stable-v27";
+    var demoPageVersion = "20260722-scheme2-top-v28";
 
     function demoAppendVersionBeforeHash(href) {
       if (!href) return href;
