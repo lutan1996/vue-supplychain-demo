@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html lang="zh-CN" data-build="20260722-tab3d-v35">
+<html lang="zh-CN" data-build="20260722-tab3d-v36">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
-  <title>生产物资库存管理 · 方案2 - 新能源物资供应链管理系统</title>
+  <title>生产物资库存管理 - 新能源物资供应链管理系统</title>
   <link rel="stylesheet" href="css/vendor/fa-all.min.css" />
   <link rel="stylesheet" href="css/subpage-base.css" />
   <link rel="stylesheet" href="css/carrier-management.css" />
@@ -680,15 +680,7 @@
         <div class="ledger-page">
           <div class="ledger-view-row">
             <div class="page-view-switch">
-              <div class="overview-dd" id="overviewDd">
-                <button type="button" class="overview-dd-btn" id="overviewDdBtn" aria-haspopup="true" aria-expanded="false">
-                  <i class="fa-solid fa-house"></i> 库存总览·方案2 <i class="fa-solid fa-caret-down caret"></i>
-                </button>
-                <div class="overview-dd-menu" id="overviewDdMenu" role="menu">
-                  <a href="prod-spare-inventory-ledger-0714.html" data-action="prod-spare-inventory" data-label="库存总览·方案1" role="menuitem">方案1</a>
-                  <a class="on" href="prod-spare-inventory-scheme2.html" data-action="prod-spare-inventory-scheme2" data-label="库存总览·方案2" role="menuitem">方案2</a>
-                </div>
-              </div>
+              <a class="on" href="prod-spare-inventory-scheme2.html" data-action="prod-spare-inventory" data-label="库存总览" id="linkInventoryOverview"><i class="fa-solid fa-house"></i> 库存总览</a>
               <a href="prod-spare-storage-0714.html" data-action="prod-spare-storage" data-label="仓库视图" id="linkWarehouseView"><i class="fa-solid fa-warehouse"></i> 仓库视图</a>
             </div>
           </div>
@@ -1565,8 +1557,8 @@
     function buildStorage(scene, meshes) {
       /* 集装箱式储能：柜体半透明外壳 + 外显电池簇，避免切换后看起来像空白 */
       addMesh(scene, [], new THREE.BoxGeometry(6.2, 0.18, 3.2), 0x94a3b8, 0, 0.12, 0, "", { metalness: 0.35, roughness: 0.7 });
-      addMesh(scene, [], new THREE.BoxGeometry(5.8, 2.6, 2.4), 0xcbd5e1, 0, 1.5, 0, "", {
-        metalness: 0.2, roughness: 0.55, transparent: true, opacity: 0.35, depthWrite: false
+      addMesh(scene, [], new THREE.BoxGeometry(5.8, 2.6, 2.4), 0xdbe4ee, 0, 1.5, 0, "", {
+        metalness: 0.15, roughness: 0.7
       });
       for (var i = 0; i < 5; i++) {
         addMesh(scene, meshes, new THREE.BoxGeometry(0.9, 1.7, 0.78), 0x059669, -1.9 + i * 0.95, 1.45, 0.55, i === 2 ? "es_battery" : "", { metalness: 0.4 });
@@ -1791,28 +1783,29 @@
       document.querySelectorAll("#matTabs button").forEach(function (b) {
         b.classList.toggle("on", b === btn);
       });
+      /* 先切 3D 再刷标注/图表，避免先换标签后模型空一帧像闪退 */
+      if (prevKind !== nextKind) {
+        if (scene3d.renderer && scene3d.modelsReady) {
+          applyKind(nextKind);
+        } else {
+          initScene();
+        }
+      }
+      updatePartHighlight();
+      startAnimLoop();
+      paintScene();
       renderCallouts();
       renderCharts();
-      if (prevKind === nextKind && scene3d.modelsReady) {
-        updatePartHighlight();
+      requestAnimationFrame(function () {
+        startAnimLoop();
         paintScene();
-        return;
-      }
-      if (scene3d.renderer && scene3d.modelsReady) {
-        applyKind(nextKind);
-        updatePartHighlight();
-        syncRendererSize(false);
-        paintScene();
-        requestAnimationFrame(function () { paintScene(); });
-        return;
-      }
-      initScene();
+      });
     });
 
     function jumpInventoryPage(file, action, label) {
       var href = file;
       if (href && href.indexOf("v=") < 0) {
-        href += (href.indexOf("?") >= 0 ? "&" : "?") + "v=20260722-tab3d-v35";
+        href += (href.indexOf("?") >= 0 ? "&" : "?") + "v=20260722-tab3d-v36";
       }
       if (action && typeof navigateBySidebarAction === "function" && navigateBySidebarAction(action, { label: label || "" })) {
         return true;
@@ -1832,33 +1825,6 @@
       return true;
     }
 
-    (function bindOverviewSchemeDd() {
-      var dd = document.getElementById("overviewDd");
-      var btn = document.getElementById("overviewDdBtn");
-      var menu = document.getElementById("overviewDdMenu");
-      if (!dd || !btn || !menu) return;
-      btn.addEventListener("click", function (e) {
-        e.preventDefault();
-        e.stopPropagation();
-        var open = !dd.classList.contains("open");
-        dd.classList.toggle("open", open);
-        btn.setAttribute("aria-expanded", open ? "true" : "false");
-      });
-      menu.addEventListener("click", function (e) {
-        var a = e.target.closest("a[href]");
-        if (!a) return;
-        e.preventDefault();
-        e.stopPropagation();
-        dd.classList.remove("open");
-        btn.setAttribute("aria-expanded", "false");
-        if (a.classList.contains("on")) return;
-        jumpInventoryPage(a.getAttribute("href"), a.getAttribute("data-action"), a.getAttribute("data-label"));
-      }, true);
-      document.addEventListener("click", function () {
-        dd.classList.remove("open");
-        btn.setAttribute("aria-expanded", "false");
-      });
-    })();
 
     (function bindWarehouseViewLink() {
       var link = document.getElementById("linkWarehouseView");

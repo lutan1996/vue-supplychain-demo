@@ -142,7 +142,7 @@
     "purchase-pay": "material-procurement-hub.html?tab=m8",
     "purchase-return-exchange": "return-exchange-management.html",
     "purchase-quality-accept": "material-procurement-hub.html?tab=m10",
-    "prod-spare-inventory": "prod-spare-inventory-ledger-0714.html",
+    "prod-spare-inventory": "prod-spare-inventory-scheme2.html",
     "prod-spare-inventory-scheme2": "prod-spare-inventory-scheme2.html",
     "prod-spare-storage": "prod-spare-storage-0714.html",
     "prod-spare-type-detail": "prod-spare-type-detail-0714.html",
