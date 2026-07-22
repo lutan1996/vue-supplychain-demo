@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN" data-build="20260722-tab3d-v49">
+<html lang="zh-CN" data-build="20260722-tab3d-v50">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -785,7 +785,7 @@
                 </div>
 
                 <div class="dash-card">
-                  <h3>库存金额动态</h3>
+                  <h3>库容比</h3>
                   <div class="chart-el" id="chartAmount" style="height:100%"></div>
                 </div>
 
@@ -1726,12 +1726,12 @@
       /* 方案1：呆滞是第2张；方案2：库存金额是第2张、呆滞是第3张 */
       var isScheme2 = !!document.querySelector(".dash-grid");
       if (isScheme2) {
-        if (cards[1]) cards[1].textContent = "库存金额动态" + scope;
+        if (cards[1]) cards[1].textContent = "库容比" + scope;
         if (cards[2]) cards[2].textContent = "呆滞物资动态" + scope;
         if (cards[3]) cards[3].textContent = "报废数量动态" + scope;
       } else {
         if (cards[1]) cards[1].textContent = "呆滞物资动态" + scope;
-        if (cards[2]) cards[2].textContent = "库存金额动态" + scope;
+        if (cards[2]) cards[2].textContent = "库容比" + scope;
         if (cards[3]) cards[3].textContent = "报废数量动态" + scope;
       }
 
@@ -1850,7 +1850,7 @@
       var c4 = ensureChart("chartScrap");
       if (c4) {
         c4.setOption({
-          grid: { left: 56, right: 24, top: 10, bottom: 10 },
+          grid: { left: 56, right: 36, top: 10, bottom: 10 },
           xAxis: { type: "value", splitLine: { lineStyle: { color: "#eef2f7" } }, axisLabel: { fontSize: 10, color: "#94a3b8" } },
           yAxis: {
             type: "category",
@@ -1861,6 +1861,14 @@
           series: [{
             type: "bar",
             barWidth: 12,
+            label: {
+              show: true,
+              position: "right",
+              distance: 4,
+              fontSize: 11,
+              color: "#475569",
+              formatter: "{c}"
+            },
             data: d.scrap.map(function (v, i) {
               return { value: v, itemStyle: { color: scrapColors[i % scrapColors.length] } };
             })
@@ -1956,7 +1964,7 @@
     function jumpInventoryPage(file, action, label) {
       var href = file;
       if (href && href.indexOf("v=") < 0) {
-        href += (href.indexOf("?") >= 0 ? "&" : "?") + "v=20260722-tab3d-v49";
+        href += (href.indexOf("?") >= 0 ? "&" : "?") + "v=20260722-tab3d-v50";
       }
       if (action && typeof navigateBySidebarAction === "function" && navigateBySidebarAction(action, { label: label || "" })) {
         return true;
