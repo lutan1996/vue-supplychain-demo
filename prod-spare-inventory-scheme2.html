@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN" data-build="20260722-tab3d-v52">
+<html lang="zh-CN" data-build="20260722-tab3d-v53">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -11,6 +11,9 @@
   <link rel="stylesheet" href="css/subpage-base.css" />
   <link rel="stylesheet" href="css/carrier-management.css" />
   <link rel="stylesheet" href="css/source-navbar-header.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&display=swap" rel="stylesheet" />
   <style>
     :root {
       --primary: #1677ff;
@@ -427,10 +430,11 @@
       gap: 6px;
     }
     .rt-summary {
-      background: linear-gradient(165deg, #f5f9ff 0%, #f8fafc 48%, #f3f6fb 100%);
-      border: 1px solid #e8eef8;
+      --num: "Barlow Condensed", "Arial Narrow", "PingFang SC", "Microsoft YaHei", sans-serif;
+      background: #fff;
+      border: 1px solid #e8edf4;
       border-radius: 8px;
-      padding: 8px 8px 8px;
+      padding: 0;
       height: 100%;
       display: flex;
       flex-direction: column;
@@ -440,31 +444,36 @@
     .rt-head {
       position: relative;
       display: flex;
-      align-items: flex-end;
+      flex-direction: column;
+      align-items: stretch;
       justify-content: center;
-      gap: 28px;
-      padding: 16px 6px 10px;
+      gap: 6px;
+      padding: 10px 12px 8px;
       flex: 0 0 auto;
-      background: rgba(255, 255, 255, 0.72);
-      border-radius: 6px;
-      border: 1px solid rgba(22, 119, 255, 0.08);
-      box-shadow: 0 1px 0 rgba(255, 255, 255, 0.9) inset;
+      background:
+        linear-gradient(90deg, rgba(22, 119, 255, 0.08), transparent 42%),
+        linear-gradient(180deg, #f7fbff 0%, #fff 100%);
+      border-bottom: 1px solid #eef2f7;
     }
     .rt-summary .rt-title {
-      position: absolute;
-      left: 50%;
-      top: 5px;
-      transform: translateX(-50%);
+      position: static;
+      left: auto;
+      top: auto;
+      transform: none;
       font-size: 11px;
       color: #64748b;
       font-weight: 600;
-      letter-spacing: 0.02em;
+      letter-spacing: 0.08em;
       line-height: 1.2;
       white-space: nowrap;
-      z-index: 1;
+      text-transform: none;
     }
     .rt-summary .rt-vals {
-      display: contents;
+      display: flex;
+      align-items: baseline;
+      justify-content: flex-start;
+      gap: 18px;
+      flex-wrap: wrap;
     }
     .rt-summary .rt-vals > div {
       display: inline-flex;
@@ -472,72 +481,89 @@
       gap: 3px;
     }
     .rt-summary .rt-vals b {
-      font-size: 20px;
-      color: #1f2d3d;
+      font-family: var(--num);
+      font-size: 30px;
+      color: #0f172a;
       font-weight: 700;
-      line-height: 1;
+      line-height: 0.95;
       font-variant-numeric: tabular-nums;
-      letter-spacing: -0.02em;
+      letter-spacing: -0.04em;
     }
     .rt-summary .rt-vals > div:first-child b { color: #1677ff; }
     .rt-summary .rt-vals span {
       font-size: 11px;
       color: #94a3b8;
       margin-left: 1px;
-      font-weight: 500;
+      font-weight: 600;
     }
     .rt-flow {
       flex: 1;
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 6px;
-      padding-top: 6px;
+      gap: 0;
+      padding: 0;
       min-height: 0;
-      border-top: 0;
     }
     .rt-flow-col {
-      padding: 6px 8px 7px;
-      border-radius: 6px;
-      background: #fff;
-      border: 1px solid #eef2f7;
+      padding: 8px 10px 9px;
+      border-radius: 0;
+      background: transparent;
+      border: 0;
       display: flex;
       flex-direction: column;
       justify-content: center;
       min-height: 0;
+      position: relative;
     }
-    .rt-flow-col + .rt-flow-col { border-left: 1px solid #eef2f7; }
-    .rt-flow-col.out {
-      border-top: 2px solid #1677ff;
+    .rt-flow-col + .rt-flow-col {
+      border-left: 1px solid #eef2f7;
     }
-    .rt-flow-col.in {
-      border-top: 2px solid #52c41a;
+    .rt-flow-col.out::before,
+    .rt-flow-col.in::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 10px;
+      bottom: 10px;
+      width: 3px;
+      border-radius: 0 2px 2px 0;
     }
+    .rt-flow-col.out::before { background: #1677ff; }
+    .rt-flow-col.in::before { background: #52c41a; }
+    .rt-flow-col.out { border-top: 0; padding-left: 12px; }
+    .rt-flow-col.in { border-top: 0; padding-left: 12px; }
     .rt-flow-col .t {
-      text-align: center;
+      text-align: left;
       font-size: 11px;
-      color: #334155;
-      font-weight: 700;
-      margin-bottom: 5px;
+      color: #64748b;
+      font-weight: 600;
+      margin-bottom: 6px;
+      letter-spacing: 0.02em;
     }
     .rt-flow-col.out .t { color: #1677ff; }
     .rt-flow-col.in .t { color: #389e0d; }
     .rt-flow-col .r {
       display: flex;
       justify-content: space-between;
-      align-items: center;
+      align-items: baseline;
       font-size: 11px;
       color: #94a3b8;
-      margin-top: 4px;
-      line-height: 1.3;
-      padding: 3px 6px;
-      border-radius: 4px;
-      background: #f8fafc;
+      margin-top: 3px;
+      line-height: 1.25;
+      padding: 0;
+      border-radius: 0;
+      background: transparent;
+      gap: 8px;
     }
     .rt-flow-col .r em {
+      font-family: var(--num);
       font-style: normal;
-      color: #1f2d3d;
+      color: #0f172a;
       font-weight: 700;
+      font-size: 16px;
+      letter-spacing: -0.03em;
       font-variant-numeric: tabular-nums;
+      white-space: nowrap;
     }
     .chart-box { min-height: 0; height: 100%; display: flex; flex-direction: column; }
     .chart-box .chart-title {
@@ -574,73 +600,118 @@
     .chart-el { width: 100%; flex: 1; min-height: 0; }
 
     .idle-board {
+      --num: "Barlow Condensed", "Arial Narrow", "PingFang SC", "Microsoft YaHei", sans-serif;
       position: relative;
       height: 100%;
       min-height: 0;
-      background: linear-gradient(165deg, #f5f9ff 0%, #f8fafc 50%, #f3f6fb 100%);
-      border: 1px solid #e8eef8;
+      background: #fff;
+      border: 1px solid #e8edf4;
       border-radius: 8px;
       display: grid;
       grid-template-columns: 1fr 1fr;
       grid-template-rows: 1fr 1fr;
-      gap: 6px;
-      padding: 6px;
+      gap: 0;
+      padding: 0;
       overflow: hidden;
     }
     .idle-board::before,
     .idle-board::after,
     .idle-board .idle-dot { display: none; }
     .idle-cell {
-      padding: 8px 10px;
+      position: relative;
+      padding: 10px 12px 9px 14px;
       display: flex;
       flex-direction: column;
       justify-content: center;
-      gap: 4px;
+      gap: 2px;
       min-height: 0;
       overflow: hidden;
       background: #fff;
-      border: 1px solid #eef2f7;
-      border-radius: 6px;
-      border-top-width: 2px;
-      box-shadow: 0 1px 0 rgba(255, 255, 255, 0.9) inset;
+      border: 0;
+      border-radius: 0;
+      border-top-width: 0;
+      box-shadow: none;
     }
-    .idle-cell:nth-child(1) { border-top-color: #1677ff; }
-    .idle-cell:nth-child(2) { border-top-color: #13c2c2; }
-    .idle-cell:nth-child(3) { border-top-color: #faad14; }
-    .idle-cell:nth-child(4) { border-top-color: #f5222d; }
+    .idle-cell:nth-child(1),
+    .idle-cell:nth-child(2) { border-bottom: 1px solid #eef2f7; }
+    .idle-cell:nth-child(odd) { border-right: 1px solid #eef2f7; }
+    .idle-cell::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 10px;
+      bottom: 10px;
+      width: 3px;
+      border-radius: 0 2px 2px 0;
+    }
+    .idle-cell:nth-child(1)::before { background: #1677ff; }
+    .idle-cell:nth-child(2)::before { background: #13c2c2; }
+    .idle-cell:nth-child(3)::before { background: #faad14; }
+    .idle-cell:nth-child(4)::before { background: #f5222d; }
+    .idle-cell:nth-child(1) { border-top-color: transparent; }
+    .idle-cell:nth-child(2) { border-top-color: transparent; }
+    .idle-cell:nth-child(3) { border-top-color: transparent; }
+    .idle-cell:nth-child(4) { border-top-color: transparent; }
     .idle-cell .t {
       font-size: 10px;
-      color: #64748b;
-      line-height: 1.3;
+      color: #94a3b8;
+      line-height: 1.25;
       font-weight: 600;
+      letter-spacing: 0.02em;
     }
     .idle-cell .t em {
       font-style: normal;
-      color: #334155;
+      color: #475569;
       font-weight: 700;
     }
     .idle-cell .v {
       font-size: 12px;
       color: #334155;
-      line-height: 1.25;
+      line-height: 1;
+      margin-top: 2px;
     }
     .idle-cell .v b {
-      font-size: 16px;
+      font-family: var(--num);
+      font-size: 26px;
       font-weight: 700;
-      color: #1f2d3d;
+      color: #0f172a;
       font-variant-numeric: tabular-nums;
-      letter-spacing: -0.02em;
+      letter-spacing: -0.04em;
     }
+    .idle-cell:nth-child(1) .v b { color: #1677ff; }
+    .idle-cell:nth-child(2) .v b { color: #08979c; }
+    .idle-cell:nth-child(3) .v b { color: #d48806; }
+    .idle-cell:nth-child(4) .v b { color: #cf1322; }
     .idle-cell .a {
       font-size: 10px;
-      color: #64748b;
+      color: #94a3b8;
       line-height: 1.3;
-      padding: 2px 6px;
-      border-radius: 4px;
-      background: #f8fafc;
+      padding: 0;
+      border-radius: 0;
+      background: transparent;
       width: fit-content;
       max-width: 100%;
+      margin-top: 1px;
     }
+    .idle-cell .idle-bar {
+      margin-top: 6px;
+      height: 3px;
+      border-radius: 999px;
+      background: #f1f5f9;
+      overflow: hidden;
+      width: 100%;
+    }
+    .idle-cell .idle-bar > i {
+      display: block;
+      height: 100%;
+      width: 30%;
+      border-radius: inherit;
+      background: currentColor;
+    }
+    .idle-cell:nth-child(1) .idle-bar { color: #1677ff; }
+    .idle-cell:nth-child(2) .idle-bar { color: #13c2c2; }
+    .idle-cell:nth-child(3) .idle-bar { color: #faad14; }
+    .idle-cell:nth-child(4) .idle-bar { color: #f5222d; }
 
     .bottom-row {
       display: contents;
@@ -798,21 +869,25 @@
                         <div class="t">呆滞时长 · <em>30~90天</em></div>
                         <div class="v"><b>1280件</b></div>
                         <div class="a">库存金额 2000万元</div>
+                        <div class="idle-bar" aria-hidden="true"><i style="width:20%"></i></div>
                       </div>
                       <div class="idle-cell">
                         <div class="t">呆滞时长 · <em>90~180天</em></div>
                         <div class="v"><b>1280件</b></div>
                         <div class="a">库存金额 2000万元</div>
+                        <div class="idle-bar" aria-hidden="true"><i style="width:30%"></i></div>
                       </div>
                       <div class="idle-cell">
                         <div class="t">呆滞时长 · <em>180~360天</em></div>
                         <div class="v"><b>1280件</b></div>
                         <div class="a">库存金额 2000万元</div>
+                        <div class="idle-bar" aria-hidden="true"><i style="width:20%"></i></div>
                       </div>
                       <div class="idle-cell">
                         <div class="t">呆滞时长 · <em>360天以上</em></div>
                         <div class="v"><b>1280件</b></div>
                         <div class="a">库存金额 2000万元</div>
+                        <div class="idle-bar" aria-hidden="true"><i style="width:30%"></i></div>
                       </div>
                     </div>
                     <div class="chart-box">
@@ -1666,8 +1741,10 @@
         var row = d.idle[i];
         var v = cell.querySelector(".v");
         var a = cell.querySelector(".a");
+        var bar = cell.querySelector(".idle-bar > i");
         if (v) v.innerHTML = "<b>" + row.qty + "</b>";
         if (a) a.textContent = "库存金额 " + row.amt;
+        if (bar && row.pct) bar.style.width = row.pct;
       }
     }
 
@@ -1875,7 +1952,7 @@
     function jumpInventoryPage(file, action, label) {
       var href = file;
       if (href && href.indexOf("v=") < 0) {
-        href += (href.indexOf("?") >= 0 ? "&" : "?") + "v=20260722-tab3d-v52";
+        href += (href.indexOf("?") >= 0 ? "&" : "?") + "v=20260722-tab3d-v53";
       }
       if (action && typeof navigateBySidebarAction === "function" && navigateBySidebarAction(action, { label: label || "" })) {
         return true;
