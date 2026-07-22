@@ -1203,6 +1203,7 @@
       'prod-spare-inventory-scheme2.html': 'physicalMgmt',
       'prod-spare-storage-0714.html': 'physicalMgmt',
       'prod-spare-type-detail-0714.html': 'physicalMgmt',
+      'prod-spare-station-detail-0714.html': 'physicalMgmt',
       'assets-personal.html': 'assetMgmt',
       'assets-department.html': 'assetMgmt',
       'assets-company.html': 'assetMgmt',
@@ -1598,6 +1599,10 @@
       }
       if (file === "prod-spare-type-detail-0714.html") {
         pageLabel = "备件类型";
+        displayMod = "实物管理";
+      }
+      if (file === "prod-spare-station-detail-0714.html") {
+        pageLabel = "生产物资库存管理";
         displayMod = "实物管理";
       }
       if (

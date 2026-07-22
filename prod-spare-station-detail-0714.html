@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-build="20260722-station-wh-v2">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>风电场仓库详情 - 新能源物资供应链管理系统</title>
+  <link rel="stylesheet" href="css/vendor/fa-all.min.css" />
+  <link rel="stylesheet" href="css/subpage-base.css" />
+  <link rel="stylesheet" href="css/source-navbar-header.css" />
+  <style>
+    :root {
+      --pri: #1677ff;
+      --bd: #e8edf4;
+      --t: #1f2d3d;
+      --m: #8c9bb0;
+      --ok: #1677ff;
+      --warn: #faad14;
+      --danger: #f5222d;
+    }
+    * { box-sizing: border-box; }
+    body.page-subpage .main-scroll { background: #f0f3f8; }
+    .sd-page {
+      padding: 0 12px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      min-height: 0;
+      height: calc(100vh - 56px - 28px);
+    }
+    .sd-top, .sd-bottom {
+      background: #fff;
+      border: 1px solid var(--bd);
+      border-radius: 4px;
+      min-height: 0;
+    }
+    .sd-top {
+      flex: 0 0 42%;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .sd-bottom {
+      flex: 1 1 58%;
+      display: grid;
+      grid-template-columns: minmax(280px, 34%) minmax(0, 1fr);
+      gap: 0;
+      overflow: hidden;
+    }
+    .sd-hd {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 14px 8px;
+      border-bottom: 1px solid var(--bd);
+      flex: 0 0 auto;
+    }
+    .sd-hd h3 {
+      margin: 0;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--t);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .sd-hd h3::before {
+      content: "";
+      width: 3px;
+      height: 14px;
+      background: var(--pri);
+      border-radius: 1px;
+    }
+    .btn-export {
+      height: 28px;
+      padding: 0 14px;
+      border: 0;
+      border-radius: 3px;
+      background: var(--pri);
+      color: #fff;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .btn-export:hover { background: #4096ff; }
+    .sd-table-wrap {
+      flex: 1;
+      overflow: auto;
+      min-height: 0;
+    }
+    .sd-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+      color: var(--t);
+      min-width: 1180px;
+    }
+    .sd-table th, .sd-table td {
+      border: 1px solid #eef2f7;
+      padding: 6px 8px;
+      text-align: center;
+      white-space: nowrap;
+    }
+    .sd-table thead th {
+      background: #f7f9fc;
+      color: #5a6b82;
+      font-weight: 600;
+    }
+    .sd-table .filter-row th {
+      background: #fff;
+      padding: 4px 6px;
+    }
+    .sd-table .filter-row input {
+      width: 100%;
+      height: 26px;
+      border: 1px solid #d9e2ec;
+      border-radius: 2px;
+      padding: 0 6px;
+      font-size: 11px;
+      color: var(--t);
+      background: #fff;
+    }
+    .sd-table tbody tr:hover { background: #f5f9ff; }
+    .sd-pager {
+      flex: 0 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 10px;
+      padding: 8px 12px;
+      border-top: 1px solid var(--bd);
+      font-size: 12px;
+      color: #64748b;
+    }
+    .sd-pager .pages {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .sd-pager button {
+      min-width: 26px;
+      height: 26px;
+      border: 1px solid #d9e2ec;
+      background: #fff;
+      border-radius: 2px;
+      cursor: pointer;
+      color: #64748b;
+      font-size: 12px;
+    }
+    .sd-pager button.on {
+      background: var(--pri);
+      border-color: var(--pri);
+      color: #fff;
+    }
+    .sd-pager select {
+      height: 26px;
+      border: 1px solid #d9e2ec;
+      border-radius: 2px;
+      font-size: 12px;
+      color: #64748b;
+      padding: 0 4px;
+    }
+
+    /* 左：仓库信息面板 */
+    .sd-left {
+      border-right: 1px solid var(--bd);
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      overflow: hidden;
+      background: #fff;
+    }
+    .wh-title-row {
+      padding: 12px 14px 4px;
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 8px;
+    }
+    .wh-title-row h2 {
+      margin: 0;
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--t);
+    }
+    .wh-status {
+      font-size: 12px;
+      color: #64748b;
+      white-space: nowrap;
+    }
+    .wh-status b { color: #389e0d; font-weight: 600; }
+    .wh-meta {
+      padding: 0 14px 8px;
+      font-size: 11px;
+      color: var(--m);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px 16px;
+    }
+    .wh-tabs {
+      display: flex;
+      gap: 18px;
+      padding: 0 14px;
+      border-bottom: 1px solid var(--bd);
+    }
+    .wh-tabs button {
+      border: 0;
+      background: transparent;
+      padding: 8px 0 9px;
+      font-size: 13px;
+      color: #64748b;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -1px;
+    }
+    .wh-tabs button.on {
+      color: var(--pri);
+      font-weight: 600;
+      border-bottom-color: var(--pri);
+    }
+    .wh-pane {
+      display: none;
+      flex: 1;
+      min-height: 0;
+      overflow: auto;
+      padding: 10px 14px 12px;
+    }
+    .wh-pane.on { display: flex; flex-direction: column; gap: 10px; }
+    .wh-legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px 14px;
+      font-size: 11px;
+      color: #64748b;
+    }
+    .wh-legend span {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .wh-legend i {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+    .wh-legend .ok { background: var(--ok); }
+    .wh-legend .warn { background: var(--warn); }
+    .wh-legend .danger { background: var(--danger); }
+    .wh-metrics {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px 16px;
+    }
+    .wh-metric .k {
+      font-size: 11px;
+      color: #64748b;
+      margin-bottom: 2px;
+    }
+    .wh-metric .v {
+      font-size: 12px;
+      color: var(--t);
+      line-height: 1.45;
+    }
+    .wh-metric .v b {
+      font-size: 14px;
+      font-weight: 700;
+      margin-right: 2px;
+    }
+    .wh-charts {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      min-height: 140px;
+    }
+    .wh-chart-box {
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .wh-chart-box .ct {
+      font-size: 11px;
+      color: #64748b;
+      margin-bottom: 2px;
+    }
+    .wh-chart-el { width: 100%; height: 120px; }
+    .wh-cam {
+      margin-top: auto;
+      height: 72px;
+      border-radius: 4px;
+      background: #e8edf4;
+      color: #94a3b8;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      border: 1px dashed #c9d7ea;
+    }
+    .wh-info-form {
+      display: grid;
+      gap: 10px;
+      font-size: 12px;
+      color: #475569;
+    }
+    .wh-info-form .row {
+      display: grid;
+      grid-template-columns: 72px 1fr;
+      gap: 8px;
+      align-items: center;
+    }
+    .wh-info-form .row span { color: var(--m); text-align: right; }
+    .wh-zone-tree {
+      font-size: 12px;
+      color: #334155;
+      line-height: 1.9;
+      padding-left: 4px;
+    }
+    .wh-zone-tree .l2 { padding-left: 16px; color: #64748b; }
+    .wh-zone-tree .l3 { padding-left: 32px; color: #94a3b8; }
+
+    /* 右：货架可视化 */
+    .sd-right {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      overflow: hidden;
+      background: #fafbfd;
+    }
+    .rack-toolbar {
+      flex: 0 0 auto;
+      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border-bottom: 1px solid var(--bd);
+      background: #fff;
+      font-size: 12px;
+      color: #475569;
+    }
+    .rack-toolbar select {
+      height: 28px;
+      min-width: 120px;
+      border: 1px solid #d9e2ec;
+      border-radius: 3px;
+      padding: 0 8px;
+      font-size: 12px;
+      color: var(--t);
+      background: #fff;
+    }
+    .rack-list {
+      flex: 1;
+      overflow: auto;
+      padding: 10px 12px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .rack-card {
+      background: #fff;
+      border: 1px solid var(--bd);
+      border-radius: 4px;
+      padding: 10px 12px;
+    }
+    .rack-card h4 {
+      margin: 0 0 6px;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--t);
+    }
+    .rack-stats {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px 16px;
+      font-size: 11px;
+      color: #64748b;
+      margin-bottom: 8px;
+    }
+    .rack-stats b { color: var(--t); font-weight: 600; }
+    .rack-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(52px, 1fr));
+      gap: 6px;
+      min-height: 48px;
+    }
+    .rack-bin {
+      height: 36px;
+      border-radius: 3px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 600;
+      color: #fff;
+      cursor: default;
+      user-select: none;
+    }
+    .rack-bin.ok { background: #1677ff; }
+    .rack-bin.warn { background: #faad14; }
+    .rack-bin.danger { background: #f5222d; }
+    .rack-empty {
+      min-height: 56px;
+      border: 1px dashed #d9e2ec;
+      border-radius: 3px;
+      background: #f8fafc;
+    }
+
+    @media (max-width: 1200px) {
+      .sd-bottom { grid-template-columns: 300px minmax(0, 1fr); }
+    }
+  </style>
+</head>
+<body class="page-source-navbar page-subpage page-logistics">
+  <div class="page-bg" aria-hidden="true"></div>
+  <div class="app">
+    <header class="header">
+      <div class="header-left">
+        <button type="button" class="header-hamburger" aria-label="菜单"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+        <a class="header-logo" href="index-portal-screen-alt.html"><img src="assets/logo-chenergy.png" alt="CHN ENERGY" width="220" height="40" /></a>
+        <div class="header-source-brand"><p>新能源供应链管理系统</p></div>
+      </div>
+      <div class="header-right"><span class="clock" id="clock"></span><div class="user-avatar" title="用户菜单" role="button" tabindex="0">用</div></div>
+    </header>
+    <div class="layout">
+      <aside class="sidebar" aria-label="主导航">
+        <div class="nav-item" title="我的资产"><span class="nav-label">我的资产</span></div>
+        <div class="nav-item" title="我的任务"><span class="nav-label">我的任务</span></div>
+        <a class="nav-item" href="index-portal-screen-alt.html" title="首页"><span class="nav-label">首页</span></a>
+        <a class="nav-item" href="cockpit.html" title="驾驶舱"><span class="nav-label">驾驶舱</span></a>
+        <div class="nav-item" title="采购管理"><span class="nav-label">采购管理</span></div>
+        <div class="nav-item" title="销售管理"><span class="nav-label">销售管理</span></div>
+        <div class="nav-item nav-item--module-active" title="实物管理"><span class="nav-label">实物管理</span></div>
+        <a class="nav-item" href="carrier-management.html" title="物流管理"><span class="nav-label">物流管理</span></a>
+        <div class="nav-item" title="仓储管理"><span class="nav-label">仓储管理</span></div>
+        <div class="nav-item" title="物资采购"><span class="nav-label">物资采购</span></div>
+        <div class="nav-item" title="物资出库与处置"><span class="nav-label">物资出库与处置</span></div>
+        <div class="nav-item" title="绩效考核"><span class="nav-label">绩效考核</span></div>
+        <div class="nav-item" title="公告管理"><span class="nav-label">公告管理</span></div>
+        <div class="nav-item" title="综合业务管理"><span class="nav-label">综合业务管理</span></div>
+        <div class="nav-item" title="数据管理"><span class="nav-label">数据管理</span></div>
+        <div class="nav-item" title="开发工具"><span class="nav-label">开发工具</span></div>
+        <div class="nav-item" title="设置"><span class="nav-label">设置</span></div>
+        <div class="nav-item" title="系统管理"><span class="nav-label">系统管理</span></div>
+      </aside>
+
+      <main class="main-scroll">
+        <!-- 面包屑：首页 / 实物管理 / 生产物资库存管理 / 分公司 / 风电场 -->
+        <nav class="subpage-breadcrumb" aria-label="面包屑">
+          <a href="index-portal-screen-alt.html">首页</a>
+          <span class="sep">/</span>
+          <span>实物管理</span>
+          <span class="sep">/</span>
+          <a href="prod-spare-inventory-scheme2.html" id="bcInventory">生产物资库存管理</a>
+          <span class="sep">/</span>
+          <span id="bcOrg">上海龙源</span>
+          <span class="sep">/</span>
+          <span id="bcStation">东海大桥风电场</span>
+        </nav>
+
+        <div class="sd-page">
+          <!-- 上：库存数据表 -->
+          <section class="sd-top">
+            <div class="sd-hd">
+              <h3>库存数据</h3>
+              <button type="button" class="btn-export" id="btnExport">导出</button>
+            </div>
+            <div class="sd-table-wrap">
+              <table class="sd-table" id="stockTable">
+                <thead>
+                  <tr>
+                    <th>序号</th>
+                    <th>物资编码</th>
+                    <th>原厂物料号</th>
+                    <th>物资名称</th>
+                    <th>规格型号</th>
+                    <th>物资大类</th>
+                    <th>适用机型</th>
+                    <th>安装位置</th>
+                    <th>制造商</th>
+                    <th>单位</th>
+                    <th>采购单价</th>
+                  </tr>
+                  <tr class="filter-row">
+                    <th></th>
+                    <th><input data-col="1" placeholder="" /></th>
+                    <th><input data-col="2" placeholder="" /></th>
+                    <th><input data-col="3" placeholder="" /></th>
+                    <th><input data-col="4" placeholder="" /></th>
+                    <th><input data-col="5" placeholder="" /></th>
+                    <th><input data-col="6" placeholder="" /></th>
+                    <th><input data-col="7" placeholder="" /></th>
+                    <th><input data-col="8" placeholder="" /></th>
+                    <th><input data-col="9" placeholder="" /></th>
+                    <th><input data-col="10" placeholder="" /></th>
+                  </tr>
+                </thead>
+                <tbody id="stockBody"></tbody>
+              </table>
+            </div>
+            <div class="sd-pager">
+              <div class="pages">
+                <button type="button" data-page="first">&lt;&lt;</button>
+                <button type="button" data-page="prev">&lt;</button>
+                <button type="button" class="on">1</button>
+                <span>/ 1</span>
+                <button type="button" data-page="next">&gt;</button>
+                <button type="button" data-page="last">&gt;&gt;</button>
+              </div>
+              <select id="pageSize" aria-label="每页条数">
+                <option value="10" selected>10条/页</option>
+                <option value="20">20条/页</option>
+                <option value="50">50条/页</option>
+              </select>
+              <span id="totalTip">共 7 条记录</span>
+            </div>
+          </section>
+
+          <!-- 下：仓库面板 + 货架 -->
+          <section class="sd-bottom">
+            <aside class="sd-left">
+              <div class="wh-title-row">
+                <h2 id="whName">东海大桥中心库</h2>
+                <div class="wh-status">仓库状态：<b>正常</b></div>
+              </div>
+              <div class="wh-meta">
+                <span>仓库类型：场站备件库</span>
+                <span>仓库面积：860㎡</span>
+              </div>
+              <div class="wh-tabs" id="whTabs">
+                <button type="button" class="on" data-tab="items">仓库物品</button>
+                <button type="button" data-tab="info">仓库信息</button>
+                <button type="button" data-tab="zone">库区层级</button>
+              </div>
+
+              <div class="wh-pane on" id="paneItems">
+                <div class="wh-legend">
+                  <span><i class="ok"></i>正常</span>
+                  <span><i class="warn"></i>临近超期</span>
+                  <span><i class="danger"></i>超60天以上库存</span>
+                </div>
+                <div class="wh-metrics">
+                  <div class="wh-metric">
+                    <div class="k">当前库存</div>
+                    <div class="v"><b>400</b>件<br /><b>2500</b>万元</div>
+                  </div>
+                  <div class="wh-metric">
+                    <div class="k">入库库存</div>
+                    <div class="v"><b>400</b>件<br /><b>2500</b>万元</div>
+                  </div>
+                  <div class="wh-metric">
+                    <div class="k">出库库存</div>
+                    <div class="v"><b>400</b>件<br /><b>2500</b>万元</div>
+                  </div>
+                  <div class="wh-metric">
+                    <div class="k">累计废旧</div>
+                    <div class="v"><b>400</b>件<br /><b>2500</b>万元</div>
+                  </div>
+                </div>
+                <div class="wh-charts">
+                  <div class="wh-chart-box">
+                    <div class="ct">全仓库区分布</div>
+                    <div class="wh-chart-el" id="chartDist"></div>
+                  </div>
+                  <div class="wh-chart-box">
+                    <div class="ct">库位利用率</div>
+                    <div class="wh-chart-el" id="chartUtil"></div>
+                  </div>
+                </div>
+                <div class="wh-cam">监控摄像头画面</div>
+              </div>
+
+              <div class="wh-pane" id="paneInfo">
+                <div class="wh-info-form">
+                  <div class="row"><span>仓库名称</span><div id="infoName">—</div></div>
+                  <div class="row"><span>所属组织</span><div id="infoOrg">—</div></div>
+                  <div class="row"><span>所属场站</span><div id="infoStation">—</div></div>
+                  <div class="row"><span>仓库类型</span><div>场站备件库</div></div>
+                  <div class="row"><span>仓库状态</span><div style="color:#389e0d">正常</div></div>
+                  <div class="row"><span>仓库面积</span><div>860㎡</div></div>
+                  <div class="row"><span>联系人</span><div>张工 / 138****0621</div></div>
+                </div>
+              </div>
+
+              <div class="wh-pane" id="paneZone">
+                <div class="wh-zone-tree">
+                  <div>● 一层库区</div>
+                  <div class="l2">├ 1号货架</div>
+                  <div class="l3">├ A01–A12 库位</div>
+                  <div class="l2">├ 2号货架</div>
+                  <div class="l3">├ B01–B08 库位</div>
+                  <div>● 二层库区</div>
+                  <div class="l2">├ 3号货架</div>
+                  <div class="l3">├ C01–C10 库位</div>
+                </div>
+              </div>
+            </aside>
+
+            <div class="sd-right">
+              <div class="rack-toolbar">
+                <label for="matCat">物资大类：</label>
+                <select id="matCat">
+                  <option value="风电备件" selected>风电备件</option>
+                  <option value="光伏备件">光伏备件</option>
+                  <option value="储能备件">储能备件</option>
+                </select>
+              </div>
+              <div class="rack-list" id="rackList"></div>
+            </div>
+          </section>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.1/dist/echarts.min.js"></script>
+  <script src="js/sidebar-actions.js"></script>
+  <script src="js/subpage-feature-title.js"></script>
+  <script src="js/site-footer.js"></script>
+  <script src="js/subpage-clock.js"></script>
+  <script>
+  (function () {
+    var params = new URLSearchParams(location.search || "");
+    var org = params.get("org") || "上海龙源";
+    var station = params.get("station") || "东海大桥风电场";
+    var whName = station.replace(/风电场$/, "") + "中心库";
+
+    document.getElementById("bcOrg").textContent = org;
+    document.getElementById("bcStation").textContent = station;
+    document.getElementById("whName").textContent = whName;
+    document.getElementById("infoName").textContent = whName;
+    document.getElementById("infoOrg").textContent = org;
+    document.getElementById("infoStation").textContent = station;
+    document.title = station + " · 仓库详情 - 新能源物资供应链管理系统";
+
+    var ROWS = [
+      ["WZ-FD-00128", "OEM-BP-2048", "变桨轴承", "BP-2.0MW", "风电备件", "2.0MW机组", "轮毂/变桨", "SKF", "套", "680000"],
+      ["WZ-FD-00136", "OEM-MS-120", "主轴轴承", "BR-120", "风电备件", "2.0MW机组", "机舱/主轴", "FAG", "套", "310000"],
+      ["WZ-FD-00201", "OEM-IGBT-450", "IGBT模块", "FF450R", "风电备件", "2.5MW机组", "机舱/变流", "Infineon", "只", "186000"],
+      ["WZ-FD-00218", "OEM-YF-800", "偏航减速机", "YF-800", "风电备件", "2.0MW机组", "偏航系统", "南高齿", "台", "98000"],
+      ["WZ-FD-00305", "OEM-HY-12", "液压泵站滤芯", "HY-12", "风电备件", "通用", "液压系统", "Parker", "个", "1280"],
+      ["WZ-FD-00322", "OEM-SN-88", "振动传感器", "SN-88", "风电备件", "通用", "塔筒/机舱", "B&K", "个", "5600"],
+      ["WZ-FD-00410", "OEM-CV-330", "变频器模块", "VF-800", "风电备件", "3.XMW机组", "机舱/变流", "ABB", "台", "122500"]
+    ];
+
+    function renderTable(list) {
+      var html = list.map(function (r, i) {
+        return "<tr><td>" + (i + 1) + "</td>" + r.map(function (c) {
+          return "<td>" + c + "</td>";
+        }).join("") + "</tr>";
+      }).join("");
+      document.getElementById("stockBody").innerHTML = html;
+      document.getElementById("totalTip").textContent = "共 " + list.length + " 条记录";
+    }
+
+    function applyFilter() {
+      var inputs = document.querySelectorAll(".filter-row input[data-col]");
+      var filters = {};
+      inputs.forEach(function (inp) {
+        var c = Number(inp.getAttribute("data-col"));
+        var v = (inp.value || "").trim();
+        if (v) filters[c] = v;
+      });
+      var keys = Object.keys(filters);
+      var list = ROWS.filter(function (r) {
+        return keys.every(function (k) {
+          return String(r[Number(k) - 1] || "").indexOf(filters[k]) >= 0;
+        });
+      });
+      renderTable(list);
+    }
+
+    document.querySelectorAll(".filter-row input").forEach(function (inp) {
+      inp.addEventListener("input", applyFilter);
+    });
+    renderTable(ROWS);
+
+    document.getElementById("btnExport").addEventListener("click", function () {
+      alert("演示：已导出「" + station + "」库存数据（CSV）");
+    });
+
+    document.getElementById("whTabs").addEventListener("click", function (e) {
+      var btn = e.target.closest("button[data-tab]");
+      if (!btn) return;
+      document.querySelectorAll("#whTabs button").forEach(function (b) {
+        b.classList.toggle("on", b === btn);
+      });
+      var tab = btn.getAttribute("data-tab");
+      document.getElementById("paneItems").classList.toggle("on", tab === "items");
+      document.getElementById("paneInfo").classList.toggle("on", tab === "info");
+      document.getElementById("paneZone").classList.toggle("on", tab === "zone");
+    });
+
+    function initCharts() {
+      if (!window.echarts) return;
+      var dist = echarts.init(document.getElementById("chartDist"));
+      dist.setOption({
+        color: ["#1677ff", "#13c2c2", "#52c41a", "#faad14", "#f5222d", "#eb2f96", "#722ed1", "#2f54eb"],
+        tooltip: { trigger: "item" },
+        series: [{
+          type: "pie",
+          radius: ["48%", "72%"],
+          center: ["50%", "52%"],
+          label: { show: false },
+          data: [
+            { name: "库区A", value: 28 },
+            { name: "库区B", value: 22 },
+            { name: "库区C", value: 18 },
+            { name: "库区D", value: 14 },
+            { name: "其他", value: 18 }
+          ]
+        }]
+      });
+      var util = echarts.init(document.getElementById("chartUtil"));
+      util.setOption({
+        series: [{
+          type: "pie",
+          radius: ["55%", "78%"],
+          center: ["50%", "52%"],
+          label: {
+            show: true,
+            position: "center",
+            formatter: "72%",
+            fontSize: 16,
+            fontWeight: 700,
+            color: "#1f2d3d"
+          },
+          data: [
+            { value: 72, itemStyle: { color: "#52c41a" } },
+            { value: 28, itemStyle: { color: "#e8edf4" } }
+          ]
+        }]
+      });
+      window.addEventListener("resize", function () {
+        dist.resize();
+        util.resize();
+      });
+    }
+
+    var BIN_CODES = ["85833", "85834", "85835", "85836", "85837", "85838", "85839", "85840", "85841", "85842", "85843", "85844", "85845", "85846", "85847", "85848", "85849", "85850", "85851", "85852", "85853", "85854"];
+    var BIN_STATUS = ["ok", "ok", "ok", "warn", "ok", "ok", "danger", "ok", "ok", "ok", "warn", "ok", "ok", "ok", "ok", "danger", "ok", "ok", "warn", "ok", "ok", "ok"];
+
+    function renderRacks(cat) {
+      var racks = [
+        {
+          name: "1号货架",
+          stats: { cur: "128件 / 860万元", near: "12件 / 96万元", over: "6件 / 48万元" },
+          bins: true
+        },
+        {
+          name: "2号货架",
+          stats: { cur: "0件 / 0万元", near: "0件 / 0万元", over: "0件 / 0万元" },
+          bins: false
+        },
+        {
+          name: "3号货架",
+          stats: { cur: "0件 / 0万元", near: "0件 / 0万元", over: "0件 / 0万元" },
+          bins: false
+        }
+      ];
+      var html = racks.map(function (r) {
+        var bins = "";
+        if (r.bins) {
+          bins = '<div class="rack-grid">' + BIN_CODES.map(function (code, i) {
+            return '<div class="rack-bin ' + BIN_STATUS[i] + '" title="' + cat + " · " + code + '">' + code + "</div>";
+          }).join("") + "</div>";
+        } else {
+          bins = '<div class="rack-empty"></div>';
+        }
+        return (
+          '<div class="rack-card">' +
+            "<h4>" + r.name + "</h4>" +
+            '<div class="rack-stats">' +
+              "<span>当前库存：<b>" + r.stats.cur + "</b></span>" +
+              "<span>临近超期：<b>" + r.stats.near + "</b></span>" +
+              "<span>超60天：<b>" + r.stats.over + "</b></span>" +
+            "</div>" +
+            bins +
+          "</div>"
+        );
+      }).join("");
+      document.getElementById("rackList").innerHTML = html;
+    }
+
+    document.getElementById("matCat").addEventListener("change", function () {
+      renderRacks(this.value);
+    });
+    renderRacks("风电备件");
+    initCharts();
+  })();
+  </script>
+</body>
+</html>

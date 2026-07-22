@@ -146,6 +146,7 @@
     "prod-spare-inventory-scheme2": "prod-spare-inventory-scheme2.html",
     "prod-spare-storage": "prod-spare-storage-0714.html",
     "prod-spare-type-detail": "prod-spare-type-detail-0714.html",
+    "prod-spare-station-detail": "prod-spare-station-detail-0714.html",
     "bd-warehouse-mgmt": "bd-warehouse-mgmt.html",
     "bd-warehouse-area": "bd-warehouse-area.html",
     "bd-warehouse-shelf": "bd-warehouse-shelf.html",
