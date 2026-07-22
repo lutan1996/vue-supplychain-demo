@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN" data-build="20260722-tab3d-v42">
+<html lang="zh-CN" data-build="20260722-tab3d-v43">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -1354,8 +1354,9 @@
       var camera = scene3d.camera;
       if (!camera) return;
       if (kind === "wind") {
-        camera.position.set(16.8, 7.2, 15.2);
-        camera.lookAt(0.05, 5.0, 0);
+        /* 正面侧视：略侧对机舱看清内部；整体下移、稍放大 */
+        camera.position.set(12.8, 5.4, 14.6);
+        camera.lookAt(0.1, 4.2, 0);
       } else if (kind === "pv") {
         camera.position.set(6.8, 4.6, 9.2);
         camera.lookAt(0, 1.6, 0);
@@ -1373,6 +1374,7 @@
         if (!scene3d.renderer || !scene3d.scene || !scene3d.camera) return;
         scene3d.animId = requestAnimationFrame(animate);
         try {
+          if (scene3d.rotor) scene3d.rotor.rotation.x += 0.008;
           scene3d.renderer.render(scene3d.scene, scene3d.camera);
         } catch (eAnim) {}
       }
@@ -1473,16 +1475,17 @@
       addMesh(scene, [], new THREE.CylinderGeometry(0.55, 0.62, 0.38, 28), 0x475569, 0.1, 7.95, 0, "", { metalness: 0.6 });
       addMesh(scene, [], new THREE.TorusGeometry(0.52, 0.05, 8, 28), 0x64748b, 0.1, 7.78, 0, "", { metalness: 0.55, rx: Math.PI / 2 });
 
-      /* 变桨轮毂（实色深灰） */
-      addMesh(scene, meshes, new THREE.SphereGeometry(0.7, 28, 24), 0x1e293b, -1.4, 8.85, 0, "blade", { metalness: 0.7 });
-      addMesh(scene, [], new THREE.ConeGeometry(0.4, 0.65, 20), 0x1e293b, -2.0, 8.85, 0, "", { metalness: 0.65, rz: Math.PI / 2 });
-
-      /* 叶片：实色浅灰（对照原图，非透明） */
+      /* 变桨轮毂 + 叶片（转子组，绕主轴 X 旋转） */
+      var rotor = new THREE.Group();
+      rotor.position.set(-1.4, 8.85, 0);
+      scene.add(rotor);
+      addMesh(rotor, meshes, new THREE.SphereGeometry(0.7, 28, 24), 0x1e293b, 0, 0, 0, "blade", { metalness: 0.7 });
+      addMesh(rotor, [], new THREE.ConeGeometry(0.4, 0.65, 20), 0x1e293b, -0.6, 0, 0, "", { metalness: 0.65, rz: Math.PI / 2 });
       for (var i = 0; i < 3; i++) {
-        var blade = addMesh(scene, meshes, new THREE.BoxGeometry(0.16, 5.4, 0.72), 0xe2e8f0, -1.4, 8.85, 0, i === 0 ? "blade" : "", {
+        var blade = addMesh(rotor, meshes, new THREE.BoxGeometry(0.16, 5.4, 0.72), 0xe2e8f0, 0, 0, 0, i === 0 ? "blade" : "", {
           metalness: 0.12, roughness: 0.42
         });
-        blade.rotation.z = (i * Math.PI * 2 / 3) - Math.PI / 2;
+        blade.rotation.x = (i * Math.PI * 2) / 3;
         blade.translateY(2.7);
         if (i !== 0) blade.userData.partId = "";
       }
@@ -1505,12 +1508,13 @@
       /* 底座 */
       addMesh(scene, [], new THREE.CylinderGeometry(1.15, 1.35, 0.14, 40), 0xcbd5e1, 0, 0.05, 0, "", { metalness: 0.12, roughness: 0.85 });
 
-      /* 侧视，对齐原图透视角度 */
-      scene.rotation.y = -0.55;
-      scene.scale.set(0.92, 0.92, 0.92);
+      /* 正面侧视（对齐图2），整体略下移、稍放大 */
+      scene.rotation.y = -0.22;
+      scene.position.y = -0.55;
+      scene.scale.set(1.05, 1.05, 1.05);
 
-      scene3d.rotor = null;
-      scene3d.windRotor = null;
+      scene3d.windRotor = rotor;
+      scene3d.rotor = rotor;
     }
 
     function buildPv(scene, meshes) {
@@ -1789,7 +1793,7 @@
     function jumpInventoryPage(file, action, label) {
       var href = file;
       if (href && href.indexOf("v=") < 0) {
-        href += (href.indexOf("?") >= 0 ? "&" : "?") + "v=20260722-tab3d-v42";
+        href += (href.indexOf("?") >= 0 ? "&" : "?") + "v=20260722-tab3d-v43";
       }
       if (action && typeof navigateBySidebarAction === "function" && navigateBySidebarAction(action, { label: label || "" })) {
         return true;
