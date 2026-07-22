@@ -1582,11 +1582,88 @@
       return CALLOUTS_BY_KIND[modelKind(state.mat)] || CALLOUTS_BY_KIND.wind;
     }
 
+    var _projVec = null;
+    function findPartMesh(partId) {
+      if (!partId) return null;
+      var found = null;
+      var meshes = scene3d.meshes || [];
+      for (var i = 0; i < meshes.length; i++) {
+        if (meshes[i] && meshes[i].userData && meshes[i].userData.partId === partId) {
+          found = meshes[i];
+          break;
+        }
+      }
+      if (!found && scene3d.roots && scene3d.roots.wind) {
+        scene3d.roots.wind.traverse(function (o) {
+          if (!found && o && o.userData && o.userData.partId === partId) found = o;
+        });
+      }
+      return found;
+    }
+
+    /* 把 3D 部件中心投影到标注层 0~1 坐标，引导点贴在部件上 */
+    function projectPartAnchor(partId) {
+      if (!scene3d.camera || typeof THREE === "undefined") return null;
+      var mesh = findPartMesh(partId);
+      if (!mesh) return null;
+      if (!_projVec) _projVec = new THREE.Vector3();
+      mesh.updateWorldMatrix(true, false);
+      if (mesh.userData && mesh.userData.anchorLocal) {
+        _projVec.copy(mesh.userData.anchorLocal);
+        mesh.localToWorld(_projVec);
+      } else {
+        mesh.getWorldPosition(_projVec);
+      }
+      _projVec.project(scene3d.camera);
+      if (!isFinite(_projVec.x) || !isFinite(_projVec.y)) return null;
+      if (_projVec.z < -1 || _projVec.z > 1) return null;
+      return {
+        tx: Math.max(0.08, Math.min(0.92, (_projVec.x + 1) / 2)),
+        ty: Math.max(0.06, Math.min(0.94, (1 - _projVec.y) / 2))
+      };
+    }
+
+    function buildCalloutLeaderPath(c, tx, ty) {
+      var x1 = c.x * 100;
+      var y1 = c.y * 100;
+      var x2 = tx * 100;
+      var y2 = ty * 100;
+      if (c.side === "left") x1 = (c.x + 0.108) * 100;
+      if (c.side === "right") x1 = (c.x - 0.108) * 100;
+      var mid = c.side === "left" ? Math.min(x2 - 2, 22) : (c.side === "right" ? Math.max(x2 + 2, 78) : ((x1 + x2) / 2));
+      return "M" + x1 + " " + y1 + " L" + mid + " " + y1 + " L" + x2 + " " + y2;
+    }
+
+    function syncWindCalloutLeaders() {
+      if (modelKind(state.mat) !== "wind") return;
+      var layer = document.getElementById("calloutLayer");
+      if (!layer) return;
+      if (scene3d.rotor && scene3d.rotor.updateMatrixWorld) scene3d.rotor.updateMatrixWorld(true);
+      else if (scene3d.scene && scene3d.scene.updateMatrixWorld) scene3d.scene.updateMatrixWorld(true);
+      var list = getCallouts();
+      var svg = layer.querySelector("svg");
+      if (!svg) return;
+      var paths = svg.querySelectorAll("path");
+      var dots = svg.querySelectorAll("circle");
+      for (var i = 0; i < list.length; i++) {
+        var c = list[i];
+        var p = projectPartAnchor(c.id);
+        var tx = p ? p.tx : c.tx;
+        var ty = p ? p.ty : c.ty;
+        c._tx = tx;
+        c._ty = ty;
+        if (paths[i]) paths[i].setAttribute("d", buildCalloutLeaderPath(c, tx, ty));
+        if (dots[i]) {
+          dots[i].setAttribute("cx", String(tx * 100));
+          dots[i].setAttribute("cy", String(ty * 100));
+        }
+      }
+    }
+
     function renderCallouts() {
       var kind = modelKind(state.mat);
       var stageLayer = document.getElementById("calloutLayer");
       var windLayer = document.getElementById("windCalloutLayer");
-      /* 风机与光伏一样挂舞台层；旧剖视层清空 */
       var layer = stageLayer;
       if (!layer) return;
       var list = getCallouts();
@@ -1602,32 +1679,21 @@
       layer.style.opacity = "1";
       layer.style.pointerEvents = "auto";
 
-      /* 切风机/光伏/储能时重建引线；同页签只刷新选中态 */
+      /* 同页签只刷新选中态；风机仍同步 3D 锚点 */
       if (layer.getAttribute("data-kind") === kind && layer.getAttribute("data-built") === "1") {
         layer.querySelectorAll(".callout").forEach(function (el) {
           el.classList.toggle("on", el.getAttribute("data-part") === state.partId);
         });
+        if (kind === "wind") syncWindCalloutLeaders();
         return;
       }
 
-      /* 水平引线为主（同高对齐），少量折线；整齐不交叉 */
       var lines = list.map(function (c) {
-        var x1 = c.x * 100;
-        var y1 = c.y * 100;
-        var x2 = c.tx * 100;
-        var y2 = c.ty * 100;
-        if (c.side === "left") x1 = (c.x + 0.108) * 100;
-        if (c.side === "right") x1 = (c.x - 0.108) * 100;
-        var d;
-        if (Math.abs(c.y - c.ty) < 0.04) {
-          d = "M" + x1 + " " + y1 + " L" + x2 + " " + y1;
-          y2 = y1;
-        } else {
-          var mid = c.side === "left" ? 20 : (c.side === "right" ? 80 : ((x1 + x2) / 2));
-          d = "M" + x1 + " " + y1 + " L" + mid + " " + y1 + " L" + x2 + " " + y2;
-        }
-        return '<path d="' + d + '" fill="none" stroke="#69b1ff" stroke-width="0.32" />' +
-          '<circle cx="' + x2 + '" cy="' + y2 + '" r="0.65" fill="#1677ff" />';
+        var p = kind === "wind" ? projectPartAnchor(c.id) : null;
+        var tx = p ? p.tx : c.tx;
+        var ty = p ? p.ty : c.ty;
+        return '<path d="' + buildCalloutLeaderPath(c, tx, ty) + '" fill="none" stroke="#69b1ff" stroke-width="0.32" />' +
+          '<circle cx="' + (tx * 100) + '" cy="' + (ty * 100) + '" r="0.65" fill="#1677ff" />';
       }).join("");
       var boxes = list.map(function (c) {
         var sideCls = c.side === "left" ? " side-left" : (c.side === "right" ? " side-right" : "");
@@ -1650,6 +1716,7 @@
           requestAnimationFrame(function () { paintScene(); });
         };
       });
+      if (kind === "wind") syncWindCalloutLeaders();
     }
 
     function disposeObject3D(obj) {
@@ -1899,26 +1966,33 @@
     function startAnimLoop() {
       if (scene3d.animId) return;
       var myGen = sceneGen;
-      function animate() {
+      var lastTs = 0;
+      function animate(ts) {
         if (myGen !== sceneGen || !scene3d.renderer || !scene3d.scene || !scene3d.camera) {
           scene3d.animId = null;
           return;
         }
         scene3d.animId = requestAnimationFrame(animate);
         try {
+          var now = typeof ts === "number" ? ts : performance.now();
+          var dt = lastTs ? Math.min(0.05, (now - lastTs) / 1000) : 0.016;
+          lastTs = now;
           if (scene3d.kind === "wind" && scene3d.rotor) {
+            /* 顺时针缓慢旋转（约 40 秒/圈），按时间步进避免鬼畜跳变 */
+            var speed = 0.16; /* rad/s */
             if (scene3d.rotor.userData && scene3d.rotor.userData.spinAxis === "z") {
-              scene3d.rotor.rotation.z += 0.01;
+              scene3d.rotor.rotation.z -= speed * dt;
             } else {
-              scene3d.rotor.rotation.x += 0.012;
+              scene3d.rotor.rotation.x -= speed * dt;
             }
+            syncWindCalloutLeaders();
           }
           scene3d.renderer.render(scene3d.scene, scene3d.camera);
         } catch (eAnim) {
-          scene3d.animId = null;
+          /* 单帧异常不拆掉循环，避免闪退 */
         }
       }
-      animate();
+      animate(performance.now());
     }
 
     function restartAnimLoop() {
@@ -2090,6 +2164,8 @@
         wrap.rotation.x = (bi * Math.PI * 2) / 3;
         wrap.add(blade);
         blade.userData.partId = "blade";
+        /* 标注锚点取叶片中段，投影点落在叶片实体上 */
+        blade.userData.anchorLocal = new THREE.Vector3(0, 0.15, 0);
         rotor.add(wrap);
         if (bi === 0) meshes.push(blade);
       }
