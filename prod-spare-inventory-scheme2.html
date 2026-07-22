@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN" data-build="20260722-tab3d-v47">
+<html lang="zh-CN" data-build="20260722-tab3d-v48">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -427,9 +427,10 @@
       gap: 6px;
     }
     .rt-summary {
-      background: #f7f8fa;
-      border-radius: 6px;
-      padding: 6px 8px 8px;
+      background: linear-gradient(165deg, #f5f9ff 0%, #f8fafc 48%, #f3f6fb 100%);
+      border: 1px solid #e8eef8;
+      border-radius: 8px;
+      padding: 8px 8px 8px;
       height: 100%;
       display: flex;
       flex-direction: column;
@@ -441,18 +442,23 @@
       display: flex;
       align-items: flex-end;
       justify-content: center;
-      gap: 24px;
-      padding: 14px 4px 6px;
+      gap: 28px;
+      padding: 16px 6px 10px;
       flex: 0 0 auto;
+      background: rgba(255, 255, 255, 0.72);
+      border-radius: 6px;
+      border: 1px solid rgba(22, 119, 255, 0.08);
+      box-shadow: 0 1px 0 rgba(255, 255, 255, 0.9) inset;
     }
     .rt-summary .rt-title {
       position: absolute;
       left: 50%;
-      top: 0;
+      top: 5px;
       transform: translateX(-50%);
-      font-size: 12px;
-      color: #334155;
+      font-size: 11px;
+      color: #64748b;
       font-weight: 600;
+      letter-spacing: 0.02em;
       line-height: 1.2;
       white-space: nowrap;
       z-index: 1;
@@ -463,46 +469,75 @@
     .rt-summary .rt-vals > div {
       display: inline-flex;
       align-items: baseline;
-      gap: 2px;
+      gap: 3px;
     }
     .rt-summary .rt-vals b {
-      font-size: 18px;
+      font-size: 20px;
       color: #1f2d3d;
       font-weight: 700;
       line-height: 1;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: -0.02em;
     }
     .rt-summary .rt-vals > div:first-child b { color: #1677ff; }
-    .rt-summary .rt-vals span { font-size: 11px; color: #64748b; margin-left: 2px; }
+    .rt-summary .rt-vals span {
+      font-size: 11px;
+      color: #94a3b8;
+      margin-left: 1px;
+      font-weight: 500;
+    }
     .rt-flow {
       flex: 1;
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 0;
-      border-top: 1px solid #e8edf4;
+      gap: 6px;
       padding-top: 6px;
       min-height: 0;
+      border-top: 0;
     }
-    .rt-flow-col { padding: 0 8px; }
-    .rt-flow-col + .rt-flow-col { border-left: 1px solid #e8edf4; }
+    .rt-flow-col {
+      padding: 6px 8px 7px;
+      border-radius: 6px;
+      background: #fff;
+      border: 1px solid #eef2f7;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      min-height: 0;
+    }
+    .rt-flow-col + .rt-flow-col { border-left: 1px solid #eef2f7; }
+    .rt-flow-col.out {
+      border-top: 2px solid #1677ff;
+    }
+    .rt-flow-col.in {
+      border-top: 2px solid #52c41a;
+    }
     .rt-flow-col .t {
       text-align: center;
       font-size: 11px;
       color: #334155;
-      font-weight: 600;
-      margin-bottom: 4px;
+      font-weight: 700;
+      margin-bottom: 5px;
     }
+    .rt-flow-col.out .t { color: #1677ff; }
+    .rt-flow-col.in .t { color: #389e0d; }
     .rt-flow-col .r {
       display: flex;
       justify-content: space-between;
+      align-items: center;
       font-size: 11px;
-      color: #64748b;
-      margin-top: 3px;
+      color: #94a3b8;
+      margin-top: 4px;
       line-height: 1.3;
+      padding: 3px 6px;
+      border-radius: 4px;
+      background: #f8fafc;
     }
     .rt-flow-col .r em {
       font-style: normal;
       color: #1f2d3d;
-      font-weight: 600;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
     }
     .chart-box { min-height: 0; height: 100%; display: flex; flex-direction: column; }
     .chart-box .chart-title {
@@ -726,17 +761,15 @@
                         </div>
                       </div>
                       <div class="rt-flow">
-                        <div class="rt-flow-col">
+                        <div class="rt-flow-col out">
                           <div class="t">出库动态</div>
                           <div class="r"><span>数量</span><em>14200 件</em></div>
                           <div class="r"><span>金额</span><em>14200 万元</em></div>
-                          <div class="r"><span>占比</span><em>50%</em></div>
                         </div>
-                        <div class="rt-flow-col">
+                        <div class="rt-flow-col in">
                           <div class="t">入库动态</div>
                           <div class="r"><span>数量</span><em>14200 件</em></div>
                           <div class="r"><span>金额</span><em>14200 万元</em></div>
-                          <div class="r"><span>占比</span><em>45%</em></div>
                         </div>
                       </div>
                     </div>
@@ -1712,13 +1745,11 @@
         var ems = flows[0].querySelectorAll("em");
         if (ems[0]) ems[0].textContent = d.outQty;
         if (ems[1]) ems[1].textContent = d.outAmt;
-        if (ems[2]) ems[2].textContent = d.outPct;
       }
       if (flows[1]) {
         var ems2 = flows[1].querySelectorAll("em");
         if (ems2[0]) ems2[0].textContent = d.inQty;
         if (ems2[1]) ems2[1].textContent = d.inAmt;
-        if (ems2[2]) ems2[2].textContent = d.inPct;
       }
       var cells = pane.querySelectorAll(".idle-cell");
       for (var i = 0; i < cells.length && i < d.idle.length; i++) {
@@ -1927,7 +1958,7 @@
     function jumpInventoryPage(file, action, label) {
       var href = file;
       if (href && href.indexOf("v=") < 0) {
-        href += (href.indexOf("?") >= 0 ? "&" : "?") + "v=20260722-tab3d-v47";
+        href += (href.indexOf("?") >= 0 ? "&" : "?") + "v=20260722-tab3d-v48";
       }
       if (action && typeof navigateBySidebarAction === "function" && navigateBySidebarAction(action, { label: label || "" })) {
         return true;
