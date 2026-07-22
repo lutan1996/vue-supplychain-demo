@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN" data-build="20260722-scheme-dd-v20">
+<html lang="zh-CN" data-build="20260722-rt-stock-v21">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -303,29 +303,47 @@
     .rt-summary {
       background: #f7f8fa;
       border-radius: 6px;
-      padding: 10px 12px 12px;
+      padding: 12px 12px 14px;
       height: 100%;
       display: flex;
       flex-direction: column;
+      min-height: 0;
+    }
+    .rt-head {
+      position: relative;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      gap: 32px;
+      padding: 20px 8px 14px;
     }
     .rt-summary .rt-title {
-      text-align: center;
+      position: absolute;
+      left: 50%;
+      top: 0;
+      transform: translateX(-50%);
       font-size: 13px;
       color: #334155;
       font-weight: 600;
-      margin-bottom: 8px;
+      line-height: 1.2;
+      white-space: nowrap;
+      z-index: 1;
     }
     .rt-summary .rt-vals {
-      display: flex;
-      justify-content: center;
-      gap: 28px;
-      margin-bottom: 12px;
+      display: contents;
+    }
+    .rt-summary .rt-vals > div {
+      display: inline-flex;
+      align-items: baseline;
+      gap: 2px;
     }
     .rt-summary .rt-vals b {
-      font-size: 20px;
+      font-size: 22px;
       color: #1f2d3d;
       font-weight: 700;
+      line-height: 1;
     }
+    .rt-summary .rt-vals > div:first-child b { color: #1677ff; }
     .rt-summary .rt-vals span { font-size: 12px; color: #64748b; margin-left: 2px; }
     .rt-flow {
       flex: 1;
@@ -334,8 +352,9 @@
       gap: 0;
       border-top: 1px solid #e8edf4;
       padding-top: 10px;
+      min-height: 0;
     }
-    .rt-flow-col { padding: 0 10px; }
+    .rt-flow-col { padding: 0 12px; }
     .rt-flow-col + .rt-flow-col { border-left: 1px solid #e8edf4; }
     .rt-flow-col .t {
       text-align: center;
@@ -526,10 +545,12 @@
                 <h3>实时物资动态</h3>
                 <div class="dash-split">
                   <div class="rt-summary">
-                    <div class="rt-title">当前库存</div>
-                    <div class="rt-vals">
-                      <div><b>14200</b><span>件</span></div>
-                      <div><b>40000</b><span>万元</span></div>
+                    <div class="rt-head">
+                      <div class="rt-title">当前库存</div>
+                      <div class="rt-vals">
+                        <div><b>14200</b><span>件</span></div>
+                        <div><b>40000</b><span>万元</span></div>
+                      </div>
                     </div>
                     <div class="rt-flow">
                       <div class="rt-flow-col">
