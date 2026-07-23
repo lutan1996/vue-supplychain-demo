@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN" data-build="20260723-wh-short-v131">
+<html lang="zh-CN" data-build="20260723-wh-short-v132">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -287,8 +287,8 @@
       overflow-y: auto; /* 首屏约 6 卡；下滑看后 3 卡 */
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
-      /* 行高略低于半屏，卡片变矮 */
-      grid-auto-rows: calc((100% - 6px) / 2.35);
+      /* 再矮一档，首屏仍约 6 卡 */
+      grid-auto-rows: calc((100% - 6px) / 2.65);
       gap: 6px;
       align-content: start;
       padding-bottom: 0;
@@ -297,7 +297,7 @@
       background: #fff;
       border: 1px solid #e5e7eb;
       border-radius: 6px;
-      padding: 4px 8px 4px;
+      padding: 3px 7px 3px;
       min-width: 0;
       min-height: 0;
       height: 100%;
@@ -321,55 +321,58 @@
     }
     .wh-card-hd h3 {
       margin: 0;
-      font-size: 13px;
+      font-size: 12px;
       font-weight: 700;
       color: #1f2937;
-      line-height: 1.2;
+      line-height: 1.15;
     }
     .wh-card-status {
-      font-size: 11px;
+      font-size: 10px;
       color: #6b7280;
-      line-height: 1.2;
+      line-height: 1.15;
     }
     .wh-card-status b { color: #6b7280; font-weight: 400; }
     .wh-card-meta {
-      font-size: 11px;
+      font-size: 10px;
       color: var(--m);
       display: flex;
-      flex-wrap: wrap;
+      flex-wrap: nowrap;
       align-items: center;
-      gap: 4px;
+      gap: 3px;
       flex: 0 0 auto;
+      overflow: hidden;
     }
     .wh-card-meta .org {
       color: #6b7280;
-      line-height: 16px;
-      font-size: 11px;
+      line-height: 15px;
+      font-size: 10px;
+      flex: 0 0 auto;
     }
     .wh-card-meta .wh-tag {
       display: inline-flex;
       align-items: center;
-      height: 16px;
-      padding: 0 5px;
+      height: 15px;
+      padding: 0 4px;
       border: 1px solid #d1d5db;
       border-radius: 3px;
       background: #f3f4f6;
       color: #6b7280;
-      font-size: 10px;
+      font-size: 9px;
       line-height: 1;
       white-space: nowrap;
+      flex: 0 0 auto;
     }
     .wh-slot {
       display: grid;
       grid-template-columns: auto minmax(0, 1fr) auto;
       align-items: center;
-      gap: 6px;
-      font-size: 11px;
+      gap: 5px;
+      font-size: 10px;
       color: #4b5563;
       flex: 0 0 auto;
     }
     .wh-slot-track {
-      height: 7px;
+      height: 6px;
       border-radius: 999px;
       background: #f3f4f6;
       border: 1px solid #e5e7eb;
@@ -388,24 +391,23 @@
       min-width: 2em;
       text-align: right;
     }
-    /* 恢复原 6 卡占比：环上图例下 + 右侧条形填满卡片 */
+    /* 矮卡：环图与图例并排，避免竖叠裁切/重叠 */
     .wh-split {
       display: grid;
-      grid-template-columns: minmax(112px, 0.88fr) minmax(0, 1.28fr);
+      grid-template-columns: minmax(118px, 0.92fr) minmax(0, 1.22fr);
       gap: 0 8px;
       min-height: 0;
       flex: 1 1 auto;
       align-items: stretch;
       border-top: 1px solid #eef2f7;
-      padding-top: 4px;
+      padding-top: 3px;
       overflow: hidden;
     }
     .wh-split-l {
-      display: flex;
-      flex-direction: column;
-      align-items: stretch;
-      justify-content: center;
-      gap: 4px;
+      display: grid;
+      grid-template-columns: 54px minmax(0, 1fr);
+      align-items: center;
+      gap: 2px 5px;
       min-width: 0;
       min-height: 0;
       padding-right: 8px;
@@ -415,19 +417,18 @@
     .wh-split-r {
       display: flex;
       flex-direction: column;
-      gap: 2px;
+      gap: 1px;
       min-width: 0;
       min-height: 0;
       overflow: hidden;
     }
     .wh-ring-el {
-      width: 66px;
-      height: 66px;
-      min-width: 66px;
-      min-height: 66px;
-      margin: 0 auto;
+      width: 54px;
+      height: 54px;
+      min-width: 54px;
+      min-height: 54px;
+      margin: 0;
       overflow: hidden;
-      flex: 0 0 auto;
     }
     .wh-ring-legend {
       margin: 0;
@@ -435,23 +436,23 @@
       list-style: none;
       display: flex;
       flex-direction: column;
-      gap: 2px;
+      justify-content: center;
+      gap: 1px;
       min-width: 0;
-      flex: 0 0 auto;
     }
     .wh-ring-legend li {
       display: grid;
-      grid-template-columns: 6px minmax(0, 1fr) auto;
+      grid-template-columns: 5px minmax(0, 1fr) auto;
       align-items: center;
-      gap: 4px;
-      font-size: 10px;
-      line-height: 1.2;
+      gap: 3px;
+      font-size: 9px;
+      line-height: 1.15;
       color: #4b5563;
       min-width: 0;
     }
     .wh-ring-legend i {
-      width: 6px;
-      height: 6px;
+      width: 5px;
+      height: 5px;
       border-radius: 50%;
       flex: 0 0 auto;
     }
@@ -586,7 +587,7 @@
   <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.1/dist/echarts.min.js"></script>
   <script src="js/sidebar-actions.js"></script>
   <script src="js/site-footer.js"></script>
-  <script src="js/subpage-clock.js?v=20260723-wh-short-v131"></script>
+  <script src="js/subpage-clock.js?v=20260723-wh-short-v132"></script>
   <script>
     (function () {
       var ORG_DATA = [
@@ -871,7 +872,7 @@
           color: ["#1677ff", "#cf1322", "#faad14"],
           tooltip: { trigger: "axis", confine: true, textStyle: { fontSize: 11 }, axisPointer: { type: "shadow" } },
           legend: { show: false },
-          grid: { left: 50, right: 24, top: 1, bottom: 4, containLabel: false },
+          grid: { left: 48, right: 22, top: 1, bottom: 2, containLabel: false },
           xAxis: {
             type: "value",
             show: false,
@@ -886,7 +887,7 @@
               fontSize: 9,
               color: "#6b7280",
               margin: 4,
-              width: 46,
+              width: 44,
               overflow: "none",
               interval: 0
             }
@@ -896,22 +897,22 @@
               name: "库存金额",
               type: "bar",
               stack: "amt",
-              barWidth: 6,
-              barCategoryGap: "38%",
+              barWidth: 5,
+              barCategoryGap: "42%",
               data: data.stock.slice().reverse()
             },
             {
               name: "报废金额",
               type: "bar",
               stack: "amt",
-              barWidth: 6,
+              barWidth: 5,
               data: data.scrap.slice().reverse()
             },
             {
               name: "超60天以上呆滞金额",
               type: "bar",
               stack: "amt",
-              barWidth: 6,
+              barWidth: 5,
               data: data.idle.slice().reverse(),
               label: {
                 show: true,
