@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN" data-build="20260723-storage-station-v101">
+<html lang="zh-CN" data-build="20260723-wh-card-jump-v102">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -299,6 +299,12 @@
       display: flex;
       flex-direction: column;
       gap: 6px;
+      cursor: pointer;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+    .wh-card:hover {
+      border-color: #91caff;
+      box-shadow: 0 2px 10px rgba(22, 119, 255, 0.12);
     }
     .wh-card-hd h3 {
       margin: 0;
@@ -431,7 +437,7 @@
   <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.1/dist/echarts.min.js"></script>
   <script src="js/sidebar-actions.js"></script>
   <script src="js/site-footer.js"></script>
-  <script src="js/subpage-clock.js?v=20260723-storage-station-v101"></script>
+  <script src="js/subpage-clock.js?v=20260723-wh-card-jump-v102"></script>
   <script>
     (function () {
       var ORG_DATA = [
@@ -780,6 +786,20 @@
         });
       }
 
+      function openStationDetail(org, station) {
+        var href =
+          "prod-spare-station-detail-0714.html?org=" +
+          encodeURIComponent(org) +
+          "&station=" +
+          encodeURIComponent(station);
+        try {
+          if (window.top && window.top !== window && typeof window.top.__demoOpenPage === "function") {
+            if (window.top.__demoOpenPage(href) === true) return;
+          }
+        } catch (eTop) {}
+        window.location.href = href;
+      }
+
       function renderAll() {
         renderOrg();
         renderKpi();
@@ -816,17 +836,20 @@
         state.station = station;
         renderOrg();
         if (!station || !state.company) return;
-        var href =
-          "prod-spare-station-detail-0714.html?org=" +
-          encodeURIComponent(state.company) +
-          "&station=" +
-          encodeURIComponent(station);
-        try {
-          if (window.top && window.top !== window && typeof window.top.__demoOpenPage === "function") {
-            if (window.top.__demoOpenPage(href) === true) return;
-          }
-        } catch (eTop) {}
-        window.location.href = href;
+        openStationDetail(state.company, station);
+      });
+
+      /* 点击任意仓库卡片整块 → 跳转仓库具体页（场站详情） */
+      document.getElementById("whCards").addEventListener("click", function (e) {
+        var card = e.target.closest(".wh-card");
+        if (!card) return;
+        var org = state.company || "上海龙源";
+        var station = state.station;
+        if (!station) {
+          var c = companyData(org);
+          station = (c && c.stations && c.stations[0]) || "崇明风电场";
+        }
+        openStationDetail(org, station);
       });
 
       document.getElementById("orgSearch").addEventListener("input", renderOrg);
