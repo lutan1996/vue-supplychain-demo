@@ -1693,13 +1693,15 @@
       if (!window.echarts) return;
 
       /* 图3 同心环表达：每圈一条进度弧 + 右侧图例 */
-      function ringOption(items, colors, trackColor) {
+      function ringOption(items, colors, trackColor, centerX) {
         var max = 0;
         var i;
         for (i = 0; i < items.length; i++) {
           if (items[i].value > max) max = items[i].value;
         }
         max = Math.max(max * 1.15, 1);
+        var cx = centerX != null ? centerX : "28%";
+        var legendLeft = (parseFloat(cx) + 20) + "%";
         var series = [];
         var legendData = [];
         for (i = 0; i < items.length; i++) {
@@ -1709,7 +1711,7 @@
           series.push({
             type: "pie",
             radius: [inner + "%", outer + "%"],
-            center: ["28%", "52%"],
+            center: [cx, "52%"],
             startAngle: 90,
             clockwise: true,
             silent: false,
@@ -1756,10 +1758,10 @@
           },
           legend: {
             orient: "vertical",
-            left: "48%",
-            right: 0,
+            left: legendLeft,
+            right: 2,
             top: "middle",
-            width: "50%",
+            width: "54%",
             itemWidth: 6,
             itemHeight: 6,
             itemGap: 4,
@@ -1769,7 +1771,7 @@
               fontSize: 8,
               color: "#475569",
               lineHeight: 11,
-              width: 78,
+              width: 92,
               overflow: "none",
               rich: {}
             },
@@ -1790,7 +1792,8 @@
           { name: "风电库区", value: 420 }
         ],
         ["#1d4ed8", "#22d3ee", "#f87171", "#fbbf24"],
-        "#e8edf4"
+        "#e8edf4",
+        "28%"
       ));
 
       var util = echarts.init(document.getElementById("chartUtil"));
@@ -1800,7 +1803,8 @@
           { name: "空闲库位", value: 820 }
         ],
         ["#1d4ed8", "#22d3ee"],
-        "#e8edf4"
+        "#e8edf4",
+        "22%"
       ));
 
       window.addEventListener("resize", function () {
