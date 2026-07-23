@@ -814,7 +814,15 @@
 
       function selectedOrgName() {
         if (state.level === "group" || !state.company) return "龙源电力";
-        return state.company;
+        var c = companyData(state.company);
+        return (c && c.name) || state.company;
+      }
+
+      /* 只改卡片上的公司名，立刻生效，不整卡重绘 */
+      function syncCardOrgName() {
+        var name = selectedOrgName();
+        var nodes = document.querySelectorAll("#whCards .org");
+        for (var i = 0; i < nodes.length; i++) nodes[i].textContent = name;
       }
 
       function renderCards() {
