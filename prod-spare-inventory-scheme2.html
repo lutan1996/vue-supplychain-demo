@@ -1063,8 +1063,8 @@
                     </div>
                     <div class="chart-box">
                       <div class="chart-legend" aria-hidden="true">
-                        <span><i style="background:#1677ff"></i>出库数量</span>
-                        <span><i style="background:#f5222d"></i>当前数量</span>
+                        <span><i style="background:#f5222d"></i>出库数量</span>
+                        <span><i style="background:#1677ff"></i>当前数量</span>
                         <span><i style="background:#52c41a"></i>入库数量</span>
                       </div>
                       <div class="chart-el" id="chartRealtime"></div>
@@ -2488,50 +2488,7 @@
       var c1 = ensureChart("chartRealtime");
       if (c1) {
         c1.setOption({
-          color: ["#1677ff", "#f5222d", "#52c41a"],
-          legend: { show: false },
-          tooltip: {
-            trigger: "axis",
-            confine: true,
-            backgroundColor: "rgba(255,255,255,0.96)",
-            borderColor: "#d9e2ec",
-            borderWidth: 1,
-            textStyle: { color: "#1f2d3d", fontSize: 12 },
-            formatter: function (params) {
-              var name = (params && params[0] && params[0].axisValue) || "仓库";
-              var html = '<div style="font-weight:700;margin-bottom:6px;color:#1677ff">实时物资动态图</div>';
-              html += '<div style="color:#64748b;margin-bottom:6px;font-size:11px">各仓库出库 / 当前库存 / 入库数量对比</div>';
-              html += '<div style="margin-bottom:4px">' + name + "</div>";
-              (params || []).forEach(function (p) {
-                html += '<div style="display:flex;justify-content:space-between;gap:16px;line-height:1.7">' +
-                  "<span>" + p.marker + p.seriesName + "</span><b>" + p.value + " 件</b></div>";
-              });
-              return html;
-            }
-          },
-          grid: { left: 42, right: 10, top: 28, bottom: 24 },
-          xAxis: {
-            type: "category",
-            data: whNames,
-            axisLabel: { fontSize: 10, color: "#64748b" },
-            axisTick: { show: false },
-            axisLine: { lineStyle: { color: "#e8edf4" } }
-          },
-          yAxis: {
-            type: "value",
-            name: "单位：件",
-            nameGap: 10,
-            nameTextStyle: { fontSize: 10, color: "#94a3b8", padding: [8, 0, 0, 8] },
-            min: 0,
-            max: d.rtMax,
-            interval: 5,
-            splitLine: { lineStyle: { color: "#eef2f7" } },
-            axisLabel: { fontSize: 10, color: "#94a3b8" }
-          },
-          series: [
-            { name: "出库数量", type: "bar", stack: "t", barWidth: 18, data: d.rtOut },
-            { name: "当前数量", type: "bar", stack: "t", data: d.rtCur },
-            { name: "入库数量", type: "bar", stack: "t", data: d.rtIn }
+          color: ["#f5222d", "#1677ff", "#52c41a"],
           ]
         }, true);
       }
