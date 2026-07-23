@@ -325,8 +325,9 @@
       grid-template-columns: 1fr 1fr;
       gap: 4px;
       min-height: 0;
+      overflow: visible;
     }
-    .wh-ring-box { min-width: 0; }
+    .wh-ring-box { min-width: 0; overflow: visible; }
     .wh-ring-box .ct {
       text-align: center;
       font-size: 11px;
@@ -334,7 +335,7 @@
       color: #334155;
       margin-bottom: 2px;
     }
-    .wh-ring-el { width: 100%; height: 96px; }
+    .wh-ring-el { width: 100%; height: 118px; overflow: visible; }
     .wh-bar-box .ct {
       font-size: 11px;
       font-weight: 600;
@@ -640,14 +641,15 @@
         max = Math.max(max * 1.15, 1);
         var series = [];
         var legend = [];
+        /* 环略放大，中心右移，避免左侧被裁切 */
         items.forEach(function (it, i) {
-          var outer = 68 - i * 14;
+          var outer = 72 - i * 14;
           var inner = outer - 10;
           legend.push(it.name + " " + it.value);
           series.push({
             type: "pie",
             radius: [inner + "%", outer + "%"],
-            center: ["26%", "52%"],
+            center: ["34%", "52%"],
             startAngle: 90,
             label: { show: false },
             labelLine: { show: false },
@@ -661,7 +663,7 @@
           tooltip: { trigger: "item", formatter: function (p) { return p && p.name ? p.name : ""; } },
           legend: {
             orient: "vertical",
-            left: "48%",
+            left: "56%",
             top: "middle",
             itemWidth: 6,
             itemHeight: 6,
