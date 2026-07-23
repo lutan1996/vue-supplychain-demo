@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN" data-build="20260723-pv-es-static-v95">
+<html lang="zh-CN" data-build="20260723-station-pane-v98">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -111,17 +111,17 @@
       flex: 1 1 auto;
       min-height: 0;
       display: grid;
-      /* 方案2原型：左组织树 + 右主区（上风机、下四宫格） */
+      /* 左组织树 |（可选）独立风电场竖框 | 右主区 */
       grid-template-columns: 220px minmax(0, 1fr);
       gap: 8px;
       padding: 6px 8px 8px;
       overflow: hidden;
     }
     .ly-home.has-station {
-      grid-template-columns: 360px minmax(0, 1fr);
+      grid-template-columns: 220px 152px minmax(0, 1fr);
     }
     .ly-home.has-station.station-collapsed {
-      grid-template-columns: 252px minmax(0, 1fr);
+      grid-template-columns: 220px 32px minmax(0, 1fr);
     }
 
     .ly-pane {
@@ -161,8 +161,8 @@
       overflow: hidden;
     }
 
-    /* 左侧：组织 + 风电场 */
-    .left-pane { display: grid; grid-template-rows: auto 1fr; }
+    /* 左侧：组织树（宽度固定，不因风电场变宽） */
+    .left-pane { display: grid; grid-template-rows: auto 1fr; min-width: 0; }
     .org-search {
       display: flex;
       align-items: center;
@@ -183,30 +183,26 @@
       color: #334155;
       background: transparent;
     }
-    .left-body {
-      flex: 1;
-      min-height: 0;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 0;
-      margin-top: 8px;
-      border-top: 1px solid var(--border);
-    }
-    .left-body.no-station { grid-template-columns: 1fr; }
-    .left-body.station-collapsed { grid-template-columns: 1fr 32px; }
-    .org-list, .station-list {
+    .org-list {
       overflow: auto;
       padding: 6px;
       min-height: 0;
+      margin-top: 8px;
+      border-top: 1px solid var(--border);
     }
-    .station-col {
-      display: flex;
-      flex-direction: column;
+
+    /* 独立风电场竖框（与组织树并列，非同框内加列） */
+    .station-pane {
+      display: none;
       min-width: 0;
       min-height: 0;
-      border-left: 1px solid var(--border);
-      background: #fafbfd;
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      overflow: hidden;
+      flex-direction: column;
     }
+    .ly-home.has-station > .station-pane { display: flex; }
     .station-col-head {
       flex: 0 0 auto;
       display: flex;
@@ -215,7 +211,7 @@
       height: 28px;
       padding: 0 4px;
       border-bottom: 1px solid var(--border);
-      background: #fff;
+      background: #fafbfd;
     }
     .station-toggle {
       width: 24px;
@@ -232,10 +228,15 @@
       justify-content: center;
     }
     .station-toggle:hover { background: #f0f7ff; color: var(--primary); }
-    .station-list { flex: 1 1 auto; }
-    .left-body.no-station .station-col { display: none; }
-    .left-body.station-collapsed .station-list { display: none; }
-    .left-body.station-collapsed .station-col-head {
+    .station-list {
+      flex: 1 1 auto;
+      overflow: auto;
+      padding: 6px;
+      min-height: 0;
+      background: #fafbfd;
+    }
+    .ly-home.has-station.station-collapsed .station-list { display: none; }
+    .ly-home.has-station.station-collapsed .station-col-head {
       border-bottom: 0;
       justify-content: center;
       height: 100%;
@@ -917,8 +918,8 @@
 
     @media (max-width: 1280px) {
       .ly-home { grid-template-columns: 180px minmax(0, 1fr); }
-      .ly-home.has-station { grid-template-columns: 320px minmax(0, 1fr); }
-      .ly-home.has-station.station-collapsed { grid-template-columns: 212px minmax(0, 1fr); }
+      .ly-home.has-station { grid-template-columns: 180px 136px minmax(0, 1fr); }
+      .ly-home.has-station.station-collapsed { grid-template-columns: 180px 32px minmax(0, 1fr); }
     }
   </style>
 </head>
@@ -965,21 +966,21 @@
           </div>
 
           <div class="ly-home" id="lyHome">
-            <!-- 左：组织树 + 风电场 -->
+            <!-- 左：组织树（固定宽度） -->
             <aside class="ly-pane left-pane">
               <div class="org-search">
                 <i class="fa-solid fa-magnifying-glass"></i>
                 <input id="orgSearch" type="search" placeholder="搜索组织 / 风电场" />
               </div>
-              <div class="left-body" id="leftBody">
-                <div class="org-list" id="orgList"></div>
-                <div class="station-col" id="stationCol">
-                  <div class="station-col-head">
-                    <button type="button" class="station-toggle" id="stationToggle" title="收起风电场" aria-expanded="true" aria-controls="stationList">◀</button>
-                  </div>
-                  <div class="station-list" id="stationList"></div>
-                </div>
+              <div class="org-list" id="orgList"></div>
+            </aside>
+
+            <!-- 独立风电场竖框（点公司后出现，右上角可折叠） -->
+            <aside class="station-pane" id="stationCol" aria-label="风电场列表">
+              <div class="station-col-head">
+                <button type="button" class="station-toggle" id="stationToggle" title="收起风电场" aria-expanded="true" aria-controls="stationList">◀</button>
               </div>
+              <div class="station-list" id="stationList"></div>
             </aside>
 
             <!-- 右主区：上风机，下四宫格（对齐生产管控原型） -->
@@ -1592,28 +1593,22 @@
       });
       document.getElementById("orgList").innerHTML = html;
 
-      var leftBody = document.getElementById("leftBody");
       var lyHome = document.getElementById("lyHome");
       var stationList = document.getElementById("stationList");
       var stationToggle = document.getElementById("stationToggle");
       var showStation = state.level !== "group";
       if (!showStation) {
-        leftBody.classList.add("no-station");
-        leftBody.classList.remove("station-collapsed");
         lyHome.classList.remove("has-station", "station-collapsed");
         stationList.innerHTML = "";
         return;
       }
-      leftBody.classList.remove("no-station");
       lyHome.classList.add("has-station");
       if (state.stationColOpen) {
-        leftBody.classList.remove("station-collapsed");
         lyHome.classList.remove("station-collapsed");
         stationToggle.textContent = "◀";
         stationToggle.title = "收起风电场";
         stationToggle.setAttribute("aria-expanded", "true");
       } else {
-        leftBody.classList.add("station-collapsed");
         lyHome.classList.add("station-collapsed");
         stationToggle.textContent = "▶";
         stationToggle.title = "展开风电场";
