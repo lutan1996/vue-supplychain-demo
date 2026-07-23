@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN" data-build="20260723-wh-fit-v123">
+<html lang="zh-CN" data-build="20260723-wh-fit-v124">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -287,10 +287,10 @@
       display: grid;
       /* 一页 6 个：3 列 × 2 行 */
       grid-template-columns: repeat(3, minmax(0, 1fr));
-      grid-auto-rows: minmax(0, auto);
-      gap: 6px;
+      grid-auto-rows: auto;
+      gap: 8px;
       align-content: start;
-      padding-bottom: 2px;
+      padding-bottom: 8px;
     }
     .wh-card {
       background: #fff;
@@ -480,7 +480,7 @@
       border-radius: 1px;
       flex: 0 0 auto;
     }
-    .wh-bar-el { width: 100%; height: 148px; min-height: 148px; flex: 0 0 auto; }
+    .wh-bar-el { width: 100%; height: 168px; min-height: 168px; flex: 0 0 auto; }
 
     @media (max-width: 1280px) {
       .ps-body { grid-template-columns: 180px minmax(0, 1fr); }
@@ -572,7 +572,7 @@
   <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.1/dist/echarts.min.js"></script>
   <script src="js/sidebar-actions.js"></script>
   <script src="js/site-footer.js"></script>
-  <script src="js/subpage-clock.js?v=20260723-wh-fit-v123"></script>
+  <script src="js/subpage-clock.js?v=20260723-wh-fit-v124"></script>
   <script>
     (function () {
       var ORG_DATA = [
@@ -821,7 +821,7 @@
           color: ["#1677ff", "#cf1322", "#faad14"],
           tooltip: { trigger: "axis", confine: true, textStyle: { fontSize: 11 }, axisPointer: { type: "shadow" } },
           legend: { show: false },
-          grid: { left: 56, right: 28, top: 4, bottom: 8, containLabel: false },
+          grid: { left: 56, right: 28, top: 2, bottom: 12, containLabel: false },
           xAxis: {
             type: "value",
             show: false,
