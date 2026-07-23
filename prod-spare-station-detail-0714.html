@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN" data-build="20260723-rack-labels-v100">
+<html lang="zh-CN" data-build="20260723-station-ring-fit-v112">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -417,22 +417,23 @@
       flex: 0 0 auto;
       border-top: 1px solid #eef2f7;
       border-bottom: 1px solid #eef2f7;
-      padding: 2px 0;
-      overflow: visible;
+      padding: 2px 0 4px;
+      overflow: hidden;
     }
     .wh-chart-box {
       min-width: 0;
       display: flex;
       flex-direction: column;
       align-items: stretch;
-      padding: 0 4px;
-      overflow: visible;
+      padding: 2px 4px 4px;
+      overflow: hidden;
+      gap: 2px;
     }
     .wh-chart-box + .wh-chart-box {
       border-left: 1px solid #eef2f7;
     }
     .wh-chart-box .ct {
-      font-size: 10px;
+      font-size: 9px;
       color: #334155;
       font-weight: 600;
       margin-bottom: 0;
@@ -441,18 +442,53 @@
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-      line-height: 1.3;
+      line-height: 1.2;
       padding: 0 2px;
+    }
+    .wh-chart-row {
+      display: grid;
+      grid-template-columns: minmax(64px, 0.8fr) minmax(84px, 1.2fr);
+      gap: 2px 4px;
+      align-items: center;
+      min-height: 0;
     }
     .wh-chart-el {
       width: 100%;
-      height: 92px;
-      min-height: 92px;
-      overflow: visible;
+      height: 78px;
+      min-height: 78px;
+      overflow: hidden;
       position: relative;
       z-index: 1;
     }
-    .wh-chart-el:hover { z-index: 5; }
+    .wh-chart-legend {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 2px;
+      min-width: 0;
+    }
+    .wh-chart-legend li {
+      display: flex;
+      align-items: center;
+      gap: 3px;
+      font-size: 9px;
+      line-height: 1.2;
+      color: #475569;
+      min-width: 0;
+    }
+    .wh-chart-legend i {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      flex: 0 0 auto;
+    }
+    .wh-chart-legend em {
+      font-style: normal;
+      white-space: nowrap;
+    }
     /* 图5 摄像头区放大，占满剩余高度 */
     .wh-cam {
       flex: 1.55 1 0;
@@ -1344,11 +1380,17 @@
                 <div class="wh-charts">
                   <div class="wh-chart-box">
                     <div class="ct">全仓库区分布</div>
-                    <div class="wh-chart-el" id="chartDist"></div>
+                    <div class="wh-chart-row">
+                      <div class="wh-chart-el" id="chartDist"></div>
+                      <ul class="wh-chart-legend" id="chartDistLegend"></ul>
+                    </div>
                   </div>
                   <div class="wh-chart-box">
                     <div class="ct">库存利用率</div>
-                    <div class="wh-chart-el" id="chartUtil"></div>
+                    <div class="wh-chart-row">
+                      <div class="wh-chart-el" id="chartUtil"></div>
+                      <ul class="wh-chart-legend" id="chartUtilLegend"></ul>
+                    </div>
                   </div>
                 </div>
                 <div class="wh-cam">监控摄像头画面</div>
@@ -1692,29 +1734,38 @@
     function initCharts() {
       if (!window.echarts) return;
 
-      /* 图3 同心环表达：每圈一条进度弧 + 右侧图例 */
-      function ringOption(items, colors, trackColor, centerX) {
+      function fillLegend(elId, items, colors) {
+        var el = document.getElementById(elId);
+        if (!el) return;
+        el.innerHTML = items.map(function (it, i) {
+          return (
+            "<li><i style=\"background:" + colors[i % colors.length] + "\"></i>" +
+            "<em>" + it.name + " " + it.value + "</em></li>"
+          );
+        }).join("");
+      }
+
+      /* 冰状图缩小居中；图例用 HTML，100% 缩放不裁切 */
+      function ringOption(items, colors, trackColor) {
         var max = 0;
         var i;
         for (i = 0; i < items.length; i++) {
           if (items[i].value > max) max = items[i].value;
         }
         max = Math.max(max * 1.15, 1);
-        var cx = centerX != null ? centerX : "28%";
-        var legendLeft = (parseFloat(cx) + 20) + "%";
         var series = [];
-        var legendData = [];
+        var n = items.length;
+        var step = n > 2 ? 10 : 12;
+        var outer0 = n > 2 ? 56 : 60;
         for (i = 0; i < items.length; i++) {
-          var outer = 66 - i * 13;
-          var inner = outer - 9;
-          legendData.push(items[i].name + " " + items[i].value);
+          var outer = outer0 - i * step;
+          var inner = Math.max(outer - 7, 10);
           series.push({
             type: "pie",
             radius: [inner + "%", outer + "%"],
-            center: [cx, "52%"],
+            center: ["50%", "50%"],
             startAngle: 90,
             clockwise: true,
-            silent: false,
             label: { show: false },
             labelLine: { show: false },
             data: [
@@ -1734,78 +1785,41 @@
           });
         }
         return {
-          animationDuration: 600,
-          grid: { left: 4, right: 4, top: 4, bottom: 4 },
+          animation: false,
           tooltip: {
             trigger: "item",
             appendToBody: true,
-            confine: false,
-            enterable: false,
-            position: function (pos, params, dom, rect, size) {
-              var x = pos[0] - size.contentSize[0] / 2;
-              if (x < 8) x = 8;
-              if (x + size.contentSize[0] > size.viewSize[0] - 8) {
-                x = size.viewSize[0] - size.contentSize[0] - 8;
-              }
-              return [x, 6];
-            },
-            extraCssText: "z-index:3000;white-space:nowrap;max-width:none;padding:6px 10px;",
-            textStyle: { fontSize: 12, color: "#1f2d3d" },
+            confine: true,
+            textStyle: { fontSize: 11, color: "#1f2d3d" },
             formatter: function (p) {
               if (!p || !p.name) return "";
               return (p.marker || "") + " " + p.name;
             }
           },
-          legend: {
-            orient: "vertical",
-            left: legendLeft,
-            right: 2,
-            top: "middle",
-            width: "54%",
-            itemWidth: 6,
-            itemHeight: 6,
-            itemGap: 4,
-            icon: "circle",
-            data: legendData,
-            textStyle: {
-              fontSize: 8,
-              color: "#475569",
-              lineHeight: 11,
-              width: 92,
-              overflow: "none",
-              rich: {}
-            },
-            formatter: function (name) {
-              return name;
-            }
-          },
+          legend: { show: false },
           series: series
         };
       }
 
+      var distItems = [
+        { name: "风电库区", value: 1895 },
+        { name: "风电库区", value: 980 },
+        { name: "风电库区", value: 520 },
+        { name: "风电库区", value: 420 }
+      ];
+      var distColors = ["#1d4ed8", "#22d3ee", "#f87171", "#fbbf24"];
+      fillLegend("chartDistLegend", distItems, distColors);
       var dist = echarts.init(document.getElementById("chartDist"));
-      dist.setOption(ringOption(
-        [
-          { name: "风电库区", value: 1895 },
-          { name: "风电库区", value: 980 },
-          { name: "风电库区", value: 520 },
-          { name: "风电库区", value: 420 }
-        ],
-        ["#1d4ed8", "#22d3ee", "#f87171", "#fbbf24"],
-        "#e8edf4",
-        "28%"
-      ));
+      dist.setOption(ringOption(distItems, distColors, "#e8edf4"));
 
+      var utilItems = [
+        { name: "已占用库位", value: 11 },
+        { name: "空闲库位", value: 820 }
+      ];
+      var utilColors = ["#1d4ed8", "#22d3ee"];
+      fillLegend("chartUtilLegend", utilItems, utilColors);
       var util = echarts.init(document.getElementById("chartUtil"));
-      util.setOption(ringOption(
-        [
-          { name: "已占用库位", value: 1895 },
-          { name: "空闲库位", value: 820 }
-        ],
-        ["#1d4ed8", "#22d3ee"],
-        "#e8edf4",
-        "22%"
-      ));
+      util.setOption(ringOption(utilItems, utilColors, "#e8edf4"));
 
       window.addEventListener("resize", function () {
         dist.resize();
