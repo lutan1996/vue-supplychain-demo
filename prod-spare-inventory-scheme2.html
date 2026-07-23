@@ -117,6 +117,12 @@
       padding: 6px 8px 8px;
       overflow: hidden;
     }
+    .ly-home.has-station {
+      grid-template-columns: 360px minmax(0, 1fr);
+    }
+    .ly-home.has-station.station-collapsed {
+      grid-template-columns: 252px minmax(0, 1fr);
+    }
 
     .ly-pane {
       min-height: 0;
@@ -187,16 +193,54 @@
       border-top: 1px solid var(--border);
     }
     .left-body.no-station { grid-template-columns: 1fr; }
+    .left-body.station-collapsed { grid-template-columns: 1fr 32px; }
     .org-list, .station-list {
       overflow: auto;
       padding: 6px;
       min-height: 0;
     }
-    .station-list {
+    .station-col {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      min-height: 0;
       border-left: 1px solid var(--border);
       background: #fafbfd;
     }
-    .left-body.no-station .station-list { display: none; }
+    .station-col-head {
+      flex: 0 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      height: 28px;
+      padding: 0 4px;
+      border-bottom: 1px solid var(--border);
+      background: #fff;
+    }
+    .station-toggle {
+      width: 24px;
+      height: 24px;
+      border: 0;
+      border-radius: 4px;
+      background: transparent;
+      color: #64748b;
+      cursor: pointer;
+      font-size: 12px;
+      line-height: 1;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .station-toggle:hover { background: #f0f7ff; color: var(--primary); }
+    .station-list { flex: 1 1 auto; }
+    .left-body.no-station .station-col { display: none; }
+    .left-body.station-collapsed .station-list { display: none; }
+    .left-body.station-collapsed .station-col-head {
+      border-bottom: 0;
+      justify-content: center;
+      height: 100%;
+      padding: 6px 0;
+    }
     .tree-item, .station-item {
       padding: 8px 10px;
       border-radius: 4px;
@@ -765,6 +809,8 @@
 
     @media (max-width: 1280px) {
       .ly-home { grid-template-columns: 180px minmax(0, 1fr); }
+      .ly-home.has-station { grid-template-columns: 320px minmax(0, 1fr); }
+      .ly-home.has-station.station-collapsed { grid-template-columns: 212px minmax(0, 1fr); }
     }
   </style>
 </head>
@@ -819,7 +865,12 @@
               </div>
               <div class="left-body" id="leftBody">
                 <div class="org-list" id="orgList"></div>
-                <div class="station-list" id="stationList"></div>
+                <div class="station-col" id="stationCol">
+                  <div class="station-col-head">
+                    <button type="button" class="station-toggle" id="stationToggle" title="收起风电场" aria-expanded="true" aria-controls="stationList">◀</button>
+                  </div>
+                  <div class="station-list" id="stationList"></div>
+                </div>
               </div>
             </aside>
 
@@ -1535,6 +1586,7 @@
     var state = {
       level: "company",
       company: "上海龙源",
+      stationColOpen: true,
       station: "",
       mat: "全部",
       partId: ""
@@ -1564,13 +1616,32 @@
       document.getElementById("orgList").innerHTML = html;
 
       var leftBody = document.getElementById("leftBody");
+      var lyHome = document.getElementById("lyHome");
       var stationList = document.getElementById("stationList");
-      if (state.level === "group") {
+      var stationToggle = document.getElementById("stationToggle");
+      var showStation = state.level !== "group";
+      if (!showStation) {
         leftBody.classList.add("no-station");
+        leftBody.classList.remove("station-collapsed");
+        lyHome.classList.remove("has-station", "station-collapsed");
         stationList.innerHTML = "";
         return;
       }
       leftBody.classList.remove("no-station");
+      lyHome.classList.add("has-station");
+      if (state.stationColOpen) {
+        leftBody.classList.remove("station-collapsed");
+        lyHome.classList.remove("station-collapsed");
+        stationToggle.textContent = "◀";
+        stationToggle.title = "收起风电场";
+        stationToggle.setAttribute("aria-expanded", "true");
+      } else {
+        leftBody.classList.add("station-collapsed");
+        lyHome.classList.add("station-collapsed");
+        stationToggle.textContent = "▶";
+        stationToggle.title = "展开风电场";
+        stationToggle.setAttribute("aria-expanded", "false");
+      }
       var c = companyData(state.company);
       stationList.innerHTML = (c ? c.stations : []).map(function (s) {
         if (kw && s.indexOf(kw) < 0 && (!c || c.name.indexOf(kw) < 0)) return "";
@@ -2484,7 +2555,13 @@
         state.level = "company";
         state.company = item.getAttribute("data-key");
         state.station = "";
+        state.stationColOpen = true;
       }
+      renderOrg();
+    });
+
+    document.getElementById("stationToggle").addEventListener("click", function () {
+      state.stationColOpen = !state.stationColOpen;
       renderOrg();
     });
 
