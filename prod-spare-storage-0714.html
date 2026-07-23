@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN" data-build="20260723-wh-6rings-v118">
+<html lang="zh-CN" data-build="20260723-wh-card-style-v119">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -294,13 +294,13 @@
     }
     .wh-card {
       background: #fff;
-      border: 1px solid var(--bd);
-      border-radius: 4px;
-      padding: 6px 8px 5px;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      padding: 10px 12px 10px;
       min-width: 0;
       display: flex;
       flex-direction: column;
-      gap: 3px;
+      gap: 8px;
       cursor: pointer;
       transition: border-color 0.15s ease, box-shadow 0.15s ease;
       overflow: hidden;
@@ -309,92 +309,111 @@
       border-color: #91caff;
       box-shadow: 0 2px 8px rgba(22, 119, 255, 0.1);
     }
+    .wh-card-hd {
+      display: flex;
+      align-items: baseline;
+      flex-wrap: wrap;
+      gap: 8px 12px;
+    }
     .wh-card-hd h3 {
       margin: 0;
-      font-size: 12px;
+      font-size: 15px;
       font-weight: 700;
-      color: var(--t);
-      line-height: 1.2;
+      color: #1f2937;
+      line-height: 1.3;
     }
+    .wh-card-status {
+      font-size: 12px;
+      color: #6b7280;
+      line-height: 1.3;
+    }
+    .wh-card-status b { color: #6b7280; font-weight: 400; }
     .wh-card-meta {
-      margin-top: 2px;
-      font-size: 10px;
+      font-size: 12px;
       color: var(--m);
       display: flex;
       flex-wrap: wrap;
       align-items: center;
-      gap: 3px 4px;
+      gap: 6px;
     }
     .wh-card-meta .org {
-      color: #64748b;
-      line-height: 16px;
-      font-size: 10px;
+      color: #6b7280;
+      line-height: 20px;
+      font-size: 12px;
     }
-    /* 图1：存储类型 / 仓库类型 标签样式 */
     .wh-card-meta .wh-tag {
       display: inline-flex;
       align-items: center;
-      height: 16px;
-      padding: 0 5px;
-      border: 1px solid #d9e2ec;
-      border-radius: 2px;
-      background: #f2f4f7;
-      color: #4e5969;
-      font-size: 9px;
+      height: 20px;
+      padding: 0 8px;
+      border: 1px solid #d1d5db;
+      border-radius: 4px;
+      background: #f3f4f6;
+      color: #6b7280;
+      font-size: 11px;
       line-height: 1;
       white-space: nowrap;
     }
-    .wh-rings {
+    /* 已占用库位进度条（参考样式） */
+    .wh-slot {
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 0;
-      min-height: 88px;
-      overflow: hidden;
-      margin: 0;
-      border: 1px solid #eef2f7;
-      border-radius: 3px;
-      background: #fff;
-      flex: 0 0 auto;
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      color: #4b5563;
     }
-    .wh-ring-box {
-      min-width: 0;
+    .wh-slot-track {
+      height: 10px;
+      border-radius: 999px;
+      background: #f3f4f6;
+      border: 1px solid #e5e7eb;
       overflow: hidden;
-      padding: 2px 4px 4px;
+    }
+    .wh-slot-fill {
+      height: 100%;
+      border-radius: 999px;
+      background: #1677ff;
+      min-width: 0;
+    }
+    .wh-slot-val {
+      font-size: 12px;
+      color: #374151;
+      font-variant-numeric: tabular-nums;
+      min-width: 2.5em;
+      text-align: right;
+    }
+    /* 下半：左同心环 + 右横向堆叠条 */
+    .wh-split {
+      display: grid;
+      grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.15fr);
+      gap: 0;
+      min-height: 0;
+      flex: 1 1 auto;
+      border-top: 1px solid #eef2f7;
+      padding-top: 8px;
+    }
+    .wh-split-l,
+    .wh-split-r {
+      min-width: 0;
       display: flex;
       flex-direction: column;
-      gap: 1px;
+      gap: 6px;
     }
-    .wh-ring-box + .wh-ring-box {
-      border-left: 1px solid #eef2f7;
+    .wh-split-l {
+      padding-right: 10px;
+      border-right: 1px solid #e5e7eb;
     }
-    .wh-ring-box .ct {
-      text-align: center;
-      font-size: 9px;
-      font-weight: 600;
-      color: #334155;
-      line-height: 1.15;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      flex: 0 0 auto;
-    }
-    /* 环图可见：固定高度，避免初始化宽高为 0 */
-    .wh-ring-row {
-      display: grid;
-      grid-template-columns: 72px minmax(0, 1fr);
-      gap: 2px 4px;
-      align-items: center;
-      min-height: 72px;
-      flex: 0 0 auto;
-      padding: 0;
+    .wh-split-r {
+      padding-left: 10px;
     }
     .wh-ring-el {
-      width: 72px;
-      height: 72px;
-      min-width: 72px;
-      min-height: 72px;
+      width: 88px;
+      height: 88px;
+      min-width: 88px;
+      min-height: 88px;
+      margin: 0 auto;
       overflow: hidden;
-      justify-self: start;
     }
     .wh-ring-legend {
       margin: 0;
@@ -402,24 +421,22 @@
       list-style: none;
       display: flex;
       flex-direction: column;
-      justify-content: center;
-      gap: 1px;
+      gap: 4px;
       min-width: 0;
-      overflow: hidden;
     }
     .wh-ring-legend li {
-      display: flex;
+      display: grid;
+      grid-template-columns: 8px minmax(0, 1fr) auto;
       align-items: center;
-      gap: 2px;
-      font-size: 8px;
-      line-height: 1.2;
-      color: #475569;
+      gap: 6px;
+      font-size: 11px;
+      line-height: 1.25;
+      color: #4b5563;
       min-width: 0;
-      overflow: hidden;
     }
     .wh-ring-legend i {
-      width: 4px;
-      height: 4px;
+      width: 8px;
+      height: 8px;
       border-radius: 50%;
       flex: 0 0 auto;
     }
@@ -429,21 +446,13 @@
       overflow: hidden;
       text-overflow: ellipsis;
     }
-    .wh-bar-box .ct {
-      font-size: 9px;
-      font-weight: 600;
-      color: #334155;
-      margin: 1px 0 1px;
+    .wh-ring-legend b {
+      font-weight: 500;
+      color: #374151;
+      white-space: nowrap;
+      font-variant-numeric: tabular-nums;
     }
-    .wh-bar-el { width: 100%; height: 96px; }
-    .wh-card-ft {
-      font-size: 10px;
-      color: #475569;
-      padding-top: 2px;
-      border-top: 1px solid #eef2f7;
-      line-height: 1.2;
-    }
-    .wh-card-ft b { color: #389e0d; font-weight: 600; }
+    .wh-bar-el { width: 100%; height: 148px; min-height: 148px; }
 
     @media (max-width: 1280px) {
       .ps-body { grid-template-columns: 180px minmax(0, 1fr); }
@@ -535,7 +544,7 @@
   <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.1/dist/echarts.min.js"></script>
   <script src="js/sidebar-actions.js"></script>
   <script src="js/site-footer.js"></script>
-  <script src="js/subpage-clock.js?v=20260723-wh-6rings-v118"></script>
+  <script src="js/subpage-clock.js?v=20260723-wh-card-style-v119"></script>
   <script>
     (function () {
       var ORG_DATA = [
@@ -733,12 +742,10 @@
         return (
           '<ul class="wh-ring-legend">' +
           items.map(function (it, i) {
-            var label = (it.name || "")
-              .replace(/库区$/, "")
-              .replace(/库位$/, "");
             return (
               "<li><i style=\"background:" + colors[i % colors.length] + "\"></i>" +
-              "<em title=\"" + it.name + " " + it.value + "\">" + label + " " + it.value + "</em></li>"
+              "<em title=\"" + it.name + "\">" + it.name + "</em>" +
+              "<b>" + it.value + "</b></li>"
             );
           }).join("") +
           "</ul>"
@@ -750,13 +757,12 @@
         items.forEach(function (it) { if (it.value > max) max = it.value; });
         max = Math.max(max * 1.15, 1);
         var series = [];
-        /* 仅画缩小居中的冰状图，图例在 HTML，100% 缩放不裁切 */
         var n = items.length;
         var step = n > 2 ? 10 : 12;
-        var outer0 = n > 2 ? 58 : 62;
+        var outer0 = n > 2 ? 68 : 70;
         items.forEach(function (it, i) {
           var outer = outer0 - i * step;
-          var inner = Math.max(outer - 8, 10);
+          var inner = Math.max(outer - 8, 12);
           series.push({
             type: "pie",
             radius: [inner + "%", outer + "%"],
@@ -779,46 +785,67 @@
       }
 
       function barOption(data) {
-        /* 原型：蓝=库存金额，红=报废金额，黄=超60天以上呆滞金额；堆叠柱（紧凑适配 9 卡） */
+        /* 横向堆叠：蓝=库存金额，红=报废金额，黄=超60天以上呆滞金额 */
+        var totals = data.stock.map(function (v, i) {
+          return v + data.scrap[i] + data.idle[i];
+        });
         return {
-          color: ["#1677ff", "#f5222d", "#faad14"],
-          tooltip: { trigger: "axis", confine: true, textStyle: { fontSize: 10 } },
+          color: ["#1677ff", "#cf1322", "#faad14"],
+          tooltip: { trigger: "axis", confine: true, textStyle: { fontSize: 11 }, axisPointer: { type: "shadow" } },
           legend: {
             top: 0,
-            left: "center",
-            itemWidth: 6,
-            itemHeight: 6,
-            itemGap: 4,
-            textStyle: { fontSize: 7, color: "#64748b" },
+            left: 0,
+            itemWidth: 8,
+            itemHeight: 8,
+            itemGap: 10,
+            textStyle: { fontSize: 10, color: "#6b7280" },
             data: ["库存金额", "报废金额", "超60天以上呆滞金额"]
           },
-          grid: { left: 28, right: 4, top: 18, bottom: 22, containLabel: false },
+          grid: { left: 4, right: 36, top: 24, bottom: 2, containLabel: true },
           xAxis: {
-            type: "category",
-            data: ZONES,
-            axisLabel: {
-              fontSize: 7,
-              color: "#94a3b8",
-              interval: 0,
-              rotate: 0,
-              hideOverlap: true,
-              margin: 4
-            },
-            axisTick: { show: false },
-            axisLine: { lineStyle: { color: "#e8edf4" } }
+            type: "value",
+            show: false,
+            splitLine: { show: false }
           },
           yAxis: {
-            type: "value",
-            name: "万元",
-            nameGap: 6,
-            nameTextStyle: { fontSize: 7, color: "#94a3b8" },
-            splitLine: { lineStyle: { type: "dashed", color: "#eef2f7" } },
-            axisLabel: { fontSize: 7, color: "#94a3b8", margin: 2 }
+            type: "category",
+            data: ZONES.slice().reverse(),
+            axisTick: { show: false },
+            axisLine: { show: false },
+            axisLabel: { fontSize: 10, color: "#6b7280", margin: 6 }
           },
           series: [
-            { name: "库存金额", type: "bar", stack: "amt", barWidth: 10, data: data.stock },
-            { name: "报废金额", type: "bar", stack: "amt", barWidth: 10, data: data.scrap },
-            { name: "超60天以上呆滞金额", type: "bar", stack: "amt", barWidth: 10, data: data.idle }
+            {
+              name: "库存金额",
+              type: "bar",
+              stack: "amt",
+              barWidth: 10,
+              data: data.stock.slice().reverse()
+            },
+            {
+              name: "报废金额",
+              type: "bar",
+              stack: "amt",
+              barWidth: 10,
+              data: data.scrap.slice().reverse()
+            },
+            {
+              name: "超60天以上呆滞金额",
+              type: "bar",
+              stack: "amt",
+              barWidth: 10,
+              data: data.idle.slice().reverse(),
+              label: {
+                show: true,
+                position: "right",
+                distance: 4,
+                fontSize: 10,
+                color: "#374151",
+                formatter: function (p) {
+                  return totals[totals.length - 1 - p.dataIndex];
+                }
+              }
+            }
           ]
         };
       }
@@ -859,35 +886,37 @@
         var orgName = selectedOrgName();
         var root = document.getElementById("whCards");
         root.innerHTML = list.map(function (wh) {
+          var used = wh.ringUtil[0] || 0;
+          var free = wh.ringUtil[1] || 0;
+          var pct = Math.max(0, Math.min(100, Math.round((used / Math.max(used + free, 1)) * 100)));
+          /* 已占用占比过小时用数值本身作进度示意（原数据可能是占比） */
+          if (pct < 3 && used <= 100) pct = used;
           return (
             '<article class="wh-card" data-id="' + wh.id + '">' +
               '<div class="wh-card-hd">' +
                 "<h3>" + wh.name + "</h3>" +
-                '<div class="wh-card-meta">' +
-                  '<span class="org">' + orgName + "</span>" +
-                  (wh.types || []).map(function (t) {
-                    return '<span class="wh-tag">' + t + "</span>";
-                  }).join("") +
+                '<span class="wh-card-status">仓库状态：<b>正常</b></span>' +
+              "</div>" +
+              '<div class="wh-card-meta">' +
+                '<span class="org">' + orgName + "</span>" +
+                (wh.types || []).map(function (t) {
+                  return '<span class="wh-tag">' + t + "</span>";
+                }).join("") +
+              "</div>" +
+              '<div class="wh-slot">' +
+                "<span>已占用库位</span>" +
+                '<div class="wh-slot-track"><div class="wh-slot-fill" style="width:' + pct + '%"></div></div>' +
+                '<span class="wh-slot-val">' + used + "</span>" +
+              "</div>" +
+              '<div class="wh-split">' +
+                '<div class="wh-split-l">' +
+                  '<div class="wh-ring-el" id="dist-' + wh.id + '"></div>' +
+                  '<div id="dist-leg-' + wh.id + '"></div>' +
+                "</div>" +
+                '<div class="wh-split-r">' +
+                  '<div class="wh-bar-el" id="bar-' + wh.id + '"></div>' +
                 "</div>" +
               "</div>" +
-              '<div class="wh-rings">' +
-                '<div class="wh-ring-box">' +
-                  '<div class="ct">全仓库区分布</div>' +
-                  '<div class="wh-ring-row">' +
-                    '<div class="wh-ring-el" id="dist-' + wh.id + '"></div>' +
-                    '<div id="dist-leg-' + wh.id + '"></div>' +
-                  "</div>" +
-                "</div>" +
-                '<div class="wh-ring-box">' +
-                  '<div class="ct">库存利用率</div>' +
-                  '<div class="wh-ring-row">' +
-                    '<div class="wh-ring-el" id="util-' + wh.id + '"></div>' +
-                    '<div id="util-leg-' + wh.id + '"></div>' +
-                  "</div>" +
-                "</div>" +
-              "</div>" +
-              '<div class="wh-bar-box"><div class="ct">各库区金额情况</div><div class="wh-bar-el" id="bar-' + wh.id + '"></div></div>' +
-              '<div class="wh-card-ft">仓库状态：<b>正常</b></div>' +
             "</article>"
           );
         }).join("");
@@ -895,31 +924,20 @@
         list.forEach(function (wh) {
           var distItems = [
             { name: "风电库区", value: wh.ringDist[0] },
-            { name: "风电库区", value: wh.ringDist[1] },
-            { name: "风电库区", value: wh.ringDist[2] },
-            { name: "风电库区", value: wh.ringDist[3] }
+            { name: "光伏库区", value: wh.ringDist[1] },
+            { name: "储能库区", value: wh.ringDist[2] },
+            { name: "返修库区", value: wh.ringDist[3] }
           ];
-          var distColors = ["#1d4ed8", "#22d3ee", "#f87171", "#fbbf24"];
+          var distColors = ["#22d3ee", "#1d4ed8", "#f87171", "#fbbf24"];
           var distLeg = document.getElementById("dist-leg-" + wh.id);
           if (distLeg) distLeg.innerHTML = ringLegendHtml(distItems, distColors);
           var dist = ensureChart("dist-" + wh.id, document.getElementById("dist-" + wh.id));
           if (dist) dist.setOption(ringOption(distItems, distColors), true);
 
-          var utilItems = [
-            { name: "已占用库位", value: wh.ringUtil[0] },
-            { name: "空闲库位", value: wh.ringUtil[1] }
-          ];
-          var utilColors = ["#1d4ed8", "#22d3ee"];
-          var utilLeg = document.getElementById("util-leg-" + wh.id);
-          if (utilLeg) utilLeg.innerHTML = ringLegendHtml(utilItems, utilColors);
-          var util = ensureChart("util-" + wh.id, document.getElementById("util-" + wh.id));
-          if (util) util.setOption(ringOption(utilItems, utilColors), true);
-
           var bar = ensureChart("bar-" + wh.id, document.getElementById("bar-" + wh.id));
           if (bar) bar.setOption(barOption(barDataFor(wh)), true);
         });
 
-        /* 布局完成后再 resize，避免冰状图宽高为 0 画不出来 */
         requestAnimationFrame(function () {
           Object.keys(chartMap).forEach(function (k) {
             try { chartMap[k].resize(); } catch (e) {}
