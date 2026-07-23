@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN" data-build="20260723-wh-fit-v124">
+<html lang="zh-CN" data-build="20260723-wh-fit6-v125">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -283,27 +283,28 @@
     .wh-cards {
       flex: 1;
       min-height: 0;
-      overflow: auto;
+      overflow: hidden; /* 一屏看全 6 卡，不上下滑 */
       display: grid;
-      /* 一页 6 个：3 列 × 2 行 */
       grid-template-columns: repeat(3, minmax(0, 1fr));
-      grid-auto-rows: auto;
-      gap: 8px;
-      align-content: start;
-      padding-bottom: 8px;
+      grid-template-rows: 1fr 1fr;
+      gap: 6px;
+      align-content: stretch;
+      padding-bottom: 0;
     }
     .wh-card {
       background: #fff;
       border: 1px solid #e5e7eb;
-      border-radius: 8px;
-      padding: 8px 10px 10px;
+      border-radius: 6px;
+      padding: 5px 8px 6px;
       min-width: 0;
+      min-height: 0;
+      height: 100%;
       display: flex;
       flex-direction: column;
-      gap: 6px;
+      gap: 3px;
       cursor: pointer;
       transition: border-color 0.15s ease, box-shadow 0.15s ease;
-      overflow: visible;
+      overflow: hidden;
     }
     .wh-card:hover {
       border-color: #91caff;
@@ -313,58 +314,60 @@
       display: flex;
       align-items: baseline;
       flex-wrap: wrap;
-      gap: 8px 12px;
+      gap: 4px 8px;
+      flex: 0 0 auto;
     }
     .wh-card-hd h3 {
       margin: 0;
-      font-size: 15px;
+      font-size: 13px;
       font-weight: 700;
       color: #1f2937;
-      line-height: 1.3;
+      line-height: 1.2;
     }
     .wh-card-status {
-      font-size: 12px;
+      font-size: 11px;
       color: #6b7280;
-      line-height: 1.3;
+      line-height: 1.2;
     }
     .wh-card-status b { color: #6b7280; font-weight: 400; }
     .wh-card-meta {
-      font-size: 12px;
+      font-size: 11px;
       color: var(--m);
       display: flex;
       flex-wrap: wrap;
       align-items: center;
-      gap: 6px;
+      gap: 4px;
+      flex: 0 0 auto;
     }
     .wh-card-meta .org {
       color: #6b7280;
-      line-height: 20px;
-      font-size: 12px;
+      line-height: 16px;
+      font-size: 11px;
     }
     .wh-card-meta .wh-tag {
       display: inline-flex;
       align-items: center;
-      height: 20px;
-      padding: 0 8px;
+      height: 16px;
+      padding: 0 5px;
       border: 1px solid #d1d5db;
-      border-radius: 4px;
+      border-radius: 3px;
       background: #f3f4f6;
       color: #6b7280;
-      font-size: 11px;
+      font-size: 10px;
       line-height: 1;
       white-space: nowrap;
     }
-    /* 已占用库位进度条（参考样式） */
     .wh-slot {
       display: grid;
       grid-template-columns: auto minmax(0, 1fr) auto;
       align-items: center;
-      gap: 8px;
-      font-size: 12px;
+      gap: 6px;
+      font-size: 11px;
       color: #4b5563;
+      flex: 0 0 auto;
     }
     .wh-slot-track {
-      height: 10px;
+      height: 7px;
       border-radius: 999px;
       background: #f3f4f6;
       border: 1px solid #e5e7eb;
@@ -377,49 +380,50 @@
       min-width: 0;
     }
     .wh-slot-val {
-      font-size: 12px;
+      font-size: 11px;
       color: #374151;
       font-variant-numeric: tabular-nums;
-      min-width: 2.5em;
+      min-width: 2em;
       text-align: right;
     }
-    /* 下半：左环上图例下 + 右条形；拉开间距，避免压字/裁切 */
+    /* 左环+图例并排省高度；右条形自适应填满 */
     .wh-split {
       display: grid;
-      grid-template-columns: 108px minmax(0, 1fr);
-      gap: 0 12px;
+      grid-template-columns: minmax(118px, 0.9fr) minmax(0, 1.25fr);
+      gap: 0 8px;
       min-height: 0;
-      flex: 0 0 auto;
-      align-items: start;
+      flex: 1 1 auto;
+      align-items: stretch;
       border-top: 1px solid #eef2f7;
-      padding-top: 6px;
-      overflow: visible;
+      padding-top: 4px;
+      overflow: hidden;
     }
     .wh-split-l {
-      display: flex;
-      flex-direction: column;
-      align-items: stretch;
-      gap: 4px;
+      display: grid;
+      grid-template-columns: 48px minmax(0, 1fr);
+      align-items: center;
+      gap: 2px 5px;
       min-width: 0;
-      padding-right: 10px;
+      min-height: 0;
+      padding-right: 8px;
       border-right: 1px solid #e5e7eb;
-      overflow: visible;
+      overflow: hidden;
     }
     .wh-split-r {
       display: flex;
       flex-direction: column;
       gap: 2px;
       min-width: 0;
-      overflow: visible;
+      min-height: 0;
+      overflow: hidden;
     }
     .wh-ring-el {
-      width: 58px;
-      height: 58px;
-      min-width: 58px;
-      min-height: 58px;
-      margin: 0 auto;
+      width: 48px;
+      height: 48px;
+      min-width: 48px;
+      min-height: 48px;
+      margin: 0;
       overflow: hidden;
-      flex: 0 0 auto;
     }
     .wh-ring-legend {
       margin: 0;
@@ -427,22 +431,23 @@
       list-style: none;
       display: flex;
       flex-direction: column;
-      gap: 3px;
+      justify-content: center;
+      gap: 2px;
       min-width: 0;
     }
     .wh-ring-legend li {
       display: grid;
-      grid-template-columns: 6px minmax(0, 1fr) auto;
+      grid-template-columns: 5px minmax(0, 1fr) auto;
       align-items: center;
       gap: 3px;
       font-size: 10px;
-      line-height: 1.2;
+      line-height: 1.15;
       color: #4b5563;
       min-width: 0;
     }
     .wh-ring-legend i {
-      width: 6px;
-      height: 6px;
+      width: 5px;
+      height: 5px;
       border-radius: 50%;
       flex: 0 0 auto;
     }
@@ -462,25 +467,30 @@
       display: flex;
       flex-wrap: wrap;
       align-items: center;
-      gap: 2px 8px;
-      font-size: 10px;
+      gap: 1px 6px;
+      font-size: 9px;
       color: #6b7280;
-      line-height: 1.2;
+      line-height: 1.15;
       flex: 0 0 auto;
     }
     .wh-bar-legend span {
       display: inline-flex;
       align-items: center;
-      gap: 3px;
+      gap: 2px;
       white-space: nowrap;
     }
     .wh-bar-legend i {
-      width: 7px;
-      height: 7px;
+      width: 6px;
+      height: 6px;
       border-radius: 1px;
       flex: 0 0 auto;
     }
-    .wh-bar-el { width: 100%; height: 168px; min-height: 168px; flex: 0 0 auto; }
+    .wh-bar-el {
+      width: 100%;
+      flex: 1 1 auto;
+      min-height: 0;
+      height: auto;
+    }
 
     @media (max-width: 1280px) {
       .ps-body { grid-template-columns: 180px minmax(0, 1fr); }
@@ -572,7 +582,7 @@
   <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.1/dist/echarts.min.js"></script>
   <script src="js/sidebar-actions.js"></script>
   <script src="js/site-footer.js"></script>
-  <script src="js/subpage-clock.js?v=20260723-wh-fit-v124"></script>
+  <script src="js/subpage-clock.js?v=20260723-wh-fit6-v125"></script>
   <script>
     (function () {
       var ORG_DATA = [
@@ -821,7 +831,7 @@
           color: ["#1677ff", "#cf1322", "#faad14"],
           tooltip: { trigger: "axis", confine: true, textStyle: { fontSize: 11 }, axisPointer: { type: "shadow" } },
           legend: { show: false },
-          grid: { left: 56, right: 28, top: 2, bottom: 12, containLabel: false },
+          grid: { left: 50, right: 24, top: 1, bottom: 4, containLabel: false },
           xAxis: {
             type: "value",
             show: false,
@@ -833,10 +843,10 @@
             axisTick: { show: false },
             axisLine: { show: false },
             axisLabel: {
-              fontSize: 10,
+              fontSize: 9,
               color: "#6b7280",
-              margin: 6,
-              width: 50,
+              margin: 4,
+              width: 46,
               overflow: "none",
               interval: 0
             }
@@ -846,28 +856,28 @@
               name: "库存金额",
               type: "bar",
               stack: "amt",
-              barWidth: 8,
-              barCategoryGap: "32%",
+              barWidth: 6,
+              barCategoryGap: "38%",
               data: data.stock.slice().reverse()
             },
             {
               name: "报废金额",
               type: "bar",
               stack: "amt",
-              barWidth: 8,
+              barWidth: 6,
               data: data.scrap.slice().reverse()
             },
             {
               name: "超60天以上呆滞金额",
               type: "bar",
               stack: "amt",
-              barWidth: 8,
+              barWidth: 6,
               data: data.idle.slice().reverse(),
               label: {
                 show: true,
                 position: "right",
-                distance: 4,
-                fontSize: 10,
+                distance: 3,
+                fontSize: 9,
                 color: "#374151",
                 formatter: function (p) {
                   return totals[totals.length - 1 - p.dataIndex];
@@ -972,8 +982,10 @@
         });
 
         requestAnimationFrame(function () {
-          Object.keys(chartMap).forEach(function (k) {
-            try { chartMap[k].resize(); } catch (e) {}
+          requestAnimationFrame(function () {
+            Object.keys(chartMap).forEach(function (k) {
+              try { chartMap[k].resize(); } catch (e) {}
+            });
           });
         });
       }
