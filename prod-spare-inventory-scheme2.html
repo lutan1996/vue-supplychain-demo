@@ -1195,9 +1195,9 @@
         rtOut: [8, 7, 9, 8, 7], rtCur: [10, 9, 11, 10, 9], rtIn: [6, 5, 7, 6, 5], rtMax: 30,
         idleS1: [8, 7, 8, 7, 6], idleS2: [6, 5, 6, 5, 5], idleS3: [5, 4, 5, 4, 4], idleS4: [4, 0, 0, 0, 0], idleMax: 30,
         pie: [
-          { name: "仓库类别1", value: 18 }, { name: "仓库类别2", value: 14 }, { name: "仓库类别3", value: 12 },
-          { name: "仓库类别4", value: 11 }, { name: "仓库类别5", value: 10 }, { name: "仓库类别6", value: 12 },
-          { name: "仓库类别7", value: 13 }, { name: "仓库类别8", value: 10 }
+          { name: "仓库类别1", value: 7200 }, { name: "仓库类别2", value: 5600 }, { name: "仓库类别3", value: 4800 },
+          { name: "仓库类别4", value: 4400 }, { name: "仓库类别5", value: 4000 }, { name: "仓库类别6", value: 4800 },
+          { name: "仓库类别7", value: 5200 }, { name: "仓库类别8", value: 4000 }
         ],
         scrap: [86, 72, 64, 58, 50, 42]
       },
@@ -1594,6 +1594,7 @@
     };
 
     var charts = {};
+    var scrapRace = { timer: null, values: null, tick: 0 };
     var scene3d = { renderer: null, scene: null, camera: null, animId: null, meshes: [], rotor: null, ro: null, lastW: 0, lastH: 0, kind: "", lastPart: "", baseReady: false, modelsReady: false, roots: null, meshByKind: null, windRotor: null };
     var sceneGen = 0;
 
@@ -2321,6 +2322,101 @@
       addMesh(scene, [], new THREE.BoxGeometry(0.35, 2.2, 0.35), 0xf97316, 3.35, 1.4, -0.7, "", { metalness: 0.25 });
     }
 
+    function stopScrapRace() {
+      if (scrapRace.timer) {
+        clearInterval(scrapRace.timer);
+        scrapRace.timer = null;
+      }
+    }
+
+    function startScrapRace(chart, baseValues) {
+      if (!chart) return;
+      stopScrapRace();
+      var colors = ["#f5222d", "#1f2d3d", "#1677ff", "#f5222d", "#1f2d3d", "#1677ff"];
+      var names = ["w0", "w1", "w2", "w3", "w4", "w5"];
+      var values = (baseValues || []).map(function (v) { return Number(v) || 0; });
+      while (values.length < 6) values.push(40 + values.length * 6);
+      values = values.slice(0, 6);
+      scrapRace.values = values;
+      scrapRace.tick = 0;
+
+      function paint(replace) {
+        var data = scrapRace.values.map(function (v, i) {
+          return {
+            value: Math.round(v),
+            itemStyle: {
+              color: colors[i % colors.length],
+              borderRadius: [0, 3, 3, 0]
+            }
+          };
+        });
+        chart.setOption({
+          animationDuration: replace ? 0 : 2000,
+          animationDurationUpdate: 2000,
+          animationEasing: "linear",
+          animationEasingUpdate: "linear",
+          grid: { left: 56, right: 40, top: 8, bottom: 18 },
+          xAxis: {
+            type: "value",
+            max: "dataMax",
+            splitLine: { lineStyle: { color: "#eef2f7" } },
+            axisLabel: { fontSize: 10, color: "#94a3b8" }
+          },
+          yAxis: {
+            type: "category",
+            data: names,
+            inverse: true,
+            animationDuration: 300,
+            animationDurationUpdate: 300,
+            axisLabel: {
+              fontSize: 11,
+              color: "#64748b",
+              formatter: function () { return "xx仓库"; }
+            },
+            axisTick: { show: false },
+            axisLine: { show: false }
+          },
+          series: [{
+            type: "bar",
+            realtimeSort: true,
+            seriesLayoutBy: "column",
+            barWidth: 12,
+            data: data,
+            label: {
+              show: true,
+              position: "right",
+              distance: 4,
+              fontSize: 11,
+              color: "#475569",
+              valueAnimation: true,
+              formatter: "{c}"
+            }
+          }]
+        }, !!replace);
+      }
+
+      paint(true);
+      scrapRace.timer = setInterval(function () {
+        scrapRace.tick += 1;
+        var i;
+        for (i = 0; i < scrapRace.values.length; i++) {
+          /* 不均匀增长，底部条更容易冲上去形成由大到小换位滚动 */
+          var r = Math.random();
+          if (r > 0.78) scrapRace.values[i] += 10 + Math.random() * 22;
+          else if (r > 0.45) scrapRace.values[i] += 3 + Math.random() * 8;
+          else scrapRace.values[i] += 0.5 + Math.random() * 3;
+        }
+        /* 周期回落，循环往复不无限膨胀 */
+        if (scrapRace.tick % 16 === 0) {
+          var min = Math.min.apply(null, scrapRace.values);
+          for (i = 0; i < scrapRace.values.length; i++) {
+            scrapRace.values[i] = Math.max(24, scrapRace.values[i] - min + 28 + (i % 3) * 4);
+          }
+        }
+        paint(false);
+      }, 2000);
+    }
+
     function ensureChart(id) {
       if (!window.echarts) return null;
       var el = document.getElementById(id);
@@ -2388,7 +2484,6 @@
       if (!window.echarts) return;
       var d = getDashData();
       var whNames = ["XX仓库", "XX仓库", "XX仓库", "XX仓库", "XX仓库"];
-      var scrapColors = ["#1677ff", "#1f2d3d", "#f5222d", "#1677ff", "#1f2d3d", "#f5222d"];
 
       var c1 = ensureChart("chartRealtime");
       if (c1) {
@@ -2497,12 +2592,41 @@
       if (c3) {
         c3.setOption({
           color: ["#1677ff", "#13c2c2", "#52c41a", "#faad14", "#fa8c16", "#eb2f96", "#722ed1", "#f5222d"],
-          tooltip: { trigger: "item" },
+          tooltip: {
+            trigger: "item",
+            formatter: function (p) {
+              return p.name + "<br/>金额：" + p.value;
+            }
+          },
           series: [{
             type: "pie",
-            radius: ["28%", "62%"],
+            radius: ["26%", "56%"],
             center: ["50%", "52%"],
-            label: { fontSize: 10, color: "#475569" },
+            label: {
+              formatter: function (p) {
+                return "{amt|" + p.value + "}\n{nm|" + p.name + "}";
+              },
+              rich: {
+                amt: {
+                  fontSize: 11,
+                  fontWeight: 700,
+                  color: "#1f2d3d",
+                  lineHeight: 14,
+                  fontFamily: "Barlow Condensed, Arial Narrow, PingFang SC, Microsoft YaHei, sans-serif"
+                },
+                nm: {
+                  fontSize: 10,
+                  color: "#64748b",
+                  lineHeight: 13,
+                  padding: [2, 0, 0, 0]
+                }
+              }
+            },
+            labelLine: {
+              length: 10,
+              length2: 8,
+              maxSurfaceAngle: 80
+            },
             data: d.pie
           }]
         }, true);
@@ -2510,31 +2634,7 @@
 
       var c4 = ensureChart("chartScrap");
       if (c4) {
-        c4.setOption({
-          grid: { left: 56, right: 36, top: 10, bottom: 10 },
-          xAxis: { type: "value", splitLine: { lineStyle: { color: "#eef2f7" } }, axisLabel: { fontSize: 10, color: "#94a3b8" } },
-          yAxis: {
-            type: "category",
-            data: ["xx仓库", "xx仓库", "xx仓库", "xx仓库", "xx仓库", "xx仓库"],
-            axisLabel: { fontSize: 11, color: "#64748b" },
-            axisTick: { show: false }
-          },
-          series: [{
-            type: "bar",
-            barWidth: 12,
-            label: {
-              show: true,
-              position: "right",
-              distance: 4,
-              fontSize: 11,
-              color: "#475569",
-              formatter: "{c}"
-            },
-            data: d.scrap.map(function (v, i) {
-              return { value: v, itemStyle: { color: scrapColors[i % scrapColors.length] } };
-            })
-          }]
-        }, true);
+        startScrapRace(c4, d.scrap);
       }
     }
 
