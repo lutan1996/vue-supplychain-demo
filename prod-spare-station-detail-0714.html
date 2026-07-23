@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN" data-build="20260723-station-ring-fit-v112">
+<html lang="zh-CN" data-build="20260723-ring-left-v114">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -418,19 +418,20 @@
       border-top: 1px solid #eef2f7;
       border-bottom: 1px solid #eef2f7;
       padding: 2px 0 4px;
-      overflow: hidden;
+      overflow: visible;
     }
     .wh-chart-box {
       min-width: 0;
       display: flex;
       flex-direction: column;
       align-items: stretch;
-      padding: 2px 4px 4px;
-      overflow: hidden;
+      padding: 2px 2px 4px 0;
+      overflow: visible;
       gap: 2px;
     }
     .wh-chart-box + .wh-chart-box {
       border-left: 1px solid #eef2f7;
+      padding-left: 2px;
     }
     .wh-chart-box .ct {
       font-size: 9px;
@@ -445,20 +446,24 @@
       line-height: 1.2;
       padding: 0 2px;
     }
+    /* 冰状图略放大并靠左；图例放下方，文字整行露出不遮挡 */
     .wh-chart-row {
-      display: grid;
-      grid-template-columns: minmax(64px, 0.8fr) minmax(84px, 1.2fr);
-      gap: 2px 4px;
-      align-items: center;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 3px;
       min-height: 0;
+      padding: 0 2px 0 0;
     }
     .wh-chart-el {
-      width: 100%;
-      height: 78px;
-      min-height: 78px;
+      width: 100px;
+      height: 100px;
+      min-height: 100px;
       overflow: hidden;
       position: relative;
       z-index: 1;
+      align-self: flex-start;
+      margin-left: 0;
     }
     .wh-chart-legend {
       margin: 0;
@@ -466,18 +471,23 @@
       list-style: none;
       display: flex;
       flex-direction: column;
-      justify-content: center;
+      justify-content: flex-start;
       gap: 2px;
+      width: 100%;
       min-width: 0;
+      overflow: visible;
+      box-sizing: border-box;
     }
     .wh-chart-legend li {
       display: flex;
       align-items: center;
-      gap: 3px;
+      gap: 4px;
       font-size: 9px;
-      line-height: 1.2;
+      line-height: 1.25;
       color: #475569;
+      width: 100%;
       min-width: 0;
+      overflow: visible;
     }
     .wh-chart-legend i {
       width: 5px;
@@ -488,6 +498,8 @@
     .wh-chart-legend em {
       font-style: normal;
       white-space: nowrap;
+      overflow: visible;
+      flex: 0 1 auto;
     }
     /* 图5 摄像头区放大，占满剩余高度 */
     .wh-cam {
