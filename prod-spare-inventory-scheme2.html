@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN" data-build="20260723-wind-hd-v84">
+<html lang="zh-CN" data-build="20260723-pie-legend-v85">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -694,6 +694,70 @@
       flex: 0 0 auto;
     }
     .chart-el { width: 100%; flex: 1; min-height: 0; }
+    .pie-legend-wrap {
+      flex: 1;
+      min-height: 0;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      width: 100%;
+    }
+    .pie-legend-wrap .chart-el {
+      flex: 0 0 44%;
+      width: auto;
+      max-width: 44%;
+    }
+    .pie-legend {
+      flex: 1;
+      min-width: 0;
+      max-height: 100%;
+      overflow-y: auto;
+      overflow-x: hidden;
+      padding: 2px 2px 2px 4px;
+      scrollbar-width: thin;
+      scrollbar-color: #d0d7e2 transparent;
+    }
+    .pie-legend::-webkit-scrollbar { width: 3px; }
+    .pie-legend::-webkit-scrollbar-thumb { background: #d0d7e2; border-radius: 2px; }
+    .pie-legend-row {
+      display: grid;
+      grid-template-columns: 8px minmax(42px, 1fr) 1px 36px 52px;
+      align-items: center;
+      column-gap: 8px;
+      min-height: 24px;
+      padding: 1px 0;
+      font-size: 12px;
+      line-height: 1.2;
+    }
+    .pie-legend-row > i {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      display: block;
+    }
+    .pie-legend-row .n {
+      color: #334155;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .pie-legend-row .sep {
+      width: 1px;
+      height: 12px;
+      background: #e5e7eb;
+      justify-self: center;
+    }
+    .pie-legend-row .p {
+      color: #94a3b8;
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+    .pie-legend-row .v {
+      color: #64748b;
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+      padding-right: 2px;
+    }
 
     .idle-board {
       --num: "Barlow Condensed", "Arial Narrow", "PingFang SC", "Microsoft YaHei", sans-serif;
@@ -967,7 +1031,10 @@
 
                 <div class="dash-card">
                   <h3>库容比</h3>
-                  <div class="chart-el" id="chartAmount" style="height:100%"></div>
+                  <div class="pie-legend-wrap">
+                    <div class="chart-el" id="chartAmount"></div>
+                    <div class="pie-legend" id="chartAmountLegend" aria-label="库容比图例"></div>
+                  </div>
                 </div>
 
                 <div class="dash-card">
@@ -2474,56 +2541,49 @@
 
       var c3 = ensureChart("chartAmount");
       if (c3) {
+        var pieColors = ["#1677ff", "#13c2c2", "#52c41a", "#faad14", "#fa8c16", "#eb2f96", "#722ed1", "#f5222d"];
+        var pieData = d.pie || [];
+        var pieTotal = pieData.reduce(function (s, it) { return s + (Number(it.value) || 0); }, 0) || 1;
+        function fmtNum(n) {
+          var v = Math.round(Number(n) || 0);
+          return String(v).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        }
+        var legendEl = document.getElementById("chartAmountLegend");
+        if (legendEl) {
+          legendEl.innerHTML = pieData.map(function (it, i) {
+            var pct = Math.round(((Number(it.value) || 0) / pieTotal) * 100);
+            return (
+              '<div class="pie-legend-row">' +
+                '<i style="background:' + pieColors[i % pieColors.length] + '"></i>' +
+                '<span class="n">' + (it.name || "xx仓库") + "</span>" +
+                '<span class="sep" aria-hidden="true"></span>' +
+                '<span class="p">' + pct + "%</span>" +
+                '<span class="v">' + fmtNum(it.value) + "</span>" +
+              "</div>"
+            );
+          }).join("");
+        }
         c3.setOption({
-          color: ["#1677ff", "#13c2c2", "#52c41a", "#faad14", "#fa8c16", "#eb2f96", "#722ed1", "#f5222d"],
+          color: pieColors,
           tooltip: {
             trigger: "item",
             formatter: function (p) {
-              return p.name + "<br/>金额：" + p.value;
+              var pct = p.percent != null ? Math.round(p.percent) : 0;
+              return p.name + "<br/>占比：" + pct + "%<br/>金额：" + fmtNum(p.value);
             }
           },
           series: [{
             type: "pie",
-            radius: ["28%", "52%"],
-            center: ["50%", "52%"],
+            radius: ["40%", "68%"],
+            center: ["50%", "50%"],
             avoidLabelOverlap: true,
-            label: {
-              show: true,
-              position: "outside",
-              alignTo: "labelLine",
-              distanceToLabelLine: 4,
-              formatter: function (p) {
-                var amt = (p && p.value != null) ? p.value : "";
-                var nm = (p && p.name) ? p.name : "";
-                return "{amt|" + amt + "}\n{nm|" + nm + "}";
-              },
-              rich: {
-                amt: {
-                  fontSize: 12,
-                  fontWeight: 700,
-                  color: "#0f172a",
-                  lineHeight: 16,
-                  align: "left",
-                  fontFamily: "Barlow Condensed, Arial Narrow, PingFang SC, Microsoft YaHei, sans-serif"
-                },
-                nm: {
-                  fontSize: 10,
-                  fontWeight: 500,
-                  color: "#64748b",
-                  lineHeight: 14,
-                  align: "left",
-                  padding: [1, 0, 0, 0]
-                }
-              }
+            label: { show: false },
+            labelLine: { show: false },
+            itemStyle: {
+              borderColor: "#fff",
+              borderWidth: 2
             },
-            labelLine: {
-              show: true,
-              length: 12,
-              length2: 10,
-              smooth: false,
-              maxSurfaceAngle: 80
-            },
-            data: d.pie
+            data: pieData
           }]
         }, true);
       }
