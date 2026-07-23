@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN" data-build="20260723-util-left-v97">
+<html lang="zh-CN" data-build="20260723-rack-labels-v100">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -1865,9 +1865,9 @@
             '<div class="rack-hd">' +
               '<span class="rack-name">' + r.name + "</span>" +
               '<div class="rack-stats">' +
-                "<span><b>" + r.stats.cur + "</b></span>" +
-                "<span><b>" + r.stats.near + "</b></span>" +
-                "<span><b>" + r.stats.over + "</b></span>" +
+                "<span>当前库存：<b>" + r.stats.cur + "</b></span>" +
+                "<span>超期归还库存：<b>" + r.stats.near + "</b></span>" +
+                "<span>超60天以上库存：<b>" + r.stats.over + "</b></span>" +
               "</div>" +
             "</div>" +
             bins +
