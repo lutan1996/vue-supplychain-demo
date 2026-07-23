@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN" data-build="20260723-wh-type-text-v109">
+<html lang="zh-CN" data-build="20260723-wh-ring-fit-v110">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -518,7 +518,7 @@
   <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.1/dist/echarts.min.js"></script>
   <script src="js/sidebar-actions.js"></script>
   <script src="js/site-footer.js"></script>
-  <script src="js/subpage-clock.js?v=20260723-wh-type-text-v109"></script>
+  <script src="js/subpage-clock.js?v=20260723-wh-ring-fit-v110"></script>
   <script>
     (function () {
       var ORG_DATA = [
@@ -569,6 +569,9 @@
         "其他仓": 0.46
       };
 
+      /* 卡片仓库类型标签（图2文字） */
+      var WH_TYPE_TAGS = ["中心主仓", "场站周转仓", "返修备件仓", "报废暂存仓"];
+
       var WAREHOUSES = [
         {
           id: "w1",
@@ -577,7 +580,7 @@
           score: { qtyPct: 86, amtPct: 92, inQtyPct: 70, inAmtPct: 74, outQtyPct: 68, outAmtPct: 71, idlePct: 40, scrapPct: 28 },
           ringDist: [1895, 980, 520, 420],
           ringUtil: [11, 820],
-          types: ["中心主仓", "场站周转仓", "返修备件仓", "报废暂存仓"],
+          types: WH_TYPE_TAGS,
           barBase: {
             stock: [18, 16, 14, 12, 10],
             scrap: [8, 7, 6, 9, 11],
@@ -591,7 +594,7 @@
           score: { qtyPct: 64, amtPct: 58, inQtyPct: 82, inAmtPct: 79, outQtyPct: 55, outAmtPct: 52, idlePct: 66, scrapPct: 48 },
           ringDist: [1260, 840, 610, 390],
           ringUtil: [28, 760],
-          types: ["中心主仓", "场站周转仓", "返修备件仓", "报废暂存仓"],
+          types: WH_TYPE_TAGS,
           barBase: {
             stock: [14, 15, 13, 11, 9],
             scrap: [6, 8, 7, 10, 12],
@@ -605,7 +608,7 @@
           score: { qtyPct: 41, amtPct: 47, inQtyPct: 36, inAmtPct: 39, outQtyPct: 88, outAmtPct: 84, idlePct: 22, scrapPct: 71 },
           ringDist: [980, 720, 480, 350],
           ringUtil: [42, 690],
-          types: ["中心主仓", "场站周转仓", "返修备件仓", "报废暂存仓"],
+          types: WH_TYPE_TAGS,
           barBase: {
             stock: [12, 13, 11, 10, 8],
             scrap: [5, 6, 5, 8, 10],
@@ -823,7 +826,7 @@
                 "<h3>" + wh.name + "</h3>" +
                 '<div class="wh-card-meta">' +
                   '<span class="org">' + wh.company + "</span>" +
-                  (wh.types || []).map(function (t) {
+                  WH_TYPE_TAGS.map(function (t) {
                     return '<span class="wh-tag">' + t + "</span>";
                   }).join("") +
                 "</div>" +
