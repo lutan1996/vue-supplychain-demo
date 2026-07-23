@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN" data-build="20260723-callout-v94">
+<html lang="zh-CN" data-build="20260723-pv-es-static-v95">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -287,11 +287,12 @@
       position: relative;
       background: linear-gradient(180deg, #ffffff 0%, #f3f7fc 55%, #e9f0f8 100%);
     }
-    .diagram-stage.is-wind {
+    .diagram-stage.is-wind,
+    .diagram-stage.is-static {
       background: #f5f5f5;
     }
-    /* 风机：静态剖视图（完整 contain，不裁切） */
-    .wind-cutaway {
+    /* 风机/光伏/储能：静态剖视图（完整 contain，不裁切） */
+    .static-cutaway {
       display: none;
       position: absolute;
       inset: 0;
@@ -302,8 +303,8 @@
       overflow: hidden;
       padding: 8px 16px;
     }
-    .wind-cutaway.on { display: flex; }
-    .wind-cutaway-frame {
+    .static-cutaway.on { display: flex; }
+    .static-cutaway-frame {
       position: relative;
       width: 100%;
       height: 100%;
@@ -313,7 +314,7 @@
       align-items: center;
       justify-content: center;
     }
-    .wind-cutaway-frame > img {
+    .static-cutaway-frame > img {
       display: block;
       width: auto;
       height: auto;
@@ -324,7 +325,10 @@
       pointer-events: none;
       user-select: none;
     }
-    .diagram-stage.is-wind #diagramWrap { visibility: hidden; }
+    .diagram-stage.is-static #diagramWrap { visibility: hidden; }
+    /* 兼容旧类名 */
+    .wind-cutaway { display: none; }
+    .wind-cutaway.on { display: flex; }
     #diagramWrap {
       position: absolute;
       inset: 0;
@@ -989,10 +993,19 @@
                 </div>
                 <div class="diagram-stage" id="diagramStage">
                   <div id="diagramWrap"></div>
-                  <div class="wind-cutaway" id="windCutaway" aria-label="风机剖视">
-                    <div class="wind-cutaway-frame">
+                  <div class="static-cutaway wind-cutaway" id="windCutaway" aria-label="风机剖视">
+                    <div class="static-cutaway-frame wind-cutaway-frame">
                       <img src="assets/wind-turbine-cutaway-clean.png" alt="风机侧面剖视" draggable="false" />
-                      <div class="callout-layer" id="windCalloutLayer"></div>
+                    </div>
+                  </div>
+                  <div class="static-cutaway" id="pvCutaway" aria-label="光伏剖视">
+                    <div class="static-cutaway-frame">
+                      <img src="assets/pv-system-cutaway-clean.png" alt="光伏系统剖视" draggable="false" />
+                    </div>
+                  </div>
+                  <div class="static-cutaway" id="storageCutaway" aria-label="储能剖视">
+                    <div class="static-cutaway-frame">
+                      <img src="assets/es-system-cutaway-clean.png" alt="储能系统剖视" draggable="false" />
                     </div>
                   </div>
                   <div class="callout-layer" id="calloutLayer"></div>
@@ -1129,14 +1142,14 @@
         { id: "nacelle", title: "机舱", tip: "点击查看机舱相关备件", x: 0.96, y: 0.82, tx: 0.70, ty: 0.74, side: "right" }
       ],
       pv: [
-        { id: "pv_module", title: "光伏组件", tip: "点击查看光伏组件相关备件", x: 0.16, y: 0.40, tx: 0.40, ty: 0.48 },
-        { id: "pv_inverter", title: "逆变器", tip: "点击查看逆变器相关备件", x: 0.84, y: 0.34, tx: 0.70, ty: 0.50 },
-        { id: "pv_combiner", title: "汇流箱", tip: "点击查看汇流箱相关备件", x: 0.78, y: 0.70, tx: 0.58, ty: 0.62 }
+        { id: "pv_module", title: "光伏组件", tip: "点击查看光伏组件相关备件", x: 0.04, y: 0.28, tx: 0.22, ty: 0.42, side: "left" },
+        { id: "pv_combiner", title: "汇流箱", tip: "点击查看汇流箱相关备件", x: 0.04, y: 0.72, tx: 0.48, ty: 0.58, side: "left" },
+        { id: "pv_inverter", title: "逆变器", tip: "点击查看逆变器相关备件", x: 0.96, y: 0.48, tx: 0.78, ty: 0.52, side: "right" }
       ],
       storage: [
-        { id: "es_battery", title: "电池模组", tip: "点击查看电池模组相关备件", x: 0.16, y: 0.42, tx: 0.42, ty: 0.50 },
-        { id: "es_pcs", title: "PCS变流器", tip: "点击查看PCS相关备件", x: 0.84, y: 0.36, tx: 0.68, ty: 0.48 },
-        { id: "es_sensor", title: "温控/传感器", tip: "点击查看温控传感器相关备件", x: 0.18, y: 0.72, tx: 0.34, ty: 0.62 }
+        { id: "es_battery", title: "电池模组", tip: "点击查看电池模组相关备件", x: 0.04, y: 0.32, tx: 0.22, ty: 0.48, side: "left" },
+        { id: "es_sensor", title: "温控/传感器", tip: "点击查看温控传感器相关备件", x: 0.04, y: 0.72, tx: 0.28, ty: 0.18, side: "left" },
+        { id: "es_pcs", title: "PCS变流器", tip: "点击查看PCS相关备件", x: 0.96, y: 0.48, tx: 0.72, ty: 0.50, side: "right" }
       ]
     };
 
@@ -1676,8 +1689,7 @@
     function syncWindCalloutLeaders() {
       try {
         /* 静态剖视图不跟随 3D 投影 */
-        var cut = document.getElementById("windCutaway");
-        if (cut && cut.classList.contains("on")) return;
+        if (document.querySelector(".static-cutaway.on")) return;
         if (scene3d.kind !== "wind") return;
         if (modelKind(state.mat) !== "wind") return;
         var layer = document.getElementById("calloutLayer");
@@ -1705,24 +1717,15 @@
 
     function renderCallouts() {
       var kind = modelKind(state.mat);
-      var stageLayer = document.getElementById("calloutLayer");
-      var windLayer = document.getElementById("windCalloutLayer");
-      var layer = stageLayer;
+      var layer = document.getElementById("calloutLayer");
       if (!layer) return;
       var list = getCallouts();
-      if (windLayer) {
-        windLayer.innerHTML = "";
-        windLayer.style.visibility = "hidden";
-        windLayer.style.pointerEvents = "none";
-        windLayer.removeAttribute("data-built");
-        windLayer.removeAttribute("data-kind");
-      }
 
       layer.style.visibility = "visible";
       layer.style.opacity = "1";
       layer.style.pointerEvents = "auto";
 
-      /* 同页签只刷新选中态；风机仍同步 3D 锚点 */
+      /* 同页签只刷新选中态；静态图用配置锚点 */
       if (layer.getAttribute("data-kind") === kind && layer.getAttribute("data-built") === "1") {
         layer.querySelectorAll(".callout").forEach(function (el) {
           el.classList.toggle("on", el.getAttribute("data-part") === state.partId);
@@ -1732,9 +1735,8 @@
       }
 
       var lines = list.map(function (c) {
-        var p = null; /* 风机改静态图，锚点用配置坐标 */
-        var tx = p ? p.tx : c.tx;
-        var ty = p ? p.ty : c.ty;
+        var tx = c.tx;
+        var ty = c.ty;
         return '<path d="' + buildCalloutLeaderPath(c, tx, ty) + '" fill="none" stroke="#69b1ff" stroke-width="0.32" />' +
           '<circle cx="' + (tx * 100) + '" cy="' + (ty * 100) + '" r="0.65" fill="#1677ff" />';
       }).join("");
@@ -1967,11 +1969,19 @@
 
     function applyKind(kind) {
       var stage = document.getElementById("diagramStage");
-      var cutaway = document.getElementById("windCutaway");
-      if (stage) stage.classList.toggle("is-wind", kind === "wind");
-      if (cutaway) cutaway.classList.toggle("on", kind === "wind");
+      var windCut = document.getElementById("windCutaway");
+      var pvCut = document.getElementById("pvCutaway");
+      var stCut = document.getElementById("storageCutaway");
+      var isStatic = kind === "wind" || kind === "pv" || kind === "storage";
+      if (stage) {
+        stage.classList.toggle("is-wind", kind === "wind");
+        stage.classList.toggle("is-static", isStatic);
+      }
+      if (windCut) windCut.classList.toggle("on", kind === "wind");
+      if (pvCut) pvCut.classList.toggle("on", kind === "pv");
+      if (stCut) stCut.classList.toggle("on", kind === "storage");
 
-      /* 强制重建标注，避免风机/光伏标签与模型错配 */
+      /* 强制重建标注，避免页签切换时标签与模型错配 */
       var calloutLayer = document.getElementById("calloutLayer");
       if (calloutLayer) {
         calloutLayer.removeAttribute("data-built");
@@ -1979,43 +1989,28 @@
       }
 
       if (!scene3d.scene) {
-        if (kind === "wind") renderCallouts();
+        renderCallouts();
         return;
       }
       if (!scene3d.roots) ensureModels();
       if (!scene3d.roots) {
-        if (kind === "wind") renderCallouts();
+        renderCallouts();
         return;
       }
 
-      /* 先全隐再显目标，避免页签切换时旧模型残影/空白 */
+      /* 静态图模式：隐藏全部 3D 根节点 */
       Object.keys(scene3d.roots).forEach(function (k) {
         if (scene3d.roots[k]) scene3d.roots[k].visible = false;
       });
-      if (kind !== "wind" && scene3d.roots[kind]) scene3d.roots[kind].visible = true;
 
-      scene3d.meshes = (kind === "wind") ? [] : ((scene3d.meshByKind && scene3d.meshByKind[kind]) || []);
+      scene3d.meshes = [];
       scene3d.kind = kind;
       scene3d.lastPart = "";
       scene3d.rotor = null;
 
-      var camera = scene3d.camera;
-      if (camera && kind !== "wind") {
-        if (kind === "pv") {
-          camera.fov = 34;
-          camera.position.set(5.2, 3.8, 8.0);
-          camera.lookAt(0.2, 1.35, 0);
-        } else {
-          camera.fov = 34;
-          camera.position.set(6.0, 3.9, 8.6);
-          camera.lookAt(0.15, 1.45, 0);
-        }
-        camera.updateProjectionMatrix();
-      }
-      if (scene3d.renderer) scene3d.renderer.setClearColor(kind === "wind" ? 0xf5f5f5 : 0xeef1f5, 1);
+      if (scene3d.renderer) scene3d.renderer.setClearColor(0xf5f5f5, 1);
       var ground = scene3d.scene && scene3d.scene.getObjectByName("ground");
-      if (ground) ground.visible = kind !== "wind";
-      if (kind !== "wind") paintScene();
+      if (ground) ground.visible = false;
       renderCallouts();
     }
 
