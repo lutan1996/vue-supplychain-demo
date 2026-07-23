@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN" data-build="20260722-storage-empty-v1">
+<html lang="zh-CN" data-build="20260723-storage-tabs-v99">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -8,7 +8,7 @@
   <link rel="stylesheet" href="css/subpage-base.css" />
   <link rel="stylesheet" href="css/source-navbar-header.css" />
   <style>
-    :root { --pri: #1677ff; --bd: #e8edf4; }
+    :root { --pri: #1677ff; --bd: #e8edf4; --t: #1f2d3d; --m: #64748b; }
     * { box-sizing: border-box; }
     body.page-subpage .main-scroll { background: #f0f3f8; }
     .ps-wrap {
@@ -56,10 +56,237 @@
       font-weight: 600;
       box-shadow: 0 2px 6px rgba(22, 119, 255, 0.28);
     }
-    .ps-main {
+    .ps-body {
       flex: 1;
       min-height: 0;
+      display: grid;
+      grid-template-columns: 220px minmax(0, 1fr);
+      gap: 8px;
+      padding: 8px;
+      overflow: hidden;
+    }
+    .ps-left {
       background: #fff;
+      border: 1px solid var(--bd);
+      border-radius: 6px;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+      overflow: hidden;
+    }
+    .org-search {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 10px 10px 0;
+      height: 32px;
+      border: 1px solid #d9e2ec;
+      border-radius: 4px;
+      padding: 0 10px;
+      background: #fff;
+      flex: 0 0 auto;
+    }
+    .org-search i { color: #94a3b8; font-size: 12px; }
+    .org-search input {
+      flex: 1; border: 0; outline: none; font-size: 12px; color: #334155; background: transparent;
+    }
+    .org-list {
+      flex: 1;
+      min-height: 0;
+      overflow: auto;
+      padding: 6px;
+      margin-top: 8px;
+      border-top: 1px solid var(--bd);
+    }
+    .tree-item {
+      padding: 8px 10px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 12px;
+      color: #334155;
+      line-height: 1.35;
+      user-select: none;
+    }
+    .tree-item:hover { background: #f0f7ff; color: var(--pri); }
+    .tree-item.on { background: #e6f4ff; color: var(--pri); font-weight: 600; }
+    .tree-item.group { color: #1677ff; font-weight: 600; }
+
+    .ps-right {
+      min-width: 0;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      overflow: hidden;
+    }
+
+    /* 图4：顶部指标页签 */
+    .kpi-row {
+      flex: 0 0 auto;
+      display: grid;
+      grid-template-columns: repeat(8, minmax(0, 1fr));
+      gap: 6px;
+    }
+    .kpi-card {
+      background: #fff;
+      border: 1px solid var(--bd);
+      border-radius: 4px;
+      padding: 8px 10px 8px 12px;
+      position: relative;
+      overflow: hidden;
+      min-width: 0;
+    }
+    .kpi-card::before {
+      content: "";
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 3px;
+      background: var(--acc, #1677ff);
+    }
+    .kpi-card .k {
+      font-size: 12px;
+      color: #334155;
+      line-height: 1.35;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .kpi-card .v {
+      margin-top: 4px;
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--t);
+      font-variant-numeric: tabular-nums;
+    }
+    .kpi-card .u { font-size: 11px; color: var(--m); font-weight: 500; margin-left: 2px; }
+
+    /* 图2 页签 + 图3 排序 */
+    .wh-toolbar {
+      flex: 0 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 2px 0;
+      flex-wrap: wrap;
+    }
+    .type-tabs {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .type-tabs button {
+      height: 30px;
+      padding: 0 14px;
+      border: 1px solid #d9e2ec;
+      border-radius: 2px;
+      background: #fff;
+      color: #334155;
+      font-size: 12px;
+      cursor: pointer;
+      line-height: 1;
+    }
+    .type-tabs button:hover { border-color: #91caff; color: var(--pri); }
+    .type-tabs button.on {
+      color: #a16207;
+      border-color: #d9e2ec;
+      background: #fff;
+      font-weight: 600;
+    }
+    .sort-wrap {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      color: #475569;
+      white-space: nowrap;
+    }
+    .sort-wrap select {
+      height: 30px;
+      min-width: 148px;
+      border: 1px solid #d9e2ec;
+      border-radius: 2px;
+      background: #fff;
+      color: #334155;
+      font-size: 12px;
+      padding: 0 28px 0 10px;
+      outline: none;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath fill='%2394a3b8' d='M0 0l5 6 5-6z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 10px center;
+      cursor: pointer;
+    }
+
+    .wh-cards {
+      flex: 1;
+      min-height: 0;
+      overflow: auto;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+      align-content: start;
+      padding-bottom: 4px;
+    }
+    .wh-card {
+      background: #fff;
+      border: 1px solid var(--bd);
+      border-radius: 6px;
+      padding: 10px 12px 8px;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .wh-card-hd h3 {
+      margin: 0;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--t);
+    }
+    .wh-card-meta {
+      margin-top: 4px;
+      font-size: 11px;
+      color: var(--m);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 12px;
+    }
+    .wh-rings {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4px;
+      min-height: 0;
+    }
+    .wh-ring-box { min-width: 0; }
+    .wh-ring-box .ct {
+      text-align: center;
+      font-size: 11px;
+      font-weight: 600;
+      color: #334155;
+      margin-bottom: 2px;
+    }
+    .wh-ring-el { width: 100%; height: 96px; }
+    .wh-bar-box .ct {
+      font-size: 11px;
+      font-weight: 600;
+      color: #334155;
+      margin: 2px 0 4px;
+    }
+    .wh-bar-el { width: 100%; height: 160px; }
+    .wh-card-ft {
+      font-size: 12px;
+      color: #475569;
+      padding-top: 4px;
+      border-top: 1px solid #eef2f7;
+    }
+    .wh-card-ft b { color: #389e0d; font-weight: 600; }
+
+    @media (max-width: 1280px) {
+      .ps-body { grid-template-columns: 180px minmax(0, 1fr); }
+      .kpi-row { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+      .wh-cards { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -97,17 +324,394 @@
         <div class="ps-wrap">
           <div class="ps-view-row" aria-label="生产物资库存管理视图">
             <div class="ps-view-switch" aria-label="生产物资库存管理视图切换">
-              <a href="prod-spare-inventory-ledger-0714.html"><i class="fa-solid fa-house"></i> 库存总览</a>
-              <a class="on" href="prod-spare-storage-0714.html"><i class="fa-solid fa-warehouse"></i> 仓库视图</a>
+              <a href="prod-spare-inventory-scheme2.html" data-action="prod-spare-inventory" data-label="库存总览"><i class="fa-solid fa-house"></i> 库存总览</a>
+              <a class="on" href="prod-spare-storage-0714.html" data-action="prod-spare-storage" data-label="仓库视图"><i class="fa-solid fa-warehouse"></i> 仓库视图</a>
             </div>
           </div>
-          <div class="ps-main" aria-label="仓库视图内容（已清空）"></div>
+
+          <div class="ps-body">
+            <aside class="ps-left">
+              <div class="org-search">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input id="orgSearch" type="search" placeholder="搜索组织 / 风电场" />
+              </div>
+              <div class="org-list" id="orgList"></div>
+            </aside>
+
+            <section class="ps-right">
+              <div class="kpi-row" id="kpiRow" aria-label="仓库汇总指标"></div>
+
+              <div class="wh-toolbar">
+                <div class="type-tabs" id="typeTabs" role="tablist" aria-label="仓库类型页签"></div>
+                <div class="sort-wrap">
+                  <span>排序方式：</span>
+                  <select id="sortSelect" aria-label="排序方式"></select>
+                </div>
+              </div>
+
+              <div class="wh-cards" id="whCards"></div>
+            </section>
+          </div>
         </div>
       </main>
     </div>
   </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.1/dist/echarts.min.js"></script>
   <script src="js/sidebar-actions.js"></script>
   <script src="js/site-footer.js"></script>
-  <script src="js/subpage-clock.js?v=20260714-whcfg-v1"></script>
+  <script src="js/subpage-clock.js?v=20260723-storage-tabs-v99"></script>
+  <script>
+    (function () {
+      var ORG_DATA = [
+        { key: "上海龙源", name: "上海龙源" },
+        { key: "云南龙源", name: "云南龙源" },
+        { key: "天津龙源", name: "天津龙源" },
+        { key: "山西龙源", name: "山西龙源" },
+        { key: "河北龙源", name: "河北龙源" },
+        { key: "蒙东龙源", name: "蒙东龙源" },
+        { key: "安徽龙源", name: "安徽龙源" },
+        { key: "海上龙源", name: "海上龙源" }
+      ];
+
+      /* 图2：仓库类型页签 */
+      var TYPE_TABS = ["中心主仓", "场站周转仓", "近修备件仓", "报废暂存仓", "其他仓"];
+
+      /* 图4 指标 → 图3 下拉「按…」格式 */
+      var SORT_OPTS = [
+        { key: "qtyPct", label: "按库存数量占比" },
+        { key: "amtPct", label: "按库存金额占比" },
+        { key: "inQtyPct", label: "按入库量占比" },
+        { key: "inAmtPct", label: "按入库金额占比" },
+        { key: "outQtyPct", label: "按出库数量占比" },
+        { key: "outAmtPct", label: "按出库金额占比" },
+        { key: "idlePct", label: "按呆滞金额占比" },
+        { key: "scrapPct", label: "按废旧报废金额占比" }
+      ];
+
+      var KPI = [
+        { key: "qty", name: "总库存数量", value: 140, unit: "件", acc: "#1677ff" },
+        { key: "amt", name: "总库存金额", value: 4400, unit: "万元", acc: "#1677ff" },
+        { key: "inQty", name: "总入库量", value: 140, unit: "件", acc: "#52c41a" },
+        { key: "inAmt", name: "总入库金额", value: 4400, unit: "万元", acc: "#52c41a" },
+        { key: "outQty", name: "总出库数量", value: 140, unit: "件", acc: "#faad14" },
+        { key: "outAmt", name: "总出库金额", value: 4400, unit: "万元", acc: "#faad14" },
+        { key: "idle", name: "呆滞总金额（超60天）", value: 140, unit: "万元", acc: "#cf1322" },
+        { key: "scrap", name: "总废旧报废金额", value: 140, unit: "万元", acc: "#f5222d" }
+      ];
+
+      var ZONES = ["风电库区", "火电库区", "光伏库区", "储能库区", "综合库区"];
+
+      /* 各仓库类型下的柱状图基础倍数，切换页签时数值变化 */
+      var TYPE_FACTOR = {
+        "中心主仓": 1.0,
+        "场站周转仓": 0.72,
+        "近修备件仓": 0.55,
+        "报废暂存仓": 0.38,
+        "其他仓": 0.46
+      };
+
+      var WAREHOUSES = [
+        {
+          id: "w1",
+          name: "仓库名称",
+          company: "江苏龙源",
+          storageType: "存储类型",
+          whType: "仓库类型",
+          score: { qtyPct: 86, amtPct: 92, inQtyPct: 70, inAmtPct: 74, outQtyPct: 68, outAmtPct: 71, idlePct: 40, scrapPct: 28 },
+          ringDist: [1895, 980, 520, 420],
+          ringUtil: [11, 820],
+          barBase: {
+            stock: [18, 22, 12, 16, 10],
+            inbound: [10, 14, 8, 11, 6],
+            idle: [6, 8, 4, 5, 3]
+          }
+        },
+        {
+          id: "w2",
+          name: "仓库名称",
+          company: "江苏龙源",
+          storageType: "存储类型",
+          whType: "仓库类型",
+          score: { qtyPct: 64, amtPct: 58, inQtyPct: 82, inAmtPct: 79, outQtyPct: 55, outAmtPct: 52, idlePct: 66, scrapPct: 48 },
+          ringDist: [1260, 840, 610, 390],
+          ringUtil: [28, 760],
+          barBase: {
+            stock: [14, 17, 20, 11, 9],
+            inbound: [8, 12, 15, 7, 5],
+            idle: [5, 7, 9, 4, 3]
+          }
+        },
+        {
+          id: "w3",
+          name: "仓库名称",
+          company: "江苏龙源",
+          storageType: "存储类型",
+          whType: "仓库类型",
+          score: { qtyPct: 41, amtPct: 47, inQtyPct: 36, inAmtPct: 39, outQtyPct: 88, outAmtPct: 84, idlePct: 22, scrapPct: 71 },
+          ringDist: [980, 720, 480, 350],
+          ringUtil: [42, 690],
+          barBase: {
+            stock: [11, 13, 9, 15, 12],
+            inbound: [6, 9, 5, 10, 7],
+            idle: [3, 5, 2, 6, 4]
+          }
+        }
+      ];
+
+      var state = {
+        org: "group",
+        typeTab: TYPE_TABS[0],
+        sortKey: SORT_OPTS[0].key
+      };
+
+      var chartMap = {};
+
+      function scaleArr(arr, factor) {
+        return arr.map(function (v) { return Math.max(1, Math.round(v * factor)); });
+      }
+
+      function barDataFor(wh) {
+        var f = TYPE_FACTOR[state.typeTab] || 1;
+        return {
+          stock: scaleArr(wh.barBase.stock, f),
+          inbound: scaleArr(wh.barBase.inbound, f * 0.95),
+          idle: scaleArr(wh.barBase.idle, f * 0.9)
+        };
+      }
+
+      function sortedWarehouses() {
+        var key = state.sortKey;
+        return WAREHOUSES.slice().sort(function (a, b) {
+          var av = (a.score && a.score[key]) || 0;
+          var bv = (b.score && b.score[key]) || 0;
+          return bv - av; /* 正序：值高/大的在前 */
+        });
+      }
+
+      function renderOrg() {
+        var kw = (document.getElementById("orgSearch").value || "").trim();
+        var html = '<div class="tree-item group' + (state.org === "group" ? " on" : "") + '" data-org="group">龙源电力(总计)</div>';
+        ORG_DATA.forEach(function (c) {
+          if (kw && c.name.indexOf(kw) < 0) return;
+          html += '<div class="tree-item' + (state.org === c.key ? " on" : "") + '" data-org="' + c.key + '">' + c.name + "</div>";
+        });
+        document.getElementById("orgList").innerHTML = html;
+      }
+
+      function renderKpi() {
+        document.getElementById("kpiRow").innerHTML = KPI.map(function (k) {
+          return (
+            '<div class="kpi-card" style="--acc:' + k.acc + '">' +
+              '<div class="k">' + k.name + "</div>" +
+              '<div class="v">' + k.value + '<span class="u">' + k.unit + "</span></div>" +
+            "</div>"
+          );
+        }).join("");
+      }
+
+      function renderTypeTabs() {
+        document.getElementById("typeTabs").innerHTML = TYPE_TABS.map(function (t) {
+          return '<button type="button" role="tab" data-type="' + t + '" class="' + (state.typeTab === t ? "on" : "") + '">' + t + "</button>";
+        }).join("");
+      }
+
+      function renderSort() {
+        var sel = document.getElementById("sortSelect");
+        sel.innerHTML = SORT_OPTS.map(function (o) {
+          return '<option value="' + o.key + '"' + (state.sortKey === o.key ? " selected" : "") + ">" + o.label + "</option>";
+        }).join("");
+      }
+
+      function ringOption(items, colors) {
+        var max = 0;
+        items.forEach(function (it) { if (it.value > max) max = it.value; });
+        max = Math.max(max * 1.15, 1);
+        var series = [];
+        var legend = [];
+        items.forEach(function (it, i) {
+          var outer = 68 - i * 14;
+          var inner = outer - 10;
+          legend.push(it.name + " " + it.value);
+          series.push({
+            type: "pie",
+            radius: [inner + "%", outer + "%"],
+            center: ["26%", "52%"],
+            startAngle: 90,
+            label: { show: false },
+            labelLine: { show: false },
+            data: [
+              { value: it.value, name: it.name + " " + it.value, itemStyle: { color: colors[i % colors.length] } },
+              { value: max - it.value, name: "", itemStyle: { color: "#eef2f7" }, tooltip: { show: false }, emphasis: { disabled: true } }
+            ]
+          });
+        });
+        return {
+          tooltip: { trigger: "item", formatter: function (p) { return p && p.name ? p.name : ""; } },
+          legend: {
+            orient: "vertical",
+            left: "48%",
+            top: "middle",
+            itemWidth: 6,
+            itemHeight: 6,
+            itemGap: 4,
+            icon: "circle",
+            data: legend,
+            textStyle: { fontSize: 9, color: "#475569", width: 88, overflow: "none" }
+          },
+          series: series
+        };
+      }
+
+      function barOption(data) {
+        return {
+          color: ["#1677ff", "#52c41a", "#faad14"],
+          tooltip: { trigger: "axis" },
+          legend: {
+            top: 0,
+            right: 0,
+            itemWidth: 8,
+            itemHeight: 8,
+            textStyle: { fontSize: 10, color: "#64748b" },
+            data: ["库存金额", "入库金额", "超60天金额"]
+          },
+          grid: { left: 36, right: 8, top: 28, bottom: 28 },
+          xAxis: {
+            type: "category",
+            data: ZONES,
+            axisLabel: { fontSize: 10, color: "#94a3b8", interval: 0, rotate: 0 },
+            axisTick: { show: false },
+            axisLine: { lineStyle: { color: "#e8edf4" } }
+          },
+          yAxis: {
+            type: "value",
+            name: "万元",
+            nameTextStyle: { fontSize: 10, color: "#94a3b8" },
+            splitLine: { lineStyle: { color: "#eef2f7" } },
+            axisLabel: { fontSize: 10, color: "#94a3b8" }
+          },
+          series: [
+            { name: "库存金额", type: "bar", barWidth: 10, data: data.stock },
+            { name: "入库金额", type: "bar", barWidth: 10, data: data.inbound },
+            { name: "超60天金额", type: "bar", barWidth: 10, data: data.idle }
+          ]
+        };
+      }
+
+      function ensureChart(id, el) {
+        if (!window.echarts || !el) return null;
+        if (chartMap[id]) {
+          chartMap[id].resize();
+          return chartMap[id];
+        }
+        chartMap[id] = echarts.init(el);
+        return chartMap[id];
+      }
+
+      function disposeCharts() {
+        Object.keys(chartMap).forEach(function (k) {
+          try { chartMap[k].dispose(); } catch (e) {}
+        });
+        chartMap = {};
+      }
+
+      function renderCards() {
+        disposeCharts();
+        var list = sortedWarehouses();
+        var root = document.getElementById("whCards");
+        root.innerHTML = list.map(function (wh) {
+          return (
+            '<article class="wh-card" data-id="' + wh.id + '">' +
+              '<div class="wh-card-hd">' +
+                "<h3>" + wh.name + "</h3>" +
+                '<div class="wh-card-meta">' +
+                  "<span>" + wh.company + "</span>" +
+                  "<span>" + wh.storageType + "</span>" +
+                  "<span>" + wh.whType + "</span>" +
+                "</div>" +
+              "</div>" +
+              '<div class="wh-rings">' +
+                '<div class="wh-ring-box"><div class="ct">全仓库区分布</div><div class="wh-ring-el" id="dist-' + wh.id + '"></div></div>' +
+                '<div class="wh-ring-box"><div class="ct">库存利用率</div><div class="wh-ring-el" id="util-' + wh.id + '"></div></div>' +
+              "</div>" +
+              '<div class="wh-bar-box"><div class="ct">各库区金额情况</div><div class="wh-bar-el" id="bar-' + wh.id + '"></div></div>' +
+              '<div class="wh-card-ft">仓库状态：<b>正常</b></div>' +
+            "</article>"
+          );
+        }).join("");
+
+        list.forEach(function (wh) {
+          var dist = ensureChart("dist-" + wh.id, document.getElementById("dist-" + wh.id));
+          if (dist) {
+            dist.setOption(ringOption(
+              [
+                { name: "风电库区", value: wh.ringDist[0] },
+                { name: "风电库区", value: wh.ringDist[1] },
+                { name: "风电库区", value: wh.ringDist[2] },
+                { name: "风电库区", value: wh.ringDist[3] }
+              ],
+              ["#1d4ed8", "#22d3ee", "#f87171", "#fbbf24"]
+            ), true);
+          }
+          var util = ensureChart("util-" + wh.id, document.getElementById("util-" + wh.id));
+          if (util) {
+            util.setOption(ringOption(
+              [
+                { name: "已占用库位", value: wh.ringUtil[0] },
+                { name: "空闲库位", value: wh.ringUtil[1] }
+              ],
+              ["#1d4ed8", "#22d3ee"]
+            ), true);
+          }
+          var bar = ensureChart("bar-" + wh.id, document.getElementById("bar-" + wh.id));
+          if (bar) bar.setOption(barOption(barDataFor(wh)), true);
+        });
+      }
+
+      function updateBarsOnly() {
+        sortedWarehouses().forEach(function (wh) {
+          var bar = chartMap["bar-" + wh.id];
+          if (bar) bar.setOption(barOption(barDataFor(wh)), true);
+        });
+      }
+
+      function renderAll() {
+        renderOrg();
+        renderKpi();
+        renderTypeTabs();
+        renderSort();
+        renderCards();
+      }
+
+      document.getElementById("orgList").addEventListener("click", function (e) {
+        var item = e.target.closest(".tree-item");
+        if (!item) return;
+        state.org = item.getAttribute("data-org") || "group";
+        renderOrg();
+      });
+      document.getElementById("orgSearch").addEventListener("input", renderOrg);
+
+      document.getElementById("typeTabs").addEventListener("click", function (e) {
+        var btn = e.target.closest("button[data-type]");
+        if (!btn) return;
+        state.typeTab = btn.getAttribute("data-type");
+        renderTypeTabs();
+        updateBarsOnly(); /* 切换图2页签 → 下方柱状图数值变化 */
+      });
+
+      document.getElementById("sortSelect").addEventListener("change", function () {
+        state.sortKey = this.value;
+        renderCards(); /* 按…占比 → 值高/大的排最前 */
+      });
+
+      window.addEventListener("resize", function () {
+        Object.keys(chartMap).forEach(function (k) {
+          try { chartMap[k].resize(); } catch (e) {}
+        });
+      });
+
+      renderAll();
+    })();
+  </script>
 </body>
 </html>
