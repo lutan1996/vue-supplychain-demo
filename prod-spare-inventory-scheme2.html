@@ -548,8 +548,8 @@
       flex-direction: column;
       align-items: stretch;
       justify-content: center;
-      gap: 3px;
-      padding: 7px 8px 6px;
+      gap: 2px;
+      padding: 5px 6px 4px;
       flex: 0 0 auto;
       background:
         linear-gradient(90deg, rgba(22, 119, 255, 0.08), transparent 42%),
@@ -561,11 +561,11 @@
       left: auto;
       top: auto;
       transform: none;
-      font-size: 10px;
+      font-size: 9px;
       color: #64748b;
       font-weight: 600;
-      letter-spacing: 0.06em;
-      line-height: 1.2;
+      letter-spacing: 0.04em;
+      line-height: 1.15;
       white-space: nowrap;
       text-transform: none;
     }
@@ -573,8 +573,8 @@
       display: flex;
       align-items: baseline;
       justify-content: flex-start;
-      gap: 10px;
-      flex-wrap: wrap;
+      gap: 8px;
+      flex-wrap: nowrap;
     }
     .rt-summary .rt-vals > div {
       display: inline-flex;
@@ -583,16 +583,16 @@
     }
     .rt-summary .rt-vals b {
       font-family: var(--num);
-      font-size: 14px;
+      font-size: 12px;
       color: #0f172a;
       font-weight: 700;
-      line-height: 0.95;
+      line-height: 1;
       font-variant-numeric: tabular-nums;
       letter-spacing: -0.03em;
     }
     .rt-summary .rt-vals > div:first-child b { color: #1677ff; }
     .rt-summary .rt-vals span {
-      font-size: 10px;
+      font-size: 9px;
       color: #94a3b8;
       margin-left: 1px;
       font-weight: 600;
@@ -606,15 +606,17 @@
       min-height: 0;
     }
     .rt-flow-col {
-      padding: 6px 7px 7px;
+      padding: 4px 5px 5px;
       border-radius: 0;
       background: transparent;
       border: 0;
       display: flex;
       flex-direction: column;
       justify-content: center;
+      gap: 1px;
       min-height: 0;
       position: relative;
+      overflow: hidden;
     }
     .rt-flow-col + .rt-flow-col {
       border-left: 1px solid #eef2f7;
@@ -624,22 +626,24 @@
       content: "";
       position: absolute;
       left: 0;
-      top: 8px;
-      bottom: 8px;
+      top: 6px;
+      bottom: 6px;
       width: 2px;
       border-radius: 0 2px 2px 0;
     }
     .rt-flow-col.out::before { background: #1677ff; }
     .rt-flow-col.in::before { background: #52c41a; }
-    .rt-flow-col.out { border-top: 0; padding-left: 9px; }
-    .rt-flow-col.in { border-top: 0; padding-left: 9px; }
+    .rt-flow-col.out { border-top: 0; padding-left: 8px; }
+    .rt-flow-col.in { border-top: 0; padding-left: 8px; }
     .rt-flow-col .t {
       text-align: left;
-      font-size: 10px;
+      font-size: 9px;
       color: #64748b;
       font-weight: 600;
-      margin-bottom: 4px;
+      margin-bottom: 2px;
       letter-spacing: 0.02em;
+      line-height: 1.15;
+      white-space: nowrap;
     }
     .rt-flow-col.out .t { color: #1677ff; }
     .rt-flow-col.in .t { color: #389e0d; }
@@ -647,21 +651,22 @@
       display: flex;
       justify-content: space-between;
       align-items: baseline;
-      font-size: 10px;
+      font-size: 9px;
       color: #94a3b8;
-      margin-top: 2px;
+      margin-top: 0;
       line-height: 1.2;
       padding: 0;
       border-radius: 0;
       background: transparent;
-      gap: 4px;
+      gap: 2px;
+      min-width: 0;
     }
     .rt-flow-col .r em {
       font-family: var(--num);
       font-style: normal;
       color: #0f172a;
       font-weight: 700;
-      font-size: 11px;
+      font-size: 10px;
       letter-spacing: -0.02em;
       font-variant-numeric: tabular-nums;
       white-space: nowrap;
@@ -790,11 +795,11 @@
     .idle-board .idle-dot { display: none; }
     .idle-cell {
       position: relative;
-      padding: 6px 8px 6px 10px;
+      padding: 4px 6px 4px 8px;
       display: flex;
       flex-direction: column;
       justify-content: center;
-      gap: 1px;
+      gap: 0;
       min-height: 0;
       overflow: hidden;
       background: #fff;
@@ -810,8 +815,8 @@
       content: "";
       position: absolute;
       left: 0;
-      top: 7px;
-      bottom: 7px;
+      top: 5px;
+      bottom: 5px;
       width: 2px;
       border-radius: 0 2px 2px 0;
     }
@@ -824,11 +829,14 @@
     .idle-cell:nth-child(3) { border-top-color: transparent; }
     .idle-cell:nth-child(4) { border-top-color: transparent; }
     .idle-cell .t {
-      font-size: 9px;
+      font-size: 8px;
       color: #94a3b8;
-      line-height: 1.2;
+      line-height: 1.15;
       font-weight: 600;
-      letter-spacing: 0.01em;
+      letter-spacing: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
     .idle-cell .t em {
       font-style: normal;
@@ -836,14 +844,14 @@
       font-weight: 700;
     }
     .idle-cell .v {
-      font-size: 11px;
+      font-size: 10px;
       color: #334155;
-      line-height: 1;
+      line-height: 1.1;
       margin-top: 1px;
     }
     .idle-cell .v b {
       font-family: var(--num);
-      font-size: 13px;
+      font-size: 11px;
       font-weight: 700;
       color: #0f172a;
       font-variant-numeric: tabular-nums;
@@ -854,18 +862,20 @@
     .idle-cell:nth-child(3) .v b { color: #d48806; }
     .idle-cell:nth-child(4) .v b { color: #cf1322; }
     .idle-cell .a {
-      font-size: 9px;
+      font-size: 8px;
       color: #94a3b8;
-      line-height: 1.25;
+      line-height: 1.15;
       padding: 0;
       border-radius: 0;
       background: transparent;
       width: fit-content;
       max-width: 100%;
       margin-top: 1px;
+      white-space: nowrap;
     }
     .idle-cell .idle-bar {
-      margin-top: 4px;
+      display: none; /* 腾出高度，避免时长/金额被裁切 */
+      margin-top: 2px;
       height: 2px;
       border-radius: 999px;
       background: #f1f5f9;
@@ -1062,25 +1072,25 @@
                   <div class="dash-split">
                     <div class="idle-board">
                       <div class="idle-cell">
-                        <div class="t">呆滞时长 · <em>30~90天</em></div>
+                        <div class="t"><em>30~90天</em></div>
                         <div class="v"><b>1280件</b></div>
                         <div class="a">库存金额 2000万元</div>
                         <div class="idle-bar" aria-hidden="true"><i style="width:20%"></i></div>
                       </div>
                       <div class="idle-cell">
-                        <div class="t">呆滞时长 · <em>90~180天</em></div>
+                        <div class="t"><em>90~180天</em></div>
                         <div class="v"><b>1280件</b></div>
                         <div class="a">库存金额 2000万元</div>
                         <div class="idle-bar" aria-hidden="true"><i style="width:30%"></i></div>
                       </div>
                       <div class="idle-cell">
-                        <div class="t">呆滞时长 · <em>180~360天</em></div>
+                        <div class="t"><em>180~360天</em></div>
                         <div class="v"><b>1280件</b></div>
                         <div class="a">库存金额 2000万元</div>
                         <div class="idle-bar" aria-hidden="true"><i style="width:20%"></i></div>
                       </div>
                       <div class="idle-cell">
-                        <div class="t">呆滞时长 · <em>360天以上</em></div>
+                        <div class="t"><em>360天以上</em></div>
                         <div class="v"><b>1280件</b></div>
                         <div class="a">库存金额 2000万元</div>
                         <div class="idle-bar" aria-hidden="true"><i style="width:30%"></i></div>
