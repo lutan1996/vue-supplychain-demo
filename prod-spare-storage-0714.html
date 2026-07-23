@@ -477,7 +477,7 @@
               <a href="prod-spare-inventory-scheme2.html" data-action="prod-spare-inventory" data-label="库存总览"><i class="fa-solid fa-house"></i> 库存总览</a>
               <a class="on" href="prod-spare-storage-0714.html" data-action="prod-spare-storage" data-label="仓库视图"><i class="fa-solid fa-warehouse"></i> 仓库视图</a>
             </div>
-          </div>
+                </div>
 
           <div class="ps-body" id="psBody">
             <aside class="ps-left">
@@ -569,9 +569,6 @@
         "其他仓": 0.46
       };
 
-      /* 卡片仓库类型标签（图2文字） */
-      var WH_TYPE_TAGS = ["中心主仓", "场站周转仓", "返修备件仓", "报废暂存仓"];
-
       var WAREHOUSES = [
         {
           id: "w1",
@@ -580,7 +577,7 @@
           score: { qtyPct: 86, amtPct: 92, inQtyPct: 70, inAmtPct: 74, outQtyPct: 68, outAmtPct: 71, idlePct: 40, scrapPct: 28 },
           ringDist: [1895, 980, 520, 420],
           ringUtil: [11, 820],
-          types: WH_TYPE_TAGS,
+          types: ["中心主仓", "场站周转仓", "返修备件仓", "报废暂存仓"],
           barBase: {
             stock: [18, 16, 14, 12, 10],
             scrap: [8, 7, 6, 9, 11],
@@ -594,7 +591,7 @@
           score: { qtyPct: 64, amtPct: 58, inQtyPct: 82, inAmtPct: 79, outQtyPct: 55, outAmtPct: 52, idlePct: 66, scrapPct: 48 },
           ringDist: [1260, 840, 610, 390],
           ringUtil: [28, 760],
-          types: WH_TYPE_TAGS,
+          types: ["中心主仓", "场站周转仓", "返修备件仓", "报废暂存仓"],
           barBase: {
             stock: [14, 15, 13, 11, 9],
             scrap: [6, 8, 7, 10, 12],
@@ -608,7 +605,7 @@
           score: { qtyPct: 41, amtPct: 47, inQtyPct: 36, inAmtPct: 39, outQtyPct: 88, outAmtPct: 84, idlePct: 22, scrapPct: 71 },
           ringDist: [980, 720, 480, 350],
           ringUtil: [42, 690],
-          types: WH_TYPE_TAGS,
+          types: ["中心主仓", "场站周转仓", "返修备件仓", "报废暂存仓"],
           barBase: {
             stock: [12, 13, 11, 10, 8],
             scrap: [5, 6, 5, 8, 10],
@@ -815,9 +812,15 @@
         chartMap = {};
       }
 
+      function selectedOrgName() {
+        if (state.level === "group" || !state.company) return "龙源电力";
+        return state.company;
+      }
+
       function renderCards() {
         disposeCharts();
         var list = sortedWarehouses();
+        var orgName = selectedOrgName();
         var root = document.getElementById("whCards");
         root.innerHTML = list.map(function (wh) {
           return (
@@ -825,8 +828,8 @@
               '<div class="wh-card-hd">' +
                 "<h3>" + wh.name + "</h3>" +
                 '<div class="wh-card-meta">' +
-                  '<span class="org">' + wh.company + "</span>" +
-                  WH_TYPE_TAGS.map(function (t) {
+                  '<span class="org">' + orgName + "</span>" +
+                  (wh.types || []).map(function (t) {
                     return '<span class="wh-tag">' + t + "</span>";
                   }).join("") +
                 "</div>" +
