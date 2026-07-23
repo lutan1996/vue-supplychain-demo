@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN" data-build="20260722-tab3d-v60">
+<html lang="zh-CN" data-build="20260723-wind-img-v80">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -288,10 +288,43 @@
       background: linear-gradient(180deg, #ffffff 0%, #f3f7fc 55%, #e9f0f8 100%);
     }
     .diagram-stage.is-wind {
-      background: #eef1f5;
+      background: #f5f5f5;
     }
-    /* 旧 SVG 剖视停用：风机与光伏一样走 Three.js 3D */
-    .wind-cutaway { display: none !important; }
+    /* 风机：静态剖视图（完整 contain，不裁切） */
+    .wind-cutaway {
+      display: none;
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+      align-items: center;
+      justify-content: center;
+      background: #f5f5f5;
+      overflow: hidden;
+      padding: 8px 16px;
+    }
+    .wind-cutaway.on { display: flex; }
+    .wind-cutaway-frame {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      max-width: 100%;
+      max-height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .wind-cutaway-frame > img {
+      display: block;
+      width: auto;
+      height: auto;
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+      object-position: center;
+      pointer-events: none;
+      user-select: none;
+    }
+    .diagram-stage.is-wind #diagramWrap { visibility: hidden; }
     #diagramWrap {
       position: absolute;
       inset: 0;
@@ -888,147 +921,7 @@
                   <div id="diagramWrap"></div>
                   <div class="wind-cutaway" id="windCutaway" aria-label="风机剖视">
                     <div class="wind-cutaway-frame">
-                      <div class="wind-art" aria-hidden="true">
-                        <svg viewBox="0 0 900 560" preserveAspectRatio="xMidYMid meet">
-                          <defs>
-                            <linearGradient id="wShell" x1="0" y1="0" x2="0" y2="1">
-                              <stop offset="0%" stop-color="#f8fafc"/>
-                              <stop offset="55%" stop-color="#eef2f6"/>
-                              <stop offset="100%" stop-color="#dbe3ea"/>
-                            </linearGradient>
-                            <linearGradient id="wTower" x1="0" y1="0" x2="1" y2="0">
-                              <stop offset="0%" stop-color="#e8eef4"/>
-                              <stop offset="45%" stop-color="#f7fafc"/>
-                              <stop offset="100%" stop-color="#cfd8e3"/>
-                            </linearGradient>
-                            <linearGradient id="wTeal" x1="0" y1="0" x2="0" y2="1">
-                              <stop offset="0%" stop-color="#7ec8d4"/>
-                              <stop offset="100%" stop-color="#4aa3b5"/>
-                            </linearGradient>
-                            <linearGradient id="wCopper" x1="0" y1="0" x2="1" y2="1">
-                              <stop offset="0%" stop-color="#e8a06a"/>
-                              <stop offset="100%" stop-color="#c56a35"/>
-                            </linearGradient>
-                            <linearGradient id="wBlade" x1="0" y1="0" x2="1" y2="0">
-                              <stop offset="0%" stop-color="#d5dde6"/>
-                              <stop offset="45%" stop-color="#f4f7fa"/>
-                              <stop offset="100%" stop-color="#c5ced8"/>
-                            </linearGradient>
-                            <linearGradient id="wDisc" x1="0" y1="0" x2="1" y2="0">
-                              <stop offset="0%" stop-color="#b8c4d0"/>
-                              <stop offset="50%" stop-color="#e8eef4"/>
-                              <stop offset="100%" stop-color="#9aabba"/>
-                            </linearGradient>
-                            <filter id="wSoft" x="-20%" y="-20%" width="140%" height="140%">
-                              <feDropShadow dx="0" dy="6" stdDeviation="8" flood-color="#0f172a" flood-opacity="0.10"/>
-                            </filter>
-                          </defs>
-
-                          <!-- 塔架 -->
-                          <path d="M412 330 L488 330 L505 560 L395 560 Z" fill="url(#wTower)" stroke="#c5d0db" stroke-width="1.2"/>
-                          <path d="M418 330 L430 560" stroke="#eef3f7" stroke-width="6" opacity="0.7"/>
-
-                          <!-- 机舱底板 / 平台 -->
-                          <ellipse cx="470" cy="328" rx="195" ry="18" fill="#5eb0bf" opacity="0.85"/>
-                          <rect x="290" y="300" width="360" height="30" rx="4" fill="url(#wTeal)"/>
-
-                          <!-- 机舱外壳（剖开） -->
-                          <g filter="url(#wSoft)">
-                            <path d="M250 210
-                              C250 175 275 150 320 145
-                              L620 145
-                              C680 145 720 175 725 215
-                              L730 300
-                              L255 300
-                              Z" fill="url(#wShell)" stroke="#c9d4df" stroke-width="1.4"/>
-                            <!-- 剖开截面边 -->
-                            <path d="M250 210 L255 300" fill="none" stroke="#94a3b8" stroke-width="1.2"/>
-                            <path d="M725 215 L730 300" fill="none" stroke="#94a3b8" stroke-width="1.2"/>
-                          </g>
-                          <!-- 机舱顶外轮廓高光 -->
-                          <path d="M320 148 L615 148" stroke="#fff" stroke-width="3" opacity="0.55"/>
-
-                          <!-- 顶部风速仪 / 滤芯传感器 -->
-                          <g>
-                            <rect x="560" y="118" width="8" height="30" rx="2" fill="#94a3b8"/>
-                            <circle cx="564" cy="112" r="7" fill="none" stroke="#64748b" stroke-width="2"/>
-                            <circle cx="552" cy="108" r="4" fill="#94a3b8"/>
-                            <circle cx="576" cy="108" r="4" fill="#94a3b8"/>
-                            <circle cx="564" cy="98" r="4" fill="#94a3b8"/>
-                            <rect x="548" y="128" width="36" height="14" rx="3" fill="#cbd5e1"/>
-                          </g>
-
-                          <!-- 电器柜 -->
-                          <rect x="640" y="210" width="58" height="78" rx="4" fill="#6ec0cf" stroke="#3d8fa0" stroke-width="1"/>
-                          <rect x="648" y="220" width="42" height="10" rx="2" fill="#dff6fa"/>
-                          <rect x="648" y="236" width="42" height="10" rx="2" fill="#dff6fa"/>
-                          <rect x="648" y="252" width="42" height="10" rx="2" fill="#dff6fa"/>
-
-                          <!-- 发电机总成：前盘 / 磁铁 / 定子绕组 / 中间定子 / 后盘 -->
-                          <g>
-                            <!-- 前盘式转子 -->
-                            <ellipse cx="360" cy="245" rx="18" ry="72" fill="url(#wDisc)" stroke="#8a9aab" stroke-width="1"/>
-                            <!-- 永久磁铁环 -->
-                            <g>
-                              <rect x="378" y="188" width="22" height="18" rx="3" fill="url(#wCopper)"/>
-                              <rect x="378" y="212" width="22" height="18" rx="3" fill="url(#wCopper)"/>
-                              <rect x="378" y="236" width="22" height="18" rx="3" fill="url(#wCopper)"/>
-                              <rect x="378" y="260" width="22" height="18" rx="3" fill="url(#wCopper)"/>
-                              <rect x="378" y="284" width="22" height="18" rx="3" fill="url(#wCopper)"/>
-                            </g>
-                            <!-- 中间定子绕组 -->
-                            <g>
-                              <rect x="408" y="185" width="28" height="22" rx="4" fill="url(#wCopper)"/>
-                              <rect x="408" y="214" width="28" height="22" rx="4" fill="url(#wCopper)"/>
-                              <rect x="408" y="243" width="28" height="22" rx="4" fill="url(#wCopper)"/>
-                              <rect x="408" y="272" width="28" height="22" rx="4" fill="url(#wCopper)"/>
-                              <rect x="442" y="185" width="28" height="22" rx="4" fill="url(#wCopper)"/>
-                              <rect x="442" y="214" width="28" height="22" rx="4" fill="url(#wCopper)"/>
-                              <rect x="442" y="243" width="28" height="22" rx="4" fill="url(#wCopper)"/>
-                              <rect x="442" y="272" width="28" height="22" rx="4" fill="url(#wCopper)"/>
-                            </g>
-                            <!-- 中间定子 -->
-                            <ellipse cx="490" cy="245" rx="22" ry="70" fill="#7ec8d4" stroke="#3d8fa0" stroke-width="1.2"/>
-                            <ellipse cx="490" cy="245" rx="10" ry="40" fill="#e8f6f9"/>
-                            <!-- 后盘式转子 -->
-                            <ellipse cx="530" cy="245" rx="18" ry="72" fill="url(#wDisc)" stroke="#8a9aab" stroke-width="1"/>
-                            <!-- 主轴 -->
-                            <rect x="300" y="236" width="240" height="18" rx="4" fill="#94a3b8"/>
-                          </g>
-
-                          <!-- 轮毂体（叶片绕此旋转） -->
-                          <ellipse cx="250" cy="245" rx="42" ry="58" fill="url(#wShell)" stroke="#c9d4df" stroke-width="1.3"/>
-                          <ellipse cx="238" cy="245" rx="28" ry="40" fill="#eef2f6" stroke="#b8c4d0" stroke-width="1"/>
-
-                          <!-- 侧视三叶片：与机舱同风格，绕轮毂中心旋转并融入画面 -->
-                          <g transform="translate(210 245)">
-                            <g class="blade-spin">
-                              <!-- 叶片1 向下 -->
-                              <path d="M0 8
-                                C-14 70 -18 150 -10 230
-                                C-4 255 12 255 18 230
-                                C26 150 18 70 8 8 Z" fill="url(#wBlade)" stroke="#9aa8b6" stroke-width="1.1"/>
-                              <!-- 叶片2 右上 -->
-                              <path d="M6 -4
-                                C55 -40 120 -78 175 -100
-                                C195 -108 202 -92 182 -82
-                                C130 -58 70 -28 10 -6 Z" fill="url(#wBlade)" stroke="#9aa8b6" stroke-width="1.1"/>
-                              <!-- 叶片3 左上 -->
-                              <path d="M-6 -4
-                                C-55 -40 -120 -78 -175 -100
-                                C-195 -108 -202 -92 -182 -82
-                                C-130 -58 -70 -28 -10 -6 Z" fill="url(#wBlade)" stroke="#9aa8b6" stroke-width="1.1"/>
-                              <circle r="14" fill="#e8eef4" stroke="#94a3b8" stroke-width="1"/>
-                              <circle r="6" fill="#cbd5e1"/>
-                            </g>
-                          </g>
-
-                          <!-- 轮毂外罩压在叶片根部，保证融合 -->
-                          <ellipse cx="210" cy="245" rx="34" ry="48" fill="url(#wShell)" stroke="#c9d4df" stroke-width="1.2"/>
-                          <ellipse cx="192" cy="245" rx="18" ry="26" fill="#f1f5f9" stroke="#c9d4df" stroke-width="1"/>
-                          <ellipse cx="180" cy="245" rx="10" ry="14" fill="#dbe3ea"/>
-                        </svg>
-                      </div>
+                      <img src="assets/wind-turbine-cutaway-clean.png" alt="风机侧面剖视" draggable="false" />
                       <div class="callout-layer" id="windCalloutLayer"></div>
                     </div>
                   </div>
@@ -1151,20 +1044,16 @@
 
     var CALLOUTS_BY_KIND = {
       /* 风机：左右两列整齐 + 折线引线，锚点对准 3D 部件 */
+      /* 风机：静态剖视图锚点（完整 contain 展示） */
       wind: [
-        { id: "hub_cover", title: "轮毂外罩", tip: "点击查看轮毂外罩相关备件", x: 0.04, y: 0.28, tx: 0.26, ty: 0.28, side: "left" },
-        { id: "hub", title: "轮毂", tip: "点击查看轮毂相关备件", x: 0.04, y: 0.38, tx: 0.29, ty: 0.38, side: "left" },
-        { id: "blade", title: "叶片", tip: "点击查看叶片相关备件", x: 0.04, y: 0.50, tx: 0.18, ty: 0.50, side: "left" },
-        { id: "magnet", title: "永久磁铁", tip: "点击查看永久磁铁相关备件", x: 0.04, y: 0.62, tx: 0.36, ty: 0.62, side: "left" },
-        { id: "tower", title: "塔架", tip: "点击查看塔架相关备件", x: 0.04, y: 0.80, tx: 0.48, ty: 0.80, side: "left" },
-        { id: "filter", title: "滤芯/传感器", tip: "点击查看滤芯/传感器相关备件", x: 0.96, y: 0.20, tx: 0.58, ty: 0.20, side: "right" },
-        { id: "front_rotor", title: "前盘式转子", tip: "点击查看前盘式转子相关备件", x: 0.96, y: 0.32, tx: 0.38, ty: 0.32, side: "right" },
-        { id: "stator_winding", title: "中间定子绕组", tip: "点击查看中间定子绕组相关备件", x: 0.96, y: 0.42, tx: 0.44, ty: 0.42, side: "right" },
-        { id: "stator", title: "中间定子", tip: "点击查看中间定子相关备件", x: 0.96, y: 0.52, tx: 0.50, ty: 0.52, side: "right" },
-        { id: "rear_rotor", title: "后盘式转子", tip: "点击查看后盘式转子相关备件", x: 0.96, y: 0.60, tx: 0.56, ty: 0.60, side: "right" },
-        { id: "generator", title: "发电机", tip: "点击查看发电机相关备件", x: 0.96, y: 0.70, tx: 0.62, ty: 0.70, side: "right" },
-        { id: "cabinet", title: "电器柜", tip: "点击查看电器柜相关备件", x: 0.96, y: 0.80, tx: 0.70, ty: 0.80, side: "right" },
-        { id: "nacelle", title: "机舱", tip: "点击查看机舱相关备件", x: 0.96, y: 0.90, tx: 0.66, ty: 0.90, side: "right" }
+        { id: "blade", title: "叶片", tip: "点击查看叶片相关备件", x: 0.05, y: 0.22, tx: 0.18, ty: 0.28, side: "left" },
+        { id: "hub_cover", title: "轮毂外罩", tip: "点击查看轮毂外罩相关备件", x: 0.05, y: 0.42, tx: 0.24, ty: 0.48, side: "left" },
+        { id: "hub", title: "轮毂", tip: "点击查看轮毂相关备件", x: 0.05, y: 0.58, tx: 0.28, ty: 0.55, side: "left" },
+        { id: "tower", title: "塔架", tip: "点击查看塔架相关备件", x: 0.05, y: 0.82, tx: 0.42, ty: 0.88, side: "left" },
+        { id: "filter", title: "滤芯/传感器", tip: "点击查看滤芯/传感器相关备件", x: 0.95, y: 0.16, tx: 0.72, ty: 0.14, side: "right" },
+        { id: "generator", title: "发电机", tip: "点击查看发电机相关备件", x: 0.95, y: 0.42, tx: 0.58, ty: 0.48, side: "right" },
+        { id: "cabinet", title: "电器柜", tip: "点击查看电器柜相关备件", x: 0.95, y: 0.62, tx: 0.78, ty: 0.58, side: "right" },
+        { id: "nacelle", title: "机舱", tip: "点击查看机舱相关备件", x: 0.95, y: 0.82, tx: 0.70, ty: 0.78, side: "right" }
       ],
       pv: [
         { id: "pv_module", title: "光伏组件", tip: "点击查看光伏组件相关备件", x: 0.16, y: 0.40, tx: 0.40, ty: 0.48 },
@@ -1713,6 +1602,9 @@
 
     function syncWindCalloutLeaders() {
       try {
+        /* 静态剖视图不跟随 3D 投影 */
+        var cut = document.getElementById("windCutaway");
+        if (cut && cut.classList.contains("on")) return;
         if (scene3d.kind !== "wind") return;
         if (modelKind(state.mat) !== "wind") return;
         var layer = document.getElementById("calloutLayer");
@@ -1767,7 +1659,7 @@
       }
 
       var lines = list.map(function (c) {
-        var p = kind === "wind" ? projectPartAnchor(c.id) : null;
+        var p = null; /* 风机改静态图，锚点用配置坐标 */
         var tx = p ? p.tx : c.tx;
         var ty = p ? p.ty : c.ty;
         return '<path d="' + buildCalloutLeaderPath(c, tx, ty) + '" fill="none" stroke="#69b1ff" stroke-width="0.32" />' +
@@ -2001,36 +1893,10 @@
     }
 
     function applyKind(kind) {
-      if (!scene3d.scene) return;
-      if (!scene3d.roots) ensureModels();
-      if (!scene3d.roots) return;
-
-      /* 先全隐再显目标，避免页签切换时旧模型残影/空白 */
-      Object.keys(scene3d.roots).forEach(function (k) {
-        if (scene3d.roots[k]) scene3d.roots[k].visible = false;
-      });
-      if (scene3d.roots[kind]) scene3d.roots[kind].visible = true;
-
-      scene3d.meshes = (scene3d.meshByKind && scene3d.meshByKind[kind]) || [];
-      scene3d.kind = kind;
-      scene3d.lastPart = "";
-
-      /* 风机转子引用以当前 wind 组为准，防止切换后丢引用导致异常 */
-      if (kind === "wind") {
-        if (!scene3d.windRotor && scene3d.roots.wind) {
-          scene3d.roots.wind.traverse(function (o) {
-            if (!scene3d.windRotor && o && o.userData && o.userData.spinAxis) scene3d.windRotor = o;
-          });
-        }
-        scene3d.rotor = scene3d.windRotor;
-      } else {
-        scene3d.rotor = null;
-      }
-
       var stage = document.getElementById("diagramStage");
       var cutaway = document.getElementById("windCutaway");
       if (stage) stage.classList.toggle("is-wind", kind === "wind");
-      if (cutaway) cutaway.classList.remove("on");
+      if (cutaway) cutaway.classList.toggle("on", kind === "wind");
 
       /* 强制重建标注，避免风机/光伏标签与模型错配 */
       var calloutLayer = document.getElementById("calloutLayer");
@@ -2039,13 +1905,30 @@
         calloutLayer.removeAttribute("data-kind");
       }
 
+      if (!scene3d.scene) {
+        if (kind === "wind") renderCallouts();
+        return;
+      }
+      if (!scene3d.roots) ensureModels();
+      if (!scene3d.roots) {
+        if (kind === "wind") renderCallouts();
+        return;
+      }
+
+      /* 先全隐再显目标，避免页签切换时旧模型残影/空白 */
+      Object.keys(scene3d.roots).forEach(function (k) {
+        if (scene3d.roots[k]) scene3d.roots[k].visible = false;
+      });
+      if (kind !== "wind" && scene3d.roots[kind]) scene3d.roots[kind].visible = true;
+
+      scene3d.meshes = (kind === "wind") ? [] : ((scene3d.meshByKind && scene3d.meshByKind[kind]) || []);
+      scene3d.kind = kind;
+      scene3d.lastPart = "";
+      scene3d.rotor = null;
+
       var camera = scene3d.camera;
-      if (camera) {
-        if (kind === "wind") {
-          camera.fov = 33;
-          camera.position.set(3.8, 3.4, 8.6);
-          camera.lookAt(0.05, 2.35, 0);
-        } else if (kind === "pv") {
+      if (camera && kind !== "wind") {
+        if (kind === "pv") {
           camera.fov = 34;
           camera.position.set(5.2, 3.8, 8.0);
           camera.lookAt(0.2, 1.35, 0);
@@ -2056,10 +1939,11 @@
         }
         camera.updateProjectionMatrix();
       }
-      if (scene3d.renderer) scene3d.renderer.setClearColor(0xeef1f5, 1);
+      if (scene3d.renderer) scene3d.renderer.setClearColor(kind === "wind" ? 0xf5f5f5 : 0xeef1f5, 1);
       var ground = scene3d.scene && scene3d.scene.getObjectByName("ground");
-      if (ground) ground.visible = true;
-      paintScene();
+      if (ground) ground.visible = kind !== "wind";
+      if (kind !== "wind") paintScene();
+      renderCallouts();
     }
 
     function startAnimLoop() {
@@ -2652,6 +2536,8 @@
 
     function renderAll() {
       renderOrg();
+      /* 风机静态图优先显示，避免等 3D 初始化 */
+      applyKind(modelKind(state.mat));
       renderCallouts();
       initScene();
       renderCharts();
