@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN" data-build="20260723-wh-ring-bigger-v108">
+<html lang="zh-CN" data-build="20260723-wh-type-text-v109">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -345,7 +345,7 @@
       grid-template-columns: 1fr 1fr;
       gap: 0;
       min-height: 0;
-      overflow: visible;
+      overflow: hidden;
       margin: 2px 0 4px;
       border: 1px solid #eef2f7;
       border-radius: 4px;
@@ -353,10 +353,11 @@
     }
     .wh-ring-box {
       min-width: 0;
-      overflow: visible;
-      padding: 4px 6px 2px;
+      overflow: hidden;
+      padding: 4px 6px 6px;
       display: flex;
       flex-direction: column;
+      gap: 2px;
     }
     .wh-ring-box + .wh-ring-box {
       border-left: 1px solid #eef2f7;
@@ -366,18 +367,54 @@
       font-size: 10px;
       font-weight: 600;
       color: #334155;
-      margin-bottom: 2px;
       line-height: 1.2;
       white-space: nowrap;
       flex: 0 0 auto;
     }
-    /* 整体略放大，给环+图例留足空间 */
+    /* 左：缩小的冰状图；右：HTML 图例（避免画布裁字） */
+    .wh-ring-row {
+      display: grid;
+      grid-template-columns: minmax(70px, 0.85fr) minmax(88px, 1.15fr);
+      gap: 4px;
+      align-items: center;
+      min-height: 0;
+      flex: 1 1 auto;
+    }
     .wh-ring-el {
       width: 100%;
-      height: 148px;
-      min-height: 148px;
+      height: 88px;
+      min-height: 88px;
+      overflow: hidden;
+    }
+    .wh-ring-legend {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 3px;
+      min-width: 0;
+    }
+    .wh-ring-legend li {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 10px;
+      line-height: 1.25;
+      color: #475569;
+      min-width: 0;
+    }
+    .wh-ring-legend i {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      flex: 0 0 auto;
+    }
+    .wh-ring-legend em {
+      font-style: normal;
+      white-space: nowrap;
       overflow: visible;
-      flex: 1 1 auto;
     }
     .wh-bar-box .ct {
       font-size: 11px;
@@ -481,7 +518,7 @@
   <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.1/dist/echarts.min.js"></script>
   <script src="js/sidebar-actions.js"></script>
   <script src="js/site-footer.js"></script>
-  <script src="js/subpage-clock.js?v=20260723-wh-ring-bigger-v108"></script>
+  <script src="js/subpage-clock.js?v=20260723-wh-type-text-v109"></script>
   <script>
     (function () {
       var ORG_DATA = [
@@ -675,24 +712,35 @@
         }).join("");
       }
 
+      function ringLegendHtml(items, colors) {
+        return (
+          '<ul class="wh-ring-legend">' +
+          items.map(function (it, i) {
+            return (
+              "<li><i style=\"background:" + colors[i % colors.length] + "\"></i>" +
+              "<em>" + it.name + " " + it.value + "</em></li>"
+            );
+          }).join("") +
+          "</ul>"
+        );
+      }
+
       function ringOption(items, colors) {
         var max = 0;
         items.forEach(function (it) { if (it.value > max) max = it.value; });
         max = Math.max(max * 1.15, 1);
         var series = [];
-        var legend = [];
-        /* 环居中偏上，图例在下，框变大后文字/环都完整可见 */
+        /* 仅画缩小居中的冰状图，图例在 HTML，100% 缩放不裁切 */
         var n = items.length;
-        var step = n > 2 ? 8 : 10;
-        var outer0 = n > 2 ? 38 : 40;
+        var step = n > 2 ? 10 : 12;
+        var outer0 = n > 2 ? 58 : 62;
         items.forEach(function (it, i) {
           var outer = outer0 - i * step;
-          var inner = Math.max(outer - 6, 8);
-          legend.push(it.name + " " + it.value);
+          var inner = Math.max(outer - 8, 10);
           series.push({
             type: "pie",
             radius: [inner + "%", outer + "%"],
-            center: ["50%", "38%"],
+            center: ["50%", "50%"],
             startAngle: 90,
             label: { show: false },
             labelLine: { show: false },
@@ -703,23 +751,9 @@
           });
         });
         return {
+          animation: false,
           tooltip: { trigger: "item", formatter: function (p) { return p && p.name ? p.name : ""; } },
-          legend: {
-            orient: "vertical",
-            left: "center",
-            bottom: 2,
-            itemWidth: 6,
-            itemHeight: 6,
-            itemGap: 3,
-            icon: "circle",
-            data: legend,
-            textStyle: {
-              fontSize: 9,
-              color: "#475569",
-              lineHeight: 12,
-              overflow: "none"
-            }
-          },
+          legend: { show: false },
           series: series
         };
       }
@@ -789,13 +823,26 @@
                 "<h3>" + wh.name + "</h3>" +
                 '<div class="wh-card-meta">' +
                   '<span class="org">' + wh.company + "</span>" +
-                  '<span class="wh-tag">' + wh.storageType + "</span>" +
-                  '<span class="wh-tag">' + wh.whType + "</span>" +
+                  (wh.types || []).map(function (t) {
+                    return '<span class="wh-tag">' + t + "</span>";
+                  }).join("") +
                 "</div>" +
               "</div>" +
               '<div class="wh-rings">' +
-                '<div class="wh-ring-box"><div class="ct">全仓库区分布</div><div class="wh-ring-el" id="dist-' + wh.id + '"></div></div>' +
-                '<div class="wh-ring-box"><div class="ct">库存利用率</div><div class="wh-ring-el" id="util-' + wh.id + '"></div></div>' +
+                '<div class="wh-ring-box">' +
+                  '<div class="ct">全仓库区分布</div>' +
+                  '<div class="wh-ring-row">' +
+                    '<div class="wh-ring-el" id="dist-' + wh.id + '"></div>' +
+                    '<div id="dist-leg-' + wh.id + '"></div>' +
+                  "</div>" +
+                "</div>" +
+                '<div class="wh-ring-box">' +
+                  '<div class="ct">库存利用率</div>' +
+                  '<div class="wh-ring-row">' +
+                    '<div class="wh-ring-el" id="util-' + wh.id + '"></div>' +
+                    '<div id="util-leg-' + wh.id + '"></div>' +
+                  "</div>" +
+                "</div>" +
               "</div>" +
               '<div class="wh-bar-box"><div class="ct">各库区金额情况</div><div class="wh-bar-el" id="bar-' + wh.id + '"></div></div>' +
               '<div class="wh-card-ft">仓库状态：<b>正常</b></div>' +
@@ -804,28 +851,28 @@
         }).join("");
 
         list.forEach(function (wh) {
+          var distItems = [
+            { name: "风电库区", value: wh.ringDist[0] },
+            { name: "风电库区", value: wh.ringDist[1] },
+            { name: "风电库区", value: wh.ringDist[2] },
+            { name: "风电库区", value: wh.ringDist[3] }
+          ];
+          var distColors = ["#1d4ed8", "#22d3ee", "#f87171", "#fbbf24"];
+          var distLeg = document.getElementById("dist-leg-" + wh.id);
+          if (distLeg) distLeg.innerHTML = ringLegendHtml(distItems, distColors);
           var dist = ensureChart("dist-" + wh.id, document.getElementById("dist-" + wh.id));
-          if (dist) {
-            dist.setOption(ringOption(
-              [
-                { name: "风电库区", value: wh.ringDist[0] },
-                { name: "风电库区", value: wh.ringDist[1] },
-                { name: "风电库区", value: wh.ringDist[2] },
-                { name: "风电库区", value: wh.ringDist[3] }
-              ],
-              ["#1d4ed8", "#22d3ee", "#f87171", "#fbbf24"]
-            ), true);
-          }
+          if (dist) dist.setOption(ringOption(distItems, distColors), true);
+
+          var utilItems = [
+            { name: "已占用库位", value: wh.ringUtil[0] },
+            { name: "空闲库位", value: wh.ringUtil[1] }
+          ];
+          var utilColors = ["#1d4ed8", "#22d3ee"];
+          var utilLeg = document.getElementById("util-leg-" + wh.id);
+          if (utilLeg) utilLeg.innerHTML = ringLegendHtml(utilItems, utilColors);
           var util = ensureChart("util-" + wh.id, document.getElementById("util-" + wh.id));
-          if (util) {
-            util.setOption(ringOption(
-              [
-                { name: "已占用库位", value: wh.ringUtil[0] },
-                { name: "空闲库位", value: wh.ringUtil[1] }
-              ],
-              ["#1d4ed8", "#22d3ee"]
-            ), true);
-          }
+          if (util) util.setOption(ringOption(utilItems, utilColors), true);
+
           var bar = ensureChart("bar-" + wh.id, document.getElementById("bar-" + wh.id));
           if (bar) bar.setOption(barOption(barDataFor(wh)), true);
         });
