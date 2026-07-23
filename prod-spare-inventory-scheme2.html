@@ -2581,9 +2581,9 @@
           },
           series: [
             { name: "90~180天以内", type: "bar", stack: "i", barWidth: 18, data: d.idleS1 },
-            { name: "示意 ", type: "bar", stack: "i", data: d.idleS2 },
+            { name: "360天以上", type: "bar", stack: "i", data: d.idleS2 },
             { name: "30~90天以内", type: "bar", stack: "i", data: d.idleS3 },
-            { name: "示意", type: "bar", stack: "i", data: d.idleS4 }
+            { name: "180~360天", type: "bar", stack: "i", data: d.idleS4 }
           ]
         }, true);
       }
@@ -2600,31 +2600,43 @@
           },
           series: [{
             type: "pie",
-            radius: ["26%", "56%"],
+            radius: ["28%", "52%"],
             center: ["50%", "52%"],
+            avoidLabelOverlap: true,
             label: {
+              show: true,
+              position: "outside",
+              alignTo: "labelLine",
+              distanceToLabelLine: 4,
               formatter: function (p) {
-                return "{amt|" + p.value + "}\n{nm|" + p.name + "}";
+                var amt = (p && p.value != null) ? p.value : "";
+                var nm = (p && p.name) ? p.name : "";
+                return "{amt|" + amt + "}\n{nm|" + nm + "}";
               },
               rich: {
                 amt: {
-                  fontSize: 11,
+                  fontSize: 12,
                   fontWeight: 700,
-                  color: "#1f2d3d",
-                  lineHeight: 14,
+                  color: "#0f172a",
+                  lineHeight: 16,
+                  align: "left",
                   fontFamily: "Barlow Condensed, Arial Narrow, PingFang SC, Microsoft YaHei, sans-serif"
                 },
                 nm: {
                   fontSize: 10,
+                  fontWeight: 500,
                   color: "#64748b",
-                  lineHeight: 13,
-                  padding: [2, 0, 0, 0]
+                  lineHeight: 14,
+                  align: "left",
+                  padding: [1, 0, 0, 0]
                 }
               }
             },
             labelLine: {
-              length: 10,
-              length2: 8,
+              show: true,
+              length: 12,
+              length2: 10,
+              smooth: false,
               maxSurfaceAngle: 80
             },
             data: d.pie
