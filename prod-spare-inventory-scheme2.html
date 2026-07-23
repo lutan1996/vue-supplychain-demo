@@ -1603,24 +1603,28 @@
 
     /* 把 3D 部件中心投影到标注层 0~1 坐标，引导点贴在部件上 */
     function projectPartAnchor(partId) {
-      if (!scene3d.camera || typeof THREE === "undefined") return null;
-      var mesh = findPartMesh(partId);
-      if (!mesh) return null;
-      if (!_projVec) _projVec = new THREE.Vector3();
-      mesh.updateWorldMatrix(true, false);
-      if (mesh.userData && mesh.userData.anchorLocal) {
-        _projVec.copy(mesh.userData.anchorLocal);
-        mesh.localToWorld(_projVec);
-      } else {
-        mesh.getWorldPosition(_projVec);
+      try {
+        if (!scene3d.camera || typeof THREE === "undefined") return null;
+        var mesh = findPartMesh(partId);
+        if (!mesh) return null;
+        if (!_projVec) _projVec = new THREE.Vector3();
+        mesh.updateWorldMatrix(true, false);
+        if (mesh.userData && mesh.userData.anchorLocal && mesh.userData.anchorLocal.isVector3) {
+          _projVec.copy(mesh.userData.anchorLocal);
+          mesh.localToWorld(_projVec);
+        } else {
+          mesh.getWorldPosition(_projVec);
+        }
+        _projVec.project(scene3d.camera);
+        if (!isFinite(_projVec.x) || !isFinite(_projVec.y)) return null;
+        if (_projVec.z < -1 || _projVec.z > 1) return null;
+        return {
+          tx: Math.max(0.08, Math.min(0.92, (_projVec.x + 1) / 2)),
+          ty: Math.max(0.06, Math.min(0.94, (1 - _projVec.y) / 2))
+        };
+      } catch (eProj) {
+        return null;
       }
-      _projVec.project(scene3d.camera);
-      if (!isFinite(_projVec.x) || !isFinite(_projVec.y)) return null;
-      if (_projVec.z < -1 || _projVec.z > 1) return null;
-      return {
-        tx: Math.max(0.08, Math.min(0.92, (_projVec.x + 1) / 2)),
-        ty: Math.max(0.06, Math.min(0.94, (1 - _projVec.y) / 2))
-      };
     }
 
     function buildCalloutLeaderPath(c, tx, ty) {
@@ -1635,29 +1639,30 @@
     }
 
     function syncWindCalloutLeaders() {
-      if (modelKind(state.mat) !== "wind") return;
-      var layer = document.getElementById("calloutLayer");
-      if (!layer) return;
-      if (scene3d.rotor && scene3d.rotor.updateMatrixWorld) scene3d.rotor.updateMatrixWorld(true);
-      else if (scene3d.scene && scene3d.scene.updateMatrixWorld) scene3d.scene.updateMatrixWorld(true);
-      var list = getCallouts();
-      var svg = layer.querySelector("svg");
-      if (!svg) return;
-      var paths = svg.querySelectorAll("path");
-      var dots = svg.querySelectorAll("circle");
-      for (var i = 0; i < list.length; i++) {
-        var c = list[i];
-        var p = projectPartAnchor(c.id);
-        var tx = p ? p.tx : c.tx;
-        var ty = p ? p.ty : c.ty;
-        c._tx = tx;
-        c._ty = ty;
-        if (paths[i]) paths[i].setAttribute("d", buildCalloutLeaderPath(c, tx, ty));
-        if (dots[i]) {
-          dots[i].setAttribute("cx", String(tx * 100));
-          dots[i].setAttribute("cy", String(ty * 100));
+      try {
+        if (scene3d.kind !== "wind") return;
+        if (modelKind(state.mat) !== "wind") return;
+        var layer = document.getElementById("calloutLayer");
+        if (!layer || layer.getAttribute("data-kind") !== "wind") return;
+        if (scene3d.rotor && scene3d.rotor.updateMatrixWorld) scene3d.rotor.updateMatrixWorld(true);
+        var list = getCallouts();
+        var svg = layer.querySelector("svg");
+        if (!svg) return;
+        var paths = svg.querySelectorAll("path");
+        var dots = svg.querySelectorAll("circle");
+        for (var i = 0; i < list.length; i++) {
+          var c = list[i];
+          if (!c) continue;
+          var proj = projectPartAnchor(c.id);
+          var tx = proj ? proj.tx : c.tx;
+          var ty = proj ? proj.ty : c.ty;
+          if (paths[i]) paths[i].setAttribute("d", buildCalloutLeaderPath(c, tx, ty));
+          if (dots[i]) {
+            dots[i].setAttribute("cx", String(tx * 100));
+            dots[i].setAttribute("cy", String(ty * 100));
+          }
         }
-      }
+      } catch (eSync) {}
     }
 
     function renderCallouts() {
@@ -1771,7 +1776,8 @@
       scene3d = {
         renderer: null, scene: null, camera: null, animId: null, meshes: [], rotor: null,
         ro: null, lastW: 0, lastH: 0, kind: "", lastPart: "",
-        baseReady: false, modelsReady: false, roots: null, meshByKind: null, windRotor: null
+        baseReady: false, modelsReady: false, roots: null, meshByKind: null, windRotor: null,
+        _windRimReady: false
       };
     }
 
@@ -1922,42 +1928,62 @@
     }
 
     function applyKind(kind) {
+      if (!scene3d.scene) return;
+      if (!scene3d.roots) ensureModels();
       if (!scene3d.roots) return;
+
+      /* 先全隐再显目标，避免页签切换时旧模型残影/空白 */
       Object.keys(scene3d.roots).forEach(function (k) {
-        scene3d.roots[k].visible = k === kind;
+        if (scene3d.roots[k]) scene3d.roots[k].visible = false;
       });
+      if (scene3d.roots[kind]) scene3d.roots[kind].visible = true;
+
       scene3d.meshes = (scene3d.meshByKind && scene3d.meshByKind[kind]) || [];
       scene3d.kind = kind;
       scene3d.lastPart = "";
-      scene3d.rotor = kind === "wind" ? scene3d.windRotor : null;
+
+      /* 风机转子引用以当前 wind 组为准，防止切换后丢引用导致异常 */
+      if (kind === "wind") {
+        if (!scene3d.windRotor && scene3d.roots.wind) {
+          scene3d.roots.wind.traverse(function (o) {
+            if (!scene3d.windRotor && o && o.userData && o.userData.spinAxis) scene3d.windRotor = o;
+          });
+        }
+        scene3d.rotor = scene3d.windRotor;
+      } else {
+        scene3d.rotor = null;
+      }
 
       var stage = document.getElementById("diagramStage");
       var cutaway = document.getElementById("windCutaway");
       if (stage) stage.classList.toggle("is-wind", kind === "wind");
       if (cutaway) cutaway.classList.remove("on");
 
-      var camera = scene3d.camera;
-      if (!camera) return;
-      if (kind === "wind") {
-        /* 与光伏同款俯视 3/4 科技视角 */
-        camera.fov = 33;
-        camera.position.set(3.8, 3.4, 8.6);
-        camera.lookAt(0.05, 2.35, 0);
-        camera.updateProjectionMatrix();
-        if (scene3d.renderer) scene3d.renderer.setClearColor(0xeef1f5, 1);
-      } else if (kind === "pv") {
-        camera.fov = 34;
-        camera.position.set(5.2, 3.8, 8.0);
-        camera.lookAt(0.2, 1.35, 0);
-        camera.updateProjectionMatrix();
-        if (scene3d.renderer) scene3d.renderer.setClearColor(0xeef1f5, 1);
-      } else {
-        camera.fov = 34;
-        camera.position.set(6.0, 3.9, 8.6);
-        camera.lookAt(0.15, 1.45, 0);
-        camera.updateProjectionMatrix();
-        if (scene3d.renderer) scene3d.renderer.setClearColor(0xeef1f5, 1);
+      /* 强制重建标注，避免风机/光伏标签与模型错配 */
+      var calloutLayer = document.getElementById("calloutLayer");
+      if (calloutLayer) {
+        calloutLayer.removeAttribute("data-built");
+        calloutLayer.removeAttribute("data-kind");
       }
+
+      var camera = scene3d.camera;
+      if (camera) {
+        if (kind === "wind") {
+          camera.fov = 33;
+          camera.position.set(3.8, 3.4, 8.6);
+          camera.lookAt(0.05, 2.35, 0);
+        } else if (kind === "pv") {
+          camera.fov = 34;
+          camera.position.set(5.2, 3.8, 8.0);
+          camera.lookAt(0.2, 1.35, 0);
+        } else {
+          camera.fov = 34;
+          camera.position.set(6.0, 3.9, 8.6);
+          camera.lookAt(0.15, 1.45, 0);
+        }
+        camera.updateProjectionMatrix();
+      }
+      if (scene3d.renderer) scene3d.renderer.setClearColor(0xeef1f5, 1);
       var ground = scene3d.scene && scene3d.scene.getObjectByName("ground");
       if (ground) ground.visible = true;
       paintScene();
@@ -1967,29 +1993,38 @@
       if (scene3d.animId) return;
       var myGen = sceneGen;
       var lastTs = 0;
+      var leaderAcc = 0;
       function animate(ts) {
         if (myGen !== sceneGen || !scene3d.renderer || !scene3d.scene || !scene3d.camera) {
           scene3d.animId = null;
           return;
         }
         scene3d.animId = requestAnimationFrame(animate);
+        var now = typeof ts === "number" ? ts : performance.now();
+        var dt = lastTs ? Math.min(0.05, (now - lastTs) / 1000) : 0.016;
+        lastTs = now;
         try {
-          var now = typeof ts === "number" ? ts : performance.now();
-          var dt = lastTs ? Math.min(0.05, (now - lastTs) / 1000) : 0.016;
-          lastTs = now;
           if (scene3d.kind === "wind" && scene3d.rotor) {
-            /* 顺时针缓慢旋转（约 40 秒/圈），按时间步进避免鬼畜跳变 */
-            var speed = 0.16; /* rad/s */
+            var speed = 0.16;
             if (scene3d.rotor.userData && scene3d.rotor.userData.spinAxis === "z") {
               scene3d.rotor.rotation.z -= speed * dt;
             } else {
               scene3d.rotor.rotation.x -= speed * dt;
             }
+          }
+        } catch (eSpin) {}
+        /* 先渲染，避免引导线同步异常导致整帧空白闪退 */
+        try {
+          scene3d.renderer.render(scene3d.scene, scene3d.camera);
+        } catch (eRender) {}
+        if (scene3d.kind === "wind") {
+          leaderAcc += dt;
+          if (leaderAcc >= 0.08) {
+            leaderAcc = 0;
             syncWindCalloutLeaders();
           }
-          scene3d.renderer.render(scene3d.scene, scene3d.camera);
-        } catch (eAnim) {
-          /* 单帧异常不拆掉循环，避免闪退 */
+        } else {
+          leaderAcc = 0;
         }
       }
       animate(performance.now());
@@ -2171,13 +2206,18 @@
       }
 
       scene.add(rotor);
-      /* 科技感补光：青色轮廓光，贴近光伏页观感 */
-      var rim = new THREE.DirectionalLight(0x38bdf8, 0.45);
-      rim.position.set(-4, 6, 5);
-      scene.add(rim);
-      var rim2 = new THREE.DirectionalLight(0xffffff, 0.25);
-      rim2.position.set(5, 3, -4);
-      scene.add(rim2);
+      /* 补光挂到主场景，避免随风机组隐藏/显示带来切换闪烁 */
+      if (scene3d.scene && !scene3d._windRimReady) {
+        var rim = new THREE.DirectionalLight(0x38bdf8, 0.35);
+        rim.name = "windRim";
+        rim.position.set(-4, 6, 5);
+        scene3d.scene.add(rim);
+        var rim2 = new THREE.DirectionalLight(0xffffff, 0.2);
+        rim2.name = "windRim2";
+        rim2.position.set(5, 3, -4);
+        scene3d.scene.add(rim2);
+        scene3d._windRimReady = true;
+      }
       scene3d.windRotor = rotor;
       scene3d.rotor = rotor;
       scene.position.set(0, -0.45, 0);
@@ -2483,30 +2523,26 @@
       document.querySelectorAll("#matTabs button").forEach(function (b) {
         b.classList.toggle("on", b === btn);
       });
-      /* 先切可见模型并立刻画一帧，避免光伏/储能切换时空一帧像闪退 */
-      if (prevKind !== nextKind) {
-        if (scene3d.renderer && scene3d.modelsReady) {
-          applyKind(nextKind);
-        } else {
-          initScene();
-        }
+      /* 先保证模型就绪，再强制切换可见组，避免光伏/储能/风机错模或空白闪退 */
+      if (!scene3d.renderer || !scene3d.modelsReady) {
+        initScene();
+      }
+      if (scene3d.modelsReady) {
+        applyKind(nextKind);
       } else if (nextKind === "wind") {
         scene3d.rotor = scene3d.windRotor;
       }
-      /* 切页签不强制 setSize，避免画布被清成空白闪一下 */
-      syncRendererSize(false);
-      updatePartHighlight();
+      try { updatePartHighlight(); } catch (eHi) {}
       paintScene();
       try { renderCallouts(); } catch (eCall) {}
-      /* 不重启动画循环（停一下再开会造成画布空白闪一下）；只在死去时拉起 */
       if (!scene3d.animId) startAnimLoop();
       requestAnimationFrame(function () {
+        /* 再刷一帧，确保切换后目标模型已上屏 */
+        if (scene3d.modelsReady) applyKind(nextKind);
         paintScene();
+        try { renderCallouts(); } catch (eCall2) {}
         try { renderCharts(); } catch (eChart) {}
-        requestAnimationFrame(function () {
-          if (!scene3d.animId) startAnimLoop();
-          paintScene();
-        });
+        if (!scene3d.animId) startAnimLoop();
       });
     });
 
