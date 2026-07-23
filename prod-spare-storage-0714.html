@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN" data-build="20260723-wh-ring-shrink-v105">
+<html lang="zh-CN" data-build="20260723-wh-meta-tags-v106">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -461,7 +461,7 @@
   <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.1/dist/echarts.min.js"></script>
   <script src="js/sidebar-actions.js"></script>
   <script src="js/site-footer.js"></script>
-  <script src="js/subpage-clock.js?v=20260723-wh-ring-shrink-v105"></script>
+  <script src="js/subpage-clock.js?v=20260723-wh-meta-tags-v106"></script>
   <script>
     (function () {
       var ORG_DATA = [
@@ -501,7 +501,7 @@
         { key: "scrap", name: "总废旧报废金额", value: 140, unit: "万元", acc: "#f5222d" }
       ];
 
-      var ZONES = ["风电库区", "火电库区", "光伏库区", "储能库区", "综合库区"];
+      var ZONES = ["风电库区", "光伏库区", "储能库区", "返修库区", "报废库区"];
 
       /* 各仓库类型下的柱状图基础倍数，切换页签时数值变化 */
       var TYPE_FACTOR = {
@@ -523,9 +523,9 @@
           ringDist: [1895, 980, 520, 420],
           ringUtil: [11, 820],
           barBase: {
-            stock: [18, 22, 12, 16, 10],
-            inbound: [10, 14, 8, 11, 6],
-            idle: [6, 8, 4, 5, 3]
+            stock: [18, 16, 14, 12, 10],
+            scrap: [8, 7, 6, 9, 11],
+            idle: [6, 5, 4, 5, 7]
           }
         },
         {
@@ -538,9 +538,9 @@
           ringDist: [1260, 840, 610, 390],
           ringUtil: [28, 760],
           barBase: {
-            stock: [14, 17, 20, 11, 9],
-            inbound: [8, 12, 15, 7, 5],
-            idle: [5, 7, 9, 4, 3]
+            stock: [14, 15, 13, 11, 9],
+            scrap: [6, 8, 7, 10, 12],
+            idle: [5, 6, 5, 4, 8]
           }
         },
         {
@@ -553,9 +553,9 @@
           ringDist: [980, 720, 480, 350],
           ringUtil: [42, 690],
           barBase: {
-            stock: [11, 13, 9, 15, 12],
-            inbound: [6, 9, 5, 10, 7],
-            idle: [3, 5, 2, 6, 4]
+            stock: [12, 13, 11, 10, 8],
+            scrap: [5, 6, 5, 8, 10],
+            idle: [4, 5, 3, 6, 9]
           }
         }
       ];
@@ -583,7 +583,7 @@
         var f = TYPE_FACTOR[state.typeTab] || 1;
         return {
           stock: scaleArr(wh.barBase.stock, f),
-          inbound: scaleArr(wh.barBase.inbound, f * 0.95),
+          scrap: scaleArr(wh.barBase.scrap, f * 0.95),
           idle: scaleArr(wh.barBase.idle, f * 0.9)
         };
       }
@@ -710,36 +710,38 @@
       }
 
       function barOption(data) {
+        /* 原型：蓝=库存金额，红=报废金额，黄=超60天以上呆滞金额；堆叠柱 */
         return {
-          color: ["#1677ff", "#52c41a", "#faad14"],
+          color: ["#1677ff", "#f5222d", "#faad14"],
           tooltip: { trigger: "axis" },
           legend: {
             top: 0,
-            right: 0,
+            left: "center",
             itemWidth: 8,
             itemHeight: 8,
-            textStyle: { fontSize: 10, color: "#64748b" },
-            data: ["库存金额", "入库金额", "超60天金额"]
+            itemGap: 10,
+            textStyle: { fontSize: 9, color: "#64748b" },
+            data: ["库存金额", "报废金额", "超60天以上呆滞金额"]
           },
-          grid: { left: 36, right: 8, top: 28, bottom: 28 },
+          grid: { left: 40, right: 8, top: 30, bottom: 32 },
           xAxis: {
             type: "category",
             data: ZONES,
-            axisLabel: { fontSize: 10, color: "#94a3b8", interval: 0, rotate: 0 },
+            axisLabel: { fontSize: 9, color: "#94a3b8", interval: 0, rotate: 0 },
             axisTick: { show: false },
             axisLine: { lineStyle: { color: "#e8edf4" } }
           },
           yAxis: {
             type: "value",
-            name: "万元",
-            nameTextStyle: { fontSize: 10, color: "#94a3b8" },
-            splitLine: { lineStyle: { color: "#eef2f7" } },
+            name: "单位：万元",
+            nameTextStyle: { fontSize: 9, color: "#94a3b8", padding: [0, 0, 0, 8] },
+            splitLine: { lineStyle: { type: "dashed", color: "#eef2f7" } },
             axisLabel: { fontSize: 10, color: "#94a3b8" }
           },
           series: [
-            { name: "库存金额", type: "bar", barWidth: 10, data: data.stock },
-            { name: "入库金额", type: "bar", barWidth: 10, data: data.inbound },
-            { name: "超60天金额", type: "bar", barWidth: 10, data: data.idle }
+            { name: "库存金额", type: "bar", stack: "amt", barWidth: 18, data: data.stock },
+            { name: "报废金额", type: "bar", stack: "amt", barWidth: 18, data: data.scrap },
+            { name: "超60天以上呆滞金额", type: "bar", stack: "amt", barWidth: 18, data: data.idle }
           ]
         };
       }
@@ -771,9 +773,9 @@
               '<div class="wh-card-hd">' +
                 "<h3>" + wh.name + "</h3>" +
                 '<div class="wh-card-meta">' +
-                  "<span>" + wh.company + "</span>" +
-                  "<span>" + wh.storageType + "</span>" +
-                  "<span>" + wh.whType + "</span>" +
+                  '<span class="org">' + wh.company + "</span>" +
+                  '<span class="wh-tag">' + wh.storageType + "</span>" +
+                  '<span class="wh-tag">' + wh.whType + "</span>" +
                 "</div>" +
               "</div>" +
               '<div class="wh-rings">' +
