@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN" data-build="20260723-storage-tabs-v99">
+<html lang="zh-CN" data-build="20260723-storage-station-v101">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -56,6 +56,7 @@
       font-weight: 600;
       box-shadow: 0 2px 6px rgba(22, 119, 255, 0.28);
     }
+    /* 左组织树 |（可选）独立风电场竖框 | 右主区 —— 与库存总览一致 */
     .ps-body {
       flex: 1;
       min-height: 0;
@@ -65,6 +66,12 @@
       padding: 8px;
       overflow: hidden;
     }
+    .ps-body.has-station {
+      grid-template-columns: 220px 152px minmax(0, 1fr);
+    }
+    .ps-body.has-station.station-collapsed {
+      grid-template-columns: 220px 32px minmax(0, 1fr);
+    }
     .ps-left {
       background: #fff;
       border: 1px solid var(--bd);
@@ -73,6 +80,7 @@
       flex-direction: column;
       min-height: 0;
       overflow: hidden;
+      min-width: 0;
     }
     .org-search {
       display: flex;
@@ -98,7 +106,7 @@
       margin-top: 8px;
       border-top: 1px solid var(--bd);
     }
-    .tree-item {
+    .tree-item, .station-item {
       padding: 8px 10px;
       border-radius: 4px;
       cursor: pointer;
@@ -107,9 +115,62 @@
       line-height: 1.35;
       user-select: none;
     }
-    .tree-item:hover { background: #f0f7ff; color: var(--pri); }
-    .tree-item.on { background: #e6f4ff; color: var(--pri); font-weight: 600; }
+    .tree-item:hover, .station-item:hover { background: #f0f7ff; color: var(--pri); }
+    .tree-item.on, .station-item.on { background: #eef2f7; color: #1f2d3d; font-weight: 600; }
     .tree-item.group { color: #1677ff; font-weight: 600; }
+    .tree-item.group.on { background: #e6f4ff; color: var(--pri); }
+
+    /* 独立风电场竖框（点公司后出现，右上角可折叠） */
+    .station-pane {
+      display: none;
+      min-width: 0;
+      min-height: 0;
+      background: #fff;
+      border: 1px solid var(--bd);
+      border-radius: 6px;
+      overflow: hidden;
+      flex-direction: column;
+    }
+    .ps-body.has-station > .station-pane { display: flex; }
+    .station-col-head {
+      flex: 0 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      height: 28px;
+      padding: 0 4px;
+      border-bottom: 1px solid var(--bd);
+      background: #fafbfd;
+    }
+    .station-toggle {
+      width: 24px;
+      height: 24px;
+      border: 0;
+      border-radius: 4px;
+      background: transparent;
+      color: #64748b;
+      cursor: pointer;
+      font-size: 12px;
+      line-height: 1;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .station-toggle:hover { background: #f0f7ff; color: var(--pri); }
+    .station-list {
+      flex: 1 1 auto;
+      overflow: auto;
+      padding: 6px;
+      min-height: 0;
+      background: #fafbfd;
+    }
+    .ps-body.has-station.station-collapsed .station-list { display: none; }
+    .ps-body.has-station.station-collapsed .station-col-head {
+      border-bottom: 0;
+      justify-content: center;
+      height: 100%;
+      padding: 6px 0;
+    }
 
     .ps-right {
       min-width: 0;
@@ -285,6 +346,8 @@
 
     @media (max-width: 1280px) {
       .ps-body { grid-template-columns: 180px minmax(0, 1fr); }
+      .ps-body.has-station { grid-template-columns: 180px 132px minmax(0, 1fr); }
+      .ps-body.has-station.station-collapsed { grid-template-columns: 180px 32px minmax(0, 1fr); }
       .kpi-row { grid-template-columns: repeat(4, minmax(0, 1fr)); }
       .wh-cards { grid-template-columns: 1fr; }
     }
@@ -329,13 +392,21 @@
             </div>
           </div>
 
-          <div class="ps-body">
+          <div class="ps-body" id="psBody">
             <aside class="ps-left">
               <div class="org-search">
                 <i class="fa-solid fa-magnifying-glass"></i>
                 <input id="orgSearch" type="search" placeholder="搜索组织 / 风电场" />
               </div>
               <div class="org-list" id="orgList"></div>
+            </aside>
+
+            <!-- 独立风电场竖框（点公司后出现，右上角可折叠）——与库存总览一致 -->
+            <aside class="station-pane" id="stationCol" aria-label="风电场列表">
+              <div class="station-col-head">
+                <button type="button" class="station-toggle" id="stationToggle" title="收起风电场" aria-expanded="true" aria-controls="stationList">◀</button>
+              </div>
+              <div class="station-list" id="stationList"></div>
             </aside>
 
             <section class="ps-right">
@@ -360,18 +431,18 @@
   <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.1/dist/echarts.min.js"></script>
   <script src="js/sidebar-actions.js"></script>
   <script src="js/site-footer.js"></script>
-  <script src="js/subpage-clock.js?v=20260723-storage-tabs-v99"></script>
+  <script src="js/subpage-clock.js?v=20260723-storage-station-v101"></script>
   <script>
     (function () {
       var ORG_DATA = [
-        { key: "上海龙源", name: "上海龙源" },
-        { key: "云南龙源", name: "云南龙源" },
-        { key: "天津龙源", name: "天津龙源" },
-        { key: "山西龙源", name: "山西龙源" },
-        { key: "河北龙源", name: "河北龙源" },
-        { key: "蒙东龙源", name: "蒙东龙源" },
-        { key: "安徽龙源", name: "安徽龙源" },
-        { key: "海上龙源", name: "海上龙源" }
+        { key: "上海龙源", name: "上海龙源", stations: ["东海大桥风电场", "临港风电场", "崇明风电场", "奉贤风电场"] },
+        { key: "云南龙源", name: "云南龙源", stations: ["大理风电场", "楚雄风电场", "曲靖风电场"] },
+        { key: "天津龙源", name: "天津龙源", stations: ["大神堂风电场", "汉沽风电场"] },
+        { key: "山西龙源", name: "山西龙源", stations: ["雁门关风电场", "右玉风电场", "神池风电场", "平鲁风电场"] },
+        { key: "河北龙源", name: "河北龙源", stations: ["麒麟山风电场", "康保风电场"] },
+        { key: "蒙东龙源", name: "蒙东龙源", stations: ["齐心营风电场"] },
+        { key: "安徽龙源", name: "安徽龙源", stations: ["来安风电场"] },
+        { key: "海上龙源", name: "海上龙源", stations: ["射阳海上风电场"] }
       ];
 
       /* 图2：仓库类型页签 */
@@ -460,12 +531,19 @@
       ];
 
       var state = {
-        org: "group",
+        level: "group",
+        company: "",
+        station: "",
+        stationColOpen: true,
         typeTab: TYPE_TABS[0],
         sortKey: SORT_OPTS[0].key
       };
 
       var chartMap = {};
+
+      function companyData(key) {
+        return ORG_DATA.filter(function (c) { return c.key === key; })[0];
+      }
 
       function scaleArr(arr, factor) {
         return arr.map(function (v) { return Math.max(1, Math.round(v * factor)); });
@@ -491,12 +569,39 @@
 
       function renderOrg() {
         var kw = (document.getElementById("orgSearch").value || "").trim();
-        var html = '<div class="tree-item group' + (state.org === "group" ? " on" : "") + '" data-org="group">龙源电力(总计)</div>';
+        var html = '<div class="tree-item group' + (state.level === "group" ? " on" : "") + '" data-level="group">龙源电力(总计)</div>';
         ORG_DATA.forEach(function (c) {
-          if (kw && c.name.indexOf(kw) < 0) return;
-          html += '<div class="tree-item' + (state.org === c.key ? " on" : "") + '" data-org="' + c.key + '">' + c.name + "</div>";
+          if (kw && c.name.indexOf(kw) < 0 && !(c.stations || []).some(function (s) { return s.indexOf(kw) >= 0; })) return;
+          html += '<div class="tree-item' + (state.company === c.key ? " on" : "") + '" data-level="company" data-key="' + c.key + '">' + c.name + "</div>";
         });
         document.getElementById("orgList").innerHTML = html;
+
+        var psBody = document.getElementById("psBody");
+        var stationList = document.getElementById("stationList");
+        var stationToggle = document.getElementById("stationToggle");
+        var showStation = state.level !== "group";
+        if (!showStation) {
+          psBody.classList.remove("has-station", "station-collapsed");
+          stationList.innerHTML = "";
+          return;
+        }
+        psBody.classList.add("has-station");
+        if (state.stationColOpen) {
+          psBody.classList.remove("station-collapsed");
+          stationToggle.textContent = "◀";
+          stationToggle.title = "收起风电场";
+          stationToggle.setAttribute("aria-expanded", "true");
+        } else {
+          psBody.classList.add("station-collapsed");
+          stationToggle.textContent = "▶";
+          stationToggle.title = "展开风电场";
+          stationToggle.setAttribute("aria-expanded", "false");
+        }
+        var c = companyData(state.company);
+        stationList.innerHTML = (c ? c.stations : []).map(function (s) {
+          if (kw && s.indexOf(kw) < 0 && (!c || c.name.indexOf(kw) < 0)) return "";
+          return '<div class="station-item' + (state.station === s ? " on" : "") + '" data-station="' + s + '">' + s + "</div>";
+        }).join("");
       }
 
       function renderKpi() {
@@ -686,9 +791,44 @@
       document.getElementById("orgList").addEventListener("click", function (e) {
         var item = e.target.closest(".tree-item");
         if (!item) return;
-        state.org = item.getAttribute("data-org") || "group";
+        if (item.getAttribute("data-level") === "group") {
+          state.level = "group";
+          state.company = "";
+          state.station = "";
+        } else {
+          state.level = "company";
+          state.company = item.getAttribute("data-key") || "";
+          state.station = "";
+          state.stationColOpen = true;
+        }
         renderOrg();
       });
+
+      document.getElementById("stationToggle").addEventListener("click", function () {
+        state.stationColOpen = !state.stationColOpen;
+        renderOrg();
+      });
+
+      document.getElementById("stationList").addEventListener("click", function (e) {
+        var item = e.target.closest(".station-item");
+        if (!item) return;
+        var station = item.getAttribute("data-station") || "";
+        state.station = station;
+        renderOrg();
+        if (!station || !state.company) return;
+        var href =
+          "prod-spare-station-detail-0714.html?org=" +
+          encodeURIComponent(state.company) +
+          "&station=" +
+          encodeURIComponent(station);
+        try {
+          if (window.top && window.top !== window && typeof window.top.__demoOpenPage === "function") {
+            if (window.top.__demoOpenPage(href) === true) return;
+          }
+        } catch (eTop) {}
+        window.location.href = href;
+      });
+
       document.getElementById("orgSearch").addEventListener("input", renderOrg);
 
       document.getElementById("typeTabs").addEventListener("click", function (e) {
