@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN" data-build="20260723-wh-9cards-v115">
+<html lang="zh-CN" data-build="20260723-wh-6rings-v117">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -285,7 +285,7 @@
       min-height: 0;
       overflow: auto;
       display: grid;
-      /* 一页 9 个：3 列 × 3 行 */
+      /* 一页 6 个：3 列 × 2 行 */
       grid-template-columns: repeat(3, minmax(0, 1fr));
       grid-auto-rows: minmax(0, auto);
       gap: 6px;
@@ -348,17 +348,18 @@
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 0;
-      min-height: 0;
+      min-height: 88px;
       overflow: hidden;
       margin: 0;
       border: 1px solid #eef2f7;
       border-radius: 3px;
       background: #fff;
+      flex: 0 0 auto;
     }
     .wh-ring-box {
       min-width: 0;
       overflow: hidden;
-      padding: 2px 3px 3px;
+      padding: 2px 4px 4px;
       display: flex;
       flex-direction: column;
       gap: 1px;
@@ -377,20 +378,21 @@
       text-overflow: ellipsis;
       flex: 0 0 auto;
     }
-    /* 压缩：环左图例右，避免上下留白过大 */
+    /* 环图可见：固定高度，避免初始化宽高为 0 */
     .wh-ring-row {
       display: grid;
-      grid-template-columns: 56px minmax(0, 1fr);
-      gap: 2px 3px;
+      grid-template-columns: 72px minmax(0, 1fr);
+      gap: 2px 4px;
       align-items: center;
-      min-height: 0;
-      flex: 1 1 auto;
+      min-height: 72px;
+      flex: 0 0 auto;
       padding: 0;
     }
     .wh-ring-el {
-      width: 56px;
-      height: 56px;
-      min-height: 56px;
+      width: 72px;
+      height: 72px;
+      min-width: 72px;
+      min-height: 72px;
       overflow: hidden;
       justify-self: start;
     }
@@ -533,7 +535,7 @@
   <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.1/dist/echarts.min.js"></script>
   <script src="js/sidebar-actions.js"></script>
   <script src="js/site-footer.js"></script>
-  <script src="js/subpage-clock.js?v=20260723-wh-9cards-v115"></script>
+  <script src="js/subpage-clock.js?v=20260723-wh-6cards-v116"></script>
   <script>
     (function () {
       var ORG_DATA = [
@@ -915,6 +917,13 @@
 
           var bar = ensureChart("bar-" + wh.id, document.getElementById("bar-" + wh.id));
           if (bar) bar.setOption(barOption(barDataFor(wh)), true);
+        });
+
+        /* 布局完成后再 resize，避免冰状图宽高为 0 画不出来 */
+        requestAnimationFrame(function () {
+          Object.keys(chartMap).forEach(function (k) {
+            try { chartMap[k].resize(); } catch (e) {}
+          });
         });
       }
 
