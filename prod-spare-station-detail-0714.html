@@ -418,15 +418,15 @@
       border-top: 1px solid #eef2f7;
       border-bottom: 1px solid #eef2f7;
       padding: 2px 0;
-      overflow: hidden;
+      overflow: visible;
     }
     .wh-chart-box {
       min-width: 0;
       display: flex;
       flex-direction: column;
       align-items: stretch;
-      padding: 0 2px;
-      overflow: hidden;
+      padding: 0 4px;
+      overflow: visible;
     }
     .wh-chart-box + .wh-chart-box {
       border-left: 1px solid #eef2f7;
@@ -446,8 +446,8 @@
     }
     .wh-chart-el {
       width: 100%;
-      height: 86px;
-      min-height: 86px;
+      height: 92px;
+      min-height: 92px;
       overflow: visible;
       position: relative;
       z-index: 1;
@@ -1703,13 +1703,13 @@
         var series = [];
         var legendData = [];
         for (i = 0; i < items.length; i++) {
-          var outer = 62 - i * 13;
+          var outer = 66 - i * 13;
           var inner = outer - 9;
           legendData.push(items[i].name + " " + items[i].value);
           series.push({
             type: "pie",
             radius: [inner + "%", outer + "%"],
-            center: ["18%", "52%"],
+            center: ["28%", "52%"],
             startAngle: 90,
             clockwise: true,
             silent: false,
@@ -1733,6 +1733,7 @@
         }
         return {
           animationDuration: 600,
+          grid: { left: 4, right: 4, top: 4, bottom: 4 },
           tooltip: {
             trigger: "item",
             appendToBody: true,
@@ -1755,10 +1756,10 @@
           },
           legend: {
             orient: "vertical",
-            left: "38%",
+            left: "48%",
             right: 0,
             top: "middle",
-            width: "60%",
+            width: "50%",
             itemWidth: 6,
             itemHeight: 6,
             itemGap: 4,
