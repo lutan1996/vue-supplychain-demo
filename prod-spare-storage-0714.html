@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN" data-build="20260723-org-name-live-v113">
+<html lang="zh-CN" data-build="20260723-wh-9cards-v115">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -285,58 +285,62 @@
       min-height: 0;
       overflow: auto;
       display: grid;
+      /* 一页 9 个：3 列 × 3 行 */
       grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 8px;
+      grid-auto-rows: minmax(0, auto);
+      gap: 6px;
       align-content: start;
-      padding-bottom: 4px;
+      padding-bottom: 2px;
     }
     .wh-card {
       background: #fff;
       border: 1px solid var(--bd);
-      border-radius: 6px;
-      padding: 10px 12px 8px;
+      border-radius: 4px;
+      padding: 6px 8px 5px;
       min-width: 0;
       display: flex;
       flex-direction: column;
-      gap: 6px;
+      gap: 3px;
       cursor: pointer;
       transition: border-color 0.15s ease, box-shadow 0.15s ease;
-      overflow: visible;
+      overflow: hidden;
     }
     .wh-card:hover {
       border-color: #91caff;
-      box-shadow: 0 2px 10px rgba(22, 119, 255, 0.12);
+      box-shadow: 0 2px 8px rgba(22, 119, 255, 0.1);
     }
     .wh-card-hd h3 {
       margin: 0;
-      font-size: 14px;
+      font-size: 12px;
       font-weight: 700;
       color: var(--t);
+      line-height: 1.2;
     }
     .wh-card-meta {
-      margin-top: 6px;
-      font-size: 11px;
+      margin-top: 2px;
+      font-size: 10px;
       color: var(--m);
       display: flex;
       flex-wrap: wrap;
       align-items: center;
-      gap: 6px 8px;
+      gap: 3px 4px;
     }
     .wh-card-meta .org {
       color: #64748b;
-      line-height: 20px;
+      line-height: 16px;
+      font-size: 10px;
     }
     /* 图1：存储类型 / 仓库类型 标签样式 */
     .wh-card-meta .wh-tag {
       display: inline-flex;
       align-items: center;
-      height: 22px;
-      padding: 0 8px;
+      height: 16px;
+      padding: 0 5px;
       border: 1px solid #d9e2ec;
       border-radius: 2px;
       background: #f2f4f7;
       color: #4e5969;
-      font-size: 11px;
+      font-size: 9px;
       line-height: 1;
       white-space: nowrap;
     }
@@ -345,49 +349,50 @@
       grid-template-columns: 1fr 1fr;
       gap: 0;
       min-height: 0;
-      overflow: visible;
-      margin: 2px 0 4px;
+      overflow: hidden;
+      margin: 0;
       border: 1px solid #eef2f7;
-      border-radius: 4px;
+      border-radius: 3px;
       background: #fff;
     }
     .wh-ring-box {
       min-width: 0;
-      overflow: visible;
-      padding: 4px 2px 6px 0;
+      overflow: hidden;
+      padding: 2px 3px 3px;
       display: flex;
       flex-direction: column;
-      gap: 2px;
+      gap: 1px;
     }
     .wh-ring-box + .wh-ring-box {
       border-left: 1px solid #eef2f7;
-      padding-left: 2px;
     }
     .wh-ring-box .ct {
       text-align: center;
-      font-size: 10px;
+      font-size: 9px;
       font-weight: 600;
       color: #334155;
-      line-height: 1.2;
+      line-height: 1.15;
       white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
       flex: 0 0 auto;
     }
-    /* 冰状图略放大并靠左；图例放下方，文字全部露出 */
+    /* 压缩：环左图例右，避免上下留白过大 */
     .wh-ring-row {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 3px;
+      display: grid;
+      grid-template-columns: 56px minmax(0, 1fr);
+      gap: 2px 3px;
+      align-items: center;
       min-height: 0;
       flex: 1 1 auto;
-      padding: 0 2px 0 0;
+      padding: 0;
     }
     .wh-ring-el {
-      width: 104px;
-      height: 104px;
-      min-height: 104px;
+      width: 56px;
+      height: 56px;
+      min-height: 56px;
       overflow: hidden;
-      align-self: flex-start;
+      justify-self: start;
     }
     .wh-ring-legend {
       margin: 0;
@@ -395,46 +400,46 @@
       list-style: none;
       display: flex;
       flex-direction: column;
-      justify-content: flex-start;
-      gap: 2px;
-      width: 100%;
+      justify-content: center;
+      gap: 1px;
       min-width: 0;
-      overflow: visible;
+      overflow: hidden;
     }
     .wh-ring-legend li {
       display: flex;
       align-items: center;
-      gap: 4px;
-      font-size: 10px;
-      line-height: 1.25;
+      gap: 2px;
+      font-size: 8px;
+      line-height: 1.2;
       color: #475569;
-      width: 100%;
       min-width: 0;
-      overflow: visible;
+      overflow: hidden;
     }
     .wh-ring-legend i {
-      width: 5px;
-      height: 5px;
+      width: 4px;
+      height: 4px;
       border-radius: 50%;
       flex: 0 0 auto;
     }
     .wh-ring-legend em {
       font-style: normal;
       white-space: nowrap;
-      overflow: visible;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
     .wh-bar-box .ct {
-      font-size: 11px;
+      font-size: 9px;
       font-weight: 600;
       color: #334155;
-      margin: 2px 0 4px;
+      margin: 1px 0 1px;
     }
-    .wh-bar-el { width: 100%; height: 160px; }
+    .wh-bar-el { width: 100%; height: 96px; }
     .wh-card-ft {
-      font-size: 12px;
+      font-size: 10px;
       color: #475569;
-      padding-top: 4px;
+      padding-top: 2px;
       border-top: 1px solid #eef2f7;
+      line-height: 1.2;
     }
     .wh-card-ft b { color: #389e0d; font-weight: 600; }
 
@@ -443,6 +448,9 @@
       .ps-body.has-station { grid-template-columns: 180px 132px minmax(0, 1fr); }
       .ps-body.has-station.station-collapsed { grid-template-columns: 180px 32px minmax(0, 1fr); }
       .kpi-row { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+      .wh-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+    @media (max-width: 900px) {
       .wh-cards { grid-template-columns: 1fr; }
     }
   </style>
@@ -525,7 +533,7 @@
   <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.1/dist/echarts.min.js"></script>
   <script src="js/sidebar-actions.js"></script>
   <script src="js/site-footer.js"></script>
-  <script src="js/subpage-clock.js?v=20260723-org-name-live-v113"></script>
+  <script src="js/subpage-clock.js?v=20260723-wh-9cards-v115"></script>
   <script>
     (function () {
       var ORG_DATA = [
@@ -578,46 +586,67 @@
 
       var WAREHOUSES = [
         {
-          id: "w1",
-          name: "仓库名称",
-          company: "江苏龙源",
+          id: "w1", name: "仓库名称",
           score: { qtyPct: 86, amtPct: 92, inQtyPct: 70, inAmtPct: 74, outQtyPct: 68, outAmtPct: 71, idlePct: 40, scrapPct: 28 },
-          ringDist: [1895, 980, 520, 420],
-          ringUtil: [11, 820],
+          ringDist: [1895, 980, 520, 420], ringUtil: [11, 820],
           types: ["中心主仓", "场站周转仓", "返修备件仓", "报废暂存仓"],
-          barBase: {
-            stock: [18, 16, 14, 12, 10],
-            scrap: [8, 7, 6, 9, 11],
-            idle: [6, 5, 4, 5, 7]
-          }
+          barBase: { stock: [18, 16, 14, 12, 10], scrap: [8, 7, 6, 9, 11], idle: [6, 5, 4, 5, 7] }
         },
         {
-          id: "w2",
-          name: "仓库名称",
-          company: "江苏龙源",
+          id: "w2", name: "仓库名称",
           score: { qtyPct: 64, amtPct: 58, inQtyPct: 82, inAmtPct: 79, outQtyPct: 55, outAmtPct: 52, idlePct: 66, scrapPct: 48 },
-          ringDist: [1260, 840, 610, 390],
-          ringUtil: [28, 760],
+          ringDist: [1260, 840, 610, 390], ringUtil: [28, 760],
           types: ["中心主仓", "场站周转仓", "返修备件仓", "报废暂存仓"],
-          barBase: {
-            stock: [14, 15, 13, 11, 9],
-            scrap: [6, 8, 7, 10, 12],
-            idle: [5, 6, 5, 4, 8]
-          }
+          barBase: { stock: [14, 15, 13, 11, 9], scrap: [6, 8, 7, 10, 12], idle: [5, 6, 5, 4, 8] }
         },
         {
-          id: "w3",
-          name: "仓库名称",
-          company: "江苏龙源",
+          id: "w3", name: "仓库名称",
           score: { qtyPct: 41, amtPct: 47, inQtyPct: 36, inAmtPct: 39, outQtyPct: 88, outAmtPct: 84, idlePct: 22, scrapPct: 71 },
-          ringDist: [980, 720, 480, 350],
-          ringUtil: [42, 690],
+          ringDist: [980, 720, 480, 350], ringUtil: [42, 690],
           types: ["中心主仓", "场站周转仓", "返修备件仓", "报废暂存仓"],
-          barBase: {
-            stock: [12, 13, 11, 10, 8],
-            scrap: [5, 6, 5, 8, 10],
-            idle: [4, 5, 3, 6, 9]
-          }
+          barBase: { stock: [12, 13, 11, 10, 8], scrap: [5, 6, 5, 8, 10], idle: [4, 5, 3, 6, 9] }
+        },
+        {
+          id: "w4", name: "仓库名称",
+          score: { qtyPct: 73, amtPct: 68, inQtyPct: 61, inAmtPct: 59, outQtyPct: 44, outAmtPct: 47, idlePct: 51, scrapPct: 33 },
+          ringDist: [1520, 910, 640, 410], ringUtil: [19, 740],
+          types: ["中心主仓", "场站周转仓", "返修备件仓", "报废暂存仓"],
+          barBase: { stock: [16, 14, 15, 11, 9], scrap: [7, 6, 8, 9, 10], idle: [5, 4, 6, 5, 7] }
+        },
+        {
+          id: "w5", name: "仓库名称",
+          score: { qtyPct: 55, amtPct: 62, inQtyPct: 48, inAmtPct: 52, outQtyPct: 77, outAmtPct: 73, idlePct: 35, scrapPct: 58 },
+          ringDist: [1100, 760, 530, 380], ringUtil: [33, 710],
+          types: ["中心主仓", "场站周转仓", "返修备件仓", "报废暂存仓"],
+          barBase: { stock: [13, 12, 14, 10, 8], scrap: [6, 7, 5, 8, 11], idle: [4, 5, 4, 6, 8] }
+        },
+        {
+          id: "w6", name: "仓库名称",
+          score: { qtyPct: 38, amtPct: 44, inQtyPct: 91, inAmtPct: 86, outQtyPct: 29, outAmtPct: 31, idlePct: 74, scrapPct: 42 },
+          ringDist: [860, 690, 470, 320], ringUtil: [48, 650],
+          types: ["中心主仓", "场站周转仓", "返修备件仓", "报废暂存仓"],
+          barBase: { stock: [10, 11, 9, 12, 7], scrap: [4, 5, 6, 7, 9], idle: [3, 4, 5, 4, 6] }
+        },
+        {
+          id: "w7", name: "仓库名称",
+          score: { qtyPct: 79, amtPct: 81, inQtyPct: 54, inAmtPct: 57, outQtyPct: 63, outAmtPct: 60, idlePct: 28, scrapPct: 19 },
+          ringDist: [1680, 1020, 580, 450], ringUtil: [15, 790],
+          types: ["中心主仓", "场站周转仓", "返修备件仓", "报废暂存仓"],
+          barBase: { stock: [17, 15, 13, 14, 11], scrap: [7, 8, 6, 8, 9], idle: [5, 4, 3, 5, 6] }
+        },
+        {
+          id: "w8", name: "仓库名称",
+          score: { qtyPct: 49, amtPct: 53, inQtyPct: 67, inAmtPct: 64, outQtyPct: 71, outAmtPct: 69, idlePct: 58, scrapPct: 64 },
+          ringDist: [1180, 800, 550, 360], ringUtil: [36, 700],
+          types: ["中心主仓", "场站周转仓", "返修备件仓", "报废暂存仓"],
+          barBase: { stock: [11, 14, 12, 9, 8], scrap: [5, 6, 7, 8, 10], idle: [4, 5, 4, 5, 7] }
+        },
+        {
+          id: "w9", name: "仓库名称",
+          score: { qtyPct: 32, amtPct: 36, inQtyPct: 43, inAmtPct: 41, outQtyPct: 95, outAmtPct: 91, idlePct: 19, scrapPct: 77 },
+          ringDist: [740, 610, 430, 290], ringUtil: [52, 620],
+          types: ["中心主仓", "场站周转仓", "返修备件仓", "报废暂存仓"],
+          barBase: { stock: [9, 10, 8, 11, 7], scrap: [4, 5, 4, 7, 9], idle: [3, 3, 2, 5, 6] }
         }
       ];
 
@@ -723,9 +752,12 @@
         return (
           '<ul class="wh-ring-legend">' +
           items.map(function (it, i) {
+            var label = (it.name || "")
+              .replace(/库区$/, "")
+              .replace(/库位$/, "");
             return (
               "<li><i style=\"background:" + colors[i % colors.length] + "\"></i>" +
-              "<em>" + it.name + " " + it.value + "</em></li>"
+              "<em title=\"" + it.name + " " + it.value + "\">" + label + " " + it.value + "</em></li>"
             );
           }).join("") +
           "</ul>"
@@ -766,38 +798,46 @@
       }
 
       function barOption(data) {
-        /* 原型：蓝=库存金额，红=报废金额，黄=超60天以上呆滞金额；堆叠柱 */
+        /* 原型：蓝=库存金额，红=报废金额，黄=超60天以上呆滞金额；堆叠柱（紧凑适配 9 卡） */
         return {
           color: ["#1677ff", "#f5222d", "#faad14"],
-          tooltip: { trigger: "axis" },
+          tooltip: { trigger: "axis", confine: true, textStyle: { fontSize: 10 } },
           legend: {
             top: 0,
             left: "center",
-            itemWidth: 8,
-            itemHeight: 8,
-            itemGap: 10,
-            textStyle: { fontSize: 9, color: "#64748b" },
+            itemWidth: 6,
+            itemHeight: 6,
+            itemGap: 4,
+            textStyle: { fontSize: 7, color: "#64748b" },
             data: ["库存金额", "报废金额", "超60天以上呆滞金额"]
           },
-          grid: { left: 40, right: 8, top: 30, bottom: 32 },
+          grid: { left: 28, right: 4, top: 18, bottom: 22, containLabel: false },
           xAxis: {
             type: "category",
             data: ZONES,
-            axisLabel: { fontSize: 9, color: "#94a3b8", interval: 0, rotate: 0 },
+            axisLabel: {
+              fontSize: 7,
+              color: "#94a3b8",
+              interval: 0,
+              rotate: 0,
+              hideOverlap: true,
+              margin: 4
+            },
             axisTick: { show: false },
             axisLine: { lineStyle: { color: "#e8edf4" } }
           },
           yAxis: {
             type: "value",
-            name: "单位：万元",
-            nameTextStyle: { fontSize: 9, color: "#94a3b8", padding: [0, 0, 0, 8] },
+            name: "万元",
+            nameGap: 6,
+            nameTextStyle: { fontSize: 7, color: "#94a3b8" },
             splitLine: { lineStyle: { type: "dashed", color: "#eef2f7" } },
-            axisLabel: { fontSize: 10, color: "#94a3b8" }
+            axisLabel: { fontSize: 7, color: "#94a3b8", margin: 2 }
           },
           series: [
-            { name: "库存金额", type: "bar", stack: "amt", barWidth: 18, data: data.stock },
-            { name: "报废金额", type: "bar", stack: "amt", barWidth: 18, data: data.scrap },
-            { name: "超60天以上呆滞金额", type: "bar", stack: "amt", barWidth: 18, data: data.idle }
+            { name: "库存金额", type: "bar", stack: "amt", barWidth: 10, data: data.stock },
+            { name: "报废金额", type: "bar", stack: "amt", barWidth: 10, data: data.scrap },
+            { name: "超60天以上呆滞金额", type: "bar", stack: "amt", barWidth: 10, data: data.idle }
           ]
         };
       }
