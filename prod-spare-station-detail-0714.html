@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN" data-build="20260723-rm-wh-legend-v82">
+<html lang="zh-CN" data-build="20260723-rack-bin-v86">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -163,8 +163,8 @@
     .sd-bottom {
       flex: 1 1 66%;
       display: grid;
-      /* 图1左栏收窄，空间留给右侧货架 */
-      grid-template-columns: minmax(200px, 24%) minmax(0, 1fr);
+      /* 左栏再收一点，右侧货架格子更大更清晰 */
+      grid-template-columns: minmax(168px, 18%) minmax(0, 1fr);
       gap: 0;
       overflow: hidden;
     }
@@ -286,14 +286,19 @@
     }
     .wh-title-row h2 {
       margin: 0;
-      font-size: 15px;
+      font-size: 13px;
       font-weight: 700;
       color: var(--t);
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
     .wh-status {
-      font-size: 12px;
+      font-size: 11px;
       color: #64748b;
       white-space: nowrap;
+      flex: 0 0 auto;
     }
     .wh-status b { color: #389e0d; font-weight: 600; }
     .wh-meta {
@@ -382,15 +387,18 @@
       display: none;
     }
     .wh-metric .v {
-      font-size: 11px;
+      font-size: 10px;
       color: var(--t);
-      line-height: 1.4;
+      line-height: 1.35;
       padding-top: 2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
     .wh-metric .v b {
-      font-size: 12px;
+      font-size: 11px;
       font-weight: 700;
-      margin-right: 2px;
+      margin-right: 1px;
     }
     .wh-charts {
       display: grid;
@@ -401,6 +409,7 @@
       border-top: 1px solid #eef2f7;
       border-bottom: 1px solid #eef2f7;
       padding: 2px 0;
+      overflow: hidden;
     }
     .wh-chart-box {
       min-width: 0;
@@ -414,14 +423,19 @@
       border-left: 1px solid #eef2f7;
     }
     .wh-chart-box .ct {
-      font-size: 11px;
+      font-size: 10px;
       color: #334155;
       font-weight: 600;
       margin-bottom: 0;
       flex: 0 0 auto;
       text-align: center;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      line-height: 1.3;
+      padding: 0 2px;
     }
-    .wh-chart-el { width: 100%; height: 96px; }
+    .wh-chart-el { width: 100%; height: 78px; min-height: 78px; }
     /* 图5 摄像头区放大，占满剩余高度 */
     .wh-cam {
       flex: 1.55 1 0;
@@ -716,23 +730,25 @@
     .rack-hd {
       display: flex;
       align-items: center;
-      gap: 12px;
+      justify-content: flex-start;
+      gap: 8px;
       flex: 0 0 auto;
-      margin-bottom: 4px;
-      padding: 4px 2px;
+      margin-bottom: 5px;
+      padding: 2px 0 5px;
       border-bottom: 1px solid #eef2f7;
     }
     .rack-name {
       flex: 0 0 auto;
-      width: 52px;
-      height: 24px;
-      padding: 0 4px;
+      width: auto;
+      min-width: 72px;
+      height: 26px;
+      padding: 0 8px;
       border: 1px solid #1f2d3d;
       border-radius: 2px;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      font-size: 11px;
+      font-size: 12px;
       font-weight: 600;
       color: #1f2d3d;
       background: #fff;
@@ -742,20 +758,21 @@
     }
     .rack-stats {
       display: flex;
-      flex-wrap: wrap;
-      gap: 4px 18px;
+      flex-wrap: nowrap;
+      gap: 4px 14px;
       font-size: 12px;
       color: #595959;
-      flex: 1;
+      flex: 0 1 auto;
       line-height: 1.35;
       min-width: 0;
+      justify-content: flex-start;
     }
     .rack-stats b { color: #1f2d3d; font-weight: 600; }
     .rack-grid {
       display: grid;
-      grid-template-columns: repeat(15, minmax(0, 1fr));
+      grid-template-columns: repeat(12, minmax(0, 1fr));
       grid-template-rows: repeat(6, minmax(0, 1fr));
-      gap: 2px;
+      gap: 3px;
       flex: 1 1 0;
       min-height: 0;
       overflow: hidden;
@@ -764,14 +781,15 @@
       height: auto;
       min-height: 0;
       border: 0;
-      padding: 0;
-      border-radius: 2px;
+      padding: 0 1px;
+      border-radius: 3px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 7px;
-      font-weight: 600;
+      font-size: 11px;
+      font-weight: 700;
       line-height: 1;
+      letter-spacing: 0;
       color: #fff;
       cursor: pointer;
       user-select: none;
@@ -1161,7 +1179,7 @@
     }
 
     @media (max-width: 1200px) {
-      .sd-bottom { grid-template-columns: 300px minmax(0, 1fr); }
+      .sd-bottom { grid-template-columns: minmax(150px, 20%) minmax(0, 1fr); }
     }
   </style>
 </head>
@@ -1752,7 +1770,7 @@
     }
 
     /* 1号货架：15列 × 6行，对齐原型密度 */
-    var BIN_COLS = 15;
+    var BIN_COLS = 12;
     var BIN_ROWS = 6;
     var BIN_STATUS_PATTERN = ["ok", "ok", "ok", "warn", "ok", "ok", "danger", "ok", "ok", "ok", "warn", "ok", "ok", "ok", "ok", "danger", "ok", "ok", "warn", "ok", "ok", "ok"];
 
