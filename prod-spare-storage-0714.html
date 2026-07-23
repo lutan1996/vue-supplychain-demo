@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN" data-build="20260723-wh-card-jump-v102">
+<html lang="zh-CN" data-build="20260723-wh-ring-shrink-v105">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -301,6 +301,7 @@
       gap: 6px;
       cursor: pointer;
       transition: border-color 0.15s ease, box-shadow 0.15s ease;
+      overflow: visible;
     }
     .wh-card:hover {
       border-color: #91caff;
@@ -323,19 +324,22 @@
     .wh-rings {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 4px;
+      gap: 2px;
       min-height: 0;
       overflow: visible;
+      padding: 0 2px;
     }
     .wh-ring-box { min-width: 0; overflow: visible; }
     .wh-ring-box .ct {
       text-align: center;
-      font-size: 11px;
+      font-size: 10px;
       font-weight: 600;
       color: #334155;
-      margin-bottom: 2px;
+      margin-bottom: 0;
+      line-height: 1.2;
+      white-space: nowrap;
     }
-    .wh-ring-el { width: 100%; height: 118px; overflow: visible; }
+    .wh-ring-el { width: 100%; height: 108px; overflow: visible; }
     .wh-bar-box .ct {
       font-size: 11px;
       font-weight: 600;
@@ -438,7 +442,7 @@
   <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.1/dist/echarts.min.js"></script>
   <script src="js/sidebar-actions.js"></script>
   <script src="js/site-footer.js"></script>
-  <script src="js/subpage-clock.js?v=20260723-wh-card-jump-v102"></script>
+  <script src="js/subpage-clock.js?v=20260723-wh-ring-shrink-v105"></script>
   <script>
     (function () {
       var ORG_DATA = [
@@ -641,15 +645,18 @@
         max = Math.max(max * 1.15, 1);
         var series = [];
         var legend = [];
-        /* 环略放大，中心右移，避免左侧被裁切 */
+        /* 字+环整体缩小，保证左右都不被裁切 */
+        var n = items.length;
+        var step = n > 2 ? 9 : 11;
+        var outer0 = n > 2 ? 44 : 46;
         items.forEach(function (it, i) {
-          var outer = 72 - i * 14;
-          var inner = outer - 10;
+          var outer = outer0 - i * step;
+          var inner = Math.max(outer - 7, 8);
           legend.push(it.name + " " + it.value);
           series.push({
             type: "pie",
             radius: [inner + "%", outer + "%"],
-            center: ["34%", "52%"],
+            center: ["28%", "50%"],
             startAngle: 90,
             label: { show: false },
             labelLine: { show: false },
@@ -663,14 +670,21 @@
           tooltip: { trigger: "item", formatter: function (p) { return p && p.name ? p.name : ""; } },
           legend: {
             orient: "vertical",
-            left: "56%",
+            left: "50%",
+            right: 0,
             top: "middle",
-            itemWidth: 6,
-            itemHeight: 6,
-            itemGap: 4,
+            itemWidth: 5,
+            itemHeight: 5,
+            itemGap: 3,
             icon: "circle",
             data: legend,
-            textStyle: { fontSize: 9, color: "#475569", width: 88, overflow: "none" }
+            textStyle: {
+              fontSize: 8,
+              color: "#475569",
+              lineHeight: 10,
+              width: 78,
+              overflow: "none"
+            }
           },
           series: series
         };
