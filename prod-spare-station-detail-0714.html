@@ -1727,9 +1727,22 @@
           animationDuration: 600,
           tooltip: {
             trigger: "item",
+            appendToBody: true,
+            confine: false,
+            enterable: false,
+            position: function (pos, params, dom, rect, size) {
+              var x = pos[0] - size.contentSize[0] / 2;
+              if (x < 8) x = 8;
+              if (x + size.contentSize[0] > size.viewSize[0] - 8) {
+                x = size.viewSize[0] - size.contentSize[0] - 8;
+              }
+              return [x, 6];
+            },
+            extraCssText: "z-index:3000;white-space:nowrap;max-width:none;padding:6px 10px;",
+            textStyle: { fontSize: 12, color: "#1f2d3d" },
             formatter: function (p) {
               if (!p || !p.name) return "";
-              return p.name;
+              return (p.marker || "") + " " + p.name;
             }
           },
           legend: {
