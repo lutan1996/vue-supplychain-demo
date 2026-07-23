@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN" data-build="20260723-rack2-v89">
+<html lang="zh-CN" data-build="20260723-ring-left-v90">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -1695,8 +1695,8 @@
         var series = [];
         var legendData = [];
         for (i = 0; i < items.length; i++) {
-          var outer = 78 - i * 16;
-          var inner = outer - 11;
+          var outer = 72 - i * 15;
+          var inner = outer - 10;
           legendData.push(items[i].name + " " + items[i].value);
           series.push({
             type: "pie",
