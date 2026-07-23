@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN" data-build="20260723-wh-card-style-v119">
+<html lang="zh-CN" data-build="20260723-wh-fit-v120">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -296,14 +296,14 @@
       background: #fff;
       border: 1px solid #e5e7eb;
       border-radius: 8px;
-      padding: 10px 12px 10px;
+      padding: 8px 10px 10px;
       min-width: 0;
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 6px;
       cursor: pointer;
       transition: border-color 0.15s ease, box-shadow 0.15s ease;
-      overflow: hidden;
+      overflow: visible;
     }
     .wh-card:hover {
       border-color: #91caff;
@@ -383,37 +383,42 @@
       min-width: 2.5em;
       text-align: right;
     }
-    /* 下半：左同心环 + 右横向堆叠条 */
+    /* 下半：左窄右宽，保证库区名与条形不重叠、底部不被裁切 */
     .wh-split {
       display: grid;
-      grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.15fr);
+      grid-template-columns: 118px minmax(0, 1fr);
       gap: 0;
       min-height: 0;
-      flex: 1 1 auto;
+      flex: 0 0 auto;
+      align-items: stretch;
       border-top: 1px solid #eef2f7;
       padding-top: 8px;
+      overflow: visible;
     }
     .wh-split-l,
     .wh-split-r {
       min-width: 0;
       display: flex;
       flex-direction: column;
-      gap: 6px;
+      gap: 4px;
+      overflow: visible;
     }
     .wh-split-l {
-      padding-right: 10px;
+      padding-right: 8px;
       border-right: 1px solid #e5e7eb;
     }
     .wh-split-r {
-      padding-left: 10px;
+      padding-left: 8px;
+      min-width: 0;
     }
     .wh-ring-el {
-      width: 88px;
-      height: 88px;
-      min-width: 88px;
-      min-height: 88px;
+      width: 64px;
+      height: 64px;
+      min-width: 64px;
+      min-height: 64px;
       margin: 0 auto;
       overflow: hidden;
+      flex: 0 0 auto;
     }
     .wh-ring-legend {
       margin: 0;
@@ -421,22 +426,23 @@
       list-style: none;
       display: flex;
       flex-direction: column;
-      gap: 4px;
+      gap: 2px;
       min-width: 0;
+      flex: 0 0 auto;
     }
     .wh-ring-legend li {
       display: grid;
-      grid-template-columns: 8px minmax(0, 1fr) auto;
+      grid-template-columns: 6px minmax(0, 1fr) auto;
       align-items: center;
-      gap: 6px;
-      font-size: 11px;
-      line-height: 1.25;
+      gap: 4px;
+      font-size: 10px;
+      line-height: 1.2;
       color: #4b5563;
       min-width: 0;
     }
     .wh-ring-legend i {
-      width: 8px;
-      height: 8px;
+      width: 6px;
+      height: 6px;
       border-radius: 50%;
       flex: 0 0 auto;
     }
@@ -452,7 +458,7 @@
       white-space: nowrap;
       font-variant-numeric: tabular-nums;
     }
-    .wh-bar-el { width: 100%; height: 148px; min-height: 148px; }
+    .wh-bar-el { width: 100%; height: 168px; min-height: 168px; }
 
     @media (max-width: 1280px) {
       .ps-body { grid-template-columns: 180px minmax(0, 1fr); }
@@ -544,7 +550,7 @@
   <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.1/dist/echarts.min.js"></script>
   <script src="js/sidebar-actions.js"></script>
   <script src="js/site-footer.js"></script>
-  <script src="js/subpage-clock.js?v=20260723-wh-card-style-v119"></script>
+  <script src="js/subpage-clock.js?v=20260723-wh-fit-v120"></script>
   <script>
     (function () {
       var ORG_DATA = [
@@ -794,14 +800,16 @@
           tooltip: { trigger: "axis", confine: true, textStyle: { fontSize: 11 }, axisPointer: { type: "shadow" } },
           legend: {
             top: 0,
-            left: 0,
-            itemWidth: 8,
-            itemHeight: 8,
-            itemGap: 10,
-            textStyle: { fontSize: 10, color: "#6b7280" },
+            left: "center",
+            width: "96%",
+            itemWidth: 7,
+            itemHeight: 7,
+            itemGap: 6,
+            textStyle: { fontSize: 9, color: "#6b7280" },
             data: ["库存金额", "报废金额", "超60天以上呆滞金额"]
           },
-          grid: { left: 4, right: 36, top: 24, bottom: 2, containLabel: true },
+          /* 左侧固定留给库区名，避免条形压字 */
+          grid: { left: 54, right: 28, top: 34, bottom: 4, containLabel: false },
           xAxis: {
             type: "value",
             show: false,
@@ -812,28 +820,36 @@
             data: ZONES.slice().reverse(),
             axisTick: { show: false },
             axisLine: { show: false },
-            axisLabel: { fontSize: 10, color: "#6b7280", margin: 6 }
+            axisLabel: {
+              fontSize: 10,
+              color: "#6b7280",
+              margin: 4,
+              width: 48,
+              overflow: "none",
+              interval: 0
+            }
           },
           series: [
             {
               name: "库存金额",
               type: "bar",
               stack: "amt",
-              barWidth: 10,
+              barWidth: 9,
+              barCategoryGap: "28%",
               data: data.stock.slice().reverse()
             },
             {
               name: "报废金额",
               type: "bar",
               stack: "amt",
-              barWidth: 10,
+              barWidth: 9,
               data: data.scrap.slice().reverse()
             },
             {
               name: "超60天以上呆滞金额",
               type: "bar",
               stack: "amt",
-              barWidth: 10,
+              barWidth: 9,
               data: data.idle.slice().reverse(),
               label: {
                 show: true,
