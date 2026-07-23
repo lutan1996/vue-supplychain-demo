@@ -386,10 +386,10 @@
       min-width: 2em;
       text-align: right;
     }
-    /* 左环+图例并排省高度；右条形自适应填满 */
+    /* 左：图2占比——冰状图在上、图例在下；右条形填满 */
     .wh-split {
       display: grid;
-      grid-template-columns: minmax(118px, 0.9fr) minmax(0, 1.25fr);
+      grid-template-columns: minmax(112px, 0.88fr) minmax(0, 1.28fr);
       gap: 0 8px;
       min-height: 0;
       flex: 1 1 auto;
@@ -399,10 +399,11 @@
       overflow: hidden;
     }
     .wh-split-l {
-      display: grid;
-      grid-template-columns: 60px minmax(0, 1fr);
-      align-items: center;
-      gap: 2px 5px;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      justify-content: center;
+      gap: 4px;
       min-width: 0;
       min-height: 0;
       padding-right: 8px;
@@ -418,12 +419,13 @@
       overflow: hidden;
     }
     .wh-ring-el {
-      width: 48px;
-      height: 48px;
-      min-width: 48px;
-      min-height: 48px;
-      margin: 0;
+      width: 76px;
+      height: 76px;
+      min-width: 76px;
+      min-height: 76px;
+      margin: 0 auto;
       overflow: hidden;
+      flex: 0 0 auto;
     }
     .wh-ring-legend {
       margin: 0;
@@ -431,23 +433,23 @@
       list-style: none;
       display: flex;
       flex-direction: column;
-      justify-content: center;
       gap: 2px;
       min-width: 0;
+      flex: 0 0 auto;
     }
     .wh-ring-legend li {
       display: grid;
-      grid-template-columns: 5px minmax(0, 1fr) auto;
+      grid-template-columns: 6px minmax(0, 1fr) auto;
       align-items: center;
-      gap: 3px;
+      gap: 4px;
       font-size: 10px;
-      line-height: 1.15;
+      line-height: 1.2;
       color: #4b5563;
       min-width: 0;
     }
     .wh-ring-legend i {
-      width: 5px;
-      height: 5px;
+      width: 6px;
+      height: 6px;
       border-radius: 50%;
       flex: 0 0 auto;
     }
@@ -582,7 +584,7 @@
   <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.1/dist/echarts.min.js"></script>
   <script src="js/sidebar-actions.js"></script>
   <script src="js/site-footer.js"></script>
-  <script src="js/subpage-clock.js?v=20260723-wh-fit6-v125"></script>
+  <script src="js/subpage-clock.js?v=20260723-wh-ring-v126"></script>
   <script>
     (function () {
       var ORG_DATA = [
@@ -795,22 +797,36 @@
         items.forEach(function (it) { if (it.value > max) max = it.value; });
         max = Math.max(max * 1.15, 1);
         var series = [];
+        /* 图1/图2：更大同心环 + 圆角端点 */
         var n = items.length;
-        var step = n > 2 ? 10 : 12;
-        var outer0 = n > 2 ? 68 : 70;
+        var step = n > 2 ? 11 : 13;
+        var outer0 = n > 2 ? 78 : 80;
+        var thickness = n > 2 ? 9 : 10;
         items.forEach(function (it, i) {
           var outer = outer0 - i * step;
-          var inner = Math.max(outer - 8, 12);
+          var inner = Math.max(outer - thickness, 14);
           series.push({
             type: "pie",
             radius: [inner + "%", outer + "%"],
             center: ["50%", "50%"],
             startAngle: 90,
+            padAngle: 0,
             label: { show: false },
             labelLine: { show: false },
+            itemStyle: { borderRadius: 20 },
             data: [
-              { value: it.value, name: it.name + " " + it.value, itemStyle: { color: colors[i % colors.length] } },
-              { value: max - it.value, name: "", itemStyle: { color: "#eef2f7" }, tooltip: { show: false }, emphasis: { disabled: true } }
+              {
+                value: it.value,
+                name: it.name + " " + it.value,
+                itemStyle: { color: colors[i % colors.length], borderRadius: 20 }
+              },
+              {
+                value: max - it.value,
+                name: "",
+                itemStyle: { color: "#eef2f7", borderRadius: 0 },
+                tooltip: { show: false },
+                emphasis: { disabled: true }
+              }
             ]
           });
         });
