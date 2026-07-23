@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN" data-build="20260723-wh-ring-v126">
+<html lang="zh-CN" data-build="20260723-wh-tab-all-v127">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -584,7 +584,7 @@
   <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.1/dist/echarts.min.js"></script>
   <script src="js/sidebar-actions.js"></script>
   <script src="js/site-footer.js"></script>
-  <script src="js/subpage-clock.js?v=20260723-wh-ring-v126"></script>
+  <script src="js/subpage-clock.js?v=20260723-wh-tab-all-v127"></script>
   <script>
     (function () {
       var ORG_DATA = [
@@ -599,7 +599,7 @@
       ];
 
       /* 图2：仓库类型页签 */
-      var TYPE_TABS = ["中心主仓", "场站周转仓", "近修备件仓", "报废暂存仓", "其他仓"];
+      var TYPE_TABS = ["全部", "中心主仓", "场站周转仓", "近修备件仓", "报废暂存仓", "其他仓"];
 
       /* 图4 指标 → 图3 下拉「按…」格式 */
       var SORT_OPTS = [
@@ -628,6 +628,7 @@
 
       /* 各仓库类型下的柱状图基础倍数，切换页签时数值变化 */
       var TYPE_FACTOR = {
+        "全部": 1.0,
         "中心主仓": 1.0,
         "场站周转仓": 0.72,
         "近修备件仓": 0.55,
