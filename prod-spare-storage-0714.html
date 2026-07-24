@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN" data-build="20260723-wh-short-v132">
+<html lang="zh-CN" data-build="20260724-wh-ring-stack-v133">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -404,10 +404,11 @@
       overflow: hidden;
     }
     .wh-split-l {
-      display: grid;
-      grid-template-columns: 54px minmax(0, 1fr);
-      align-items: center;
-      gap: 2px 5px;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      justify-content: center;
+      gap: 3px;
       min-width: 0;
       min-height: 0;
       padding-right: 8px;
@@ -427,8 +428,9 @@
       height: 54px;
       min-width: 54px;
       min-height: 54px;
-      margin: 0;
+      margin: 0 auto;
       overflow: hidden;
+      flex: 0 0 auto;
     }
     .wh-ring-legend {
       margin: 0;
@@ -436,9 +438,9 @@
       list-style: none;
       display: flex;
       flex-direction: column;
-      justify-content: center;
       gap: 1px;
       min-width: 0;
+      flex: 0 0 auto;
     }
     .wh-ring-legend li {
       display: grid;
@@ -587,7 +589,7 @@
   <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.1/dist/echarts.min.js"></script>
   <script src="js/sidebar-actions.js"></script>
   <script src="js/site-footer.js"></script>
-  <script src="js/subpage-clock.js?v=20260723-wh-short-v132"></script>
+  <script src="js/subpage-clock.js?v=20260724-wh-ring-stack-v133"></script>
   <script>
     (function () {
       var ORG_DATA = [
